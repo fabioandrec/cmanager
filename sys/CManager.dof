@@ -90,8 +90,8 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=.\Bin
-UnitOutputDir=.\Trash
+OutputDir=..\..\Bin
+UnitOutputDir=..\..\Trash
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source;C:\Program Files\Delphi\Others\vtv\Source
@@ -134,16 +134,21 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[Excluded Packages]
+c:\program files\borland\delphi7\Projects\Bpl\NowaPoczta.bpl=Komponenty Danych Nowa Poczta
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=2
-Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
-Item1=C:\Program Files\Borland\VirtualTreeview
+Count=3
+Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source;C:\Program Files\Delphi\Others\vtv\Source
+Item1=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
+Item2=C:\Program Files\Borland\VirtualTreeview
 [HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=.\Trash
+Count=2
+Item0=..\..\Trash
+Item1=.\Trash
 [HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=.\Bin
+Count=2
+Item0=..\..\Bin
+Item1=.\Bin
