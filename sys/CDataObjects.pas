@@ -180,14 +180,17 @@ type
   private
     FtriggerDate: TDateTime;
     FidPlannedMovement: TDataGid;
+    FdoneState: TBaseEnumeration;
     procedure SetidPlannedMovement(const Value: TDataGid);
     procedure SettriggerDate(const Value: TDateTime);
+    procedure SetdoneState(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
   published
     property triggerDate: TDateTime read FtriggerDate write SettriggerDate;
     property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
+    property doneState: TBaseEnumeration read FdoneState write SetdoneState;
   end;
 
 
@@ -675,6 +678,15 @@ begin
   with ADataset do begin
     FtriggerDate := FieldByName('triggerDate').AsDateTime;
     FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
+    FdoneState := FieldByName('doneState').AsString;
+  end;
+end;
+
+procedure TPlannedDone.SetdoneState(const Value: TBaseEnumeration);
+begin
+  if FdoneState <> Value then begin
+    FdoneState := Value;
+    SetState(msModified);
   end;
 end;
 
@@ -700,6 +712,7 @@ begin
   with DataFieldList do begin
     AddField('triggerDate', DatetimeToDatabase(FtriggerDate), False, 'plannedDone');
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
+    AddField('doneState', FdoneState, True, 'plannedDone');
   end;
 end;
 

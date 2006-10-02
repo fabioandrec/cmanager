@@ -1,6 +1,7 @@
 program CManager;
 
 {$R 'CMandbpat.res' 'CMandbpat.rc'}
+{%File 'CMandb.sql'}
 
 uses
   MemCheck in 'MemCheck.pas',

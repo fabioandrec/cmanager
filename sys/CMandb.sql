@@ -69,9 +69,11 @@ create table plannedDone (
   created datetime not null,
   modified datetime,
   triggerDate datetime not null,
+  doneState varchar(1) not null,
   idPlannedMovement uniqueidentifier not null,
   primary key (idPlannedMovement),
-  constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement)
+  constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
+  constraint ck_doneState check (doneState in ('A', 'D'))
 );
 
 create table baseMovement (
