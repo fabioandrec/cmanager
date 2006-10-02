@@ -16,27 +16,27 @@ type
     Label5: TLabel;
     ComboBoxType: TComboBox;
     Label4: TLabel;
-    CStaticInoutOnceAccount: TCStatic;
+    CStaticAccount: TCStatic;
     Label2: TLabel;
-    CStaticInoutOnceCategory: TCStatic;
+    CStaticCategory: TCStatic;
     Label6: TLabel;
-    CStaticInoutOnceCashpoint: TCStatic;
+    CStaticCashpoint: TCStatic;
     Label9: TLabel;
-    CCurrEditInoutOnce: TCCurrEdit;
+    CCurrEdit: TCCurrEdit;
     Label7: TLabel;
     ComboBoxStatus: TComboBox;
     Label1: TLabel;
     CStaticSchedule: TCStatic;
     procedure ComboBoxTypeChange(Sender: TObject);
-    procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticTransSourceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticTransDestAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-    procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-    procedure CStaticInoutOnceCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-    procedure CStaticInoutOnceAccountChanged(Sender: TObject);
+    procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticAccountChanged(Sender: TObject);
     procedure ComboBoxModeChange(Sender: TObject);
     procedure CStaticScheduleGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
@@ -51,7 +51,6 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
-    procedure AfterCommitData; override;
   public
     destructor Destroy; override;
   end;
@@ -79,9 +78,10 @@ begin
   FSchedule := TSchedule.Create;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
+  CStaticSchedule.Caption := FSchedule.AsString;
 end;
 
-procedure TCPlannedForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+procedure TCPlannedForm.CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := ChooseAccount(ADataGid, AText);
 end;
@@ -106,7 +106,7 @@ begin
   Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText);
 end;
 
-procedure TCPlannedForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+procedure TCPlannedForm.CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := ChooseCashpoint(ADataGid, AText);
 end;
@@ -132,16 +132,35 @@ begin
   AAccepted := ChooseProduct(ADataGid, AText);
 end;
 
-procedure TCPlannedForm.CStaticInoutOnceCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+procedure TCPlannedForm.CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := ChooseProduct(ADataGid, AText);
 end;
 
 procedure TCPlannedForm.UpdateDescription;
+var xI: Integer;
+    xText: String;
 begin
+  xI := ComboBoxType.ItemIndex;
+  GDataProvider.BeginTransaction;
+  if (xI = 0) then begin
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).name;
+    end else begin
+      xText := '[kategoria rozchodu]';
+    end;
+  end else if (xI = 1) then begin
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).name;
+    end else begin
+      xText := '[kategoria przychodu]';
+    end;
+  end;
+  RichEditDesc.Text := xText;
+  GDataProvider.RollbackTransaction;
 end;
 
-procedure TCPlannedForm.CStaticInoutOnceAccountChanged(Sender: TObject);
+procedure TCPlannedForm.CStaticAccountChanged(Sender: TObject);
 begin
   UpdateDescription;
 end;
@@ -149,11 +168,46 @@ end;
 
 function TCPlannedForm.CanAccept: Boolean;
 begin
-  Result := False;
+  Result := True;
+  if CStaticCategory.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCategory.DoGetDataId;
+    end;
+  end else if CCurrEdit.Value = 0 then begin
+    Result := False;
+    ShowInfo(itError, 'Kwota operacji nie mo¿e byæ zerowa', '');
+    CCurrEdit.SetFocus;
+  end;
 end;
 
 procedure TCPlannedForm.FillForm;
 begin
+  with TPlannedMovement(Dataobject) do begin
+    RichEditDesc.Text := description;
+    CCurrEdit.Value := cash;
+    ComboBoxType.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
+    ComboBoxStatus.ItemIndex := IfThen(isActive, 0, 1);
+    CStaticAccount.DataId := idAccount;
+    if idAccount <> CEmptyDataGid then begin
+      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+    end;
+    CStaticCashpoint.DataId := idCashPoint;
+    if idCashPoint <> CEmptyDataGid then begin
+      CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
+    end;
+    CStaticCategory.DataId := idProduct;
+    CStaticCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
+    FSchedule.scheduleType := scheduleType;
+    FSchedule.scheduleDate := scheduleDate;
+    FSchedule.endCondition := endCondition;
+    FSchedule.endCount := endCount;
+    FSchedule.endDate := endDate;
+    FSchedule.triggerType := triggerType;
+    FSchedule.triggerDay := triggerDay;
+    ComboBoxTypeChange(ComboBoxType);
+    CStaticSchedule.Caption := FSchedule.AsString;
+  end;
 end;
 
 function TCPlannedForm.GetDataobjectClass: TDataObjectClass;
@@ -163,10 +217,22 @@ end;
 
 procedure TCPlannedForm.ReadValues;
 begin
-end;
-
-procedure TCPlannedForm.AfterCommitData;
-begin
+  with TPlannedMovement(Dataobject) do begin
+    description := RichEditDesc.Text;
+    cash := CCurrEdit.Value;
+    movementType := IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement);
+    isActive := ComboBoxStatus.ItemIndex = 0;
+    idAccount := CStaticAccount.DataId;
+    idCashPoint := CStaticCashpoint.DataId;
+    idProduct := CStaticCategory.DataId;
+    scheduleType := FSchedule.scheduleType;
+    scheduleDate := FSchedule.scheduleDate;
+    endCondition := FSchedule.endCondition;
+    endCount := FSchedule.endCount;
+    endDate := FSchedule.endDate;
+    triggerType := FSchedule.triggerType;
+    triggerDay := FSchedule.triggerDay;
+  end;
 end;
 
 procedure TCPlannedForm.ComboBoxModeChange(Sender: TObject);

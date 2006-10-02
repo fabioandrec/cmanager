@@ -61,6 +61,7 @@ type
     function ChooseAccount(var AId: String; var AText: String): Boolean;
     function ChooseCashpoint(var AId: String; var AText: String): Boolean;
     function ChooseProduct(var AId: String; var AText: String): Boolean;
+    function ChoosePlanned(var AId: String; var AText: String): Boolean;
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
@@ -290,11 +291,13 @@ begin
     CDateTime.Value := regDate;
     RichEditDesc.Text := description;
     if (movementType = CInMovement) or (movementType = COutMovement) then begin
-      xI := IfThen(movementType = COutMovement, 0, 1);
+      if idPlannedDone = CEmptyDataGid then begin
+        xI := IfThen(movementType = COutMovement, 0, 1);
+      end else begin
+        xI := IfThen(movementType = COutMovement, 3, 4);
+      end;
     end else if (movementType = CTransferMovement) then begin
       xI := 2;
-    end else if (movementType = CPlannedInMovement) or (movementType = CPlannedOutMovement) then begin
-      xI := IfThen(movementType = CPlannedInMovement, 3, 4);
     end else begin
       xI := -1;
     end;
@@ -303,28 +306,30 @@ begin
     ComboBoxTypeChange(ComboBoxType);
     GDataProvider.BeginTransaction;
     if (movementType = COutMovement) or (movementType = CInMovement) then begin
-      CCurrEditInoutOnce.Value := cash;
-      CStaticInoutOnceAccount.DataId := idAccount;
-      CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
-      CStaticInoutOnceCashpoint.DataId := idCashPoint;
-      CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
-      CStaticInoutOnceCategory.DataId := idProduct;
-      CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
+      if idPlannedDone = CEmptyDataGid then begin
+        CCurrEditInoutOnce.Value := cash;
+        CStaticInoutOnceAccount.DataId := idAccount;
+        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+        CStaticInoutOnceCashpoint.DataId := idCashPoint;
+        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
+        CStaticInoutOnceCategory.DataId := idProduct;
+        CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
+      end else begin
+        CCurrEditInoutCyclic.Value := cash;
+        CStaticInoutCyclicAccount.DataId := idAccount;
+        CStaticInoutCyclicAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+        CStaticInoutCyclicCashpoint.DataId := idCashPoint;
+        CStaticInoutCyclicCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
+        CStaticInoutCyclicCategory.DataId := idProduct;
+        CStaticInoutCyclicCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
+        CStaticInoutCyclic.DataId := idPlannedDone;
+      end;
     end else if (movementType = CTransferMovement) then begin
       CCurrEditTrans.Value := cash;
       CStaticTransDestAccount.DataId := idAccount;
       CStaticTransDestAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
       CStaticTransSourceAccount.DataId := idSourceAccount;
       CStaticTransSourceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False)).name;
-    end else if (movementType = CPlannedInMovement) or (movementType = CPlannedOutMovement) then begin
-      CCurrEditInoutCyclic.Value := cash;
-      CStaticInoutCyclicAccount.DataId := idAccount;
-      CStaticInoutCyclicAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
-      CStaticInoutCyclicCashpoint.DataId := idCashPoint;
-      CStaticInoutCyclicCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
-      CStaticInoutCyclicCategory.DataId := idProduct;
-      CStaticInoutCyclicCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
-      CStaticInoutCyclic.DataId := idPlannedMovement;
     end;
     GDataProvider.RollbackTransaction;
   end;
@@ -396,7 +401,7 @@ begin
       idSourceAccount := CEmptyDataGid;
       idCashPoint := CStaticInoutOnceCashpoint.DataId;
       idProduct := CStaticInoutOnceCategory.DataId;
-      idPlannedMovement := CEmptyDataGid;
+      idPlannedDone := CEmptyDataGid;
     end else if (xI = 2) then begin
       movementType := CTransferMovement;
       cash := CCurrEditTrans.Value;
@@ -411,9 +416,9 @@ begin
       SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
       idCashPoint := CEmptyDataGid;
       idProduct := CEmptyDataGid;
-      idPlannedMovement := CEmptyDataGid;
+      idPlannedDone := CEmptyDataGid;
     end else if (xI = 3) or (xI = 4) then begin
-      movementType := IfThen(xI = 3, CPlannedOutMovement, CPlannedInMovement);
+      movementType := IfThen(xI = 3, COutMovement, CInMovement);
       cash := CCurrEditInoutCyclic.Value;
       idAccount := CStaticInoutCyclicAccount.DataId;
       xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
@@ -427,7 +432,7 @@ begin
       idSourceAccount := CEmptyDataGid;
       idCashPoint := CStaticInoutCyclicCashpoint.DataId;
       idProduct := CStaticInoutCyclicCategory.DataId;
-      idPlannedMovement := CStaticInoutCyclic.DataId;
+      idPlannedDone := CStaticInoutCyclic.DataId;
     end;
   end;
 end;
@@ -449,6 +454,11 @@ begin
     xId := CStaticInoutCyclicAccount.DataId;
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
   end;
+end;
+
+function TCMovementForm.ChoosePlanned(var AId, AText: String): Boolean;
+begin
+  //
 end;
 
 end.

@@ -30,7 +30,8 @@ uses
   CReports in 'CReports.pas',
   CPlannedFrameUnit in 'CPlannedFrameUnit.pas' {CPlannedFrame: TFrame},
   CPlannedFormUnit in 'CPlannedFormUnit.pas' {CPlannedForm},
-  CScheduleFormUnit in 'CScheduleFormUnit.pas' {CScheduleForm};
+  CScheduleFormUnit in 'CScheduleFormUnit.pas' {CScheduleForm},
+  CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame};
 
 {$R *.res}
 

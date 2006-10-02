@@ -42,8 +42,9 @@ create table plannedMovement (
   description varchar(200),
   cash money not null,
   movementType varchar(1) not null,
-  idAccount uniqueidentifier not null,
-  idCashPoint uniqueidentifier null,
+  isActive bit not null,
+  idAccount uniqueidentifier,
+  idCashPoint uniqueidentifier,
   idProduct uniqueidentifier null,
   scheduleType varchar(1) not null,
   scheduleDate datetime not null,
@@ -51,8 +52,8 @@ create table plannedMovement (
   endCount int,
   endDate datetime,
   triggerType varchar(1) not null,
-  triggerDay int not null, 
-  primary key (idPlannedMovement),  
+  triggerDay int not null,
+  primary key (idPlannedMovement),
   constraint ck_plannedType check (movementType in ('I', 'O')),
   constraint fk_plannedMovementAccount foreign key (idAccount) references account (idAccount),
   constraint fk_plannedMovementCashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
@@ -61,6 +62,16 @@ create table plannedMovement (
   constraint ck_endCondition check (endCondition in ('T', 'D', 'N')),
   constraint ck_endConditionCountDate check ((endCount is not null) or (endDate is not null)),
   constraint ck_triggerType check (triggerType in ('W', 'M'))
+);
+
+create table plannedDone (
+  idPlannedDone uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  code varchar(100) not null,
+  idPlannedMovement uniqueidentifier not null,
+  primary key (idPlannedMovement),
+  constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement)
 );
 
 create table baseMovement (
@@ -76,14 +87,14 @@ create table baseMovement (
   idSourceAccount uniqueidentifier null,
   idCashPoint uniqueidentifier null,
   idProduct uniqueidentifier null,
-  idPlannedMovement uniqueidentifier null,
+  idPlannedDone uniqueidentifier null,
   primary key (idBaseMovement),
-  constraint ck_movementType check (movementType in ('I', 'O', 'T', 'X', 'Z')),
+  constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
   constraint fk_sourceAccount foreign key (idSourceAccount) references account (idAccount),
   constraint fk_cashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
-  constraint fk_product foreign key (idProduct) references product (idProduct),
-  constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement)
+  constraint fk_product foreign key (idProduct) references product (idProduct)
 );
 
 create index ix_baseMovement_regDate on baseMovement (regDate);
+create index ix_plannedDone_code on plannedDone (code);

@@ -130,11 +130,11 @@ begin
     xIdTemp2 := xBase.idAccount;
     xIdTemp3 := CEmptyDataGid;
     xIdTemp3Frame := Nil;
-    if (xBase.movementType = CInMovement) or (xBase.movementType = CPlannedInMovement) then begin
+    if (xBase.movementType = CInMovement) then begin
       xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.id, False));
       xAccount := TAccount(TAccount.LoadObject(AccountProxy, xBase.idAccount, False));
       xAccount.cash := xAccount.cash - xBase.cash;
-    end else if (xBase.movementType = COutMovement) or (xBase.movementType = CPlannedOutMovement) then begin
+    end else if (xBase.movementType = COutMovement) then begin
       xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.id, False));
       xAccount := TAccount(TAccount.LoadObject(AccountProxy, xBase.idAccount, False));
       xAccount.cash := xAccount.cash + xBase.cash;
@@ -181,9 +181,9 @@ begin
   GetFilterDates(xDf, xDt);
   xSql := xSql + Format('regDate between DateValue(%s) and DateValue(%s)', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
   if CStaticFilter.DataId = '2' then begin
-    xSql := xSql + Format(' and movementType in (''%s'', ''%s'')', [COutMovement, CPlannedOutMovement]);
+    xSql := xSql + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
-    xSql := xSql + Format(' and movementType in (''%s'', ''%s'')', [CInMovement, CPlannedInMovement]);
+    xSql := xSql + Format(' and movementType = ''%s''', [CInMovement]);
   end else if CStaticFilter.DataId = '4' then begin
     xSql := xSql + ' and movementType = ''' + CTransferMovement + '''';
   end;
@@ -231,15 +231,17 @@ begin
   end else if Column = 1 then begin
     CellText := xData.description;
   end else if Column = 2 then begin
-    if (xData.movementType = CInMovement) or (xData.movementType = CPlannedInMovement) then begin
+    CellText := DateToStr(xData.regDate);
+  end else if Column = 3 then begin
+    CellText := CurrencyToString(xData.cash);
+  end else if Column = 4 then begin
+    if (xData.movementType = CInMovement) then begin
       CellText := 'Przychód';
-    end else if (xData.movementType = COutMovement) or (xData.movementType = CPlannedOutMovement) then begin
+    end else if (xData.movementType = COutMovement) then begin
       CellText := 'Rozchód';
     end else begin
       CellText := 'Transfer';
     end;
-  end else begin
-    CellText := CurrencyToString(xData.cash);
   end;
 end;
 
@@ -277,7 +279,13 @@ begin
   end else if Column = 1 then begin
     Result := AnsiCompareText(xData1.description, xData2.description);
   end else if Column = 2 then begin
-    Result := AnsiCompareText(xData1.movementType, xData2.movementType);
+    if xData1.regDate > xData2.regDate then begin
+      Result := 1;
+    end else if xData1.regDate < xData2.regDate then begin
+      Result := -1;
+    end else begin
+      Result := 0;
+    end;
   end else if Column = 3 then begin
     if xData1.cash > xData2.cash then begin
       Result := 1;
@@ -286,6 +294,8 @@ begin
     end else begin
       Result := 0;
     end;
+  end else if Column = 4 then begin
+    Result := AnsiCompareText(xData1.movementType, xData2.movementType);
   end;
 end;
 
@@ -390,9 +400,9 @@ var xOt, xFt: String;
 begin
   xOt := TBaseMovement(AObject).movementType;
   if CStaticFilter.DataId = '2' then begin
-    xFt := COutMovement + CPlannedOutMovement;
+    xFt := COutMovement;
   end else if CStaticFilter.DataId = '3' then begin
-    xFt := CInMovement + CPlannedInMovement;
+    xFt := CInMovement;
   end else if CStaticFilter.DataId = '4' then begin
     xFt := CTransferMovement;
   end else begin

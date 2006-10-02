@@ -72,7 +72,7 @@ end;
 
 procedure TCPlannedFrame.ReloadPlanned;
 begin
-  FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovement, 'select * from plannedMovement');
+  FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, 'select * from plannedMovement');
   PlannedList.BeginUpdate;
   PlannedList.Clear;
   PlannedList.RootNodeCount := FPlannedObjects.Count;
@@ -191,7 +191,7 @@ procedure TCPlannedFrame.MessageMovementAdded(AId: TDataGid);
 var xDataobject: TPlannedMovement;
     xNode: PVirtualNode;
 begin
-  xDataobject := TPlannedMovement(TPlannedMovement.LoadObject(BaseMovementProxy, AId, True));
+  xDataobject := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovementProxy, AId, True));
   if IsValidFilteredObject(xDataobject) then begin
     FPlannedObjects.Add(xDataobject);
     xNode := PlannedList.AddChild(Nil, xDataobject);
@@ -264,7 +264,7 @@ var xForm: TCPlannedForm;
     xDataGid: TDataGid;
 begin
   xForm := TCPlannedForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, PlannedMovement, Nil, True);
+  xDataGid := xForm.ShowDataobject(coAdd, PlannedMovementProxy, Nil, True);
   if xDataGid <> CEmptyDataGid then begin
     SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
   end;
@@ -278,7 +278,7 @@ var xForm: TCPlannedForm;
 begin
   xBase := TPlannedMovement(PlannedList.GetNodeData(PlannedList.FocusedNode)^);
   xForm := TCPlannedForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, PlannedMovement, xBase, True);
+  xDataGid := xForm.ShowDataobject(coEdit, PlannedMovementProxy, xBase, True);
   if xDataGid <> CEmptyDataGid then begin
     SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
   end;
@@ -292,7 +292,7 @@ begin
   xBase := TPlannedMovement(PlannedList.GetNodeData(PlannedList.FocusedNode)^);
   if TPlannedMovement.CanBeDeleted(xBase.id) then begin
     if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybrany plan ?', '') then begin
-      xObject := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovement, xBase.id, False));
+      xObject := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovementProxy, xBase.id, False));
       xObject.DeleteObject;
       GDataProvider.CommitTransaction;
       SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTDELETED, Integer(@xObject.id), 0);

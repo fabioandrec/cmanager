@@ -8,8 +8,6 @@ const
   CInMovement = 'I';
   COutMovement = 'O';
   CTransferMovement = 'T';
-  CPlannedInMovement = 'X';
-  CPlannedOutMovement = 'Z';
   CInProduct = 'I';
   COutProduct = 'O';
   CBankAccount = 'B';
@@ -101,7 +99,7 @@ type
     FidSourceAccount: TDataGid;
     FidCashPoint: TDataGid;
     FidProduct: TDataGid;
-    FidPlannedMovement: TDataGid;
+    FidPlannedDone: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -111,7 +109,7 @@ type
     procedure SetidSourceAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
-    procedure SetidPlannedMovement(const Value: TDataGid);
+    procedure SetidPlannedDone(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -125,7 +123,7 @@ type
     property idSourceAccount: TDataGid read FidSourceAccount write SetidSourceAccount;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
     property idProduct: TDataGid read FidProduct write SetidProduct;
-    property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
+    property idPlannedDone: TDataGid read FidPlannedDone write SetidPlannedDone;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -133,6 +131,7 @@ type
     Fdescription: TBaseDescription;
     Fcash: Currency;
     FmovementType: TBaseEnumeration;
+    FisActive: Boolean;
     FidAccount: TDataGid;
     FidCashPoint: TDataGid;
     FidProduct: TDataGid;
@@ -156,6 +155,7 @@ type
     procedure SetscheduleType(const Value: TBaseEnumeration);
     procedure SettriggerDay(const Value: Integer);
     procedure SettriggerType(const Value: TBaseEnumeration);
+    procedure SetisActive(const Value: Boolean);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -163,6 +163,7 @@ type
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property isActive: Boolean read FisActive write SetisActive;
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
     property idProduct: TDataGid read FidProduct write SetidProduct;
@@ -179,7 +180,7 @@ var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
     BaseMovementProxy: TDataProxy;
-    PlannedMovement: TDataProxy;
+    PlannedMovementProxy: TDataProxy;
 
 procedure InitializeProxies;
 
@@ -193,7 +194,7 @@ begin
   AccountProxy := TDataProxy.Create(GDataProvider, 'account', Nil);
   ProductProxy := TDataProxy.Create(GDataProvider, 'product', Nil);
   BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement', Nil);
-  PlannedMovement :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
+  PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
 end;
 
 procedure TCashPoint.FromDataset(ADataset: TADOQuery);
@@ -380,7 +381,7 @@ begin
     FidSourceAccount := FieldByName('idSourceAccount').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
-    FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
+    FidPlannedDone := FieldByName('idPlannedDone').AsString;
   end;
 end;
 
@@ -453,7 +454,7 @@ begin
     AddField('idSourceAccount', DataGidToDatabase(FidSourceAccount), False, 'baseMovement');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'baseMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'baseMovement');
-    AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'baseMovement');
+    AddField('idPlannedDone', DataGidToDatabase(FidPlannedDone), False, 'baseMovement');
   end;
 end;
 
@@ -489,10 +490,10 @@ begin
   end;
 end;
 
-procedure TBaseMovement.SetidPlannedMovement(const Value: TDataGid);
+procedure TBaseMovement.SetidPlannedDone(const Value: TDataGid);
 begin
-  if FidPlannedMovement <> Value then begin
-    FidPlannedMovement := Value;
+  if FidPlannedDone <> Value then begin
+    FidPlannedDone := Value;
     SetState(msModified);
   end;
 end;
@@ -504,6 +505,7 @@ begin
     Fdescription := FieldByName('description').AsString;
     Fcash := FieldByName('cash').AsCurrency;
     FmovementType := FieldByName('movementType').AsString;
+    FisActive := FieldByName('isActive').AsBoolean;
     FidAccount := FieldByName('idAccount').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
@@ -581,6 +583,14 @@ begin
   end;
 end;
 
+procedure TPlannedMovement.SetisActive(const Value: Boolean);
+begin
+  if FisActive <> Value then begin
+    FisActive := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TPlannedMovement.SetmovementType(const Value: TBaseEnumeration);
 begin
   if FmovementType <> Value then begin
@@ -628,6 +638,7 @@ begin
     AddField('description', Fdescription, True, 'plannedMovement');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'plannedMovement');
     AddField('movementType', FmovementType, True, 'plannedMovement');
+    AddField('isActive', IntToStr(Integer(FisActive)), False, 'plannedMovement');
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'plannedMovement');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'plannedMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'plannedMovement');

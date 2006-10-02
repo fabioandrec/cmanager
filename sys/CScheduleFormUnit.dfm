@@ -221,8 +221,9 @@ inherited CScheduleForm: TCScheduleForm
         ItemHeight = 13
         ItemIndex = 0
         TabOrder = 2
-        Text = '1'
+        Text = 'Ostatni'
         Items.Strings = (
+          'Ostatni'
           '1'
           '2'
           '3'
@@ -253,8 +254,7 @@ inherited CScheduleForm: TCScheduleForm
           '28'
           '29'
           '30'
-          '31'
-          'Ostatni')
+          '31')
       end
     end
   end

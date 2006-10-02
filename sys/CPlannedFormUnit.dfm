@@ -65,7 +65,7 @@ inherited CPlannedForm: TCPlannedForm
         Alignment = taRightJustify
         Caption = 'Kwota'
       end
-      object CStaticInoutOnceAccount: TCStatic
+      object CStaticAccount: TCStatic
         Left = 112
         Top = 25
         Width = 361
@@ -78,11 +78,11 @@ inherited CPlannedForm: TCPlannedForm
         ParentColor = False
         TabOrder = 0
         TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
-        OnGetDataId = CStaticInoutOnceAccountGetDataId
-        OnChanged = CStaticInoutOnceAccountChanged
+        OnGetDataId = CStaticAccountGetDataId
+        OnChanged = CStaticAccountChanged
         HotTrack = True
       end
-      object CStaticInoutOnceCategory: TCStatic
+      object CStaticCategory: TCStatic
         Left = 112
         Top = 61
         Width = 361
@@ -95,11 +95,11 @@ inherited CPlannedForm: TCPlannedForm
         ParentColor = False
         TabOrder = 1
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
-        OnGetDataId = CStaticInoutOnceCategoryGetDataId
-        OnChanged = CStaticInoutOnceAccountChanged
+        OnGetDataId = CStaticCategoryGetDataId
+        OnChanged = CStaticAccountChanged
         HotTrack = True
       end
-      object CStaticInoutOnceCashpoint: TCStatic
+      object CStaticCashpoint: TCStatic
         Left = 112
         Top = 97
         Width = 361
@@ -112,11 +112,11 @@ inherited CPlannedForm: TCPlannedForm
         ParentColor = False
         TabOrder = 2
         TextOnEmpty = '<wybierz kontrahenta z listy>'
-        OnGetDataId = CStaticInoutOnceCashpointGetDataId
-        OnChanged = CStaticInoutOnceAccountChanged
+        OnGetDataId = CStaticCashpointGetDataId
+        OnChanged = CStaticAccountChanged
         HotTrack = True
       end
-      object CCurrEditInoutOnce: TCCurrEdit
+      object CCurrEdit: TCCurrEdit
         Left = 264
         Top = 135
         Width = 209
