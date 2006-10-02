@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
-  CComponents, VirtualTrees;
+  CComponents, VirtualTrees, ActnColorMaps;
 
 type
   TCMainForm = class(TForm)
@@ -63,7 +63,7 @@ implementation
 uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
-     CReportsFrameUnit, CReports, CPlannedFrameUnit;
+     CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit;
 
 {$R *.dfm}
 
@@ -118,6 +118,8 @@ begin
       xClass := TCMovementFrame;
     end else if AAction = ActionShortcutPlanned then begin
       xClass := TCPlannedFrame;
+    end else if AAction = ActionShortcutPlannedDone then begin
+      xClass := TCDoneFrame;
     end else if AAction = ActionShortcutCashpoints then begin
       xClass := TCCashpointsFrame;
     end else if AAction = ActionShortcutAccounts then begin
