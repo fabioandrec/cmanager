@@ -21,7 +21,7 @@ uses
   CAccountFormUnit in 'CAccountFormUnit.pas' {CAccountForm},
   CProductsFrameUnit in 'CProductsFrameUnit.pas' {CProductsFrame: TFrame},
   CProductFormUnit in 'CProductFormUnit.pas' {CProductForm},
-  CTodayFrameUnit in 'CTodayFrameUnit.pas' {CTodayFrame: TFrame},
+  CMovementFrameUnit in 'CMovementFrameUnit.pas' {CMovementFrame: TFrame},
   CListFrameUnit in 'CListFrameUnit.pas' {CListFrame: TFrame},
   CCalendarFormUnit in 'CCalendarFormUnit.pas' {CCalendarForm},
   CReportsFrameUnit in 'CReportsFrameUnit.pas' {CReportsFrame: TFrame},

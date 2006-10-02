@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
-  CComponents;
+  CComponents, VirtualTrees;
 
 type
   TCMainForm = class(TForm)
@@ -15,7 +15,6 @@ type
     PanelTitle: TPanel;
     BevelU2: TBevel;
     PanelShortcuts: TPanel;
-    Splitter: TSplitter;
     BevelU1: TBevel;
     PanelFrames: TPanel;
     PanelShortcutsTitle: TPanel;
@@ -25,25 +24,33 @@ type
     ImageShortcut: TImage;
     ActionManager: TActionManager;
     ActionShortcuts: TAction;
-    ActionShorcutDefault: TAction;
+    ActionShorcutOperations: TAction;
     ActionShortcutAccounts: TAction;
     ActionShortcutProducts: TAction;
     ActionShortcutCashpoints: TAction;
     ActionShortcutReports: TAction;
     CDateTime: TCDateTime;
     ActionShortcutPlanned: TAction;
+    ActionShortcutPlannedDone: TAction;
+    ShortcutList: TVirtualStringTree;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ActionShortcutsExecute(Sender: TObject);
     procedure CDateTimeChanged(Sender: TObject);
+    procedure ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+    procedure ShortcutListClick(Sender: TObject);
+    procedure ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
   private
+    FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
     FActiveFrame: TFrame;
     function GetShortcutsVisible: Boolean;
     procedure SetShortcutsVisible(const Value: Boolean);
-    procedure ActionShortcutExecute(Sender: TObject);
     procedure PerformShortcutAction(AAction: TAction);
+    procedure UpdateShortcutList;
+    procedure ActionShortcutExecute(ASender: TObject);
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
   end;
@@ -55,35 +62,19 @@ implementation
 
 uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
-  CProductsFrameUnit, CTodayFrameUnit, CListFrameUnit, DateUtils,
-  CReportsFrameUnit, CReports, CPlannedFrameUnit;
+     CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
+     CReportsFrameUnit, CReports, CPlannedFrameUnit;
 
 {$R *.dfm}
 
 procedure TCMainForm.FormCreate(Sender: TObject);
-var xCount: Integer;
-    xAction: TContainedAction;
-    xButton: TCButton;
-    xIndex: Integer;
 begin
   FShortcutsFrames := TStringList.Create;
+  FShortcutList := TStringList.Create;
   ActionShortcuts.Checked := ShortcutsVisible;
-  xIndex := 0;
-  for xCount := 0 to ActionManager.ActionCount - 1 do begin
-    xAction := ActionManager.Actions[xCount];
-    if AnsiUpperCase(xAction.Category) = 'SKRÓTY' then begin
-      xAction.OnExecute := ActionShortcutExecute;
-      xButton := TCButton.Create(Self);
-      xButton.Width := 81;
-      xButton.Height := 57;
-      xButton.Left := 24;
-      xButton.Top := 32 + xIndex * 67;
-      xButton.Parent := PanelShortcuts;
-      xButton.Action := xAction;
-      Inc(xIndex);
-    end;
-  end;
-  PerformShortcutAction(ActionShorcutDefault);
+  UpdateShortcutList;
+  ShortcutList.RootNodeCount := FShortcutList.Count;
+  PerformShortcutAction(ActionShorcutOperations);
 end;
 
 function TCMainForm.GetShortcutsVisible: Boolean;
@@ -95,11 +86,9 @@ procedure TCMainForm.SetShortcutsVisible(const Value: Boolean);
 begin
   DisableAlign;
   if Value then begin
-    Splitter.Visible := True;
     PanelShortcuts.Visible := True;
     ActionShortcuts.Checked := True;
   end else begin
-    Splitter.Visible := False;
     PanelShortcuts.Visible := False;
     ActionShortcuts.Checked := False;
   end;
@@ -114,6 +103,7 @@ end;
 procedure TCMainForm.FormDestroy(Sender: TObject);
 begin
   FShortcutsFrames.Free;
+  FShortcutList.Free;
 end;
 
 procedure TCMainForm.PerformShortcutAction(AAction: TAction);
@@ -124,8 +114,8 @@ var xFrame: TCBaseFrame;
 begin
   xIndex := FShortcutsFrames.IndexOf(AAction.Caption);
   if xIndex = -1 then begin
-    if AAction = ActionShorcutDefault then begin
-      xClass := TCTodayFrame;
+    if AAction = ActionShorcutOperations then begin
+      xClass := TCMovementFrame;
     end else if AAction = ActionShortcutPlanned then begin
       xClass := TCPlannedFrame;
     end else if AAction = ActionShortcutCashpoints then begin
@@ -168,11 +158,6 @@ begin
   end;
 end;
 
-procedure TCMainForm.ActionShortcutExecute(Sender: TObject);
-begin
-  PerformShortcutAction(TAction(Sender));
-end;
-
 procedure TCMainForm.ActionShortcutsExecute(Sender: TObject);
 begin
   ShortcutsVisible := not ShortcutsVisible;
@@ -181,11 +166,61 @@ end;
 procedure TCMainForm.CDateTimeChanged(Sender: TObject);
 var xIndex: Integer;
 begin
-  xIndex := FShortcutsFrames.IndexOf(ActionShorcutDefault.Caption);
+  xIndex := FShortcutsFrames.IndexOf(ActionShorcutOperations.Caption);
   if xIndex <> -1 then begin
-    TCTodayFrame(FShortcutsFrames.Objects[xIndex]).ReloadToday;
-    TCTodayFrame(FShortcutsFrames.Objects[xIndex]).ReloadSums;
+    TCMovementFrame(FShortcutsFrames.Objects[xIndex]).ReloadToday;
+    TCMovementFrame(FShortcutsFrames.Objects[xIndex]).ReloadSums;
   end;
+end;
+
+procedure TCMainForm.ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+begin
+  CellText := FShortcutList.Strings[Node.Index];
+end;
+
+procedure TCMainForm.ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+begin
+  if NewNode <> Nil then begin
+    Sender.Cursor := crHandPoint;
+  end else begin
+    Sender.Cursor := crDefault;
+  end;
+end;
+
+procedure TCMainForm.ShortcutListClick(Sender: TObject);
+var xAction: TAction;
+begin
+  if ShortcutList.FocusedNode <> Nil then begin
+    xAction := TAction(FShortcutList.Objects[ShortcutList.FocusedNode.Index]);
+    xAction.Execute;
+  end;
+end;
+
+procedure TCMainForm.UpdateShortcutList;
+var xCount: Integer;
+    xAction: TAction;
+begin
+  for xCount := 0 to ActionManager.ActionCount - 1 do begin
+    xAction := TAction(ActionManager.Actions[xCount]);
+    if xAction.Category = 'Skróty' then begin
+      FShortcutList.AddObject(xAction.Caption, xAction);
+      xAction.OnExecute := ActionShortcutExecute;
+    end;
+  end;
+end;
+
+procedure TCMainForm.ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
+var xIndex, xLeft, xTop: Integer;
+begin
+  xIndex := TAction(FShortcutList.Objects[Node.Index]).ImageIndex;
+  xLeft := ((ShortcutList.Width - ImageListActionManager.Width) div 2);
+  xTop := 0;
+  ImageList_Draw(ImageListActionManager.Handle, xIndex, TargetCanvas.Handle, xLeft, xTop, ILD_NORMAL);
+end;
+
+procedure TCMainForm.ActionShortcutExecute(ASender: TObject);
+begin
+  PerformShortcutAction(TAction(ASender));
 end;
 
 end.

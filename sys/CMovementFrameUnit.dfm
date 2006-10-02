@@ -1,4 +1,4 @@
-inherited CTodayFrame: TCTodayFrame
+inherited CMovementFrame: TCMovementFrame
   object Splitter1: TSplitter [0]
     Left = 0
     Top = 85

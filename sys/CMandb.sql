@@ -68,7 +68,7 @@ create table plannedDone (
   idPlannedDone uniqueidentifier not null,
   created datetime not null,
   modified datetime,
-  code varchar(100) not null,
+  triggerDate datetime not null,
   idPlannedMovement uniqueidentifier not null,
   primary key (idPlannedMovement),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement)
@@ -97,4 +97,4 @@ create table baseMovement (
 );
 
 create index ix_baseMovement_regDate on baseMovement (regDate);
-create index ix_plannedDone_code on plannedDone (code);
+create index ix_plannedDone_triggerDate on plannedDone (triggerDate);

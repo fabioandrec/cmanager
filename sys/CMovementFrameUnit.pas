@@ -1,4 +1,4 @@
-unit CTodayFrameUnit;
+unit CMovementFrameUnit;
 
 interface
 
@@ -9,7 +9,7 @@ uses
   Contnrs;
 
 type
-  TCTodayFrame = class(TCBaseFrame)
+  TCMovementFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
     TodayList: TVirtualStringTree;
     ActionList: TActionList;
@@ -52,7 +52,7 @@ type
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FTodayObjects: TDataObjectList;
-    FSumObjects: TObjectList;
+    FSumObjects: TSumList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
@@ -70,20 +70,6 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
   end;
 
-  TSumElement = class(TObject)
-  private
-    Fid: TDataGid;
-    Fname: String;
-    FcashIn: Currency;
-    FcashOut: Currency;
-  public
-    constructor Create;
-    property id: TDataGid read Fid write Fid;
-    property name: String read Fname write Fname;
-    property cashIn: Currency read FcashIn write FcashIn;
-    property cashOut: Currency read FcashOut write FcashOut;
-  end;
-
 implementation
 
 uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
@@ -91,19 +77,19 @@ uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFo
 
 {$R *.dfm}
 
-procedure TCTodayFrame.ActionMovementExecute(Sender: TObject);
+procedure TCMovementFrame.ActionMovementExecute(Sender: TObject);
 var xForm: TCMovementForm;
     xDataGid: TDataGid;
 begin
   xForm := TCMovementForm.Create(Nil);
   xDataGid := xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True);
   if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCTodayFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
   end;
   xForm.Free;
 end;
 
-procedure TCTodayFrame.ActionEditMovementExecute(Sender: TObject);
+procedure TCMovementFrame.ActionEditMovementExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
     xBase: TBaseMovement;
     xDataGid: TDataGid;
@@ -112,12 +98,12 @@ begin
   xForm := TCMovementForm.Create(Nil);
   xDataGid := xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase, True);
   if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCTodayFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
   end;
   xForm.Free;
 end;
 
-procedure TCTodayFrame.ActionDelMovementExecute(Sender: TObject);
+procedure TCMovementFrame.ActionDelMovementExecute(Sender: TObject);
 var xBase: TBaseMovement;
     xObject: TDataObject;
     xAccount: TAccount;
@@ -149,7 +135,7 @@ begin
     end;
     xObject.DeleteObject;
     GDataProvider.CommitTransaction;
-    SendMessageToFrames(TCTodayFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), 0);
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), 0);
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), 0);
     if (xIdTemp3 <> CEmptyDataGid) and (xIdTemp3Frame <> Nil) then begin
       SendMessageToFrames(xIdTemp3Frame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), 0);
@@ -157,14 +143,14 @@ begin
   end;
 end;
 
-constructor TCTodayFrame.Create(AOwner: TComponent);
+constructor TCMovementFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FTodayObjects := Nil;
-  FSumObjects := TObjectList.Create(True);
+  FSumObjects := TSumList.Create(True);
 end;
 
-procedure TCTodayFrame.TodayListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+procedure TCMovementFrame.TodayListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 begin
   CButtonEdit.Enabled := Node <> Nil;
   CButtonDel.Enabled := Node <> Nil;
@@ -173,7 +159,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.ReloadToday;
+procedure TCMovementFrame.ReloadToday;
 var xSql: String;
     xDf, xDt: TDateTime;
 begin
@@ -198,31 +184,31 @@ begin
   TodayList.EndUpdate;
 end;
 
-procedure TCTodayFrame.InitializeFrame(AAdditionalData: TObject);
+procedure TCMovementFrame.InitializeFrame(AAdditionalData: TObject);
 begin
   inherited InitializeFrame(AAdditionalData);
   ReloadToday;
   ReloadSums;
 end;
 
-destructor TCTodayFrame.Destroy;
+destructor TCMovementFrame.Destroy;
 begin
   FTodayObjects.Free;
   FSumObjects.Free;
   inherited Destroy;
 end;
 
-procedure TCTodayFrame.TodayListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+procedure TCMovementFrame.TodayListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TDataObject(TodayList.GetNodeData(Node)^) := FTodayObjects.Items[Node.Index];
 end;
 
-procedure TCTodayFrame.TodayListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
+procedure TCMovementFrame.TodayListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
 begin
   NodeDataSize := SizeOf(TDataObject);
 end;
 
-procedure TCTodayFrame.TodayListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+procedure TCMovementFrame.TodayListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 var xData: TBaseMovement;
 begin
   xData := TBaseMovement(TodayList.GetNodeData(Node)^);
@@ -245,7 +231,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.TodayListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TCMovementFrame.TodayListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   if Button = mbLeft then begin
     with Sender do begin
@@ -262,7 +248,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.TodayListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+procedure TCMovementFrame.TodayListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TBaseMovement;
     xData2: TBaseMovement;
 begin
@@ -299,7 +285,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.TodayListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+procedure TCMovementFrame.TodayListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
 var xData: TBaseMovement;
 begin
   xData := TBaseMovement(TodayList.GetNodeData(Node)^);
@@ -307,7 +293,7 @@ begin
   LineBreakStyle := hlbForceMultiLine;
 end;
 
-procedure TCTodayFrame.TodayListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+procedure TCMovementFrame.TodayListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
 begin
   with TargetCanvas do begin
     if not Odd(Node.Index) then begin
@@ -319,7 +305,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.MessageMovementAdded(AId: TDataGid);
+procedure TCMovementFrame.MessageMovementAdded(AId: TDataGid);
 var xDataobject: TBaseMovement;
     xNode: PVirtualNode;
 begin
@@ -336,7 +322,7 @@ begin
   ReloadSums;
 end;
 
-procedure TCTodayFrame.MessageMovementDeleted(AId: TDataGid);
+procedure TCMovementFrame.MessageMovementDeleted(AId: TDataGid);
 var xNode: PVirtualNode;
 begin
   xNode := FindDataobjectNode(AId, TodayList);
@@ -347,7 +333,7 @@ begin
   ReloadSums;
 end;
 
-procedure TCTodayFrame.MessageMovementEdited(AId: TDataGid);
+procedure TCMovementFrame.MessageMovementEdited(AId: TDataGid);
 var xDataobject: TBaseMovement;
     xNode: PVirtualNode;
 begin
@@ -366,12 +352,12 @@ begin
   ReloadSums;
 end;
 
-function TCTodayFrame.GetList: TVirtualStringTree;
+function TCMovementFrame.GetList: TVirtualStringTree;
 begin
   Result := TodayList;
 end;
 
-procedure TCTodayFrame.WndProc(var Message: TMessage);
+procedure TCMovementFrame.WndProc(var Message: TMessage);
 var xDataGid: TDataGid;
 begin
   inherited WndProc(Message);
@@ -389,12 +375,12 @@ begin
   end;
 end;
 
-class function TCTodayFrame.GetTitle: String;
+class function TCMovementFrame.GetTitle: String;
 begin
   Result := 'Na dziœ';
 end;
 
-function TCTodayFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
+function TCMovementFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 var xOt, xFt: String;
     xDf, xDt: TDateTime;
 begin
@@ -415,7 +401,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+procedure TCMovementFrame.CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 var xList: TStringList;
     xGid, xText: String;
     xRect: TRect;
@@ -435,30 +421,12 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.CStaticFilterChanged(Sender: TObject);
+procedure TCMovementFrame.CStaticFilterChanged(Sender: TObject);
 begin
   ReloadToday;
 end;
 
-procedure TCTodayFrame.ReloadSums;
-
-  function FindSumObject(AId: TDataGid): TSumElement;
-  var xCount: Integer;
-  begin
-    Result := Nil;
-    xCount := 0;
-    while (xCount <= FSumObjects.Count - 1) and (Result = Nil) do begin
-      if TSumElement(FSumObjects.Items[xCount]).id = AId then begin
-        Result := TSumElement(FSumObjects.Items[xCount]);
-      end;
-      Inc(xCount);
-    end;
-    if Result = Nil then begin
-      Result := TSumElement.Create;
-      FSumObjects.Add(Result);
-    end;
-  end;
-
+procedure TCMovementFrame.ReloadSums;
 var xDs: TADOQuery;
     xSql: String;
     xObj: TSumElement;
@@ -479,7 +447,7 @@ begin
   xOvr.cashOut := 0;
   xOvr.id := '*';
   while not xDs.Eof do begin
-    xObj := FindSumObject(xDs.FieldByName('idAccount').AsString);
+    xObj := FSumObjects.FindSumObject(xDs.FieldByName('idAccount').AsString);
     xObj.id := xDs.FieldByName('idAccount').AsString;
     xObj.name := xDs.FieldByName('name').AsString;
     if xDs.FieldByName('movementType').AsString = CInMovement then begin
@@ -499,16 +467,7 @@ begin
   xDs.Free;
 end;
 
-constructor TSumElement.Create;
-begin
-  inherited Create;
-  Fid := '';
-  Fname := '';
-  FcashIn := 0;
-  FcashOut := 0;
-end;
-
-procedure TCTodayFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+procedure TCMovementFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
 begin
   with TargetCanvas do begin
     if not Odd(Node.Index) then begin
@@ -520,7 +479,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.SumListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+procedure TCMovementFrame.SumListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TSumElement;
     xData2: TSumElement;
 begin
@@ -569,12 +528,12 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.SumListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
+procedure TCMovementFrame.SumListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
 begin
   NodeDataSize := SizeOf(TSumElement);
 end;
 
-procedure TCTodayFrame.SumListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+procedure TCMovementFrame.SumListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 var xData: TSumElement;
 begin
   xData := TSumElement(SumList.GetNodeData(Node)^);
@@ -589,7 +548,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TCMovementFrame.SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   if Button = mbLeft then begin
     with Sender do begin
@@ -606,12 +565,12 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+procedure TCMovementFrame.SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TSumElement(SumList.GetNodeData(Node)^) := TSumElement(FSumObjects.Items[Node.Index]);
 end;
 
-procedure TCTodayFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+procedure TCMovementFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 var xList: TStringList;
     xGid, xText: String;
     xRect: TRect;
@@ -633,7 +592,7 @@ begin
   end;
 end;
 
-procedure TCTodayFrame.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+procedure TCMovementFrame.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
 var xId: TDataGid;
 begin
   ADateFrom := 0;

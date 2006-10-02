@@ -253,7 +253,7 @@ begin
   if (not (csDesigning in ComponentState)) and Enabled then begin
     FMouseIn := True;
     Font.Style := Font.Style + [fsUnderline];
-    Font.Color := clBlue;
+    Font.Color := clNavy;
     Invalidate;
   end;
 end;
@@ -456,7 +456,7 @@ begin
   if FHotTrack and Enabled and (not (csDesigning in ComponentState)) then begin
     Font.Style := Font.Style + [fsUnderline];
     FOldColor := Font.Color;
-    Font.Color := clBlue;
+    Font.Color := clNavy;
   end;
 end;
 
@@ -950,7 +950,7 @@ begin
   if FHotTrack and Enabled and (not (csDesigning in ComponentState)) then begin
     Font.Style := Font.Style + [fsUnderline];
     FOldColor := Font.Color;
-    Font.Color := clBlue;
+    Font.Color := clNavy;
   end;
 end;
 

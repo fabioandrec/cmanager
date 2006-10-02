@@ -162,6 +162,25 @@ type
     property Items[AIndex: Integer]: TTreeObject read GetItems write SetItems;
   end;
 
+  TSumElement = class(TObject)
+  private
+    Fid: TDataGid;
+    Fname: String;
+    FcashIn: Currency;
+    FcashOut: Currency;
+  public
+    constructor Create;
+    property id: TDataGid read Fid write Fid;
+    property name: String read Fname write Fname;
+    property cashIn: Currency read FcashIn write FcashIn;
+    property cashOut: Currency read FcashOut write FcashOut;
+  end;
+
+  TSumList = class(TObjectList)
+  public
+    function FindSumObject(AId: TDataGid): TSumElement;
+  end;
+
 var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
     GTodayCashIn: Currency;
@@ -796,6 +815,32 @@ end;
 procedure TTreeObjectList.SetItems(AIndex: Integer; const Value: TTreeObject);
 begin
   inherited Items[AIndex] := Value;
+end;
+
+constructor TSumElement.Create;
+begin
+  inherited Create;
+  Fid := '';
+  Fname := '';
+  FcashIn := 0;
+  FcashOut := 0;
+end;
+
+function TSumList.FindSumObject(AId: TDataGid): TSumElement;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= Count - 1) and (Result = Nil) do begin
+    if TSumElement(Items[xCount]).id = AId then begin
+      Result := TSumElement(Items[xCount]);
+    end;
+    Inc(xCount);
+  end;
+  if Result = Nil then begin
+    Result := TSumElement.Create;
+    Add(Result);
+  end;
 end;
 
 initialization

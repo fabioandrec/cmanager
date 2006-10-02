@@ -176,11 +176,27 @@ type
     property triggerDay: Integer read FtriggerDay write SettriggerDay;
   end;
 
+  TPlannedDone = class(TDataObject)
+  private
+    FtriggerDate: TDateTime;
+    FidPlannedMovement: TDataGid;
+    procedure SetidPlannedMovement(const Value: TDataGid);
+    procedure SettriggerDate(const Value: TDateTime);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property triggerDate: TDateTime read FtriggerDate write SettriggerDate;
+    property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
+  end;
+
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
     BaseMovementProxy: TDataProxy;
     PlannedMovementProxy: TDataProxy;
+    PlannedDoneProxy: TDataProxy;
 
 procedure InitializeProxies;
 
@@ -195,6 +211,7 @@ begin
   ProductProxy := TDataProxy.Create(GDataProvider, 'product', Nil);
   BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement', Nil);
   PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
+  PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
 end;
 
 procedure TCashPoint.FromDataset(ADataset: TADOQuery);
@@ -649,6 +666,40 @@ begin
     AddField('endDate', DatetimeToDatabase(FendDate), False, 'plannedMovement');
     AddField('triggerType', FtriggerType, True, 'plannedMovement');
     AddField('triggerDay', IntToStr(FtriggerDay), False, 'plannedMovement');
+  end;
+end;
+
+procedure TPlannedDone.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FtriggerDate := FieldByName('triggerDate').AsDateTime;
+    FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
+  end;
+end;
+
+procedure TPlannedDone.SetidPlannedMovement(const Value: TDataGid);
+begin
+  if FidPlannedMovement <> Value then begin
+    FidPlannedMovement := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TPlannedDone.SettriggerDate(const Value: TDateTime);
+begin
+  if FtriggerDate <> Value then begin
+    FtriggerDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TPlannedDone.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('triggerDate', DatetimeToDatabase(FtriggerDate), False, 'plannedDone');
+    AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
   end;
 end;
 
