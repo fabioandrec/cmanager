@@ -7,9 +7,6 @@ uses
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, CDatabase,
   CDataObjects;
 
-const
-  CDays: Array[0..6] of String = ('Pon', 'Wto', 'Œro', 'Czw', 'Pi¹', 'Sob', 'Nie');
-
 type
   TSchedule = class(TObject)
   private
@@ -63,8 +60,6 @@ type
   protected
     procedure FillForm; override;
     procedure ChangeEndCondition;
-    procedure ReadValues; override;
-    function CanAccept: Boolean; override;
   published
     property Schedule: TSchedule read FSchedule write FSchedule;
   end;
@@ -73,7 +68,7 @@ function GetSchedule(ASchedule: TSchedule): Boolean;
 
 implementation
 
-uses StrUtils, Math, DateUtils, CInfoFormUnit;
+uses StrUtils;
 
 {$R *.dfm}
 
@@ -89,32 +84,11 @@ end;
 constructor TSchedule.Create;
 begin
   inherited Create;
-  FscheduleType := CScheduleTypeCyclic;
-  FscheduleDate := GWorkDate;
-  FendCondition := CEndConditionNever;
-  FendCount := 12;
-  FendDate := 0;
-  FtriggerType := CTriggerTypeMonthly;
-  FtriggerDay := 0;
+  
 end;
 
 function TSchedule.GetAsString: String;
 begin
-  if FscheduleType = CScheduleTypeOnce then begin
-    Result := 'Jednorazowo, ' + DateToStr(FscheduleDate);
-  end else begin
-    Result := 'Cyklicznie, od ' + DateToStr(FscheduleDate);
-    if FendCondition = CEndConditionTimes then begin
-      Result := Result + ', ' + IntToStr(FendCount) + ' raz/y';
-    end else if FendCondition = CEndConditionDate then begin
-      Result := Result + ', do ' + DateToStr(FendDate);
-    end;
-    if FtriggerType = CTriggerTypeWeekly then begin
-      Result := Result + ', ka¿dy ' + CDays[FtriggerDay];
-    end else begin
-      Result := Result + ', ka¿dy ' + IfThen(FtriggerDay = 0, 'ostatni', IntToStr(FtriggerDay)) + ' dzieñ mies.';
-    end;
-  end;
 end;
 
 procedure TCScheduleForm.ChangeEndCondition;
@@ -129,37 +103,18 @@ begin
   if ComboBoxType.ItemIndex = 0 then begin
     GroupBox2.Visible := False;
     GroupBox3.Visible := False;
-    Height := 167;
+    Height := Height - 234;
   end else begin
     GroupBox2.Visible := True;
     GroupBox3.Visible := True;
-    Height := 401;
+    Height := Height + 234;
   end;
 end;
 
 procedure TCScheduleForm.FillForm;
 begin
-  with FSchedule do begin
-    ComboBoxType.ItemIndex := IfThen(scheduleType = CScheduleTypeOnce, 0, 1);
-    CDateTime.Value := scheduleDate;
-    RadioButtonTimes.Checked := endCondition = CEndConditionTimes;
-    RadioButtonEnd.Checked := endCondition = CEndConditionDate;
-    RadioButtonAlways.Checked := endCondition = CEndConditionNever;
-    if endDate = 0 then begin
-      CDateTimeEnd.Value := EndOfTheYear(GWorkDate);
-    end else begin
-      CDateTimeEnd.Value := endDate;
-    end;
-    CIntEditTimes.Text := IntToStr(endCount);
-    if triggerType = CTriggerTypeWeekly then begin
-      ComboBoxWeekday.ItemIndex := triggerDay;
-      ComboBoxMonthday.ItemIndex := 0;
-    end else begin
-      ComboBoxWeekday.ItemIndex := 0;
-      ComboBoxMonthday.ItemIndex := triggerDay;
-    end;
-    ComboBoxInterval.ItemIndex := IfThen(triggerType = CTriggerTypeWeekly, 0, 1);
-  end;
+  CDateTime.Value := GWorkDate;
+  CDateTimeEnd.Value := GWorkDate;
   ChangeEndCondition;
   ComboBoxTypeChange(ComboBoxType);
   ComboBoxIntervalChange(ComboBoxInterval);
@@ -180,46 +135,6 @@ begin
     ComboBoxWeekday.Visible := False;
     ComboBoxMonthday.Visible := True;
     Label7.Visible := True;
-  end;
-end;
-
-procedure TCScheduleForm.ReadValues;
-begin
-  with FSchedule do begin
-    scheduleType := IfThen(ComboBoxType.ItemIndex = 0, CScheduleTypeOnce, CScheduleTypeCyclic);
-    scheduleDate := CDateTime.Value;
-    if RadioButtonTimes.Checked then begin
-      endCondition := CEndConditionTimes;
-    end else if RadioButtonEnd.Checked then begin
-      endCondition := CEndConditionDate;
-    end else begin
-      endCondition := CEndConditionNever;
-    end;
-    if endCondition = CEndConditionDate then begin
-      endDate := CDateTimeEnd.Value;
-    end else begin
-      endDate := 0;
-    end;
-    endCount := CIntEditTimes.Value;
-    triggerType := IfThen(ComboBoxInterval.ItemIndex = 0, CTriggerTypeWeekly, CTriggerTypeMonthly);
-    if triggerType = CTriggerTypeWeekly then begin
-      triggerDay := ComboBoxWeekday.ItemIndex;
-    end else begin
-      triggerDay := ComboBoxMonthday.ItemIndex;
-    end;
-  end;
-end;
-
-function TCScheduleForm.CanAccept: Boolean;
-begin
-  Result := True;
-  if RadioButtonTimes.Checked and (StrToIntDef(CIntEditTimes.Text, -1) <= 0) then begin
-    Result := False;
-    ShowInfo(itError, 'Niepoprana iloœæ wykonañ planowanej operacji', '');
-    CIntEditTimes.SetFocus;
-  end else if RadioButtonEnd.Checked and (CDateTime.Value > CDateTimeEnd.Value) then begin
-    Result := False;
-    ShowInfo(itError, 'Data rozpoczêcia nie mo¿e byæ wiêksza od daty zakoñczenia', '');
   end;
 end;
 
