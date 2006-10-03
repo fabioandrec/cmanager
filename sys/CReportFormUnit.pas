@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, OleCtrls, SHDocVw, CComponents, ExtCtrls,
-  ActnList, ImgList;
+  ActnList, ImgList, TeeProcs, TeEngine, Chart;
 
 type
   TCReportForm = class(TCBaseForm)
@@ -43,7 +43,7 @@ end;
 
 procedure TCReportForm.ActionSaveExecute(Sender: TObject);
 begin
-//
+  CBrowser.ExecWB(OLECMDID_SAVEAS, OLECMDEXECOPT_PROMPTUSER);
 end;
 
 end.

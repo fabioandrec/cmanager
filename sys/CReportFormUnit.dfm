@@ -222,17 +222,17 @@ inherited CReportForm: TCReportForm
     Left = 11
     Top = 48
     object ActionPreview: TAction
-      Caption = '&Podgl'#261'd'
+      Caption = 'Podgl'#261'd'
       ImageIndex = 0
       OnExecute = ActionPreviewExecute
     end
     object ActionPrint: TAction
-      Caption = '&Drukuj'
+      Caption = 'Drukuj'
       ImageIndex = 0
       OnExecute = ActionPrintExecute
     end
     object ActionSave: TAction
-      Caption = '&Zapisz'
+      Caption = 'Zapisz'
       ImageIndex = 0
       OnExecute = ActionSaveExecute
     end

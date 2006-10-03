@@ -2,22 +2,26 @@ unit CReports;
 
 interface
 
-uses Classes, CReportFormUnit;
+uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs;
 
 type
+  TCReportClass = class of TCReport;
+
   TCReport = class(TObject)
   private
     FreportText: TStringList;
     Fform: TCReportForm;
+    Fcharts: TObjectList;
     function GetreportText: String;
   protected
     procedure CleanReportData; virtual;
-    function PrepareReportData: Boolean;
+    function PrepareReportData: Boolean; virtual; abstract;
     function GetreportName: String; virtual;
   public
     procedure ShowReport;
     constructor Create;
     destructor Destroy; override;
+    function GetChart: TChart;
   published
     property reportText: String read GetreportText;
     property reportName: String read GetreportName;
@@ -38,13 +42,27 @@ constructor TCReport.Create;
 begin
   inherited Create;
   FreportText := TStringList.Create;
+  Fcharts := TObjectList.Create(False);
 end;
 
 destructor TCReport.Destroy;
 begin
   CleanReportData;
+  Fcharts.Free;
   FreportText.Free;
   inherited Destroy;
+end;
+
+function TCReport.GetChart: TChart;
+begin
+  Result := TChart.Create(Fform);
+  Result.Visible := False;
+  Result.BorderStyle := bsNone;
+  Result.BevelInner := bvNone;
+  Result.BevelOuter := bvNone;
+  Result.Color := clWindow;
+  Result.Parent := Fform;
+  Fcharts.Add(Result)
 end;
 
 function TCReport.GetreportName: String;
@@ -57,21 +75,15 @@ begin
   Result := FreportText.Text;
 end;
 
-function TCReport.PrepareReportData: Boolean;
-begin
-  Result := True;
-  FreportText.Text := '<HTML><HEAD><TITLE>template page</TITLE></HEAD><BODY BGCOLOR="#EDB681"><IMG src="d:\a.bmp"></BODY></HTML>';
-end;
-
 procedure TCReport.ShowReport;
 begin
+  Fform := TCReportForm.Create(Nil);
   if PrepareReportData then begin
-    Fform := TCReportForm.Create(Nil);
     Fform.Caption := reportName;
     Fform.CBrowser.LoadFromString(reportText);
     Fform.ShowModal;
-    Fform.Free;
   end;
+  Fform.Free;
 end;
 
 end.

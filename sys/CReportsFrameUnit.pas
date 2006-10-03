@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, ExtCtrls, VirtualTrees, Menus,
   VTHeaderPopup, ActnList, CComponents, CDatabase, Contnrs, GraphUtil,
-  StdCtrls;
+  StdCtrls, CReports;
 
 type
   THelperElement = class(TObjectList)
@@ -41,6 +41,7 @@ type
     procedure ReportListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ReportListDblClick(Sender: TObject);
     procedure ReportListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+    procedure ActionExecuteExecute(Sender: TObject);
   private
     FTreeHelper: THelperElement;
     procedure RecreateTreeHelper;
@@ -49,6 +50,7 @@ type
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
     function GetList: TVirtualStringTree; override;
+    function GetClassOfReport(AGid: TDataGid): TCReportClass;
   public
     procedure InitializeFrame(AAdditionalData: TObject); override;
     destructor Destroy; override;
@@ -193,6 +195,10 @@ begin
   if ReportList.FocusedNode <> Nil then begin
     if Owner.InheritsFrom(TCFrameForm) then begin
       TCFrameForm(Owner).BitBtnOkClick(Nil);
+    end else begin
+      if CButtonExecute.Enabled then begin
+        ActionExecute.Execute;
+      end;
     end;
   end;
 end;
@@ -234,6 +240,25 @@ begin
   Fid := AId;
   Fname := AName;
   Fdesc := ADesc;
+end;
+
+procedure TCReportsFrame.ActionExecuteExecute(Sender: TObject);
+var xClass: TCReportClass;
+    xReport: TCReport;
+    xGid: TDataGid;
+begin
+  xGid := GetSelectedId;
+  if xGid <> CEmptyDataGid then begin
+    xClass := GetClassOfReport(xGid);
+    xReport := xClass.Create;
+    xReport.ShowReport;
+    xReport.Free;
+  end;
+end;
+
+function TCReportsFrame.GetClassOfReport(AGid: TDataGid): TCReportClass;
+begin
+  Result := TTestReport;
 end;
 
 end.

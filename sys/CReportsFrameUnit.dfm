@@ -220,6 +220,7 @@ inherited CReportsFrame: TCReportsFrame
     object ActionExecute: TAction
       Caption = 'Uruchom raport'
       ImageIndex = 0
+      OnExecute = ActionExecuteExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
