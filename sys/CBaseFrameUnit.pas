@@ -10,6 +10,7 @@ const
   WM_DATAOBJECTADDED = WM_USER + 1;
   WM_DATAOBJECTEDITED = WM_USER + 2;
   WM_DATAOBJECTDELETED = WM_USER + 3;
+  WM_DATAREFRESH = WM_USER + 4;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;

@@ -13,14 +13,6 @@ type
     PanelFrameButtons: TPanel;
     DoneList: TVirtualStringTree;
     ActionList: TActionList;
-    ActionMovement: TAction;
-    ActionEditMovement: TAction;
-    ActionDelMovement: TAction;
-    Panel1: TPanel;
-    CButtonOut: TCButton;
-    CButtonEdit: TCButton;
-    CButtonDel: TCButton;
-    Bevel: TBevel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     Panel: TPanel;
     CStaticFilter: TCStatic;
@@ -30,10 +22,14 @@ type
     Label2: TLabel;
     Label1: TLabel;
     CStaticPeriod: TCStatic;
+    Label3: TLabel;
+    CDateTimePerStart: TCDateTime;
+    Label4: TLabel;
+    CDateTimePerEnd: TCDateTime;
+    Label5: TLabel;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
-    procedure DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -50,12 +46,11 @@ type
     procedure SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CDateTimePerStartChanged(Sender: TObject);
   private
     FDoneObjects: TDataObjectList;
     FSumObjects: TSumList;
-    procedure MessageMovementAdded(AId: TDataGid);
-    procedure MessageMovementEdited(AId: TDataGid);
-    procedure MessageMovementDeleted(AId: TDataGid);
+    procedure UpdateCustomPeriod;
   protected
     procedure WndProc(var Message: TMessage); override;
     function GetList: TVirtualStringTree; override;
@@ -150,41 +145,47 @@ begin
   FSumObjects := TSumList.Create(True);
 end;
 
-procedure TCDoneFrame.DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-begin
-  CButtonEdit.Enabled := Node <> Nil;
-  CButtonDel.Enabled := Node <> Nil;
-  if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
-  end;
-end;
-
 procedure TCDoneFrame.ReloadDone;
 var xSql: String;
     xDf, xDt: TDateTime;
 begin
-  xSql := 'select * from baseMovement where ';
-  GetFilterDates(xDf, xDt);
-  xSql := xSql + Format('regDate between DateValue(%s) and DateValue(%s)', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
+  xSql := 'select * from plannedMovement where isActive = true ';
   if CStaticFilter.DataId = '2' then begin
     xSql := xSql + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
     xSql := xSql + Format(' and movementType = ''%s''', [CInMovement]);
   end;
+  GetFilterDates(xDf, xDt);
+  xSql := xSql + Format(' and (' +
+                        '  (scheduleType = ''O'' and scheduleDate between dateValue(%s) and dateValue (%s) and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
+                        '  (scheduleType = ''C'' and scheduleDate >= dateValue(%s))' +
+                        ' )', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt), DatetimeToDatabase(xDf)]);
+  xSql := xSql + Format(' and (' +
+                        '  (endCondition = ''N'') or ' +
+                        '  (endCondition = ''D'' and endDate >= dateValue(%s)) or ' +
+                        '  (endCondition = ''T'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
+                        ' )', [DatetimeToDatabase(xDf)]);
   if FDoneObjects <> Nil then begin
     FreeAndNil(FDoneObjects);
   end;
-  FDoneObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, xSql);
+  FDoneObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSql);
   DoneList.BeginUpdate;
   DoneList.Clear;
   DoneList.RootNodeCount := FDoneObjects.Count;
-  DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0);
   DoneList.EndUpdate;
 end;
 
 procedure TCDoneFrame.InitializeFrame(AAdditionalData: TObject);
 begin
   inherited InitializeFrame(AAdditionalData);
+  UpdateCustomPeriod;
+  CDateTimePerStart.Value := GWorkDate;
+  CDateTimePerEnd.Value := GWorkDate;
+  Label3.Anchors := [akRight, akTop];
+  CDateTimePerStart.Anchors := [akRight, akTop];
+  Label4.Anchors := [akRight, akTop];
+  CDateTimePerEnd.Anchors := [akRight, akTop];
+  Label5.Anchors := [akRight, akTop];
   ReloadDone;
   ReloadSums;
 end;
@@ -301,72 +302,18 @@ begin
   end;
 end;
 
-procedure TCDoneFrame.MessageMovementAdded(AId: TDataGid);
-var xDataobject: TBaseMovement;
-    xNode: PVirtualNode;
-begin
-  xDataobject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, AId, True));
-  if IsValidFilteredObject(xDataobject) then begin
-    FDoneObjects.Add(xDataobject);
-    xNode := DoneList.AddChild(Nil, xDataobject);
-    DoneList.Sort(xNode, DoneList.Header.SortColumn, DoneList.Header.SortDirection);
-    DoneList.FocusedNode := xNode;
-    DoneList.Selected[xNode] := True;
-  end else begin
-    xDataobject.Free;
-  end;
-  ReloadSums;
-end;
-
-procedure TCDoneFrame.MessageMovementDeleted(AId: TDataGid);
-var xNode: PVirtualNode;
-begin
-  xNode := FindDataobjectNode(AId, DoneList);
-  if xNode <> Nil then begin
-    DoneList.DeleteNode(xNode);
-    FDoneObjects.Remove(TBaseMovement(DoneList.GetNodeData(xNode)^));
-  end;
-  ReloadSums;
-end;
-
-procedure TCDoneFrame.MessageMovementEdited(AId: TDataGid);
-var xDataobject: TBaseMovement;
-    xNode: PVirtualNode;
-begin
-  xNode := FindDataobjectNode(AId, DoneList);
-  if xNode <> Nil then begin
-    xDataobject := TBaseMovement(DoneList.GetNodeData(xNode)^);
-    xDataobject.ReloadObject;
-    if IsValidFilteredObject(xDataobject) then begin
-      DoneList.InvalidateNode(xNode);
-      DoneList.Sort(xNode, DoneList.Header.SortColumn, DoneList.Header.SortDirection);
-    end else begin
-      DoneList.DeleteNode(xNode);
-      FDoneObjects.Remove(TBaseMovement(DoneList.GetNodeData(xNode)^));
-    end;
-  end;
-  ReloadSums;
-end;
-
 function TCDoneFrame.GetList: TVirtualStringTree;
 begin
   Result := DoneList;
 end;
 
 procedure TCDoneFrame.WndProc(var Message: TMessage);
-var xDataGid: TDataGid;
 begin
   inherited WndProc(Message);
   with Message do begin
-    if Msg = WM_DATAOBJECTADDED then begin
-      xDataGid := PDataGid(WParam)^;
-      MessageMovementAdded(xDataGid);
-    end else if Msg = WM_DATAOBJECTEDITED then begin
-      xDataGid := PDataGid(WParam)^;
-      MessageMovementEdited(xDataGid);
-    end else if Msg = WM_DATAOBJECTDELETED then begin
-      xDataGid := PDataGid(WParam)^;
-      MessageMovementDeleted(xDataGid);
+    if Msg = WM_DATAREFRESH then begin
+      ReloadDone;
+      ReloadSums;
     end;
   end;
 end;
@@ -416,7 +363,9 @@ end;
 
 procedure TCDoneFrame.CStaticFilterChanged(Sender: TObject);
 begin
+  UpdateCustomPeriod;
   ReloadDone;
+  ReloadSums;
 end;
 
 procedure TCDoneFrame.ReloadSums;
@@ -424,12 +373,14 @@ var xDs: TADOQuery;
     xSql: String;
     xObj: TSumElement;
     xOvr: TSumElement;
+    xDf, xDt: TDateTime;
 begin
+  GetFilterDates(xDf, xDt);
   xSql := Format(
           'select T1.*, account.name from ( ' +
           '   select sum(cash) as deltaCash, movementType, idAccount from baseMovement where ' +
-          '   regDate = dateValue(%s) and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
-          '   left join account on account.idAccount = T1.idAccount', [DatetimeToDatabase(GWorkDate)]);
+          '   regDate between DateValue(%s) and DateValue(%s) and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
+          '   left join account on account.idAccount = T1.idAccount', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
   xDs := GDataProvider.OpenSql(xSql);
   SumList.BeginUpdate;
   SumList.Clear;
@@ -575,9 +526,15 @@ begin
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
   xList.Add('6=<ostatnie 30 dni>');
+  xList.Add('7=<w przysz³ym tygodni>');
+  xList.Add('8=<w przysz³ym miesi¹cu>');
+  xList.Add('9=<nastêpne 7 dni>');
+  xList.Add('10=<nastêpne 14 dni>');
+  xList.Add('11=<nastêpne 30 dni>');
+  xList.Add('12=<dowolny>');
   xGid := CEmptyDataGid;
   xText := '';
-  xRect := Rect(10, 10, 200, 300);
+  xRect := Rect(10, 10, 200, 400);
   AAccepted := TCFrameForm.ShowFrame(TCListFrame, xGid, xText, xList, @xRect);
   if AAccepted then begin
     ADataGid := xGid;
@@ -609,7 +566,43 @@ begin
   end else if xId = '6' then begin
     ADateFrom := IncDay(GWorkDate, -29);
     ADateTo := GWorkDate;
-  end
+  end else if xId = '7' then begin
+    ADateFrom := StartOfTheWeek(IncDay(GWorkDate, 7));
+    ADateTo := EndOfTheWeek(IncDay(GWorkDate, 7));
+  end else if xId = '8' then begin
+    ADateFrom := StartOfTheMonth(IncDay(EndOfTheMonth(GWorkDate), 1));
+    ADateTo := EndOfTheMonth(IncDay(EndOfTheMonth(GWorkDate), 1));
+  end else if xId = '9' then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, 6);
+  end else if xId = '10' then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, 13);
+  end else if xId = '11' then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, 29);
+  end else if xId = '12' then begin
+    ADateFrom := CDateTimePerStart.Value;
+    ADateTo := CDateTimePerEnd.Value;
+  end;
+end;
+
+procedure TCDoneFrame.UpdateCustomPeriod;
+var xF, xE: TDateTime;
+begin
+  CDateTimePerStart.HotTrack := CStaticPeriod.DataId = '12';
+  CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = '12';
+  if CStaticPeriod.DataId <> '12' then begin
+    GetFilterDates(xF, xE);
+    CDateTimePerStart.Value := xF;
+    CDateTimePerEnd.Value := xE;
+  end;
+end;
+
+procedure TCDoneFrame.CDateTimePerStartChanged(Sender: TObject);
+begin
+  ReloadDone;
+  ReloadSums;
 end;
 
 end.

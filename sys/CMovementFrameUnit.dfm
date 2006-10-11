@@ -236,6 +236,53 @@ inherited CMovementFrame: TCMovementFrame
       Height = 13
       Caption = 'Okres wykonania:'
     end
+    object Label3: TLabel
+      Left = 289
+      Top = 4
+      Width = 15
+      Height = 13
+      Caption = '(od'
+    end
+    object Label4: TLabel
+      Left = 362
+      Top = 4
+      Width = 12
+      Height = 13
+      Caption = 'do'
+    end
+    object Label5: TLabel
+      Left = 430
+      Top = 4
+      Width = 3
+      Height = 13
+      Caption = ')'
+    end
+    object CStaticPeriod: TCStatic
+      Left = 235
+      Top = 4
+      Width = 134
+      Height = 15
+      Cursor = crHandPoint
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '<tylko dzi'#347'>'
+      Color = clBtnFace
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentColor = False
+      ParentFont = False
+      TabOrder = 1
+      DataId = '1'
+      TextOnEmpty = '<tylko dzi'#347'>'
+      OnGetDataId = CStaticPeriodGetDataId
+      OnChanged = CStaticFilterChanged
+      HotTrack = True
+    end
     object CStaticFilter: TCStatic
       Left = 73
       Top = 4
@@ -262,30 +309,36 @@ inherited CMovementFrame: TCMovementFrame
       OnChanged = CStaticFilterChanged
       HotTrack = True
     end
-    object CStaticPeriod: TCStatic
-      Left = 235
+    object CDateTimePerStart: TCDateTime
+      Left = 306
       Top = 4
-      Width = 118
-      Height = 15
-      Cursor = crHandPoint
+      Width = 56
+      Height = 14
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '<tylko dzi'#347'>'
+      Caption = '2006-01-01'
       Color = clBtnFace
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
       ParentColor = False
-      ParentFont = False
-      TabOrder = 1
-      DataId = '1'
-      TextOnEmpty = '<tylko dzi'#347'>'
-      OnGetDataId = CStaticPeriodGetDataId
-      OnChanged = CStaticFilterChanged
+      TabOrder = 2
+      OnChanged = CDateTimePerStartChanged
+      HotTrack = True
+    end
+    object CDateTimePerEnd: TCDateTime
+      Left = 376
+      Top = 4
+      Width = 55
+      Height = 14
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '2006-01-01'
+      Color = clBtnFace
+      ParentColor = False
+      TabOrder = 3
+      OnChanged = CDateTimePerStartChanged
       HotTrack = True
     end
   end

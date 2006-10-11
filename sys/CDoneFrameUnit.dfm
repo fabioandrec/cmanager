@@ -16,60 +16,6 @@ inherited CDoneFrame: TCDoneFrame
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
-    object Bevel: TBevel
-      Left = 0
-      Top = 146
-      Width = 443
-      Height = 3
-      Align = alBottom
-      Shape = bsBottomLine
-    end
-    object Panel1: TPanel
-      Left = 0
-      Top = 149
-      Width = 443
-      Height = 40
-      Align = alBottom
-      BevelOuter = bvNone
-      Color = clWindow
-      TabOrder = 0
-      object CButtonOut: TCButton
-        Left = 13
-        Top = 4
-        Width = 116
-        Height = 33
-        Cursor = crHandPoint
-        PicPosition = ppLeft
-        PicOffset = 10
-        TxtOffset = 15
-        Framed = False
-        Action = ActionMovement
-      end
-      object CButtonEdit: TCButton
-        Left = 116
-        Top = 4
-        Width = 110
-        Height = 33
-        Cursor = crHandPoint
-        PicPosition = ppLeft
-        PicOffset = 10
-        TxtOffset = 15
-        Framed = False
-        Action = ActionEditMovement
-      end
-      object CButtonDel: TCButton
-        Left = 228
-        Top = 4
-        Width = 110
-        Height = 33
-        Cursor = crHandPoint
-        PicPosition = ppLeft
-        PicOffset = 10
-        TxtOffset = 15
-        Framed = False
-        Action = ActionDelMovement
-      end
-    end
     object Panel2: TPanel
       Left = 0
       Top = 0
@@ -78,13 +24,13 @@ inherited CDoneFrame: TCDoneFrame
       Align = alTop
       Alignment = taLeftJustify
       Caption = '  Sumy zaplanowanych przychod'#243'w/rozchod'#243'w w wybranym okresie'
-      TabOrder = 1
+      TabOrder = 0
     end
     object SumList: TVirtualStringTree
       Left = 0
       Top = 21
       Width = 443
-      Height = 125
+      Height = 168
       Align = alClient
       BevelEdges = []
       BevelInner = bvNone
@@ -104,7 +50,7 @@ inherited CDoneFrame: TCDoneFrame
       Header.Style = hsFlatButtons
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 2
+      TabOrder = 1
       TabStop = False
       TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
@@ -112,7 +58,6 @@ inherited CDoneFrame: TCDoneFrame
       TreeOptions.SelectionOptions = [toFullRowSelect]
       OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
-      OnFocusChanged = DoneListFocusChanged
       OnGetText = SumListGetText
       OnGetHint = DoneListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
@@ -178,7 +123,6 @@ inherited CDoneFrame: TCDoneFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnBeforeItemErase = DoneListBeforeItemErase
     OnCompareNodes = DoneListCompareNodes
-    OnFocusChanged = DoneListFocusChanged
     OnGetText = DoneListGetText
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
@@ -236,6 +180,27 @@ inherited CDoneFrame: TCDoneFrame
       Height = 13
       Caption = 'Okres wykonania:'
     end
+    object Label3: TLabel
+      Left = 289
+      Top = 4
+      Width = 15
+      Height = 13
+      Caption = '(od'
+    end
+    object Label4: TLabel
+      Left = 362
+      Top = 4
+      Width = 12
+      Height = 13
+      Caption = 'do'
+    end
+    object Label5: TLabel
+      Left = 430
+      Top = 4
+      Width = 3
+      Height = 13
+      Caption = ')'
+    end
     object CStaticFilter: TCStatic
       Left = 73
       Top = 4
@@ -286,6 +251,38 @@ inherited CDoneFrame: TCDoneFrame
       TextOnEmpty = '<tylko dzi'#347'>'
       OnGetDataId = CStaticPeriodGetDataId
       OnChanged = CStaticFilterChanged
+      HotTrack = True
+    end
+    object CDateTimePerStart: TCDateTime
+      Left = 306
+      Top = 4
+      Width = 56
+      Height = 14
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '2006-01-01'
+      Color = clBtnFace
+      ParentColor = False
+      TabOrder = 2
+      OnChanged = CDateTimePerStartChanged
+      HotTrack = True
+    end
+    object CDateTimePerEnd: TCDateTime
+      Left = 376
+      Top = 4
+      Width = 55
+      Height = 14
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '2006-01-01'
+      Color = clBtnFace
+      ParentColor = False
+      TabOrder = 3
+      OnChanged = CDateTimePerStartChanged
       HotTrack = True
     end
   end
@@ -699,21 +696,6 @@ inherited CDoneFrame: TCDoneFrame
     Images = ImageList
     Left = 200
     Top = 112
-    object ActionMovement: TAction
-      Caption = 'Dodaj operacj'#281
-      ImageIndex = 0
-      OnExecute = ActionMovementExecute
-    end
-    object ActionEditMovement: TAction
-      Caption = 'Edytuj operacj'#281
-      ImageIndex = 3
-      OnExecute = ActionEditMovementExecute
-    end
-    object ActionDelMovement: TAction
-      Caption = 'Usu'#324' operacj'#281
-      ImageIndex = 4
-      OnExecute = ActionDelMovementExecute
-    end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80

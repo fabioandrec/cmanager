@@ -51,7 +51,7 @@ implementation
 
 uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  CPlannedFormUnit;
+  CPlannedFormUnit, CDoneFrameUnit;
 
 {$R *.dfm}
 
@@ -201,6 +201,7 @@ begin
   end else begin
     xDataobject.Free;
   end;
+  SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
 end;
 
 procedure TCPlannedFrame.MessageMovementDeleted(AId: TDataGid);
@@ -211,6 +212,7 @@ begin
     PlannedList.DeleteNode(xNode);
     FPlannedObjects.Remove(TPlannedMovement(PlannedList.GetNodeData(xNode)^));
   end;
+  SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
 end;
 
 procedure TCPlannedFrame.MessageMovementEdited(AId: TDataGid);
@@ -229,6 +231,7 @@ begin
       FPlannedObjects.Remove(TPlannedMovement(PlannedList.GetNodeData(xNode)^));
     end;
   end;
+  SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
 end;
 
 function TCPlannedFrame.GetList: TVirtualStringTree;

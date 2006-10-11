@@ -440,13 +440,15 @@ var xId, xText: String;
     xAccepted: Boolean;
 begin
   inherited Click;
-  if Assigned(FOnGetDataId) then begin
-    xId := DataId;
-    xText := Caption;
-    FOnGetDataId(xId, xText, xAccepted);
-    if xAccepted then begin
-      Caption := xText;
-      DataId := xId;
+  if Enabled and FHotTrack then begin
+    if Assigned(FOnGetDataId) then begin
+      xId := DataId;
+      xText := Caption;
+      FOnGetDataId(xId, xText, xAccepted);
+      if xAccepted then begin
+        Caption := xText;
+        DataId := xId;
+      end;
     end;
   end;
 end;
@@ -457,6 +459,7 @@ begin
     Font.Style := Font.Style + [fsUnderline];
     FOldColor := Font.Color;
     Font.Color := clNavy;
+    Cursor := crHandPoint;
   end;
 end;
 
@@ -465,6 +468,7 @@ begin
   if FHotTrack and Enabled and (not (csDesigning in ComponentState)) then begin
     Font.Style := Font.Style - [fsUnderline];
     Font.Color := FOldColor;
+    Cursor := crDefault;
   end;
 end;
 
@@ -476,7 +480,7 @@ begin
   Width := 150;
   BorderStyle := sbsNone;
   BevelKind := bkTile;
-  Cursor := crHandPoint;
+  Cursor := crDefault;
   ParentColor := False;
   Color := clWindow;
   FTextOnEmpty := '<kliknij tutaj aby wybraæ>';
@@ -939,9 +943,14 @@ procedure TCDateTime.Click;
 var xDate: TDateTime;
 begin
   inherited Click;
-  xDate := FValue;
-  if ShowCalendar(Self, xDate) then begin
-    Value := xDate;
+  if HotTrack then begin
+    xDate := FValue;
+    if ShowCalendar(Self, xDate) then begin
+      Value := xDate;
+      if Assigned(FOnChanged) then begin
+        FOnChanged(Self);
+      end;
+    end;
   end;
 end;
 
@@ -951,6 +960,7 @@ begin
     Font.Style := Font.Style + [fsUnderline];
     FOldColor := Font.Color;
     Font.Color := clNavy;
+    Cursor := crHandPoint;
   end;
 end;
 
@@ -959,6 +969,7 @@ begin
   if FHotTrack and Enabled and (not (csDesigning in ComponentState)) then begin
     Font.Style := Font.Style - [fsUnderline];
     Font.Color := FOldColor;
+    Cursor := crDefault;
   end;
 end;
 
@@ -970,7 +981,7 @@ begin
   Width := 150;
   BorderStyle := sbsNone;
   BevelKind := bkTile;
-  Cursor := crHandPoint;
+  Cursor := crDefault;
   ParentColor := False;
   Color := clWindow;
   FValue := 0;
@@ -984,9 +995,6 @@ begin
   if FValue <> Value then begin
     FValue := Value;
     UpdateCaption;
-    if Assigned(FOnChanged) then begin
-      FOnChanged(Self);
-    end;
   end;
 end;
 

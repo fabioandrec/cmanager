@@ -30,6 +30,11 @@ type
     Label2: TLabel;
     Label1: TLabel;
     CStaticPeriod: TCStatic;
+    Label3: TLabel;
+    CDateTimePerStart: TCDateTime;
+    Label4: TLabel;
+    CDateTimePerEnd: TCDateTime;
+    Label5: TLabel;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -50,12 +55,14 @@ type
     procedure SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CDateTimePerStartChanged(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
+    procedure UpdateCustomPeriod;
   protected
     procedure WndProc(var Message: TMessage); override;
     function GetList: TVirtualStringTree; override;
@@ -73,7 +80,8 @@ type
 implementation
 
 uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
-  CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit;
+  CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
+  Types;
 
 {$R *.dfm}
 
@@ -187,6 +195,14 @@ end;
 procedure TCMovementFrame.InitializeFrame(AAdditionalData: TObject);
 begin
   inherited InitializeFrame(AAdditionalData);
+  UpdateCustomPeriod;
+  CDateTimePerStart.Value := GWorkDate;
+  CDateTimePerEnd.Value := GWorkDate;
+  Label3.Anchors := [akRight, akTop];
+  CDateTimePerStart.Anchors := [akRight, akTop];
+  Label4.Anchors := [akRight, akTop];
+  CDateTimePerEnd.Anchors := [akRight, akTop];
+  Label5.Anchors := [akRight, akTop];
   ReloadToday;
   ReloadSums;
 end;
@@ -423,7 +439,9 @@ end;
 
 procedure TCMovementFrame.CStaticFilterChanged(Sender: TObject);
 begin
+  UpdateCustomPeriod;
   ReloadToday;
+  ReloadSums;
 end;
 
 procedure TCMovementFrame.ReloadSums;
@@ -431,12 +449,14 @@ var xDs: TADOQuery;
     xSql: String;
     xObj: TSumElement;
     xOvr: TSumElement;
+    xDf, xDt: TDateTime;
 begin
+  GetFilterDates(xDf, xDt);
   xSql := Format(
           'select T1.*, account.name from ( ' +
           '   select sum(cash) as deltaCash, movementType, idAccount from baseMovement where ' +
-          '   regDate = dateValue(%s) and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
-          '   left join account on account.idAccount = T1.idAccount', [DatetimeToDatabase(GWorkDate)]);
+          '   regDate between DateValue(%s) and DateValue(%s) and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
+          '   left join account on account.idAccount = T1.idAccount', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
   xDs := GDataProvider.OpenSql(xSql);
   SumList.BeginUpdate;
   SumList.Clear;
@@ -582,6 +602,7 @@ begin
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
   xList.Add('6=<ostatnie 30 dni>');
+  xList.Add('7=<dowolny>');
   xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 200, 300);
@@ -616,7 +637,28 @@ begin
   end else if xId = '6' then begin
     ADateFrom := IncDay(GWorkDate, -29);
     ADateTo := GWorkDate;
-  end
+  end else if xId = '7' then begin
+    ADateFrom := CDateTimePerStart.Value;
+    ADateTo := CDateTimePerEnd.Value;
+  end;
+end;
+
+procedure TCMovementFrame.UpdateCustomPeriod;
+var xF, xE: TDateTime;
+begin
+  CDateTimePerStart.HotTrack := CStaticPeriod.DataId = '7';
+  CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = '7';
+  if CStaticPeriod.DataId <> '7' then begin
+    GetFilterDates(xF, xE);
+    CDateTimePerStart.Value := xF;
+    CDateTimePerEnd.Value := xE;
+  end;
+end;
+
+procedure TCMovementFrame.CDateTimePerStartChanged(Sender: TObject);
+begin
+  ReloadToday;
+  ReloadSums;
 end;
 
 end.

@@ -70,6 +70,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
 procedure TCMainForm.FormCreate(Sender: TObject);
 begin
   FShortcutsFrames := TStringList.Create;
+  CDateTime.Value := GWorkDate;
   FShortcutList := TStringList.Create;
   ActionShortcuts.Checked := ShortcutsVisible;
   UpdateShortcutList;

@@ -140,15 +140,12 @@ c:\program files\borland\delphi7\Projects\Bpl\NowaPoczta.bpl=Komponenty Danych N
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source;C:\Program Files\Delphi\Others\vtv\Source
-Item1=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
-Item2=C:\Program Files\Borland\VirtualTreeview
+Count=2
+Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
+Item1=C:\Program Files\Borland\VirtualTreeview
 [HistoryLists\hlUnitOutputDirectory]
-Count=2
-Item0=..\..\Trash
-Item1=.\Trash
+Count=1
+Item0=.\Trash
 [HistoryLists\hlOutputDirectorry]
-Count=2
-Item0=..\..\Bin
-Item1=.\Bin
+Count=1
+Item0=.\Bin
