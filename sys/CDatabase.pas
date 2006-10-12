@@ -10,7 +10,7 @@ const
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
 
 type
-  TDataGid = String[38];
+  TDataGid = ShortString;
   PDataGid = ^TDataGid;
   TDataCreationMode = (cmCreated, cmLoaded);
   TDataMemoryState = (msValid, msModified, msDeleted);
@@ -25,7 +25,7 @@ type
     function GetInTransaction: Boolean;
     function GetIsConnected: Boolean;
   public
-    procedure ClearProxies;
+    procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
     destructor Destroy; override;
@@ -178,7 +178,7 @@ type
 
   TSumList = class(TObjectList)
   public
-    function FindSumObject(AId: TDataGid): TSumElement;
+    function FindSumObject(AId: TDataGid; ACreate: Boolean): TSumElement;
   end;
 
 var GDataProvider: TDataProvider;
@@ -190,6 +190,8 @@ function InitializeDataProvider: Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime): String;
+function DatabaseToDatetime(ADatetime: String): TDateTime;
+
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
@@ -221,6 +223,22 @@ begin
     end else begin
       Result := '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '''';
     end;
+  end;
+end;
+
+function DatabaseToDatetime(ADatetime: String): TDateTime;
+var xY, xM, xD: Word;
+    xDs: String;
+begin
+  xDs := StringReplace(ADatetime, '''', '', [rfReplaceAll, rfIgnoreCase]);
+  xDs := StringReplace(xDs, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xY := StrToIntDef(Copy(xDs, 1, 4), 0);
+  xM := StrToIntDef(Copy(xDs, 5, 2), 0);
+  xD := StrToIntDef(Copy(xDs, 7, 2), 0);
+  try
+    Result := EncodeDate(xY, xM, xD);
+  except
+    Result := 0;
   end;
 end;
 
@@ -444,7 +462,7 @@ begin
   end;
 end;
 
-procedure TDataProvider.ClearProxies;
+procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
 var xCountP, xCountO: Integer;
     xList: TObjectList;
     xDataObject: TDataObject;
@@ -453,7 +471,7 @@ begin
     xList := TDataProxy(FDataProxyList.Items[xCountP]).DataObjects;
     for xCountO := xList.Count - 1 downto 0 do begin
       xDataObject := TDataObject(xList.Items[xCountO]);
-      if not xDataObject.isStatic then begin
+      if (not xDataObject.isStatic) or AForceClearStatic then begin
         xList.Delete(xCountO);
         xDataObject.Free;
       end;
@@ -471,7 +489,7 @@ begin
       FConnection.RollbackTrans;
     end;
   end;
-  ClearProxies;
+  ClearProxies(False);
 end;
 
 function TDataProvider.ConnectToDatabase(AConnectionString: String): Boolean;
@@ -500,6 +518,7 @@ end;
 
 destructor TDataProvider.Destroy;
 begin
+  ClearProxies(True);
   FDataProxyList.Free;
   FConnection.Free;
   inherited Destroy;
@@ -590,7 +609,7 @@ begin
   if FConnection.InTransaction then begin
     FConnection.RollbackTrans;
   end;
-  ClearProxies;
+  ClearProxies(False);
 end;
 
 function TDataProxy.FindInCache(AId: TDataGid): TDataObject;
@@ -826,7 +845,7 @@ begin
   FcashOut := 0;
 end;
 
-function TSumList.FindSumObject(AId: TDataGid): TSumElement;
+function TSumList.FindSumObject(AId: TDataGid; ACreate: Boolean): TSumElement;
 var xCount: Integer;
 begin
   Result := Nil;
@@ -837,7 +856,7 @@ begin
     end;
     Inc(xCount);
   end;
-  if Result = Nil then begin
+  if (Result = Nil) and ACreate then begin
     Result := TSumElement.Create;
     Add(Result);
   end;

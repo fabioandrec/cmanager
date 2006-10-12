@@ -138,7 +138,7 @@ begin
     xFrame.Height := PanelFrames.Height;
     xFrame.DisableAlign;
     xFrame.Visible := False;
-    xFrame.InitializeFrame(Nil);
+    xFrame.InitializeFrame(Nil, Nil);
     xFrame.Parent := PanelFrames;
     xFrame.EnableAlign;
     FShortcutsFrames.AddObject(AAction.Caption, xFrame);

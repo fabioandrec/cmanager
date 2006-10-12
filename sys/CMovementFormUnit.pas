@@ -55,6 +55,8 @@ type
     procedure CStaticInoutCyclicCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceAccountChanged(Sender: TObject);
+    procedure CStaticInoutCyclicGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticInoutCyclicChanged(Sender: TObject);
   protected
     procedure UpdateDescription;
     procedure InitializeForm; override;
@@ -73,7 +75,8 @@ implementation
 
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
-  CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit;
+  CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit, CPlannedFrameUnit,
+  CDoneFrameUnit;
 
 {$R *.dfm}
 
@@ -209,7 +212,6 @@ begin
   UpdateDescription;
 end;
 
-
 function TCMovementForm.CanAccept: Boolean;
 var xI: Integer;
 begin
@@ -286,10 +288,10 @@ end;
 
 procedure TCMovementForm.FillForm;
 var xI: Integer;
+    xD: TPlannedDone;
+    xM: TPlannedMovement;
 begin
   with TBaseMovement(Dataobject) do begin
-    CDateTime.Value := regDate;
-    RichEditDesc.Text := description;
     if (movementType = CInMovement) or (movementType = COutMovement) then begin
       if idPlannedDone = CEmptyDataGid then begin
         xI := IfThen(movementType = COutMovement, 0, 1);
@@ -303,6 +305,7 @@ begin
     end;
     ComboBoxType.ItemIndex := xI;
     ComboBoxType.Enabled := False;
+    CStaticInoutCyclic.Enabled := False;
     ComboBoxTypeChange(ComboBoxType);
     GDataProvider.BeginTransaction;
     if (movementType = COutMovement) or (movementType = CInMovement) then begin
@@ -323,6 +326,13 @@ begin
         CStaticInoutCyclicCategory.DataId := idProduct;
         CStaticInoutCyclicCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
         CStaticInoutCyclic.DataId := idPlannedDone;
+        xD := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
+        xM := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovementProxy, xD.idPlannedMovement, False));
+        if movementType = COutMovement then begin
+          CStaticInoutCyclic.Caption := xM.description + ' (p³atne do ' + DateToStr(xD.triggerDate) + ')';
+        end else begin
+          CStaticInoutCyclic.Caption := xM.description + ' (wp³yw do ' + DateToStr(xD.triggerDate) + ')'
+        end;
       end;
     end else if (movementType = CTransferMovement) then begin
       CCurrEditTrans.Value := cash;
@@ -332,6 +342,8 @@ begin
       CStaticTransSourceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False)).name;
     end;
     GDataProvider.RollbackTransaction;
+    CDateTime.Value := regDate;
+    RichEditDesc.Text := description;
   end;
 end;
 
@@ -343,6 +355,10 @@ end;
 procedure TCMovementForm.ReadValues;
 var xI: Integer;
     xBa, xSa: TAccount;
+    xDone: TPlannedDone;
+    xTrDate: TDateTime;
+    xTrMove: TDataGid;
+    xPos: Integer;
 begin
   with TBaseMovement(Dataobject) do begin
     xI := ComboBoxType.ItemIndex;
@@ -432,7 +448,17 @@ begin
       idSourceAccount := CEmptyDataGid;
       idCashPoint := CStaticInoutCyclicCashpoint.DataId;
       idProduct := CStaticInoutCyclicCategory.DataId;
-      idPlannedDone := CStaticInoutCyclic.DataId;
+      if Operation = coAdd then begin
+        xPos := Pos('|', CStaticInoutCyclic.DataId);
+        xTrMove := Copy(CStaticInoutCyclic.DataId, 1, xPos - 1);
+        xTrDate := DatabaseToDatetime(Copy(CStaticInoutCyclic.DataId, xPos + 1, MaxInt));
+        xDone := TPlannedDone.CreateObject(PlannedDoneProxy, False);
+        xDone.idPlannedMovement := xTrMove;
+        xDone.triggerDate := xTrDate;
+        xDone.doneState := CDoneAccepted;
+        idPlannedDone := xDone.id;
+        SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+      end;
     end;
   end;
 end;
@@ -457,8 +483,45 @@ begin
 end;
 
 function TCMovementForm.ChoosePlanned(var AId, AText: String): Boolean;
+var xType: TBaseEnumeration;
 begin
-  //
+  if (ComboBoxType.ItemIndex = 3) then begin
+    xType := COutProduct;
+  end else begin
+    xType := CInProduct;
+  end;
+  Result := TCFrameForm.ShowFrame(TCDoneFrame, AId, AText, TDoneFrameAdditionalData.Create(xType));
+end;
+
+procedure TCMovementForm.CStaticInoutCyclicGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := ChoosePlanned(ADataGid, AText);
+end;
+
+procedure TCMovementForm.CStaticInoutCyclicChanged(Sender: TObject);
+var xId: TDataGid;
+    xPos: Integer;
+    xPlan: TPlannedMovement;
+begin
+  GDataProvider.BeginTransaction;
+  xPos := Pos('|', CStaticInoutCyclic.DataId);
+  xId := Copy(CStaticInoutCyclic.DataId, 1, xPos - 1);
+  xPlan := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovementProxy, xId, False));
+  CStaticInoutCyclicAccount.DataId := xPlan.idAccount;
+  if xPlan.idAccount <> CEmptyDataGid then begin
+    CStaticInoutCyclicAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xPlan.idAccount, False)).name;
+  end;
+  CStaticInoutCyclicCategory.DataId := xPlan.idProduct;
+  if xPlan.idProduct <> CEmptyDataGid then begin
+    CStaticInoutCyclicCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xPlan.idProduct, False)).name;
+  end;
+  CStaticInoutCyclicCashpoint.DataId := xPlan.idCashPoint;
+  if xPlan.idCashPoint <> CEmptyDataGid then begin
+    CStaticInoutCyclicCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xPlan.idCashPoint, False)).name;
+  end;
+  CCurrEditInoutCyclic.Value := xPlan.cash;
+  GDataProvider.RollbackTransaction;
+  UpdateDescription;
 end;
 
 end.

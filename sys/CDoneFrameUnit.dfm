@@ -123,6 +123,7 @@ inherited CDoneFrame: TCDoneFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnBeforeItemErase = DoneListBeforeItemErase
     OnCompareNodes = DoneListCompareNodes
+    OnFocusChanged = DoneListFocusChanged
     OnGetText = DoneListGetText
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
@@ -237,7 +238,7 @@ inherited CDoneFrame: TCDoneFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '<tylko dzi'#347'>'
+      Caption = '<w tym tygodni>'
       Color = clBtnFace
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -247,7 +248,7 @@ inherited CDoneFrame: TCDoneFrame
       ParentColor = False
       ParentFont = False
       TabOrder = 1
-      DataId = '1'
+      DataId = '2'
       TextOnEmpty = '<tylko dzi'#347'>'
       OnGetDataId = CStaticPeriodGetDataId
       OnChanged = CStaticFilterChanged

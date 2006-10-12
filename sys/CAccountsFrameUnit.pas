@@ -43,7 +43,7 @@ type
     function GetSelectedText: String; override;
     function GetList: TVirtualStringTree; override;
   public
-    procedure InitializeFrame(AAdditionalData: TObject); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -66,9 +66,9 @@ begin
   Result := 'Konta';
 end;
 
-procedure TCAccountsFrame.InitializeFrame(AAdditionalData: TObject);
+procedure TCAccountsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
 begin
-  inherited InitializeFrame(AAdditionalData);
+  inherited InitializeFrame(AAdditionalData, AOutputData);
   ReloadAccounts;
 end;
 

@@ -448,6 +448,9 @@ begin
       if xAccepted then begin
         Caption := xText;
         DataId := xId;
+        if Assigned(FOnChanged) then begin
+          FOnChanged(Self);
+        end;
       end;
     end;
   end;
@@ -508,9 +511,6 @@ begin
     FDataId := Value;
     if FDataId = '' then begin
       Caption := FTextOnEmpty;
-    end;
-    if Assigned(FOnChanged) then begin
-      FOnChanged(Self);
     end;
   end;
 end;

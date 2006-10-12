@@ -19,6 +19,8 @@ const
   CEndConditionNever = 'N';
   CTriggerTypeWeekly = 'W';
   CTriggerTypeMonthly = 'M';
+  CDoneAccepted = 'A';
+  CDoneDeleted = 'D';
 
 type
   TBaseName = string[40];
@@ -142,6 +144,7 @@ type
     FendDate: TDateTime;
     FtriggerType: TBaseEnumeration;
     FtriggerDay: Integer;
+    FdoneCount: Integer;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -174,6 +177,7 @@ type
     property endDate: TDateTime read FendDate write SetendDate;
     property triggerType: TBaseEnumeration read FtriggerType write SettriggerType;
     property triggerDay: Integer read FtriggerDay write SettriggerDay;
+    property doneCount: Integer read FdoneCount;
   end;
 
   TPlannedDone = class(TDataObject)
@@ -519,6 +523,7 @@ begin
 end;
 
 procedure TPlannedMovement.FromDataset(ADataset: TADOQuery);
+var xField: TField;
 begin
   inherited FromDataset(ADataset);
   with ADataset do begin
@@ -536,6 +541,10 @@ begin
     FendDate := FieldByName('endDate').AsDateTime;
     FtriggerType := FieldByName('triggerType').AsString;
     FtriggerDay := FieldByName('triggerDay').AsInteger;
+    xField := FindField('doneCount');
+    if xField <> Nil then begin
+      FdoneCount := xField.AsInteger;
+    end;
   end;
 end;
 

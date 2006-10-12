@@ -94,7 +94,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 160
-        ActivePage = TabSheetInOutOnce
+        ActivePage = TabSheetInOutCyclic
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -167,7 +167,8 @@ inherited CMovementForm: TCMovementForm
             ParentColor = False
             TabOrder = 1
             TextOnEmpty = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
-            OnChanged = CStaticInoutOnceAccountChanged
+            OnGetDataId = CStaticInoutCyclicGetDataId
+            OnChanged = CStaticInoutCyclicChanged
             HotTrack = True
           end
           object CStaticInoutCyclicAccount: TCStatic

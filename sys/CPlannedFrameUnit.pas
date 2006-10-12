@@ -42,7 +42,7 @@ type
   public
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AAdditionalData: TObject); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -80,9 +80,9 @@ begin
   PlannedList.EndUpdate;
 end;
 
-procedure TCPlannedFrame.InitializeFrame(AAdditionalData: TObject);
+procedure TCPlannedFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
 begin
-  inherited InitializeFrame(AAdditionalData);
+  inherited InitializeFrame(AAdditionalData, AOutputData);
   ReloadPlanned;
 end;
 

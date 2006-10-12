@@ -45,7 +45,7 @@ create table plannedMovement (
   isActive bit not null,
   idAccount uniqueidentifier,
   idCashPoint uniqueidentifier,
-  idProduct uniqueidentifier null,
+  idProduct uniqueidentifier not null,
   scheduleType varchar(1) not null,
   scheduleDate datetime not null,
   endCondition varchar(1) not null,
@@ -71,7 +71,7 @@ create table plannedDone (
   triggerDate datetime not null,
   doneState varchar(1) not null,
   idPlannedMovement uniqueidentifier not null,
-  primary key (idPlannedMovement),
+  primary key (idPlannedDone),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
   constraint ck_doneState check (doneState in ('A', 'D'))
 );

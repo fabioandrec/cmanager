@@ -19,16 +19,20 @@ type
     ImageList: TImageList;
   private
     FAdditionalData: TObject;
+    FOutputData: Pointer;
   protected
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
     function GetList: TVirtualStringTree; virtual;
   public
-    procedure InitializeFrame(AAdditionalData: TObject); virtual;
+    procedure UpdateOutputData; virtual;
+    function FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode; virtual;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); virtual;
     class function GetTitle: String; virtual;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; virtual;
+    property OutputData: Pointer read FOutputData;
   published
     property SelectedId: TDataGid read GetSelectedId;
     property SelectedText: String read GetSelectedText;
@@ -100,6 +104,11 @@ begin
   inherited Destroy;
 end;
 
+function TCBaseFrame.FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode;
+begin
+  Result := FindDataobjectNode(ADataId, AList);
+end;
+
 function TCBaseFrame.GetList: TVirtualStringTree;
 begin
   Result := Nil;
@@ -120,14 +129,19 @@ begin
   Result := '';
 end;
 
-procedure TCBaseFrame.InitializeFrame(AAdditionalData: TObject);
+procedure TCBaseFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
 begin
   FAdditionalData := AAdditionalData;
+  FOutputData := AOutputData;
 end;
 
 function TCBaseFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 begin
   Result := True;
+end;
+
+procedure TCBaseFrame.UpdateOutputData;
+begin
 end;
 
 initialization

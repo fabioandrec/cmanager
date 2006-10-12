@@ -71,7 +71,7 @@ type
     procedure ReloadToday;
     procedure ReloadSums;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AAdditionalData: TObject); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -115,6 +115,7 @@ procedure TCMovementFrame.ActionDelMovementExecute(Sender: TObject);
 var xBase: TBaseMovement;
     xObject: TDataObject;
     xAccount: TAccount;
+    xDone: TPlannedDone;
     xIdTemp1, xIdTemp2, xIdTemp3: TDataGid;
     xIdTemp3Frame: TCBaseFrameClass;
 begin
@@ -140,6 +141,10 @@ begin
       xAccount.cash := xAccount.cash - xBase.cash;
       xIdTemp3 := TBaseMovement(xObject).idSourceAccount;
       xIdTemp3Frame := TCAccountsFrame;
+    end;
+    if TBaseMovement(xObject).idPlannedDone <> CEmptyDataGid then begin
+      xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, TBaseMovement(xObject).idPlannedDone, False));
+      xDone.DeleteObject;
     end;
     xObject.DeleteObject;
     GDataProvider.CommitTransaction;
@@ -192,9 +197,9 @@ begin
   TodayList.EndUpdate;
 end;
 
-procedure TCMovementFrame.InitializeFrame(AAdditionalData: TObject);
+procedure TCMovementFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
 begin
-  inherited InitializeFrame(AAdditionalData);
+  inherited InitializeFrame(AAdditionalData, AOutputData);
   UpdateCustomPeriod;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
@@ -467,7 +472,7 @@ begin
   xOvr.cashOut := 0;
   xOvr.id := '*';
   while not xDs.Eof do begin
-    xObj := FSumObjects.FindSumObject(xDs.FieldByName('idAccount').AsString);
+    xObj := FSumObjects.FindSumObject(xDs.FieldByName('idAccount').AsString, True);
     xObj.id := xDs.FieldByName('idAccount').AsString;
     xObj.name := xDs.FieldByName('name').AsString;
     if xDs.FieldByName('movementType').AsString = CInMovement then begin
