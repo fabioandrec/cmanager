@@ -2,6 +2,8 @@ program CManager;
 
 {$R 'CMandbpat.res' 'CMandbpat.rc'}
 {%File 'CMandb.sql'}
+{$R 'strings.res' 'strings.rc'}
+{$R 'icons.res' 'icons.rc'}
 
 uses
   MemCheck in 'MemCheck.pas',
@@ -32,16 +34,17 @@ uses
   CPlannedFrameUnit in 'CPlannedFrameUnit.pas' {CPlannedFrame: TFrame},
   CPlannedFormUnit in 'CPlannedFormUnit.pas' {CPlannedForm},
   CScheduleFormUnit in 'CScheduleFormUnit.pas' {CScheduleForm},
-  CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame};
+  CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame},
+  CAboutFormUnit in 'CAboutFormUnit.pas';
 
 {$R *.res}
 
 begin
   MemChk;
   Application.Initialize;
-  if InitializeDataProvider then begin
+  if InitializeDataProvider(CDefaultFilename) then begin
     InitializeProxies;
     Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+    Application.Run;
   end;
 end.

@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
-  CComponents, VirtualTrees, ActnColorMaps;
+  CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit;
 
 type
   TCMainForm = class(TForm)
@@ -33,6 +33,8 @@ type
     ActionShortcutPlanned: TAction;
     ActionShortcutPlannedDone: TAction;
     ShortcutList: TVirtualStringTree;
+    ActionStatusbar: TAction;
+    ActionAbout: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -42,6 +44,8 @@ type
     procedure ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
     procedure ShortcutListClick(Sender: TObject);
     procedure ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
+    procedure ActionStatusbarExecute(Sender: TObject);
+    procedure ActionAboutExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -50,9 +54,13 @@ type
     procedure SetShortcutsVisible(const Value: Boolean);
     procedure PerformShortcutAction(AAction: TAction);
     procedure UpdateShortcutList;
+    procedure UpdateStatusbar;
     procedure ActionShortcutExecute(ASender: TObject);
+    function GetStatusbarVisible: Boolean;
+    procedure SetStatusbarVisible(const Value: Boolean);
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
+    property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
   end;
 
 var
@@ -63,7 +71,8 @@ implementation
 uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
-     CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit;
+     CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
+  CAboutFormUnit;
 
 {$R *.dfm}
 
@@ -73,7 +82,9 @@ begin
   CDateTime.Value := GWorkDate;
   FShortcutList := TStringList.Create;
   ActionShortcuts.Checked := ShortcutsVisible;
+  ActionStatusbar.Checked := StatusbarVisible;
   UpdateShortcutList;
+  UpdateStatusbar;
   ShortcutList.RootNodeCount := FShortcutList.Count;
   PerformShortcutAction(ActionShorcutOperations);
 end;
@@ -224,6 +235,43 @@ end;
 procedure TCMainForm.ActionShortcutExecute(ASender: TObject);
 begin
   PerformShortcutAction(TAction(ASender));
+end;
+
+procedure TCMainForm.ActionStatusbarExecute(Sender: TObject);
+begin
+  StatusbarVisible := not StatusbarVisible;
+end;
+
+function TCMainForm.GetStatusbarVisible: Boolean;
+begin
+  Result := StatusBar.Visible;
+end;
+
+procedure TCMainForm.SetStatusbarVisible(const Value: Boolean);
+begin
+  DisableAlign;
+  if Value then begin
+    StatusBar.Visible := True;
+    ActionStatusbar.Checked := True;
+  end else begin
+    StatusBar.Visible := False;
+    ActionStatusbar.Checked := False;
+  end;
+  EnableAlign;
+end;
+
+procedure TCMainForm.UpdateStatusbar;
+begin
+  Caption := 'CManager - na dzieñ ' + DateToStr(GWorkDate);
+  StatusBar.SimpleText := ' Plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+end;
+
+procedure TCMainForm.ActionAboutExecute(Sender: TObject);
+var xAbout: TCAboutForm;
+begin
+  xAbout := TCAboutForm.Create(Nil);
+  xAbout.ShowConfig(coNone);
+  xAbout.Free;
 end;
 
 end.

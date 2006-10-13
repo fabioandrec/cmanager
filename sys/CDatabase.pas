@@ -6,8 +6,8 @@ uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes;
 
 const
   CEmptyDataGid = '';
-  CDatabaseName = 'CManager.dat';
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
+  CDefaultFilename = 'CManager.dat';
 
 type
   TDataGid = ShortString;
@@ -36,6 +36,7 @@ type
     function CommitTransaction: Boolean;
     function ExecuteSql(ASql: String): Boolean;
     function OpenSql(ASql: String): TADOQuery;
+    function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
   published
     property DataProxyList: TObjectList read FDataProxyList;
     property InTransaction: Boolean read GetInTransaction;
@@ -185,8 +186,9 @@ var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
     GTodayCashIn: Currency;
     GTodayCashOut: Currency;
+    GDatabaseName: String;
 
-function InitializeDataProvider: Boolean;
+function InitializeDataProvider(ADatabaseName: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime): String;
@@ -219,9 +221,9 @@ begin
     Result := 'Null';
   end else begin
     if TimeOf(ADatetime) = 0 then begin
-      Result := '''' + FormatDateTime('yyyy-mm-dd', ADatetime) + '''';
+      Result := 'dateValue(''' + FormatDateTime('yyyy-mm-dd', ADatetime) + ''')';
     end else begin
-      Result := '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '''';
+      Result := 'dateValue(''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + ''')';
     end;
   end;
 end;
@@ -242,16 +244,16 @@ begin
   end;
 end;
 
-function InitializeDataProvider: Boolean;
+function InitializeDataProvider(ADatabaseName: String): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
 begin
   xCommand := '';
-  Result := FileExists(CDatabaseName);
+  Result := FileExists(ADatabaseName);
   if not Result then begin
     try
       xResStream := TResourceStream.Create(HInstance, 'DBPATTERN', RT_RCDATA);
-      xResStream.SaveToFile(CDatabaseName);
+      xResStream.SaveToFile(ADatabaseName);
       xResStream.Free;
       xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
       SetLength(xCommand, xResStream.Size);
@@ -264,9 +266,9 @@ begin
         ShowInfo(itError, 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', E.Message);
       end;
     end;
-  end;                                          
+  end;
   if Result then begin
-    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [CDatabaseName]));
+    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
     if not Result then begin
       ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
     end else begin
@@ -275,8 +277,12 @@ begin
         if not Result then begin
           ShowInfo(itError, 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
           GDataProvider.DisconnectFromDatabase;
-          DeleteFile(CDatabaseName);
+          DeleteFile(ADatabaseName);
+        end else begin
+          GDatabaseName := ADatabaseName;
         end;
+      end else begin
+        GDatabaseName := ADatabaseName;
       end;
     end;
   end;
@@ -560,6 +566,19 @@ end;
 function TDataProvider.GetIsConnected: Boolean;
 begin
   Result := FConnection.Connected;
+end;
+
+function TDataProvider.GetSqlInteger(ASql: String; ADefault: Integer): Integer;
+var xQ: TADOQuery;
+begin
+  Result := ADefault;
+  xQ := OpenSql(ASql);
+  if xQ <> Nil then begin
+    if not xQ.IsEmpty then begin
+      Result := xQ.Fields[0].AsInteger;
+    end;
+    xQ.Free;
+  end;
 end;
 
 function TDataProvider.OpenSql(ASql: String): TADOQuery;

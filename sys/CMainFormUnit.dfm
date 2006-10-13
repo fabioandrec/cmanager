@@ -47,6 +47,7 @@ object CMainForm: TCMainForm
     Width = 861
     Height = 19
     Panels = <>
+    SimplePanel = True
   end
   object PanelTitle: TPanel
     Left = 0
@@ -383,6 +384,10 @@ object CMainForm: TCMainForm
               item
                 Action = ActionShortcuts
                 Caption = '&Pasek skr'#243't'#243'w'
+              end
+              item
+                Action = ActionStatusbar
+                Caption = 'P&asek stanu'
               end>
             Caption = '&Widok'
           end
@@ -390,25 +395,48 @@ object CMainForm: TCMainForm
             Items = <
               item
                 Action = ActionShorcutOperations
+                Caption = '&Operacje wykonane'
+                ImageIndex = 0
+              end
+              item
+                Action = ActionShortcutPlannedDone
+                Caption = '&Czynno'#347'ci zaplanowane'
+                ImageIndex = 0
+              end
+              item
+                Action = ActionShortcutPlanned
+                Caption = '&Definicje plan'#243'w'
                 ImageIndex = 0
               end
               item
                 Action = ActionShortcutAccounts
+                Caption = '&Lista kont'
                 ImageIndex = 0
               end
               item
                 Action = ActionShortcutProducts
+                Caption = 'L&ista kategorii'
                 ImageIndex = 1
               end
               item
                 Action = ActionShortcutCashpoints
+                Caption = 'Li&sta kontrahent'#243'w'
                 ImageIndex = 0
               end
               item
                 Action = ActionShortcutReports
+                Caption = 'S&tatystyka, raporty'
                 ImageIndex = 1
               end>
             Caption = '&Skr'#243'ty'
+          end
+          item
+            Items = <
+              item
+                Action = ActionAbout
+                Caption = '&O programie'
+              end>
+            Caption = '&Pomoc'
           end>
         ActionBar = MenuBar
       end>
@@ -438,7 +466,7 @@ object CMainForm: TCMainForm
     end
     object ActionShortcutAccounts: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Definicje kont'
+      Caption = 'Lista kont'
       ImageIndex = 0
     end
     object ActionShortcutProducts: TAction
@@ -455,6 +483,16 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Statystyka, raporty'
       ImageIndex = 1
+    end
+    object ActionStatusbar: TAction
+      Category = 'Widok'
+      Caption = 'Pasek stanu'
+      OnExecute = ActionStatusbarExecute
+    end
+    object ActionAbout: TAction
+      Category = 'Pomoc'
+      Caption = 'O programie'
+      OnExecute = ActionAboutExecute
     end
   end
 end

@@ -178,7 +178,7 @@ var xSql: String;
 begin
   xSql := 'select * from baseMovement where ';
   GetFilterDates(xDf, xDt);
-  xSql := xSql + Format('regDate between DateValue(%s) and DateValue(%s)', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
+  xSql := xSql + Format('regDate between %s and %s', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
   if CStaticFilter.DataId = '2' then begin
     xSql := xSql + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
@@ -460,7 +460,7 @@ begin
   xSql := Format(
           'select T1.*, account.name from ( ' +
           '   select sum(cash) as deltaCash, movementType, idAccount from baseMovement where ' +
-          '   regDate between DateValue(%s) and DateValue(%s) and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
+          '   regDate between %s and %s and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
           '   left join account on account.idAccount = T1.idAccount', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
   xDs := GDataProvider.OpenSql(xSql);
   SumList.BeginUpdate;

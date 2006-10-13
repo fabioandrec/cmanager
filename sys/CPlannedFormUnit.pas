@@ -174,10 +174,6 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCategory.DoGetDataId;
     end;
-  end else if CCurrEdit.Value = 0 then begin
-    Result := False;
-    ShowInfo(itError, 'Kwota operacji nie mo¿e byæ zerowa', '');
-    CCurrEdit.SetFocus;
   end;
 end;
 

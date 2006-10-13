@@ -37,6 +37,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -59,6 +60,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -82,6 +84,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -162,6 +165,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
@@ -209,7 +213,7 @@ procedure InitializeProxies;
 
 implementation
 
-uses DB;
+uses DB, CInfoFormUnit;
 
 procedure InitializeProxies;
 begin
@@ -219,6 +223,23 @@ begin
   BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement', Nil);
   PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
   PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
+end;
+
+class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from account where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim konta bankowe';
+  end else if GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zaplanowane operacje z jego udzia³em';
+  end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ wykonane operacje z jego udzia³em';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ kontrahenta, gdy¿ ' + xText, '');
+    Result := False;
+  end;
 end;
 
 procedure TCashPoint.FromDataset(ADataset: TADOQuery);
@@ -310,6 +331,23 @@ begin
     AddField('cash', CurrencyToDatabase(Fcash), False, 'account');
     AddField('accountNumber', FaccountNumber, True, 'account');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'account');
+  end;
+end;
+
+class function TProduct.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ zaplanowane operacje';
+  end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ wykonane operacje';
+  end else if GDataProvider.GetSqlInteger('select count(*) from product where idParentProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ podkategorie';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ kategorii, gdy¿ ' + xText, '');
+    Result := False;
   end;
 end;
 
@@ -522,6 +560,19 @@ begin
   end;
 end;
 
+class function TPlannedMovement.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from plannedDone where idPlannedMovement = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ operacje wykonane';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ zaplanowanej operacji, gdy¿ ' + xText, '');
+    Result := False;
+  end;
+end;
+
 procedure TPlannedMovement.FromDataset(ADataset: TADOQuery);
 var xField: TField;
 begin
@@ -722,6 +773,21 @@ begin
     AddField('triggerDate', DatetimeToDatabase(FtriggerDate), False, 'plannedDone');
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
     AddField('doneState', FdoneState, True, 'plannedDone');
+  end;
+end;
+
+class function TAccount.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim zaplanowane operacje';
+  end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim wykonane operacje';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ konta, gdy¿ ' + xText, '');
+    Result := False;
   end;
 end;
 

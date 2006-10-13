@@ -110,12 +110,12 @@ ActiveLang=
 ProjectLang=
 RootDir=C:\Program Files\Borland\Delphi7\Bin\
 [Version Info]
-IncludeVerInfo=0
-AutoIncBuild=0
+IncludeVerInfo=1
+AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=0
-Build=0
+Build=1
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=
-FileVersion=1.0.0.0
+FileVersion=1.0.0.1
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -140,12 +140,15 @@ c:\program files\borland\delphi7\Projects\Bpl\NowaPoczta.bpl=Komponenty Danych N
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=2
-Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
-Item1=C:\Program Files\Borland\VirtualTreeview
+Count=3
+Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source;C:\Program Files\Delphi\Others\vtv\Source
+Item1=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
+Item2=C:\Program Files\Borland\VirtualTreeview
 [HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=.\Trash
+Count=2
+Item0=..\..\Trash
+Item1=.\Trash
 [HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=.\Bin
+Count=2
+Item0=..\..\Bin
+Item1=.\Bin

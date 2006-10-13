@@ -124,15 +124,15 @@ begin
   end;
   GetFilterDates(xDf, xDt);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
-                        '  (scheduleType = ''O'' and scheduleDate between dateValue(%s) and dateValue (%s) and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
-                        '  (scheduleType = ''C'' and scheduleDate <= dateValue(%s))' +
-                        ' )', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt), DatetimeToDatabase(xDf)]);
+                        '  (scheduleType = ''O'' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
+                        '  (scheduleType = ''C'' and scheduleDate <= %s)' +
+                        ' )', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt), DatetimeToDatabase(xDt)]);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
                         '  (endCondition = ''N'') or ' +
-                        '  (endCondition = ''D'' and endDate >= dateValue(%s)) or ' +
+                        '  (endCondition = ''D'' and endDate >= %s) or ' +
                         '  (endCondition = ''T'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
                         ' )', [DatetimeToDatabase(xDf)]);
-  xSqlDone := Format('select * from plannedDone where triggerDate between dateValue(%s) and dateValue (%s)', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
+  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
   if FPlannedObjects <> Nil then begin
     FreeAndNil(FPlannedObjects);
   end;
@@ -179,6 +179,14 @@ begin
   if AAdditionalData <> Nil then begin
     PanelFrameButtons.Visible := False;
     Splitter1.Visible := False;
+    CStaticFilter.HotTrack := False;
+    if TDoneFrameAdditionalData(AAdditionalData).movementType = COutMovement then begin
+      CStaticFilter.DataId := '2';
+      CStaticFilter.Caption := '<rozchód>';
+    end else begin
+      CStaticFilter.DataId := '3';
+      CStaticFilter.Caption := '<przychód>';
+    end;
   end;
   ReloadDone;
 end;

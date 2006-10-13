@@ -207,7 +207,6 @@ inherited CDoneFrame: TCDoneFrame
       Top = 4
       Width = 74
       Height = 15
-      Cursor = crHandPoint
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
