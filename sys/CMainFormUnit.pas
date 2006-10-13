@@ -78,6 +78,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
 
 procedure TCMainForm.FormCreate(Sender: TObject);
 begin
+  Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   FShortcutsFrames := TStringList.Create;
   CDateTime.Value := GWorkDate;
   FShortcutList := TStringList.Create;
@@ -262,7 +263,7 @@ end;
 
 procedure TCMainForm.UpdateStatusbar;
 begin
-  Caption := 'CManager - na dzieñ ' + DateToStr(GWorkDate);
+  Caption := 'CManager - ' + DateToStr(GWorkDate);
   StatusBar.SimpleText := ' Plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
 end;
 
