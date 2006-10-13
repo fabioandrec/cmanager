@@ -15,14 +15,6 @@ object CMainForm: TCMainForm
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object BevelU2: TBevel
-    Left = 0
-    Top = 45
-    Width = 861
-    Height = 3
-    Align = alTop
-    Shape = bsSpacer
-  end
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
@@ -49,184 +41,202 @@ object CMainForm: TCMainForm
     Panels = <>
     SimplePanel = True
   end
-  object PanelTitle: TPanel
+  object PanelMain: TPanel
     Left = 0
     Top = 24
     Width = 861
-    Height = 21
-    Align = alTop
-    Alignment = taRightJustify
+    Height = 564
+    Align = alClient
     BevelOuter = bvNone
-    Color = clBtnShadow
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindow
-    Font.Height = -16
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    ParentFont = False
+    Caption = 'PanelMain'
     TabOrder = 2
-    DesignSize = (
-      861
-      21)
-    object BevelU1: TBevel
+    object BevelU2: TBevel
       Left = 0
-      Top = 0
+      Top = 21
       Width = 861
       Height = 3
       Align = alTop
       Shape = bsSpacer
     end
-    object LabelShortcut: TLabel
-      Left = 30
-      Top = 3
-      Width = 100
-      Height = 16
-      Caption = 'ActiveShortcut'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindow
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
-    object ImageShortcut: TImage
-      Left = 6
-      Top = 3
-      Width = 16
-      Height = 16
-      Center = True
-      Transparent = True
-    end
-    object CDateTime: TCDateTime
-      Left = 776
-      Top = 3
-      Width = 81
-      Height = 15
-      Cursor = crHandPoint
-      Anchors = [akTop, akRight]
-      AutoSize = False
-      BevelInner = bvNone
-      BevelKind = bkTile
+    object PanelTitle: TPanel
+      Left = 0
+      Top = 0
+      Width = 861
+      Height = 21
+      Align = alTop
+      Alignment = taRightJustify
       BevelOuter = bvNone
-      Caption = '2006-08-20'
       Color = clBtnShadow
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindow
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ParentColor = False
-      ParentFont = False
-      TabOrder = 0
-      Visible = False
-      Value = 38949.000000000000000000
-      OnChanged = CDateTimeChanged
-      HotTrack = True
-    end
-  end
-  object PanelShortcuts: TPanel
-    Left = 0
-    Top = 48
-    Width = 170
-    Height = 540
-    Align = alLeft
-    BevelOuter = bvLowered
-    Color = clWindow
-    TabOrder = 3
-    DesignSize = (
-      170
-      540)
-    object PanelShortcutsTitle: TPanel
-      Left = 1
-      Top = 1
-      Width = 168
-      Height = 21
-      Align = alTop
-      Alignment = taLeftJustify
-      Caption = '  Skr'#243'ty'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -16
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        168
+        861
         21)
-      object SpeedButtonCloseShortcuts: TSpeedButton
-        Left = 151
-        Top = 5
-        Width = 13
-        Height = 13
-        Anchors = [akTop, akRight]
-        Caption = 'r'
-        Flat = True
+      object BevelU1: TBevel
+        Left = 0
+        Top = 0
+        Width = 861
+        Height = 3
+        Align = alTop
+        Shape = bsSpacer
+      end
+      object LabelShortcut: TLabel
+        Left = 30
+        Top = 3
+        Width = 100
+        Height = 16
+        Caption = 'ActiveShortcut'
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -8
-        Font.Name = 'Marlett'
-        Font.Style = []
+        Font.Color = clWindow
+        Font.Height = -15
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
         ParentFont = False
-        OnClick = SpeedButtonCloseShortcutsClick
+      end
+      object ImageShortcut: TImage
+        Left = 6
+        Top = 3
+        Width = 16
+        Height = 16
+        Center = True
+        Transparent = True
+      end
+      object CDateTime: TCDateTime
+        Left = 776
+        Top = 3
+        Width = 81
+        Height = 15
+        Cursor = crHandPoint
+        Anchors = [akTop, akRight]
+        AutoSize = False
+        BevelInner = bvNone
+        BevelKind = bkTile
+        BevelOuter = bvNone
+        Caption = '2006-08-20'
+        Color = clBtnShadow
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindow
+        Font.Height = -15
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        TabOrder = 0
+        Visible = False
+        Value = 38949.000000000000000000
+        OnChanged = CDateTimeChanged
+        HotTrack = True
       end
     end
-    object ShortcutList: TVirtualStringTree
-      Left = 1
-      Top = 48
-      Width = 168
-      Height = 480
-      Anchors = [akLeft, akTop, akRight, akBottom]
-      BevelEdges = []
-      BevelInner = bvNone
-      BevelOuter = bvRaised
-      BevelKind = bkFlat
-      BorderStyle = bsNone
-      ButtonStyle = bsTriangle
-      Colors.HotColor = clNavy
-      DefaultNodeHeight = 60
-      Header.AutoSizeIndex = -1
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'MS Sans Serif'
-      Header.Font.Style = []
-      Header.Height = 21
-      Header.Options = [hoAutoResize, hoDrag, hoShowSortGlyphs]
-      Header.SortColumn = 0
-      Header.Style = hsFlatButtons
-      HintMode = hmHint
-      Images = ImageListActionManager
-      Indent = 20
-      ParentShowHint = False
-      ShowHint = True
+    object PanelFrames: TPanel
+      Left = 170
+      Top = 24
+      Width = 691
+      Height = 540
+      Align = alClient
+      BevelOuter = bvLowered
+      Color = clWindow
       TabOrder = 1
-      TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-      TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-      TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
-      TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnAfterItemPaint = ShortcutListAfterItemPaint
-      OnClick = ShortcutListClick
-      OnGetText = ShortcutListGetText
-      OnHotChange = ShortcutListHotChange
-      Columns = <
-        item
-          Alignment = taCenter
-          Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
-          Position = 0
-          Width = 168
-        end>
     end
-  end
-  object PanelFrames: TPanel
-    Left = 170
-    Top = 48
-    Width = 691
-    Height = 540
-    Align = alClient
-    BevelOuter = bvLowered
-    Color = clWindow
-    TabOrder = 4
+    object PanelShortcuts: TPanel
+      Left = 0
+      Top = 24
+      Width = 170
+      Height = 540
+      Align = alLeft
+      BevelOuter = bvLowered
+      Color = clWindow
+      TabOrder = 2
+      DesignSize = (
+        170
+        540)
+      object PanelShortcutsTitle: TPanel
+        Left = 1
+        Top = 1
+        Width = 168
+        Height = 21
+        Align = alTop
+        Alignment = taLeftJustify
+        Caption = '  Skr'#243'ty'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        DesignSize = (
+          168
+          21)
+        object SpeedButtonCloseShortcuts: TSpeedButton
+          Left = 151
+          Top = 5
+          Width = 13
+          Height = 13
+          Anchors = [akTop, akRight]
+          Caption = 'r'
+          Flat = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -8
+          Font.Name = 'Marlett'
+          Font.Style = []
+          ParentFont = False
+          OnClick = SpeedButtonCloseShortcutsClick
+        end
+      end
+      object ShortcutList: TVirtualStringTree
+        Left = 1
+        Top = 48
+        Width = 168
+        Height = 480
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        BevelEdges = []
+        BevelInner = bvNone
+        BevelOuter = bvRaised
+        BevelKind = bkFlat
+        BorderStyle = bsNone
+        ButtonStyle = bsTriangle
+        Colors.HotColor = clNavy
+        DefaultNodeHeight = 60
+        Header.AutoSizeIndex = -1
+        Header.Font.Charset = DEFAULT_CHARSET
+        Header.Font.Color = clWindowText
+        Header.Font.Height = -11
+        Header.Font.Name = 'MS Sans Serif'
+        Header.Font.Style = []
+        Header.Height = 21
+        Header.Options = [hoAutoResize, hoDrag, hoShowSortGlyphs]
+        Header.SortColumn = 0
+        Header.Style = hsFlatButtons
+        HintMode = hmHint
+        Images = ImageListActionManager
+        Indent = 20
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+        TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+        TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
+        TreeOptions.SelectionOptions = [toFullRowSelect]
+        OnAfterItemPaint = ShortcutListAfterItemPaint
+        OnClick = ShortcutListClick
+        OnGetText = ShortcutListGetText
+        OnHotChange = ShortcutListHotChange
+        Columns = <
+          item
+            Alignment = taCenter
+            Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+            Position = 0
+            Width = 168
+          end>
+      end
+    end
   end
   object ImageListActionManager: TImageList
     Left = 483

@@ -12,16 +12,7 @@ type
   TCMainForm = class(TForm)
     MenuBar: TActionMainMenuBar;
     StatusBar: TStatusBar;
-    PanelTitle: TPanel;
-    BevelU2: TBevel;
-    PanelShortcuts: TPanel;
-    BevelU1: TBevel;
-    PanelFrames: TPanel;
-    PanelShortcutsTitle: TPanel;
-    SpeedButtonCloseShortcuts: TSpeedButton;
-    LabelShortcut: TLabel;
     ImageListActionManager: TImageList;
-    ImageShortcut: TImage;
     ActionManager: TActionManager;
     ActionShortcuts: TAction;
     ActionShorcutOperations: TAction;
@@ -29,12 +20,22 @@ type
     ActionShortcutProducts: TAction;
     ActionShortcutCashpoints: TAction;
     ActionShortcutReports: TAction;
-    CDateTime: TCDateTime;
     ActionShortcutPlanned: TAction;
     ActionShortcutPlannedDone: TAction;
-    ShortcutList: TVirtualStringTree;
     ActionStatusbar: TAction;
     ActionAbout: TAction;
+    PanelMain: TPanel;
+    PanelTitle: TPanel;
+    BevelU1: TBevel;
+    LabelShortcut: TLabel;
+    ImageShortcut: TImage;
+    CDateTime: TCDateTime;
+    BevelU2: TBevel;
+    PanelFrames: TPanel;
+    PanelShortcuts: TPanel;
+    PanelShortcutsTitle: TPanel;
+    SpeedButtonCloseShortcuts: TSpeedButton;
+    ShortcutList: TVirtualStringTree;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -263,8 +264,9 @@ end;
 
 procedure TCMainForm.UpdateStatusbar;
 begin
-  Caption := 'CManager - ' + DateToStr(GWorkDate);
-  StatusBar.SimpleText := ' Plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+  PanelMain.Visible := GDataProvider.IsConnected;
+  Caption := 'CManager ' + DateToStr(GWorkDate);
+  StatusBar.SimpleText := ' ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
 end;
 
 procedure TCMainForm.ActionAboutExecute(Sender: TObject);
