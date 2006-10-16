@@ -455,7 +455,8 @@ begin
         xDone := TPlannedDone.CreateObject(PlannedDoneProxy, False);
         xDone.idPlannedMovement := xTrMove;
         xDone.triggerDate := xTrDate;
-        xDone.doneState := CDoneAccepted;
+        xDone.doneState := CDoneOperation;
+        xDone.doneDate := regDate;
         idPlannedDone := xDone.id;
         SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
       end;

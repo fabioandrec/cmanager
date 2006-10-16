@@ -144,7 +144,7 @@ inherited CDoneFrame: TCDoneFrame
       item
         Position = 2
         Width = 100
-        WideText = 'Data'
+        WideText = 'Do kiedy'
       end
       item
         Alignment = taRightJustify
@@ -696,6 +696,18 @@ inherited CDoneFrame: TCDoneFrame
     Images = ImageList
     Left = 200
     Top = 112
+    object ActionOperation: TAction
+      Caption = 'Wykonaj'
+      ImageIndex = 0
+    end
+    object ActionAccept: TAction
+      Caption = 'Uznaj'
+      ImageIndex = 0
+    end
+    object ActionDecline: TAction
+      Caption = 'Odrzu'#263
+      ImageIndex = 0
+    end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80

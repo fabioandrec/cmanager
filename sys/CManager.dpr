@@ -8,6 +8,7 @@ program CManager;
 uses
   MemCheck in 'MemCheck.pas',
   Forms,
+  Windows,
   CDatabase in 'CDatabase.pas',
   CDataObjects in 'CDataObjects.pas',
   CMainFormUnit in 'CMainFormUnit.pas' {CMainForm},
@@ -42,6 +43,7 @@ uses
 begin
   MemChk;
   Application.Initialize;
+  Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeDataProvider(CDefaultFilename) then begin
     InitializeProxies;
     Application.CreateForm(TCMainForm, CMainForm);

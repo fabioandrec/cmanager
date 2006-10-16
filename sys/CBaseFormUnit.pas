@@ -26,7 +26,6 @@ type
   end;
 
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
-function FileVersion(AName: string): String;
 
 implementation
 
@@ -236,32 +235,6 @@ begin
     ARichEdit.Text := AText;
   end;
   ARichEdit.Lines.EndUpdate;
-end;
-
-function FileVersion(AName: string): String;
-var xProductVersionMS: DWORD;
-    xProductVersionLS: DWORD;
-    xVersionBuffer: Pointer;
-    xVersionSize, xDummy: DWord;
-    xSize: Integer;
-    xVSFixedFileInfo: PVSFixedFileInfo;
-begin
-  xProductVersionLS := 0;
-  xProductVersionMS := 0;
-  xVersionSize := GetFileVersionInfoSize(PChar(AName), xDummy);
-  if xVersionSize <> 0 then begin
-    xSize := xVersionSize;
-    GetMem(xVersionBuffer, xSize);
-    try
-      if GetFileVersionInfo(PChar(AName), xDummy, xVersionSize, xVersionBuffer) and VerQueryValue(xVersionBuffer, '', Pointer(xVSFixedFileInfo), xVersionSize) then begin
-        xProductVersionMS := xVSFixedFileInfo^.dwProductVersionMS;
-        xProductVersionLS := xVSFixedFileInfo^.dwProductVersionLS;
-      end;
-    finally
-      FreeMem(xVersionBuffer, xSize);
-    end;
-  end;
-  Result := IntToStr(HiWord(xProductVersionMS)) + '.' + IntToStr(LoWord(xProductVersionMS)) + '.' + IntToStr(HiWord(xProductVersionLS)) + '.' + IntToStr(LoWord(xProductVersionLS));
 end;
 
 end.

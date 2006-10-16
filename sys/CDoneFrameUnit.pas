@@ -36,6 +36,9 @@ type
     Label4: TLabel;
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
+    ActionOperation: TAction;
+    ActionAccept: TAction;
+    ActionDecline: TAction;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -161,6 +164,7 @@ begin
     SumList.RootNodeCount := FSumObjects.Count;
     SumList.EndUpdate;
   end;
+  DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0);
 end;
 
 procedure TCDoneFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
@@ -686,11 +690,13 @@ var xData: TPlannedTreeItem;
     xCanAccept: Boolean;
 begin
   xCanAccept := False;
-  if Owner.InheritsFrom(TCFrameForm) then begin
-    if Node <> Nil then begin
-      xData := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
-      xCanAccept := xData.done = Nil;
+  if Node <> Nil then begin
+    xData := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
+    if xData.done = Nil then begin
+      xCanAccept := True;
     end;
+  end;
+  if Owner.InheritsFrom(TCFrameForm) then begin
     TCFrameForm(Owner).BitBtnOk.Enabled := xCanAccept;
   end;
 end;

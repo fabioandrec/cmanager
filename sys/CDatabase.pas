@@ -35,7 +35,7 @@ type
     procedure RollbackTransaction;
     function CommitTransaction: Boolean;
     function ExecuteSql(ASql: String): Boolean;
-    function OpenSql(ASql: String): TADOQuery;
+    function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
   published
     property DataProxyList: TObjectList read FDataProxyList;
@@ -193,12 +193,39 @@ function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
+function FileVersion(AName: string): String;
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils;
+
+function FileVersion(AName: string): String;
+var xProductVersionMS: DWORD;
+    xProductVersionLS: DWORD;
+    xVersionBuffer: Pointer;
+    xVersionSize, xDummy: DWord;
+    xSize: Integer;
+    xVSFixedFileInfo: PVSFixedFileInfo;
+begin
+  xProductVersionLS := 0;
+  xProductVersionMS := 0;
+  xVersionSize := GetFileVersionInfoSize(PChar(AName), xDummy);
+  if xVersionSize <> 0 then begin
+    xSize := xVersionSize;
+    GetMem(xVersionBuffer, xSize);
+    try
+      if GetFileVersionInfo(PChar(AName), xDummy, xVersionSize, xVersionBuffer) and VerQueryValue(xVersionBuffer, '', Pointer(xVSFixedFileInfo), xVersionSize) then begin
+        xProductVersionMS := xVSFixedFileInfo^.dwProductVersionMS;
+        xProductVersionLS := xVSFixedFileInfo^.dwProductVersionLS;
+      end;
+    finally
+      FreeMem(xVersionBuffer, xSize);
+    end;
+  end;
+  Result := IntToStr(HiWord(xProductVersionMS)) + '.' + IntToStr(LoWord(xProductVersionMS)) + '.' + IntToStr(HiWord(xProductVersionLS)) + '.' + IntToStr(LoWord(xProductVersionLS));
+end;
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 begin
@@ -247,6 +274,7 @@ end;
 function InitializeDataProvider(ADatabaseName: String): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
+    xDataset: TADOQuery;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
@@ -273,7 +301,8 @@ begin
       ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
     end else begin
       if xCommand <> '' then begin
-        Result := GDataProvider.ExecuteSql(xCommand);
+        Result := GDataProvider.ExecuteSql(xCommand) and
+                  GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now)]));
         if not Result then begin
           ShowInfo(itError, 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
           GDataProvider.DisconnectFromDatabase;
@@ -283,6 +312,14 @@ begin
         end;
       end else begin
         GDatabaseName := ADatabaseName;
+        xDataset := GDataProvider.OpenSql('select * from cmanagerInfo', False);
+        if xDataset = Nil then begin
+          ShowInfo(itError, 'Wybrany plik nie jest poprawnym plikiem danych', '');
+          GDataProvider.DisconnectFromDatabase;
+          Result := False;
+        end else begin
+          xDataset.Free;
+        end;
       end;
     end;
   end;
@@ -581,7 +618,7 @@ begin
   end;
 end;
 
-function TDataProvider.OpenSql(ASql: String): TADOQuery;
+function TDataProvider.OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
 begin
   Result := TADOQuery.Create(Nil);
   try
@@ -591,7 +628,9 @@ begin
     Result.Open
   except
     on E: Exception do begin
-      ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+      if AShowError then begin
+        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+      end;
       FLastError := E.Message;
       FreeAndNil(Result);
     end;

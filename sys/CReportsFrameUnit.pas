@@ -250,15 +250,23 @@ begin
   xGid := GetSelectedId;
   if xGid <> CEmptyDataGid then begin
     xClass := GetClassOfReport(xGid);
-    xReport := xClass.Create;
-    xReport.ShowReport;
-    xReport.Free;
+    if xClass <> Nil then begin
+      xReport := xClass.Create;
+      xReport.ShowReport;
+      xReport.Free;
+    end else begin
+      ShowInfo(itError, 'Wybrany raport nie jest jeszcze dostêpny', '')
+    end;
   end;
 end;
 
 function TCReportsFrame.GetClassOfReport(AGid: TDataGid): TCReportClass;
 begin
-  Result := TTestReport;
+  if AGid = '1' then begin
+    Result := TTodayCashInAccount;
+  end else begin
+    Result := Nil;
+  end;
 end;
 
 end.

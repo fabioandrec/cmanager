@@ -69,11 +69,12 @@ create table plannedDone (
   created datetime not null,
   modified datetime,
   triggerDate datetime not null,
+  doneDate datetime not null,
   doneState varchar(1) not null,
   idPlannedMovement uniqueidentifier not null,
   primary key (idPlannedDone),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
-  constraint ck_doneState check (doneState in ('A', 'D'))
+  constraint ck_doneState check (doneState in ('O', 'D', 'A'))
 );
 
 create table baseMovement (
@@ -96,6 +97,11 @@ create table baseMovement (
   constraint fk_sourceAccount foreign key (idSourceAccount) references account (idAccount),
   constraint fk_cashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_product foreign key (idProduct) references product (idProduct)
+);
+
+create table cmanagerInfo (
+  version varchar(20) not null,
+  created datetime not null
 );
 
 create index ix_baseMovement_regDate on baseMovement (regDate);

@@ -19,8 +19,9 @@ const
   CEndConditionNever = 'N';
   CTriggerTypeWeekly = 'W';
   CTriggerTypeMonthly = 'M';
-  CDoneAccepted = 'A';
+  CDoneOperation = 'O';
   CDoneDeleted = 'D';
+  CDoneAccepted = 'A';
 
 type
   TBaseName = string[40];
@@ -187,11 +188,13 @@ type
   TPlannedDone = class(TDataObject)
   private
     FtriggerDate: TDateTime;
+    FdoneDate: TDateTime;
     FidPlannedMovement: TDataGid;
     FdoneState: TBaseEnumeration;
     procedure SetidPlannedMovement(const Value: TDataGid);
     procedure SettriggerDate(const Value: TDateTime);
     procedure SetdoneState(const Value: TBaseEnumeration);
+    procedure SetdoneDate(const Value: TDateTime);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -199,6 +202,7 @@ type
     property triggerDate: TDateTime read FtriggerDate write SettriggerDate;
     property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
     property doneState: TBaseEnumeration read FdoneState write SetdoneState;
+    property doneDate: TDateTime read FdoneDate write SetdoneDate;
   end;
 
 
@@ -737,8 +741,17 @@ begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     FtriggerDate := FieldByName('triggerDate').AsDateTime;
+    FdoneDate := FieldByName('doneDate').AsDateTime;
     FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
     FdoneState := FieldByName('doneState').AsString;
+  end;
+end;
+
+procedure TPlannedDone.SetdoneDate(const Value: TDateTime);
+begin
+  if FdoneDate <> Value then begin
+    FdoneDate := Value;
+    SetState(msModified);
   end;
 end;
 
@@ -771,6 +784,7 @@ begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('triggerDate', DatetimeToDatabase(FtriggerDate), False, 'plannedDone');
+    AddField('doneDate', DatetimeToDatabase(FdoneDate), False, 'plannedDone');
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
     AddField('doneState', FdoneState, True, 'plannedDone');
   end;
