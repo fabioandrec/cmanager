@@ -37,18 +37,6 @@ inherited CReportForm: TCReportForm
       Framed = False
       Action = ActionPrint
     end
-    object CButtonEditCategory: TCButton
-      Left = 181
-      Top = 5
-      Width = 92
-      Height = 33
-      Cursor = crHandPoint
-      PicPosition = ppLeft
-      PicOffset = 10
-      TxtOffset = 15
-      Framed = False
-      Action = ActionSave
-    end
   end
   object Panel2: TPanel
     Left = 0
@@ -230,11 +218,6 @@ inherited CReportForm: TCReportForm
       Caption = 'Drukuj'
       ImageIndex = 0
       OnExecute = ActionPrintExecute
-    end
-    object ActionSave: TAction
-      Caption = 'Zapisz'
-      ImageIndex = 0
-      OnExecute = ActionSaveExecute
     end
   end
 end

@@ -10,32 +10,33 @@ type
 
   TCReport = class(TObject)
   private
+    FreportPath: String;
     FreportText: TStringList;
     Fform: TCReportForm;
     Fcharts: TObjectList;
-    function GetreportText: String;
+    function PrepareReportData: Boolean;
+    procedure PrepareReportPath;
   protected
     procedure CleanReportData; virtual;
-    function PrepareReportData: Boolean; virtual;
-    function GetreportName: String; virtual;
-    procedure UpdateReportHeader; virtual;
-    procedure UpdateReportBody; virtual; abstract;
-    procedure UpdateReportFooter; virtual;
+    function PrepareReportConditions: Boolean; virtual;
+    function GetReportTitle: String; virtual; abstract;
+    function GetReportBody: String; virtual; abstract;
+    function GetReportFooter: String; virtual;
   public
     procedure ShowReport;
     constructor Create;
     destructor Destroy; override;
     function GetChart: TChart;
   published
-    property reportText: String read GetreportText;
-    property reportName: String read GetreportName;
-    property body: TStringList read FreportText;
+    property reportTitle: String read GetReportTitle;
+    property reportBody: String read GetReportBody;
+    property reportFooter: String read GetReportFooter;
   end;
 
   TTodayCashInAccount = class(TCReport)
   protected
-    function GetreportName: String; override;
-    procedure UpdateReportBody; override;
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
   end;
 
 implementation
@@ -49,8 +50,26 @@ begin
   Result := '"#' + Format('%.2x%.2x%.2x', [GetRValue(xRgb), GetGValue(xRgb), GetBValue(xRgb)]) + '"';
 end;
 
-procedure TCReport.CleanReportData;
+function GetReportPath(ASubpath: String): string;
+var i: integer;
 begin
+  SetLength(Result, MAX_PATH);
+	i := GetTempPath(Length(Result), PChar(Result));
+	SetLength(Result, i);
+  Result := IncludeTrailingPathDelimiter(Result) + IncludeTrailingPathDelimiter('Cmanager') + IncludeTrailingPathDelimiter(ASubpath);
+end;
+
+procedure TCReport.CleanReportData;
+var xRec: TSearchRec;
+    xRes: Integer;
+begin
+  xRes := FindFirst(FreportPath + '*.*', faAnyFile, xRec);
+  while (xRes = 0) do begin
+    DeleteFile(FreportPath + xRec.Name);
+    xRes := FindNext(xRec);
+  end;
+  FindClose(xRec);
+  RemoveDir(FreportPath);
 end;
 
 constructor TCReport.Create;
@@ -80,31 +99,44 @@ begin
   Fcharts.Add(Result)
 end;
 
-function TCReport.GetreportName: String;
+function TCReport.GetReportFooter: String;
 begin
-  Result := 'bez nazwy';
+  Result := 'CManager wer. ' + FileVersion(ParamStr(0));
 end;
 
-function TCReport.GetreportText: String;
+function TCReport.PrepareReportConditions: Boolean;
 begin
-  Result := FreportText.Text;
+  Result := True;
 end;
 
 function TCReport.PrepareReportData: Boolean;
+var xText: String;
 begin
-  Result := True;
-  with FreportText do begin
-    Add('<HTML>');
-    Add('<HEAD>');
-    Add('<TITLE>' + GetreportName + '</TITLE>');
-    Add('</HEAD>');
-    Add('<BODY>');
-    UpdateReportHeader;
-    UpdateReportBody;
-    UpdateReportFooter;
-    Add('</BODY>');
-    Add('</HTML>');
+  Result := PrepareReportConditions;
+  PrepareReportPath;
+  xText := FreportText.Text;
+  xText := StringReplace(xText, '[reptitle]', reportTitle, [rfReplaceAll, rfIgnoreCase]);
+  xText := StringReplace(xText, '[repbody]', reportBody, [rfReplaceAll, rfIgnoreCase]);
+  xText := StringReplace(xText, '[repfooter]', reportFooter, [rfReplaceAll, rfIgnoreCase]);
+  FreportText.Text := xText;
+end;
+
+procedure TCReport.PrepareReportPath;
+var xRes: TResourceStream;
+begin
+  FreportPath := GetReportPath(IntToStr(GetTickCount));
+  if not FileExists('report.css') then begin
+    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
+    xRes.SaveToFile('report.css');
+    xRes.Free;
   end;
+  if not FileExists('report.htm') then begin
+    xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
+    xRes.SaveToFile('report.htm');
+    xRes.Free;
+  end;
+  FreportText.LoadFromFile('report.htm');
+  ForceDirectories(FreportPath)
 end;
 
 procedure TCReport.ShowReport;
@@ -112,67 +144,56 @@ begin
   Fform := TCReportForm.Create(Nil);
   if PrepareReportData then begin
     Fform.Caption := 'Raport';
-    Fform.CBrowser.LoadFromString(reportText);
+    FreportText.SaveToFile(FreportPath + 'report.htm');
+    CopyFile('report.css', PChar(FreportPath + 'report.css'), False); 
+    Fform.CBrowser.Navigate('file://' + FreportPath + 'report.htm');
     Fform.ShowModal;
   end;
   Fform.Free;
 end;
 
-procedure TCReport.UpdateReportFooter;
-begin
-end;
-
-procedure TCReport.UpdateReportHeader;
-begin
-  with FreportText do begin
-    Add('<FONT FACE="VERDANA,ARIAL" SIZE=2 COLOR=' + ColToRgb(clInfoText) + '><B>' + GetreportName + '<B></FONT>');
-    Add('<HR SIZE=1>');
-  end;
-end;
-
-function TTodayCashInAccount.GetreportName: String;
-begin
-  Result := 'Stan kont na dziœ (' + DateToStr(GWorkDate) + ')';
-end;
-
-procedure TTodayCashInAccount.UpdateReportBody;
+function TTodayCashInAccount.GetReportBody: String;
 var xDataset: TADOQuery;
     xSum: Currency;
+    xBody: TStringList;
 begin
   xDataset := GDataProvider.OpenSql('select * from account order by name');
   xSum := 0;
-  with xDataset, body do begin
-    Add('<TABLE COLSPAN=2 CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH="100%">');
-    Add('<TR BGCOLOR=' + ColToRgb(clActiveBorder) + '>');
-    Add('<TD WIDTH="75%">Nazwa konta</TD>');
-    Add('<TD ALIGN="RIGHT" WIDTH="25%">Saldo</TD>');
-    Add('</TR>');
-    Add('</TABLE>');
-    Add('<HR SIZE=1>');
-    Add('<TABLE COLSPAN=2 CELLSPACING=0 BORDER=0 WIDTH="100%">');
+  xBody := TStringList.Create;
+  with xDataset, xBody do begin
+    Add('<table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="75%">Nazwa konta</td>');
+    Add('<td class="headcash" width="25%">Saldo</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=2>');
     while not Eof do begin
       if not Odd(RecNo) then begin
-        Add('<TR BGCOLOR=' + ColToRgb(GetHighLightColor(clWindow, -10)) + '>');
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
       end else begin
-        Add('<TR>');
+        Add('<tr class="base">');
       end;
-      Add('<TD WIDTH="75%">' + FieldByName('name').AsString + '</TD>');
-      Add('<TD ALIGN="RIGHT" WIDTH="25%">' + CurrencyToString(FieldByName('cash').AsCurrency) + '</TD>');
-      Add('</TR>');
+      Add('<td class="text" width="75%">' + FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency) + '</td>');
+      Add('</tr>');
       xSum := xSum + FieldByName('cash').AsCurrency;
       Next;
     end;
-    Add('</TABLE>');
-    Add('<HR SIZE=1>');
-    Add('<TABLE COLSPAN=2 CELLSPACING=0 BORDER=0 WIDTH="100%">');
-    Add('<TR>');
-    Add('<TD WIDTH="75%">Wszystkie konta</TD>');
-    Add('<TD ALIGN="RIGHT" WIDTH="25%">' + CurrencyToString(xSum) + '</TD>');
-    Add('</TR>');
-    Add('</TABLE>');
-    Add('<HR SIZE=1>');
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="75%">Wszystkie konta</td>');
+    Add('<td class="sumcash" width="25%">' + CurrencyToString(xSum) + '</td>');
+    Add('</tr>');
+    Add('</table>');
   end;
   xDataset.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TTodayCashInAccount.GetReportTitle: String;
+begin
+  Result := 'Stan kont na dziœ (' + DateToStr(GWorkDate) + ')';
 end;
 
 end.

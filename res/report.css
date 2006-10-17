@@ -1,0 +1,68 @@
+body
+{
+color: black;
+font-family: Verdana, Arial;
+font-size: 12px;
+background-color: white;
+}
+table.base
+{
+border: 0px;
+border-collapse: collapse;
+width: 100%;
+}
+tr.base
+{
+height: 25px
+}
+td.cash
+{
+text-align: right;
+}
+td.text
+{
+text-align: left;
+}
+td.headtext
+{
+font-weight: bold;
+background-color: #CCFFCC;
+text-align: left;
+}
+td.headcash
+{
+font-weight: bold;
+text-align: right;
+background-color: #CCFFCC;
+}
+td.sumtext
+{
+font-weight: bold;
+background-color: #CCCCFF;
+text-align: left;
+}
+td.sumcash
+{
+font-weight: bold;
+text-align: right;
+background-color: #CCCCFF;
+}
+hr
+{
+height: 1px;
+width: 100%;
+}
+.reptitle
+{
+font-size: 16px;
+font-weight: bold;
+color: navy;
+font-family: Verdana, Arial;
+}
+.repfooter
+{
+font-size: 10px;
+color: navy;
+font-family: Verdana, Arial;
+text-align: right;
+}

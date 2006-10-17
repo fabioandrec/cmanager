@@ -14,15 +14,12 @@ type
     CBrowser: TCBrowser;
     CButtonAddCategory: TCButton;
     CButtonAddSubcategory: TCButton;
-    CButtonEditCategory: TCButton;
     ImageList: TImageList;
     ActionList: TActionList;
     ActionPreview: TAction;
     ActionPrint: TAction;
-    ActionSave: TAction;
     procedure ActionPrintExecute(Sender: TObject);
     procedure ActionPreviewExecute(Sender: TObject);
-    procedure ActionSaveExecute(Sender: TObject);
   end;
 
 implementation
@@ -39,11 +36,6 @@ end;
 procedure TCReportForm.ActionPreviewExecute(Sender: TObject);
 begin
   CBrowser.ExecWB(OLECMDID_PRINTPREVIEW, OLECMDEXECOPT_PROMPTUSER);
-end;
-
-procedure TCReportForm.ActionSaveExecute(Sender: TObject);
-begin
-  CBrowser.ExecWB(OLECMDID_SAVEAS, OLECMDEXECOPT_PROMPTUSER);
 end;
 
 end.
