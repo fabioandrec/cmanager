@@ -30,13 +30,13 @@ uses
   CCalendarFormUnit in 'CCalendarFormUnit.pas' {CCalendarForm},
   CReportsFrameUnit in 'CReportsFrameUnit.pas' {CReportsFrame: TFrame},
   CMovementFormUnit in 'CMovementFormUnit.pas' {CMovementForm},
-  CReportFormUnit in 'CReportFormUnit.pas' {CReportForm},
   CReports in 'CReports.pas',
   CPlannedFrameUnit in 'CPlannedFrameUnit.pas' {CPlannedFrame: TFrame},
   CPlannedFormUnit in 'CPlannedFormUnit.pas' {CPlannedForm},
   CScheduleFormUnit in 'CScheduleFormUnit.pas' {CScheduleForm},
   CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame},
-  CAboutFormUnit in 'CAboutFormUnit.pas';
+  CAboutFormUnit in 'CAboutFormUnit.pas',
+  CReportFormUnit in 'CReportFormUnit.pas' {CReportForm};
 
 {$R *.res}
 
@@ -47,6 +47,6 @@ begin
   if InitializeDataProvider(CDefaultFilename) then begin
     InitializeProxies;
     Application.CreateForm(TCMainForm, CMainForm);
-    Application.Run;
+  Application.Run;
   end;
 end.

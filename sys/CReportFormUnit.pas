@@ -4,38 +4,20 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CBaseFormUnit, OleCtrls, SHDocVw, CComponents, ExtCtrls,
-  ActnList, ImgList, TeeProcs, TeEngine, Chart;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, OleCtrls, SHDocVw,
+  CComponents;
 
 type
-  TCReportForm = class(TCBaseForm)
-    Panel1: TPanel;
-    Panel2: TPanel;
+  TCReportForm = class(TCConfigForm)
     CBrowser: TCBrowser;
-    CButtonAddCategory: TCButton;
-    CButtonAddSubcategory: TCButton;
-    ImageList: TImageList;
-    ActionList: TActionList;
-    ActionPreview: TAction;
-    ActionPrint: TAction;
-    procedure ActionPrintExecute(Sender: TObject);
-    procedure ActionPreviewExecute(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
   end;
 
 implementation
 
-uses CReports;
-
 {$R *.dfm}
-
-procedure TCReportForm.ActionPrintExecute(Sender: TObject);
-begin
-  CBrowser.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_PROMPTUSER);
-end;
-
-procedure TCReportForm.ActionPreviewExecute(Sender: TObject);
-begin
-  CBrowser.ExecWB(OLECMDID_PRINTPREVIEW, OLECMDEXECOPT_PROMPTUSER);
-end;
 
 end.

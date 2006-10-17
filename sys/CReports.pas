@@ -41,7 +41,7 @@ type
 
 implementation
 
-uses Forms, SysUtils, CDatabase, Adodb;
+uses Forms, SysUtils, CDatabase, Adodb, CConfigFormUnit;
 
 function ColToRgb(AColor: TColor): String;
 var xRgb: Integer;
@@ -147,7 +147,7 @@ begin
     FreportText.SaveToFile(FreportPath + 'report.htm');
     CopyFile('report.css', PChar(FreportPath + 'report.css'), False); 
     Fform.CBrowser.Navigate('file://' + FreportPath + 'report.htm');
-    Fform.ShowModal;
+    Fform.ShowConfig(coNone);
   end;
   Fform.Free;
 end;
