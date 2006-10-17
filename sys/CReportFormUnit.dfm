@@ -1,4 +1,6 @@
 inherited CReportForm: TCReportForm
+  Left = 126
+  Top = 15
   Width = 799
   Height = 638
   BorderIcons = [biSystemMenu, biMaximize]
@@ -34,6 +36,26 @@ inherited CReportForm: TCReportForm
     end
     inherited BitBtnCancel: TBitBtn
       Left = 702
+    end
+    object BitBtn1: TBitBtn
+      Left = 14
+      Top = 8
+      Width = 75
+      Height = 25
+      Anchors = [akLeft, akBottom]
+      Caption = 'Drukuj'
+      TabOrder = 2
+      OnClick = BitBtnCancelClick
+    end
+    object BitBtn2: TBitBtn
+      Left = 102
+      Top = 8
+      Width = 75
+      Height = 25
+      Anchors = [akLeft, akBottom]
+      Caption = 'Podgl'#261'd'
+      TabOrder = 3
+      OnClick = BitBtn2Click
     end
   end
 end
