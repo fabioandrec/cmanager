@@ -45,7 +45,7 @@ inherited CReportForm: TCReportForm
       Anchors = [akLeft, akBottom]
       Caption = 'Drukuj'
       TabOrder = 2
-      OnClick = BitBtnCancelClick
+      OnClick = BitBtn1Click
     end
     object BitBtn2: TBitBtn
       Left = 102

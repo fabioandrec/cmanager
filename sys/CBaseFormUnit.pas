@@ -3,7 +3,7 @@ unit CBaseFormUnit;
 interface
 
 uses
-  Windows, Forms, Classes, ComCtrls, Graphics, SysUtils;
+  Windows, Forms, Classes, ComCtrls, Graphics, SysUtils, Messages;
 
 const
   CRtfSB = '<b>';
@@ -21,13 +21,18 @@ const
 type
   TCBaseForm = class(TForm)
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   protected
     procedure CloseForm; virtual;
+    procedure WndProc(var Message: TMessage); override;
   end;
 
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
 
 implementation
+
+uses CSettings, CBaseFrameUnit;
 
 {$R *.dfm}
 
@@ -235,6 +240,26 @@ begin
     ARichEdit.Text := AText;
   end;
   ARichEdit.Lines.EndUpdate;
+end;
+
+procedure TCBaseForm.FormDestroy(Sender: TObject);
+begin
+  SaveFormPosition(Self);
+end;
+
+procedure TCBaseForm.FormShow(Sender: TObject);
+begin
+  LoadFormPosition(Self);
+end;
+
+procedure TCBaseForm.WndProc(var Message: TMessage);
+begin
+  inherited WndProc(Message);
+  if Message.Msg = WM_FORMMAXIMIZE then begin
+    WindowState := wsMaximized;
+  end else if Message.Msg = WM_FORMMINIMIZE then begin
+    WindowState := wsMaximized;
+  end;
 end;
 
 end.

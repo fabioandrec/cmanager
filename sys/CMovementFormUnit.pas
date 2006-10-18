@@ -278,10 +278,6 @@ begin
       if ShowInfo(itQuestion, 'Nie wybrano kontrahenta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
         CStaticInoutCyclicCashpoint.DoGetDataId;
       end;
-    end else if CCurrEditInoutCyclic.Value = 0 then begin
-      Result := False;
-      ShowInfo(itError, 'Kwota operacji nie mo¿e byæ zerowa', '');
-      CCurrEditInoutCyclic.SetFocus;
     end;
   end;
 end;

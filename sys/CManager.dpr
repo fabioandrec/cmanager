@@ -36,7 +36,8 @@ uses
   CScheduleFormUnit in 'CScheduleFormUnit.pas' {CScheduleForm},
   CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame},
   CAboutFormUnit in 'CAboutFormUnit.pas',
-  CReportFormUnit in 'CReportFormUnit.pas' {CReportForm};
+  CReportFormUnit in 'CReportFormUnit.pas' {CReportForm},
+  CSettings in 'CSettings.pas';
 
 {$R *.res}
 
@@ -44,9 +45,11 @@ begin
   MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
-  if InitializeDataProvider(CDefaultFilename) then begin
-    InitializeProxies;
-    Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+  if InitializeSettings(CSettingsFilename) then begin
+    if InitializeDataProvider(CDefaultFilename) then begin
+      InitializeProxies;
+      Application.CreateForm(TCMainForm, CMainForm);
+      Application.Run;
+    end;
   end;
 end.

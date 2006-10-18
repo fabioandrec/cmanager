@@ -47,6 +47,7 @@ type
     procedure ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
     procedure ActionStatusbarExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -59,6 +60,8 @@ type
     procedure ActionShortcutExecute(ASender: TObject);
     function GetStatusbarVisible: Boolean;
     procedure SetStatusbarVisible(const Value: Boolean);
+  protected
+    procedure WndProc(var Message: TMessage); override;
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
     property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
@@ -73,7 +76,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
-  CAboutFormUnit;
+  CAboutFormUnit, CSettings;
 
 {$R *.dfm}
 
@@ -117,6 +120,8 @@ procedure TCMainForm.FormDestroy(Sender: TObject);
 begin
   FShortcutsFrames.Free;
   FShortcutList.Free;
+  SaveFormPosition(Self);
+  FinalizeSettings(CSettingsFilename);
 end;
 
 procedure TCMainForm.PerformShortcutAction(AAction: TAction);
@@ -274,6 +279,21 @@ begin
   xAbout := TCAboutForm.Create(Nil);
   xAbout.ShowConfig(coNone);
   xAbout.Free;
+end;
+
+procedure TCMainForm.FormShow(Sender: TObject);
+begin
+  LoadFormPosition(Self);
+end;
+
+procedure TCMainForm.WndProc(var Message: TMessage);
+begin
+  inherited WndProc(Message);
+  if Message.Msg = WM_FORMMAXIMIZE then begin
+    WindowState := wsMaximized;
+  end else if Message.Msg = WM_FORMMINIMIZE then begin
+    WindowState := wsMaximized;
+  end;
 end;
 
 end.

@@ -12,8 +12,9 @@ object CBaseForm: TCBaseForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  Position = poScreenCenter
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
 end

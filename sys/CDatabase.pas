@@ -199,7 +199,7 @@ function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
 
-uses CInfoFormUnit, DB, StrUtils, DateUtils;
+uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit;
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
