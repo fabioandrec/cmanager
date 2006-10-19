@@ -72,6 +72,7 @@ create table plannedDone (
   doneDate datetime not null,
   doneState varchar(1) not null,
   idPlannedMovement uniqueidentifier not null,
+  description varchar(200),
   primary key (idPlannedDone),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
   constraint ck_doneState check (doneState in ('O', 'D', 'A'))

@@ -16,6 +16,14 @@ inherited CDoneFrame: TCDoneFrame
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
+    object Bevel: TBevel
+      Left = 0
+      Top = 146
+      Width = 443
+      Height = 3
+      Align = alBottom
+      Shape = bsBottomLine
+    end
     object Panel2: TPanel
       Left = 0
       Top = 0
@@ -30,7 +38,7 @@ inherited CDoneFrame: TCDoneFrame
       Left = 0
       Top = 21
       Width = 443
-      Height = 168
+      Height = 125
       Align = alClient
       BevelEdges = []
       BevelInner = bvNone
@@ -88,6 +96,28 @@ inherited CDoneFrame: TCDoneFrame
           Width = 150
           WideText = 'Saldo'
         end>
+    end
+    object Panel1: TPanel
+      Left = 0
+      Top = 149
+      Width = 443
+      Height = 40
+      Align = alBottom
+      BevelOuter = bvNone
+      Color = clWindow
+      TabOrder = 2
+      object CButtonsStatus: TCButton
+        Left = 13
+        Top = 4
+        Width = 116
+        Height = 33
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionOperation
+      end
     end
   end
   object DoneList: TVirtualStringTree [2]
@@ -697,16 +727,9 @@ inherited CDoneFrame: TCDoneFrame
     Left = 200
     Top = 112
     object ActionOperation: TAction
-      Caption = 'Wykonaj'
+      Caption = 'Zmie'#324' status'
       ImageIndex = 0
-    end
-    object ActionAccept: TAction
-      Caption = 'Uznaj'
-      ImageIndex = 0
-    end
-    object ActionDecline: TAction
-      Caption = 'Odrzu'#263
-      ImageIndex = 0
+      OnExecute = ActionOperationExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

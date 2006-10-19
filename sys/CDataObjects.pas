@@ -191,10 +191,12 @@ type
     FdoneDate: TDateTime;
     FidPlannedMovement: TDataGid;
     FdoneState: TBaseEnumeration;
+    Fdescription: TBaseDescription;
     procedure SetidPlannedMovement(const Value: TDataGid);
     procedure SettriggerDate(const Value: TDateTime);
     procedure SetdoneState(const Value: TBaseEnumeration);
     procedure SetdoneDate(const Value: TDateTime);
+    procedure Setdescription(const Value: TBaseDescription);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -203,6 +205,7 @@ type
     property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
     property doneState: TBaseEnumeration read FdoneState write SetdoneState;
     property doneDate: TDateTime read FdoneDate write SetdoneDate;
+    property description: TBaseDescription read Fdescription write Setdescription;
   end;
 
 
@@ -744,6 +747,15 @@ begin
     FdoneDate := FieldByName('doneDate').AsDateTime;
     FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
     FdoneState := FieldByName('doneState').AsString;
+    Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+procedure TPlannedDone.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
   end;
 end;
 
@@ -787,6 +799,7 @@ begin
     AddField('doneDate', DatetimeToDatabase(FdoneDate), False, 'plannedDone');
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
     AddField('doneState', FdoneState, True, 'plannedDone');
+    AddField('description', Fdescription, True, 'plannedDone');
   end;
 end;
 

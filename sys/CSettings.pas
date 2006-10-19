@@ -93,8 +93,13 @@ begin
     xPlacement.length := SizeOf(TWindowPlacement);
     xPlacement.rcNormalPosition.Left := GetXmlAttribute('left', xNode, AForm.Left);
     xPlacement.rcNormalPosition.Top := GetXmlAttribute('top', xNode, AForm.Top);
-    xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + GetXmlAttribute('width', xNode, AForm.Width);
-    xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + GetXmlAttribute('height', xNode, AForm.Height);
+    if AForm.BorderStyle <> bsSizeable then begin
+      xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + AForm.Width;
+      xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + AForm.Height;
+    end else begin
+      xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + GetXmlAttribute('width', xNode, AForm.Width);
+      xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + GetXmlAttribute('height', xNode, AForm.Height);
+    end;
     xPlacement.showCmd := SW_HIDE;
     SetWindowPlacement(AForm.Handle, @xPlacement);
     xS := GetXmlAttribute('state', xNode, 0);

@@ -37,7 +37,8 @@ uses
   CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame},
   CAboutFormUnit in 'CAboutFormUnit.pas',
   CReportFormUnit in 'CReportFormUnit.pas' {CReportForm},
-  CSettings in 'CSettings.pas';
+  CSettings in 'CSettings.pas',
+  CDoneFormUnit in 'CDoneFormUnit.pas' {CDoneForm};
 
 {$R *.res}
 
@@ -49,7 +50,7 @@ begin
     if InitializeDataProvider(CDefaultFilename) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+  Application.Run;
     end;
   end;
 end.

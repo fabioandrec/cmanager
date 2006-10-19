@@ -18,6 +18,19 @@ type
     property movementType: TBaseEnumeration read FmovementType;
   end;
 
+  TPlannedTreeItem = class(TObject)
+  private
+    FPlanned: TPlannedMovement;
+    FDone: TPlannedDone;
+    FtriggerDate: TDateTime;
+  public
+    constructor Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
+  published
+    property planned: TPlannedMovement read FPlanned write FPlanned;
+    property done: TPlannedDone read FDone write FDone;
+    property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
+  end;
+
   TCDoneFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
     DoneList: TVirtualStringTree;
@@ -37,8 +50,9 @@ type
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
     ActionOperation: TAction;
-    ActionAccept: TAction;
-    ActionDecline: TAction;
+    Panel1: TPanel;
+    CButtonsStatus: TCButton;
+    Bevel: TBevel;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -57,6 +71,7 @@ type
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure ActionOperationExecute(Sender: TObject);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -86,24 +101,9 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math;
+  Math, CDoneFormUnit;
 
 {$R *.dfm}
-
-type
-  TPlannedTreeItem = class(TObject)
-  private
-    FPlanned: TPlannedMovement;
-    FDone: TPlannedDone;
-    FtriggerDate: TDateTime;
-  public
-    constructor Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
-  published
-    property planned: TPlannedMovement read FPlanned write FPlanned;
-    property done: TPlannedDone read FDone write FDone;
-    property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
-  end;
-
 
 constructor TCDoneFrame.Create(AOwner: TComponent);
 begin
@@ -193,6 +193,7 @@ begin
     end;
   end;
   ReloadDone;
+  DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0)
 end;
 
 destructor TCDoneFrame.Destroy;
@@ -688,17 +689,23 @@ end;
 procedure TCDoneFrame.DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 var xData: TPlannedTreeItem;
     xCanAccept: Boolean;
+    xStat: Boolean;
 begin
   xCanAccept := False;
+  xStat := False;
   if Node <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
     if xData.done = Nil then begin
       xCanAccept := True;
+      xStat := True;
+    end else begin
+      xStat := xData.done.doneState <> CDoneOperation;
     end;
   end;
   if Owner.InheritsFrom(TCFrameForm) then begin
     TCFrameForm(Owner).BitBtnOk.Enabled := xCanAccept;
   end;
+  CButtonsStatus.Enabled := xStat;
 end;
 
 function TCDoneFrame.FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode;
@@ -714,6 +721,45 @@ begin
     end else begin
       xCurNode := AList.GetNext(xCurNode);
     end;
+  end;
+end;
+
+procedure TCDoneFrame.ActionOperationExecute(Sender: TObject);
+var xForm: TCDoneForm;
+    xData: TPlannedTreeItem;
+begin
+  if DoneList.FocusedNode <> Nil then begin
+    xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
+    xForm := TCDoneForm.Create(Nil);
+    xForm.TreeElement := xData;
+    if xForm.ShowConfig(coEdit) then begin
+      if xForm.ComboBoxStatus.ItemIndex = 0 then begin
+        if xData.done <> Nil then begin
+          GDataProvider.BeginTransaction;
+          xData.done.DeleteObject;
+          GDataProvider.CommitTransaction;
+          FPlannedObjects.Remove(xData.done);
+        end;
+      end else begin
+        GDataProvider.BeginTransaction;
+        if xData.done = Nil then begin
+          xData.done := TPlannedDone.CreateObject(PlannedDoneProxy, True);
+          FDoneObjects.Add(xData.done);
+          xData.done.idPlannedMovement := xData.planned.id;
+          xData.done.triggerDate := xData.triggerDate;
+        end;
+        xData.done.doneDate := xForm.CDateTime.Value;
+        xData.done.description := xForm.RichEditDesc.Text;
+        if xForm.ComboBoxStatus.ItemIndex = 1 then begin
+          xData.done.doneState := CDoneAccepted;
+        end else begin
+          xData.done.doneState := CDoneDeleted;
+        end;
+        GDataProvider.CommitTransaction;
+      end;
+      DoneList.InvalidateNode(DoneList.FocusedNode);
+    end;
+    xForm.Free;
   end;
 end;
 
