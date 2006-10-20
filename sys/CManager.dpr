@@ -50,7 +50,7 @@ begin
     if InitializeDataProvider(CDefaultFilename) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+      Application.Run;
     end;
   end;
 end.

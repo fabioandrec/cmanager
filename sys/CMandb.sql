@@ -105,5 +105,14 @@ create table cmanagerInfo (
   created datetime not null
 );
 
+create view transactions as select * from (
+select idBaseMovement, idAccount, regDate, weekNumber, cash as cash from baseMovement where movementType = 'I'
+union all
+select idBaseMovement, idAccount, regDate, weekNumber, (-1) * cash as cash from baseMovement where movementType = 'O'
+union all 
+select idBaseMovement, idSourceAccount as idAccount, regDate, weekNumber, (-1) * cash as cash from baseMovement where movementType = 'T'
+union all
+select idBaseMovement, idAccount as idAccount, regDate, weekNumber, cash as cash from baseMovement where movementType = 'T') as v;
+
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_plannedDone_triggerDate on plannedDone (triggerDate);

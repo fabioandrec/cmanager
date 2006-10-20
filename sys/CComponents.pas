@@ -132,8 +132,6 @@ type
     procedure SetDecimals(Value: smallint);
     function GetValue: Currency;
     procedure SetValue(Value: Currency);
-    function GetCurrStr: string;
-    procedure SetCurrStr(CurrStr: string);
   protected
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
@@ -183,7 +181,6 @@ type
     property OnMouseUp;
     property Decimals: smallint read GetDecimals write SetDecimals;
     property Value: Currency read GetValue write SetValue;
-    property CurrencyStr: string read GetCurrStr write SetCurrStr;
     property ThousandSep: Boolean read FShowKSeps write FShowKSeps;
     property BevelEdges;
     property BevelKind;
@@ -523,10 +520,18 @@ begin
   end;
 end;
 
+function GetCurrencySymbol: string;
+var xRes: Cardinal;
+begin
+  xRes := GetLocaleInfo(GetUserDefaultLCID, LOCALE_SCURRENCY, nil, 0);
+  SetLength(Result, xRes);
+  GetLocaleInfo(GetUserDefaultLCID, LOCALE_SCURRENCY, PChar(Result), xRes);
+end;
+
 constructor TCCurrEdit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FCurrencyStr := 'z³';
+  FCurrencyStr := GetCurrencySymbol;
   FValue := 0;
   FDecimals := 2;
   FMaxDigits := 17 - FDecimals;
@@ -836,17 +841,6 @@ begin
     raise TCEditError.Create('"' + FloatToStr(Value) + '" is not valid for Value');
   end;
   FValue := Value;
-  Update;
-end;
-
-function TCCurrEdit.GetCurrStr: string;
-begin
-  result := FCurrencyStr;
-end;
-
-procedure TCCurrEdit.SetCurrStr(CurrStr: string);
-begin
-  FCurrencyStr := CurrStr;
   Update;
 end;
 
