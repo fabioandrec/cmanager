@@ -1,4 +1,6 @@
 inherited CMovementForm: TCMovementForm
+  Left = 443
+  Top = 165
   Caption = 'Operacja'
   ClientHeight = 477
   ClientWidth = 536
@@ -150,7 +152,6 @@ inherited CMovementForm: TCMovementForm
             BorderStyle = bsNone
             TabOrder = 0
             Decimals = 2
-            CurrencyStr = 'z'#322
             ThousandSep = True
             BevelKind = bkTile
           end
@@ -293,7 +294,6 @@ inherited CMovementForm: TCMovementForm
             BorderStyle = bsNone
             TabOrder = 2
             Decimals = 2
-            CurrencyStr = 'z'#322
             ThousandSep = True
             BevelKind = bkTile
           end
@@ -393,7 +393,6 @@ inherited CMovementForm: TCMovementForm
             BorderStyle = bsNone
             TabOrder = 3
             Decimals = 2
-            CurrencyStr = 'z'#322
             ThousandSep = True
             BevelKind = bkTile
           end

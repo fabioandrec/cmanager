@@ -1,6 +1,6 @@
 inherited CAccountForm: TCAccountForm
-  Left = 648
-  Top = 172
+  Left = 351
+  Top = 141
   Caption = 'Konto'
   ClientHeight = 489
   ClientWidth = 370
@@ -91,7 +91,6 @@ inherited CAccountForm: TCAccountForm
         BorderStyle = bsNone
         TabOrder = 2
         Decimals = 2
-        CurrencyStr = 'z'#322
         ThousandSep = True
         BevelKind = bkTile
       end

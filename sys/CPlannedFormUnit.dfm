@@ -1,6 +1,6 @@
 inherited CPlannedForm: TCPlannedForm
-  Left = 245
-  Top = 74
+  Left = 283
+  Top = 183
   Caption = 'Planowana operacja'
   ClientHeight = 518
   ClientWidth = 536
@@ -124,7 +124,6 @@ inherited CPlannedForm: TCPlannedForm
         BorderStyle = bsNone
         TabOrder = 3
         Decimals = 2
-        CurrencyStr = 'z'#322
         ThousandSep = True
         BevelKind = bkTile
       end
