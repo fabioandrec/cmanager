@@ -38,7 +38,8 @@ uses
   CAboutFormUnit in 'CAboutFormUnit.pas',
   CReportFormUnit in 'CReportFormUnit.pas' {CReportForm},
   CSettings in 'CSettings.pas',
-  CDoneFormUnit in 'CDoneFormUnit.pas' {CDoneForm};
+  CDoneFormUnit in 'CDoneFormUnit.pas' {CDoneForm},
+  CChooseDateFormUnit in 'CChooseDateFormUnit.pas' {CChooseDateForm};
 
 {$R *.res}
 
@@ -50,7 +51,7 @@ begin
     if InitializeDataProvider(CDefaultFilename) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+  Application.Run;
     end;
   end;
 end.

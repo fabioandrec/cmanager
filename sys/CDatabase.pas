@@ -194,6 +194,13 @@ function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
 function FileVersion(AName: string): String;
+function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
+function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
+
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
@@ -919,6 +926,49 @@ begin
     Add(Result);
   end;
 end;
+
+function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+var xQuarter: Integer;
+begin
+  xQuarter := GetQuarterOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), (xQuarter - 1) * 3 + 1, 1);
+end;
+
+function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+var xQuarter: Integer;
+begin
+  xQuarter := GetQuarterOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), xQuarter * 3, DayOf(EndOfAMonth(YearOf(ADateTime), xQuarter * 3)));
+end;
+
+function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
+var xMonth: Integer;
+begin
+  xMonth := MonthOf(ADateTime);
+  Result := ((xMonth - 1) div 3) + 1;
+end;
+
+function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+var xHalf: Integer;
+begin
+  xHalf := GetHalfOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), (xHalf - 1) * 6 + 1, 1);
+end;
+
+function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+var xHalf: Integer;
+begin
+  xHalf := GetHalfOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), xHalf * 6, DayOf(EndOfAMonth(YearOf(ADateTime), xHalf * 6)));
+end;
+
+function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
+var xMonth: Integer;
+begin
+  xMonth := MonthOf(ADateTime);
+  Result := ((xMonth - 1) div 6) + 1;
+end;
+
 
 initialization
   CoInitialize(Nil);

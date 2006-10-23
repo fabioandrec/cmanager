@@ -42,21 +42,25 @@ end;
 
 function GetSettingsRoot: IXMLDOMNode;
 begin
-  Result := GSettings.selectSingleNode('cmanager');
-  if Result = Nil then begin
-    Result := GSettings.createElement('cmanager');
-    GSettings.appendChild(Result);
+  if GSettings <> Nil then begin
+    Result := GSettings.selectSingleNode('cmanager');
+    if Result = Nil then begin
+      Result := GSettings.createElement('cmanager');
+      GSettings.appendChild(Result);
+    end;
   end;
 end;
 
 function GetSettingsForms: IXMLDOMNode;
 var xRoot: IXMLDOMNode;
 begin
-  xRoot := GetSettingsRoot;
-  Result := xRoot.selectSingleNode('forms');
-  if Result = Nil then begin
-    Result := GSettings.createElement('forms');
-    xRoot.appendChild(Result);
+  if GSettings <> Nil then begin
+    xRoot := GetSettingsRoot;
+    Result := xRoot.selectSingleNode('forms');
+    if Result = Nil then begin
+      Result := GSettings.createElement('forms');
+      xRoot.appendChild(Result);
+    end;
   end;
 end;
 
@@ -87,26 +91,28 @@ var xForms: IXMLDOMNode;
     xPlacement: TWindowPlacement;
     xS: Integer;
 begin
-  xForms := GetSettingsForms;
-  xNode := xForms.selectSingleNode(AnsiLowerCase(AForm.Name));
-  if xNode <> Nil then begin
-    xPlacement.length := SizeOf(TWindowPlacement);
-    xPlacement.rcNormalPosition.Left := GetXmlAttribute('left', xNode, AForm.Left);
-    xPlacement.rcNormalPosition.Top := GetXmlAttribute('top', xNode, AForm.Top);
-    if AForm.BorderStyle <> bsSizeable then begin
-      xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + AForm.Width;
-      xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + AForm.Height;
-    end else begin
-      xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + GetXmlAttribute('width', xNode, AForm.Width);
-      xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + GetXmlAttribute('height', xNode, AForm.Height);
-    end;
-    xPlacement.showCmd := SW_HIDE;
-    SetWindowPlacement(AForm.Handle, @xPlacement);
-    xS := GetXmlAttribute('state', xNode, 0);
-    if xS = 1 then begin
-      PostMessage(AForm.Handle, WM_FORMMAXIMIZE, 0, 0);
-    end else if xS = -1 then begin
-      PostMessage(AForm.Handle, WM_FORMMINIMIZE, 0, 0);
+  if GSettings <> Nil then begin
+    xForms := GetSettingsForms;
+    xNode := xForms.selectSingleNode(AnsiLowerCase(AForm.Name));
+    if xNode <> Nil then begin
+      xPlacement.length := SizeOf(TWindowPlacement);
+      xPlacement.rcNormalPosition.Left := GetXmlAttribute('left', xNode, AForm.Left);
+      xPlacement.rcNormalPosition.Top := GetXmlAttribute('top', xNode, AForm.Top);
+      if AForm.BorderStyle <> bsSizeable then begin
+        xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + AForm.Width;
+        xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + AForm.Height;
+      end else begin
+        xPlacement.rcNormalPosition.Right := xPlacement.rcNormalPosition.Left + GetXmlAttribute('width', xNode, AForm.Width);
+        xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + GetXmlAttribute('height', xNode, AForm.Height);
+      end;
+      xPlacement.showCmd := SW_HIDE;
+      SetWindowPlacement(AForm.Handle, @xPlacement);
+      xS := GetXmlAttribute('state', xNode, 0);
+      if xS = 1 then begin
+        PostMessage(AForm.Handle, WM_FORMMAXIMIZE, 0, 0);
+      end else if xS = -1 then begin
+        PostMessage(AForm.Handle, WM_FORMMINIMIZE, 0, 0);
+      end;
     end;
   end;
 end;
@@ -140,17 +146,19 @@ procedure SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: 
 var xForms: IXMLDOMNode;
     xNode: IXMLDOMNode;
 begin
-  xForms := GetSettingsForms;
-  xNode := xForms.selectSingleNode(AnsiLowerCase(AName));
-  if xNode = Nil then begin
-    xNode := GSettings.createElement(AnsiLowerCase(AName));
-    xForms.appendChild(xNode);
+  if GSettings <> Nil then begin
+    xForms := GetSettingsForms;
+    xNode := xForms.selectSingleNode(AnsiLowerCase(AName));
+    if xNode = Nil then begin
+      xNode := GSettings.createElement(AnsiLowerCase(AName));
+      xForms.appendChild(xNode);
+    end;
+    SetXmlAttribute('left', xNode, ALeft);
+    SetXmlAttribute('top', xNode, ATop);
+    SetXmlAttribute('width', xNode, AWidth);
+    SetXmlAttribute('height', xNode, AHeight);
+    SetXmlAttribute('state', xNode, AState);
   end;
-  SetXmlAttribute('left', xNode, ALeft);
-  SetXmlAttribute('top', xNode, ATop);
-  SetXmlAttribute('width', xNode, AWidth);
-  SetXmlAttribute('height', xNode, AHeight);
-  SetXmlAttribute('state', xNode, AState);
 end;
 
 end.

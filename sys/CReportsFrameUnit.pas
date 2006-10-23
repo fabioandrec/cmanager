@@ -15,13 +15,15 @@ type
     Fid: TDataGid;
     Fname: String;
     Fdesc: String;
+    Fimage: Integer;
   public
-    constructor Create(AIsReport: Boolean; AName: String; AId: TDataGid; ADesc: String);
+    constructor Create(AIsReport: Boolean; AName: String; AId: TDataGid; ADesc: String; AImage: Integer);
   published
     property isReport: Boolean read FisReport;
     property id: TDataGid read Fid;
     property name: String read Fname;
     property desc: String read Fdesc;
+    property image: Integer read Fimage;
   end;
 
   TCReportsFrame = class(TCBaseFrame)
@@ -60,9 +62,11 @@ type
 implementation
 
 uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit,
-  CInfoFormUnit;
+     CInfoFormUnit;
 
 {$R *.dfm}
+
+const CNoImage = -1;
 
 procedure TCReportsFrame.ReloadReports;
 begin
@@ -94,10 +98,7 @@ end;
 procedure TCReportsFrame.RecreateTreeHelper;
 var xRoot: THelperElement;
 begin
-  FTreeHelper.Add(THelperElement.Create(True, 'Stan kont na dziœ', '1', 'Pokazuje aktualny stan wszystkich kont'));
-  xRoot := THelperElement.Create(False, 'Rozchody', '2', '');
-  FTreeHelper.Add(xRoot);
-  xRoot.Add(THelperElement.Create(True, 'W tym tygodniu', '3', 'Pokazuje sumaryczne rozchody w tym tygodniu'))
+  FTreeHelper.Add(THelperElement.Create(True, 'Stan kont na dziœ' , '1', 'Pokazuje aktualny stan wszystkich kont', CNoImage));
 end;
 
 destructor TCReportsFrame.Destroy;
@@ -114,7 +115,7 @@ end;
 procedure TCReportsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
 begin
   inherited InitializeFrame(AAdditionalData, AOutputData);
-  FTreeHelper := THelperElement.Create(False, '', '', '');
+  FTreeHelper := THelperElement.Create(False, '', '', '', CNoImage);
   ReloadReports;
 end;
 
@@ -233,13 +234,14 @@ begin
   end;
 end;
 
-constructor THelperElement.Create(AIsReport: Boolean; AName: String; AId: TDataGid; ADesc: String);
+constructor THelperElement.Create(AIsReport: Boolean; AName: String; AId: TDataGid; ADesc: String; AImage: Integer);
 begin
   inherited Create(True);
   FisReport := AIsReport;
   Fid := AId;
   Fname := AName;
   Fdesc := ADesc;
+  Fimage := AImage;
 end;
 
 procedure TCReportsFrame.ActionExecuteExecute(Sender: TObject);
