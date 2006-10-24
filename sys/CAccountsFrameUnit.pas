@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, ActnList, Menus, VTHeaderPopup,
-  ExtCtrls, CComponents, VirtualTrees, CDatabase;
+  ExtCtrls, CComponents, VirtualTrees, CDatabase, PngImageList;
 
 type
   TCAccountsFrame = class(TCBaseFrame)

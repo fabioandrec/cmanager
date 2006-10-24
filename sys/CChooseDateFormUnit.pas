@@ -16,10 +16,9 @@ type
     Label1: TLabel;
     Label2: TLabel;
     procedure ComboBoxPredefinedChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     procedure GetFilterDates(var AStartDate, AEndDate: TDateTime);
-  public
-    { Public declarations }
   end;
 
 function ChooseDateByForm(var AStartDate, AEndDate: TDateTime): Boolean;
@@ -34,9 +33,6 @@ function ChooseDateByForm(var AStartDate, AEndDate: TDateTime): Boolean;
 var xForm: TCChooseDateForm;
 begin
   xForm := TCChooseDateForm.Create(Nil);
-  with xForm do begin
-    ComboBoxPredefinedChange(ComboBoxPredefined);
-  end;
   Result := xForm.ShowConfig(coEdit);
   xForm.Free;
 end;
@@ -86,6 +82,12 @@ begin
     AStartDate := IncDay(GWorkDate, -29);
     AEndDate := GWorkDate;
   end;
+end;
+
+procedure TCChooseDateForm.FormCreate(Sender: TObject);
+begin
+  inherited;
+  ComboBoxPredefinedChange(ComboBoxPredefined);
 end;
 
 end.

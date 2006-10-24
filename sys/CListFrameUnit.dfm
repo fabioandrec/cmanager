@@ -1,10 +1,9 @@
 inherited CListFrame: TCListFrame
-  Height = 430
   object List: TVirtualStringTree [0]
     Left = 0
     Top = 0
     Width = 443
-    Height = 430
+    Height = 277
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone

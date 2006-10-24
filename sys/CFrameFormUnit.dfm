@@ -1,4 +1,6 @@
 inherited CFrameForm: TCFrameForm
+  Left = 386
+  Top = 278
   Caption = 'CFrameForm'
   PixelsPerInch = 96
   TextHeight = 13

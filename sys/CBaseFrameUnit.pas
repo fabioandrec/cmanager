@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees;
+  Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList;
 
 const
   WM_DATAOBJECTADDED = WM_USER + 1;
@@ -18,7 +18,7 @@ type
   TCBaseFrameClass = class of TCBaseFrame;
 
   TCBaseFrame = class(TFrame)
-    ImageList: TImageList;
+    ImageList: TPngImageList;
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;

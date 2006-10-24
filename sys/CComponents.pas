@@ -4,7 +4,7 @@ interface
 
 uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList,
      Buttons, StdCtrls, ExtCtrls, SysUtils, ComCtrls, IntfUIHandlers, ShDocVw,
-     ActiveX;
+     ActiveX, PngImageList;
 
 type
   TPicturePosition = (ppLeft, ppTop);
@@ -43,16 +43,16 @@ type
 
   TCImage = class(TGraphicControl)
   private
-    FImageList: TImageList;
+    FImageList: TPngImageList;
     FImageIndex: Integer;
     procedure SetImageIndex(const Value: Integer);
-    procedure SetImageList(const Value: TImageList);
+    procedure SeTPngImageList(const Value: TPngImageList);
   protected
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property ImageList: TImageList read FImageList write SetImageList;
+    property ImageList: TPngImageList read FImageList write SeTPngImageList;
     property ImageIndex: Integer read FImageIndex write SetImageIndex;
   end;
 
@@ -423,7 +423,7 @@ begin
   end;
 end;
 
-procedure TCImage.SetImageList(const Value: TImageList);
+procedure TCImage.SeTPngImageList(const Value: TPngImageList);
 begin
   if FImageList <> Value then begin
     FImageList := Value;

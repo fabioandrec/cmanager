@@ -1,6 +1,6 @@
 inherited CAccountForm: TCAccountForm
-  Left = 351
-  Top = 141
+  Left = 269
+  Top = 192
   Caption = 'Konto'
   ClientHeight = 489
   ClientWidth = 370

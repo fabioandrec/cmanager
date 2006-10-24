@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, ExtCtrls, VirtualTrees, Menus,
   VTHeaderPopup, ActnList, CComponents, CDatabase, Contnrs, GraphUtil,
-  StdCtrls;
+  StdCtrls, PngImageList;
 
 type
   TProductsFrameAdditionalData = class(TObject)

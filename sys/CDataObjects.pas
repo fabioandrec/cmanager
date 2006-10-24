@@ -102,6 +102,9 @@ type
     FidAccount: TDataGid;
     FregDate: TDateTime;
     FweekNumber: Integer;
+    FmonthNumber: Integer;
+    FdayNumber: Integer;
+    FyearNumber: Integer;
     FidSourceAccount: TDataGid;
     FidCashPoint: TDataGid;
     FidProduct: TDataGid;
@@ -116,6 +119,9 @@ type
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
     procedure SetidPlannedDone(const Value: TDataGid);
+    procedure SetdayNumber(const Value: Integer);
+    procedure SetmonthNumber(const Value: Integer);
+    procedure SetyearNumber(const Value: Integer);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -130,6 +136,9 @@ type
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
     property idProduct: TDataGid read FidProduct write SetidProduct;
     property idPlannedDone: TDataGid read FidPlannedDone write SetidPlannedDone;
+    property monthNumber: Integer read FmonthNumber write SetmonthNumber;
+    property dayNumber: Integer read FdayNumber write SetdayNumber;
+    property yearNumber: Integer read FyearNumber write SetyearNumber;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -447,6 +456,9 @@ begin
     FidAccount := FieldByName('idAccount').AsString;
     FregDate := FieldByName('regDate').AsDateTime;
     FweekNumber := FieldByName('weekNumber').AsInteger;
+    FmonthNumber := FieldByName('monthNumber').AsInteger;
+    FyearNumber := FieldByName('yearNumber').AsInteger;
+    FdayNumber := FieldByName('dayNumber').AsInteger;
     FidSourceAccount := FieldByName('idSourceAccount').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
@@ -520,6 +532,9 @@ begin
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'baseMovement');
     AddField('regDate', DatetimeToDatabase(FregDate), False, 'baseMovement');
     AddField('weekNumber', IntToStr(FweekNumber), False, 'baseMovement');
+    AddField('yearNumber', IntToStr(FyearNumber), False, 'baseMovement');
+    AddField('monthNumber', IntToStr(FmonthNumber), False, 'baseMovement');
+    AddField('dayNumber', IntToStr(FdayNumber), False, 'baseMovement');
     AddField('idSourceAccount', DataGidToDatabase(FidSourceAccount), False, 'baseMovement');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'baseMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'baseMovement');
@@ -815,6 +830,30 @@ begin
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ konta, gdy¿ ' + xText, '');
     Result := False;
+  end;
+end;
+
+procedure TBaseMovement.SetdayNumber(const Value: Integer);
+begin
+  if FdayNumber <> Value then begin
+    FdayNumber := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetmonthNumber(const Value: Integer);
+begin
+  if FmonthNumber <> Value then begin
+    FmonthNumber := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetyearNumber(const Value: Integer);
+begin
+  if FyearNumber <> Value then begin
+    FyearNumber := Value;
+    SetState(msModified);
   end;
 end;
 

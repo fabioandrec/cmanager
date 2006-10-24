@@ -1,6 +1,6 @@
 inherited CInfoForm: TCInfoForm
-  Left = 423
-  Top = 199
+  Left = 359
+  Top = 355
   Caption = 'InfoForm'
   ClientHeight = 190
   ClientWidth = 501

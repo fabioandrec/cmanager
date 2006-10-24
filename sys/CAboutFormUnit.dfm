@@ -2,14 +2,14 @@ inherited CAboutForm: TCAboutForm
   Left = 392
   Top = 335
   Caption = 'O programie'
-  ClientHeight = 268
-  ClientWidth = 375
+  ClientHeight = 313
+  ClientWidth = 377
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 375
-    Height = 227
+    Width = 377
+    Height = 272
     object Image: TImage
       Left = 16
       Top = 16
@@ -74,8 +74,8 @@ inherited CAboutForm: TCAboutForm
     object RichEditContrib: TRichEdit
       Left = 16
       Top = 64
-      Width = 344
-      Height = 154
+      Width = 346
+      Height = 199
       TabStop = False
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelInner = bvNone
@@ -97,13 +97,13 @@ inherited CAboutForm: TCAboutForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 227
-    Width = 375
+    Top = 272
+    Width = 377
     inherited BitBtnOk: TBitBtn
-      Left = 198
+      Left = 200
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 286
+      Left = 288
     end
   end
 end

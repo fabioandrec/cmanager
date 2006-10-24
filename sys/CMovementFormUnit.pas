@@ -397,6 +397,9 @@ begin
     regDate := CDateTime.Value;
     description := RichEditDesc.Text;
     weekNumber := WeekOf(regDate);
+    yearNumber := YearOf(regDate);
+    monthNumber := MonthOf(regDate);
+    dayNumber := DayOf(regDate);
     xI := ComboBoxType.ItemIndex;
     if (xI = 0) or (xI = 1) then begin
       movementType := IfThen(xI = 0, COutMovement, CInMovement);

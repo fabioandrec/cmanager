@@ -8,7 +8,8 @@ object CBaseFrame: TCBaseFrame
   Color = clWindow
   ParentColor = False
   TabOrder = 0
-  object ImageList: TImageList
+  object ImageList: TPngImageList
+    PngImages = <>
     Left = 16
     Top = 16
   end

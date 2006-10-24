@@ -4,6 +4,7 @@ inherited CChooseDateForm: TCChooseDateForm
   Caption = 'Parametry raportu'
   ClientHeight = 190
   ClientWidth = 511
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel

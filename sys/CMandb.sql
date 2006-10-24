@@ -88,6 +88,9 @@ create table baseMovement (
   idAccount uniqueidentifier not null,
   regDate datetime not null,
   weekNumber int not null,
+  monthNumber int not null,
+  dayNumber int not null,
+  yearNumber int not null,
   idSourceAccount uniqueidentifier null,
   idCashPoint uniqueidentifier null,
   idProduct uniqueidentifier null,
@@ -106,13 +109,13 @@ create table cmanagerInfo (
 );
 
 create view transactions as select * from (
-select idBaseMovement, idAccount, regDate, weekNumber, cash as cash from baseMovement where movementType = 'I'
-union all
-select idBaseMovement, idAccount, regDate, weekNumber, (-1) * cash as cash from baseMovement where movementType = 'O'
-union all 
-select idBaseMovement, idSourceAccount as idAccount, regDate, weekNumber, (-1) * cash as cash from baseMovement where movementType = 'T'
-union all
-select idBaseMovement, idAccount as idAccount, regDate, weekNumber, cash as cash from baseMovement where movementType = 'T') as v;
+ select idBaseMovement, movementType, idAccount, regDate, weekNumber, dayNumber, monthNumber, yearNumber, cash as cash from baseMovement where movementType = 'I'
+ union all
+ select idBaseMovement, movementType, idAccount, regDate, weekNumber, dayNumber, monthNumber, yearNumber, (-1) * cash as cash from baseMovement where movementType = 'O'
+ union all
+ select idBaseMovement, movementType, idSourceAccount as idAccount, regDate, weekNumber, dayNumber, monthNumber, yearNumber, (-1) * cash as cash from baseMovement where movementType = 'T'
+ union all
+ select idBaseMovement, movementType, idAccount as idAccount, regDate, weekNumber, dayNumber, monthNumber, yearNumber, cash as cash from baseMovement where movementType = 'T') as v;
 
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_plannedDone_triggerDate on plannedDone (triggerDate);

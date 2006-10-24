@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CBaseFrameUnit, ImgList, VirtualTrees, CDatabase, GraphUtil;
+  Dialogs, CBaseFrameUnit, ImgList, VirtualTrees, CDatabase, GraphUtil,
+  PngImageList;
 
 type
   TCListFrame = class(TCBaseFrame)

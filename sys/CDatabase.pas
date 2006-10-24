@@ -592,7 +592,7 @@ begin
       FConnection.Execute(xSqls.Strings[xCount], cmdText, [eoExecuteNoRecords]);
     except
       on E: Exception do begin
-        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message + xSqls.Strings[xCount]);
         FLastError := E.Message;
         Result := False;
       end;

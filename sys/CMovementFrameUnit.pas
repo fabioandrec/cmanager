@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs;
+  Contnrs, PngImageList;
 
 type
   TCMovementFrame = class(TCBaseFrame)

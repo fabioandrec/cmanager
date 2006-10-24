@@ -94,7 +94,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=
+SearchPath=..\others\pngcomponents\source
 Packages=
 Conditionals=
 DebugSourceDirs=
@@ -134,16 +134,5 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=2
-Item0=C:\Program Files\Borland\VirtualTreeview;C:\Program Files\Borland\Delphi7\Vtv\Source
-Item1=C:\Program Files\Borland\VirtualTreeview
-[HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=.\Trash
-[HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=.\Bin
+[Excluded Packages]
+c:\program files\borland\delphi7\Projects\Bpl\NowaPoczta.bpl=Komponenty Danych Nowa Poczta

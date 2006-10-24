@@ -6,13 +6,13 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
-  CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit;
+  CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList;
 
 type
   TCMainForm = class(TForm)
     MenuBar: TActionMainMenuBar;
     StatusBar: TStatusBar;
-    ImageListActionManager: TImageList;
+    ImageListActionManager: TPngImageList;
     ActionManager: TActionManager;
     ActionShortcuts: TAction;
     ActionShorcutOperations: TAction;
@@ -174,7 +174,8 @@ begin
     SelectObject(ImageShortcut.Canvas.Handle, xBrush);
     FillRect(ImageShortcut.Canvas.Handle, Rect(0, 0, ImageShortcut.Width, ImageShortcut.Height), xBrush);
     DeleteObject(xBrush);
-    ImageList_Draw(ImageListActionManager.Handle, AAction.ImageIndex, ImageShortcut.Canvas.Handle, 0, 0, ILD_NORMAL);
+    ImageListActionManager.Draw(ImageShortcut.Canvas, 0, 0, AAction.ImageIndex);
+    ImageShortcut.Refresh;
   end;
 end;
 
@@ -235,7 +236,7 @@ begin
   xIndex := TAction(FShortcutList.Objects[Node.Index]).ImageIndex;
   xLeft := ((ShortcutList.Width - ImageListActionManager.Width) div 2);
   xTop := 0;
-  ImageList_Draw(ImageListActionManager.Handle, xIndex, TargetCanvas.Handle, xLeft, xTop, ILD_NORMAL);
+  ImageListActionManager.Draw(TargetCanvas, xLeft, xTop, xIndex);
 end;
 
 procedure TCMainForm.ActionShortcutExecute(ASender: TObject);

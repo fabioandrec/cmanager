@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, ExtCtrls, VirtualTrees, Menus,
   VTHeaderPopup, ActnList, CComponents, CDatabase, Contnrs, GraphUtil,
-  StdCtrls, CReports;
+  StdCtrls, CReports, PngImageList;
 
 type
   THelperElement = class(TObjectList)
@@ -38,11 +38,9 @@ type
     procedure ReportListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ReportListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ReportListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure ReportListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ReportListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure ReportListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ReportListDblClick(Sender: TObject);
-    procedure ReportListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionExecuteExecute(Sender: TObject);
   private
     FTreeHelper: THelperElement;
@@ -96,9 +94,38 @@ begin
 end;
 
 procedure TCReportsFrame.RecreateTreeHelper;
-var xRoot: THelperElement;
+var xBase: THelperElement;
+    xIncomes: THelperElement;
+    xExpenses: THelperElement;
+    xOthers: THelperElement;
 begin
-  FTreeHelper.Add(THelperElement.Create(True, 'Stan kont na dziœ' , '1', 'Pokazuje aktualny stan wszystkich kont', CNoImage));
+  xBase := THelperElement.Create(False, 'Podstawowe', '1', '', CNoImage);
+  FTreeHelper.Add(xBase);
+  xBase.Add(THelperElement.Create(True, 'Stan kont' , '1_01', 'Pokazuje stan wszystkich kont na wybrany dzieñ', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Wykonane operacje' , '1_02', 'Pokazuje operacje wykonane w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Zaplanowane operacje' , '1_03', 'Pokazuje operacje zaplanowane na wybrany okres', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Historia konta' , '1_04', 'Pokazuje historiê wybranego konta w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , '1_05', 'Pokazuje wykres stanu kont w wybranym okresie', CNoImage));
+
+  xIncomes := THelperElement.Create(False, 'Rozchody', '2', '', CNoImage);
+  FTreeHelper.Add(xIncomes);
+  xIncomes.Add(THelperElement.Create(True, 'Lista operacji rozchodowych' , '2_01', 'Pokazuje operacje rozchodowe w wybranym okresie', CNoImage));
+  xIncomes.Add(THelperElement.Create(True, 'Rozchody wed³ug kategorii' , '2_02', 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CNoImage));
+  xIncomes.Add(THelperElement.Create(True, 'Rozchody wed³ug kontrahentów' , '2_03', 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CNoImage));
+  xIncomes.Add(THelperElement.Create(True, 'Œrednie rozchody' , '2_04', 'Pokazuje œrednie rozchody w wybranym okresie', CNoImage));
+
+  xExpenses := THelperElement.Create(False, 'Przychody', '3', '', CNoImage);
+  FTreeHelper.Add(xExpenses);
+  xExpenses.Add(THelperElement.Create(True, 'Lista operacji przychodowych' , '3_01', 'Pokazuje operacje przychodowe w wybranym okresie', CNoImage));
+  xExpenses.Add(THelperElement.Create(True, 'Przychody wed³ug kategorii' , '3_02', 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CNoImage));
+  xExpenses.Add(THelperElement.Create(True, 'Przychody wed³ug kontrahentów' , '3_03', 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CNoImage));
+  xExpenses.Add(THelperElement.Create(True, 'Œrednie przychody' , '3_04', 'Pokazuje œrednie przychody w wybranym okresie', CNoImage));
+
+  xOthers := THelperElement.Create(False, 'Inne', '4', '', CNoImage);
+  xOthers.Add(THelperElement.Create(True, 'Bilans' , '4_01', 'Pokazuje bilans wybranego okresu', CNoImage));
+  xOthers.Add(THelperElement.Create(True, 'Trendy rozchodów i przychodów' , '4_02', 'Pokazuje trendy rozchodów i przychodów dla wybranego okresu', CNoImage));
+
+  FTreeHelper.Add(xOthers);
 end;
 
 destructor TCReportsFrame.Destroy;
@@ -154,23 +181,6 @@ begin
   CellText := xData.name;
 end;
 
-procedure TCReportsFrame.ReportListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCReportsFrame.ReportListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
 var xData: THelperElement;
 begin
@@ -202,15 +212,6 @@ begin
       end;
     end;
   end;
-end;
-
-procedure TCReportsFrame.ReportListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
-var xData1: THelperElement;
-    xData2: THelperElement;
-begin
-  xData1 := THelperElement(ReportList.GetNodeData(Node1)^);
-  xData2 := THelperElement(ReportList.GetNodeData(Node2)^);
-  Result := AnsiCompareText(xData1.name, xData2.name);
 end;
 
 function TCReportsFrame.GetList: TVirtualStringTree;
