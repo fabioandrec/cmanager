@@ -308,7 +308,7 @@ begin
   if Result then begin
     Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
     if not Result then begin
-      ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
+      ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku danych.', GDataProvider.LastError);
     end else begin
       if xCommand <> '' then begin
         Result := GDataProvider.ExecuteSql(xCommand) and

@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 362
-  Top = 288
+  Left = 113
+  Top = 34
   Width = 869
   Height = 634
   Caption = 'CManager'
@@ -32,6 +32,8 @@ object CMainForm: TCMainForm
     Font.Height = -11
     Font.Name = 'Microsoft Sans Serif'
     Font.Style = []
+    ParentShowHint = False
+    ShowHint = True
     Spacing = 0
   end
   object StatusBar: TStatusBar
@@ -255,6 +257,16 @@ object CMainForm: TCMainForm
           item
             Items = <
               item
+                Action = ActionCloseConnection
+              end
+              item
+                Action = ActionOpenConnection
+              end>
+            Caption = 'P&lik'
+          end
+          item
+            Items = <
+              item
                 Action = ActionShortcuts
                 Caption = '&Pasek skr'#243't'#243'w'
               end
@@ -274,17 +286,15 @@ object CMainForm: TCMainForm
               item
                 Action = ActionShortcutPlannedDone
                 Caption = '&Czynno'#347'ci zaplanowane'
-                ImageIndex = 0
+                ImageIndex = 1
               end
               item
                 Action = ActionShortcutPlanned
                 Caption = '&Definicje plan'#243'w'
-                ImageIndex = 0
               end
               item
                 Action = ActionShortcutAccounts
                 Caption = '&Lista kont'
-                ImageIndex = 0
               end
               item
                 Action = ActionShortcutProducts
@@ -294,13 +304,13 @@ object CMainForm: TCMainForm
               item
                 Action = ActionShortcutCashpoints
                 Caption = 'Li&sta kontrahent'#243'w'
-                ImageIndex = 0
               end
               item
                 Action = ActionShortcutReports
                 Caption = 'S&tatystyka, raporty'
                 ImageIndex = 1
               end>
+            Visible = False
             Caption = '&Skr'#243'ty'
           end
           item
@@ -362,5 +372,22 @@ object CMainForm: TCMainForm
       Caption = 'O programie'
       OnExecute = ActionAboutExecute
     end
+    object ActionCloseConnection: TAction
+      Category = 'Plik'
+      Caption = 'Zamknij plik danych'
+      OnExecute = ActionCloseConnectionExecute
+    end
+    object ActionOpenConnection: TAction
+      Category = 'Plik'
+      Caption = 'Otw'#243'rz plik danych'
+      OnExecute = ActionOpenConnectionExecute
+    end
+  end
+  object OpenDialog: TOpenDialog
+    DefaultExt = 'dat'
+    Filter = 'Pliki danych|*.dat|Wszystkie pliki|*.*'
+    FilterIndex = 0
+    Left = 474
+    Top = 184
   end
 end

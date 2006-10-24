@@ -36,6 +36,9 @@ type
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     ShortcutList: TVirtualStringTree;
+    ActionCloseConnection: TAction;
+    ActionOpenConnection: TAction;
+    OpenDialog: TOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -48,6 +51,8 @@ type
     procedure ActionStatusbarExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ActionCloseConnectionExecute(Sender: TObject);
+    procedure ActionOpenConnectionExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -268,10 +273,27 @@ begin
 end;
 
 procedure TCMainForm.UpdateStatusbar;
+var xCount: Integer;
+    xAction: TAction;
 begin
   PanelMain.Visible := GDataProvider.IsConnected;
-  Caption := 'CManager - obs³uga finansów (na dzieñ ' + DateToStr(GWorkDate) + ')';
-  StatusBar.SimpleText := ' ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+  if PanelMain.Visible then begin
+    Caption := 'CManager - obs³uga finansów (na dzieñ ' + DateToStr(GWorkDate) + ')';
+    StatusBar.SimpleText := ' ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+  end else begin
+    Caption := 'CManager - obs³uga finansów';
+    StatusBar.SimpleText := ' Nie wybrano pliku danych';
+  end;
+  for xCount := 0 to ActionManager.ActionCount - 1 do begin
+    xAction := TAction(ActionManager.Actions[xCount]);
+    if xAction.Category = 'Skróty' then begin
+      xAction.Visible := GDataProvider.IsConnected;
+    end;
+  end;
+  TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[2]).Visible := GDataProvider.IsConnected;
+  ActionShortcuts.Visible := GDataProvider.IsConnected;
+  ActionCloseConnection.Enabled := GDataProvider.IsConnected;
+  ActionOpenConnection.Enabled := not GDataProvider.IsConnected;
 end;
 
 procedure TCMainForm.ActionAboutExecute(Sender: TObject);
@@ -294,6 +316,21 @@ begin
     WindowState := wsMaximized;
   end else if Message.Msg = WM_FORMMINIMIZE then begin
     WindowState := wsMaximized;
+  end;
+end;
+
+procedure TCMainForm.ActionCloseConnectionExecute(Sender: TObject);
+begin
+  GDataProvider.DisconnectFromDatabase;
+  UpdateStatusbar;
+end;
+
+procedure TCMainForm.ActionOpenConnectionExecute(Sender: TObject);
+begin
+  if OpenDialog.Execute then begin
+    if InitializeDataProvider(OpenDialog.FileName) then begin
+      UpdateStatusbar;
+    end;
   end;
 end;
 
