@@ -180,7 +180,7 @@ var xAccounts: TADOQuery;
     xBody: TStringList;
 begin
   xAccounts := GDataProvider.OpenSql('select * from account order by name');
-  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, idAccount from transactions where regDate > %s group by idAccount', [DatetimeToDatabase(FDate)]));
+  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, idAccount from transactions where regDate > %s group by idAccount', [DatetimeToDatabase(FDate, False)]));
   xSum := 0;
   xBody := TStringList.Create;
   with xAccounts, xBody do begin
@@ -211,7 +211,7 @@ begin
     end;
     Add('</table><hr><table class="base" colspan=2>');
     Add('<tr class="base">');
-    Add('<td class="sumtext" width="75%">Wszystkie konta</td>');
+    Add('<td class="sumtext" width="75%">Razem</td>');
     Add('<td class="sumcash" width="25%">' + CurrencyToString(xSum) + '</td>');
     Add('</tr>');
     Add('</table>');
@@ -239,48 +239,57 @@ var xOperations: TADOQuery;
     xBody: TStringList;
     xCash: Currency;
 begin
-  xOperations := GDataProvider.OpenSql(Format('select * from transactions where regDate between %s and %s order by created',
-                                              [DatetimeToDatabase(FStartDate), DatetimeToDatabase(FEndDate)]));
+  xOperations := GDataProvider.OpenSql(
+            Format('select b.*, a.name from balances b' +
+                   ' left outer join account a on a.idAccount = b.idAccount ' +
+                   '  where b.regDate between %s and %s order by b.created',
+                   [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
   xInSum := 0;
   xOutSum := 0;
   xBody := TStringList.Create;
   with xOperations, xBody do begin
-    Add('<table class="base" colspan=4>');
+    Add('<table class="base" colspan=5>');
     Add('<tr class="base">');
     Add('<td class="headtext" width="10%">Lp</td>');
     Add('<td class="headtext" width="50%">Opis</td>');
-    Add('<td class="headcash" width="20%">Przychód</td>');
-    Add('<td class="headcash" width="20%">Rozchód</td>');
+    Add('<td class="headtext" width="20%">Konto</td>');
+    Add('<td class="headcash" width="10%">Przychód</td>');
+    Add('<td class="headcash" width="10%">Rozchód</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=4>');
+    Add('</table><hr><table class="base" colspan=5>');
     while not Eof do begin
       if not Odd(RecNo) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
       end else begin
         Add('<tr class="base">');
       end;
-      xCash := FieldByName('cash').AsCurrency;
+      xCash := FieldByName('income').AsCurrency;
       if xCash > 0 then begin
         xIn := CurrencyToString(xCash);
         xInSum := xInSum + xCash;
-        xOut := '';
       end else begin
-        xOut := CurrencyToString((-1) * xCash);
-        xOutSum := xOutSum + (-1) * xCash;
         xIn := '';
+      end;
+      xCash := FieldByName('expense').AsCurrency;
+      if xCash > 0 then begin
+        xOut := CurrencyToString(xCash);
+        xOutSum := xOutSum + xCash;
+      end else begin
+        xOut := '';
       end;
       Add('<td class="text" width="10%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="50%">' + FieldByName('description').AsString + '</td>');
-      Add('<td class="cash" width="20%">' + xIn + '</td>');
-      Add('<td class="cash" width="20%">' + xOut + '</td>');
+      Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="10%">' + xIn + '</td>');
+      Add('<td class="cash" width="10%">' + xOut + '</td>');
       Add('</tr>');
       Next;
     end;
     Add('</table><hr><table class="base" colspan=2>');
     Add('<tr class="base">');
-    Add('<td class="sumtext" width="60%">Wszystkie konta</td>');
-    Add('<td class="sumcash" width="20%">' + CurrencyToString(xInSum) + '</td>');
-    Add('<td class="sumcash" width="20%">' + CurrencyToString(xOutSum) + '</td>');
+    Add('<td class="sumtext" width="80%">Razem</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xInSum) + '</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xOutSum) + '</td>');
     Add('</tr>');
     Add('</table>');
   end;

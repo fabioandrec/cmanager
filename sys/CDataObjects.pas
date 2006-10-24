@@ -530,7 +530,7 @@ begin
     AddField('cash', CurrencyToDatabase(Fcash), False, 'baseMovement');
     AddField('movementType', FmovementType, True, 'baseMovement');
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'baseMovement');
-    AddField('regDate', DatetimeToDatabase(FregDate), False, 'baseMovement');
+    AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'baseMovement');
     AddField('weekNumber', IntToStr(FweekNumber), False, 'baseMovement');
     AddField('yearNumber', IntToStr(FyearNumber), False, 'baseMovement');
     AddField('monthNumber', IntToStr(FmonthNumber), False, 'baseMovement');
@@ -745,10 +745,10 @@ begin
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'plannedMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'plannedMovement');
     AddField('scheduleType', FscheduleType, True, 'plannedMovement');
-    AddField('scheduleDate', DatetimeToDatabase(FscheduleDate), False, 'plannedMovement');
+    AddField('scheduleDate', DatetimeToDatabase(FscheduleDate, False), False, 'plannedMovement');
     AddField('endCondition', FendCondition, True, 'plannedMovement');
     AddField('endCount', IntToStr(FendCount), False, 'plannedMovement');
-    AddField('endDate', DatetimeToDatabase(FendDate), False, 'plannedMovement');
+    AddField('endDate', DatetimeToDatabase(FendDate, False), False, 'plannedMovement');
     AddField('triggerType', FtriggerType, True, 'plannedMovement');
     AddField('triggerDay', IntToStr(FtriggerDay), False, 'plannedMovement');
   end;
@@ -810,8 +810,8 @@ procedure TPlannedDone.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin
-    AddField('triggerDate', DatetimeToDatabase(FtriggerDate), False, 'plannedDone');
-    AddField('doneDate', DatetimeToDatabase(FdoneDate), False, 'plannedDone');
+    AddField('triggerDate', DatetimeToDatabase(FtriggerDate, False), False, 'plannedDone');
+    AddField('doneDate', DatetimeToDatabase(FdoneDate, False), False, 'plannedDone');
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
     AddField('doneState', FdoneState, True, 'plannedDone');
     AddField('description', Fdescription, True, 'plannedDone');

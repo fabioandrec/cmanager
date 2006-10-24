@@ -191,7 +191,7 @@ var GDataProvider: TDataProvider;
 function InitializeDataProvider(ADatabaseName: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
-function DatetimeToDatabase(ADatetime: TDateTime): String;
+function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
 function FileVersion(AName: string): String;
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
@@ -240,8 +240,11 @@ begin
 end;
 
 function CurrencyToDatabase(ACurrency: Currency): String;
+var xFormat: TFormatSettings;
 begin
-  Result := CurrToStr(ACurrency);
+  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
+  xFormat.DecimalSeparator := '.';
+  Result := CurrToStr(ACurrency, xFormat);
 end;
 
 function CurrencyToString(ACurrency: Currency): String;
@@ -249,12 +252,12 @@ begin
   Result := CurrToStrF(ACurrency, ffCurrency, 2);
 end;
 
-function DatetimeToDatabase(ADatetime: TDateTime): String;
+function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 begin
   if ADatetime = 0 then begin
     Result := 'Null';
   end else begin
-    if TimeOf(ADatetime) = 0 then begin
+    if not AWithTime then begin
       Result := '#' + FormatDateTime('yyyy-mm-dd', ADatetime) + '#';
     end else begin
       Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '#';
@@ -309,7 +312,7 @@ begin
     end else begin
       if xCommand <> '' then begin
         Result := GDataProvider.ExecuteSql(xCommand) and
-                  GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now)]));
+                  GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]));
         if not Result then begin
           ShowInfo(itError, 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
           GDataProvider.DisconnectFromDatabase;
@@ -592,7 +595,7 @@ begin
       FConnection.Execute(xSqls.Strings[xCount], cmdText, [eoExecuteNoRecords]);
     except
       on E: Exception do begin
-        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message + xSqls.Strings[xCount]);
+        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
         FLastError := E.Message;
         Result := False;
       end;
@@ -847,8 +850,8 @@ procedure TDataObject.UpdateFieldList;
 begin
   with FDataFieldList do begin
     Clear;
-    AddField('created', DatetimeToDatabase(Fcreated), False, FDataProxy.GetRootTableName);
-    AddField('modified', DatetimeToDatabase(Fmodified), False, FDataProxy.GetRootTableName);
+    AddField('created', DatetimeToDatabase(Fcreated, True), False, FDataProxy.GetRootTableName);
+    AddField('modified', DatetimeToDatabase(Fmodified, True), False, FDataProxy.GetRootTableName);
   end;
 end;
 

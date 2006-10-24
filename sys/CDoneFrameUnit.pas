@@ -129,13 +129,13 @@ begin
   xSqlPlanned := xSqlPlanned + Format(' and (' +
                         '  (scheduleType = ''O'' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
                         '  (scheduleType = ''C'' and scheduleDate <= %s)' +
-                        ' )', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt), DatetimeToDatabase(xDt)]);
+                        ' )', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), DatetimeToDatabase(xDt, False)]);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
                         '  (endCondition = ''N'') or ' +
                         '  (endCondition = ''D'' and endDate >= %s) or ' +
                         '  (endCondition = ''T'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
-                        ' )', [DatetimeToDatabase(xDf)]);
-  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
+                        ' )', [DatetimeToDatabase(xDf, False)]);
+  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if FPlannedObjects <> Nil then begin
     FreeAndNil(FPlannedObjects);
   end;
@@ -668,7 +668,7 @@ begin
   Result := '';
   if DoneList.FocusedNode <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
-    Result := xData.planned.id + '|' + DatetimeToDatabase(xData.triggerDate);
+    Result := xData.planned.id + '|' + DatetimeToDatabase(xData.triggerDate, False);
   end;
 end;
 
@@ -716,7 +716,7 @@ begin
   xCurNode := AList.GetFirst;
   while (Result = Nil) and (xCurNode <> Nil) do begin
     xDataobject := TPlannedTreeItem(AList.GetNodeData(xCurNode)^);
-    if (xDataobject.planned.id + '|' + DatetimeToDatabase(xDataobject.triggerDate)) = ADataId then begin
+    if (xDataobject.planned.id + '|' + DatetimeToDatabase(xDataobject.triggerDate, False)) = ADataId then begin
       Result := xCurNode;
     end else begin
       xCurNode := AList.GetNext(xCurNode);

@@ -178,7 +178,7 @@ var xSql: String;
 begin
   xSql := 'select * from baseMovement where ';
   GetFilterDates(xDf, xDt);
-  xSql := xSql + Format('regDate between %s and %s', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
+  xSql := xSql + Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if CStaticFilter.DataId = '2' then begin
     xSql := xSql + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
@@ -457,17 +457,16 @@ var xDs: TADOQuery;
     xDf, xDt: TDateTime;
 begin
   GetFilterDates(xDf, xDt);
-  xSql := Format(
-          'select T1.*, account.name from ( ' +
-          '   select sum(cash) as deltaCash, movementType, idAccount from baseMovement where ' +
-          '   regDate between %s and %s and movementType <> ''' + CTransferMovement + ''' group by idAccount, movementType) as T1 ' +
-          '   left join account on account.idAccount = T1.idAccount', [DatetimeToDatabase(xDf), DatetimeToDatabase(xDt)]);
+  xSql := Format('select v.*, a.name from ' +
+                 ' (select idAccount, sum(income) as incomes, sum(expense) as expenses from balances where regDate between %s and %s group by idAccount) as v ' +
+                 '   left outer join account a on a.idAccount = v.idAccount',
+       [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   xDs := GDataProvider.OpenSql(xSql);
   SumList.BeginUpdate;
   SumList.Clear;
   FSumObjects.Clear;
   xOvr := TSumElement.Create;
-  xOvr.name := 'Ogó³em dla wszystkich kont';
+  xOvr.name := 'Razem dla wszystkich kont';
   xOvr.cashIn := 0;
   xOvr.cashOut := 0;
   xOvr.id := '*';
@@ -475,13 +474,10 @@ begin
     xObj := FSumObjects.FindSumObject(xDs.FieldByName('idAccount').AsString, True);
     xObj.id := xDs.FieldByName('idAccount').AsString;
     xObj.name := xDs.FieldByName('name').AsString;
-    if xDs.FieldByName('movementType').AsString = CInMovement then begin
-      xObj.cashIn := xObj.cashIn + xDs.FieldByName('deltaCash').AsCurrency;
-      xOvr.cashIn := xOvr.cashIn + xObj.cashIn;
-    end else begin
-      xObj.cashOut := xObj.cashOut + xDs.FieldByName('deltaCash').AsCurrency;
-      xOvr.cashOut := xOvr.cashOut + xObj.cashOut;
-    end;
+    xObj.cashIn := xObj.cashIn + xDs.FieldByName('incomes').AsCurrency;
+    xOvr.cashIn := xOvr.cashIn + xObj.cashIn;
+    xObj.cashOut := xObj.cashOut + xDs.FieldByName('expenses').AsCurrency;
+    xOvr.cashOut := xOvr.cashOut + xObj.cashOut;
     xDs.Next;
   end;
   FSumObjects.Add(xOvr);

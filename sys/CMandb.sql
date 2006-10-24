@@ -117,5 +117,14 @@ create view transactions as select * from (
  union all
  select idBaseMovement, movementType, description, idAccount as idAccount, regDate, created, weekNumber, dayNumber, monthNumber, yearNumber, cash as cash from baseMovement where movementType = 'T') as v;
 
+create view balances as select * from (
+ select idBaseMovement, movementType, description, idAccount, regDate, created, weekNumber, dayNumber, monthNumber, yearNumber, cash as income, 0 as expense from baseMovement where movementType = 'I'
+ union all
+ select idBaseMovement, movementType, description, idAccount, regDate, created, weekNumber, dayNumber, monthNumber, yearNumber, 0 as income, cash as expense from baseMovement where movementType = 'O'
+ union all
+ select idBaseMovement, movementType, description, idSourceAccount as idAccount, regDate, created, weekNumber, dayNumber, monthNumber, yearNumber, 0 as income, cash as expense from baseMovement where movementType = 'T'
+ union all
+ select idBaseMovement, movementType, description, idAccount as idAccount, regDate, created, weekNumber, dayNumber, monthNumber, yearNumber, cash as income, 0 as expense from baseMovement where movementType = 'T') as v;
+
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_plannedDone_triggerDate on plannedDone (triggerDate);
