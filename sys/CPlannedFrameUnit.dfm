@@ -88,7 +88,7 @@ inherited CPlannedFrame: TCPlannedFrame
       item
         Alignment = taRightJustify
         Position = 0
-        WideText = 'Lp.'
+        WideText = 'Lp'
       end
       item
         Position = 1

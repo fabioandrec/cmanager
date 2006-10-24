@@ -7,9 +7,6 @@ uses
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, CDatabase,
   CDataObjects;
 
-const
-  CDays: Array[0..6] of String = ('Pon', 'Wto', 'Œro', 'Czw', 'Pi¹', 'Sob', 'Nie');
-
 type
   TSchedule = class(TObject)
   private
@@ -73,7 +70,7 @@ function GetSchedule(ASchedule: TSchedule): Boolean;
 
 implementation
 
-uses StrUtils, Math, DateUtils, CInfoFormUnit;
+uses StrUtils, Math, DateUtils, CInfoFormUnit, CConsts;
 
 {$R *.dfm}
 
@@ -110,7 +107,7 @@ begin
       Result := Result + ', do ' + DateToStr(FendDate);
     end;
     if FtriggerType = CTriggerTypeWeekly then begin
-      Result := Result + ', ka¿dy ' + CDays[FtriggerDay];
+      Result := Result + ', ka¿dy ' + CShortDayNames[FtriggerDay];
     end else begin
       Result := Result + ', ka¿dy ' + IfThen(FtriggerDay = 0, 'ostatni', IntToStr(FtriggerDay)) + ' dzieñ mies.';
     end;

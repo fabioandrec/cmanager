@@ -232,7 +232,7 @@ procedure Register;
 
 implementation
 
-uses Forms, CCalendarFormUnit, Types;
+uses Forms, CCalendarFormUnit, Types, DateUtils;
 
 procedure Register;
 begin
@@ -987,7 +987,7 @@ end;
 procedure TCDateTime.SetValue(const Value: TDateTime);
 begin
   if FValue <> Value then begin
-    FValue := Value;
+    FValue := DateOf(Value);
     UpdateCaption;
   end;
 end;

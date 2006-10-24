@@ -33,15 +33,36 @@ type
     property reportFooter: String read GetReportFooter;
   end;
 
-  TTodayCashInAccount = class(TCReport)
+  TAccountBalanceOnDayReport = class(TCReport)
+  private
+    FDate: TDateTime;
   protected
     function GetReportTitle: String; override;
     function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
+  end;
+
+  TOperationsListReport = class(TCReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+  protected
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
   end;
 
 implementation
 
-uses Forms, SysUtils, CDatabase, Adodb, CConfigFormUnit;
+uses Forms, SysUtils, CDatabase, Adodb, CConfigFormUnit,
+     CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts;
+
+function DayName(ADate: TDateTime): String;
+var xDay: Integer;
+begin
+  xDay := DayOfWeek(ADate);
+  Result := CShortDayNames[xDay - 1];
+end;
 
 function ColToRgb(AColor: TColor): String;
 var xRgb: Integer;
@@ -101,7 +122,7 @@ end;
 
 function TCReport.GetReportFooter: String;
 begin
-  Result := 'CManager wer. ' + FileVersion(ParamStr(0));
+  Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
 end;
 
 function TCReport.PrepareReportConditions: Boolean;
@@ -152,15 +173,17 @@ begin
   Fform.Free;
 end;
 
-function TTodayCashInAccount.GetReportBody: String;
-var xDataset: TADOQuery;
-    xSum: Currency;
+function TAccountBalanceOnDayReport.GetReportBody: String;
+var xAccounts: TADOQuery;
+    xOperations: TADOQuery;
+    xSum, xDelta: Currency;
     xBody: TStringList;
 begin
-  xDataset := GDataProvider.OpenSql('select * from account order by name');
+  xAccounts := GDataProvider.OpenSql('select * from account order by name');
+  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, idAccount from transactions where regDate > %s group by idAccount', [DatetimeToDatabase(FDate)]));
   xSum := 0;
   xBody := TStringList.Create;
-  with xDataset, xBody do begin
+  with xAccounts, xBody do begin
     Add('<table class="base" colspan=2>');
     Add('<tr class="base">');
     Add('<td class="headtext" width="75%">Nazwa konta</td>');
@@ -174,9 +197,16 @@ begin
         Add('<tr class="base">');
       end;
       Add('<td class="text" width="75%">' + FieldByName('name').AsString + '</td>');
-      Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency) + '</td>');
+      xOperations.Filter := 'idAccount = ' + DataGidToDatabase(FieldByName('idAccount').AsString);
+      xOperations.Filtered := True;
+      if xOperations.IsEmpty then begin
+        xDelta := 0;
+      end else begin
+        xDelta := xOperations.FieldByName('cash').AsCurrency;
+      end;
+      Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency - xDelta) + '</td>');
       Add('</tr>');
-      xSum := xSum + FieldByName('cash').AsCurrency;
+      xSum := xSum + FieldByName('cash').AsCurrency - xDelta;
       Next;
     end;
     Add('</table><hr><table class="base" colspan=2>');
@@ -186,14 +216,87 @@ begin
     Add('</tr>');
     Add('</table>');
   end;
-  xDataset.Free;
+  xAccounts.Free;
+  xOperations.Free;
   Result := xBody.Text;
   xBody.Free;
 end;
 
-function TTodayCashInAccount.GetReportTitle: String;
+function TAccountBalanceOnDayReport.GetReportTitle: String;
 begin
-  Result := 'Stan kont na dziœ (' + DateToStr(GWorkDate) + ')';
+  Result := 'Stan kont (' + DayName(FDate) + ', ' + DateToStr(FDate) + ')';
+end;
+
+function TAccountBalanceOnDayReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChooseDateByForm(FDate);
+end;
+
+function TOperationsListReport.GetReportBody: String;
+var xOperations: TADOQuery;
+    xInSum, xOutSum: Currency;
+    xIn, xOut: String;
+    xBody: TStringList;
+    xCash: Currency;
+begin
+  xOperations := GDataProvider.OpenSql(Format('select * from transactions where regDate between %s and %s order by created',
+                                              [DatetimeToDatabase(FStartDate), DatetimeToDatabase(FEndDate)]));
+  xInSum := 0;
+  xOutSum := 0;
+  xBody := TStringList.Create;
+  with xOperations, xBody do begin
+    Add('<table class="base" colspan=4>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="10%">Lp</td>');
+    Add('<td class="headtext" width="50%">Opis</td>');
+    Add('<td class="headcash" width="20%">Przychód</td>');
+    Add('<td class="headcash" width="20%">Rozchód</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    while not Eof do begin
+      if not Odd(RecNo) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      xCash := FieldByName('cash').AsCurrency;
+      if xCash > 0 then begin
+        xIn := CurrencyToString(xCash);
+        xInSum := xInSum + xCash;
+        xOut := '';
+      end else begin
+        xOut := CurrencyToString((-1) * xCash);
+        xOutSum := xOutSum + (-1) * xCash;
+        xIn := '';
+      end;
+      Add('<td class="text" width="10%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="50%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="cash" width="20%">' + xIn + '</td>');
+      Add('<td class="cash" width="20%">' + xOut + '</td>');
+      Add('</tr>');
+      Next;
+    end;
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="60%">Wszystkie konta</td>');
+    Add('<td class="sumcash" width="20%">' + CurrencyToString(xInSum) + '</td>');
+    Add('<td class="sumcash" width="20%">' + CurrencyToString(xOutSum) + '</td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  xOperations.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TOperationsListReport.GetReportTitle: String;
+begin
+  Result := 'Operacje wykonane (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+end;
+
+function TOperationsListReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodByForm(FStartDate, FEndDate);
 end;
 
 end.

@@ -39,7 +39,9 @@ uses
   CReportFormUnit in 'CReportFormUnit.pas' {CReportForm},
   CSettings in 'CSettings.pas',
   CDoneFormUnit in 'CDoneFormUnit.pas' {CDoneForm},
-  CChooseDateFormUnit in 'CChooseDateFormUnit.pas' {CChooseDateForm};
+  CChooseDateFormUnit in 'CChooseDateFormUnit.pas' {CChooseDateForm},
+  CChoosePeriodFormUnit in 'CChoosePeriodFormUnit.pas' {CChoosePeriodForm},
+  CConsts in 'CConsts.pas';
 
 {$R *.res}
 

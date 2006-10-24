@@ -255,9 +255,9 @@ begin
     Result := 'Null';
   end else begin
     if TimeOf(ADatetime) = 0 then begin
-      Result := 'dateValue(''' + FormatDateTime('yyyy-mm-dd', ADatetime) + ''')';
+      Result := '#' + FormatDateTime('yyyy-mm-dd', ADatetime) + '#';
     end else begin
-      Result := 'dateValue(''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + ''')';
+      Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '#';
     end;
   end;
 end;
@@ -837,8 +837,10 @@ end;
 
 procedure TDataObject.SetState(AState: TDataMemoryState);
 begin
-  FMemoryState := AState;
-  FModified := Now;
+  if FMemoryState <> AState then begin
+    FModified := Now;
+    FMemoryState := AState;
+  end;
 end;
 
 procedure TDataObject.UpdateFieldList;

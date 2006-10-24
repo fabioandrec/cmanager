@@ -102,8 +102,8 @@ begin
   xBase := THelperElement.Create(False, 'Podstawowe', '1', '', CNoImage);
   FTreeHelper.Add(xBase);
   xBase.Add(THelperElement.Create(True, 'Stan kont' , '1_01', 'Pokazuje stan wszystkich kont na wybrany dzieñ', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Wykonane operacje' , '1_02', 'Pokazuje operacje wykonane w wybranym okresie', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Zaplanowane operacje' , '1_03', 'Pokazuje operacje zaplanowane na wybrany okres', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Operacje wykonane' , '1_02', 'Pokazuje operacje wykonane w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Operacje zaplanowane' , '1_03', 'Pokazuje operacje zaplanowane na wybrany okres', CNoImage));
   xBase.Add(THelperElement.Create(True, 'Historia konta' , '1_04', 'Pokazuje historiê wybranego konta w wybranym okresie', CNoImage));
   xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , '1_05', 'Pokazuje wykres stanu kont w wybranym okresie', CNoImage));
 
@@ -265,8 +265,10 @@ end;
 
 function TCReportsFrame.GetClassOfReport(AGid: TDataGid): TCReportClass;
 begin
-  if AGid = '1' then begin
-    Result := TTodayCashInAccount;
+  if AGid = '1_01' then begin
+    Result := TAccountBalanceOnDayReport;
+  end else if AGid = '1_02' then begin
+    Result := TOperationsListReport;
   end else begin
     Result := Nil;
   end;
