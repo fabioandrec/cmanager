@@ -456,7 +456,15 @@ begin
         xDone.triggerDate := xTrDate;
         xDone.doneState := CDoneOperation;
         xDone.doneDate := regDate;
+        xDone.description := description;
+        xDone.cash := cash;
         idPlannedDone := xDone.id;
+        SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+      end else begin
+        xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
+        xDone.cash := cash;
+        xDone.description := description;
+        xDone.doneDate := regDate;
         SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
       end;
     end;

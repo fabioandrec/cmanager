@@ -458,9 +458,11 @@ var xDs: TADOQuery;
 begin
   GetFilterDates(xDf, xDt);
   xSql := Format('select v.*, a.name from ' +
-                 ' (select idAccount, sum(income) as incomes, sum(expense) as expenses from balances where regDate between %s and %s group by idAccount) as v ' +
+                 ' (select idAccount, sum(income) as incomes, sum(expense) as expenses from balances where ' +
+                 '   movementType <> ''%s'' and ' +
+                 '   regDate between %s and %s group by idAccount) as v ' +
                  '   left outer join account a on a.idAccount = v.idAccount',
-       [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+       [CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   xDs := GDataProvider.OpenSql(xSql);
   SumList.BeginUpdate;
   SumList.Clear;

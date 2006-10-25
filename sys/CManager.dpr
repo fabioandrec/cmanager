@@ -41,7 +41,8 @@ uses
   CDoneFormUnit in 'CDoneFormUnit.pas' {CDoneForm},
   CChooseDateFormUnit in 'CChooseDateFormUnit.pas' {CChooseDateForm},
   CChoosePeriodFormUnit in 'CChoosePeriodFormUnit.pas' {CChoosePeriodForm},
-  CConsts in 'CConsts.pas';
+  CConsts in 'CConsts.pas',
+  CSchedules in 'CSchedules.pas';
 
 {$R *.res}
 

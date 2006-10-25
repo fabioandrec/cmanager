@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ComCtrls, CDoneFrameUnit;
+  ComCtrls, CDoneFrameUnit, CSchedules;
 
 type
   TCDoneForm = class(TCConfigForm)
@@ -19,6 +19,8 @@ type
     RichEditOperation: TRichEdit;
     Label3: TLabel;
     CDateTime: TCDateTime;
+    Label10: TLabel;
+    CCurrCash: TCCurrEdit;
     procedure ComboBoxStatusSelect(Sender: TObject);
   private
     FData: TPlannedTreeItem;
@@ -40,6 +42,7 @@ begin
   CDateTimePlanned.Value := FData.triggerDate;
   RichEditOperation.Text := FData.planned.description;
   CDateTime.Value := GWorkDate;
+  CCurrCash.Value := FData.planned.cash;
   if FData.done = Nil then begin
     ComboBoxStatus.ItemIndex := 0;
   end else begin
@@ -49,6 +52,7 @@ begin
       ComboBoxStatus.ItemIndex := 2;
     end;
     RichEditDesc.Text := FData.done.description;
+    CCurrCash.Value := FData.done.cash;
   end;
   GDataProvider.RollbackTransaction;
   ComboBoxStatusSelect(Nil);
@@ -56,8 +60,8 @@ end;
 
 procedure TCDoneForm.ComboBoxStatusSelect(Sender: TObject);
 begin
-  Label3.Enabled := ComboBoxStatus.ItemIndex <> 0;
   CDateTime.Enabled := ComboBoxStatus.ItemIndex <> 0;
+  CCurrCash.Enabled := ComboBoxStatus.ItemIndex <> 0;
 end;
 
 end.

@@ -73,6 +73,7 @@ create table plannedDone (
   doneState varchar(1) not null,
   idPlannedMovement uniqueidentifier not null,
   description varchar(200),
+  cash money not null,
   primary key (idPlannedDone),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
   constraint ck_doneState check (doneState in ('O', 'D', 'A'))

@@ -66,7 +66,6 @@ inherited CPlannedFrame: TCPlannedFrame
     Header.Height = 21
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
     Header.PopupMenu = VTHeaderPopupMenu
-    Header.SortColumn = 0
     Header.Style = hsFlatButtons
     HintMode = hmHint
     ParentShowHint = False
@@ -87,6 +86,7 @@ inherited CPlannedFrame: TCPlannedFrame
     Columns = <
       item
         Alignment = taRightJustify
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
         WideText = 'Lp'
       end

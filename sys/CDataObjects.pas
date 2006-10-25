@@ -201,11 +201,13 @@ type
     FidPlannedMovement: TDataGid;
     FdoneState: TBaseEnumeration;
     Fdescription: TBaseDescription;
+    Fcash: Currency;
     procedure SetidPlannedMovement(const Value: TDataGid);
     procedure SettriggerDate(const Value: TDateTime);
     procedure SetdoneState(const Value: TBaseEnumeration);
     procedure SetdoneDate(const Value: TDateTime);
     procedure Setdescription(const Value: TBaseDescription);
+    procedure Setcash(const Value: Currency);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -215,6 +217,7 @@ type
     property doneState: TBaseEnumeration read FdoneState write SetdoneState;
     property doneDate: TDateTime read FdoneDate write SetdoneDate;
     property description: TBaseDescription read Fdescription write Setdescription;
+    property cash: Currency read Fcash write Setcash;
   end;
 
 
@@ -763,6 +766,15 @@ begin
     FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
     FdoneState := FieldByName('doneState').AsString;
     Fdescription := FieldByName('description').AsString;
+    Fcash := FieldByName('cash').AsCurrency;
+  end;
+end;
+
+procedure TPlannedDone.Setcash(const Value: Currency);
+begin
+  if Fcash <> Value then begin
+    Fcash := Value;
+    SetState(msModified);
   end;
 end;
 
@@ -815,6 +827,7 @@ begin
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
     AddField('doneState', FdoneState, True, 'plannedDone');
     AddField('description', Fdescription, True, 'plannedDone');
+    AddField('cash', CurrencyToDatabase(Fcash), False, 'plannedDone');
   end;
 end;
 

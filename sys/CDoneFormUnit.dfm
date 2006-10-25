@@ -39,12 +39,20 @@ inherited CDoneForm: TCDoneForm
       Caption = ' Opis '
       TabOrder = 1
       object Label3: TLabel
-        Left = 183
+        Left = 23
         Top = 136
         Width = 66
         Height = 13
         Alignment = taRightJustify
         Caption = 'Data realizacji'
+      end
+      object Label10: TLabel
+        Left = 218
+        Top = 136
+        Width = 30
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Kwota'
       end
       object RichEditDesc: TRichEdit
         Left = 24
@@ -56,7 +64,7 @@ inherited CDoneForm: TCDoneForm
         TabOrder = 0
       end
       object CDateTime: TCDateTime
-        Left = 256
+        Left = 96
         Top = 132
         Width = 89
         Height = 21
@@ -68,6 +76,17 @@ inherited CDoneForm: TCDoneForm
         ParentColor = False
         TabOrder = 1
         HotTrack = True
+      end
+      object CCurrCash: TCCurrEdit
+        Left = 256
+        Top = 132
+        Width = 89
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 2
+        Decimals = 2
+        ThousandSep = True
+        BevelKind = bkTile
       end
     end
     object GroupBox3: TGroupBox

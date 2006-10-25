@@ -104,8 +104,9 @@ begin
   xBase.Add(THelperElement.Create(True, 'Stan kont' , '1_01', 'Pokazuje stan wszystkich kont na wybrany dzieñ', CNoImage));
   xBase.Add(THelperElement.Create(True, 'Operacje wykonane' , '1_02', 'Pokazuje operacje wykonane w wybranym okresie', CNoImage));
   xBase.Add(THelperElement.Create(True, 'Operacje zaplanowane' , '1_03', 'Pokazuje operacje zaplanowane na wybrany okres', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Historia konta' , '1_04', 'Pokazuje historiê wybranego konta w wybranym okresie', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , '1_05', 'Pokazuje wykres stanu kont w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Przep³yw gotówki' , '1_04', 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Historia konta' , '1_05', 'Pokazuje historiê wybranego konta w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , '1_06', 'Pokazuje wykres stanu kont w wybranym okresie', CNoImage));
 
   xIncomes := THelperElement.Create(False, 'Rozchody', '2', '', CNoImage);
   FTreeHelper.Add(xIncomes);
@@ -268,7 +269,11 @@ begin
   if AGid = '1_01' then begin
     Result := TAccountBalanceOnDayReport;
   end else if AGid = '1_02' then begin
-    Result := TOperationsListReport;
+    Result := TDoneOperationsListReport;
+  end else if AGid = '1_03' then begin
+    Result := TPlannedOperationsListReport;
+  end else if AGid = '1_04' then begin
+    Result := TCashFlowListReport;
   end else begin
     Result := Nil;
   end;

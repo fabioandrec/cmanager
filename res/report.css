@@ -23,6 +23,11 @@ td.text
 {
 text-align: left;
 }
+td.infotext
+{
+font-size: 10px;
+text-align: left;
+}
 td.headtext
 {
 font-weight: bold;

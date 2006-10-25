@@ -201,7 +201,6 @@ function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 
-
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
@@ -271,6 +270,7 @@ var xY, xM, xD: Word;
 begin
   xDs := StringReplace(ADatetime, '''', '', [rfReplaceAll, rfIgnoreCase]);
   xDs := StringReplace(xDs, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xDs := StringReplace(xDs, '#', '', [rfReplaceAll, rfIgnoreCase]);
   xY := StrToIntDef(Copy(xDs, 1, 4), 0);
   xM := StrToIntDef(Copy(xDs, 5, 2), 0);
   xD := StrToIntDef(Copy(xDs, 7, 2), 0);
@@ -973,7 +973,6 @@ begin
   xMonth := MonthOf(ADateTime);
   Result := ((xMonth - 1) div 6) + 1;
 end;
-
 
 initialization
   CoInitialize(Nil);

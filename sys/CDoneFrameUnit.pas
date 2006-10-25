@@ -18,19 +18,6 @@ type
     property movementType: TBaseEnumeration read FmovementType;
   end;
 
-  TPlannedTreeItem = class(TObject)
-  private
-    FPlanned: TPlannedMovement;
-    FDone: TPlannedDone;
-    FtriggerDate: TDateTime;
-  public
-    constructor Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
-  published
-    property planned: TPlannedMovement read FPlanned write FPlanned;
-    property done: TPlannedDone read FDone write FDone;
-    property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
-  end;
-
   TCDoneFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
     DoneList: TVirtualStringTree;
@@ -78,12 +65,10 @@ type
     FSumObjects: TSumList;
     FTreeObjects: TObjectList;
     procedure UpdateCustomPeriod;
-    function FindPlannedDone(APlannedMovement: TPlannedMovement; ATriggerDate: TDateTime): TPlannedDone;
   protected
     procedure WndProc(var Message: TMessage); override;
     function GetList: TVirtualStringTree; override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
-    procedure RecreatePlannedMovements(AMovement: TPlannedMovement; AFromDate, AToDate: TDateTime);
     function GetSelectedId: ShortString; override;
     function GetSelectedText: String; override;
   public
@@ -101,7 +86,7 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit;
+  Math, CDoneFormUnit, CSchedules;
 
 {$R *.dfm}
 
@@ -222,11 +207,19 @@ begin
   if Column = 0 then begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
-    CellText := xData.planned.description;
+    if xData.done = Nil then begin
+      CellText := xData.planned.description;
+    end else begin
+      CellText := xData.done.description;
+    end;
   end else if Column = 2 then begin
     CellText := DateToStr(xData.triggerDate);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(xData.planned.cash);
+    if xData.done = Nil then begin
+      CellText := CurrencyToString(xData.planned.cash);
+    end else begin
+      CellText := CurrencyToString(xData.done.cash);
+    end;
   end else if Column = 4 then begin
     if (xData.planned.movementType = CInMovement) then begin
       CellText := 'Przychód';
@@ -567,93 +560,11 @@ begin
   ReloadDone;
 end;
 
-constructor TPlannedTreeItem.Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
-begin
-  inherited Create;
-  FPlanned := APlanned;
-  FDone := ADone;
-  FtriggerDate := ATriggerDate;
-end;
-
 procedure TCDoneFrame.RecreateTreeHelper;
-var xCount: Integer;
-    xDF, xDT: TDateTime;
+var xDF, xDT: TDateTime;
 begin
-  FTreeObjects.Clear;
   GetFilterDates(xDF, xDT);
-  for xCount := 0 to FPlannedObjects.Count - 1 do begin
-    RecreatePlannedMovements(TPlannedMovement(FPlannedObjects.Items[xCount]), xDF, xDT);
-  end;
-end;
-
-procedure TCDoneFrame.RecreatePlannedMovements(AMovement: TPlannedMovement; AFromDate, AToDate: TDateTime);
-var xCurDate: TDateTime;
-    xValid: Boolean;
-    xTimes: Integer;
-    xElement: TPlannedTreeItem;
-    xDone: TPlannedDone;
-    xSum: TSumElement;
-begin
-  xCurDate := AFromDate;
-  xTimes := AMovement.doneCount;
-  while (xCurDate <= AToDate) do begin
-    if AMovement.scheduleType = CScheduleTypeOnce then begin
-      xValid := AMovement.scheduleDate = xCurDate;
-    end else begin
-      if AMovement.triggerType = CTriggerTypeWeekly then begin
-        xValid := DayOfTheWeek(xCurDate) = (AMovement.triggerDay + 1);
-      end else begin
-        xValid := (DayOfTheMonth(xCurDate) = AMovement.triggerDay) or ((DayOfTheMonth(xCurDate) = DaysInMonth(xCurDate)) and (AMovement.triggerDay = 0));
-      end;
-      if AMovement.endCondition = CEndConditionTimes then begin
-        xValid := xValid and (xTimes < AMovement.endCount);
-        if xValid then begin
-          Inc(xTimes);
-        end;
-      end else if AMovement.endCondition = CEndConditionDate then begin
-        xValid := xValid and (xCurDate <= AMovement.endDate);
-      end;
-    end;
-    if xValid then begin
-      xDone := FindPlannedDone(AMovement, xCurDate);
-      xElement := TPlannedTreeItem.Create(AMovement, xDone, xCurDate);
-      FTreeObjects.Add(xElement);
-      if AdditionalData = Nil then begin
-        xSum := FSumObjects.FindSumObject('*', True);
-        xSum.cashIn := IfThen(AMovement.movementType = CInMovement, AMovement.cash, 0);
-        xSum.cashOut := IfThen(AMovement.movementType = COutMovement, AMovement.cash, 0);
-        xSum := FSumObjects.FindSumObject(AMovement.idAccount, False);
-        if xSum = Nil then begin
-          xSum := TSumElement.Create;
-          xSum.id := AMovement.idAccount;
-          if xSum.id = CEmptyDataGid then begin
-            xSum.name := 'Bez zdefiniowanego konta';
-          end else begin
-            xSum.name := TAccount(TAccount.LoadObject(AccountProxy, AMovement.idAccount, False)).name;
-          end;
-          FSumObjects.Add(xSum);
-        end;
-        xSum.cashIn := IfThen(AMovement.movementType = CInMovement, AMovement.cash, 0);
-        xSum.cashOut := IfThen(AMovement.movementType = COutMovement, AMovement.cash, 0);
-      end;
-    end;
-    xCurDate := IncDay(xCurDate, 1);
-  end;
-end;
-
-function TCDoneFrame.FindPlannedDone(APlannedMovement: TPlannedMovement; ATriggerDate: TDateTime): TPlannedDone;
-var xCount: Integer;
-    xCur: TPlannedDone;
-begin
-  Result := Nil;
-  xCount := 0;
-  while (Result = Nil) and (xCount <= FDoneObjects.Count - 1) do begin
-    xCur := TPlannedDone(FDoneObjects.Items[xCount]);
-    if (xCur.idPlannedMovement = APlannedMovement.id) and (xCur.triggerDate = ATriggerDate) then begin
-      Result := xCur;
-    end;
-    Inc(xCount);
-  end;
+  GetScheduledObjects(FTreeObjects, FSumObjects, FPlannedObjects, FDoneObjects, xDF, xDT);
 end;
 
 constructor TDoneFrameAdditionalData.Create(AMovementType: TBaseEnumeration);
@@ -750,6 +661,7 @@ begin
         end;
         xData.done.doneDate := xForm.CDateTime.Value;
         xData.done.description := xForm.RichEditDesc.Text;
+        xData.done.cash := xForm.CCurrCash.Value;
         if xForm.ComboBoxStatus.ItemIndex = 1 then begin
           xData.done.doneState := CDoneAccepted;
         end else begin
