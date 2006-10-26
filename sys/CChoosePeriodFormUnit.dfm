@@ -3,17 +3,17 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
   Top = 400
   Caption = 'Parametry raportu'
   ClientHeight = 190
-  ClientWidth = 511
+  ClientWidth = 368
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 511
+    Width = 368
     Height = 149
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 471
+      Width = 337
       Height = 121
       Caption = ' Zakres dat '
       TabOrder = 0
@@ -34,7 +34,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         Caption = 'od daty'
       end
       object Label2: TLabel
-        Left = 249
+        Left = 177
         Top = 76
         Width = 35
         Height = 13
@@ -44,7 +44,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
       object ComboBoxPredefined: TComboBox
         Left = 72
         Top = 32
-        Width = 369
+        Width = 233
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -69,7 +69,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
       object CDateTime1: TCDateTime
         Left = 72
         Top = 72
-        Width = 150
+        Width = 89
         Height = 21
         AutoSize = False
         BevelKind = bkTile
@@ -80,9 +80,9 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         HotTrack = True
       end
       object CDateTime2: TCDateTime
-        Left = 291
+        Left = 219
         Top = 72
-        Width = 150
+        Width = 86
         Height = 21
         AutoSize = False
         BevelKind = bkTile
@@ -96,12 +96,15 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
   end
   inherited PanelButtons: TPanel
     Top = 149
-    Width = 511
+    Width = 368
+    DesignSize = (
+      368
+      41)
     inherited BitBtnOk: TBitBtn
-      Left = 334
+      Left = 191
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 422
+      Left = 279
     end
   end
 end

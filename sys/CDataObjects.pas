@@ -62,6 +62,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    class function AccountBalanceOnDay(AIdAccount: TDataGid; ADateTime: TDateTime): Currency;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -868,6 +869,21 @@ begin
     FyearNumber := Value;
     SetState(msModified);
   end;
+end;
+
+class function TAccount.AccountBalanceOnDay(AIdAccount: TDataGid; ADateTime: TDateTime): Currency;
+var xQ: TADOQuery;
+begin
+  xQ := GDataProvider.OpenSql(Format(
+             'select tr.*, a.cash as base from (select sum(cash) as inout from transactions where idAccount = %s and regDate > %s) as tr, ' +
+             '                         account a where idAccount = %s',
+             [DataGidToDatabase(AIdAccount), DatetimeToDatabase(ADateTime, False), DataGidToDatabase(AIdAccount)]));
+  if not xQ.IsEmpty then begin
+    Result := xQ.FieldByName('base').AsCurrency  - xQ.FieldByName('inout').AsCurrency;
+  end else begin
+    Result := 0;
+  end;
+  xQ.Free;
 end;
 
 end.

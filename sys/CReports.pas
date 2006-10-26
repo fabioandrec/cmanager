@@ -3,37 +3,54 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil;
+     GraphUtil, CDatabase;
 
 type
-  TCReportClass = class of TCReport;
+  TCReportClass = class of TCBaseReport;
+  TCReportFormClass = class of TCReportForm;
 
-  TCReport = class(TObject)
+  TCBaseReport = class(TObject)
+  private
+    FForm: TCReportForm;
+  protected
+    function PrepareReportConditions: Boolean; virtual;
+    function GetReportTitle: String; virtual; abstract;
+    function GetReportFooter: String; virtual; abstract;
+    function GetFormClass: TCReportFormClass; virtual; abstract;
+    procedure PrepareReportData; virtual; abstract;
+    procedure CleanReportData; virtual; abstract;
+  public
+    constructor CreateReport; virtual;
+    procedure ShowReport;
+  end;
+
+  TCHtmlReport = class(TCBaseReport)
   private
     FreportPath: String;
     FreportText: TStringList;
-    Fform: TCReportForm;
-    Fcharts: TObjectList;
-    function PrepareReportData: Boolean;
     procedure PrepareReportPath;
   protected
-    procedure CleanReportData; virtual;
-    function PrepareReportConditions: Boolean; virtual;
-    function GetReportTitle: String; virtual; abstract;
+    procedure CleanReportData; override;
+    procedure PrepareReportData; override;
     function GetReportBody: String; virtual; abstract;
-    function GetReportFooter: String; virtual;
+    function GetReportFooter: String; override;
+    function GetFormClass: TCReportFormClass; override;
   public
-    procedure ShowReport;
-    constructor Create;
+    constructor CreateReport; override;
     destructor Destroy; override;
-    function GetChart: TChart;
-  published
-    property reportTitle: String read GetReportTitle;
-    property reportBody: String read GetReportBody;
-    property reportFooter: String read GetReportFooter;
   end;
 
-  TAccountBalanceOnDayReport = class(TCReport)
+  TCChartReport = class(TCBaseReport)
+  protected
+    function GetFormClass: TCReportFormClass; override;
+    function GetReportFooter: String; override;
+    procedure PrepareReportChart; virtual; abstract;
+    procedure PrepareReportData; override;
+    function GetChart: TChart;
+    procedure CleanReportData; override;
+  end;
+
+  TAccountBalanceOnDayReport = class(TCHtmlReport)
   private
     FDate: TDateTime;
   protected
@@ -42,7 +59,7 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
-  TDoneOperationsListReport = class(TCReport)
+  TDoneOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -52,7 +69,7 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
-  TPlannedOperationsListReport = class(TCReport)
+  TPlannedOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -62,7 +79,7 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
-  TCashFlowListReport = class(TCReport)
+  TCashFlowListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -70,14 +87,31 @@ type
     function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
+  end;
+
+  TAccountHistoryReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FIdAccount: TDataGid;
+  protected
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
+  end;
+
+  TAccountBalanceChartReport = class(TCChartReport)
+  protected
+    procedure PrepareReportChart; override;
   end;
 
 
 implementation
 
-uses Forms, SysUtils, CDatabase, Adodb, CConfigFormUnit,
+uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts, CDataObjects,
-  DateUtils, CSchedules;
+  DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
+  CChartReportFormUnit, TeeProcs;
 
 function DayName(ADate: TDateTime): String;
 var xDay: Integer;
@@ -100,99 +134,6 @@ begin
 	i := GetTempPath(Length(Result), PChar(Result));
 	SetLength(Result, i);
   Result := IncludeTrailingPathDelimiter(Result) + IncludeTrailingPathDelimiter('Cmanager') + IncludeTrailingPathDelimiter(ASubpath);
-end;
-
-procedure TCReport.CleanReportData;
-var xRec: TSearchRec;
-    xRes: Integer;
-begin
-  xRes := FindFirst(FreportPath + '*.*', faAnyFile, xRec);
-  while (xRes = 0) do begin
-    DeleteFile(FreportPath + xRec.Name);
-    xRes := FindNext(xRec);
-  end;
-  FindClose(xRec);
-  RemoveDir(FreportPath);
-end;
-
-constructor TCReport.Create;
-begin
-  inherited Create;
-  FreportText := TStringList.Create;
-  Fcharts := TObjectList.Create(False);
-end;
-
-destructor TCReport.Destroy;
-begin
-  CleanReportData;
-  Fcharts.Free;
-  FreportText.Free;
-  inherited Destroy;
-end;
-
-function TCReport.GetChart: TChart;
-begin
-  Result := TChart.Create(Fform);
-  Result.Visible := False;
-  Result.BorderStyle := bsNone;
-  Result.BevelInner := bvNone;
-  Result.BevelOuter := bvNone;
-  Result.Color := clWindow;
-  Result.Parent := Fform;
-  Fcharts.Add(Result)
-end;
-
-function TCReport.GetReportFooter: String;
-begin
-  Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
-end;
-
-function TCReport.PrepareReportConditions: Boolean;
-begin
-  Result := True;
-end;
-
-function TCReport.PrepareReportData: Boolean;
-var xText: String;
-begin
-  Result := PrepareReportConditions;
-  PrepareReportPath;
-  xText := FreportText.Text;
-  xText := StringReplace(xText, '[reptitle]', reportTitle, [rfReplaceAll, rfIgnoreCase]);
-  xText := StringReplace(xText, '[repbody]', reportBody, [rfReplaceAll, rfIgnoreCase]);
-  xText := StringReplace(xText, '[repfooter]', reportFooter, [rfReplaceAll, rfIgnoreCase]);
-  FreportText.Text := xText;
-end;
-
-procedure TCReport.PrepareReportPath;
-var xRes: TResourceStream;
-begin
-  FreportPath := GetReportPath(IntToStr(GetTickCount));
-  if not FileExists('report.css') then begin
-    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
-    xRes.SaveToFile('report.css');
-    xRes.Free;
-  end;
-  if not FileExists('report.htm') then begin
-    xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
-    xRes.SaveToFile('report.htm');
-    xRes.Free;
-  end;
-  FreportText.LoadFromFile('report.htm');
-  ForceDirectories(FreportPath)
-end;
-
-procedure TCReport.ShowReport;
-begin
-  Fform := TCReportForm.Create(Nil);
-  if PrepareReportData then begin
-    Fform.Caption := 'Raport';
-    FreportText.SaveToFile(FreportPath + 'report.htm');
-    CopyFile('report.css', PChar(FreportPath + 'report.css'), False); 
-    Fform.CBrowser.Navigate('file://' + FreportPath + 'report.htm');
-    Fform.ShowConfig(coNone);
-  end;
-  Fform.Free;
 end;
 
 function TAccountBalanceOnDayReport.GetReportBody: String;
@@ -517,6 +458,192 @@ end;
 function TCashFlowListReport.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodByForm(FStartDate, FEndDate);
+end;
+
+function TAccountHistoryReport.GetReportBody: String;
+var xOperations: TADOQuery;
+    xSum: Currency;
+    xBody: TStringList;
+begin
+  xOperations := GDataProvider.OpenSql(Format('select cash, description, regDate from transactions where regDate between %s and %s and idAccount = %s order by regDate',
+                                              [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), DataGidToDatabase(FIdAccount)]));
+  xSum := TAccount.AccountBalanceOnDay(FIdAccount, FStartDate);
+  xBody := TStringList.Create;
+  with xOperations, xBody do begin
+    Add('<table class="base" colspan=3>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="10%">Lp</td>');
+    Add('<td class="headtext" width="40%">Opis</td>');
+    Add('<td class="headtext" width="30%">Data</td>');
+    Add('<td class="headcash" width="20%">Kwota</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="80%">Stan pocz¹tkowy (na ' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ')</td>');
+    Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=3>');
+    while not Eof do begin
+      if not Odd(RecNo) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="10%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="30%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(FieldByName('cash').AsCurrency) + '</td>');
+      xSum := xSum + FieldByName('cash').AsCurrency;
+      Add('</tr>');
+      Next;
+    end;
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="80%">Stan koñcowy (na ' + DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')</td>');
+    Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  xOperations.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TAccountHistoryReport.GetReportTitle: String;
+var xAcc: TAccount;
+begin
+  GDataProvider.BeginTransaction;
+  xAcc := TAccount(TAccount.LoadObject(AccountProxy, FIdAccount, False));
+  Result := 'Historia konta ' + xAcc.name + ' (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  GDataProvider.RollbackTransaction;
+end;
+
+function TAccountHistoryReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodAccountByForm(FStartDate, FEndDate, FIdAccount);
+end;
+
+constructor TCBaseReport.CreateReport;
+begin
+  inherited Create;
+end;
+
+function TCBaseReport.PrepareReportConditions: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TCBaseReport.ShowReport;
+begin
+  Fform := GetFormClass.Create(Nil);
+  if PrepareReportConditions then begin
+    PrepareReportData;
+    Fform.Caption := 'Raport';
+    Fform.ShowConfig(coNone);
+    CleanReportData;
+  end;
+  Fform.Free;
+end;
+
+procedure TCHtmlReport.CleanReportData;
+var xRec: TSearchRec;
+    xRes: Integer;
+begin
+  xRes := FindFirst(FreportPath + '*.*', faAnyFile, xRec);
+  while (xRes = 0) do begin
+    DeleteFile(FreportPath + xRec.Name);
+    xRes := FindNext(xRec);
+  end;
+  FindClose(xRec);
+  RemoveDir(FreportPath);
+end;
+
+constructor TCHtmlReport.CreateReport;
+begin
+  inherited Create;
+  FreportText := TStringList.Create;
+end;
+
+destructor TCHtmlReport.Destroy;
+begin
+  FreportText.Free;
+  inherited Destroy;
+end;
+
+function TCHtmlReport.GetFormClass: TCReportFormClass;
+begin
+  Result := TCHtmlReportForm;
+end;
+
+function TCHtmlReport.GetReportFooter: String;
+begin
+  Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
+end;
+
+procedure TCHtmlReport.PrepareReportData;
+var xText: String;
+begin
+  PrepareReportPath;
+  xText := FreportText.Text;
+  xText := StringReplace(xText, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
+  xText := StringReplace(xText, '[repbody]', GetReportBody, [rfReplaceAll, rfIgnoreCase]);
+  xText := StringReplace(xText, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
+  FreportText.Text := xText;
+  FreportText.SaveToFile(FreportPath + 'report.htm');
+  CopyFile('report.css', PChar(FreportPath + 'report.css'), False);
+  TCHtmlReportForm(FForm).CBrowser.Navigate('file://' + FreportPath + 'report.htm');
+end;
+
+procedure TCHtmlReport.PrepareReportPath;
+var xRes: TResourceStream;
+begin
+  FreportPath := GetReportPath(IntToStr(GetTickCount));
+  if not FileExists('report.css') then begin
+    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
+    xRes.SaveToFile('report.css');
+    xRes.Free;
+  end;
+  if not FileExists('report.htm') then begin
+    xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
+    xRes.SaveToFile('report.htm');
+    xRes.Free;
+  end;
+  FreportText.LoadFromFile('report.htm');
+  ForceDirectories(FreportPath)
+end;
+
+procedure TCChartReport.CleanReportData;
+begin
+end;
+
+function TCChartReport.GetChart: TChart;
+begin
+  Result := TCChartReportForm(FForm).CChart;
+end;
+
+function TCChartReport.GetFormClass: TCReportFormClass;
+begin
+  Result := TCChartReportForm;
+end;
+
+function TCChartReport.GetReportFooter: String;
+begin
+  Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
+end;
+
+procedure TCChartReport.PrepareReportData;
+begin
+  with GetChart do begin
+    Foot.Font.Name := 'Verdana';
+    Foot.Font.Size := 7;
+    Foot.Alignment := taRightJustify;
+    Foot.Text.Text := GetReportFooter;
+  end;
+  PrepareReportChart;
+end;
+
+procedure TAccountBalanceChartReport.PrepareReportChart;
+begin
 end;
 
 end.

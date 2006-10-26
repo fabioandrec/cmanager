@@ -248,14 +248,14 @@ end;
 
 procedure TCReportsFrame.ActionExecuteExecute(Sender: TObject);
 var xClass: TCReportClass;
-    xReport: TCReport;
+    xReport: TCBaseReport;
     xGid: TDataGid;
 begin
   xGid := GetSelectedId;
   if xGid <> CEmptyDataGid then begin
     xClass := GetClassOfReport(xGid);
     if xClass <> Nil then begin
-      xReport := xClass.Create;
+      xReport := xClass.CreateReport;
       xReport.ShowReport;
       xReport.Free;
     end else begin
@@ -274,6 +274,10 @@ begin
     Result := TPlannedOperationsListReport;
   end else if AGid = '1_04' then begin
     Result := TCashFlowListReport;
+  end else if AGid = '1_05' then begin
+    Result := TAccountHistoryReport;
+  end else if AGid = '1_06' then begin
+    Result := TAccountBalanceChartReport;
   end else begin
     Result := Nil;
   end;

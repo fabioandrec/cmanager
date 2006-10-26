@@ -9,13 +9,14 @@ uses
 
 type
   TCReportForm = class(TCConfigForm)
-    CBrowser: TCBrowser;
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     procedure BitBtn2Click(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
   private
-    { Private declarations }
+  protected
+    procedure DoPrint; virtual;
+    procedure DoPreview; virtual;
   public
     { Public declarations }
   end;
@@ -26,12 +27,20 @@ implementation
 
 procedure TCReportForm.BitBtn2Click(Sender: TObject);
 begin
-  CBrowser.ExecWB(OLECMDID_PRINTPREVIEW, 0);
+  DoPreview;
 end;
 
 procedure TCReportForm.BitBtn1Click(Sender: TObject);
 begin
-  CBrowser.ExecWB(OLECMDID_PRINT, 0);
+  DoPrint;
+end;
+
+procedure TCReportForm.DoPreview;
+begin
+end;
+
+procedure TCReportForm.DoPrint;
+begin
 end;
 
 end.

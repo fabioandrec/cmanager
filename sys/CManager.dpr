@@ -42,7 +42,10 @@ uses
   CChooseDateFormUnit in 'CChooseDateFormUnit.pas' {CChooseDateForm},
   CChoosePeriodFormUnit in 'CChoosePeriodFormUnit.pas' {CChoosePeriodForm},
   CConsts in 'CConsts.pas',
-  CSchedules in 'CSchedules.pas';
+  CSchedules in 'CSchedules.pas',
+  CChoosePeriodAccountFormUnit in 'CChoosePeriodAccountFormUnit.pas' {CChoosePeriodAccountForm},
+  CHtmlReportFormUnit in 'CHtmlReportFormUnit.pas' {CHtmlReportForm},
+  CChartReportFormUnit in 'CChartReportFormUnit.pas' {CChartReportForm};
 
 {$R *.res}
 
