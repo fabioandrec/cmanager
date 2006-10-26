@@ -101,8 +101,13 @@ type
   end;
 
   TAccountBalanceChartReport = class(TCChartReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
   protected
     procedure PrepareReportChart; override;
+    function GetReportTitle: String; override;
+    function PrepareReportConditions: Boolean; override;
   end;
 
 
@@ -635,15 +640,33 @@ procedure TCChartReport.PrepareReportData;
 begin
   with GetChart do begin
     Foot.Font.Name := 'Verdana';
-    Foot.Font.Size := 7;
+    Foot.Font.Size := -10;
+    Foot.Font.Color := clNavy;
     Foot.Alignment := taRightJustify;
     Foot.Text.Text := GetReportFooter;
+    Title.Font.Name := 'Verdana';
+    Title.Font.Height := -16;
+    Title.Font.Style := [fsBold];
+    Title.Font.Color := clNavy;
+    Title.Alignment := taLeftJustify;
+    Title.Text.Text := GetReportTitle;
   end;
   PrepareReportChart;
+end;
+
+function TAccountBalanceChartReport.GetReportTitle: String;
+begin
+  Result := 'Wykres stanu kont (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
 end;
 
 procedure TAccountBalanceChartReport.PrepareReportChart;
 begin
 end;
 
+function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+end;
+
 end.
+

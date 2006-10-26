@@ -39,6 +39,8 @@ type
     ActionCloseConnection: TAction;
     ActionOpenConnection: TAction;
     OpenDialog: TOpenDialog;
+    SaveDialog: TSaveDialog;
+    ActionCreateConnection: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -53,6 +55,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure ActionCloseConnectionExecute(Sender: TObject);
     procedure ActionOpenConnectionExecute(Sender: TObject);
+    procedure ActionCreateConnectionExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -294,6 +297,7 @@ begin
   ActionShortcuts.Visible := GDataProvider.IsConnected;
   ActionCloseConnection.Enabled := GDataProvider.IsConnected;
   ActionOpenConnection.Enabled := not GDataProvider.IsConnected;
+  ActionCreateConnection.Enabled := not GDataProvider.IsConnected;
 end;
 
 procedure TCMainForm.ActionAboutExecute(Sender: TObject);
@@ -320,15 +324,33 @@ begin
 end;
 
 procedure TCMainForm.ActionCloseConnectionExecute(Sender: TObject);
+var xCount: Integer;
 begin
   GDataProvider.DisconnectFromDatabase;
   UpdateStatusbar;
+  if not GDataProvider.IsConnected then begin
+    for xCount := 0 to FShortcutsFrames.Count - 1 do begin
+      FShortcutsFrames.Objects[xCount].Free;
+    end;
+    FShortcutsFrames.Clear;
+  end;
 end;
 
 procedure TCMainForm.ActionOpenConnectionExecute(Sender: TObject);
 begin
   if OpenDialog.Execute then begin
     if InitializeDataProvider(OpenDialog.FileName) then begin
+      ActionShortcutExecute(ActionShorcutOperations);
+      UpdateStatusbar;
+    end;
+  end;
+end;
+
+procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
+begin
+  if SaveDialog.Execute then begin
+    if InitializeDataProvider(SaveDialog.FileName) then begin
+      ActionShortcutExecute(ActionShorcutOperations);
       UpdateStatusbar;
     end;
   end;

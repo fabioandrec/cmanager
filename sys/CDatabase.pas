@@ -548,6 +548,9 @@ end;
 function TDataProvider.ConnectToDatabase(AConnectionString: String): Boolean;
 begin
   Result := True;
+  if FConnection.Connected then begin
+    FConnection.Close;
+  end;
   FConnection.ConnectionString := AConnectionString;
   FConnection.LoginPrompt := False;
   FConnection.CursorLocation := clUseClient;

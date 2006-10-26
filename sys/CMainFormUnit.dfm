@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 113
-  Top = 34
+  Left = 132
+  Top = 133
   Width = 869
   Height = 634
   Caption = 'CManager'
@@ -257,10 +257,15 @@ object CMainForm: TCMainForm
           item
             Items = <
               item
-                Action = ActionCloseConnection
+                Action = ActionCreateConnection
               end
               item
                 Action = ActionOpenConnection
+                Caption = '&Otw'#243'rz plik danych'
+              end
+              item
+                Action = ActionCloseConnection
+                Caption = '&Zamknij plik danych'
               end>
             Caption = 'P&lik'
           end
@@ -372,22 +377,37 @@ object CMainForm: TCMainForm
       Caption = 'O programie'
       OnExecute = ActionAboutExecute
     end
-    object ActionCloseConnection: TAction
+    object ActionCreateConnection: TAction
       Category = 'Plik'
-      Caption = 'Zamknij plik danych'
-      OnExecute = ActionCloseConnectionExecute
+      Caption = 'Nowy plik danych'
+      OnExecute = ActionCreateConnectionExecute
     end
     object ActionOpenConnection: TAction
       Category = 'Plik'
       Caption = 'Otw'#243'rz plik danych'
       OnExecute = ActionOpenConnectionExecute
     end
+    object ActionCloseConnection: TAction
+      Category = 'Plik'
+      Caption = 'Zamknij plik danych'
+      OnExecute = ActionCloseConnectionExecute
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'
     Filter = 'Pliki danych|*.dat|Wszystkie pliki|*.*'
     FilterIndex = 0
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 474
     Top = 184
+  end
+  object SaveDialog: TSaveDialog
+    DefaultExt = '.dat'
+    Filter = 'Pliki danych|*.dat|Wszystkie pliki|*.*'
+    FilterIndex = 0
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Title = 'Plik danych'
+    Left = 514
+    Top = 192
   end
 end
