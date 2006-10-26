@@ -9,8 +9,8 @@ uses
 
 type
   TCChartReportForm = class(TCReportForm)
-    CChart: TChart;
     PrintDialog: TPrintDialog;
+    CChart: TChart;
   protected
     procedure DoPrint; override;
     procedure DoPreview; override;

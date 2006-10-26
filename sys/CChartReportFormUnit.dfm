@@ -13,7 +13,6 @@ inherited CChartReportForm: TCChartReportForm
       Title.Text.Strings = (
         'TChart')
       Align = alClient
-      BevelOuter = bvNone
       Color = clWhite
       TabOrder = 0
     end

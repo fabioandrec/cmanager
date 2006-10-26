@@ -116,7 +116,7 @@ implementation
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts, CDataObjects,
   DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
-  CChartReportFormUnit, TeeProcs;
+  CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine;
 
 function DayName(ADate: TDateTime): String;
 var xDay: Integer;
@@ -650,6 +650,23 @@ begin
     Title.Font.Color := clNavy;
     Title.Alignment := taLeftJustify;
     Title.Text.Text := GetReportTitle;
+    with LeftAxis.Axis do begin
+      Width := 1;
+    end;
+    with RightAxis.Axis do begin
+      Width := 1;
+    end;
+    with TopAxis.Axis do begin
+      Width := 1;
+    end;
+    with BottomAxis.Axis do begin
+      Width := 1;
+    end;
+    Legend.LegendStyle := lsSeries;
+    Legend.ResizeChart := False;
+    Legend.Alignment := laRight;;
+    Legend.Frame.Visible := True;
+    Legend.ShadowSize := 0;
   end;
   PrepareReportChart;
 end;
@@ -660,7 +677,16 @@ begin
 end;
 
 procedure TAccountBalanceChartReport.PrepareReportChart;
+var xSerie: TLineSeries;
+    xChart: TChart;
 begin
+  xChart := GetChart;
+  with xChart do begin
+    xSerie := TLineSeries.Create(xChart);
+    xSerie.AddArray([2, 1, 4, 5, 4, 6, 7, 8, 9, 10]);
+    xSerie.Title := 'tytu³ pierwszej serii';
+    AddSeries(xSerie);
+  end;
 end;
 
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
