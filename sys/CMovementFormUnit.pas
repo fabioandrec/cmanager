@@ -487,6 +487,8 @@ begin
   end else if (xI = 3) or (xI = 4) then begin
     xId := CStaticInoutCyclicAccount.DataId;
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
   end;
 end;
 

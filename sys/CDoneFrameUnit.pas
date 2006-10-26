@@ -73,6 +73,7 @@ type
     function GetSelectedText: String; override;
   public
     procedure ReloadDone;
+    procedure ReloadSums;
     procedure RecreateTreeHelper;
     constructor Create(AOwner: TComponent); override;
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
@@ -102,7 +103,6 @@ end;
 procedure TCDoneFrame.ReloadDone;
 var xSqlPlanned, xSqlDone: String;
     xDf, xDt: TDateTime;
-    xOvr: TSumElement;
 begin
   xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
   if CStaticFilter.DataId = '2' then begin
@@ -129,26 +129,12 @@ begin
   end;
   FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
   FDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
-  if AdditionalData = Nil then begin
-    FSumObjects.Clear;
-    xOvr := TSumElement.Create;
-    xOvr.id := '*';
-    xOvr.name := 'Ogó³em dla wszystkich kont';
-    xOvr.cashIn := 0;
-    xOvr.cashOut := 0;
-    FSumObjects.Add(xOvr);
-  end;
   RecreateTreeHelper;
   DoneList.BeginUpdate;
   DoneList.Clear;
   DoneList.RootNodeCount := FTreeObjects.Count;
   DoneList.EndUpdate;
-  SumList.BeginUpdate;
-  if AdditionalData = Nil then begin
-    SumList.Clear;
-    SumList.RootNodeCount := FSumObjects.Count;
-    SumList.EndUpdate;
-  end;
+  ReloadSums;
   DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0);
 end;
 
@@ -564,7 +550,7 @@ procedure TCDoneFrame.RecreateTreeHelper;
 var xDF, xDT: TDateTime;
 begin
   GetFilterDates(xDF, xDT);
-  GetScheduledObjects(FTreeObjects, FSumObjects, FPlannedObjects, FDoneObjects, xDF, xDT);
+  GetScheduledObjects(FTreeObjects, FPlannedObjects, FDoneObjects, xDF, xDT);
 end;
 
 constructor TDoneFrameAdditionalData.Create(AMovementType: TBaseEnumeration);
@@ -649,7 +635,8 @@ begin
           GDataProvider.BeginTransaction;
           xData.done.DeleteObject;
           GDataProvider.CommitTransaction;
-          FPlannedObjects.Remove(xData.done);
+          FDoneObjects.Remove(xData.done);
+          xData.done := Nil;
         end;
       end else begin
         GDataProvider.BeginTransaction;
@@ -670,8 +657,50 @@ begin
         GDataProvider.CommitTransaction;
       end;
       DoneList.InvalidateNode(DoneList.FocusedNode);
+      ReloadSums;
     end;
     xForm.Free;
+  end;
+end;
+
+procedure TCDoneFrame.ReloadSums;
+var xCount: Integer;
+    xElement: TPlannedTreeItem;
+    xSum: TSumElement;
+begin
+  if AdditionalData = Nil then begin
+    SumList.BeginUpdate;
+    SumList.Clear;
+    FSumObjects.Clear;
+    xSum := TSumElement.Create;
+    xSum.id := '*';
+    xSum.name := 'Ogó³em dla wszystkich kont';
+    xSum.cashIn := 0;
+    xSum.cashOut := 0;
+    FSumObjects.Add(xSum);
+    for xCount := 0 to FTreeObjects.Count - 1 do begin
+      xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
+      if xElement.done = Nil then begin
+        xSum := FSumObjects.FindSumObject('*', True);
+        xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
+        xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
+        xSum := FSumObjects.FindSumObject(xElement.planned.idAccount, False);
+        if xSum = Nil then begin
+          xSum := TSumElement.Create;
+          xSum.id := xElement.planned.idAccount;
+          if xSum.id = CEmptyDataGid then begin
+            xSum.name := 'Bez zdefiniowanego konta';
+          end else begin
+            xSum.name := TAccount(TAccount.LoadObject(AccountProxy, xElement.planned.idAccount, False)).name;
+          end;
+          FSumObjects.Add(xSum);
+        end;
+        xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
+        xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
+      end;
+    end;
+    SumList.RootNodeCount := FSumObjects.Count;
+    SumList.EndUpdate;
   end;
 end;
 

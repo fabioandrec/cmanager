@@ -279,7 +279,8 @@ end;
 function TPlannedOperationsListReport.GetReportBody: String;
 var xSqlPlanned, xSqlDone: String;
     xPlannedObjects, xDoneObjects: TDataObjectList;
-    xInSum, xOutSum: Currency;
+    xOverallInSum, xOverallOutSum: Currency;
+    xNotrealInSum, xNotrealOutSum: Currency;
     xBody: TStringList;
     xCount: Integer;
     xList: TObjectList;
@@ -301,8 +302,10 @@ begin
   GDataProvider.BeginTransaction;
   xPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
   xDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
-  xInSum := 0;
-  xOutSum := 0;
+  xOverallInSum := 0;
+  xOverallOutSum := 0;
+  xNotrealInSum := 0;
+  xNotrealOutSum := 0;
   xBody := TStringList.Create;
   xList := TObjectList.Create(True);
   with xBody do begin
@@ -315,7 +318,7 @@ begin
     Add('<td class="headcash" width="10%">Rozchód</td>');
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=5>');
-    GetScheduledObjects(xList, Nil, xPlannedObjects, xDoneObjects, FStartDate, FEndDate);
+    GetScheduledObjects(xList, xPlannedObjects, xDoneObjects, FStartDate, FEndDate);
     for xCount := 1 to xList.Count do begin
       xElement := TPlannedTreeItem(xList.Items[xCount - 1]);
       if not Odd(xCount) then begin
@@ -328,11 +331,11 @@ begin
         if xElement.planned.movementType = CInMovement then begin
           xIn := CurrencyToString(xElement.done.cash);
           xOut := '';
-          xInSum := xInSum + xElement.done.cash;
+          xOverallInSum := xOverallInSum + xElement.done.cash;
         end else begin
           xOut := CurrencyToString(xElement.done.cash);
           xIn := '';
-          xOutSum := xOutSum + xElement.done.cash;
+          xOverallOutSum := xOverallOutSum + xElement.done.cash;
         end;
         if xElement.done.doneState = CDoneOperation then begin
           xStat := 'Zrealizowana';
@@ -347,11 +350,13 @@ begin
         if xElement.planned.movementType = CInMovement then begin
           xIn := CurrencyToString(xElement.planned.cash);
           xOut := '';
-          xInSum := xInSum + xElement.planned.cash;
+          xOverallInSum := xOverallInSum + xElement.planned.cash;
+          xNotrealInSum := xNotrealInSum + xElement.planned.cash;
         end else begin
           xOut := CurrencyToString(xElement.planned.cash);
           xIn := '';
-          xOutSum := xOutSum + xElement.planned.cash;
+          xOverallOutSum := xOverallOutSum + xElement.planned.cash;
+          xNotrealOutSum := xNotrealOutSum + xElement.planned.cash;
         end;
         xStat := '';
       end;
@@ -364,9 +369,15 @@ begin
     end;
     Add('</table><hr><table class="base" colspan=2>');
     Add('<tr class="base">');
-    Add('<td class="sumtext" width="80%">Razem</td>');
-    Add('<td class="sumcash" width="10%">' + CurrencyToString(xInSum) + '</td>');
-    Add('<td class="sumcash" width="10%">' + CurrencyToString(xOutSum) + '</td>');
+    Add('<td class="sumtext" width="80%">Suma niezrealizowanych operacji</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xNotrealInSum) + '</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xNotrealOutSum) + '</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="80%">Suma wszystkich zaplanowanych operacji</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xOverallInSum) + '</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xOverallOutSum) + '</td>');
     Add('</tr>');
     Add('</table>');
   end;

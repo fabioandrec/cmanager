@@ -31,7 +31,7 @@ inherited CDoneFrame: TCDoneFrame
       Height = 21
       Align = alTop
       Alignment = taLeftJustify
-      Caption = '  Sumy zaplanowanych przychod'#243'w/rozchod'#243'w w wybranym okresie'
+      Caption = '  Sumy niezrealizowanych operacji w wybranym okresie'
       TabOrder = 0
     end
     object SumList: TVirtualStringTree

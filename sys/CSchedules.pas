@@ -19,7 +19,7 @@ type
   end;
 
 function SortTreeHelperByDate(Item1, Item2: Pointer): Integer;
-procedure GetScheduledObjects(AList: TObjectList; ASums: TSumList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime);
+procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime);
 
 implementation
 
@@ -47,7 +47,7 @@ begin
   FtriggerDate := ATriggerDate;
 end;
 
-procedure GetScheduledObjects(AList: TObjectList; ASums: TSumList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime);
+procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime);
 
   function FindPlannedDone(APlannedMovement: TPlannedMovement; ATriggerDate: TDateTime): TPlannedDone;
   var xCount: Integer;
@@ -70,7 +70,6 @@ procedure GetScheduledObjects(AList: TObjectList; ASums: TSumList; APlannedObjec
       xTimes: Integer;
       xElement: TPlannedTreeItem;
       xDone: TPlannedDone;
-      xSum: TSumElement;
   begin
     xCurDate := AFromDate;
     xTimes := AMovement.doneCount;
@@ -96,24 +95,6 @@ procedure GetScheduledObjects(AList: TObjectList; ASums: TSumList; APlannedObjec
         xDone := FindPlannedDone(AMovement, xCurDate);
         xElement := TPlannedTreeItem.Create(AMovement, xDone, xCurDate);
         AList.Add(xElement);
-        if ASums <> Nil then begin
-          xSum := ASums.FindSumObject('*', True);
-          xSum.cashIn := xSum.cashIn + IfThen(AMovement.movementType = CInMovement, AMovement.cash, 0);
-          xSum.cashOut := xSum.cashOut + IfThen(AMovement.movementType = COutMovement, AMovement.cash, 0);
-          xSum := ASums.FindSumObject(AMovement.idAccount, False);
-          if xSum = Nil then begin
-            xSum := TSumElement.Create;
-            xSum.id := AMovement.idAccount;
-            if xSum.id = CEmptyDataGid then begin
-              xSum.name := 'Bez zdefiniowanego konta';
-            end else begin
-              xSum.name := TAccount(TAccount.LoadObject(AccountProxy, AMovement.idAccount, False)).name;
-            end;
-            ASums.Add(xSum);
-          end;
-          xSum.cashIn := xSum.cashIn + IfThen(AMovement.movementType = CInMovement, AMovement.cash, 0);
-          xSum.cashOut := xSum.cashOut + IfThen(AMovement.movementType = COutMovement, AMovement.cash, 0);
-        end;
       end;
       xCurDate := IncDay(xCurDate, 1);
     end;

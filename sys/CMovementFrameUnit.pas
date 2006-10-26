@@ -81,7 +81,7 @@ implementation
 
 uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Types;
+  Types, CDoneFormUnit, CDoneFrameUnit;
 
 {$R *.dfm}
 
@@ -152,6 +152,9 @@ begin
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), 0);
     if (xIdTemp3 <> CEmptyDataGid) and (xIdTemp3Frame <> Nil) then begin
       SendMessageToFrames(xIdTemp3Frame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), 0);
+    end;
+    if TBaseMovement(xObject).idPlannedDone > CEmptyDataGid then begin
+      SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
     end;
   end;
 end;
