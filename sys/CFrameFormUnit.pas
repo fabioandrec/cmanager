@@ -14,8 +14,8 @@ type
     FAdditionalData: TObject;
     FOutData: Pointer;
   public
-    constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil);
-    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil): Boolean;
+    constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil);
+    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil): Boolean;
     destructor Destroy; override;
   end;
 
@@ -25,7 +25,7 @@ uses CCashpointsFrameUnit, CDatabase, VirtualTrees;
 
 {$R *.dfm}
 
-constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil);
+constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil);
 begin
   inherited Create(AOwner);
   FAdditionalData := AAdditionalData;
@@ -33,7 +33,8 @@ begin
   FFrame := AFrameClass.Create(Self);
   FFrame.Visible := False;
   FFrame.DisableAlign;
-  FFrame.InitializeFrame(AAdditionalData, AOutData);
+  FFrame.InitializeFrame(AAdditionalData, AOutData, AMultipleCheck);
+  FFrame.PrepareCheckStates;
   FFrame.Parent := PanelFrame;
   FFrame.EnableAlign;
   FFrame.Show;
@@ -48,13 +49,13 @@ begin
   inherited Destroy;
 end;
 
-class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil): Boolean;
+class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil): Boolean;
 var xForm: TCFrameForm;
     xNode: PVirtualNode;
     xList: TVirtualStringTree;
 begin
   Result := False;
-  xForm := TCFrameForm.CreateFrame(Application, AFrameClass, AAdditionalData);
+  xForm := TCFrameForm.CreateFrame(Application, AFrameClass, AAdditionalData, AOutData, AMultipleCheck);
   xList := xForm.FFrame.List;
   if (ADataId <> CEmptyDataGid) and (xList <> Nil) then begin
     xNode := xForm.FFrame.FindNode(ADataId, xList);
@@ -69,7 +70,7 @@ begin
   if xForm.ShowConfig(coEdit) then begin
     ADataId := xForm.FFrame.SelectedId;
     AText := xForm.FFrame.SelectedText;
-    if AOutData <> Nil then begin
+    if (AOutData <> Nil) or (AMultipleCheck <> Nil) then begin
       xForm.FFrame.UpdateOutputData;
     end;
     Result := True;

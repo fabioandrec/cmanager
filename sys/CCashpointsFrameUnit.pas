@@ -43,7 +43,7 @@ type
     function GetSelectedText: String; override;
     function GetList: TVirtualStringTree; override;
   public
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -66,9 +66,9 @@ begin
   Result := 'Kontrahenci';
 end;
 
-procedure TCCashpointsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCCashpointsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData);
+  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
   ReloadCashpoints;
 end;
 
@@ -128,7 +128,7 @@ begin
   CButtonEditCashpoint.Enabled := Node <> Nil;
   CButtonDelCashpoint.Enabled := Node <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
+    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
   end;
 end;
 

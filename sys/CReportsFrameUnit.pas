@@ -52,7 +52,7 @@ type
     function GetList: TVirtualStringTree; override;
     function GetClassOfReport(AGid: TDataGid): TCReportClass;
   public
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -140,9 +140,9 @@ begin
   Result := 'Raporty';
 end;
 
-procedure TCReportsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCReportsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData);
+  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
   FTreeHelper := THelperElement.Create(False, '', '', '', CNoImage);
   ReloadReports;
 end;

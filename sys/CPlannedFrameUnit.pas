@@ -42,7 +42,7 @@ type
   public
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -66,7 +66,7 @@ begin
   CButtonEdit.Enabled := Node <> Nil;
   CButtonDel.Enabled := Node <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
+    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
   end;
 end;
 
@@ -80,9 +80,9 @@ begin
   PlannedList.EndUpdate;
 end;
 
-procedure TCPlannedFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCPlannedFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData);
+  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
   ReloadPlanned;
 end;
 

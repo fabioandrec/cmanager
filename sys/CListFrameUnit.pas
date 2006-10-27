@@ -27,7 +27,7 @@ type
     function GetList: TVirtualStringTree; override;
   public
     procedure ReloadList(AItems: TStringList);
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -75,9 +75,9 @@ begin
   Result := 'Wybierz z listy';
 end;
 
-procedure TCListFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCListFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData);
+  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
   FGids := TStringList.Create;
   FNames := TStringList.Create;
   ReloadList(TStringList(AAdditionalData));

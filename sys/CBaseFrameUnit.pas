@@ -22,6 +22,7 @@ type
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;
+    FMultipleChecks: TStringList;
   protected
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
@@ -29,7 +30,8 @@ type
   public
     procedure UpdateOutputData; virtual;
     function FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode; virtual;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); virtual;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
+    procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -40,6 +42,7 @@ type
     property SelectedText: String read GetSelectedText;
     property List: TVirtualStringTree read GetList;
     property AdditionalData: TObject read FAdditionalData;
+    property MultipleChecks: TStringList read FMultipleChecks;
   end;
 
 var GFrames: TObjectList;
@@ -131,10 +134,15 @@ begin
   Result := '';
 end;
 
-procedure TCBaseFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCBaseFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   FAdditionalData := AAdditionalData;
+  FMultipleChecks := AMultipleCheck;
   FOutputData := AOutputData;
+  if (AMultipleCheck <> Nil) and (GetList <> Nil) then begin
+    GetList.TreeOptions.MiscOptions := GetList.TreeOptions.MiscOptions + [toCheckSupport];
+    GetList.CheckImageKind := ckFlat;
+  end;
 end;
 
 function TCBaseFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
@@ -142,8 +150,56 @@ begin
   Result := True;
 end;
 
-procedure TCBaseFrame.UpdateOutputData;
+procedure TCBaseFrame.PrepareCheckStates;
+var xNode: PVirtualNode;
+    xList: TVirtualStringTree;
+    xAll: Boolean;
+    xId: TDataGid;
+    xChecked: Boolean;
 begin
+  xList := GetList;
+  if (xList <> Nil) and (FMultipleChecks <> Nil) then begin
+    xAll := FMultipleChecks.Count = 0;
+    xNode := xList.GetFirst;
+    while (xNode <> Nil) do begin
+      xNode.CheckType := ctCheckBox;
+      xChecked := xAll;
+      if not xChecked then begin
+        xId := TDataObject(xList.GetNodeData(xNode)^).id;
+        xChecked := FMultipleChecks.IndexOf(xId) <> -1;
+      end;
+      if xChecked then begin
+        xNode.CheckState := csCheckedNormal;
+      end else begin
+        xNode.CheckState := csUncheckedNormal;
+      end;
+      xNode := xList.GetNext(xNode);
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.UpdateOutputData;
+var xNode: PVirtualNode;
+    xList: TVirtualStringTree;
+    xAll: Boolean;
+begin
+  xList := GetList;
+  if (FMultipleChecks <> Nil) and (xList <> Nil) then begin
+    FMultipleChecks.Clear;
+    xNode := xList.GetFirst;
+    xAll := True;
+    while (xNode <> Nil) do begin
+      if xNode.CheckState = csCheckedNormal then begin
+        FMultipleChecks.Add(TDataObject(xList.GetNodeData(xNode)^).id);
+      end else begin
+        xAll := False;
+      end;
+      xNode := xList.GetNext(xNode);
+    end;
+    if xAll then begin
+      FMultipleChecks.Clear;
+    end;
+  end;
 end;
 
 initialization

@@ -43,7 +43,7 @@ type
     function GetSelectedText: String; override;
     function GetList: TVirtualStringTree; override;
   public
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -66,9 +66,9 @@ begin
   Result := 'Konta';
 end;
 
-procedure TCAccountsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCAccountsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData);
+  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
   ReloadAccounts;
 end;
 
@@ -167,7 +167,7 @@ begin
   CButtonEditAccount.Enabled := Node <> Nil;
   CButtonDelAccount.Enabled := Node <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
+    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
   end;
 end;
 

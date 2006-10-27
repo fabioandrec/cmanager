@@ -45,7 +45,8 @@ uses
   CSchedules in 'CSchedules.pas',
   CChoosePeriodAccountFormUnit in 'CChoosePeriodAccountFormUnit.pas' {CChoosePeriodAccountForm},
   CHtmlReportFormUnit in 'CHtmlReportFormUnit.pas' {CHtmlReportForm},
-  CChartReportFormUnit in 'CChartReportFormUnit.pas' {CChartReportForm};
+  CChartReportFormUnit in 'CChartReportFormUnit.pas' {CChartReportForm},
+  CChoosePeriodAccountListFormUnit in 'CChoosePeriodAccountListFormUnit.pas' {CChoosePeriodAccountListForm};
 
 {$R *.res}
 

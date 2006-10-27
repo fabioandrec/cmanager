@@ -59,11 +59,10 @@ type
     function GetSelectedText: String; override;
     function GetList: TVirtualStringTree; override;
   public
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer); override;
+    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
-    function FindNode(ADataId: ShortString;
-      AList: TVirtualStringTree): PVirtualNode; override;
+    function FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode; override;
   end;
 
 implementation
@@ -96,7 +95,7 @@ begin
   CButtonDelCategory.Enabled := Node <> Nil;
   CButtonAddSubcategory.Enabled := Node <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
+    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
   end;
 end;
 
@@ -135,9 +134,9 @@ begin
   Result := 'Kategorie';
 end;
 
-procedure TCProductsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer);
+procedure TCProductsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData);
+  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
   FTreeHelper := TTreeObjectList.Create(True);
   ReloadProducts;
 end;

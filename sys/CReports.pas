@@ -104,10 +104,14 @@ type
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
+    FIds: TStringList;
   protected
     procedure PrepareReportChart; override;
     function GetReportTitle: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    constructor CreateReport; override;
+    destructor Destroy; override;
   end;
 
 
@@ -116,7 +120,8 @@ implementation
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts, CDataObjects,
   DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
-  CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine;
+  CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
+  CChoosePeriodAccountListFormUnit;
 
 function DayName(ADate: TDateTime): String;
 var xDay: Integer;
@@ -682,6 +687,18 @@ begin
   PrepareReportChart;
 end;
 
+constructor TAccountBalanceChartReport.CreateReport;
+begin
+  inherited CreateReport;
+  FIds := TStringList.Create;
+end;
+
+destructor TAccountBalanceChartReport.Destroy;
+begin
+  FIds.Free;
+  inherited Destroy;
+end;
+
 function TAccountBalanceChartReport.GetReportTitle: String;
 begin
   Result := 'Wykres stanu kont (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
@@ -702,7 +719,7 @@ end;
 
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+  Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
 end;
 
 end.
