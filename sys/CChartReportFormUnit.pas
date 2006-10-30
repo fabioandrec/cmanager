@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CReportFormUnit, StdCtrls, Buttons, ExtCtrls, TeeProcs,
-  TeEngine, Chart;
+  TeEngine, Chart, Series;
 
 type
   TCChartReportForm = class(TCReportForm)
@@ -15,7 +15,6 @@ type
     procedure DoPrint; override;
     procedure DoPreview; override;
   public
-
   end;
 
 implementation

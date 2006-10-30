@@ -105,6 +105,8 @@ type
     FStartDate: TDateTime;
     FEndDate: TDateTime;
     FIds: TStringList;
+  private
+    function IsValidAccount(AId: TDataGid): Boolean;
   protected
     procedure PrepareReportChart; override;
     function GetReportTitle: String; override;
@@ -704,17 +706,49 @@ begin
   Result := 'Wykres stanu kont (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
 end;
 
+function TAccountBalanceChartReport.IsValidAccount(AId: TDataGid): Boolean;
+begin
+  Result := FIds.Count = 0;
+  if not Result then begin
+    Result := FIds.IndexOf(AId) <> -1;
+  end;
+end;
+
 procedure TAccountBalanceChartReport.PrepareReportChart;
-var xSerie: TLineSeries;
+var xSums: TADOQuery;
+    xAccounts: TADOQuery;
     xChart: TChart;
+    xSerie: TChartSeries;
+    xDate: TDateTime;
 begin
   xChart := GetChart;
-  with xChart do begin
-    xSerie := TLineSeries.Create(xChart);
-    xSerie.AddArray([2, 1, 4, 5, 4, 6, 7, 8, 9, 10]);
-    xSerie.Title := 'tytu³ pierwszej serii';
-    AddSeries(xSerie);
+  xAccounts := GDataProvider.OpenSql('select * from account');
+  while not xAccounts.Eof do begin
+    if IsValidAccount(xAccounts.FieldByName('idAccount').AsString) then begin
+      xSerie := TLineSeries.Create(xChart);
+      xSerie.Title := xAccounts.FieldByName('name').AsString;
+      TLineSeries(xSerie).Pointer.Visible := True;
+      TLineSeries(xSerie).Pointer.Style := TSeriesPointerStyle(xAccounts.RecNo);
+      TLineSeries(xSerie).Pointer.InflateMargins := True;
+      xSerie.HorizAxis := aBottomAxis;
+      xSerie.XValues.DateTime := True;
+      xSums := GDataProvider.OpenSql(Format(
+                  'select sum(cash) as cash, regDate from transactions where regDate > %s and idAccount = %s group by regDate order by regDate desc',
+                  [DatetimeToDatabase(FStartDate, False), DataGidToDatabase(xAccounts.FieldByName('idAccount').AsString)]));
+      xDate := FEndDate;
+      while (xDate >= FStartDate) do begin
+        xSerie.AddXY(xDate, Random(10));
+        xDate := IncDay(xDate, -1);
+      end;
+      xSums.Free;
+      xChart.AddSeries(xSerie);
+    end;
+    xAccounts.Next;
   end;
+  xChart.BottomAxis.DateTimeFormat := 'yyyy-mm-dd';
+  xChart.BottomAxis.ExactDateTime := True;
+  xChart.View3D := False;
+  xAccounts.Free;
 end;
 
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
@@ -723,4 +757,5 @@ begin
 end;
 
 end.
+
 

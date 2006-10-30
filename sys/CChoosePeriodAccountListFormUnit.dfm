@@ -1,7 +1,6 @@
 inherited CChoosePeriodAccountListForm: TCChoosePeriodAccountListForm
   Left = 394
   Top = 239
-  Caption = 'CChoosePeriodAccountListForm'
   ClientHeight = 287
   PixelsPerInch = 96
   TextHeight = 13

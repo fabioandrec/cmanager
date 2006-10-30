@@ -171,6 +171,7 @@ type
     FcashOut: Currency;
   public
     constructor Create;
+  published
     property id: TDataGid read Fid write Fid;
     property name: String read Fname write Fname;
     property cashIn: Currency read FcashIn write FcashIn;
