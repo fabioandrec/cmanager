@@ -278,6 +278,14 @@ begin
     Result := TAccountHistoryReport;
   end else if AGid = '1_06' then begin
     Result := TAccountBalanceChartReport;
+  end else if AGid = '2_01' then begin
+    Result := TOutOperationListReport;
+  end else if AGid = '2_02' then begin
+    Result := TOutOperationsByCategoryChart;
+  end else if AGid = '3_01' then begin
+    Result := TInOperationListReport;
+  end else if AGid = '3_02' then begin
+    Result := TInOperationsByCategoryChart;
   end else begin
     Result := Nil;
   end;

@@ -69,6 +69,50 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
+  TBaseOperationsListReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+  protected
+    function GetOperationsType: String; virtual; abstract;
+    function PrepareReportConditions: Boolean; override;
+    function GetReportBody: String; override;
+  end;
+
+  TInOperationListReport = class(TBaseOperationsListReport)
+  protected
+    function GetReportTitle: String; override;
+    function GetOperationsType: String; override;
+  end;
+
+  TOutOperationListReport = class(TBaseOperationsListReport)
+  protected
+    function GetReportTitle: String; override;
+    function GetOperationsType: String; override;
+  end;
+
+  TBaseOperationsByCategoryChart = class(TCChartReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+  protected
+    function GetOperationsType: String; virtual; abstract;
+    function PrepareReportConditions: Boolean; override;
+    procedure PrepareReportChart; override;
+  end;
+
+  TInOperationsByCategoryChart = class(TBaseOperationsByCategoryChart)
+  protected
+    function GetReportTitle: String; override;
+    function GetOperationsType: String; override;
+  end;
+
+  TOutOperationsByCategoryChart = class(TBaseOperationsByCategoryChart)
+  protected
+    function GetReportTitle: String; override;
+    function GetOperationsType: String; override;
+  end;
+
   TPlannedOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
@@ -123,7 +167,7 @@ uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts, CDataObjects,
   DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
   CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
-  CChoosePeriodAccountListFormUnit;
+  CChoosePeriodAccountListFormUnit, CComponents;
 
 function DayName(ADate: TDateTime): String;
 var xDay: Integer;
@@ -217,21 +261,22 @@ begin
   xOperations := GDataProvider.OpenSql(
             Format('select b.*, a.name from balances b' +
                    ' left outer join account a on a.idAccount = b.idAccount ' +
-                   '  where movementType <> ''%s'' and b.regDate between %s and %s order by b.created',
+                   '  where movementType <> ''%s'' and b.regDate between %s and %s order by b.regDate, b.created',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
   xInSum := 0;
   xOutSum := 0;
   xBody := TStringList.Create;
   with xOperations, xBody do begin
-    Add('<table class="base" colspan=5>');
+    Add('<table class="base" colspan=6>');
     Add('<tr class="base">');
-    Add('<td class="headtext" width="10%">Lp</td>');
-    Add('<td class="headtext" width="50%">Opis</td>');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data</td>');
+    Add('<td class="headtext" width="40%">Opis</td>');
     Add('<td class="headtext" width="20%">Konto</td>');
     Add('<td class="headcash" width="10%">PrzychÛd</td>');
     Add('<td class="headcash" width="10%">RozchÛd</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=5>');
+    Add('</table><hr><table class="base" colspan=6>');
     while not Eof do begin
       if not Odd(RecNo) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
@@ -252,8 +297,9 @@ begin
       end else begin
         xOut := '';
       end;
-      Add('<td class="text" width="10%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="50%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
       Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
       Add('<td class="cash" width="10%">' + xIn + '</td>');
       Add('<td class="cash" width="10%">' + xOut + '</td>');
@@ -294,6 +340,7 @@ var xSqlPlanned, xSqlDone: String;
     xElement: TPlannedTreeItem;
     xIn, xOut: String;
     xDesc, xStat: String;
+    xDate: TDateTime;
 begin
   xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
   xSqlPlanned := xSqlPlanned + Format(' and (' +
@@ -316,15 +363,16 @@ begin
   xBody := TStringList.Create;
   xList := TObjectList.Create(True);
   with xBody do begin
-    Add('<table class="base" colspan=5>');
+    Add('<table class="base" colspan=6>');
     Add('<tr class="base">');
-    Add('<td class="headtext" width="10%">Lp</td>');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data</td>');
     Add('<td class="headtext" width="40%">Opis</td>');
-    Add('<td class="headtext" width="30%">Status</td>');
+    Add('<td class="headtext" width="20%">Status</td>');
     Add('<td class="headcash" width="10%">PrzychÛd</td>');
     Add('<td class="headcash" width="10%">RozchÛd</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=5>');
+    Add('</table><hr><table class="base" colspan=6>');
     GetScheduledObjects(xList, xPlannedObjects, xDoneObjects, FStartDate, FEndDate);
     for xCount := 1 to xList.Count do begin
       xElement := TPlannedTreeItem(xList.Items[xCount - 1]);
@@ -351,7 +399,7 @@ begin
         end else begin
           xStat := 'Uznana';
         end;
-        xStat := xStat + ' (' + DateToStr(xElement.done.doneDate) + ')';
+        xDate := xElement.done.doneDate;
       end else begin
         xDesc := xElement.planned.description;
         if xElement.planned.movementType = CInMovement then begin
@@ -366,14 +414,22 @@ begin
           xNotrealOutSum := xNotrealOutSum + xElement.planned.cash;
         end;
         xStat := '';
+        xDate := xElement.triggerDate;
       end;
-      Add('<td class="text" width="10%">' + IntToStr(xCount) + '</td>');
+      Add('<td class="text" width="5%">' + IntToStr(xCount) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(xDate) + '</td>');
       Add('<td class="text" width="40%">' + xDesc + '</td>');
-      Add('<td class="text" width="30%">' + xStat + '</td>');
+      Add('<td class="text" width="20%">' + xStat + '</td>');
       Add('<td class="cash" width="10%">' + xIn + '</td>');
       Add('<td class="cash" width="10%">' + xOut + '</td>');
       Add('</tr>');
     end;
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="80%">Suma zrealizowanych operacji</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xOverallInSum - xNotrealInSum) + '</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xOverallOutSum - xNotrealOutSum) + '</td>');
+    Add('</tr>');
     Add('</table><hr><table class="base" colspan=2>');
     Add('<tr class="base">');
     Add('<td class="sumtext" width="80%">Suma niezrealizowanych operacji</td>');
@@ -439,23 +495,25 @@ begin
   xBody := TStringList.Create;
   xSum := 0;
   with xOperations, xBody do begin
-    Add('<table class="base" colspan=4>');
+    Add('<table class="base" colspan=5>');
     Add('<tr class="base">');
-    Add('<td class="headtext" width="10%">Lp</td>');
-    Add('<td class="headtext" width="35%">èrÛd≥o</td>');
-    Add('<td class="headtext" width="35%">Cel</td>');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data</td>');
+    Add('<td class="headtext" width="30%">èrÛd≥o</td>');
+    Add('<td class="headtext" width="30%">Cel</td>');
     Add('<td class="headcash" width="20%">Kwota</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=4>');
+    Add('</table><hr><table class="base" colspan=5>');
     while not Eof do begin
       if not Odd(RecNo) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
       end else begin
         Add('<tr class="base">');
       end;
-      Add('<td class="text" width="10%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="35%">' + FieldByName('sourcename').AsString + '</td>');
-      Add('<td class="text" width="35%">' + FieldByName('destname').AsString + '</td>');
+      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="30%">' + FieldByName('sourcename').AsString + '</td>');
+      Add('<td class="text" width="30%">' + FieldByName('destname').AsString + '</td>');
       Add('<td class="cash" width="20%">' + CurrencyToString(FieldByName('cash').AsCurrency) + '</td>');
       Add('</tr>');
       xSum := xSum + FieldByName('cash').AsCurrency;
@@ -493,36 +551,40 @@ begin
   xSum := TAccount.AccountBalanceOnDay(FIdAccount, FStartDate);
   xBody := TStringList.Create;
   with xOperations, xBody do begin
-    Add('<table class="base" colspan=3>');
+    Add('<table class="base" colspan=4>');
     Add('<tr class="base">');
-    Add('<td class="headtext" width="10%">Lp</td>');
-    Add('<td class="headtext" width="40%">Opis</td>');
-    Add('<td class="headtext" width="30%">Data</td>');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data</td>');
+    Add('<td class="headtext" width="60%">Opis</td>');
     Add('<td class="headcash" width="20%">Kwota</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=2>');
+    Add('</table><hr><table class="base" colspan=4>');
     Add('<tr class="base">');
-    Add('<td class="sumtext" width="80%">Stan poczπtkowy (na ' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ')</td>');
+    Add('<td class="sumtext" width="5%"></td>');
+    Add('<td class="sumtext" width="15%">' + DateToStr(FStartDate) + '</td>');
+    Add('<td class="sumtext" width="60%">Stan poczπtkowy</td>');
     Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=3>');
+    Add('</table><hr><table class="base" colspan=4>');
     while not Eof do begin
       if not Odd(RecNo) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
       end else begin
         Add('<tr class="base">');
       end;
-      Add('<td class="text" width="10%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
-      Add('<td class="text" width="30%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="60%">' + FieldByName('description').AsString + '</td>');
       Add('<td class="cash" width="20%">' + CurrencyToString(FieldByName('cash').AsCurrency) + '</td>');
       xSum := xSum + FieldByName('cash').AsCurrency;
       Add('</tr>');
       Next;
     end;
-    Add('</table><hr><table class="base" colspan=2>');
+    Add('</table><hr><table class="base" colspan=4>');
     Add('<tr class="base">');
-    Add('<td class="sumtext" width="80%">Stan koÒcowy (na ' + DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')</td>');
+    Add('<td class="sumtext" width="5%"></td>');
+    Add('<td class="sumtext" width="15%">' + DateToStr(FEndDate) + '</td>');
+    Add('<td class="sumtext" width="60%">Stan koÒcowy</td>');
     Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
     Add('</tr>');
     Add('</table>');
@@ -657,16 +719,7 @@ end;
 procedure TCChartReport.PrepareReportData;
 begin
   with GetChart do begin
-    Foot.Font.Name := 'Verdana';
-    Foot.Font.Size := -10;
-    Foot.Font.Color := clNavy;
-    Foot.Alignment := taRightJustify;
     Foot.Text.Text := GetReportFooter;
-    Title.Font.Name := 'Verdana';
-    Title.Font.Height := -16;
-    Title.Font.Style := [fsBold];
-    Title.Font.Color := clNavy;
-    Title.Alignment := taLeftJustify;
     Title.Text.Text := GetReportTitle;
     with LeftAxis.Axis do begin
       Width := 1;
@@ -681,9 +734,7 @@ begin
       Width := 1;
     end;
     Legend.LegendStyle := lsSeries;
-    Legend.ResizeChart := False;
     Legend.Alignment := laRight;;
-    Legend.Frame.Visible := True;
     Legend.ShadowSize := 0;
   end;
   PrepareReportChart;
@@ -716,44 +767,214 @@ end;
 
 procedure TAccountBalanceChartReport.PrepareReportChart;
 var xSums: TADOQuery;
-    xAccounts: TADOQuery;
+    xCount: Integer;
+    xAccounts: TDataObjectList;
+    xAccount: TAccount;
     xChart: TChart;
     xSerie: TChartSeries;
     xDate: TDateTime;
+    xBalance: Currency;
+    xEnd: Boolean;
 begin
+  GDataProvider.BeginTransaction;
   xChart := GetChart;
-  xAccounts := GDataProvider.OpenSql('select * from account');
-  while not xAccounts.Eof do begin
-    if IsValidAccount(xAccounts.FieldByName('idAccount').AsString) then begin
+  xAccounts := TDataObject.GetList(TAccount, AccountProxy, 'select * from account');
+  for xCount := 0 to xAccounts.Count - 1 do begin
+    xAccount := TAccount(xAccounts.Items[xCount]);
+    if IsValidAccount(xAccount.id) then begin
+      xBalance := xAccount.cash;
       xSerie := TLineSeries.Create(xChart);
-      xSerie.Title := xAccounts.FieldByName('name').AsString;
       TLineSeries(xSerie).Pointer.Visible := True;
-      TLineSeries(xSerie).Pointer.Style := TSeriesPointerStyle(xAccounts.RecNo);
       TLineSeries(xSerie).Pointer.InflateMargins := True;
-      xSerie.HorizAxis := aBottomAxis;
-      xSerie.XValues.DateTime := True;
+      with xSerie do begin
+        Title := xAccount.name;
+        HorizAxis := aBottomAxis;
+        XValues.DateTime := True;
+      end;
       xSums := GDataProvider.OpenSql(Format(
                   'select sum(cash) as cash, regDate from transactions where regDate > %s and idAccount = %s group by regDate order by regDate desc',
-                  [DatetimeToDatabase(FStartDate, False), DataGidToDatabase(xAccounts.FieldByName('idAccount').AsString)]));
-      xDate := FEndDate;
-      while (xDate >= FStartDate) do begin
-        xSerie.AddXY(xDate, Random(10));
-        xDate := IncDay(xDate, -1);
+                  [DatetimeToDatabase(FStartDate, False), DataGidToDatabase(xAccount.id)]));
+      while not xSums.Eof do begin
+        if (xSums.RecNo = 1) and (xSums.FieldByName('regDate').AsDateTime < FEndDate) then begin
+          xDate := FEndDate;
+          while (xDate > xSums.FieldByName('regDate').AsDateTime) do begin
+            xSerie.AddXY(xDate, xBalance);
+            xDate := IncDay(xDate, -1);
+          end;
+        end;
+        xDate := xSums.FieldByName('regDate').AsDateTime;
+        if (FStartDate <= xDate) and (xDate <= FEndDate) then begin
+          xSerie.AddXY(xDate, xBalance);
+        end;
+        xBalance := xBalance - xSums.FieldByName('cash').AsCurrency;
+        xSums.Next;
+        repeat
+          xDate := IncDay(xDate, -1);
+          if not xSums.Eof then begin
+            xEnd := xDate < xSums.FieldByName('regDate').AsDateTime;
+          end else begin
+            xEnd := xDate < FStartDate;
+          end;
+          if not xEnd then begin
+            xSerie.AddXY(xDate, xBalance);
+          end;
+        until xEnd;
       end;
       xSums.Free;
       xChart.AddSeries(xSerie);
     end;
-    xAccounts.Next;
   end;
-  xChart.BottomAxis.DateTimeFormat := 'yyyy-mm-dd';
-  xChart.BottomAxis.ExactDateTime := True;
+  with xChart.BottomAxis do begin
+    DateTimeFormat := 'yyyy-mm-dd';
+    ExactDateTime := True;
+    Automatic := False;
+    AutomaticMaximum := False;
+    AutomaticMinimum := False;
+    Increment := DateTimeStep[dtOneDay];
+    Maximum := FEndDate;
+    Minimum := FStartDate;
+    LabelsAngle := 90;
+    MinorTickCount := 0;
+    Title.Caption := '[Data]';
+  end;
+  with xChart.LeftAxis do begin
+    MinorTickCount := 0;
+    Title.Caption := '[' + GetCurrencySymbol + ']';
+    Title.Angle := 90;
+  end;
   xChart.View3D := False;
+  xChart.Legend.Alignment := laRight;
+  xChart.Legend.ResizeChart := True;
   xAccounts.Free;
+  GDataProvider.RollbackTransaction;
 end;
 
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
+end;
+
+function TBaseOperationsListReport.GetReportBody: String;
+var xOperations: TADOQuery;
+    xSum: Currency;
+    xBody: TStringList;
+    xCash: Currency;
+begin
+  xOperations := GDataProvider.OpenSql(
+            Format('select b.*, a.name from transactions b' +
+                   ' left outer join account a on a.idAccount = b.idAccount ' +
+                   '  where movementType = ''%s'' and b.regDate between %s and %s order by b.regDate, b.created',
+                   [GetOperationsType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
+  xSum := 0;
+  xBody := TStringList.Create;
+  with xOperations, xBody do begin
+    Add('<table class="base" colspan=5>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data</td>');
+    Add('<td class="headtext" width="50%">Opis</td>');
+    Add('<td class="headtext" width="20%">Konto</td>');
+    Add('<td class="headcash" width="10%">Kwota</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=5>');
+    while not Eof do begin
+      if not Odd(RecNo) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      xCash := Abs(FieldByName('cash').AsCurrency);
+      xSum := xSum + xCash;
+      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="50%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="10%">' + CurrencyToString(xCash) + '</td>');
+      Add('</tr>');
+      Next;
+    end;
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="90%">Razem</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xSum) + '</td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  xOperations.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TBaseOperationsListReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+end;
+
+function TInOperationListReport.GetOperationsType: String;
+begin
+  Result := CInMovement;
+end;
+
+function TInOperationListReport.GetReportTitle: String;
+begin
+  Result := 'Lista operacji przychodowych (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+end;
+
+function TOutOperationListReport.GetOperationsType: String;
+begin
+  Result := COutMovement;
+end;
+
+function TOutOperationListReport.GetReportTitle: String;
+begin
+  Result := 'Lista operacji rozchodowych (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+end;
+
+procedure TBaseOperationsByCategoryChart.PrepareReportChart;
+var xSums: TADOQuery;
+    xSerie: TPieSeries;
+    xChart: TChart;
+begin
+  xChart := GetChart;
+  xSums := GDataProvider.OpenSql(Format('select v.cash, p.name from ( ' +
+                                        '  select sum(cash) as cash, idProduct from transactions ' +
+                                        '  where movementType = ''%s'' and regDate between %s and %s group by idProduct) as v ' +
+                                        '  left outer join product p on p.idProduct = v.idProduct',
+                                        [GetOperationsType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
+  xSerie := TPieSeries.Create(xChart);
+  while not xSums.Eof do begin
+    xSerie.Add(xSums.FieldByName('cash').AsCurrency, xSums.FieldByName('name').AsString);
+    xSums.Next;
+  end;
+  xChart.AddSeries(xSerie);
+  xChart.View3D := False;
+  xChart.Legend.Visible := False;
+  xSums.Free;
+end;
+
+function TBaseOperationsByCategoryChart.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+end;
+
+function TInOperationsByCategoryChart.GetOperationsType: String;
+begin
+  Result := CInMovement;
+end;
+
+function TInOperationsByCategoryChart.GetReportTitle: String;
+begin
+  Result := 'Operacje przychodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+end;
+
+function TOutOperationsByCategoryChart.GetOperationsType: String;
+begin
+  Result := COutMovement;
+end;
+
+function TOutOperationsByCategoryChart.GetReportTitle: String;
+begin
+  Result := 'Operacje rozchodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
 end;
 
 end.

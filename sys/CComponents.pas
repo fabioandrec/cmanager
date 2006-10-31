@@ -228,6 +228,8 @@ type
     property Value: Integer read GetValue;
   end;
 
+function GetCurrencySymbol: string;
+
 procedure Register;
 
 implementation
@@ -522,10 +524,13 @@ end;
 
 function GetCurrencySymbol: string;
 var xRes: Cardinal;
+    xPch: PChar;
 begin
   xRes := GetLocaleInfo(GetUserDefaultLCID, LOCALE_SCURRENCY, nil, 0);
-  SetLength(Result, xRes);
-  GetLocaleInfo(GetUserDefaultLCID, LOCALE_SCURRENCY, PChar(Result), xRes);
+  GetMem(xPch, xRes);
+  GetLocaleInfo(GetUserDefaultLCID, LOCALE_SCURRENCY, xPch, xRes);
+  Result := StrPas(xPch);
+  FreeMem(xPch);
 end;
 
 constructor TCCurrEdit.Create(AOwner: TComponent);
