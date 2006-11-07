@@ -78,6 +78,7 @@ inherited CChartReportForm: TCChartReportForm
       Legend.Font.Height = -11
       Legend.Font.Name = 'Verdana'
       Legend.Font.Style = []
+      Legend.Visible = False
       RightAxis.LabelsFont.Charset = EASTEUROPE_CHARSET
       RightAxis.LabelsFont.Color = clBlack
       RightAxis.LabelsFont.Height = -11

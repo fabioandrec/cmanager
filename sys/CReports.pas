@@ -8,10 +8,21 @@ uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windo
 type
   TCReportClass = class of TCBaseReport;
   TCReportFormClass = class of TCReportForm;
+  TCReportParams = class(TObject);
+
+  TCSelectedMovementTypeParams = class(TCReportParams)
+  private
+    FmovementType: String;
+  public
+    constructor Create(AType: String);
+  published
+    property movementType: String read FmovementType;
+  end;
 
   TCBaseReport = class(TObject)
   private
     FForm: TCReportForm;
+    FParams: TCReportParams;
   protected
     function PrepareReportConditions: Boolean; virtual;
     function GetReportTitle: String; virtual; abstract;
@@ -20,8 +31,9 @@ type
     procedure PrepareReportData; virtual; abstract;
     procedure CleanReportData; virtual; abstract;
   public
-    constructor CreateReport; virtual;
+    constructor CreateReport(AParams: TCReportParams); virtual;
     procedure ShowReport;
+    destructor Destroy; override;
   end;
 
   TCHtmlReport = class(TCBaseReport)
@@ -36,7 +48,7 @@ type
     function GetReportFooter: String; override;
     function GetFormClass: TCReportFormClass; override;
   public
-    constructor CreateReport; override;
+    constructor CreateReport(AParams: TCReportParams); override;
     destructor Destroy; override;
   end;
 
@@ -69,48 +81,58 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
-  TBaseOperationsListReport = class(TCHtmlReport)
+  TOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
   protected
-    function GetOperationsType: String; virtual; abstract;
     function PrepareReportConditions: Boolean; override;
     function GetReportBody: String; override;
-  end;
-
-  TInOperationListReport = class(TBaseOperationsListReport)
-  protected
     function GetReportTitle: String; override;
-    function GetOperationsType: String; override;
   end;
 
-  TOutOperationListReport = class(TBaseOperationsListReport)
-  protected
-    function GetReportTitle: String; override;
-    function GetOperationsType: String; override;
-  end;
-
-  TBaseOperationsByCategoryChart = class(TCChartReport)
+  TOperationsBySomethingChart = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
   protected
-    function GetOperationsType: String; virtual; abstract;
+    function GetSql: String; virtual; abstract;
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
   end;
 
-  TInOperationsByCategoryChart = class(TBaseOperationsByCategoryChart)
+  TOperationsBySomethingList = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
   protected
-    function GetReportTitle: String; override;
-    function GetOperationsType: String; override;
+    function GetSql: String; virtual; abstract;
+    function PrepareReportConditions: Boolean; override;
+    function GetReportBody: String; override;
   end;
 
-  TOutOperationsByCategoryChart = class(TBaseOperationsByCategoryChart)
+  TOperationsByCategoryChart = class(TOperationsBySomethingChart)
   protected
+    function GetSql: String; override;
     function GetReportTitle: String; override;
-    function GetOperationsType: String; override;
+  end;
+
+  TOperationsByCashpointChart = class(TOperationsBySomethingChart)
+  protected
+    function GetSql: String; override;
+    function GetReportTitle: String; override;
+  end;
+
+  TOperationsByCategoryList = class(TOperationsBySomethingList)
+  protected
+    function GetSql: String; override;
+    function GetReportTitle: String; override;
+  end;
+
+  TOperationsByCashpointList = class(TOperationsBySomethingList)
+  protected
+    function GetSql: String; override;
+    function GetReportTitle: String; override;
   end;
 
   TPlannedOperationsListReport = class(TCHtmlReport)
@@ -156,7 +178,7 @@ type
     function GetReportTitle: String; override;
     function PrepareReportConditions: Boolean; override;
   public
-    constructor CreateReport; override;
+    constructor CreateReport(AParams: TCReportParams); override;
     destructor Destroy; override;
   end;
 
@@ -165,9 +187,9 @@ implementation
 
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts, CDataObjects,
-  DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
-  CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
-  CChoosePeriodAccountListFormUnit, CComponents;
+     DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
+     CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
+     CChoosePeriodAccountListFormUnit, CComponents;
 
 function DayName(ADate: TDateTime): String;
 var xDay: Integer;
@@ -608,9 +630,16 @@ begin
   Result := ChoosePeriodAccountByForm(FStartDate, FEndDate, FIdAccount);
 end;
 
-constructor TCBaseReport.CreateReport;
+constructor TCBaseReport.CreateReport(AParams: TCReportParams);
 begin
   inherited Create;
+  FParams := AParams;
+end;
+
+destructor TCBaseReport.Destroy;
+begin
+  FParams.Free;
+  inherited Destroy;
 end;
 
 function TCBaseReport.PrepareReportConditions: Boolean;
@@ -643,9 +672,9 @@ begin
   RemoveDir(FreportPath);
 end;
 
-constructor TCHtmlReport.CreateReport;
+constructor TCHtmlReport.CreateReport(AParams: TCReportParams);
 begin
-  inherited Create;
+  inherited CreateReport(AParams);
   FreportText := TStringList.Create;
 end;
 
@@ -720,7 +749,9 @@ procedure TCChartReport.PrepareReportData;
 begin
   with GetChart do begin
     Foot.Text.Text := GetReportFooter;
+    Foot.Font.Height := -10;
     Title.Text.Text := GetReportTitle;
+    Title.Font.Height := -14;
     with LeftAxis.Axis do begin
       Width := 1;
     end;
@@ -740,9 +771,9 @@ begin
   PrepareReportChart;
 end;
 
-constructor TAccountBalanceChartReport.CreateReport;
+constructor TAccountBalanceChartReport.CreateReport(AParams: TCReportParams);
 begin
-  inherited CreateReport;
+  inherited CreateReport(AParams);
   FIds := TStringList.Create;
 end;
 
@@ -854,7 +885,7 @@ begin
   Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
 end;
 
-function TBaseOperationsListReport.GetReportBody: String;
+function TOperationsListReport.GetReportBody: String;
 var xOperations: TADOQuery;
     xSum: Currency;
     xBody: TStringList;
@@ -864,7 +895,7 @@ begin
             Format('select b.*, a.name from transactions b' +
                    ' left outer join account a on a.idAccount = b.idAccount ' +
                    '  where movementType = ''%s'' and b.regDate between %s and %s order by b.regDate, b.created',
-                   [GetOperationsType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
+                   [TCSelectedMovementTypeParams(FParams).movementType , DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
   xSum := 0;
   xBody := TStringList.Create;
   with xOperations, xBody do begin
@@ -905,76 +936,194 @@ begin
   xBody.Free;
 end;
 
-function TBaseOperationsListReport.PrepareReportConditions: Boolean;
+function TOperationsListReport.GetReportTitle: String;
+begin
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := 'Lista operacji przychodowych'; 
+  end else begin
+    Result := 'Lista operacji rozchodowych';
+  end;
+  Result := Result + ' (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+end;
+
+function TOperationsListReport.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodByForm(FStartDate, FEndDate);
 end;
 
-function TInOperationListReport.GetOperationsType: String;
-begin
-  Result := CInMovement;
-end;
-
-function TInOperationListReport.GetReportTitle: String;
-begin
-  Result := 'Lista operacji przychodowych (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
-end;
-
-function TOutOperationListReport.GetOperationsType: String;
-begin
-  Result := COutMovement;
-end;
-
-function TOutOperationListReport.GetReportTitle: String;
-begin
-  Result := 'Lista operacji rozchodowych (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
-end;
-
-procedure TBaseOperationsByCategoryChart.PrepareReportChart;
+procedure TOperationsBySomethingChart.PrepareReportChart;
 var xSums: TADOQuery;
     xSerie: TPieSeries;
     xChart: TChart;
+    xCash: Currency;
+    xLabel: String;
+    xSum: Currency;
+    xPercent: Double;
 begin
   xChart := GetChart;
-  xSums := GDataProvider.OpenSql(Format('select v.cash, p.name from ( ' +
-                                        '  select sum(cash) as cash, idProduct from transactions ' +
-                                        '  where movementType = ''%s'' and regDate between %s and %s group by idProduct) as v ' +
-                                        '  left outer join product p on p.idProduct = v.idProduct',
-                                        [GetOperationsType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
+  xSums := GDataProvider.OpenSql(GetSql);
   xSerie := TPieSeries.Create(xChart);
+  xSum := 0;
   while not xSums.Eof do begin
-    xSerie.Add(xSums.FieldByName('cash').AsCurrency, xSums.FieldByName('name').AsString);
+    xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
     xSums.Next;
   end;
-  xChart.AddSeries(xSerie);
-  xChart.View3D := False;
-  xChart.Legend.Visible := False;
+  xSums.First;
+  while not xSums.Eof do begin
+    xCash := Abs(xSums.FieldByName('cash').AsCurrency);
+    xPercent := (xCash * 100) / xSum;
+    xLabel := Format('%3.2f', [xPercent]) + '% - ' + xSums.FieldByName('name').AsString + ' (' + CurrencyToString(xCash) + ')';
+    xSerie.Add(xCash, xLabel);
+    xSums.Next;
+  end;
+  xSerie.Marks.Transparent := True;
+  xSerie.Marks.Style := smsLabel;
+  with xChart do begin
+    AddSeries(xSerie);
+    View3D := True;
+    Legend.Visible := False;
+  end;
   xSums.Free;
 end;
 
-function TBaseOperationsByCategoryChart.PrepareReportConditions: Boolean;
+function TOperationsBySomethingChart.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodByForm(FStartDate, FEndDate);
 end;
 
-function TInOperationsByCategoryChart.GetOperationsType: String;
+function TOperationsByCategoryChart.GetReportTitle: String;
 begin
-  Result := CInMovement;
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := 'Operacje przychodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end else begin
+    Result := 'Operacje rozchodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end;
 end;
 
-function TInOperationsByCategoryChart.GetReportTitle: String;
+function TOperationsByCategoryChart.GetSql: String;
 begin
-  Result := 'Operacje przychodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := Format('select v.cash, p.name from ( ' +
+                '  select sum(cash) as cash, idProduct from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idProduct) as v ' +
+                '  left outer join product p on p.idProduct = v.idProduct',
+                [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
 end;
 
-function TOutOperationsByCategoryChart.GetOperationsType: String;
+function TOperationsByCashpointChart.GetReportTitle: String;
 begin
-  Result := COutMovement;
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := 'Operacje przychodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end else begin
+    Result := 'Operacje rozchodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end;
 end;
 
-function TOutOperationsByCategoryChart.GetReportTitle: String;
+function TOperationsByCashpointChart.GetSql: String;
 begin
-  Result := 'Operacje rozchodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := Format('select v.cash, p.name from ( ' +
+                '  select sum(cash) as cash, idCashpoint from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idCashpoint) as v ' +
+                '  left outer join cashpoint p on p.idCashpoint = v.idCashpoint',
+                [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+end;
+
+function TOperationsBySomethingList.GetReportBody: String;
+var xSums: TADOQuery;
+    xCash: Currency;
+    xSum: Currency;
+    xPercent: Double;
+    xBody: TStringList;
+begin
+  xSums := GDataProvider.OpenSql(GetSql);
+  xSum := 0;
+  while not xSums.Eof do begin
+    xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
+    xSums.Next;
+  end;
+  xBody := TStringList.Create;
+  with xSums, xBody do begin
+    First;
+    Add('<table class="base" colspan=4>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="55%">Nazwa</td>');
+    Add('<td class="headcash" width="20%">Kwota</td>');
+    Add('<td class="headcash" width="20%">Procent ca³oœci</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    while not Eof do begin
+      if not Odd(RecNo) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      xCash := Abs(FieldByName('cash').AsCurrency);
+      xPercent := (xCash * 100) / xSum;
+      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="55%">' + FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xCash) + '</td>');
+      Add('<td class="cash" width="20%">' + Format('%3.2f', [xPercent]) + '%</td>');
+      Add('</tr>');
+      Next;
+    end;
+    Add('</table><hr><table class="base" colspan=3>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="60%">Razem</td>');
+    Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
+    Add('<td class="sumcash" width="20%"></td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+  xSums.Free;
+end;
+
+function TOperationsBySomethingList.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+end;
+
+function TOperationsByCategoryList.GetReportTitle: String;
+begin
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := 'Operacje przychodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end else begin
+    Result := 'Operacje rozchodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end;
+end;
+
+function TOperationsByCategoryList.GetSql: String;
+begin
+  Result := Format('select v.cash, p.name from ( ' +
+                '  select sum(cash) as cash, idProduct from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idProduct) as v ' +
+                '  left outer join product p on p.idProduct = v.idProduct',
+                [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+end;
+
+function TOperationsByCashpointList.GetReportTitle: String;
+begin
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := 'Operacje przychodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end else begin
+    Result := 'Operacje rozchodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  end;
+end;
+
+function TOperationsByCashpointList.GetSql: String;
+begin
+  Result := Format('select v.cash, p.name from ( ' +
+                '  select sum(cash) as cash, idCashpoint from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idCashpoint) as v ' +
+                '  left outer join cashpoint p on p.idCashpoint = v.idCashpoint',
+                [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+end;
+
+constructor TCSelectedMovementTypeParams.Create(AType: String);
+begin
+  inherited Create;
+  FmovementType := AType;
 end;
 
 end.
