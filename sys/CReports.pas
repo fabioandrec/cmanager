@@ -638,7 +638,6 @@ end;
 
 destructor TCBaseReport.Destroy;
 begin
-  FParams.Free;
   inherited Destroy;
 end;
 
