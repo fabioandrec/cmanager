@@ -4,25 +4,6 @@ interface
 
 uses CDatabase, SysUtils, AdoDb, Classes;
 
-const
-  CInMovement = 'I';
-  COutMovement = 'O';
-  CTransferMovement = 'T';
-  CInProduct = 'I';
-  COutProduct = 'O';
-  CBankAccount = 'B';
-  CCashAccount = 'C';
-  CScheduleTypeOnce = 'O';
-  CScheduleTypeCyclic = 'C';
-  CEndConditionTimes = 'T';
-  CEndConditionDate = 'D';
-  CEndConditionNever = 'N';
-  CTriggerTypeWeekly = 'W';
-  CTriggerTypeMonthly = 'M';
-  CDoneOperation = 'O';
-  CDoneDeleted = 'D';
-  CDoneAccepted = 'A';
-
 type
   TBaseName = string[40];
   TBaseDescription = string[200];

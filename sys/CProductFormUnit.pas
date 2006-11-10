@@ -36,7 +36,7 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit;
+uses CDataObjects, CInfoFormUnit, CConsts;
 
 {$R *.dfm}
 

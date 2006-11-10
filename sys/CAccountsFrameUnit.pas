@@ -51,7 +51,7 @@ type
 implementation
 
 uses CDataObjects, CAccountFormUnit, CConfigFormUnit, CInfoFormUnit, GraphUtil,
-  CFrameFormUnit;
+  CFrameFormUnit, CConsts;
 
 {$R *.dfm}
 

@@ -23,7 +23,7 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
 
 implementation
 
-uses DateUtils;
+uses DateUtils, CConsts;
 
 function SortTreeHelperByDate(Item1, Item2: Pointer): Integer;
 var xI1, xI2: TPlannedTreeItem;

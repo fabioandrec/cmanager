@@ -51,7 +51,7 @@ implementation
 
 uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  CPlannedFormUnit, CDoneFrameUnit;
+  CPlannedFormUnit, CDoneFrameUnit, CConsts;
 
 {$R *.dfm}
 

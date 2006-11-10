@@ -81,7 +81,7 @@ implementation
 
 uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Types, CDoneFormUnit, CDoneFrameUnit;
+  Types, CDoneFormUnit, CDoneFrameUnit, CConsts;
 
 {$R *.dfm}
 

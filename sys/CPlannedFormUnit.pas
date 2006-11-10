@@ -59,7 +59,7 @@ implementation
 
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
-  CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit;
+  CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit, CConsts;
 
 {$R *.dfm}
 

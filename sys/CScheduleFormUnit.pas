@@ -96,6 +96,7 @@ begin
 end;
 
 function TSchedule.GetAsString: String;
+var xDayNumber: Integer;
 begin
   if FscheduleType = CScheduleTypeOnce then begin
     Result := 'Jednorazowo, ' + DateToStr(FscheduleDate);
@@ -107,7 +108,11 @@ begin
       Result := Result + ', do ' + DateToStr(FendDate);
     end;
     if FtriggerType = CTriggerTypeWeekly then begin
-      Result := Result + ', ka¿dy ' + CShortDayNames[FtriggerDay];
+      xDayNumber := FtriggerDay + 2;
+      if xDayNumber > 7 then begin
+        xDayNumber := xDayNumber - 6;
+      end;
+      Result := Result + ', ka¿dy ' + ShortDayNames[xDayNumber];
     end else begin
       Result := Result + ', ka¿dy ' + IfThen(FtriggerDay = 0, 'ostatni', IntToStr(FtriggerDay)) + ' dzieñ mies.';
     end;

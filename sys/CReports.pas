@@ -19,6 +19,15 @@ type
     property movementType: String read FmovementType;
   end;
 
+  TCSumSelectedMovementTypeParams = class(TCSelectedMovementTypeParams)
+  private
+    FgroupBy: String;
+  public
+    constructor Create(AType: String; AGroupBy: String);
+  published
+    property groupBy: String read FgroupBy write FgroupBy;
+  end;
+
   TCBaseReport = class(TObject)
   private
     FForm: TCReportForm;
@@ -182,6 +191,23 @@ type
     destructor Destroy; override;
   end;
 
+  TSumReportList = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FIds: TStringList;
+  private
+    function IsValidAccount(AId: TDataGid): Boolean;
+    function GetDescription(ADate: TDateTime): String;
+  protected
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
+  public
+    constructor CreateReport(AParams: TCReportParams); override;
+    destructor Destroy; override;
+  end;
+
 
 implementation
 
@@ -190,13 +216,6 @@ uses Forms, SysUtils, Adodb, CConfigFormUnit,
      DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents;
-
-function DayName(ADate: TDateTime): String;
-var xDay: Integer;
-begin
-  xDay := DayOfTheWeek(ADate);
-  Result := CShortDayNames[xDay - 1];
-end;
 
 function ColToRgb(AColor: TColor): String;
 var xRgb: Integer;
@@ -265,7 +284,7 @@ end;
 
 function TAccountBalanceOnDayReport.GetReportTitle: String;
 begin
-  Result := 'Stan kont (' + DayName(FDate) + ', ' + DateToStr(FDate) + ')';
+  Result := 'Stan kont (' + GetFormattedDate(FDate, CLongDateFormat) + ')';
 end;
 
 function TAccountBalanceOnDayReport.PrepareReportConditions: Boolean;
@@ -343,7 +362,7 @@ end;
 
 function TDoneOperationsListReport.GetReportTitle: String;
 begin
-  Result := 'Operacje wykonane (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := 'Operacje wykonane (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
 function TDoneOperationsListReport.PrepareReportConditions: Boolean;
@@ -476,7 +495,7 @@ end;
 
 function TPlannedOperationsListReport.GetReportTitle: String;
 begin
-  Result := 'Operacje zaplanowane (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := 'Operacje zaplanowane (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
 function TPlannedOperationsListReport.PrepareReportConditions: Boolean;
@@ -555,7 +574,7 @@ end;
 
 function TCashFlowListReport.GetReportTitle: String;
 begin
-  Result := 'Przep³yw gotówki (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := 'Przep³yw gotówki (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
 function TCashFlowListReport.PrepareReportConditions: Boolean;
@@ -621,7 +640,7 @@ var xAcc: TAccount;
 begin
   GDataProvider.BeginTransaction;
   xAcc := TAccount(TAccount.LoadObject(AccountProxy, FIdAccount, False));
-  Result := 'Historia konta ' + xAcc.name + ' (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := 'Historia konta ' + xAcc.name + ' (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   GDataProvider.RollbackTransaction;
 end;
 
@@ -784,7 +803,7 @@ end;
 
 function TAccountBalanceChartReport.GetReportTitle: String;
 begin
-  Result := 'Wykres stanu kont (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := 'Wykres stanu kont (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
 function TAccountBalanceChartReport.IsValidAccount(AId: TDataGid): Boolean;
@@ -942,7 +961,7 @@ begin
   end else begin
     Result := 'Lista operacji rozchodowych';
   end;
-  Result := Result + ' (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+  Result := Result + ' (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
 function TOperationsListReport.PrepareReportConditions: Boolean;
@@ -993,9 +1012,9 @@ end;
 function TOperationsByCategoryChart.GetReportTitle: String;
 begin
   if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
-    Result := 'Operacje przychodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje przychodowe w/g kategorii (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end else begin
-    Result := 'Operacje rozchodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje rozchodowe w/g kategorii (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end;
 end;
 
@@ -1011,9 +1030,9 @@ end;
 function TOperationsByCashpointChart.GetReportTitle: String;
 begin
   if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
-    Result := 'Operacje przychodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje przychodowe w/g kontrahentów (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end else begin
-    Result := 'Operacje rozchodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje rozchodowe w/g kontrahentów (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end;
 end;
 
@@ -1086,9 +1105,9 @@ end;
 function TOperationsByCategoryList.GetReportTitle: String;
 begin
   if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
-    Result := 'Operacje przychodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje przychodowe w/g kategorii (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end else begin
-    Result := 'Operacje rozchodowe w/g kategorii (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje rozchodowe w/g kategorii (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end;
 end;
 
@@ -1104,9 +1123,9 @@ end;
 function TOperationsByCashpointList.GetReportTitle: String;
 begin
   if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
-    Result := 'Operacje przychodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje przychodowe w/g kontrahentów (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end else begin
-    Result := 'Operacje rozchodowe w/g kontrahentów (' + DayName(FStartDate) + ', ' + DateToStr(FStartDate) + ' - ' +  DayName(FEndDate) + ', ' + DateToStr(FEndDate) + ')';
+    Result := 'Operacje rozchodowe w/g kontrahentów (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
   end;
 end;
 
@@ -1123,6 +1142,133 @@ constructor TCSelectedMovementTypeParams.Create(AType: String);
 begin
   inherited Create;
   FmovementType := AType;
+end;
+
+constructor TCSumSelectedMovementTypeParams.Create(AType, AGroupBy: String);
+begin
+  inherited Create(AType);
+  FgroupBy := AGroupBy;
+end;
+
+constructor TSumReportList.CreateReport(AParams: TCReportParams);
+begin
+  inherited CreateReport(AParams);
+  FIds := TStringList.Create;
+end;
+
+destructor TSumReportList.Destroy;
+begin
+  FIds.Free;
+  inherited Destroy;
+end;
+
+function TSumReportList.GetDescription(ADate: TDateTime): String;
+var xPr: TCSumSelectedMovementTypeParams;
+begin
+  Result := GetFormattedDate(ADate, CLongDateFormat);
+  xPr := TCSumSelectedMovementTypeParams(FParams);
+  if xPr.groupBy = CGroupByDay then begin
+  end else if xPr.groupBy = CGroupByWeek then begin
+  end else if xPr.groupBy = CGroupByMonth then begin
+  end;
+end;
+
+function TSumReportList.GetReportBody: String;
+var xOperations: TADOQuery;
+    xGb: String;
+    xPr: TCSumSelectedMovementTypeParams;
+    xSum, xGbSum: Currency;
+    xBody: TStringList;
+    xName: String;
+    xCurDate: TDateTime;
+begin
+  xPr := TCSumSelectedMovementTypeParams(FParams);
+  xGb := 'regDate';
+  xName := 'Dzieñ';
+  if xPr.groupBy = CGroupByWeek then begin
+    xGb := 'weekDate';
+    xName := 'Tydzieñ';
+  end else if xPr.groupBy = CGroupByMonth then begin
+    xGb := 'monthDate';
+    xName := 'Miesi¹c';
+  end;
+  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where regDate between %s and %s group by %s, idAccount order by %s',
+                             [xGb, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
+  xSum := 0;
+  xGbSum := 0;
+  xBody := TStringList.Create;
+  with xOperations, xBody do begin
+    Add('<table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="80%">' + xName + '</td>');
+    Add('<td class="headcash" width="20%">Kwota</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=2>');
+    if not IsEmpty then begin
+      xCurDate := FieldByName(xGb).AsDateTime;
+      while not Eof do begin
+        if IsValidAccount(FieldByName('idAccount').AsString) then begin
+          xGbSum := xGbSum + FieldByName('cash').AsCurrency;
+        end;
+        Next;
+        if Eof or ((not Eof) and (xCurDate <> FieldByName(xGb).AsDateTime)) then begin
+          if not Odd(RecNo) then begin
+            Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+          end else begin
+            Add('<tr class="base">');
+          end;
+          Add('<td class="text" width="80%">' + GetDescription(xCurDate) + '</td>');
+          Add('<td class="cash" width="20%">' + CurrencyToString(xGbSum) + '</td>');
+          xSum := xSum + xGbSum;
+          Add('</tr>');
+          xCurDate := FieldByName(xGb).AsDateTime;
+          xGbSum := 0;
+        end;
+      end;
+    end;
+    Add('</table><hr><table class="base" colspan=2>');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="80%">Razem</td>');
+    Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  xOperations.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TSumReportList.GetReportTitle: String;
+var xP: TCSumSelectedMovementTypeParams;
+begin
+  xP := TCSumSelectedMovementTypeParams(FParams);
+  Result := 'Sumy ';
+  if xP.groupBy = CGroupByDay then begin
+    Result := Result + 'dziennych ';
+  end else if xP.groupBy = CGroupByWeek then begin
+    Result := Result + 'tygodniowych ';
+  end else if xP.groupBy = CGroupByMonth then begin
+    Result := Result + 'miesiêcznych ';
+  end;
+  if xP.movementType = CInMovement then begin
+    Result := Result + 'przychodów ';
+  end else if xP.movementType = COutMovement then begin
+    Result := Result + 'rozchodów ';
+  end;
+  Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+end;
+
+function TSumReportList.IsValidAccount(AId: TDataGid): Boolean;
+begin
+  Result := FIds.Count = 0;
+  if not Result then begin
+    Result := FIds.IndexOf(AId) <> -1;
+  end;
+end;
+
+function TSumReportList.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
 end;
 
 end.

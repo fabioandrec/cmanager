@@ -32,7 +32,7 @@ type
 
 implementation
 
-uses CDatabase, CDataObjects;
+uses CDatabase, CDataObjects, CConsts;
 
 {$R *.dfm}
 

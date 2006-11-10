@@ -201,6 +201,7 @@ function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
 function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
+function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
@@ -976,6 +977,18 @@ var xMonth: Integer;
 begin
   xMonth := MonthOf(ADateTime);
   Result := ((xMonth - 1) div 6) + 1;
+end;
+
+function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
+var xTime: TSystemTime;
+    xRes: PChar;
+begin
+  GetMem(xRes, $FF);
+  DateTimeToSystemTime(ADate, xTime);
+  if GetDateFormat(GetThreadLocale, 0, @xTime, PChar(AFormat), xRes, $FF) <> 0 then begin
+    Result := String(xRes);
+  end;
+  FreeMem(xRes);
 end;
 
 initialization

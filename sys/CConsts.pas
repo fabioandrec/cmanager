@@ -3,9 +3,36 @@ unit CConsts;
 interface
 
 const
-  CShortDayNames: Array[0..6] of String = ('Pon', 'Wto', 'Œro', 'Czw', 'Pi¹', 'Sob', 'Nie');
-  CLongDayNames: Array[0..6] of String = ('Poniedzia³ek', 'Wtorek', 'Œroda', 'Czwartek', 'Pi¹tek', 'Sobota', 'Niedziela');
+  CInMovement = 'I';
+  COutMovement = 'O';
+  CTransferMovement = 'T';
 
+  CInProduct = 'I';
+  COutProduct = 'O';
+
+  CBankAccount = 'B';
+  CCashAccount = 'C';
+
+  CScheduleTypeOnce = 'O';
+  CScheduleTypeCyclic = 'C';
+
+  CEndConditionTimes = 'T';
+  CEndConditionDate = 'D';
+  CEndConditionNever = 'N';
+
+  CTriggerTypeWeekly = 'W';
+  CTriggerTypeMonthly = 'M';
+
+  CDoneOperation = 'O';
+  CDoneDeleted = 'D';
+  CDoneAccepted = 'A';
+
+  CGroupByDay = 'D';
+  CGroupByWeek = 'W';
+  CGroupByMonth = 'M';
+
+  CLongDateFormat = 'ddd, yyyy-MM-dd';
+  CDayNameDateFormat = 'ddd';
 
 implementation
 

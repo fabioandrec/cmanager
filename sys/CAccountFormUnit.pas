@@ -36,7 +36,7 @@ type
 implementation
 
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
-  CCashpointsFrameUnit;
+  CCashpointsFrameUnit, CConsts;
 
 {$R *.dfm}
 
