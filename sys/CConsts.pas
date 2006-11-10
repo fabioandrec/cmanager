@@ -32,7 +32,9 @@ const
   CGroupByMonth = 'M';
 
   CLongDateFormat = 'ddd, yyyy-MM-dd';
+  CBaseDateFormat = 'yyyy-MM-dd';
   CDayNameDateFormat = 'ddd';
+  CMonthnameDateFormat = 'MMMM yyyy';
 
 implementation
 

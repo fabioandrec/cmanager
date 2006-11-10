@@ -1165,11 +1165,14 @@ end;
 function TSumReportList.GetDescription(ADate: TDateTime): String;
 var xPr: TCSumSelectedMovementTypeParams;
 begin
-  Result := GetFormattedDate(ADate, CLongDateFormat);
+  Result := GetFormattedDate(ADate, CBaseDateFormat);
   xPr := TCSumSelectedMovementTypeParams(FParams);
   if xPr.groupBy = CGroupByDay then begin
+    Result := GetFormattedDate(ADate, CBaseDateFormat);
   end else if xPr.groupBy = CGroupByWeek then begin
+    Result := GetFormattedDate(ADate, CBaseDateFormat) + ' - ' + GetFormattedDate(EndOfTheWeek(ADate), CBaseDateFormat);
   end else if xPr.groupBy = CGroupByMonth then begin
+    Result := GetFormattedDate(ADate, CMonthnameDateFormat);
   end;
 end;
 
@@ -1192,8 +1195,8 @@ begin
     xGb := 'monthDate';
     xName := 'Miesi¹c';
   end;
-  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where regDate between %s and %s group by %s, idAccount order by %s',
-                             [xGb, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
+  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
+                             [xGb, TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
   xSum := 0;
   xGbSum := 0;
   xBody := TStringList.Create;
@@ -1208,7 +1211,7 @@ begin
       xCurDate := FieldByName(xGb).AsDateTime;
       while not Eof do begin
         if IsValidAccount(FieldByName('idAccount').AsString) then begin
-          xGbSum := xGbSum + FieldByName('cash').AsCurrency;
+          xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
         end;
         Next;
         if Eof or ((not Eof) and (xCurDate <> FieldByName(xGb).AsDateTime)) then begin
@@ -1219,7 +1222,7 @@ begin
           end;
           Add('<td class="text" width="80%">' + GetDescription(xCurDate) + '</td>');
           Add('<td class="cash" width="20%">' + CurrencyToString(xGbSum) + '</td>');
-          xSum := xSum + xGbSum;
+          xSum := xSum + Abs(xGbSum);
           Add('</tr>');
           xCurDate := FieldByName(xGb).AsDateTime;
           xGbSum := 0;
