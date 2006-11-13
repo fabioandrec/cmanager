@@ -208,6 +208,23 @@ type
     destructor Destroy; override;
   end;
 
+  TSumReportChart = class(TCChartReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FIds: TStringList;
+  private
+    function IsValidAccount(AId: TDataGid): Boolean;
+    function GetDescription(ADate: TDateTime): String;
+  protected
+    function GetReportTitle: String; override;
+    function PrepareReportConditions: Boolean; override;
+    procedure PrepareReportChart; override;
+  public
+    constructor CreateReport(AParams: TCReportParams); override;
+    destructor Destroy; override;
+  end;
+
 
 implementation
 
@@ -1184,6 +1201,7 @@ var xOperations: TADOQuery;
     xBody: TStringList;
     xName: String;
     xCurDate: TDateTime;
+    xRec: Integer;
 begin
   xPr := TCSumSelectedMovementTypeParams(FParams);
   xGb := 'regDate';
@@ -1198,7 +1216,7 @@ begin
   xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
                              [xGb, TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
   xSum := 0;
-  xGbSum := 0;
+  xRec := 1;
   xBody := TStringList.Create;
   with xOperations, xBody do begin
     Add('<table class="base" colspan=2>');
@@ -1207,26 +1225,40 @@ begin
     Add('<td class="headcash" width="20%">Kwota</td>');
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=2>');
-    if not IsEmpty then begin
-      xCurDate := FieldByName(xGb).AsDateTime;
+    if xPr.groupBy = CGroupByWeek then begin
+      xCurDate := StartOfTheWeek(FStartDate);
+    end else if xPr.groupBy = CGroupByMonth then begin
+      xCurDate := StartOfTheMonth(FStartDate);
+    end else begin
+      xCurDate := FStartDate;
+    end;
+    while (xCurDate <= FEndDate) do begin
+      Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
+      Filtered := True;
+      First;
+      xGbSum := 0;
       while not Eof do begin
         if IsValidAccount(FieldByName('idAccount').AsString) then begin
           xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
         end;
         Next;
-        if Eof or ((not Eof) and (xCurDate <> FieldByName(xGb).AsDateTime)) then begin
-          if not Odd(RecNo) then begin
-            Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-          end else begin
-            Add('<tr class="base">');
-          end;
-          Add('<td class="text" width="80%">' + GetDescription(xCurDate) + '</td>');
-          Add('<td class="cash" width="20%">' + CurrencyToString(xGbSum) + '</td>');
-          xSum := xSum + Abs(xGbSum);
-          Add('</tr>');
-          xCurDate := FieldByName(xGb).AsDateTime;
-          xGbSum := 0;
-        end;
+      end;
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="80%">' + GetDescription(xCurDate) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xGbSum) + '</td>');
+      xSum := xSum + Abs(xGbSum);
+      Add('</tr>');
+      Inc(xRec);
+      if xPr.groupBy = CGroupByWeek then begin
+        xCurDate := IncWeek(xCurDate, 1);
+      end else if xPr.groupBy = CGroupByMonth then begin
+        xCurDate := IncMonth(xCurDate, 1);
+      end else begin
+        xCurDate := IncDay(xCurDate, 1);
       end;
     end;
     Add('</table><hr><table class="base" colspan=2>');
@@ -1270,6 +1302,152 @@ begin
 end;
 
 function TSumReportList.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
+end;
+
+constructor TSumReportChart.CreateReport(AParams: TCReportParams);
+begin
+  inherited CreateReport(AParams);
+  FIds := TStringList.Create;
+end;
+
+destructor TSumReportChart.Destroy;
+begin
+  FIds.Free;
+  inherited Destroy;
+end;
+
+function TSumReportChart.GetDescription(ADate: TDateTime): String;
+var xPr: TCSumSelectedMovementTypeParams;
+begin
+  Result := GetFormattedDate(ADate, CBaseDateFormat);
+  xPr := TCSumSelectedMovementTypeParams(FParams);
+  if xPr.groupBy = CGroupByDay then begin
+    Result := GetFormattedDate(ADate, CBaseDateFormat);
+  end else if xPr.groupBy = CGroupByWeek then begin
+    Result := GetFormattedDate(ADate, CBaseDateFormat) + ' - ' + GetFormattedDate(EndOfTheWeek(ADate), CBaseDateFormat);
+  end else if xPr.groupBy = CGroupByMonth then begin
+    Result := GetFormattedDate(ADate, CMonthnameDateFormat);
+  end;
+end;
+
+function TSumReportChart.GetReportTitle: String;
+var xP: TCSumSelectedMovementTypeParams;
+begin
+  xP := TCSumSelectedMovementTypeParams(FParams);
+  Result := 'Sumy ';
+  if xP.groupBy = CGroupByDay then begin
+    Result := Result + 'dziennych ';
+  end else if xP.groupBy = CGroupByWeek then begin
+    Result := Result + 'tygodniowych ';
+  end else if xP.groupBy = CGroupByMonth then begin
+    Result := Result + 'miesiêcznych ';
+  end;
+  if xP.movementType = CInMovement then begin
+    Result := Result + 'przychodów ';
+  end else if xP.movementType = COutMovement then begin
+    Result := Result + 'rozchodów ';
+  end;
+  Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+end;
+
+function TSumReportChart.IsValidAccount(AId: TDataGid): Boolean;
+begin
+  Result := FIds.Count = 0;
+  if not Result then begin
+    Result := FIds.IndexOf(AId) <> -1;
+  end;
+end;
+
+procedure TSumReportChart.PrepareReportChart;
+var xOperations: TADOQuery;
+    xGb: String;
+    xPr: TCSumSelectedMovementTypeParams;
+    xGbSum: Currency;
+    xName: String;
+    xCurDate: TDateTime;
+    xSerie: TBarSeries;
+begin
+  xPr := TCSumSelectedMovementTypeParams(FParams);
+  xGb := 'regDate';
+  xName := 'Dzieñ';
+  if xPr.groupBy = CGroupByWeek then begin
+    xGb := 'weekDate';
+    xName := 'Tydzieñ';
+  end else if xPr.groupBy = CGroupByMonth then begin
+    xGb := 'monthDate';
+    xName := 'Miesi¹c';
+  end;
+  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
+                             [xGb, TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
+  with xOperations do begin
+    if xPr.groupBy = CGroupByWeek then begin
+      xCurDate := StartOfTheWeek(FStartDate);
+    end else if xPr.groupBy = CGroupByMonth then begin
+      xCurDate := StartOfTheMonth(FStartDate);
+    end else begin
+      xCurDate := FStartDate;
+    end;
+    xSerie := TBarSeries.Create(GetChart);
+    with TBarSeries(xSerie) do begin
+      Title := xName;
+      Marks.ArrowLength := 0;
+      Marks.Style := smsValue;
+      HorizAxis := aBottomAxis;
+      XValues.DateTime := True;
+    end;
+    while (xCurDate <= FEndDate) do begin
+      Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
+      Filtered := True;
+      First;
+      xGbSum := 0;
+      while not Eof do begin
+        if IsValidAccount(FieldByName('idAccount').AsString) then begin
+          xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
+        end;
+        Next;
+      end;
+      xSerie.AddXY(xCurDate, xGbSum, GetDescription(xCurDate));
+      if xPr.groupBy = CGroupByWeek then begin
+        xCurDate := IncWeek(xCurDate, 1);
+      end else if xPr.groupBy = CGroupByMonth then begin
+        xCurDate := IncMonth(xCurDate, 1);
+      end else begin
+        xCurDate := IncDay(xCurDate, 1);
+      end;
+    end;
+  end;
+  with GetChart do begin
+    with BottomAxis do begin
+      Automatic := False;
+      AutomaticMaximum := False;
+      AutomaticMinimum := False;
+      if xPr.groupBy = CGroupByWeek then begin
+        Maximum := EndOfTheWeek(FEndDate);
+        Minimum := StartOfTheWeek(FStartDate);
+      end else if xPr.groupBy = CGroupByMonth then begin
+        Maximum := EndOfTheMonth(FEndDate);
+        Minimum := StartOfTheMonth(FStartDate);
+      end else begin
+        Maximum := FEndDate;
+        Minimum := FStartDate;
+      end;
+      LabelsAngle := 90;
+      MinorTickCount := 0;
+      Title.Caption := xName
+    end;
+    with LeftAxis do begin
+      MinorTickCount := 0;
+      Title.Caption := '[' + GetCurrencySymbol + ']';
+      Title.Angle := 90;
+    end;
+    AddSeries(xSerie);
+  end;
+  xOperations.Free;
+end;
+
+function TSumReportChart.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
 end;

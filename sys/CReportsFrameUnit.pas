@@ -45,6 +45,7 @@ type
     procedure ReportListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ReportListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
+    procedure ReportListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FTreeHelper: THelperElement;
     procedure RecreateTreeHelper;
@@ -122,15 +123,15 @@ begin
   xBs.Add(xTm);
   xOt := THelperElement.Create(False, 'Dzienne', Nil, Nil, '', CNoImage);
   xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum dziennych rozchodów' , Nil, Nil, 'Pokazuje sumy dzienne dla rozchodów w wybranym okresie', CNoImage));
+  xOt.Add(THelperElement.Create(True, 'Wykres sum dziennych rozchodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByDay), 'Pokazuje sumy dzienne dla rozchodów w wybranym okresie', CNoImage));
   xOt.Add(THelperElement.Create(True, 'Lista sum dziennych rozchodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByDay), 'Pokazuje sumy dzienne dla rozchodów w wybranym okresie', CNoImage));
   xOt := THelperElement.Create(False, 'Tygodniowe', Nil, Nil, '', CNoImage);
   xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum tygodniowych rozchodów' , Nil, Nil, 'Pokazuje sumy tygodniowe dla rozchodów w wybranym okresie', CNoImage));
+  xOt.Add(THelperElement.Create(True, 'Wykres sum tygodniowych rozchodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla rozchodów w wybranym okresie', CNoImage));
   xOt.Add(THelperElement.Create(True, 'Lista sum tygodniowych rozchodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla rozchodów w wybranym okresie', CNoImage));
   xOt := THelperElement.Create(False, 'Miesiêczne', Nil, Nil, '', CNoImage);
   xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum miesiêcznych rozchodów' , Nil, Nil, 'Pokazuje sumy miesiêczne dla rozchodów w wybranym okresie', CNoImage));
+  xOt.Add(THelperElement.Create(True, 'Wykres sum miesiêcznych rozchodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla rozchodów w wybranym okresie', CNoImage));
   xOt.Add(THelperElement.Create(True, 'Lista sum miesiêcznych rozchodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla rozchodów w wybranym okresie', CNoImage));
   xBs.Add(THelperElement.Create(True, 'Podsumowanie rozchodów' , Nil, Nil, 'Pokazuje podsumowanie wybranego okresu', CNoImage));
 
@@ -149,15 +150,15 @@ begin
   xBs.Add(xTm);
   xOt := THelperElement.Create(False, 'Dzienne', Nil, Nil, '', CNoImage);
   xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum dziennych przychodów' , Nil, Nil, 'Pokazuje sumy dzienne dla przychodów w wybranym okresie', CNoImage));
+  xOt.Add(THelperElement.Create(True, 'Wykres sum dziennych przychodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByDay), 'Pokazuje sumy dzienne dla przychodów w wybranym okresie', CNoImage));
   xOt.Add(THelperElement.Create(True, 'Lista sum dziennych przychodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByDay), 'Pokazuje sumy dzienne dla przychodów w wybranym okresie', CNoImage));
   xOt := THelperElement.Create(False, 'Tygodniowe', Nil, Nil, '', CNoImage);
   xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum tygodniowych przychodów', Nil, Nil, 'Pokazuje sumy tygodniowe dla przychodów w wybranym okresie', CNoImage));
+  xOt.Add(THelperElement.Create(True, 'Wykres sum tygodniowych przychodów', TSumReportChart, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla przychodów w wybranym okresie', CNoImage));
   xOt.Add(THelperElement.Create(True, 'Lista sum tygodniowych rozchodów', TSumReportList, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla przychodów w wybranym okresie', CNoImage));
   xOt := THelperElement.Create(False, 'Miesiêczne',Nil, Nil, '', CNoImage);
   xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum miesiêcznych przychodów', Nil, Nil, 'Pokazuje sumy miesiêczne dla przychodów w wybranym okresie', CNoImage));
+  xOt.Add(THelperElement.Create(True, 'Wykres sum miesiêcznych przychodów', TSumReportChart, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla przychodów w wybranym okresie', CNoImage));
   xOt.Add(THelperElement.Create(True, 'Lista sum miesiêcznych przychodów', TSumReportList, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla przychodów w wybranym okresie', CNoImage));
   xBs.Add(THelperElement.Create(True, 'Podsumowanie przychodów', Nil, Nil, 'Pokazuje podsumowanie wybranego okresu', CNoImage));
 
@@ -166,7 +167,7 @@ begin
   xStats.Add(THelperElement.Create(True, 'Œrednie dzienne' , Nil, Nil, 'Pokazuje œrednie dzienne rozchody/przychody w wybranym okresie', CNoImage));
   xStats.Add(THelperElement.Create(True, 'Œrednie tygodniowe' , Nil,Nil,  'Pokazuje œrednie tygodniowe rozchody/przychody w wybranym okresie', CNoImage));
   xStats.Add(THelperElement.Create(True, 'Œrednie miesiêczne' , Nil,Nil,  'Pokazuje œrednie tygodniowe rozchody/przychody w wybranym okresie', CNoImage));
-  xStats.Add(THelperElement.Create(True, 'Trendy' , Nil,Nil,  'Pokazuje trendy rozchodów i przychodów dla wybranego okresu', CNoImage));
+  xStats.Add(THelperElement.Create(True, 'Prognozy' , Nil,Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CNoImage));
   xStats.Add(THelperElement.Create(True, 'Podsumowanie' , Nil, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CNoImage));
 end;
 
@@ -294,6 +295,13 @@ begin
     FreportParams.Free;
   end;
   inherited Destroy;
+end;
+
+procedure TCReportsFrame.ReportListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xData: THelperElement;
+begin
+  xData := THelperElement(ReportList.GetNodeData(Node)^);
+  ImageIndex := xData.image;
 end;
 
 end.

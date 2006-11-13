@@ -23,6 +23,7 @@ inherited CReportsFrame: TCReportsFrame
     Header.PopupMenu = VTHeaderPopupMenu
     Header.Style = hsFlatButtons
     HintMode = hmHint
+    Images = ImageList
     Indent = 20
     ParentShowHint = False
     ShowHint = True
@@ -35,6 +36,7 @@ inherited CReportsFrame: TCReportsFrame
     OnDblClick = ReportListDblClick
     OnFocusChanged = ReportListFocusChanged
     OnGetText = ReportListGetText
+    OnGetImageIndex = ReportListGetImageIndex
     OnGetHint = ReportListGetHint
     OnGetNodeDataSize = ReportListGetNodeDataSize
     OnInitChildren = ReportListInitChildren

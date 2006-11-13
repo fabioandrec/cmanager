@@ -99,6 +99,7 @@ inherited CChartReportForm: TCChartReportForm
       TopAxis.Title.Font.Height = -11
       TopAxis.Title.Font.Name = 'Verdana'
       TopAxis.Title.Font.Style = []
+      View3D = False
       View3DOptions.Elevation = 315
       View3DOptions.Orthogonal = False
       View3DOptions.Perspective = 0
