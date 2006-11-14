@@ -97,7 +97,7 @@ end;
 procedure TCReportsFrame.RecreateTreeHelper;
 var xBase: THelperElement;
     xStats: THelperElement;
-    xBs, xTm, xOt: THelperElement;
+    xBs, xTm: THelperElement;
 begin
   xBase := THelperElement.Create(False, 'Podstawowe', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xBase);
@@ -121,19 +121,8 @@ begin
   xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CNoImage));
   xTm := THelperElement.Create(False, 'Sumy', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xOt := THelperElement.Create(False, 'Dzienne', Nil, Nil, '', CNoImage);
-  xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum dziennych rozchodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByDay), 'Pokazuje sumy dzienne dla rozchodów w wybranym okresie', CNoImage));
-  xOt.Add(THelperElement.Create(True, 'Lista sum dziennych rozchodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByDay), 'Pokazuje sumy dzienne dla rozchodów w wybranym okresie', CNoImage));
-  xOt := THelperElement.Create(False, 'Tygodniowe', Nil, Nil, '', CNoImage);
-  xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum tygodniowych rozchodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla rozchodów w wybranym okresie', CNoImage));
-  xOt.Add(THelperElement.Create(True, 'Lista sum tygodniowych rozchodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla rozchodów w wybranym okresie', CNoImage));
-  xOt := THelperElement.Create(False, 'Miesiêczne', Nil, Nil, '', CNoImage);
-  xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum miesiêcznych rozchodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla rozchodów w wybranym okresie', CNoImage));
-  xOt.Add(THelperElement.Create(True, 'Lista sum miesiêcznych rozchodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(COutMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla rozchodów w wybranym okresie', CNoImage));
-  xBs.Add(THelperElement.Create(True, 'Podsumowanie rozchodów' , Nil, Nil, 'Pokazuje podsumowanie wybranego okresu', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres sum rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Lista sum rozchodów' , TSumReportList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CNoImage));
 
   xBs := THelperElement.Create(False, 'Przychody', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xBs);
@@ -148,19 +137,8 @@ begin
   xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodoe w rozbiciu na kontrahentów', CNoImage));
   xTm := THelperElement.Create(False, 'Sumy', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xOt := THelperElement.Create(False, 'Dzienne', Nil, Nil, '', CNoImage);
-  xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum dziennych przychodów' , TSumReportChart, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByDay), 'Pokazuje sumy dzienne dla przychodów w wybranym okresie', CNoImage));
-  xOt.Add(THelperElement.Create(True, 'Lista sum dziennych przychodów' , TSumReportList, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByDay), 'Pokazuje sumy dzienne dla przychodów w wybranym okresie', CNoImage));
-  xOt := THelperElement.Create(False, 'Tygodniowe', Nil, Nil, '', CNoImage);
-  xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum tygodniowych przychodów', TSumReportChart, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla przychodów w wybranym okresie', CNoImage));
-  xOt.Add(THelperElement.Create(True, 'Lista sum tygodniowych rozchodów', TSumReportList, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByWeek), 'Pokazuje sumy tygodniowe dla przychodów w wybranym okresie', CNoImage));
-  xOt := THelperElement.Create(False, 'Miesiêczne',Nil, Nil, '', CNoImage);
-  xTm.Add(xOt);
-  xOt.Add(THelperElement.Create(True, 'Wykres sum miesiêcznych przychodów', TSumReportChart, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla przychodów w wybranym okresie', CNoImage));
-  xOt.Add(THelperElement.Create(True, 'Lista sum miesiêcznych przychodów', TSumReportList, TCSumSelectedMovementTypeParams.Create(CInMovement, CGroupByMonth), 'Pokazuje sumy miesiêczne dla przychodów w wybranym okresie', CNoImage));
-  xBs.Add(THelperElement.Create(True, 'Podsumowanie przychodów', Nil, Nil, 'Pokazuje podsumowanie wybranego okresu', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres sum przychodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Lista sum przychodów' , TSumReportList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CNoImage));
 
   xStats := THelperElement.Create(False, 'Statystyki', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xStats);

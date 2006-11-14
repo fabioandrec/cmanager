@@ -11,8 +11,7 @@ type
     GroupBox2: TGroupBox;
     Label14: TLabel;
     CStaticAccount: TCStatic;
-    procedure CStaticAccountGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
   public
   end;

@@ -196,6 +196,61 @@ type
     property cash: Currency read Fcash write Setcash;
   end;
 
+  TMovementFilter = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: TBaseName);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property description: TBaseDescription read Fdescription write Setdescription;
+  end;
+
+  TAccountFilter = class(TDataObject)
+  private
+    FidMovementFilter: TDataGid;
+    FidAccount: TDataGid;
+    procedure SetidMovementFilter(const Value: TDataGid);
+    procedure SetidAccount(const Value: TDataGid);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property idMovementFilter: TDataGid read FidMovementFilter write SetidMovementFilter;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+  end;
+
+  TCashpointFilter = class(TDataObject)
+  private
+    FidMovementFilter: TDataGid;
+    FidCashpoint: TDataGid;
+    procedure SetidMovementFilter(const Value: TDataGid);
+    procedure SetidCashpoint(const Value: TDataGid);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property idMovementFilter: TDataGid read FidMovementFilter write SetidMovementFilter;
+    property idCashpoint: TDataGid read FidCashpoint write SetidCashpoint;
+  end;
+
+  TProductFilter = class(TDataObject)
+  private
+    FidMovementFilter: TDataGid;
+    FidProduct: TDataGid;
+    procedure SetidMovementFilter(const Value: TDataGid);
+    procedure SetidProduct(const Value: TDataGid);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property idMovementFilter: TDataGid read FidMovementFilter write SetidMovementFilter;
+    property idProduct: TDataGid read FidProduct write SetidProduct;
+  end;
 
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
@@ -203,6 +258,10 @@ var CashPointProxy: TDataProxy;
     BaseMovementProxy: TDataProxy;
     PlannedMovementProxy: TDataProxy;
     PlannedDoneProxy: TDataProxy;
+    MovementFilterProxy: TDataProxy;
+    AccountFilterProxy: TDataProxy;
+    CashpointFilterProxy: TDataProxy;
+    ProductFilterProxy: TDataProxy;
 
 procedure InitializeProxies;
 
@@ -218,6 +277,10 @@ begin
   BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement', Nil);
   PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
   PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
+  MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
+  AccountFilterProxy :=  TDataProxy.Create(GDataProvider, 'accountFilter', Nil);
+  CashpointFilterProxy :=  TDataProxy.Create(GDataProvider, 'cashpointFilter', Nil);
+  ProductFilterProxy :=  TDataProxy.Create(GDataProvider, 'productFilter', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -828,6 +891,138 @@ begin
     Result := 0;
   end;
   xQ.Free;
+end;
+
+{ TMovementFilter }
+
+procedure TMovementFilter.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+procedure TMovementFilter.Setdescription(const Value: TBaseDescription);
+begin
+
+end;
+
+procedure TMovementFilter.Setname(const Value: TBaseName);
+begin
+
+end;
+
+procedure TMovementFilter.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fname, True, 'movementFilter');
+    AddField('description', Fdescription, True, 'movementFilter');
+  end;
+end;
+
+procedure TAccountFilter.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidMovementFilter := FieldByName('idMovementFilter').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+  end;
+end;
+
+procedure TAccountFilter.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountFilter.SetidMovementFilter(const Value: TDataGid);
+begin
+  if FidMovementFilter <> Value then begin
+    FidMovementFilter := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCashpointFilter.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidMovementFilter := FieldByName('idMovementFilter').AsString;
+    FidCashpoint := FieldByName('idCashpoint').AsString;
+  end;
+end;
+
+procedure TCashpointFilter.SetidCashpoint(const Value: TDataGid);
+begin
+  if FidCashpoint <> Value then begin
+    FidCashpoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCashpointFilter.SetidMovementFilter(const Value: TDataGid);
+begin
+  if FidMovementFilter <> Value then begin
+    FidMovementFilter := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProductFilter.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidMovementFilter := FieldByName('idMovementFilter').AsString;
+    FidProduct := FieldByName('idProduct').AsString;
+  end;
+end;
+
+procedure TProductFilter.SetidMovementFilter(const Value: TDataGid);
+begin
+  if FidMovementFilter <> Value then begin
+    FidMovementFilter := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProductFilter.SetidProduct(const Value: TDataGid);
+begin
+  if FidProduct <> Value then begin
+    FidProduct := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountFilter.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('idMovementFilter', DataGidToDatabase(FidMovementFilter), False, 'accountFilter');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'accountFilter');
+  end;
+end;
+
+procedure TCashpointFilter.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('idMovementFilter', DataGidToDatabase(FidMovementFilter), False, 'cashpointFilter');
+    AddField('idCashpoint', DataGidToDatabase(FidCashpoint), False, 'cashpointFilter');
+  end;
+end;
+
+procedure TProductFilter.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('idMovementFilter', DataGidToDatabase(FidMovementFilter), False, 'productFilter');
+    AddField('idProduct', DataGidToDatabase(FidProduct), False, 'productFilter');
+  end;
 end;
 
 end.

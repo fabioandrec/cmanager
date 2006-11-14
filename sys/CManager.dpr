@@ -46,7 +46,8 @@ uses
   CChoosePeriodAccountFormUnit in 'CChoosePeriodAccountFormUnit.pas' {CChoosePeriodAccountForm},
   CHtmlReportFormUnit in 'CHtmlReportFormUnit.pas' {CHtmlReportForm},
   CChartReportFormUnit in 'CChartReportFormUnit.pas' {CChartReportForm},
-  CChoosePeriodAccountListFormUnit in 'CChoosePeriodAccountListFormUnit.pas' {CChoosePeriodAccountListForm};
+  CChoosePeriodAccountListFormUnit in 'CChoosePeriodAccountListFormUnit.pas' {CChoosePeriodAccountListForm},
+  CChoosePeriodAccountListGroupFormUnit in 'CChoosePeriodAccountListGroupFormUnit.pas' {CChoosePeriodAccountListGroupForm};
 
 {$R *.res}
 
