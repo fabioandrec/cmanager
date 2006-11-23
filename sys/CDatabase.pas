@@ -1002,6 +1002,9 @@ begin
   FreeMem(xRes);
 end;
 
+procedure SaveToLog(AFile, AText: String);
+
+
 initialization
   CoInitialize(Nil);
   GDataProvider := TDataProvider.Create;
