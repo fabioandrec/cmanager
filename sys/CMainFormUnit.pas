@@ -41,6 +41,7 @@ type
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     ActionCreateConnection: TAction;
+    ActionShortcutFilters: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -84,7 +85,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
-  CAboutFormUnit, CSettings;
+     CAboutFormUnit, CSettings, CFilterFrameUnit;
 
 {$R *.dfm}
 
@@ -154,6 +155,8 @@ begin
       xClass := TCProductsFrame;
     end else if AAction = ActionShortcutReports then begin
       xClass := TCReportsFrame;
+    end else if AAction = ActionShortcutFilters then begin
+      xClass := TCFilterFrame;
     end else begin
       xClass := TCBaseFrame;
     end;

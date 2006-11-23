@@ -258,6 +258,7 @@ object CMainForm: TCMainForm
             Items = <
               item
                 Action = ActionCreateConnection
+                Caption = '&Nowy plik danych'
               end
               item
                 Action = ActionOpenConnection
@@ -314,6 +315,9 @@ object CMainForm: TCMainForm
                 Action = ActionShortcutReports
                 Caption = 'S&tatystyka, raporty'
                 ImageIndex = 1
+              end
+              item
+                Action = ActionShortcutFilters
               end>
             Visible = False
             Caption = '&Skr'#243'ty'
@@ -391,6 +395,10 @@ object CMainForm: TCMainForm
       Category = 'Plik'
       Caption = 'Zamknij plik danych'
       OnExecute = ActionCloseConnectionExecute
+    end
+    object ActionShortcutFilters: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Filtry'
     end
   end
   object OpenDialog: TOpenDialog

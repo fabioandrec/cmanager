@@ -179,6 +179,10 @@ end;
 procedure TCDoneFrame.DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TPlannedTreeItem(DoneList.GetNodeData(Node)^) := TPlannedTreeItem(FTreeObjects.Items[Node.Index]);
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
+  end;
 end;
 
 procedure TCDoneFrame.DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);

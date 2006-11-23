@@ -63,6 +63,7 @@ type
     destructor Destroy; override;
     class function GetTitle: String; override;
     function FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode; override;
+    function FindNodeId(ANode: PVirtualNode): ShortString; override;
   end;
 
 implementation
@@ -154,6 +155,10 @@ begin
   TTreeObject(ProductList.GetNodeData(Node)^) := xTreeObject;
   if xTreeObject.Childobjects.Count > 0 then begin
     InitialStates := InitialStates + [ivsHasChildren, ivsExpanded];
+  end;
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
   end;
 end;
 
@@ -400,6 +405,13 @@ end;
 function TCProductsFrame.FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode;
 begin
   Result := FindTreeobjectNode(ADataId, AList);
+end;
+
+function TCProductsFrame.FindNodeId(ANode: PVirtualNode): ShortString;
+var xData: TTreeObject;
+begin
+  xData := TTreeObject(ProductList.GetNodeData(ANode)^);
+  Result := TProduct(xData.Dataobject).id;
 end;
 
 end.

@@ -181,6 +181,10 @@ begin
   if xTreeObject.Count > 0 then begin
     InitialStates := InitialStates + [ivsHasChildren];
   end;
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
+  end;
 end;
 
 procedure TCReportsFrame.ReportListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);

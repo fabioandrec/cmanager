@@ -95,6 +95,10 @@ end;
 procedure TCPlannedFrame.PlannedListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TDataObject(PlannedList.GetNodeData(Node)^) := FPlannedObjects.Items[Node.Index];
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
+  end;
 end;
 
 procedure TCPlannedFrame.PlannedListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);

@@ -36,6 +36,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; virtual;
+    function FindNodeId(ANode: PVirtualNode): TDataGid; virtual;
     property OutputData: Pointer read FOutputData;
   published
     property SelectedId: TDataGid read GetSelectedId;
@@ -114,6 +115,11 @@ begin
   Result := FindDataobjectNode(ADataId, AList);
 end;
 
+function TCBaseFrame.FindNodeId(ANode: PVirtualNode): TDataGid;
+begin
+  Result := TDataObject(GetList.GetNodeData(ANode)^).id;
+end;
+
 function TCBaseFrame.GetList: TVirtualStringTree;
 begin
   Result := Nil;
@@ -165,7 +171,7 @@ begin
       xNode.CheckType := ctCheckBox;
       xChecked := xAll;
       if not xChecked then begin
-        xId := TDataObject(xList.GetNodeData(xNode)^).id;
+        xId := FindNodeId(xNode);
         xChecked := FMultipleChecks.IndexOf(xId) <> -1;
       end;
       if xChecked then begin
@@ -190,7 +196,7 @@ begin
     xAll := True;
     while (xNode <> Nil) do begin
       if xNode.CheckState = csCheckedNormal then begin
-        FMultipleChecks.Add(TDataObject(xList.GetNodeData(xNode)^).id);
+        FMultipleChecks.Add(FindNodeId(xNode));
       end else begin
         xAll := False;
       end;

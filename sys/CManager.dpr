@@ -47,7 +47,9 @@ uses
   CHtmlReportFormUnit in 'CHtmlReportFormUnit.pas' {CHtmlReportForm},
   CChartReportFormUnit in 'CChartReportFormUnit.pas' {CChartReportForm},
   CChoosePeriodAccountListFormUnit in 'CChoosePeriodAccountListFormUnit.pas' {CChoosePeriodAccountListForm},
-  CChoosePeriodAccountListGroupFormUnit in 'CChoosePeriodAccountListGroupFormUnit.pas' {CChoosePeriodAccountListGroupForm};
+  CChoosePeriodAccountListGroupFormUnit in 'CChoosePeriodAccountListGroupFormUnit.pas' {CChoosePeriodAccountListGroupForm},
+  CFilterFrameUnit in 'CFilterFrameUnit.pas' {CFilterFrame: TFrame},
+  CFilterFormUnit in 'CFilterFormUnit.pas' {CFilterForm};
 
 {$R *.res}
 

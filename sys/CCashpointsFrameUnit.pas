@@ -97,6 +97,10 @@ end;
 procedure TCCashpointsFrame.CashpointListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TDataObject(CashpointList.GetNodeData(Node)^) := FCashpointObjects.Items[Node.Index];
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
+  end;
 end;
 
 procedure TCCashpointsFrame.CashpointListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);

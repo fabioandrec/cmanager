@@ -225,6 +225,10 @@ end;
 procedure TCMovementFrame.TodayListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TDataObject(TodayList.GetNodeData(Node)^) := FTodayObjects.Items[Node.Index];
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
+  end;
 end;
 
 procedure TCMovementFrame.TodayListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);

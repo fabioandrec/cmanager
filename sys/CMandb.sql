@@ -113,34 +113,22 @@ create table movementFilter (
 );
 
 create table accountFilter (
-  idAccountFilter uniqueidentifier not null,
-  created datetime not null,
-  modified datetime,
   idMovementFilter uniqueidentifier not null,
   idAccount uniqueidentifier not null,
-  primary key (idAccountFilter),
   constraint fk_accountMovementFilter foreign key (idMovementFilter) references movementFilter (idMovementFilter),
   constraint fk_accountMovementAccount foreign key (idAccount) references account (idAccount)
 );
 
 create table cashpointFilter (
-  idCashpointFilter uniqueidentifier not null,
-  created datetime not null,
-  modified datetime,
   idMovementFilter uniqueidentifier not null,
   idCashpoint uniqueidentifier not null,
-  primary key (idCashpointFilter),
   constraint fk_cashpointMovementFilter foreign key (idMovementFilter) references movementFilter (idMovementFilter),
   constraint fk_cashpointMovementCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint)
 );
 
 create table productFilter (
-  idProductFilter uniqueidentifier not null,
-  created datetime not null,
-  modified datetime,
   idMovementFilter uniqueidentifier not null,
   idProduct uniqueidentifier not null,
-  primary key (idProductFilter),
   constraint fk_productMovementFilter foreign key (idMovementFilter) references movementFilter (idMovementFilter),
   constraint fk_productMovementproduct foreign key (idProduct) references product (idProduct)
 );

@@ -138,6 +138,10 @@ end;
 procedure TCAccountsFrame.AccountListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
   TDataObject(AccountList.GetNodeData(Node)^) := FAccountObjects.Items[Node.Index];
+  if MultipleChecks <> Nil then begin
+    Node.CheckType := ctCheckBox;
+    Node.CheckState := csCheckedNormal;
+  end;
 end;
 
 procedure TCAccountsFrame.AccountListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
