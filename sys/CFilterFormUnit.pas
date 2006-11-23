@@ -28,7 +28,6 @@ type
     FFilterAccounts: TStringList;
     FFilterProducts: TStringList;
     FFilterCashpoints: TStringList;
-    procedure FillFilterList(AList: TStringList; AQuery: TADOQuery);
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -57,34 +56,28 @@ begin
 end;
 
 procedure TCFilterForm.FillForm;
-var xQ: TADOQuery;
 begin
   with TMovementFilter(Dataobject) do begin
     EditName.Text := name;
     RichEditDesc.Text := description;
-    xQ := GDataProvider.OpenSql('select idAccount as filtered from accountFilter where idMovementFilter = ' + DataGidToDatabase(id));
-    FillFilterList(FFilterAccounts, xQ);
-    xQ.Free;
-    if FFilterAccounts.Count = 0 then begin
+    LoadSubfilters;
+    FFilterAccounts.Text := accounts.Text;
+    FFilterProducts.Text := products.Text;
+    FFilterCashpoints.Text := cashpoints.Text;
+    if accounts.Count = 0 then begin
       CStaticAccount.Caption := '<wszystkie konta>';
     end else begin
-      CStaticAccount.Caption := '<wybrano ' + IntToStr(FFilterAccounts.Count) + '>';
+      CStaticAccount.Caption := '<wybrano ' + IntToStr(accounts.Count) + '>';
     end;
-    xQ := GDataProvider.OpenSql('select idCashpoint as filtered from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(id));
-    FillFilterList(FFilterCashpoints, xQ);
-    xQ.Free;
-    if FFilterCashpoints.Count = 0 then begin
+    if cashpoints.Count = 0 then begin
       CStaticCashpoint.Caption := '<wszyscy kontrahenci>';
     end else begin
-      CStaticCashpoint.Caption := '<wybrano ' + IntToStr(FFilterCashpoints.Count) + '>';
+      CStaticCashpoint.Caption := '<wybrano ' + IntToStr(cashpoints.Count) + '>';
     end;
-    xQ := GDataProvider.OpenSql('select idProduct as filtered from productFilter where idMovementFilter = ' + DataGidToDatabase(id));
-    FillFilterList(FFilterProducts, xQ);
-    xQ.Free;
-    if FFilterProducts.Count = 0 then begin
+    if products.Count = 0 then begin
       CStaticProducts.Caption := '<wszystkie kategorie>';
     end else begin
-      CStaticProducts.Caption := '<wybrano ' + IntToStr(FFilterProducts.Count) + '>';
+      CStaticProducts.Caption := '<wybrano ' + IntToStr(products.Count) + '>';
     end;
   end;
 end;
@@ -95,30 +88,14 @@ begin
 end;
 
 procedure TCFilterForm.ReadValues;
-var xCount: Integer;
 begin
   inherited ReadValues;
   with TMovementFilter(Dataobject) do begin
     name := EditName.Text;
     description := RichEditDesc.Text;
-    GDataProvider.ExecuteSql('delete from accountFilter where idMovementFilter = ' + DataGidToDatabase(id));
-    GDataProvider.ExecuteSql('delete from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(id));
-    GDataProvider.ExecuteSql('delete from productFilter where idMovementFilter = ' + DataGidToDatabase(id));
-    for xCount := 0 to FFilterProducts.Count - 1 do begin
-      GDataProvider.ExecuteSql(Format(
-             'insert into productFilter (idMovementFilter, idProduct) values (%s, %s)',
-             [DataGidToDatabase(id), DataGidToDatabase(FFilterProducts.Strings[xCount])]));
-    end;
-    for xCount := 0 to FFilterAccounts.Count - 1 do begin
-      GDataProvider.ExecuteSql(Format(
-             'insert into accountFilter (idMovementFilter, idAccount) values (%s, %s)',
-             [DataGidToDatabase(id), DataGidToDatabase(FFilterAccounts.Strings[xCount])]));
-    end;
-    for xCount := 0 to FFilterCashpoints.Count - 1 do begin
-      GDataProvider.ExecuteSql(Format(
-             'insert into cashpointFilter (idMovementFilter, idCashpoint) values (%s, %s)',
-             [DataGidToDatabase(id), DataGidToDatabase(FFilterCashpoints.Strings[xCount])]));
-    end;
+    products := FFilterProducts;
+    accounts := FFilterAccounts;
+    cashpoints := FFilterCashpoints;
   end;
 end;
 
@@ -175,15 +152,6 @@ begin
   FFilterProducts.Free;
   FFilterCashpoints.Free;
   inherited Destroy;
-end;
-
-procedure TCFilterForm.FillFilterList(AList: TStringList; AQuery: TADOQuery);
-begin
-  AList.Clear;
-  while not AQuery.Eof do begin
-    AList.Add(AQuery.FieldByName('filtered').AsString);
-    AQuery.Next;
-  end;
 end;
 
 end.

@@ -119,9 +119,9 @@ type
     procedure SetState(AState: TDataMemoryState);
     procedure SetMode(AMode: TDataCreationMode);
   public
-    procedure DeleteObject;
-    constructor Create(AStatic: Boolean);
-    constructor CreateObject(ADataProxy: TDataProxy; AIsStatic: Boolean);
+    procedure DeleteObject; virtual;
+    constructor Create(AStatic: Boolean); virtual;
+    constructor CreateObject(ADataProxy: TDataProxy; AIsStatic: Boolean); virtual;
     class function LoadObject(ADataProxy: TDataProxy; AId: TDataGid; AIsStatic: Boolean): TDataObject;
     procedure ReloadObject;
     class function GetList(AClass: TDataObjectClass; ADataProxy: TDataProxy; ASql: String): TDataObjectList;
@@ -129,6 +129,7 @@ type
     procedure UpdateFieldList; virtual;
     procedure FromDataset(ADataset: TADOQuery); virtual;
     procedure ForceUpdate;
+    procedure AfterPost; virtual;
     class function CanBeDeleted(AId: TDataGid): Boolean; virtual;
   published
     property id: TDataGid read FId;
@@ -426,6 +427,10 @@ end;
 procedure TDataFieldList.SetItems(AIndex: Integer; const Value: TDataField);
 begin
   inherited Items[AIndex] := Value;
+end;
+
+procedure TDataObject.AfterPost;
+begin
 end;
 
 class function TDataObject.CanBeDeleted(AId: TDataGid): Boolean;
@@ -748,6 +753,9 @@ begin
       while Result and (xCountSql >= 0) do begin
         xSql := xObj.DataFieldList.GetInsertSql(xObj.Id, xTableNames.Strings[xCountSql]);
         Result := FDataProvider.ExecuteSql(xSql);
+        if Result then begin
+          xObj.AfterPost;
+        end;
         Dec(xCountSql);
       end;
       xTableNames.Free;
@@ -781,6 +789,9 @@ begin
       while Result and (xCountSql >= 0) do begin
         xSql := xObj.DataFieldList.GetUpdateSql(xObj.Id, xTableNames.Strings[xCountSql]);
         Result := FDataProvider.ExecuteSql(xSql);
+        if Result then begin
+          xObj.AfterPost;
+        end;
         Dec(xCountSql);
       end;
       xTableNames.Free;

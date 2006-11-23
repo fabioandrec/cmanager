@@ -60,33 +60,33 @@ inherited CFilterForm: TCFilterForm
       Caption = ' Definicja zakresu '
       TabOrder = 1
       object Label14: TLabel
-        Left = 63
+        Left = 44
         Top = 29
-        Width = 73
+        Width = 28
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Wybrane konta'
+        Caption = 'Konta'
       end
       object Label3: TLabel
-        Left = 38
+        Left = 15
         Top = 65
-        Width = 98
+        Width = 57
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Wybrani kontrahenci'
+        Caption = 'Kontrahenci'
       end
       object Label4: TLabel
-        Left = 46
+        Left = 27
         Top = 101
-        Width = 90
+        Width = 45
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Wybrane kategorie'
+        Caption = 'Kategorie'
       end
       object CStaticAccount: TCStatic
-        Left = 144
+        Left = 80
         Top = 25
-        Width = 169
+        Width = 233
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -100,9 +100,9 @@ inherited CFilterForm: TCFilterForm
         HotTrack = True
       end
       object CStaticCashpoint: TCStatic
-        Left = 144
+        Left = 80
         Top = 61
-        Width = 169
+        Width = 233
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -116,9 +116,9 @@ inherited CFilterForm: TCFilterForm
         HotTrack = True
       end
       object CStaticProducts: TCStatic
-        Left = 144
+        Left = 80
         Top = 97
-        Width = 169
+        Width = 233
         Height = 21
         Cursor = crHandPoint
         AutoSize = False

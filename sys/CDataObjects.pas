@@ -200,14 +200,33 @@ type
   private
     Fname: TBaseName;
     Fdescription: TBaseDescription;
+    Faccounts: TStringList;
+    Fproducts: TStringList;
+    Fcashpoints: TStringList;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
+    procedure Setaccounts(const Value: TStringList);
+    procedure Setcashpoints(const Value: TStringList);
+    procedure Setproducts(const Value: TStringList);
+    procedure FillFilterList(AList: TStringList; AQuery: TADOQuery);
+  protected
+    procedure DeleteSubfilters;
+    procedure UpdateSubfilters;
   public
+    procedure LoadSubfilters;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    destructor Destroy; override;
+    constructor Create(AStatic: Boolean); override;
+    procedure AfterPost; override;
+    procedure DeleteObject; override;
+    function IsValid(AAccountId, ACashpointId, AProductId: TDataGid): Boolean;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
+    property accounts: TStringList read Faccounts write Setaccounts;
+    property products: TStringList read Fproducts write Setproducts;
+    property cashpoints: TStringList read Fcashpoints write Setcashpoints;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -845,12 +864,100 @@ begin
   xQ.Free;
 end;
 
+procedure TMovementFilter.AfterPost;
+begin
+  inherited AfterPost;
+  UpdateSubfilters;
+end;
+
+constructor TMovementFilter.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  Faccounts := TStringList.Create;
+  Fproducts := TStringList.Create;
+  Fcashpoints := TStringList.Create;
+end;
+
+procedure TMovementFilter.DeleteObject;
+begin
+  inherited DeleteObject;
+  DeleteSubfilters;
+end;
+
+procedure TMovementFilter.DeleteSubfilters;
+begin
+  GDataProvider.ExecuteSql('delete from accountFilter where idMovementFilter = ' + DataGidToDatabase(id));
+  GDataProvider.ExecuteSql('delete from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(id));
+  GDataProvider.ExecuteSql('delete from productFilter where idMovementFilter = ' + DataGidToDatabase(id));
+end;
+
+destructor TMovementFilter.Destroy;
+begin
+  Fproducts.Free;
+  Faccounts.Free;
+  Fcashpoints.Free;
+  inherited Destroy;
+end;
+
+procedure TMovementFilter.FillFilterList(AList: TStringList; AQuery: TADOQuery);
+begin
+  AList.Clear;
+  while not AQuery.Eof do begin
+    AList.Add(AQuery.FieldByName('filtered').AsString);
+    AQuery.Next;
+  end;
+end;
+
 procedure TMovementFilter.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+function TMovementFilter.IsValid(AAccountId, ACashpointId, AProductId: TDataGid): Boolean;
+begin
+  Result := True;
+  if Result and (AAccountId <> CEmptyDataGid) and (Faccounts.Count > 0) then begin
+    Result := Faccounts.IndexOf(AAccountId) > -1;
+  end;
+  if Result and (ACashpointId <> CEmptyDataGid) and (Fcashpoints.Count > 0) then begin
+    Result := Faccounts.IndexOf(ACashpointId) > -1;
+  end;
+  if Result and (AProductId <> CEmptyDataGid) and (Fproducts.Count > 0) then begin
+    Result := Fproducts.IndexOf(AProductId) > -1;
+  end;
+end;
+
+procedure TMovementFilter.LoadSubfilters;
+var xQ: TADOQuery;
+begin
+  xQ := GDataProvider.OpenSql('select idAccount as filtered from accountFilter where idMovementFilter = ' + DataGidToDatabase(id));
+  FillFilterList(Faccounts, xQ);
+  xQ.Free;
+  xQ := GDataProvider.OpenSql('select idCashpoint as filtered from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(id));
+  FillFilterList(Fcashpoints, xQ);
+  xQ.Free;
+  xQ := GDataProvider.OpenSql('select idProduct as filtered from productFilter where idMovementFilter = ' + DataGidToDatabase(id));
+  FillFilterList(Fproducts, xQ);
+  xQ.Free;
+end;
+
+procedure TMovementFilter.Setaccounts(const Value: TStringList);
+begin
+  if Faccounts.Text <> Value.Text then begin
+    Faccounts.Text := Value.Text;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementFilter.Setcashpoints(const Value: TStringList);
+begin
+  if Fcashpoints.Text <> Value.Text then begin
+    Fcashpoints.Text := Value.Text;
+    SetState(msModified);
   end;
 end;
 
@@ -870,12 +977,41 @@ begin
   end;
 end;
 
+procedure TMovementFilter.Setproducts(const Value: TStringList);
+begin
+  if Fproducts.Text <> Value.Text then begin
+    Fproducts.Text := Value.Text;
+    SetState(msModified);
+  end;
+end;
+
 procedure TMovementFilter.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('name', Fname, True, 'movementFilter');
     AddField('description', Fdescription, True, 'movementFilter');
+  end;
+end;
+
+procedure TMovementFilter.UpdateSubfilters;
+var xCount: Integer;
+begin
+  DeleteSubfilters;
+  for xCount := 0 to FProducts.Count - 1 do begin
+    GDataProvider.ExecuteSql(Format(
+           'insert into productFilter (idMovementFilter, idProduct) values (%s, %s)',
+           [DataGidToDatabase(id), DataGidToDatabase(FProducts.Strings[xCount])]));
+  end;
+  for xCount := 0 to FAccounts.Count - 1 do begin
+    GDataProvider.ExecuteSql(Format(
+           'insert into accountFilter (idMovementFilter, idAccount) values (%s, %s)',
+           [DataGidToDatabase(id), DataGidToDatabase(FAccounts.Strings[xCount])]));
+  end;
+  for xCount := 0 to FCashpoints.Count - 1 do begin
+    GDataProvider.ExecuteSql(Format(
+           'insert into cashpointFilter (idMovementFilter, idCashpoint) values (%s, %s)',
+           [DataGidToDatabase(id), DataGidToDatabase(FCashpoints.Strings[xCount])]));
   end;
 end;
 
