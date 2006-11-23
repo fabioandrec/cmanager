@@ -2,6 +2,8 @@ unit CDatabase;
 
 interface
 
+{$DEFINE SAVETOLOG}
+
 uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants;
 
 const
@@ -191,6 +193,9 @@ var GDataProvider: TDataProvider;
     GTodayCashIn: Currency;
     GTodayCashOut: Currency;
     GDatabaseName: String;
+    {$IFDEF SAVETOLOG}
+    GSqllogfile: String;
+    {$ENDIF}
 
 function InitializeDataProvider(ADatabaseName: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
@@ -205,13 +210,18 @@ function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
-procedure SaveToLog(AFile, AText: String);
+{$IFDEF SAVETOLOG}
+procedure StartTickcounting;
+procedure SaveToLog(AText: String);
+{$ENDIF}
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit;
+
+threadvar GTickCounter: Cardinal;
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
@@ -294,6 +304,9 @@ var xResStream: TResourceStream;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
+ {$IFDEF SAVETOLOG}
+  GSqllogfile := ChangeFileExt(ADatabaseName, '.log');
+ {$ENDIF}
   if not Result then begin
     Result := GDataProvider.CreateDatabase(ADatabaseName);
     if Result then begin
@@ -514,9 +527,15 @@ end;
 
 procedure TDataProvider.BeginTransaction;
 begin
+  {$IFDEF SAVETOLOG}
+  StartTickcounting;
+  {$ENDIF}
   if not FConnection.InTransaction then begin
     FConnection.BeginTrans;
   end;
+  {$IFDEF SAVETOLOG}
+  SaveToLog('begin transaction');
+  {$ENDIF}
 end;
 
 procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
@@ -541,7 +560,13 @@ begin
   Result := PostProxies;
   if FConnection.InTransaction then begin
     if Result then begin
+      {$IFDEF SAVETOLOG}
+      StartTickcounting;
+      {$ENDIF}
       FConnection.CommitTrans;
+      {$IFDEF SAVETOLOG}
+      SaveToLog('commit');
+      {$ENDIF}
     end else begin
       FConnection.RollbackTrans;
     end;
@@ -613,6 +638,9 @@ var xSqls: TStringList;
     xCount: Integer;
 begin
   Result := True;
+  {$IFDEF SAVETOLOG}
+  StartTickCounting;
+  {$ENDIF}
   xSqls := TStringList.Create;
   xSqls.Text := StringReplace(StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]), ';', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
   xCount := 0;
@@ -629,6 +657,9 @@ begin
     Inc(xCount);
   end;
   xSqls.Free;
+  {$IFDEF SAVETOLOG}
+  SaveToLog(ASql);
+  {$ENDIF}
 end;
 
 function TDataProvider.GetInTransaction: Boolean;
@@ -656,6 +687,9 @@ end;
 
 function TDataProvider.OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
 begin
+  {$IFDEF SAVETOLOG}
+  StartTickCounting;
+  {$ENDIF}
   Result := TADOQuery.Create(Nil);
   try
     Result.Connection := FConnection;
@@ -671,6 +705,9 @@ begin
       FreeAndNil(Result);
     end;
   end;
+  {$IFDEF SAVETOLOG}
+  SaveToLog(ASql);
+  {$ENDIF}
 end;
 
 function TDataProvider.PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
@@ -701,7 +738,13 @@ end;
 procedure TDataProvider.RollbackTransaction;
 begin
   if FConnection.InTransaction then begin
+    {$IFDEF SAVETOLOG}
+    StartTickcounting;
+    {$ENDIF}
     FConnection.RollbackTrans;
+    {$IFDEF SAVETOLOG}
+    SaveToLog('rollback');
+    {$ENDIF}
   end;
   ClearProxies(False);
 end;
@@ -1018,9 +1061,29 @@ begin
   FreeMem(xRes);
 end;
 
-procedure SaveToLog(AFile, AText: String);
+{$IFDEF SAVETOLOG}
+procedure SaveToLog(AText: String);
+var xStream: TFileStream;
+    xText: String;
+    xDiff: Cardinal;
 begin
+  xDiff := GetTickCount - GTickCounter;
+  xText := FormatDateTime('yyyy-mm-ss hh:nn:ss.zzz', Now) + #9 + Format('%10d', [xDiff]) + #9 + AText + sLineBreak;
+  if FileExists(GSqllogfile) then begin
+    xStream := TFileStream.Create(GSqllogfile, fmOpenReadWrite or fmShareDenyWrite);
+  end else begin
+    xStream := TFileStream.Create(GSqllogfile, fmCreate or fmShareDenyWrite);
+  end;
+  xStream.Seek(0, soFromEnd);
+  xStream.WriteBuffer(xText[1], Length(xText));
+  xStream.Free;
 end;
+
+procedure StartTickcounting;
+begin
+  GTickCounter := GetTickCount;
+end;
+{$ENDIF}
 
 initialization
   CoInitialize(Nil);
