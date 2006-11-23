@@ -203,6 +203,7 @@ function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
+procedure SaveToLog(AFile, AText: String);
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
@@ -1003,7 +1004,8 @@ begin
 end;
 
 procedure SaveToLog(AFile, AText: String);
-
+begin
+end;
 
 initialization
   CoInitialize(Nil);
