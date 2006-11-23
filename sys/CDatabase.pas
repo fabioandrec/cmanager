@@ -2,11 +2,12 @@ unit CDatabase;
 
 interface
 
-uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes;
+uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants;
 
 const
   CEmptyDataGid = '';
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
+  CCreateDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
   CDefaultFilename = 'CManager.dat';
 
 type
@@ -30,6 +31,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function ConnectToDatabase(AConnectionString: String): Boolean;
+    function CreateDatabase(AFilename: String): Boolean;
     procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
@@ -293,20 +295,14 @@ begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
   if not Result then begin
-    try
-      xResStream := TResourceStream.Create(HInstance, 'DBPATTERN', RT_RCDATA);
-      xResStream.SaveToFile(ADatabaseName);
-      xResStream.Free;
+    Result := GDataProvider.CreateDatabase(ADatabaseName);
+    if Result then begin
       xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
       SetLength(xCommand, xResStream.Size);
       CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
       xResStream.Free;
-      Result := True;
-    except
-      on E: Exception do begin
-        Result := False;
-        ShowInfo(itError, 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', E.Message);
-      end;
+    end else begin
+      ShowInfo(itError, 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
     end;
   end;
   if Result then begin
@@ -578,6 +574,25 @@ begin
   FDataProxyList := TObjectList.Create(True);
   FConnection := TADOConnection.Create(Nil);
   FLastError := '';
+end;
+
+function TDataProvider.CreateDatabase(AFilename: String): Boolean;
+var xCatalog : OLEVariant;
+begin
+  Result := False;
+  try
+    try
+      xCatalog := CreateOleObject('ADOX.Catalog');
+      xCatalog.Create(Format(CCreateDatabaseString, [AFilename]));
+      Result := True;
+    except
+      on E: Exception do begin
+        FLastError := E.Message;
+      end;
+    end
+  finally
+    xCatalog := Unassigned;
+  end;
 end;
 
 destructor TDataProvider.Destroy;
