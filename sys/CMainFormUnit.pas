@@ -87,7 +87,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
-     CAboutFormUnit, CSettings, CFilterFrameUnit;
+     CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit;
 
 {$R *.dfm}
 
@@ -142,7 +142,9 @@ var xFrame: TCBaseFrame;
 begin
   xIndex := FShortcutsFrames.IndexOf(AAction.Caption);
   if xIndex = -1 then begin
-    if AAction = ActionShorcutOperations then begin
+    if AAction = ActionShortcutStart then begin
+      xClass := TCHomeFrame;
+    end else if AAction = ActionShorcutOperations then begin
       xClass := TCMovementFrame;
     end else if AAction = ActionShortcutPlanned then begin
       xClass := TCPlannedFrame;
