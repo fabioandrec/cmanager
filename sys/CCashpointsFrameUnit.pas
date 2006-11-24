@@ -269,6 +269,8 @@ begin
   if CashpointList.FocusedNode <> Nil then begin
     if Owner.InheritsFrom(TCFrameForm) then begin
       TCFrameForm(Owner).BitBtnOkClick(Nil);
+    end else begin
+      ActionEditCahpoint.Execute;
     end;
   end;
 end;

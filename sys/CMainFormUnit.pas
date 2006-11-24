@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
-  CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList;
+  CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList,
+  PngSpeedButton;
 
 type
   TCMainForm = class(TForm)
@@ -28,7 +29,6 @@ type
     PanelTitle: TPanel;
     BevelU1: TBevel;
     LabelShortcut: TLabel;
-    ImageShortcut: TImage;
     CDateTime: TCDateTime;
     BevelU2: TBevel;
     PanelFrames: TPanel;
@@ -42,6 +42,8 @@ type
     SaveDialog: TSaveDialog;
     ActionCreateConnection: TAction;
     ActionShortcutFilters: TAction;
+    PngImage: TPngSpeedButton;
+    ActionShortcutStart: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -99,7 +101,7 @@ begin
   UpdateShortcutList;
   UpdateStatusbar;
   ShortcutList.RootNodeCount := FShortcutList.Count;
-  PerformShortcutAction(ActionShorcutOperations);
+  PerformShortcutAction(ActionShortcutStart);
 end;
 
 function TCMainForm.GetShortcutsVisible: Boolean;
@@ -136,7 +138,6 @@ end;
 procedure TCMainForm.PerformShortcutAction(AAction: TAction);
 var xFrame: TCBaseFrame;
     xIndex: Integer;
-    xBrush: HBRUSH;
     xClass: TCBaseFrameClass;
 begin
   xIndex := FShortcutsFrames.IndexOf(AAction.Caption);
@@ -182,12 +183,7 @@ begin
     FActiveFrame.Parent := PanelFrames;
     FActiveFrame.Show;
     LabelShortcut.Caption := AAction.Caption;
-    xBrush := CreateSolidBrush(ColorToRGB(PanelTitle.Color));
-    SelectObject(ImageShortcut.Canvas.Handle, xBrush);
-    FillRect(ImageShortcut.Canvas.Handle, Rect(0, 0, ImageShortcut.Width, ImageShortcut.Height), xBrush);
-    DeleteObject(xBrush);
-    ImageListActionManager.Draw(ImageShortcut.Canvas, 0, 0, AAction.ImageIndex);
-    ImageShortcut.Refresh;
+    PngImage.PngImage := ImageListActionManager.PngImages.Items[AAction.ImageIndex].PngImage;
   end;
 end;
 

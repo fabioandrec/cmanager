@@ -296,6 +296,8 @@ begin
   if AccountList.FocusedNode <> Nil then begin
     if Owner.InheritsFrom(TCFrameForm) then begin
       TCFrameForm(Owner).BitBtnOkClick(Nil);
+    end else begin
+      ActionEditAccount.Execute;
     end;
   end;
 end;

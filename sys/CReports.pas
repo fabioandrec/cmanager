@@ -65,16 +65,21 @@ type
   TAccountBalanceOnDayReport = class(TCHtmlReport)
   private
     FDate: TDateTime;
+    FIds: TStringList;
   protected
     function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    destructor Destroy; override;
+    constructor CreateReport(AParams: TCReportParams); override;
   end;
 
   TDoneOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
+    FFilterId: TDataGid;
   protected
     function GetReportTitle: String; override;
     function GetReportBody: String; override;
@@ -139,6 +144,7 @@ type
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
+    FFilterId: TDataGid;
   protected
     function GetReportTitle: String; override;
     function GetReportBody: String; override;
@@ -171,8 +177,6 @@ type
     FStartDate: TDateTime;
     FEndDate: TDateTime;
     FIds: TStringList;
-  private
-    function IsValidAccount(AId: TDataGid): Boolean;
   protected
     procedure PrepareReportChart; override;
     function GetReportTitle: String; override;
@@ -189,7 +193,6 @@ type
     FIds: TStringList;
     FGroupBy: String;
   private
-    function IsValidAccount(AId: TDataGid): Boolean;
     function GetDescription(ADate: TDateTime): String;
   protected
     function GetReportTitle: String; override;
@@ -207,7 +210,6 @@ type
     FIds: TStringList;
     FGroupBy: String;
   private
-    function IsValidAccount(AId: TDataGid): Boolean;
     function GetDescription(ADate: TDateTime): String;
   protected
     function GetReportTitle: String; override;
@@ -218,7 +220,6 @@ type
     destructor Destroy; override;
   end;
 
-
 implementation
 
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
@@ -226,13 +227,31 @@ uses Forms, SysUtils, Adodb, CConfigFormUnit,
      DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
-  CChoosePeriodAccountListGroupFormUnit;
+     CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
+  CChoosePeriodFilterFormUnit;
 
 function ColToRgb(AColor: TColor): String;
 var xRgb: Integer;
 begin
   xRgb := ColorToRGB(AColor);
   Result := '"#' + Format('%.2x%.2x%.2x', [GetRValue(xRgb), GetGValue(xRgb), GetBValue(xRgb)]) + '"';
+end;
+
+function IsValidAccount(AId: TDataGid; AIds: TStringList): Boolean;
+begin
+  Result := AIds.Count = 0;
+  if not Result then begin
+    Result := AIds.IndexOf(AId) <> -1;
+  end;
+end;
+
+function IsValidFilter(AAcountId, ACashpointId, AProductId: TDataGid; AFilter: TMovementFilter): Boolean;
+begin
+  Result := True;
+  if AFilter <> Nil then begin
+    AFilter.LoadSubfilters;
+    Result := AFilter.IsValid(AAcountId, ACashpointId, AProductId);
+  end;
 end;
 
 function GetReportPath(ASubpath: String): string;
@@ -244,11 +263,24 @@ begin
   Result := IncludeTrailingPathDelimiter(Result) + IncludeTrailingPathDelimiter('Cmanager') + IncludeTrailingPathDelimiter(ASubpath);
 end;
 
+constructor TAccountBalanceOnDayReport.CreateReport(AParams: TCReportParams);
+begin
+  inherited CreateReport(AParams);
+  FIds := TStringList.Create;
+end;
+
+destructor TAccountBalanceOnDayReport.Destroy;
+begin
+  FIds.Free;
+  inherited Destroy;
+end;
+
 function TAccountBalanceOnDayReport.GetReportBody: String;
 var xAccounts: TADOQuery;
     xOperations: TADOQuery;
     xSum, xDelta: Currency;
     xBody: TStringList;
+    xRec: Integer;
 begin
   xAccounts := GDataProvider.OpenSql('select * from account order by name');
   xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, idAccount from transactions where regDate > %s group by idAccount', [DatetimeToDatabase(FDate, False)]));
@@ -261,23 +293,27 @@ begin
     Add('<td class="headcash" width="25%">Saldo</td>');
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=2>');
+    xRec := 1;
     while not Eof do begin
-      if not Odd(RecNo) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
+      if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
+        if not Odd(xRec) then begin
+          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+        end else begin
+          Add('<tr class="base">');
+        end;
+        Add('<td class="text" width="75%">' + FieldByName('name').AsString + '</td>');
+        xOperations.Filter := 'idAccount = ' + DataGidToDatabase(FieldByName('idAccount').AsString);
+        xOperations.Filtered := True;
+        if xOperations.IsEmpty then begin
+          xDelta := 0;
+        end else begin
+          xDelta := xOperations.FieldByName('cash').AsCurrency;
+        end;
+        Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency - xDelta) + '</td>');
+        Add('</tr>');
+        xSum := xSum + FieldByName('cash').AsCurrency - xDelta;
+        Inc(xRec);
       end;
-      Add('<td class="text" width="75%">' + FieldByName('name').AsString + '</td>');
-      xOperations.Filter := 'idAccount = ' + DataGidToDatabase(FieldByName('idAccount').AsString);
-      xOperations.Filtered := True;
-      if xOperations.IsEmpty then begin
-        xDelta := 0;
-      end else begin
-        xDelta := xOperations.FieldByName('cash').AsCurrency;
-      end;
-      Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency - xDelta) + '</td>');
-      Add('</tr>');
-      xSum := xSum + FieldByName('cash').AsCurrency - xDelta;
       Next;
     end;
     Add('</table><hr><table class="base" colspan=2>');
@@ -300,7 +336,7 @@ end;
 
 function TAccountBalanceOnDayReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChooseDateByForm(FDate);
+  Result := ChooseDateAccountListByForm(FDate, FIds);
 end;
 
 function TDoneOperationsListReport.GetReportBody: String;
@@ -309,12 +345,19 @@ var xOperations: TADOQuery;
     xIn, xOut: String;
     xBody: TStringList;
     xCash: Currency;
+    xFilter: TMovementFilter;
+    xRec: Integer;
 begin
   xOperations := GDataProvider.OpenSql(
             Format('select b.*, a.name from balances b' +
                    ' left outer join account a on a.idAccount = b.idAccount ' +
                    '  where movementType <> ''%s'' and b.regDate between %s and %s order by b.regDate, b.created',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
+  if FFilterId <> CEmptyDataGid then begin
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, FFilterId, False));
+  end else begin
+    xFilter := Nil;
+  end;
   xInSum := 0;
   xOutSum := 0;
   xBody := TStringList.Create;
@@ -329,33 +372,37 @@ begin
     Add('<td class="headcash" width="10%">Rozchód</td>');
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=6>');
+    xRec := 1;
     while not Eof do begin
-      if not Odd(RecNo) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
+      if IsValidFilter(FieldByName('idAccount').AsString, FieldByName('idCashpoint').AsString, FieldByName('idProduct').AsString, xFilter) then begin
+        if not Odd(xRec) then begin
+          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+        end else begin
+          Add('<tr class="base">');
+        end;
+        xCash := FieldByName('income').AsCurrency;
+        if xCash > 0 then begin
+          xIn := CurrencyToString(xCash);
+          xInSum := xInSum + xCash;
+        end else begin
+          xIn := '';
+        end;
+        xCash := FieldByName('expense').AsCurrency;
+        if xCash > 0 then begin
+          xOut := CurrencyToString(xCash);
+          xOutSum := xOutSum + xCash;
+        end else begin
+          xOut := '';
+        end;
+        Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
+        Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+        Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
+        Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
+        Add('<td class="cash" width="10%">' + xIn + '</td>');
+        Add('<td class="cash" width="10%">' + xOut + '</td>');
+        Add('</tr>');
+        Inc(xRec);
       end;
-      xCash := FieldByName('income').AsCurrency;
-      if xCash > 0 then begin
-        xIn := CurrencyToString(xCash);
-        xInSum := xInSum + xCash;
-      end else begin
-        xIn := '';
-      end;
-      xCash := FieldByName('expense').AsCurrency;
-      if xCash > 0 then begin
-        xOut := CurrencyToString(xCash);
-        xOutSum := xOutSum + xCash;
-      end else begin
-        xOut := '';
-      end;
-      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
-      Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
-      Add('<td class="cash" width="10%">' + xIn + '</td>');
-      Add('<td class="cash" width="10%">' + xOut + '</td>');
-      Add('</tr>');
       Next;
     end;
     Add('</table><hr><table class="base" colspan=2>');
@@ -378,7 +425,7 @@ end;
 
 function TDoneOperationsListReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FFilterId, True);
 end;
 
 function TPlannedOperationsListReport.GetReportBody: String;
@@ -393,6 +440,8 @@ var xSqlPlanned, xSqlDone: String;
     xIn, xOut: String;
     xDesc, xStat: String;
     xDate: TDateTime;
+    xRec: Integer;
+    xFilter: TMovementFilter;
 begin
   xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
   xSqlPlanned := xSqlPlanned + Format(' and (' +
@@ -405,7 +454,6 @@ begin
                         '  (endCondition = ''T'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
                         ' )', [DatetimeToDatabase(FStartDate, False)]);
   xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
-  GDataProvider.BeginTransaction;
   xPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
   xDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
   xOverallInSum := 0;
@@ -414,6 +462,11 @@ begin
   xNotrealOutSum := 0;
   xBody := TStringList.Create;
   xList := TObjectList.Create(True);
+  if FFilterId <> CEmptyDataGid then begin
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, FFilterId, False));
+  end else begin
+    xFilter := Nil;
+  end;
   with xBody do begin
     Add('<table class="base" colspan=6>');
     Add('<tr class="base">');
@@ -426,55 +479,59 @@ begin
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=6>');
     GetScheduledObjects(xList, xPlannedObjects, xDoneObjects, FStartDate, FEndDate);
+    xRec := 1;
     for xCount := 1 to xList.Count do begin
       xElement := TPlannedTreeItem(xList.Items[xCount - 1]);
-      if not Odd(xCount) then begin
+      if not Odd(xRec) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
       end else begin
         Add('<tr class="base">');
       end;
-      if xElement.done <> Nil then begin
-        xDesc := xElement.done.description;
-        if xElement.planned.movementType = CInMovement then begin
-          xIn := CurrencyToString(xElement.done.cash);
-          xOut := '';
-          xOverallInSum := xOverallInSum + xElement.done.cash;
+      if IsValidFilter(xElement.planned.idAccount, xElement.planned.idCashPoint, xElement.planned.idProduct, xFilter) then begin
+        if xElement.done <> Nil then begin
+          xDesc := xElement.done.description;
+          if xElement.planned.movementType = CInMovement then begin
+            xIn := CurrencyToString(xElement.done.cash);
+            xOut := '';
+            xOverallInSum := xOverallInSum + xElement.done.cash;
+          end else begin
+            xOut := CurrencyToString(xElement.done.cash);
+            xIn := '';
+            xOverallOutSum := xOverallOutSum + xElement.done.cash;
+          end;
+          if xElement.done.doneState = CDoneOperation then begin
+            xStat := 'Zrealizowana';
+          end else if xElement.done.doneState = CDoneDeleted then begin
+            xStat := 'Odrzucona';
+          end else begin
+            xStat := 'Uznana';
+          end;
+          xDate := xElement.done.doneDate;
         end else begin
-          xOut := CurrencyToString(xElement.done.cash);
-          xIn := '';
-          xOverallOutSum := xOverallOutSum + xElement.done.cash;
+          xDesc := xElement.planned.description;
+          if xElement.planned.movementType = CInMovement then begin
+            xIn := CurrencyToString(xElement.planned.cash);
+            xOut := '';
+            xOverallInSum := xOverallInSum + xElement.planned.cash;
+            xNotrealInSum := xNotrealInSum + xElement.planned.cash;
+          end else begin
+            xOut := CurrencyToString(xElement.planned.cash);
+            xIn := '';
+            xOverallOutSum := xOverallOutSum + xElement.planned.cash;
+            xNotrealOutSum := xNotrealOutSum + xElement.planned.cash;
+          end;
+          xStat := '';
+          xDate := xElement.triggerDate;
         end;
-        if xElement.done.doneState = CDoneOperation then begin
-          xStat := 'Zrealizowana';
-        end else if xElement.done.doneState = CDoneDeleted then begin
-          xStat := 'Odrzucona';
-        end else begin
-          xStat := 'Uznana';
-        end;
-        xDate := xElement.done.doneDate;
-      end else begin
-        xDesc := xElement.planned.description;
-        if xElement.planned.movementType = CInMovement then begin
-          xIn := CurrencyToString(xElement.planned.cash);
-          xOut := '';
-          xOverallInSum := xOverallInSum + xElement.planned.cash;
-          xNotrealInSum := xNotrealInSum + xElement.planned.cash;
-        end else begin
-          xOut := CurrencyToString(xElement.planned.cash);
-          xIn := '';
-          xOverallOutSum := xOverallOutSum + xElement.planned.cash;
-          xNotrealOutSum := xNotrealOutSum + xElement.planned.cash;
-        end;
-        xStat := '';
-        xDate := xElement.triggerDate;
+        Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
+        Add('<td class="text" width="15%">' + DateToStr(xDate) + '</td>');
+        Add('<td class="text" width="40%">' + xDesc + '</td>');
+        Add('<td class="text" width="20%">' + xStat + '</td>');
+        Add('<td class="cash" width="10%">' + xIn + '</td>');
+        Add('<td class="cash" width="10%">' + xOut + '</td>');
+        Add('</tr>');
+        Inc(xRec);
       end;
-      Add('<td class="text" width="5%">' + IntToStr(xCount) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(xDate) + '</td>');
-      Add('<td class="text" width="40%">' + xDesc + '</td>');
-      Add('<td class="text" width="20%">' + xStat + '</td>');
-      Add('<td class="cash" width="10%">' + xIn + '</td>');
-      Add('<td class="cash" width="10%">' + xOut + '</td>');
-      Add('</tr>');
     end;
     Add('</table><hr><table class="base" colspan=2>');
     Add('<tr class="base">');
@@ -496,7 +553,6 @@ begin
     Add('</tr>');
     Add('</table>');
   end;
-  GDataProvider.RollbackTransaction;
   xPlannedObjects.Free;
   xDoneObjects.Free;
   xList.Free;
@@ -511,7 +567,7 @@ end;
 
 function TPlannedOperationsListReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodByForm(FStartDate, FEndDate);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FFilterId, True);
 end;
 
 function TCashFlowListReport.GetReportBody: String;
@@ -649,10 +705,8 @@ end;
 function TAccountHistoryReport.GetReportTitle: String;
 var xAcc: TAccount;
 begin
-  GDataProvider.BeginTransaction;
   xAcc := TAccount(TAccount.LoadObject(AccountProxy, FIdAccount, False));
   Result := 'Historia konta ' + xAcc.name + ' (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
-  GDataProvider.RollbackTransaction;
 end;
 
 function TAccountHistoryReport.PrepareReportConditions: Boolean;
@@ -680,10 +734,12 @@ procedure TCBaseReport.ShowReport;
 begin
   Fform := GetFormClass.Create(Nil);
   if PrepareReportConditions then begin
+    GDataProvider.BeginTransaction;
     PrepareReportData;
     Fform.Caption := 'Raport';
     Fform.ShowConfig(coNone);
     CleanReportData;
+    GDataProvider.RollbackTransaction;
   end;
   Fform.Free;
 end;
@@ -817,14 +873,6 @@ begin
   Result := 'Wykres stanu kont (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
-function TAccountBalanceChartReport.IsValidAccount(AId: TDataGid): Boolean;
-begin
-  Result := FIds.Count = 0;
-  if not Result then begin
-    Result := FIds.IndexOf(AId) <> -1;
-  end;
-end;
-
 procedure TAccountBalanceChartReport.PrepareReportChart;
 var xSums: TADOQuery;
     xCount: Integer;
@@ -836,12 +884,11 @@ var xSums: TADOQuery;
     xBalance: Currency;
     xEnd: Boolean;
 begin
-  GDataProvider.BeginTransaction;
   xChart := GetChart;
   xAccounts := TDataObject.GetList(TAccount, AccountProxy, 'select * from account');
   for xCount := 0 to xAccounts.Count - 1 do begin
     xAccount := TAccount(xAccounts.Items[xCount]);
-    if IsValidAccount(xAccount.id) then begin
+    if IsValidAccount(xAccount.id, FIds) then begin
       xBalance := xAccount.cash;
       xSerie := TLineSeries.Create(xChart);
       TLineSeries(xSerie).Pointer.Visible := True;
@@ -906,7 +953,6 @@ begin
   xChart.Legend.Alignment := laRight;
   xChart.Legend.ResizeChart := True;
   xAccounts.Free;
-  GDataProvider.RollbackTransaction;
 end;
 
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
@@ -1005,7 +1051,6 @@ begin
     xSerie.Add(xCash, xLabel);
     xSums.Next;
   end;
-  xSerie.Marks.Transparent := True;
   xSerie.Marks.Style := smsLabel;
   with xChart do begin
     AddSeries(xSerie);
@@ -1222,7 +1267,7 @@ begin
       First;
       xGbSum := 0;
       while not Eof do begin
-        if IsValidAccount(FieldByName('idAccount').AsString) then begin
+        if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
           xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
         end;
         Next;
@@ -1275,14 +1320,6 @@ begin
   Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
-function TSumReportList.IsValidAccount(AId: TDataGid): Boolean;
-begin
-  Result := FIds.Count = 0;
-  if not Result then begin
-    Result := FIds.IndexOf(AId) <> -1;
-  end;
-end;
-
 function TSumReportList.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAccountListGroupByForm(FStartDate, FEndDate, FIds, FGroupBy);
@@ -1330,14 +1367,6 @@ begin
   Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
-function TSumReportChart.IsValidAccount(AId: TDataGid): Boolean;
-begin
-  Result := FIds.Count = 0;
-  if not Result then begin
-    Result := FIds.IndexOf(AId) <> -1;
-  end;
-end;
-
 procedure TSumReportChart.PrepareReportChart;
 var xOperations: TADOQuery;
     xGb: String;
@@ -1379,7 +1408,7 @@ begin
       First;
       xGbSum := 0;
       while not Eof do begin
-        if IsValidAccount(FieldByName('idAccount').AsString) then begin
+        if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
           xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
         end;
         Next;

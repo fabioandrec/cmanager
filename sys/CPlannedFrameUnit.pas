@@ -31,6 +31,7 @@ type
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
+    procedure PlannedListDblClick(Sender: TObject);
   private
     FPlannedObjects: TDataObjectList;
     procedure MessageMovementAdded(AId: TDataGid);
@@ -305,6 +306,11 @@ begin
       SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTDELETED, Integer(@xObject.id), 0);
     end;
   end;
+end;
+
+procedure TCPlannedFrame.PlannedListDblClick(Sender: TObject);
+begin
+  ActionEditMovement.Execute;
 end;
 
 end.

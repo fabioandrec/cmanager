@@ -1,27 +1,27 @@
-inherited CChoosePeriodAccountForm: TCChoosePeriodAccountForm
-  Left = 277
-  Top = 342
-  ClientHeight = 283
+inherited CChoosePeriodFilterForm: TCChoosePeriodFilterForm
+  Left = 388
+  Top = 268
+  ClientHeight = 287
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 242
+    Height = 246
     object GroupBox2: TGroupBox
       Left = 16
       Top = 152
       Width = 337
       Height = 81
-      Caption = ' Konto '
+      Caption = ' Zakres danych '
       TabOrder = 1
       object Label14: TLabel
-        Left = 31
+        Left = 18
         Top = 37
-        Width = 33
+        Width = 46
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Nazwa'
+        Caption = 'Filtruj w/g'
       end
-      object CStaticAccount: TCStatic
+      object CStaticFilter: TCStatic
         Left = 72
         Top = 33
         Width = 233
@@ -29,17 +29,17 @@ inherited CChoosePeriodAccountForm: TCChoosePeriodAccountForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz konto z listy>'
+        Caption = '<brak aktywnego filtru>'
         Color = clWindow
         ParentColor = False
         TabOrder = 0
-        TextOnEmpty = '<wybierz konto z listy>'
-        OnGetDataId = CStaticAccountGetDataId
+        TextOnEmpty = '<brak aktywnego filtru>'
+        OnGetDataId = CStaticFilterGetDataId
         HotTrack = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 242
+    Top = 246
   end
 end

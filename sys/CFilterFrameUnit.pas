@@ -63,7 +63,7 @@ end;
 
 class function TCFilterFrame.GetTitle: String;
 begin
-  Result := 'Kontrahenci';
+  Result := 'Filtry';
 end;
 
 procedure TCFilterFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
@@ -269,6 +269,8 @@ begin
   if FilterList.FocusedNode <> Nil then begin
     if Owner.InheritsFrom(TCFrameForm) then begin
       TCFrameForm(Owner).BitBtnOkClick(Nil);
+    end else begin
+      ActionEditFilter.Execute;
     end;
   end;
 end;

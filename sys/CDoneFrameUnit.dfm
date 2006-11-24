@@ -152,6 +152,7 @@ inherited CDoneFrame: TCDoneFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnBeforeItemErase = DoneListBeforeItemErase
     OnCompareNodes = DoneListCompareNodes
+    OnDblClick = DoneListDblClick
     OnFocusChanged = DoneListFocusChanged
     OnGetText = DoneListGetText
     OnGetHint = DoneListGetHint

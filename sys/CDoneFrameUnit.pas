@@ -59,6 +59,7 @@ type
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ActionOperationExecute(Sender: TObject);
+    procedure DoneListDblClick(Sender: TObject);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -706,6 +707,11 @@ begin
     SumList.RootNodeCount := FSumObjects.Count;
     SumList.EndUpdate;
   end;
+end;
+
+procedure TCDoneFrame.DoneListDblClick(Sender: TObject);
+begin
+  ActionOperation.Execute;
 end;
 
 end.

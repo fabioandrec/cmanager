@@ -77,6 +77,7 @@ inherited CPlannedFrame: TCPlannedFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnBeforeItemErase = PlannedListBeforeItemErase
     OnCompareNodes = PlannedListCompareNodes
+    OnDblClick = PlannedListDblClick
     OnFocusChanged = PlannedListFocusChanged
     OnGetText = PlannedListGetText
     OnGetHint = PlannedListGetHint

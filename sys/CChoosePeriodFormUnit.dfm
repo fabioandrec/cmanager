@@ -1,6 +1,6 @@
 inherited CChoosePeriodForm: TCChoosePeriodForm
-  Left = 362
-  Top = 400
+  Left = 600
+  Top = 434
   Caption = 'Parametry raportu'
   ClientHeight = 190
   ClientWidth = 368

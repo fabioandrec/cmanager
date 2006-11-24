@@ -49,7 +49,9 @@ uses
   CChoosePeriodAccountListFormUnit in 'CChoosePeriodAccountListFormUnit.pas' {CChoosePeriodAccountListForm},
   CChoosePeriodAccountListGroupFormUnit in 'CChoosePeriodAccountListGroupFormUnit.pas' {CChoosePeriodAccountListGroupForm},
   CFilterFrameUnit in 'CFilterFrameUnit.pas' {CFilterFrame: TFrame},
-  CFilterFormUnit in 'CFilterFormUnit.pas' {CFilterForm};
+  CFilterFormUnit in 'CFilterFormUnit.pas' {CFilterForm},
+  CChooseDateAccountListFormUnit in 'CChooseDateAccountListFormUnit.pas' {CChooseDateAccountListForm},
+  CChoosePeriodFilterFormUnit in 'CChoosePeriodFilterFormUnit.pas' {CChoosePeriodFilterForm};
 
 {$R *.res}
 

@@ -1,5 +1,6 @@
 inherited CChoosePeriodAccountListGroupForm: TCChoosePeriodAccountListGroupForm
-  Top = 147
+  Left = 487
+  Top = 378
   ClientHeight = 377
   ClientWidth = 369
   PixelsPerInch = 96

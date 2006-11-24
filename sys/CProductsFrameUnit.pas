@@ -223,6 +223,8 @@ begin
   if ProductList.FocusedNode <> Nil then begin
     if Owner.InheritsFrom(TCFrameForm) then begin
       TCFrameForm(Owner).BitBtnOkClick(Nil);
+    end else begin
+      ActionEditCategory.Execute;
     end;
   end;
 end;

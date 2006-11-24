@@ -203,6 +203,7 @@ type
     Faccounts: TStringList;
     Fproducts: TStringList;
     Fcashpoints: TStringList;
+    FisLoaded: Boolean;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure Setaccounts(const Value: TStringList);
@@ -876,6 +877,7 @@ begin
   Faccounts := TStringList.Create;
   Fproducts := TStringList.Create;
   Fcashpoints := TStringList.Create;
+  FisLoaded := False;
 end;
 
 procedure TMovementFilter.DeleteObject;
@@ -934,15 +936,18 @@ end;
 procedure TMovementFilter.LoadSubfilters;
 var xQ: TADOQuery;
 begin
-  xQ := GDataProvider.OpenSql('select idAccount as filtered from accountFilter where idMovementFilter = ' + DataGidToDatabase(id));
-  FillFilterList(Faccounts, xQ);
-  xQ.Free;
-  xQ := GDataProvider.OpenSql('select idCashpoint as filtered from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(id));
-  FillFilterList(Fcashpoints, xQ);
-  xQ.Free;
-  xQ := GDataProvider.OpenSql('select idProduct as filtered from productFilter where idMovementFilter = ' + DataGidToDatabase(id));
-  FillFilterList(Fproducts, xQ);
-  xQ.Free;
+  if not FisLoaded then begin
+    xQ := GDataProvider.OpenSql('select idAccount as filtered from accountFilter where idMovementFilter = ' + DataGidToDatabase(id));
+    FillFilterList(Faccounts, xQ);
+    xQ.Free;
+    xQ := GDataProvider.OpenSql('select idCashpoint as filtered from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(id));
+    FillFilterList(Fcashpoints, xQ);
+    xQ.Free;
+    xQ := GDataProvider.OpenSql('select idProduct as filtered from productFilter where idMovementFilter = ' + DataGidToDatabase(id));
+    FillFilterList(Fproducts, xQ);
+    xQ.Free;
+    FisLoaded := True;
+  end;
 end;
 
 procedure TMovementFilter.Setaccounts(const Value: TStringList);

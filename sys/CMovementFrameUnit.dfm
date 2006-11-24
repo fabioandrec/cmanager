@@ -177,6 +177,7 @@ inherited CMovementFrame: TCMovementFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnBeforeItemErase = TodayListBeforeItemErase
     OnCompareNodes = TodayListCompareNodes
+    OnDblClick = TodayListDblClick
     OnFocusChanged = TodayListFocusChanged
     OnGetText = TodayListGetText
     OnGetHint = TodayListGetHint

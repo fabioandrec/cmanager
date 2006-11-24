@@ -56,6 +56,7 @@ type
     procedure SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CDateTimePerStartChanged(Sender: TObject);
+    procedure TodayListDblClick(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
@@ -669,6 +670,11 @@ procedure TCMovementFrame.CDateTimePerStartChanged(Sender: TObject);
 begin
   ReloadToday;
   ReloadSums;
+end;
+
+procedure TCMovementFrame.TodayListDblClick(Sender: TObject);
+begin
+  ActionEditMovement.Execute;
 end;
 
 end.
