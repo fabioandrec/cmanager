@@ -57,7 +57,7 @@ uses
 {$R *.res}
 
 begin
-  MemChk;
+  //MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(CSettingsFilename) then begin

@@ -2,7 +2,7 @@ unit CDatabase;
 
 interface
 
-{$DEFINE SAVETOLOG}
+{.$DEFINE SAVETOLOG}
 
 uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants;
 

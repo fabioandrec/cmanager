@@ -46,12 +46,12 @@ end;
 
 procedure TCAboutForm.FormCreate(Sender: TObject);
 begin
-  Label2.Caption := 'wersja ' + FileVersion(ParamStr(0));
+  Label2.Caption := 'wersja ' + FileVersion(ParamStr(0)) + ' Beta 1';
 end;
 
 procedure TCAboutForm.CButtonMailClick(Sender: TObject);
 begin
-  ShellExecute(0, nil, 'mailto:abaturo@postdata.pl?subject=CManager', nil, nil, SW_SHOWNORMAL);
+  ShellExecute(0, nil, 'mailto:mabaturo@wp.pl?subject=CManager', nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TCAboutForm.CButton1Click(Sender: TObject);
