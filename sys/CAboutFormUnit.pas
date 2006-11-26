@@ -46,7 +46,7 @@ end;
 
 procedure TCAboutForm.FormCreate(Sender: TObject);
 begin
-  Label2.Caption := 'wersja ' + FileVersion(ParamStr(0)) + ' Beta 1';
+  Label2.Caption := 'wersja ' + FileVersion(ParamStr(0)) + ' Beta';
 end;
 
 procedure TCAboutForm.CButtonMailClick(Sender: TObject);

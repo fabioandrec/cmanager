@@ -60,8 +60,8 @@ begin
   //MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
-  if InitializeSettings(CSettingsFilename) then begin
-    if InitializeDataProvider(CDefaultFilename) then begin
+  if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
+    if InitializeDataProvider(GetSystemPathname(CDefaultFilename)) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
   Application.Run;

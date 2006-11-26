@@ -31,6 +31,7 @@ type
     Fdescription: TBaseDescription;
     FaccountType: TBaseEnumeration;
     Fcash: Currency;
+    FinitialBalance: Currency;
     FaccountNumber: TAccountNumber;
     FidCashPoint: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
@@ -49,6 +50,7 @@ type
     property description: TBaseDescription read Fdescription write Setdescription;
     property accountType: TBaseEnumeration read FaccountType write SetaccountType;
     property cash: Currency read Fcash write Setcash;
+    property initialBalance: Currency read FinitialBalance write FinitialBalance;
     property accountNumber: TAccountNumber read FaccountNumber write SetaccountNumber;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
   end;
@@ -314,6 +316,7 @@ begin
     Fdescription := FieldByName('description').AsString;
     FaccountType := FieldByName('accountType').AsString;
     Fcash := FieldByName('cash').AsCurrency;
+    FinitialBalance := FieldByName('initialBalance').AsCurrency;
     FaccountNumber := FieldByName('accountNumber').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
   end;
@@ -359,6 +362,7 @@ begin
     AddField('description', Fdescription, True, 'account');
     AddField('accountType', FaccountType, True, 'account');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'account');
+    AddField('initialBalance', CurrencyToDatabase(FinitialBalance), False, 'account');
     AddField('accountNumber', FaccountNumber, True, 'account');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'account');
   end;

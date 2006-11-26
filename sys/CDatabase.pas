@@ -34,6 +34,7 @@ type
     destructor Destroy; override;
     function ConnectToDatabase(AConnectionString: String): Boolean;
     function CreateDatabase(AFilename: String): Boolean;
+    function CompactDatabase(AFilename: String): Boolean;
     procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
@@ -210,6 +211,7 @@ function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
+function GetSystemPathname(AFilename: String): String;
 {$IFDEF SAVETOLOG}
 procedure StartTickcounting;
 procedure SaveToLog(AText: String);
@@ -572,6 +574,26 @@ begin
     end;
   end;
   ClearProxies(False);
+end;
+
+function TDataProvider.CompactDatabase(AFilename: String): Boolean;
+var xJetEngine: OLEVariant;
+    xCompactedFilename: String;
+begin
+  Result := False;
+  try
+    try
+      xJetEngine := CreateOleObject('JRO.JetEngine');
+      xJetEngine.CompactDatabase(AFilename, xCompactedFilename);
+      Result := True;
+    except
+      on E: Exception do begin
+        FLastError := E.Message;
+      end;
+    end
+  finally
+    xJetEngine := Unassigned;
+  end;
 end;
 
 function TDataProvider.ConnectToDatabase(AConnectionString: String): Boolean;
@@ -1084,6 +1106,11 @@ begin
   GTickCounter := GetTickCount;
 end;
 {$ENDIF}
+
+function GetSystemPathname(AFilename: String): String;
+begin
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + ExtractFileName(AFilename);
+end;
 
 initialization
   CoInitialize(Nil);

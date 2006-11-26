@@ -15,6 +15,7 @@ type
   end;
 
 function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String): Boolean;
+procedure NotImplemented(AFunctionName: String);
 
 implementation
 
@@ -75,6 +76,11 @@ begin
   xForm.Height := xHeight + xForm.PanelButtons.Height;
   Result := xForm.ShowConfig(coAdd);
   xForm.Free;
+end;
+
+procedure NotImplemented(AFunctionName: String);
+begin
+  ShowInfo(itInfo, AFunctionName + ' nie jest jeszcze zaimplementowane', '');
 end;
 
 end.

@@ -1,14 +1,14 @@
 inherited CInfoForm: TCInfoForm
-  Left = 359
-  Top = 355
+  Left = 22
+  Top = 22
   Caption = 'InfoForm'
-  ClientHeight = 190
-  ClientWidth = 501
+  ClientHeight = 471
+  ClientWidth = 774
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 501
-    Height = 149
+    Width = 774
+    Height = 430
     object Image: TImage
       Left = 16
       Top = 16
@@ -24,13 +24,13 @@ inherited CInfoForm: TCInfoForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 149
-    Width = 501
+    Top = 430
+    Width = 774
     inherited BitBtnOk: TBitBtn
-      Left = 324
+      Left = 597
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 412
+      Left = 685
     end
   end
 end

@@ -118,6 +118,7 @@ begin
     end;
     if Operation = coAdd then begin
       cash := CCurrEditCash.Value;
+      initialBalance := CCurrEditCash.Value;
     end;
     idCashPoint := CStaticBank.DataId;
     accountNumber := EditNumber.Text;

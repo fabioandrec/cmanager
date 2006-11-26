@@ -1,8 +1,8 @@
 object CMainForm: TCMainForm
-  Left = 132
-  Top = 133
-  Width = 869
-  Height = 634
+  Left = 44
+  Top = 44
+  Width = 782
+  Height = 498
   Caption = 'CManager'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,15 +19,16 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 861
+    Width = 774
     Height = 24
+    UseSystemFont = False
     ActionManager = ActionManager
     Caption = 'MenuBar'
     ColorMap.HighlightColor = 10725814
     ColorMap.BtnSelectedColor = clBtnFace
     ColorMap.UnusedColor = 10725814
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clMenuText
+    Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Microsoft Sans Serif'
     Font.Style = []
@@ -37,8 +38,8 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 588
-    Width = 861
+    Top = 452
+    Width = 774
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -46,8 +47,8 @@ object CMainForm: TCMainForm
   object PanelMain: TPanel
     Left = 0
     Top = 24
-    Width = 861
-    Height = 564
+    Width = 774
+    Height = 428
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelMain'
@@ -55,7 +56,7 @@ object CMainForm: TCMainForm
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 861
+      Width = 774
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -63,7 +64,7 @@ object CMainForm: TCMainForm
     object PanelTitle: TPanel
       Left = 0
       Top = 0
-      Width = 861
+      Width = 774
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -77,12 +78,12 @@ object CMainForm: TCMainForm
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        861
+        774
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 861
+        Width = 774
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -110,7 +111,7 @@ object CMainForm: TCMainForm
         PngOptions = []
       end
       object CDateTime: TCDateTime
-        Left = 776
+        Left = 689
         Top = 3
         Width = 81
         Height = 15
@@ -139,8 +140,8 @@ object CMainForm: TCMainForm
     object PanelFrames: TPanel
       Left = 170
       Top = 24
-      Width = 691
-      Height = 540
+      Width = 604
+      Height = 404
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -150,14 +151,14 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 170
-      Height = 540
+      Height = 404
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 2
       DesignSize = (
         170
-        540)
+        404)
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
@@ -197,7 +198,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 48
         Width = 168
-        Height = 480
+        Height = 344
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelEdges = []
         BevelInner = bvNone
@@ -549,6 +550,20 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCloseConnection
                 Caption = '&Zamknij plik danych'
+              end
+              item
+                Items = <
+                  item
+                    Action = ActionCompact
+                  end
+                  item
+                    Action = ActionBackup
+                  end
+                  item
+                    Action = ActionRestore
+                  end>
+                Action = ActionFileTools
+                Caption = 'N&arz'#281'dzia'
               end>
             Caption = 'P&lik'
           end
@@ -596,6 +611,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutFilters
+                Caption = '&Filtry'
                 ImageIndex = 2
               end>
             Caption = '&Skr'#243'ty'
@@ -700,6 +716,26 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Filtry'
       ImageIndex = 2
+    end
+    object ActionFileTools: TAction
+      Category = 'Plik'
+      Caption = 'Narz'#281'dzia'
+      OnExecute = ActionFileToolsExecute
+    end
+    object ActionCompact: TAction
+      Category = 'Plik'
+      Caption = 'Kompaktuj plik danych'
+      OnExecute = ActionCompactExecute
+    end
+    object ActionBackup: TAction
+      Category = 'Plik'
+      Caption = 'Wykonaj kopi'#281' pliku danych'
+      OnExecute = ActionBackupExecute
+    end
+    object ActionRestore: TAction
+      Category = 'Plik'
+      Caption = 'Przywr'#243#263' plik danych z kopii'
+      OnExecute = ActionRestoreExecute
     end
   end
   object OpenDialog: TOpenDialog

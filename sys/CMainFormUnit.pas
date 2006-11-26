@@ -44,6 +44,10 @@ type
     ActionShortcutFilters: TAction;
     PngImage: TPngSpeedButton;
     ActionShortcutStart: TAction;
+    ActionFileTools: TAction;
+    ActionCompact: TAction;
+    ActionBackup: TAction;
+    ActionRestore: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -59,6 +63,10 @@ type
     procedure ActionCloseConnectionExecute(Sender: TObject);
     procedure ActionOpenConnectionExecute(Sender: TObject);
     procedure ActionCreateConnectionExecute(Sender: TObject);
+    procedure ActionCompactExecute(Sender: TObject);
+    procedure ActionFileToolsExecute(Sender: TObject);
+    procedure ActionBackupExecute(Sender: TObject);
+    procedure ActionRestoreExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -87,7 +95,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
-     CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit;
+     CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
+  CInfoFormUnit;
 
 {$R *.dfm}
 
@@ -356,6 +365,26 @@ begin
       UpdateStatusbar;
     end;
   end;
+end;
+
+procedure TCMainForm.ActionCompactExecute(Sender: TObject);
+begin
+  NotImplemented('Kompaktowanie pliku danych');
+end;
+
+procedure TCMainForm.ActionFileToolsExecute(Sender: TObject);
+begin
+  //
+end;
+
+procedure TCMainForm.ActionBackupExecute(Sender: TObject);
+begin
+  NotImplemented('Wykonanie kopii pliku danych');
+end;
+
+procedure TCMainForm.ActionRestoreExecute(Sender: TObject);
+begin
+  NotImplemented('Przywrócenie pliku danych z kopii');
 end;
 
 end.

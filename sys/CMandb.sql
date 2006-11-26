@@ -15,6 +15,7 @@ create table account (
   description varchar(200),
   accountType varchar(1) not null,
   cash money not null,
+  initialBalance money not null,
   accountNumber varchar(50),
   idCashPoint uniqueidentifier,
   primary key (idAccount),
