@@ -1,8 +1,8 @@
 object CMainForm: TCMainForm
-  Left = 44
-  Top = 44
-  Width = 782
-  Height = 498
+  Left = 132
+  Top = 133
+  Width = 869
+  Height = 634
   Caption = 'CManager'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 774
+    Width = 861
     Height = 24
     UseSystemFont = False
     ActionManager = ActionManager
@@ -38,8 +38,8 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 452
-    Width = 774
+    Top = 588
+    Width = 861
     Height = 19
     Panels = <>
     SimplePanel = True
@@ -47,8 +47,8 @@ object CMainForm: TCMainForm
   object PanelMain: TPanel
     Left = 0
     Top = 24
-    Width = 774
-    Height = 428
+    Width = 861
+    Height = 564
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelMain'
@@ -56,7 +56,7 @@ object CMainForm: TCMainForm
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 774
+      Width = 861
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -64,7 +64,7 @@ object CMainForm: TCMainForm
     object PanelTitle: TPanel
       Left = 0
       Top = 0
-      Width = 774
+      Width = 861
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -78,12 +78,12 @@ object CMainForm: TCMainForm
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        774
+        861
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 774
+        Width = 861
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -111,7 +111,7 @@ object CMainForm: TCMainForm
         PngOptions = []
       end
       object CDateTime: TCDateTime
-        Left = 689
+        Left = 776
         Top = 3
         Width = 81
         Height = 15
@@ -140,8 +140,8 @@ object CMainForm: TCMainForm
     object PanelFrames: TPanel
       Left = 170
       Top = 24
-      Width = 604
-      Height = 404
+      Width = 691
+      Height = 540
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -151,14 +151,14 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 170
-      Height = 404
+      Height = 540
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 2
       DesignSize = (
         170
-        404)
+        540)
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
@@ -198,7 +198,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 48
         Width = 168
-        Height = 344
+        Height = 480
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelEdges = []
         BevelInner = bvNone
@@ -557,12 +557,11 @@ object CMainForm: TCMainForm
                     Action = ActionCompact
                   end
                   item
-                    Action = ActionBackup
+                    Caption = '&Wykonaj kopi'#281' zapasow'#261
                   end
                   item
-                    Action = ActionRestore
+                    Caption = '&Przywr'#243#263' plik danych z kopii'
                   end>
-                Action = ActionFileTools
                 Caption = 'N&arz'#281'dzia'
               end>
             Caption = 'P&lik'
@@ -717,25 +716,14 @@ object CMainForm: TCMainForm
       Caption = 'Filtry'
       ImageIndex = 2
     end
-    object ActionFileTools: TAction
+    object ActionDatatools: TAction
       Category = 'Plik'
       Caption = 'Narz'#281'dzia'
-      OnExecute = ActionFileToolsExecute
     end
     object ActionCompact: TAction
       Category = 'Plik'
       Caption = 'Kompaktuj plik danych'
       OnExecute = ActionCompactExecute
-    end
-    object ActionBackup: TAction
-      Category = 'Plik'
-      Caption = 'Wykonaj kopi'#281' pliku danych'
-      OnExecute = ActionBackupExecute
-    end
-    object ActionRestore: TAction
-      Category = 'Plik'
-      Caption = 'Przywr'#243#263' plik danych z kopii'
-      OnExecute = ActionRestoreExecute
     end
   end
   object OpenDialog: TOpenDialog
@@ -754,5 +742,9 @@ object CMainForm: TCMainForm
     Title = 'Plik danych'
     Left = 514
     Top = 192
+  end
+  object XPManifest: TXPManifest
+    Left = 706
+    Top = 112
   end
 end

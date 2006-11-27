@@ -7,7 +7,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
   CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList,
-  PngSpeedButton;
+  PngSpeedButton, XPMan;
 
 type
   TCMainForm = class(TForm)
@@ -44,10 +44,9 @@ type
     ActionShortcutFilters: TAction;
     PngImage: TPngSpeedButton;
     ActionShortcutStart: TAction;
-    ActionFileTools: TAction;
+    ActionDatatools: TAction;
     ActionCompact: TAction;
-    ActionBackup: TAction;
-    ActionRestore: TAction;
+    XPManifest: TXPManifest;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -64,9 +63,6 @@ type
     procedure ActionOpenConnectionExecute(Sender: TObject);
     procedure ActionCreateConnectionExecute(Sender: TObject);
     procedure ActionCompactExecute(Sender: TObject);
-    procedure ActionFileToolsExecute(Sender: TObject);
-    procedure ActionBackupExecute(Sender: TObject);
-    procedure ActionRestoreExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -96,7 +92,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
-  CInfoFormUnit;
+  CInfoFormUnit, CWaitFormUnit;
 
 {$R *.dfm}
 
@@ -367,24 +363,23 @@ begin
   end;
 end;
 
+
 procedure TCMainForm.ActionCompactExecute(Sender: TObject);
+var xRes: Boolean;
 begin
-  NotImplemented('Kompaktowanie pliku danych');
-end;
-
-procedure TCMainForm.ActionFileToolsExecute(Sender: TObject);
-begin
-  //
-end;
-
-procedure TCMainForm.ActionBackupExecute(Sender: TObject);
-begin
-  NotImplemented('Wykonanie kopii pliku danych');
-end;
-
-procedure TCMainForm.ActionRestoreExecute(Sender: TObject);
-begin
-  NotImplemented('Przywrócenie pliku danych z kopii');
+  ActionCloseConnection.Execute;
+  ShowWaitForm(wtAnimate, 'Trwa kompaktowanie pliku danych. Proszê czekaæ...');
+  xRes := GDataProvider.CompactDatabase(GDatabaseName);
+  HideWaitForm;
+  if not xRes then begin
+    ShowInfo(itError, 'Kompaktowanie pliku danych nie powiod³o siê', GDataProvider.LastError);
+  end else begin
+    ShowInfo(itInfo, 'Wykonano kompaktowanie pliku danych', '');
+  end;
+  if InitializeDataProvider(GDatabaseName) then begin
+    ActionShortcutExecute(ActionShorcutOperations);
+    UpdateStatusbar;
+  end;
 end;
 
 end.

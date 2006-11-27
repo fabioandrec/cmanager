@@ -10,6 +10,7 @@ const
   CEmptyDataGid = '';
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
   CCreateDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
+  CCompactDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
   CDefaultFilename = 'CManager.dat';
 
 type
@@ -19,6 +20,14 @@ type
   TDataMemoryState = (msValid, msModified, msDeleted);
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
+
+  TBackupHeader = packed record
+    sourceName: String[255];
+    sourceVersion: String[20];
+    uncompressedSize: Int64;
+    compressedSize: Int64;
+    datetime: TDateTime;
+  end;
 
   TDataProvider = class(TObject)
   private
@@ -35,6 +44,7 @@ type
     function ConnectToDatabase(AConnectionString: String): Boolean;
     function CreateDatabase(AFilename: String): Boolean;
     function CompactDatabase(AFilename: String): Boolean;
+    function BackupDatabase(AFilename: String; AOutfile: String): Boolean;
     procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
@@ -527,6 +537,11 @@ begin
   inherited Destroy;
 end;
 
+function TDataProvider.BackupDatabase(AFilename: String; AOutfile: String): Boolean;
+begin
+  Result := False;
+end;
+
 procedure TDataProvider.BeginTransaction;
 begin
   {$IFDEF SAVETOLOG}
@@ -579,13 +594,30 @@ end;
 function TDataProvider.CompactDatabase(AFilename: String): Boolean;
 var xJetEngine: OLEVariant;
     xCompactedFilename: String;
+    xTempbackupFilename: String;
 begin
   Result := False;
   try
     try
+      xCompactedFilename := IncludeTrailingPathDelimiter(ExtractFilePath(AFilename)) + FormatDateTime('yyyymmddhhnnss', Now) + '.dat';
+      xTempbackupFilename := ChangeFileExt(xCompactedFilename, '.bak');
+      if FileExists(xCompactedFilename) then begin
+        DeleteFile(xCompactedFilename);
+      end;
+      if FileExists(xTempbackupFilename) then begin
+        DeleteFile(xTempbackupFilename);
+      end;
       xJetEngine := CreateOleObject('JRO.JetEngine');
-      xJetEngine.CompactDatabase(AFilename, xCompactedFilename);
-      Result := True;
+      xJetEngine.CompactDatabase(Format(CCompactDatabaseString, [AFilename]), Format(CCompactDatabaseString, [xCompactedFilename]));
+      if RenameFile(AFilename, xTempbackupFilename) then begin
+        if RenameFile(xCompactedFilename, AFilename) then begin
+          DeleteFile(xTempbackupFilename);
+          Result := True;
+        end else begin
+          RenameFile(xTempbackupFilename, AFilename);
+        end;
+      end else begin
+      end;
     except
       on E: Exception do begin
         FLastError := E.Message;
