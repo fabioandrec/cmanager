@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls;
+  Dialogs, ComCtrls, StdCtrls, Math;
 
 type
   TWaitType = (wtProgressbar, wtAnimate);
@@ -17,13 +17,18 @@ type
   TCWaitForm = class(TForm)
     ProgressBar: TProgressBar;
     LabelText: TLabel;
+    StaticText: TStaticText;
   private
     FWaitType: TWaitType;
     FWaitThread: TWaitThread;
     FWaitHandle: THandle;
+    FCurLeft: Integer;
+    FCurWidth: Integer;
   protected
     procedure DoAnimate;
     procedure CreateParams(var Params: TCreateParams); override;
+  public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 procedure ShowWaitForm(AType: TWaitType; AText: String; AMin: Integer = 0; AMax: Integer = 0);
@@ -51,7 +56,7 @@ begin
       ProgressBar.Position := AMin;
       ProgressBar.Max := AMax;
     end else begin
-      ProgressBar.Visible := False;
+      //ProgressBar.Visible := False;
       FWaitHandle := CreateEvent(Nil, True, False, Nil);
       FWaitThread := TWaitThread.Create(True);
       FWaitThread.FreeOnTerminate := False;
@@ -86,6 +91,13 @@ begin
   end;
 end;
 
+constructor TCWaitForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FCurLeft := 1;
+  FCurWidth := 0;
+end;
+
 procedure TCWaitForm.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
@@ -96,13 +108,11 @@ begin
   end;
 end;
 
-{ TWaitThread }
-
 procedure TWaitThread.Execute;
 var xRes: Integer;
 begin
   while not Terminated do begin
-    xRes := WaitForSingleObject(GWaitForm.FWaitHandle, 10);
+    xRes := WaitForSingleObject(GWaitForm.FWaitHandle, 5);
     if xRes = WAIT_TIMEOUT then begin
       GWaitForm.DoAnimate;
     end;
@@ -110,7 +120,30 @@ begin
 end;
 
 procedure TCWaitForm.DoAnimate;
+var xDC: HDC;
+    xBrush: HBRUSH;
 begin
+  xDC := GetDC(StaticText.Handle);
+  try
+    xBrush := CreateSolidBrush(ColorToRGB(clBtnFace));
+    FillRect(xDC, Rect(0, 1, StaticText.Width - 1, StaticText.Height - 3), xBrush);
+    DeleteObject(xBrush);
+    xBrush := CreateSolidBrush(ColorToRGB(clHighlight));
+    if FCurWidth < (StaticText.Width div 2) then begin
+      Inc(FCurWidth);
+    end else begin
+      if FCurLeft > StaticText.Width - 4 then begin
+        FCurLeft := 1;
+        FCurWidth := 0;
+      end else begin
+        Inc(FCurLeft);
+      end;
+    end;
+    FillRect(xDC, Rect(FCurLeft, 1, Min(FCurLeft + FCurWidth - 1, StaticText.Width - 4), StaticText.Height - 3), xBrush);
+    DeleteObject(xBrush);
+  finally
+    ReleaseDC(StaticText.Handle, xDC);
+  end;
 end;
 
 initialization

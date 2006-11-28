@@ -1,11 +1,11 @@
 object CWaitForm: TCWaitForm
-  Left = 267
-  Top = 228
+  Left = 268
+  Top = 229
   BorderIcons = []
   BorderStyle = bsSingle
   Caption = 'CWaitForm'
-  ClientHeight = 72
-  ClientWidth = 358
+  ClientHeight = 70
+  ClientWidth = 356
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -29,5 +29,21 @@ object CWaitForm: TCWaitForm
     Height = 13
     Smooth = True
     TabOrder = 0
+  end
+  object StaticText: TStaticText
+    Left = 16
+    Top = 40
+    Width = 329
+    Height = 13
+    AutoSize = False
+    BorderStyle = sbsSunken
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    ShowAccelChar = False
+    TabOrder = 1
   end
 end

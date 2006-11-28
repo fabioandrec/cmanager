@@ -60,6 +60,7 @@ uses
 
 begin
   //MemChk;
+  ShowWaitForm(wtAnimate, 'testujemy zwyk³y progress...');
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
