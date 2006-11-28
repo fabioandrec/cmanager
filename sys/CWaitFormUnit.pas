@@ -6,21 +6,23 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls;
 
-const
-  PBS_MARQUEE = $08;
-  PBM_SETMARQUEE = (WM_USER + 10);
-
-
 type
   TWaitType = (wtProgressbar, wtAnimate);
+
+  TWaitThread = class(TThread)
+  protected
+    procedure Execute; override;
+  end;
 
   TCWaitForm = class(TForm)
     ProgressBar: TProgressBar;
     LabelText: TLabel;
-    procedure FormCreate(Sender: TObject);
   private
     FWaitType: TWaitType;
+    FWaitThread: TWaitThread;
+    FWaitHandle: THandle;
   protected
+    procedure DoAnimate;
     procedure CreateParams(var Params: TCreateParams); override;
   end;
 
@@ -44,14 +46,16 @@ begin
     FWaitType := AType;
     LabelText.Caption := AText;
     if AType = wtProgressbar then begin
+      ProgressBar.Visible := True;
       ProgressBar.Min := AMin;
       ProgressBar.Position := AMin;
       ProgressBar.Max := AMax;
     end else begin
-      ProgressBar.Min := 1;
-      ProgressBar.Max := 20;
-      ProgressBar.Position := 20;
-      SendMessage(ProgressBar.Handle, PBM_SETMARQUEE, 1, 50);
+      ProgressBar.Visible := False;
+      FWaitHandle := CreateEvent(Nil, True, False, Nil);
+      FWaitThread := TWaitThread.Create(True);
+      FWaitThread.FreeOnTerminate := False;
+      FWaitThread.Resume;
     end;
   end;
   GWaitForm.Show;
@@ -70,6 +74,14 @@ end;
 procedure HideWaitForm;
 begin
   if GWaitForm <> Nil then begin
+    with GWaitForm do begin
+      if FWaitType = wtAnimate then begin
+        FWaitThread.Terminate;
+        SetEvent(FWaitHandle);
+        FWaitThread.WaitFor;
+        FWaitThread.Free;
+      end;
+    end;
     FreeAndNil(GWaitForm);
   end;
 end;
@@ -84,11 +96,21 @@ begin
   end;
 end;
 
-procedure TCWaitForm.FormCreate(Sender: TObject);
-var xLong: Integer;
+{ TWaitThread }
+
+procedure TWaitThread.Execute;
+var xRes: Integer;
 begin
-  xLong := GetWindowLong(ProgressBar.Handle, GWL_STYLE) or PBS_MARQUEE;
-  SetWindowLong(ProgressBar.Handle, GWL_STYLE, xLong);
+  while not Terminated do begin
+    xRes := WaitForSingleObject(GWaitForm.FWaitHandle, 10);
+    if xRes = WAIT_TIMEOUT then begin
+      GWaitForm.DoAnimate;
+    end;
+  end;
+end;
+
+procedure TCWaitForm.DoAnimate;
+begin
 end;
 
 initialization

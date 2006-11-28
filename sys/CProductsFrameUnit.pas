@@ -69,7 +69,7 @@ type
 implementation
 
 uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit,
-  CInfoFormUnit;
+  CInfoFormUnit, CConsts;
 
 {$R *.dfm}
 
@@ -363,7 +363,7 @@ var xForm: TCProductForm;
     xParentGid: TDataGid;
 begin
   xForm := TCProductForm.Create(Nil);
-  xParentGid := TProduct(TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject).id;
+  xParentGid := TProduct(TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject).idParentProduct;
   xDataGid := xForm.ShowDataobject(coEdit, ProductProxy, TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject, True, TCProductAdditionalData.Create(xParentGid, ''));
   if xDataGid <> CEmptyDataGid then begin
     SendMessageToFrames(TCProductsFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);

@@ -1,8 +1,8 @@
 object CMainForm: TCMainForm
-  Left = 132
-  Top = 133
-  Width = 869
-  Height = 634
+  Left = 278
+  Top = 169
+  Width = 867
+  Height = 632
   Caption = 'CManager'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,16 +19,15 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 861
+    Width = 859
     Height = 24
-    UseSystemFont = False
     ActionManager = ActionManager
     Caption = 'MenuBar'
     ColorMap.HighlightColor = 10725814
     ColorMap.BtnSelectedColor = clBtnFace
     ColorMap.UnusedColor = 10725814
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clMenuText
     Font.Height = -11
     Font.Name = 'Microsoft Sans Serif'
     Font.Style = []
@@ -38,25 +37,40 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 588
-    Width = 861
+    Top = 586
+    Width = 859
     Height = 19
     Panels = <>
     SimplePanel = True
   end
-  object PanelMain: TPanel
+  object PanelNotconnected: TPanel
     Left = 0
     Top = 24
-    Width = 861
-    Height = 564
+    Width = 859
+    Height = 41
+    Align = alTop
+    BevelOuter = bvLowered
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clInactiveCaption
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 2
+  end
+  object PanelMain: TPanel
+    Left = 0
+    Top = 65
+    Width = 859
+    Height = 521
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelMain'
-    TabOrder = 2
+    TabOrder = 3
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 861
+      Width = 859
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -64,7 +78,7 @@ object CMainForm: TCMainForm
     object PanelTitle: TPanel
       Left = 0
       Top = 0
-      Width = 861
+      Width = 859
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -78,12 +92,12 @@ object CMainForm: TCMainForm
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        861
+        859
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 861
+        Width = 859
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -111,7 +125,7 @@ object CMainForm: TCMainForm
         PngOptions = []
       end
       object CDateTime: TCDateTime
-        Left = 776
+        Left = 774
         Top = 3
         Width = 81
         Height = 15
@@ -140,8 +154,8 @@ object CMainForm: TCMainForm
     object PanelFrames: TPanel
       Left = 170
       Top = 24
-      Width = 691
-      Height = 540
+      Width = 689
+      Height = 497
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -151,14 +165,14 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 170
-      Height = 540
+      Height = 497
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 2
       DesignSize = (
         170
-        540)
+        497)
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
@@ -198,7 +212,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 48
         Width = 168
-        Height = 480
+        Height = 437
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelEdges = []
         BevelInner = bvNone
@@ -550,19 +564,6 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCloseConnection
                 Caption = '&Zamknij plik danych'
-              end
-              item
-                Items = <
-                  item
-                    Action = ActionCompact
-                  end
-                  item
-                    Caption = '&Wykonaj kopi'#281' zapasow'#261
-                  end
-                  item
-                    Caption = '&Przywr'#243#263' plik danych z kopii'
-                  end>
-                Caption = 'N&arz'#281'dzia'
               end>
             Caption = 'P&lik'
           end
@@ -630,6 +631,13 @@ object CMainForm: TCMainForm
           item
             Items = <
               item
+                Action = ActionHelp
+                Caption = '&Spis tre'#347'ci'
+              end
+              item
+                Caption = '-'
+              end
+              item
                 Action = ActionAbout
                 Caption = '&O programie'
               end>
@@ -691,6 +699,11 @@ object CMainForm: TCMainForm
       Caption = 'Pasek stanu'
       OnExecute = ActionStatusbarExecute
     end
+    object ActionHelp: TAction
+      Category = 'Pomoc'
+      Caption = 'Spis tre'#347'ci'
+      OnExecute = ActionHelpExecute
+    end
     object ActionAbout: TAction
       Category = 'Pomoc'
       Caption = 'O programie'
@@ -716,14 +729,9 @@ object CMainForm: TCMainForm
       Caption = 'Filtry'
       ImageIndex = 2
     end
-    object ActionDatatools: TAction
-      Category = 'Plik'
-      Caption = 'Narz'#281'dzia'
-    end
     object ActionCompact: TAction
       Category = 'Plik'
       Caption = 'Kompaktuj plik danych'
-      OnExecute = ActionCompactExecute
     end
   end
   object OpenDialog: TOpenDialog
@@ -742,9 +750,5 @@ object CMainForm: TCMainForm
     Title = 'Plik danych'
     Left = 514
     Top = 192
-  end
-  object XPManifest: TXPManifest
-    Left = 706
-    Top = 112
   end
 end

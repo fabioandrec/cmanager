@@ -7,7 +7,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
   CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList,
-  PngSpeedButton, XPMan;
+  PngSpeedButton, ShellApi;
 
 type
   TCMainForm = class(TForm)
@@ -25,28 +25,28 @@ type
     ActionShortcutPlannedDone: TAction;
     ActionStatusbar: TAction;
     ActionAbout: TAction;
-    PanelMain: TPanel;
-    PanelTitle: TPanel;
-    BevelU1: TBevel;
-    LabelShortcut: TLabel;
-    CDateTime: TCDateTime;
-    BevelU2: TBevel;
-    PanelFrames: TPanel;
-    PanelShortcuts: TPanel;
-    PanelShortcutsTitle: TPanel;
-    SpeedButtonCloseShortcuts: TSpeedButton;
-    ShortcutList: TVirtualStringTree;
     ActionCloseConnection: TAction;
     ActionOpenConnection: TAction;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     ActionCreateConnection: TAction;
     ActionShortcutFilters: TAction;
-    PngImage: TPngSpeedButton;
     ActionShortcutStart: TAction;
-    ActionDatatools: TAction;
     ActionCompact: TAction;
-    XPManifest: TXPManifest;
+    ActionHelp: TAction;
+    PanelNotconnected: TPanel;
+    PanelMain: TPanel;
+    BevelU2: TBevel;
+    PanelTitle: TPanel;
+    BevelU1: TBevel;
+    LabelShortcut: TLabel;
+    PngImage: TPngSpeedButton;
+    CDateTime: TCDateTime;
+    PanelFrames: TPanel;
+    PanelShortcuts: TPanel;
+    PanelShortcutsTitle: TPanel;
+    SpeedButtonCloseShortcuts: TSpeedButton;
+    ShortcutList: TVirtualStringTree;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -62,7 +62,7 @@ type
     procedure ActionCloseConnectionExecute(Sender: TObject);
     procedure ActionOpenConnectionExecute(Sender: TObject);
     procedure ActionCreateConnectionExecute(Sender: TObject);
-    procedure ActionCompactExecute(Sender: TObject);
+    procedure ActionHelpExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -286,6 +286,8 @@ procedure TCMainForm.UpdateStatusbar;
 var xCount: Integer;
     xAction: TAction;
 begin
+  PanelNotconnected.Visible := not GDataProvider.IsConnected;
+  PanelNotconnected.Align := alClient;
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
     Caption := 'CManager - obs³uga finansów (na dzieñ ' + DateToStr(GWorkDate) + ')';
@@ -363,22 +365,14 @@ begin
   end;
 end;
 
-
-procedure TCMainForm.ActionCompactExecute(Sender: TObject);
-var xRes: Boolean;
+procedure TCMainForm.ActionHelpExecute(Sender: TObject);
+var xHelpFile: String;
 begin
-  ActionCloseConnection.Execute;
-  ShowWaitForm(wtAnimate, 'Trwa kompaktowanie pliku danych. Proszê czekaæ...');
-  xRes := GDataProvider.CompactDatabase(GDatabaseName);
-  HideWaitForm;
-  if not xRes then begin
-    ShowInfo(itError, 'Kompaktowanie pliku danych nie powiod³o siê', GDataProvider.LastError);
+  xHelpFile := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + '\help\index.html';
+  if FileExists(xHelpFile) then begin
+    ShellExecute(0, nil, PChar(xHelpFile), nil, nil, SW_SHOWNORMAL);
   end else begin
-    ShowInfo(itInfo, 'Wykonano kompaktowanie pliku danych', '');
-  end;
-  if InitializeDataProvider(GDatabaseName) then begin
-    ActionShortcutExecute(ActionShorcutOperations);
-    UpdateStatusbar;
+    ShowInfo(itWarning, 'Nie odnaleziono pliku pomocy.', '');
   end;
 end;
 

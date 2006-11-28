@@ -25,7 +25,8 @@ function ChoosePeriodAccountByForm(var AStartDate, AEndDate: TDateTime; var AIdA
 
 implementation
 
-uses CConfigFormUnit, CFrameFormUnit, CAccountsFrameUnit, CInfoFormUnit;
+uses CConfigFormUnit, CFrameFormUnit, CAccountsFrameUnit, CInfoFormUnit,
+  CConsts;
 
 {$R *.dfm}
 

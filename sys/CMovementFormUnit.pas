@@ -360,38 +360,32 @@ begin
     xI := ComboBoxType.ItemIndex;
     if Operation = coEdit then begin
       if (xI = 0) or (xI = 1) then begin
-        if (idAccount <> CStaticInoutOnceAccount.DataId) or (cash <> CCurrEditInoutOnce.Value) then begin
-          xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-          if xI = 0 then begin
-            xBa.cash := xBa.cash + cash;
-          end else begin
-            xBa.cash := xBa.cash - cash;
-          end;
-          xBa.ForceUpdate;
-          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
-        end
-      end else if (xI = 2) then begin
-        if (idAccount <> CStaticTransDestAccount.DataId) or (idSourceAccount <> CStaticTransSourceAccount.DataId) or (cash <> CCurrEditTrans.Value) then begin
-          xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-          xSa := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False));
+        xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
+        if xI = 0 then begin
+          xBa.cash := xBa.cash + cash;
+        end else begin
           xBa.cash := xBa.cash - cash;
-          xSa.cash := xSa.cash + cash;
-          xBa.ForceUpdate;
-          xSa.ForceUpdate;
-          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
-          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idSourceAccount), 0);
         end;
+        xBa.ForceUpdate;
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
+      end else if (xI = 2) then begin
+        xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
+        xSa := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False));
+        xBa.cash := xBa.cash - cash;
+        xSa.cash := xSa.cash + cash;
+        xBa.ForceUpdate;
+        xSa.ForceUpdate;
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idSourceAccount), 0);
       end else if (xI = 3) or (xI = 4) then begin
-        if (idAccount <> CStaticInoutCyclicAccount.DataId) or (cash <> CCurrEditInoutCyclic.Value) then begin
-          xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-          if xI = 3 then begin
-            xBa.cash := xBa.cash + cash;
-          end else begin
-            xBa.cash := xBa.cash - cash;
-          end;
-          xBa.ForceUpdate;
-          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
-        end
+        xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
+        if xI = 3 then begin
+          xBa.cash := xBa.cash + cash;
+        end else begin
+          xBa.cash := xBa.cash - cash;
+        end;
+        xBa.ForceUpdate;
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
       end;
     end;
     regDate := CDateTime.Value;

@@ -29,6 +29,8 @@ type
 
 implementation
 
+uses CConsts;
+
 {$R *.dfm}
 
 procedure TCDataobjectForm.AfterCommitData;

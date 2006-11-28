@@ -21,7 +21,7 @@ type
 
 implementation
 
-uses CCashpointsFrameUnit, CDatabase, VirtualTrees;
+uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts;
 
 {$R *.dfm}
 

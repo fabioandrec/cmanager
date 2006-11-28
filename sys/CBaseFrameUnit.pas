@@ -147,7 +147,7 @@ begin
   FOutputData := AOutputData;
   if (AMultipleCheck <> Nil) and (GetList <> Nil) then begin
     GetList.TreeOptions.MiscOptions := GetList.TreeOptions.MiscOptions + [toCheckSupport];
-    GetList.CheckImageKind := ckFlat;
+    GetList.CheckImageKind := ckDarkTick;
   end;
 end;
 

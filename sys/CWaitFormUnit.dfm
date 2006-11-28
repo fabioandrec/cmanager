@@ -13,7 +13,6 @@ object CWaitForm: TCWaitForm
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object LabelText: TLabel
@@ -28,6 +27,7 @@ object CWaitForm: TCWaitForm
     Top = 40
     Width = 329
     Height = 13
+    Smooth = True
     TabOrder = 0
   end
 end

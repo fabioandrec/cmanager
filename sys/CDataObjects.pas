@@ -244,7 +244,7 @@ procedure InitializeProxies;
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils;
+uses DB, CInfoFormUnit, DateUtils, CConsts;
 
 procedure InitializeProxies;
 begin

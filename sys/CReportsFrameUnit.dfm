@@ -10,7 +10,6 @@ inherited CReportsFrame: TCReportsFrame
     BevelOuter = bvRaised
     BevelKind = bkFlat
     BorderStyle = bsNone
-    ButtonStyle = bsTriangle
     DefaultNodeHeight = 24
     Header.AutoSizeIndex = 0
     Header.Font.Charset = DEFAULT_CHARSET

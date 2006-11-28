@@ -4,14 +4,7 @@ interface
 
 {.$DEFINE SAVETOLOG}
 
-uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants;
-
-const
-  CEmptyDataGid = '';
-  CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
-  CCreateDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
-  CCompactDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
-  CDefaultFilename = 'CManager.dat';
+uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts;
 
 type
   TDataGid = ShortString;
@@ -42,7 +35,6 @@ type
     constructor Create;
     destructor Destroy; override;
     function ConnectToDatabase(AConnectionString: String): Boolean;
-    function CreateDatabase(AFilename: String): Boolean;
     function CompactDatabase(AFilename: String): Boolean;
     function BackupDatabase(AFilename: String; AOutfile: String): Boolean;
     procedure DisconnectFromDatabase;
@@ -231,7 +223,7 @@ function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
 
-uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit;
+uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools;
 
 threadvar GTickCounter: Cardinal;
 
@@ -313,6 +305,7 @@ function InitializeDataProvider(ADatabaseName: String): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
+    xError: String;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
@@ -320,14 +313,14 @@ begin
   GSqllogfile := ChangeFileExt(ADatabaseName, '.log');
  {$ENDIF}
   if not Result then begin
-    Result := GDataProvider.CreateDatabase(ADatabaseName);
+    Result := CreateDatabase(ADatabaseName, xError);
     if Result then begin
       xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
       SetLength(xCommand, xResStream.Size);
       CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
       xResStream.Free;
     end else begin
-      ShowInfo(itError, 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
+      ShowInfo(itError, 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', xError);
     end;
   end;
   if Result then begin
@@ -653,25 +646,6 @@ begin
   FDataProxyList := TObjectList.Create(True);
   FConnection := TADOConnection.Create(Nil);
   FLastError := '';
-end;
-
-function TDataProvider.CreateDatabase(AFilename: String): Boolean;
-var xCatalog : OLEVariant;
-begin
-  Result := False;
-  try
-    try
-      xCatalog := CreateOleObject('ADOX.Catalog');
-      xCatalog.Create(Format(CCreateDatabaseString, [AFilename]));
-      Result := True;
-    except
-      on E: Exception do begin
-        FLastError := E.Message;
-      end;
-    end
-  finally
-    xCatalog := Unassigned;
-  end;
 end;
 
 destructor TDataProvider.Destroy;

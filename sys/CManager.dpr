@@ -53,7 +53,8 @@ uses
   CChooseDateAccountListFormUnit in 'CChooseDateAccountListFormUnit.pas' {CChooseDateAccountListForm},
   CChoosePeriodFilterFormUnit in 'CChoosePeriodFilterFormUnit.pas' {CChoosePeriodFilterForm},
   CHomeFrameUnit in 'CHomeFrameUnit.pas' {CHomeFrame: TFrame},
-  CWaitFormUnit in 'CWaitFormUnit.pas' {CWaitForm};
+  CWaitFormUnit in 'CWaitFormUnit.pas' {CWaitForm},
+  CDatatools in 'CDatatools.pas';
 
 {$R *.res}
 
@@ -65,7 +66,7 @@ begin
     if InitializeDataProvider(GetSystemPathname(CDefaultFilename)) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+  Application.Run;
     end;
   end;
 end.

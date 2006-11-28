@@ -3,6 +3,13 @@ unit CConsts;
 interface
 
 const
+  CEmptyDataGid = '';
+  CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
+  CCreateDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
+  CCompactDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
+  CDefaultFilename = 'CManager.dat';
+
+
   CInMovement = 'I';
   COutMovement = 'O';
   CTransferMovement = 'T';
