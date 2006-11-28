@@ -14,14 +14,6 @@ type
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
 
-  TBackupHeader = packed record
-    sourceName: String[255];
-    sourceVersion: String[20];
-    uncompressedSize: Int64;
-    compressedSize: Int64;
-    datetime: TDateTime;
-  end;
-
   TDataProvider = class(TObject)
   private
     FLastError: String;
@@ -205,7 +197,6 @@ function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
-function FileVersion(AName: string): String;
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
@@ -226,32 +217,6 @@ implementation
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools;
 
 threadvar GTickCounter: Cardinal;
-
-function FileVersion(AName: string): String;
-var xProductVersionMS: DWORD;
-    xProductVersionLS: DWORD;
-    xVersionBuffer: Pointer;
-    xVersionSize, xDummy: DWord;
-    xSize: Integer;
-    xVSFixedFileInfo: PVSFixedFileInfo;
-begin
-  xProductVersionLS := 0;
-  xProductVersionMS := 0;
-  xVersionSize := GetFileVersionInfoSize(PChar(AName), xDummy);
-  if xVersionSize <> 0 then begin
-    xSize := xVersionSize;
-    GetMem(xVersionBuffer, xSize);
-    try
-      if GetFileVersionInfo(PChar(AName), xDummy, xVersionSize, xVersionBuffer) and VerQueryValue(xVersionBuffer, '', Pointer(xVSFixedFileInfo), xVersionSize) then begin
-        xProductVersionMS := xVSFixedFileInfo^.dwProductVersionMS;
-        xProductVersionLS := xVSFixedFileInfo^.dwProductVersionLS;
-      end;
-    finally
-      FreeMem(xVersionBuffer, xSize);
-    end;
-  end;
-  Result := IntToStr(HiWord(xProductVersionMS)) + '.' + IntToStr(LoWord(xProductVersionMS)) + '.' + IntToStr(HiWord(xProductVersionLS)) + '.' + IntToStr(LoWord(xProductVersionLS));
-end;
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 begin

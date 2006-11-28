@@ -58,16 +58,19 @@ uses
 
 {$R *.res}
 
+var xError: String;
+
 begin
   //MemChk;
-  ShowWaitForm(wtAnimate, 'testujemy zwyk³y progress...');
+  BackupDatabase('d:\Isometric.rar', 'd:\Isometric.bak', xError);
+  RestoreDatabase('d:\Isometric.bak', 'd:\Isometric.ra_', xError);
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     if InitializeDataProvider(GetSystemPathname(CDefaultFilename)) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+      Application.Run;
     end;
   end;
 end.

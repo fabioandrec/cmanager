@@ -26,7 +26,7 @@ type
 
 implementation
 
-uses CBaseFormUnit, CDatabase;
+uses CBaseFormUnit, CDatabase, CDatatools;
 
 {$R *.dfm}
 

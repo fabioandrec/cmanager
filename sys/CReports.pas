@@ -228,7 +228,7 @@ uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-  CChoosePeriodFilterFormUnit;
+  CChoosePeriodFilterFormUnit, CDatatools;
 
 function ColToRgb(AColor: TColor): String;
 var xRgb: Integer;
