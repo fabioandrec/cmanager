@@ -1061,7 +1061,7 @@ var xStream: TFileStream;
     xDiff: Cardinal;
 begin
   xDiff := GetTickCount - GTickCounter;
-  xText := FormatDateTime('yyyy-mm-ss hh:nn:ss.zzz', Now) + #9 + Format('%10d', [xDiff]) + #9 + AText + sLineBreak;
+  xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + Format('%10d', [xDiff]) + #9 + AText + sLineBreak;
   if FileExists(GSqllogfile) then begin
     xStream := TFileStream.Create(GSqllogfile, fmOpenReadWrite or fmShareDenyWrite);
   end else begin

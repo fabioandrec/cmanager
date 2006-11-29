@@ -63,6 +63,7 @@ type
     procedure ActionOpenConnectionExecute(Sender: TObject);
     procedure ActionCreateConnectionExecute(Sender: TObject);
     procedure ActionHelpExecute(Sender: TObject);
+    procedure ActionCompactExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -92,7 +93,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
-  CInfoFormUnit, CWaitFormUnit;
+  CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
+  CProgressFormUnit;
 
 {$R *.dfm}
 
@@ -374,6 +376,11 @@ begin
   end else begin
     ShowInfo(itWarning, 'Nie odnaleziono pliku pomocy.', '');
   end;
+end;
+
+procedure TCMainForm.ActionCompactExecute(Sender: TObject);
+begin
+  ShowProgressForm(TCCompactDatafileForm);
 end;
 
 end.

@@ -54,23 +54,21 @@ uses
   CChoosePeriodFilterFormUnit in 'CChoosePeriodFilterFormUnit.pas' {CChoosePeriodFilterForm},
   CHomeFrameUnit in 'CHomeFrameUnit.pas' {CHomeFrame: TFrame},
   CWaitFormUnit in 'CWaitFormUnit.pas' {CWaitForm},
-  CDatatools in 'CDatatools.pas';
+  CDatatools in 'CDatatools.pas',
+  CProgressFormUnit in 'CProgressFormUnit.pas' {CProgressForm},
+  CCompactDatafileFormUnit in 'CCompactDatafileFormUnit.pas' {CCompactDatafileForm};
 
 {$R *.res}
 
-var xError: String;
-
 begin
   //MemChk;
-  BackupDatabase('d:\Isometric.rar', 'd:\Isometric.bak', xError);
-  RestoreDatabase('d:\Isometric.bak', 'd:\Isometric.ra_', xError);
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     if InitializeDataProvider(GetSystemPathname(CDefaultFilename)) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+  Application.Run;
     end;
   end;
 end.

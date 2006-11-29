@@ -5,9 +5,9 @@ interface
 uses Windows, SysUtils, Classes;
 
 type
-  TBackupHeader = record
+  TBackupHeader = packed record
     hSize: Byte;
-    archiveType: String[3];
+    archiveType: array[1..3] of Char;
     versionMS: DWORD;
     versionLS: DWORD;
     datetime: TDateTime;
@@ -19,20 +19,20 @@ function CreateDatabase(AFilename: String; var AError: String): Boolean;
 function CompactDatabase(AFilename: String; var AError: String): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
-function CheckDatabase(AFilename: String; var AError: String): Boolean;
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 
 implementation
 
-uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib;
+uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit;
 
 type
   TBackupRestore = class(TObject)
   private
     FInStream: TStream;
     FOutStream: TStream;
-    procedure OnProgress(ASender: TObject);
+    procedure OnCompressProgress(ASender: TObject);
+    procedure OnDecompressProgress(ASender: TObject);
   public
     function Compress(AInStream, AOutStream: TStream; var AError: String): Boolean;
     function Decompress(AInStream, AOutStream: TStream; var AError: String): Boolean;
@@ -104,23 +104,27 @@ end;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
 var xTool: TBackupRestore;
 begin
+  ShowWaitForm(wtProgressbar, 'Trwa wykonywanie kopii pliku danych. Proszê czekaæ...');
   xTool := TBackupRestore.Create;
   try
     Result := xTool.CompressFile(AFilename, ATargetFilename, AError);
   finally
     xTool.Free;
   end;
+  HideWaitForm;
 end;
 
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
 var xTool: TBackupRestore;
 begin
+  ShowWaitForm(wtProgressbar, 'Trwa odtwarzanie kopii pliku danych. Proszê czekaæ...');
   xTool := TBackupRestore.Create;
   try
     Result := xTool.DecompressFile(AFilename, ATargetFilename, AError);
   finally
     xTool.Free;
   end;
+  HideWaitForm;
 end;
 
 function CheckDatabase(AFilename: String; var AError: String): Boolean;
@@ -135,29 +139,34 @@ begin
   Result := False;
   FInStream := AInStream;
   FOutStream := AOutStream;
-  xToolStream := TCompressionStream.Create(clMax, AOutStream);
-  xToolStream.OnProgress := OnProgress;
-  AInStream.Seek(0, soFromBeginning);
-  try
+  if AInStream.Size > 0 then begin
+    xToolStream := TCompressionStream.Create(clMax, AOutStream);
+    xToolStream.OnProgress := OnCompressProgress;
+    AInStream.Seek(0, soFromBeginning);
     try
-      xToolStream.CopyFrom(AInStream, AInStream.Size);
-      with xHead do begin
-        hSize := SizeOf(TBackupHeader);
-        archiveType := ARCHIVE_TYPE;
-        FileNumbers(ParamStr(0), versionMS, versionLS);
-        datetime := Now;
-        uSize := FInStream.Size;
-        cSize := FOutStream.Size;
+      try
+        Result := xToolStream.CopyFrom(AInStream, 0) = AInStream.Size;
+      except
+        on E: Exception do begin
+          AError := E.Message;
+        end;
       end;
-      xToolStream.WriteBuffer(xHead, SizeOf(TBackupHeader));
-      Result := True;
-    except
-      on E: Exception do begin
-        AError := E.Message;
-      end;
+    finally
+      xToolStream.Free;
     end;
-  finally
-    xToolStream.Free;
+  end else begin
+    Result := True;
+  end;
+  if Result then begin
+    with xHead do begin
+      hSize := SizeOf(TBackupHeader);
+      archiveType := ARCHIVE_TYPE;
+      FileNumbers(ParamStr(0), versionMS, versionLS);
+      datetime := Now;
+      uSize := FInStream.Size;
+      cSize := FOutStream.Size;
+    end;
+    Result := AOutStream.Write(xHead, SizeOf(TBackupHeader)) = xHead.hSize;
   end;
 end;
 
@@ -170,6 +179,9 @@ begin
       xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareExclusive);
       xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareExclusive);
       Result := Compress(xInStream, xOutStream, AError);
+      if not Result then begin
+        DeleteFile(AOutFile);
+      end;
       xInStream.Free;
       xOutStream.Free;
     end else begin
@@ -188,20 +200,22 @@ begin
   if Result then begin
     FInStream := AInStream;
     FOutStream := AOutStream;
-    xToolStream := TDecompressionStream.Create(AInStream);
-    xToolStream.OnProgress := OnProgress;
-    AInStream.Seek(0, soFromBeginning);
-    try
+    if AInStream.Size > SizeOf(TBackupHeader) then begin
+      xToolStream := TDecompressionStream.Create(AInStream);
+      xToolStream.OnProgress := OnDecompressProgress;
+      AInStream.Seek(0, soFromBeginning);
       try
-        AOutStream.CopyFrom(AInStream, AInStream.Size - SizeOf(TBackupHeader));
-      except
-        on E: Exception do begin
-          AError := E.Message;
-          Result := False;
+        try
+          AOutStream.CopyFrom(xToolStream, xHeader.uSize);
+        except
+          on E: Exception do begin
+            AError := E.Message;
+            Result := False;
+          end;
         end;
+      finally
+        xToolStream.Free;
       end;
-    finally
-      xToolStream.Free;
     end;
   end;
 end;
@@ -215,6 +229,9 @@ begin
       xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareExclusive);
       xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareExclusive);
       Result := Decompress(xInStream, xOutStream, AError);
+      if not Result then begin
+        DeleteFile(AOutFile);
+      end;
       xInStream.Free;
       xOutStream.Free;
     end else begin
@@ -225,8 +242,11 @@ begin
   end;
 end;
 
-procedure TBackupRestore.OnProgress(ASender: TObject);
+procedure TBackupRestore.OnCompressProgress(ASender: TObject);
+var xPosition: Integer;
 begin
+  xPosition := Round((FInStream.Position / FInStream.Size) * 100);
+  PositionWaitForm(xPosition);
 end;
 
 function FileVersion(AName: string): String;
@@ -262,6 +282,13 @@ begin
   end;
 end;
 
+procedure TBackupRestore.OnDecompressProgress(ASender: TObject);
+var xPosition: Integer;
+begin
+  xPosition := Round((FInStream.Position / FInStream.Size) * 100);
+  PositionWaitForm(xPosition);
+end;
+
 function TBackupRestore.ReadInfo(AInStream: TStream; var AHeader: TBackupHeader; var AError: String): Boolean;
 var xRead: Integer;
     xSizeOfHead: Integer;
@@ -269,6 +296,7 @@ begin
   Result := False;
   xSizeOfHead := SizeOf(TBackupHeader);
   AInStream.Position := AInStream.Size - xSizeOfHead;
+  FillChar(AHeader, xSizeOfHead, #0);
   try
     xRead := AInStream.Read(AHeader, xSizeOfHead);
     if xRead = xSizeOfHead then begin

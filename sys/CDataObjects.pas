@@ -241,6 +241,7 @@ var CashPointProxy: TDataProxy;
     MovementFilterProxy: TDataProxy;
 
 procedure InitializeProxies;
+procedure CheckDatabase;
 
 implementation
 
@@ -1022,6 +1023,11 @@ begin
            'insert into cashpointFilter (idMovementFilter, idCashpoint) values (%s, %s)',
            [DataGidToDatabase(id), DataGidToDatabase(FCashpoints.Strings[xCount])]));
   end;
+end;
+
+procedure CheckDatabase;
+begin
+
 end;
 
 end.

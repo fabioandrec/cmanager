@@ -21,13 +21,14 @@ object CMainForm: TCMainForm
     Top = 0
     Width = 857
     Height = 24
+    UseSystemFont = False
     ActionManager = ActionManager
     Caption = 'MenuBar'
     ColorMap.HighlightColor = 10725814
     ColorMap.BtnSelectedColor = clBtnFace
     ColorMap.UnusedColor = 10725814
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clMenuText
+    Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
@@ -37,7 +38,7 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 584
+    Top = 591
     Width = 857
     Height = 19
     Panels = <>
@@ -62,7 +63,7 @@ object CMainForm: TCMainForm
     Left = 0
     Top = 65
     Width = 857
-    Height = 519
+    Height = 526
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelMain'
@@ -155,7 +156,7 @@ object CMainForm: TCMainForm
       Left = 170
       Top = 24
       Width = 687
-      Height = 495
+      Height = 502
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -165,14 +166,14 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 170
-      Height = 495
+      Height = 502
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 2
       DesignSize = (
         170
-        495)
+        502)
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
@@ -564,6 +565,13 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCloseConnection
                 Caption = '&Zamknij plik danych'
+              end
+              item
+                Items = <
+                  item
+                    Action = ActionCompact
+                  end>
+                Caption = 'N&arz'#281'dzia'
               end>
             Caption = 'P&lik'
           end
@@ -732,6 +740,7 @@ object CMainForm: TCMainForm
     object ActionCompact: TAction
       Category = 'Plik'
       Caption = 'Kompaktuj plik danych'
+      OnExecute = ActionCompactExecute
     end
   end
   object OpenDialog: TOpenDialog
