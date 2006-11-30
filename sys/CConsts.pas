@@ -2,6 +2,18 @@ unit CConsts;
 
 interface
 
+uses Messages;
+
+const
+  WM_DATAOBJECTADDED = WM_USER + 1;
+  WM_DATAOBJECTEDITED = WM_USER + 2;
+  WM_DATAOBJECTDELETED = WM_USER + 3;
+  WM_DATAREFRESH = WM_USER + 4;
+  WM_FORMMAXIMIZE = WM_USER + 5;
+  WM_FORMMINIMIZE = WM_USER + 6;
+  WM_OPENCONNECTION = WM_USER + 7;
+  WM_CLOSECONNECTION = WM_USER + 8;
+
 const
   CEmptyDataGid = '';
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';

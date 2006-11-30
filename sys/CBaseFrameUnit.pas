@@ -6,14 +6,6 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList;
 
-const
-  WM_DATAOBJECTADDED = WM_USER + 1;
-  WM_DATAOBJECTEDITED = WM_USER + 2;
-  WM_DATAOBJECTDELETED = WM_USER + 3;
-  WM_DATAREFRESH = WM_USER + 4;
-  WM_FORMMAXIMIZE = WM_USER + 5;
-  WM_FORMMINIMIZE = WM_USER + 6;
-
 type
   TCBaseFrameClass = class of TCBaseFrame;
 

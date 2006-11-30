@@ -17,7 +17,7 @@ function GetSettingsForms: IXMLDOMNode;
 
 implementation
 
-uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit;
+uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts;
 
 var GSettings: IXMLDOMDocument = Nil;
 

@@ -32,7 +32,7 @@ procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
 
 implementation
 
-uses CSettings, CBaseFrameUnit;
+uses CSettings, CBaseFrameUnit, CConsts;
 
 {$R *.dfm}
 

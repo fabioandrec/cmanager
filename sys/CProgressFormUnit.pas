@@ -10,6 +10,7 @@ uses
 const
   CIMAGE_OK = 0;
   CIMAGE_ERROR = 1;
+  CIMAGE_WARNING = 2;
 
 type
   TProgressClass = class of TCProgressForm;
@@ -67,6 +68,7 @@ type
     function DoWork: Boolean; virtual; 
     procedure NextTab;
     procedure AddToReport(AText: String);
+    function CanAccept: Boolean; virtual;
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
     property Report: TStringList read FReport;
@@ -129,22 +131,24 @@ end;
 procedure TCProgressForm.BitBtnOkClick(Sender: TObject);
 var xRes: Boolean;
 begin
-  NextTab;
-  Disabled := True;
-  InitializeProgress(GetProgressType, GetMin, GetMax);
-  xRes := DoWork;
-  FinalizeProgress;
-  NextTab;
-  if xRes then begin
-    CImageEnd.ImageIndex := CIMAGE_OK;
-  end else begin
-    CImageEnd.ImageIndex := CIMAGE_ERROR;
+  if CanAccept then begin
+    NextTab;
+    Disabled := True;
+    InitializeProgress(GetProgressType, GetMin, GetMax);
+    xRes := DoWork;
+    FinalizeProgress;
+    NextTab;
+    if xRes then begin
+      CImageEnd.ImageIndex := CIMAGE_OK;
+    end else begin
+      CImageEnd.ImageIndex := CIMAGE_ERROR;
+    end;
+    Disabled := False;
+    BitBtnOk.Visible := False;
+    BitBtnCancel.Caption := '&Zamknij';
+    BitBtnCancel.Default := True;
+    BitBtnCancel.SetFocus;
   end;
-  Disabled := False;
-  BitBtnOk.Visible := False;
-  BitBtnCancel.Caption := '&Zamknij';
-  BitBtnCancel.Default := True;
-  BitBtnCancel.SetFocus;
 end;
 
 procedure TCProgressForm.FinalizeProgress;
@@ -258,6 +262,11 @@ end;
 function TCProgressForm.GetProgressType: TWaitType;
 begin
   Result := wtAnimate;
+end;
+
+function TCProgressForm.CanAccept: Boolean;
+begin
+  Result := True;
 end;
 
 end.

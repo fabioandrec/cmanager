@@ -96,7 +96,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
   CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
-  CProgressFormUnit;
+  CProgressFormUnit, CConsts;
 
 {$R *.dfm}
 
@@ -333,6 +333,9 @@ begin
     WindowState := wsMaximized;
   end else if Message.Msg = WM_FORMMINIMIZE then begin
     WindowState := wsMaximized;
+  end else if Message.Msg = WM_OPENCONNECTION then begin
+  end else if Message.Msg = WM_CLOSECONNECTION then begin
+    CMainForm.ActionCloseConnection.Execute;
   end;
 end;
 
@@ -346,6 +349,7 @@ begin
       FShortcutsFrames.Objects[xCount].Free;
     end;
     FShortcutsFrames.Clear;
+    FActiveFrame := Nil;
   end;
 end;
 

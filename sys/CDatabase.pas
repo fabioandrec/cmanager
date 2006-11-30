@@ -585,6 +585,7 @@ procedure TDataProvider.DisconnectFromDatabase;
 begin
   ClearProxies(True);
   FConnection.Connected := False;
+  GDatabaseName := '';
 end;
 
 function TDataProvider.ExecuteSql(ASql: String): Boolean;
