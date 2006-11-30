@@ -72,12 +72,14 @@ type
     procedure SetShortcutsVisible(const Value: Boolean);
     procedure PerformShortcutAction(AAction: TAction);
     procedure UpdateShortcutList;
-    procedure UpdateStatusbar;
-    procedure ActionShortcutExecute(ASender: TObject);
     function GetStatusbarVisible: Boolean;
     procedure SetStatusbarVisible(const Value: Boolean);
   protected
     procedure WndProc(var Message: TMessage); override;
+  public
+    procedure ActionShortcutExecute(ASender: TObject);
+    procedure UpdateStatusbar;
+    function OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
     property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
@@ -293,10 +295,10 @@ begin
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
     Caption := 'CManager - obs³uga finansów (na dzieñ ' + DateToStr(GWorkDate) + ')';
-    StatusBar.SimpleText := ' ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+    StatusBar.SimpleText := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
   end else begin
     Caption := 'CManager - obs³uga finansów';
-    StatusBar.SimpleText := ' Nie wybrano pliku danych';
+    StatusBar.SimpleText := ' (brak otwartego pliku danych)';
   end;
   for xCount := 0 to ActionManager.ActionCount - 1 do begin
     xAction := TAction(ActionManager.Actions[xCount]);
@@ -348,9 +350,12 @@ begin
 end;
 
 procedure TCMainForm.ActionOpenConnectionExecute(Sender: TObject);
+var xError, xDesc: String;
 begin
   if OpenDialog.Execute then begin
-    if InitializeDataProvider(OpenDialog.FileName) then begin
+    if not OpenConnection(OpenDialog.FileName, xError, xDesc) then begin
+      ShowInfo(itError, xError, xDesc)
+    end else begin
       ActionShortcutExecute(ActionShorcutOperations);
       UpdateStatusbar;
     end;
@@ -358,11 +363,14 @@ begin
 end;
 
 procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
+var xError, xDesc: String;
 begin
   if SaveDialog.Execute then begin
-    if InitializeDataProvider(SaveDialog.FileName) then begin
+    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc) then begin
       ActionShortcutExecute(ActionShorcutOperations);
       UpdateStatusbar;
+    end else begin
+      ShowInfo(itError, xError, xDesc)
     end;
   end;
 end;
@@ -381,6 +389,11 @@ end;
 procedure TCMainForm.ActionCompactExecute(Sender: TObject);
 begin
   ShowProgressForm(TCCompactDatafileForm);
+end;
+
+function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
+begin
+  Result := InitializeDataProvider(AFilename, AError, ADesc);
 end;
 
 end.

@@ -4,7 +4,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, Math, ComCtrls;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, Math, ComCtrls, ImgList,
+  PngImageList, CComponents;
+
+const
+  CIMAGE_OK = 0;
+  CIMAGE_ERROR = 1;
 
 type
   TProgressClass = class of TCProgressForm;
@@ -31,26 +36,40 @@ type
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
     PanelConfig: TPanel;
+    PageControl: TPageControl;
+    TabSheetStart: TTabSheet;
+    TabSheetWork: TTabSheet;
+    TabSheetEnd: TTabSheet;
     StaticText: TStaticText;
     ProgressBar: TProgressBar;
+    PngImageList: TPngImageList;
+    CImageStart: TCImage;
+    CImageWork: TCImage;
+    CImageEnd: TCImage;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FWaitThread: TWaitThread;
     FWaitHandle: THandle;
     FWaitType: TWaitType;
+    FReport: TStringList;
     procedure InitializeProgress(AWaitType: TWaitType; AMin: Integer = 0; AMax: Integer = 100);
     procedure FinalizeProgress;
     function GetDisabled: Boolean;
     procedure SetDisabled(const Value: Boolean);
   protected
+    procedure InitializeForm; virtual;
     function GetMin: Integer; virtual;
     function GetMax: Integer; virtual;
-    function GetProgressType: TWaitType; virtual; abstract;
-    function DoWork: Boolean; virtual; abstract;
+    function GetProgressType: TWaitType; virtual;
+    function DoWork: Boolean; virtual; 
+    procedure NextTab;
+    procedure AddToReport(AText: String);
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
+    property Report: TStringList read FReport;
   end;
 
 procedure ShowProgressForm(AClass: TProgressClass);
@@ -110,17 +129,22 @@ end;
 procedure TCProgressForm.BitBtnOkClick(Sender: TObject);
 var xRes: Boolean;
 begin
+  NextTab;
   Disabled := True;
   InitializeProgress(GetProgressType, GetMin, GetMax);
   xRes := DoWork;
   FinalizeProgress;
-  Disabled := False;
+  NextTab;
   if xRes then begin
-    BitBtnOk.Visible := False;
-    BitBtnCancel.Caption := '&Zamknij';
-    BitBtnCancel.Default := True;
-    BitBtnCancel.SetFocus;
+    CImageEnd.ImageIndex := CIMAGE_OK;
+  end else begin
+    CImageEnd.ImageIndex := CIMAGE_ERROR;
   end;
+  Disabled := False;
+  BitBtnOk.Visible := False;
+  BitBtnCancel.Caption := '&Zamknij';
+  BitBtnCancel.Default := True;
+  BitBtnCancel.SetFocus;
 end;
 
 procedure TCProgressForm.FinalizeProgress;
@@ -199,8 +223,41 @@ end;
 
 procedure TCProgressForm.FormCreate(Sender: TObject);
 begin
+  InitializeForm;
+  PageControl.ActivePageIndex := 0;
   StaticText.Visible := False;
   ProgressBar.Visible := False;
+  FReport := TStringList.Create;
+end;
+
+procedure TCProgressForm.NextTab;
+begin
+  PageControl.ActivePageIndex := PageControl.ActivePageIndex + 1;
+  PageControl.ActivePage.Refresh;
+end;
+
+procedure TCProgressForm.InitializeForm;
+begin
+end;
+
+procedure TCProgressForm.FormDestroy(Sender: TObject);
+begin
+  FReport.Free;
+end;
+
+procedure TCProgressForm.AddToReport(AText: String);
+begin
+  FReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + AText);
+end;
+
+function TCProgressForm.DoWork: Boolean;
+begin
+  Result := True;
+end;
+
+function TCProgressForm.GetProgressType: TWaitType;
+begin
+  Result := wtAnimate;
 end;
 
 end.

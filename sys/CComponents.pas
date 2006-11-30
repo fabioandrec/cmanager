@@ -66,6 +66,7 @@ type
     FTextOnEmpty: string;
     FHotTrack: Boolean;
     FOldColor: TColor;
+    FCanvas: TCanvas;
     procedure SetDataId(const Value: string);
     procedure SetTextOnEmpty(const Value: string);
   protected
@@ -76,6 +77,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure DoGetDataId;
+    property Canvas: TCanvas read FCanvas;
+    destructor Destroy; override;
   published
     property DataId: string read FDataId write SetDataId;
     property TextOnEmpty: string read FTextOnEmpty write SetTextOnEmpty;
@@ -408,7 +411,7 @@ begin
   if (FImageList <> nil) and (FImageIndex <> -1) then begin
     xImgX := (Width - FImageList.Width) div 2;
     xImgY := (Height - FImageList.Height) div 2;
-    ImageList_Draw(FImageList.Handle, FImageIndex, Canvas.Handle, xImgX, xImgY, ILD_NORMAL + ILD_TRANSPARENT);
+    ImageList.Draw(Canvas, xImgX, xImgY, FImageIndex);
   end;
   if (csDesigning in ComponentState) then begin
     Canvas.Brush.Color := clBtnFace;
@@ -489,6 +492,14 @@ begin
   Caption := FTextOnEmpty;
   FDataId := '';
   FHotTrack := True;
+  FCanvas := TControlCanvas.Create;
+  TControlCanvas(FCanvas).Control := Self;
+end;
+
+destructor TCStatic.Destroy;
+begin
+  FCanvas.Free;
+  inherited Destroy;
 end;
 
 procedure TCStatic.DoGetDataId;

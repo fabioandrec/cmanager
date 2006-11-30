@@ -27,8 +27,6 @@ type
     constructor Create;
     destructor Destroy; override;
     function ConnectToDatabase(AConnectionString: String): Boolean;
-    function CompactDatabase(AFilename: String): Boolean;
-    function BackupDatabase(AFilename: String; AOutfile: String): Boolean;
     procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
@@ -192,7 +190,7 @@ var GDataProvider: TDataProvider;
     GSqllogfile: String;
     {$ENDIF}
 
-function InitializeDataProvider(ADatabaseName: String): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
@@ -266,7 +264,7 @@ begin
   end;
 end;
 
-function InitializeDataProvider(ADatabaseName: String): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
@@ -285,19 +283,22 @@ begin
       CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
       xResStream.Free;
     end else begin
-      ShowInfo(itError, 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.', xError);
+      AError := 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.';
+      ADesc := xError;
     end;
   end;
   if Result then begin
     Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
     if not Result then begin
-      ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku danych.', GDataProvider.LastError);
+      AError := 'Nie uda³o siê otworzyæ pliku danych.';
+      ADesc := GDataProvider.LastError;
     end else begin
       if xCommand <> '' then begin
         Result := GDataProvider.ExecuteSql(xCommand) and
                   GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]));
         if not Result then begin
-          ShowInfo(itError, 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.', GDataProvider.LastError);
+          AError := 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.';
+          ADesc := GDataProvider.LastError;
           GDataProvider.DisconnectFromDatabase;
           DeleteFile(ADatabaseName);
         end else begin
@@ -307,7 +308,8 @@ begin
         GDatabaseName := ADatabaseName;
         xDataset := GDataProvider.OpenSql('select * from cmanagerInfo', False);
         if xDataset = Nil then begin
-          ShowInfo(itError, 'Wybrany plik nie jest poprawnym plikiem danych', '');
+          AError := 'Wybrany plik nie jest poprawnym plikiem danych';
+          ADesc := '';
           GDataProvider.DisconnectFromDatabase;
           Result := False;
         end else begin
@@ -495,11 +497,6 @@ begin
   inherited Destroy;
 end;
 
-function TDataProvider.BackupDatabase(AFilename: String; AOutfile: String): Boolean;
-begin
-  Result := False;
-end;
-
 procedure TDataProvider.BeginTransaction;
 begin
   {$IFDEF SAVETOLOG}
@@ -549,43 +546,6 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.CompactDatabase(AFilename: String): Boolean;
-var xJetEngine: OLEVariant;
-    xCompactedFilename: String;
-    xTempbackupFilename: String;
-begin
-  Result := False;
-  try
-    try
-      xCompactedFilename := IncludeTrailingPathDelimiter(ExtractFilePath(AFilename)) + FormatDateTime('yyyymmddhhnnss', Now) + '.dat';
-      xTempbackupFilename := ChangeFileExt(xCompactedFilename, '.bak');
-      if FileExists(xCompactedFilename) then begin
-        DeleteFile(xCompactedFilename);
-      end;
-      if FileExists(xTempbackupFilename) then begin
-        DeleteFile(xTempbackupFilename);
-      end;
-      xJetEngine := CreateOleObject('JRO.JetEngine');
-      xJetEngine.CompactDatabase(Format(CCompactDatabaseString, [AFilename]), Format(CCompactDatabaseString, [xCompactedFilename]));
-      if RenameFile(AFilename, xTempbackupFilename) then begin
-        if RenameFile(xCompactedFilename, AFilename) then begin
-          DeleteFile(xTempbackupFilename);
-          Result := True;
-        end else begin
-          RenameFile(xTempbackupFilename, AFilename);
-        end;
-      end else begin
-      end;
-    except
-      on E: Exception do begin
-        FLastError := E.Message;
-      end;
-    end
-  finally
-    xJetEngine := Unassigned;
-  end;
-end;
-
 function TDataProvider.ConnectToDatabase(AConnectionString: String): Boolean;
 begin
   Result := True;
@@ -623,6 +583,7 @@ end;
 
 procedure TDataProvider.DisconnectFromDatabase;
 begin
+  ClearProxies(True);
   FConnection.Connected := False;
 end;
 

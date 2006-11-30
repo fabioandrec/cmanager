@@ -1,5 +1,7 @@
 unit CDatatools;
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 interface
 
 uses Windows, SysUtils, Classes;
@@ -21,6 +23,7 @@ function BackupDatabase(AFilename, ATargetFilename: String; var AError: String):
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
+function FileSize(AName: String): Int64;
 
 implementation
 
@@ -68,28 +71,18 @@ var xJetEngine: OLEVariant;
     xTempbackupFilename: String;
 begin
   Result := False;
-  ShowWaitForm(wtAnimate, 'Trwa kompaktowanie pliku danych. Proszê czekaæ...');
+  xCompactedFilename := IncludeTrailingPathDelimiter(ExtractFilePath(AFilename)) + FormatDateTime('yyyymmddhhnnss', Now) + '.dat';
+  xTempbackupFilename := ChangeFileExt(xCompactedFilename, '.bak');
+  if FileExists(xCompactedFilename) then begin
+    DeleteFile(xCompactedFilename);
+  end;
+  if FileExists(xTempbackupFilename) then begin
+    DeleteFile(xTempbackupFilename);
+  end;
   try
     try
-      xCompactedFilename := IncludeTrailingPathDelimiter(ExtractFilePath(AFilename)) + FormatDateTime('yyyymmddhhnnss', Now) + '.dat';
-      xTempbackupFilename := ChangeFileExt(xCompactedFilename, '.bak');
-      if FileExists(xCompactedFilename) then begin
-        DeleteFile(xCompactedFilename);
-      end;
-      if FileExists(xTempbackupFilename) then begin
-        DeleteFile(xTempbackupFilename);
-      end;
       xJetEngine := CreateOleObject('JRO.JetEngine');
       xJetEngine.CompactDatabase(Format(CCompactDatabaseString, [AFilename]), Format(CCompactDatabaseString, [xCompactedFilename]));
-      if RenameFile(AFilename, xTempbackupFilename) then begin
-        if RenameFile(xCompactedFilename, AFilename) then begin
-          DeleteFile(xTempbackupFilename);
-          Result := True;
-        end else begin
-          RenameFile(xTempbackupFilename, AFilename);
-        end;
-      end else begin
-      end;
     except
       on E: Exception do begin
         AError := E.Message;
@@ -97,8 +90,15 @@ begin
     end
   finally
     xJetEngine := Unassigned;
+    if RenameFile(AFilename, xTempbackupFilename) then begin
+      if RenameFile(xCompactedFilename, AFilename) then begin
+        DeleteFile(xTempbackupFilename);
+        Result := True;
+      end else begin
+        RenameFile(xTempbackupFilename, AFilename);
+      end;
+    end;
   end;
-  HideWaitForm;
 end;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
@@ -314,6 +314,16 @@ begin
     end;
   end;
   AInStream.Seek(soFromBeginning, 0);
+end;
+
+function FileSize(AName: String): Int64;
+var xS: TSearchRec;
+begin
+  Result := 0;
+  if FindFirst(AName, faAnyFile, xS) = 0 then begin
+    Result := Int64(xS.FindData.nFileSizeHigh) shl Int64(32) + Int64(xS.FindData.nFileSizeLow);
+  end;
+  SysUtils.FindClose(xS);
 end;
 
 end.

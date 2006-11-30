@@ -56,19 +56,24 @@ uses
   CWaitFormUnit in 'CWaitFormUnit.pas' {CWaitForm},
   CDatatools in 'CDatatools.pas',
   CProgressFormUnit in 'CProgressFormUnit.pas' {CProgressForm},
-  CCompactDatafileFormUnit in 'CCompactDatafileFormUnit.pas' {CCompactDatafileForm};
+  CCompactDatafileFormUnit in 'CCompactDatafileFormUnit.pas' {CCompactDatafileForm},
+  CMemoFormUnit in 'CMemoFormUnit.pas';
 
 {$R *.res}
+
+var xError, xDesc: String;
 
 begin
   //MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
-    if InitializeDataProvider(GetSystemPathname(CDefaultFilename)) then begin
+    if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
   Application.Run;
+    end else begin
+      ShowInfo(itError, xError, xDesc)
     end;
   end;
 end.
