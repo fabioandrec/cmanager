@@ -427,7 +427,7 @@ begin
       cash := CCurrEditInoutCyclic.Value;
       idAccount := CStaticInoutCyclicAccount.DataId;
       xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-      if xI = 0 then begin
+      if xI = 3 then begin
         xBa.cash := xBa.cash - cash;
       end else begin
         xBa.cash := xBa.cash + cash;
