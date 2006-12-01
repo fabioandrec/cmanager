@@ -22,11 +22,9 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
     inherited PageControl: TPageControl
       Width = 456
       Height = 83
-      ActivePage = TabSheetWork
+      ActivePage = TabSheetStart
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
-          Left = 16
-          Top = 16
           ImageIndex = 3
         end
         object Label1: TLabel
@@ -54,8 +52,6 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
       end
       inherited TabSheetWork: TTabSheet
         inherited CImageWork: TCImage
-          Left = 16
-          Top = 16
           ImageIndex = 3
         end
         object Label2: TLabel [1]
@@ -76,31 +72,7 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
       inherited TabSheetEnd: TTabSheet
         ImageIndex = -1
         inherited CImageEnd: TCImage
-          Left = 16
-          Top = 16
           ImageIndex = 0
-        end
-        object Label3: TLabel
-          Left = 64
-          Top = 24
-          Width = 108
-          Height = 13
-          Caption = 'Wynik kompaktowania'
-        end
-        object CStaticDesc: TCStatic
-          Left = 64
-          Top = 46
-          Width = 353
-          Height = 21
-          AutoSize = False
-          BevelKind = bkTile
-          Caption = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
-          Color = clWindow
-          ParentColor = False
-          TabOrder = 0
-          TextOnEmpty = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
-          OnGetDataId = CStaticDescGetDataId
-          HotTrack = True
         end
       end
     end

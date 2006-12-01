@@ -15,10 +15,7 @@ type
     OpenDialog: TOpenDialog;
     Label2: TLabel;
     Label1: TLabel;
-    Label3: TLabel;
-    CStaticDesc: TCStatic;
     procedure CStaticNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-    procedure CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
     function DoWork: Boolean; override;
     function GetProgressType: TWaitType; override;
@@ -71,7 +68,7 @@ begin
       AddToReport(xDesc);
     end;
   end;
-  Label3.Caption := xText;
+  LabelEnd.Caption := xText;
   AddToReport('Procedura kompaktowania pliku danych zakoñczona ' + IfThen(Result, 'poprawnie', 'z b³êdami'));
 end;
 
@@ -98,17 +95,11 @@ begin
   end;
 end;
 
-procedure TCCompactDatafileForm.CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-begin
-  AAccepted := False;
-  ShowReport('Raport z wykonanych czynnoœci', Report.Text, 400, 300);
-end;
-
 function TCCompactDatafileForm.CanAccept: Boolean;
 begin
   Result := CStaticName.DataId <> '';
   if not Result then begin
-    if ShowInfo(itQuestion, 'Nie wybrano pliku danych do skompaktowania, czy chcesz wybraæ go teraz?', '') then begin
+    if ShowInfo(itQuestion, 'Nie wybrano pliku danych do skompaktowania. Czy chcesz wybraæ go teraz?', '') then begin
       CStaticName.DoGetDataId;
     end;
   end;

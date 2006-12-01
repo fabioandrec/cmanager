@@ -47,6 +47,8 @@ type
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     ShortcutList: TVirtualStringTree;
+    ActionBackup: TAction;
+    ActionRestore: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -64,6 +66,8 @@ type
     procedure ActionCreateConnectionExecute(Sender: TObject);
     procedure ActionHelpExecute(Sender: TObject);
     procedure ActionCompactExecute(Sender: TObject);
+    procedure ActionBackupExecute(Sender: TObject);
+    procedure ActionRestoreExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -96,7 +100,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
   CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
-  CProgressFormUnit, CConsts;
+  CProgressFormUnit, CConsts, CArchFormUnit;
 
 {$R *.dfm}
 
@@ -398,6 +402,20 @@ end;
 function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
 begin
   Result := InitializeDataProvider(AFilename, AError, ADesc);
+end;
+
+procedure TCMainForm.ActionBackupExecute(Sender: TObject);
+var xOperation: TArchOperation;
+begin
+  xOperation := aoBackup;
+  ShowProgressForm(TCArchForm, @xOperation);
+end;
+
+procedure TCMainForm.ActionRestoreExecute(Sender: TObject);
+var xOperation: TArchOperation;
+begin
+  xOperation := aoRestore;
+  ShowProgressForm(TCArchForm, @xOperation);
 end;
 
 end.

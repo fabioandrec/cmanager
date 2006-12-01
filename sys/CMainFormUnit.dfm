@@ -570,6 +570,14 @@ object CMainForm: TCMainForm
                 Items = <
                   item
                     Action = ActionCompact
+                    Caption = '&Kompaktuj plik danych'
+                  end
+                  item
+                    Action = ActionBackup
+                    Caption = '&Wykonaj kopi'#281' pliku danych'
+                  end
+                  item
+                    Action = ActionRestore
                   end>
                 Caption = 'N&arz'#281'dzia'
               end>
@@ -741,6 +749,16 @@ object CMainForm: TCMainForm
       Category = 'Plik'
       Caption = 'Kompaktuj plik danych'
       OnExecute = ActionCompactExecute
+    end
+    object ActionBackup: TAction
+      Category = 'Plik'
+      Caption = 'Wykonaj kopi'#281' pliku danych'
+      OnExecute = ActionBackupExecute
+    end
+    object ActionRestore: TAction
+      Category = 'Plik'
+      Caption = 'Odtw'#243'rz plik danych z kopii'
+      OnExecute = ActionRestoreExecute
     end
   end
   object OpenDialog: TOpenDialog

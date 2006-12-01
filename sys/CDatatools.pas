@@ -7,6 +7,8 @@ interface
 uses Windows, SysUtils, Classes;
 
 type
+  TProgressEvent = procedure (AStepBy: Integer) of Object;
+
   TBackupHeader = packed record
     hSize: Byte;
     archiveType: array[1..3] of Char;
@@ -19,11 +21,12 @@ type
 
 function CreateDatabase(AFilename: String; var AError: String): Boolean;
 function CompactDatabase(AFilename: String; var AError: String): Boolean;
-function BackupDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
-function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
+function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
+function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 function FileSize(AName: String): Int64;
+function GetDefaultBackupFilename(ADatabaseName: String): String;
 
 implementation
 
@@ -34,6 +37,8 @@ type
   private
     FInStream: TStream;
     FOutStream: TStream;
+    FProgressEvent: TProgressEvent;
+    FOverwrite: Boolean;
     procedure OnCompressProgress(ASender: TObject);
     procedure OnDecompressProgress(ASender: TObject);
   public
@@ -42,6 +47,7 @@ type
     function ReadInfo(AInStream: TStream; var AHeader: TBackupHeader; var AError: String): Boolean;
     function CompressFile(AInFile, AOutFile: String; var AError: String): Boolean;
     function DecompressFile(AInFile, AOutFile: String; var AError: String): Boolean;
+    constructor Create(AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil);
   end;
 
 const ARCHIVE_TYPE = 'CMB';
@@ -101,30 +107,38 @@ begin
   end;
 end;
 
-function BackupDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
+function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
 begin
-  ShowWaitForm(wtProgressbar, 'Trwa wykonywanie kopii pliku danych. Proszê czekaæ...');
-  xTool := TBackupRestore.Create;
+  if not Assigned(AProgressEvent) then begin
+    ShowWaitForm(wtProgressbar, 'Trwa wykonywanie kopii pliku danych. Proszê czekaæ...');
+  end;
+  xTool := TBackupRestore.Create(AOverwrite, AProgressEvent);
   try
     Result := xTool.CompressFile(AFilename, ATargetFilename, AError);
   finally
     xTool.Free;
   end;
-  HideWaitForm;
+  if not Assigned(AProgressEvent) then begin
+    HideWaitForm;
+  end;
 end;
 
-function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String): Boolean;
+function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
 begin
-  ShowWaitForm(wtProgressbar, 'Trwa odtwarzanie kopii pliku danych. Proszê czekaæ...');
-  xTool := TBackupRestore.Create;
+  if not Assigned(AProgressEvent) then begin
+    ShowWaitForm(wtProgressbar, 'Trwa odtwarzanie kopii pliku danych. Proszê czekaæ...');
+  end;
+  xTool := TBackupRestore.Create(AOverwrite, AProgressEvent);
   try
     Result := xTool.DecompressFile(AFilename, ATargetFilename, AError);
   finally
     xTool.Free;
   end;
-  HideWaitForm;
+  if not Assigned(AProgressEvent) then begin
+    HideWaitForm;
+  end;
 end;
 
 function CheckDatabase(AFilename: String; var AError: String): Boolean;
@@ -172,10 +186,15 @@ end;
 
 function TBackupRestore.CompressFile(AInFile, AOutFile: String; var AError: String): Boolean;
 var xInStream, xOutStream: TFileStream;
+    xExists: Boolean;
 begin
   Result := False;
   if FileExists(AInFile) then begin
-    if not FileExists(AOutFile) then begin
+    xExists := FileExists(AOutFile);
+    if FOverwrite and xExists then begin
+      xExists := not DeleteFile(AOutFile);
+    end;
+    if not xExists then begin
       xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareExclusive);
       xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareExclusive);
       Result := Compress(xInStream, xOutStream, AError);
@@ -185,11 +204,18 @@ begin
       xInStream.Free;
       xOutStream.Free;
     end else begin
-      AError := 'Plik ' + AInFile + ' ju¿ istnieje';
+      AError := 'Plik ' + AOutFile + ' ju¿ istnieje';
     end;
   end else begin
     AError := 'Nie mo¿na odnaleŸæ pliku ' + AInFile;
   end;
+end;
+
+constructor TBackupRestore.Create(AOverwrite: Boolean; AProgressEvent: TProgressEvent);
+begin
+  inherited Create;
+  FProgressEvent := AProgressEvent;
+  FOverwrite := AOverwrite;
 end;
 
 function TBackupRestore.Decompress(AInStream, AOutStream: TStream; var AError: String): Boolean;
@@ -222,10 +248,15 @@ end;
 
 function TBackupRestore.DecompressFile(AInFile, AOutFile: String; var AError: String): Boolean;
 var xInStream, xOutStream: TFileStream;
+    xExists: Boolean;
 begin
   Result := False;
   if FileExists(AInFile) then begin
-    if not FileExists(AOutFile) then begin
+    xExists := FileExists(AOutFile);
+    if FOverwrite and xExists then begin
+      xExists := not DeleteFile(AOutFile);
+    end;
+    if not xExists then begin
       xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareExclusive);
       xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareExclusive);
       Result := Decompress(xInStream, xOutStream, AError);
@@ -246,7 +277,11 @@ procedure TBackupRestore.OnCompressProgress(ASender: TObject);
 var xPosition: Integer;
 begin
   xPosition := Round((FInStream.Position / FInStream.Size) * 100);
-  PositionWaitForm(xPosition);
+  if Assigned(FProgressEvent) then begin
+    FProgressEvent(xPosition);
+  end else begin
+    PositionWaitForm(xPosition);
+  end;
 end;
 
 function FileVersion(AName: string): String;
@@ -286,7 +321,11 @@ procedure TBackupRestore.OnDecompressProgress(ASender: TObject);
 var xPosition: Integer;
 begin
   xPosition := Round((FInStream.Position / FInStream.Size) * 100);
-  PositionWaitForm(xPosition);
+  if Assigned(FProgressEvent) then begin
+    FProgressEvent(xPosition);
+  end else begin
+    PositionWaitForm(xPosition);
+  end;
 end;
 
 function TBackupRestore.ReadInfo(AInStream: TStream; var AHeader: TBackupHeader; var AError: String): Boolean;
@@ -324,6 +363,13 @@ begin
     Result := Int64(xS.FindData.nFileSizeHigh) shl Int64(32) + Int64(xS.FindData.nFileSizeLow);
   end;
   SysUtils.FindClose(xS);
+end;
+
+function GetDefaultBackupFilename(ADatabaseName: String): String;
+var xFilename: String;
+begin
+  xFilename := FormatDateTime('yymmdd_hhnnss', Now) + '.cmb';
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(ADatabaseName)) + xFilename;
 end;
 
 end.

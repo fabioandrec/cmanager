@@ -47,10 +47,13 @@ type
     CImageStart: TCImage;
     CImageWork: TCImage;
     CImageEnd: TCImage;
+    LabelEnd: TLabel;
+    CStaticDesc: TCStatic;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FWaitThread: TWaitThread;
     FWaitHandle: THandle;
@@ -65,18 +68,21 @@ type
     function GetMin: Integer; virtual;
     function GetMax: Integer; virtual;
     function GetProgressType: TWaitType; virtual;
-    function DoWork: Boolean; virtual; 
+    function DoWork: Boolean; virtual;
     procedure NextTab;
     procedure AddToReport(AText: String);
     function CanAccept: Boolean; virtual;
+    procedure ShowProgress(AAdditionalData: Pointer = Nil); virtual;
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
     property Report: TStringList read FReport;
   end;
 
-procedure ShowProgressForm(AClass: TProgressClass);
+procedure ShowProgressForm(AClass: TProgressClass; AAdditionalData: Pointer = Nil);
 
 implementation
+
+uses CMemoFormUnit;
 
 {$R *.dfm}
 
@@ -212,11 +218,11 @@ begin
   EnableMenuItem(hMenu, SC_CLOSE, xOpt);
 end;
 
-procedure ShowProgressForm(AClass: TProgressClass);
+procedure ShowProgressForm(AClass: TProgressClass; AAdditionalData: Pointer = Nil);
 var xForm: TCProgressForm;
 begin
   xForm := AClass.Create(Nil);
-  xForm.ShowModal;
+  xForm.ShowProgress(AAdditionalData);
   xForm.Free;
 end;
 
@@ -227,7 +233,6 @@ end;
 
 procedure TCProgressForm.FormCreate(Sender: TObject);
 begin
-  InitializeForm;
   PageControl.ActivePageIndex := 0;
   StaticText.Visible := False;
   ProgressBar.Visible := False;
@@ -267,6 +272,18 @@ end;
 function TCProgressForm.CanAccept: Boolean;
 begin
   Result := True;
+end;
+
+procedure TCProgressForm.ShowProgress(AAdditionalData: Pointer = Nil);
+begin
+ InitializeForm;
+ ShowModal;
+end;
+
+procedure TCProgressForm.CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := False;
+  ShowReport('Raport z wykonanych czynnoœci', Report.Text, 400, 300);
 end;
 
 end.
