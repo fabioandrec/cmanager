@@ -59,7 +59,8 @@ uses
   CCompactDatafileFormUnit in 'CCompactDatafileFormUnit.pas' {CCompactDatafileForm},
   CMemoFormUnit in 'CMemoFormUnit.pas',
   CArchFormUnit in 'CArchFormUnit.pas' {CArchForm},
-  CImageListsUnit in 'CImageListsUnit.pas' {CImageLists: TDataModule};
+  CImageListsUnit in 'CImageListsUnit.pas' {CImageLists: TDataModule},
+  CCheckDatafileFormUnit in 'CCheckDatafileFormUnit.pas' {CCheckDatafileFormUnit};
 
 {$R *.res}
 
@@ -70,10 +71,10 @@ begin
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
-    if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc) then begin
+    if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc, True) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+  Application.Run;
     end else begin
       ShowInfo(itError, xError, xDesc)
     end;

@@ -4,7 +4,7 @@ interface
 
 {.$DEFINE SAVETOLOG}
 
-uses Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts;
+uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts;
 
 type
   TDataGid = ShortString;
@@ -34,6 +34,7 @@ type
     function ExecuteSql(ASql: String): Boolean;
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
+    function GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
   published
     property DataProxyList: TObjectList read FDataProxyList;
     property InTransaction: Boolean read GetInTransaction;
@@ -190,7 +191,7 @@ var GDataProvider: TDataProvider;
     GSqllogfile: String;
     {$ENDIF}
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
@@ -264,7 +265,7 @@ begin
   end;
 end;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
@@ -275,16 +276,20 @@ begin
  {$IFDEF SAVETOLOG}
   GSqllogfile := ChangeFileExt(ADatabaseName, '.log');
  {$ENDIF}
-  if not Result then begin
-    Result := CreateDatabase(ADatabaseName, xError);
-    if Result then begin
-      xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
-      SetLength(xCommand, xResStream.Size);
-      CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
-      xResStream.Free;
+  if (not Result) then begin
+    if ACanCreate then begin
+      Result := CreateDatabase(ADatabaseName, xError);
+      if Result then begin
+        xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
+        SetLength(xCommand, xResStream.Size);
+        CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
+        xResStream.Free;
+      end else begin
+        AError := 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.';
+        ADesc := xError;
+      end;
     end else begin
-      AError := 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.';
-      ADesc := xError;
+      AError := 'Nie odnaleziono pliku danych.';
     end;
   end;
   if Result then begin
@@ -625,6 +630,19 @@ end;
 function TDataProvider.GetIsConnected: Boolean;
 begin
   Result := FConnection.Connected;
+end;
+
+function TDataProvider.GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
+var xQ: TADOQuery;
+begin
+  Result := ADefault;
+  xQ := OpenSql(ASql);
+  if xQ <> Nil then begin
+    if not xQ.IsEmpty then begin
+      Result := xQ.Fields[0].AsCurrency;
+    end;
+    xQ.Free;
+  end;
 end;
 
 function TDataProvider.GetSqlInteger(ASql: String; ADefault: Integer): Integer;

@@ -49,6 +49,7 @@ type
     ShortcutList: TVirtualStringTree;
     ActionBackup: TAction;
     ActionRestore: TAction;
+    ActionCheckDatafile: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -68,6 +69,7 @@ type
     procedure ActionCompactExecute(Sender: TObject);
     procedure ActionBackupExecute(Sender: TObject);
     procedure ActionRestoreExecute(Sender: TObject);
+    procedure ActionCheckDatafileExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -100,7 +102,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
   CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
-  CProgressFormUnit, CConsts, CArchFormUnit;
+  CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit;
 
 {$R *.dfm}
 
@@ -374,7 +376,7 @@ procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
 var xError, xDesc: String;
 begin
   if SaveDialog.Execute then begin
-    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc) then begin
+    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True) then begin
       ActionShortcutExecute(ActionShorcutOperations);
       UpdateStatusbar;
     end else begin
@@ -401,7 +403,7 @@ end;
 
 function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
 begin
-  Result := InitializeDataProvider(AFilename, AError, ADesc);
+  Result := InitializeDataProvider(AFilename, AError, ADesc, False);
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);
@@ -416,6 +418,11 @@ var xOperation: TArchOperation;
 begin
   xOperation := aoRestore;
   ShowProgressForm(TCArchForm, @xOperation);
+end;
+
+procedure TCMainForm.ActionCheckDatafileExecute(Sender: TObject);
+begin
+  ShowProgressForm(TCCheckDatafileFormUnit);
 end;
 
 end.

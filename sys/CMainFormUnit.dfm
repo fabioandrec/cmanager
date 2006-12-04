@@ -578,6 +578,10 @@ object CMainForm: TCMainForm
                   end
                   item
                     Action = ActionRestore
+                    Caption = '&Odtw'#243'rz plik danych z kopii'
+                  end
+                  item
+                    Action = ActionCheckDatafile
                   end>
                 Caption = 'N&arz'#281'dzia'
               end>
@@ -759,6 +763,11 @@ object CMainForm: TCMainForm
       Category = 'Plik'
       Caption = 'Odtw'#243'rz plik danych z kopii'
       OnExecute = ActionRestoreExecute
+    end
+    object ActionCheckDatafile: TAction
+      Category = 'Plik'
+      Caption = 'Sprawdz plik danych'
+      OnExecute = ActionCheckDatafileExecute
     end
   end
   object OpenDialog: TOpenDialog

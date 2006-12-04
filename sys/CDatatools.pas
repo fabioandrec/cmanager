@@ -27,10 +27,12 @@ function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 function FileSize(AName: String): Int64;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
+function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 
 implementation
 
-uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit;
+uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
+  CDatabase, CDataObjects;
 
 type
   TBackupRestore = class(TObject)
@@ -141,9 +143,50 @@ begin
   end;
 end;
 
-function CheckDatabase(AFilename: String; var AError: String): Boolean;
+function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
+var xError, xDesc: String;
+    xAccounts: TDataObjectList;
+    xAccount: TAccount;
+    xStep, xCount: Integer;
+    xSum: Currency;
+    xSuspectedCount: Integer;
 begin
-  Result := False;
+  xSuspectedCount := 0;
+  Result := InitializeDataProvider(AFilename, xError, xDesc, False);
+  if Result then begin
+    GDataProvider.BeginTransaction;
+    xAccounts := TAccount.GetList(TAccount, AccountProxy, 'select * from account');
+    xStep := Trunc(100 / xAccounts.Count);
+    for xCount := 0 to xAccounts.Count - 1 do begin
+      xAccount := TAccount(xAccounts.Items[xCount]);
+      AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie konta ' + xAccount.name);
+      xSum := GDataProvider.GetSqlCurrency('select sum(cash) as cash from transactions where idAccount = ' + DataGidToDatabase(xAccount.id), 0);
+      if xSum + xAccount.initialBalance <> xAccount.cash then begin
+        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name +
+                Format(' wynosi %.2f, powinien wynosiæ %.2f', [xAccount.cash, xSum + xAccount.initialBalance]));
+        xAccount.cash := xAccount.initialBalance + xSum;
+        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Zmodyfikowano stan konta ' + xAccount.name);
+        inc(xSuspectedCount);
+      end else begin
+        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name + ' jest poprawny');
+      end;
+      AProgressEvent(xStep);
+    end;
+    if Result then begin
+      GDataProvider.CommitTransaction;
+    end else begin
+      GDataProvider.RollbackTransaction;
+    end;
+    GDataProvider.DisconnectFromDatabase;
+    if xSuspectedCount = 0 then begin
+      AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Nie znaleziono ¿adnych nieprawid³owoœci');
+    end else begin
+      AReport.Add(FormatDateTime('hh:nn:ss', Now) + Format(' Skorygowano %d nieprawid³owoœci', [xSuspectedCount]));
+    end;
+  end else begin
+    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
+    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
+  end;
 end;
 
 function TBackupRestore.Compress(AInStream, AOutStream: TStream; var AError: String): Boolean;
