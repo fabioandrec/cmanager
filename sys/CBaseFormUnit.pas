@@ -26,13 +26,14 @@ type
   protected
     procedure CloseForm; virtual;
     procedure WndProc(var Message: TMessage); override;
+    procedure Loaded; override;
   end;
 
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
 
 implementation
 
-uses CSettings, CBaseFrameUnit, CConsts;
+uses CSettings, CBaseFrameUnit, CConsts, CComponents;
 
 {$R *.dfm}
 
@@ -259,6 +260,18 @@ begin
     WindowState := wsMaximized;
   end else if Message.Msg = WM_FORMMINIMIZE then begin
     WindowState := wsMaximized;
+  end;
+end;
+
+procedure TCBaseForm.Loaded;
+var xCount: Integer;
+begin
+  inherited Loaded;
+  for xCount := 0 to ComponentCount - 1 do begin
+    if Components[xCount].InheritsFrom(TCStatic) then begin
+      TCStatic(Components[xCount]).TabStop := True;
+      TCStatic(Components[xCount]).Transparent := False;
+    end;
   end;
 end;
 

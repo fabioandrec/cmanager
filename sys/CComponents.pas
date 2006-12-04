@@ -67,6 +67,7 @@ type
     FHotTrack: Boolean;
     FOldColor: TColor;
     FCanvas: TCanvas;
+    FInternalIsFocused: Boolean;
     procedure SetDataId(const Value: string);
     procedure SetTextOnEmpty(const Value: string);
   protected
@@ -74,6 +75,10 @@ type
     procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
     procedure Loaded; override;
     procedure Click; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure WndProc(var Message: TMessage); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure DoGetDataId;
@@ -97,14 +102,21 @@ type
     FOnChanged: TNotifyEvent;
     FHotTrack: Boolean;
     FOldColor: TColor;
+    FInternalIsFocused: Boolean;
+    FCanvas: TCanvas;
     procedure SetValue(const Value: TDateTime);
     procedure UpdateCaption;
   protected
     procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
     procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
     procedure Click; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure WndProc(var Message: TMessage); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   published
     property Value: TDateTime read FValue write SetValue;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
@@ -493,6 +505,8 @@ begin
   FDataId := '';
   FHotTrack := True;
   FCanvas := TControlCanvas.Create;
+  TabStop := True;
+  Transparent := False;
   TControlCanvas(FCanvas).Control := Self;
 end;
 
@@ -502,9 +516,31 @@ begin
   inherited Destroy;
 end;
 
+procedure TCStatic.DoEnter;
+begin
+  inherited;
+  FInternalIsFocused := True;
+  Invalidate;
+end;
+
+procedure TCStatic.DoExit;
+begin
+  FInternalIsFocused := False;
+  Invalidate;
+  inherited;
+end;
+
 procedure TCStatic.DoGetDataId;
 begin
   Click;
+end;
+
+procedure TCStatic.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_SPACE then begin
+    Click;
+  end;
 end;
 
 procedure TCStatic.Loaded;
@@ -998,6 +1034,38 @@ begin
   FOnChanged := Nil;
   UpdateCaption;
   FHotTrack := True;
+  FCanvas := TControlCanvas.Create;
+  TabStop := True;
+  Transparent := False;
+  TControlCanvas(FCanvas).Control := Self;
+end;
+
+destructor TCDateTime.Destroy;
+begin
+  FCanvas.Free;
+  inherited;
+end;
+
+procedure TCDateTime.DoEnter;
+begin
+  inherited;
+  FInternalIsFocused := True;
+  Invalidate;
+end;
+
+procedure TCDateTime.DoExit;
+begin
+  FInternalIsFocused := False;
+  Invalidate;
+  inherited;
+end;
+
+procedure TCDateTime.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_SPACE then begin
+    Click;
+  end;
 end;
 
 procedure TCDateTime.SetValue(const Value: TDateTime);
@@ -1169,6 +1237,36 @@ end;
 function TCIntEdit.GetValue: Integer;
 begin
   Result := StrToIntDef(Text, -1);
+end;
+
+procedure TCStatic.WndProc(var Message: TMessage);
+var xRect: TRect;
+begin
+  inherited;
+  if Message.Msg = WM_PAINT then begin
+    if FInternalIsFocused then begin
+      xRect := ClientRect;
+      InflateRect(xRect, -1, -1);
+      DrawFocusRect(Canvas.Handle, xRect);
+    end;
+  end else if Message.Msg = WM_SETFOCUS then begin
+    Invalidate;
+  end;
+end;
+
+procedure TCDateTime.WndProc(var Message: TMessage);
+var xRect: TRect;
+begin
+  inherited;
+  if Message.Msg = WM_PAINT then begin
+    if FInternalIsFocused then begin
+      xRect := ClientRect;
+      InflateRect(xRect, -1, -1);
+      DrawFocusRect(FCanvas.Handle, xRect);
+    end;
+  end else if Message.Msg = WM_SETFOCUS then begin
+    Invalidate;
+  end;
 end;
 
 end.
