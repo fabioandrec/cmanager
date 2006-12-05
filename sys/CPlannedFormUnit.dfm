@@ -15,7 +15,7 @@ inherited CPlannedForm: TCPlannedForm
       Width = 505
       Height = 137
       Caption = ' Opis '
-      TabOrder = 0
+      TabOrder = 2
       object RichEditDesc: TRichEdit
         Left = 24
         Top = 28
@@ -134,7 +134,7 @@ inherited CPlannedForm: TCPlannedForm
       Width = 505
       Height = 105
       Caption = ' Dane podstawowe '
-      TabOrder = 2
+      TabOrder = 0
       object Label5: TLabel
         Left = 31
         Top = 32

@@ -582,6 +582,7 @@ object CMainForm: TCMainForm
                   end
                   item
                     Action = ActionCheckDatafile
+                    Caption = '&Sprawd'#378' plik danych'
                   end>
                 Caption = 'N&arz'#281'dzia'
               end>
@@ -647,6 +648,13 @@ object CMainForm: TCMainForm
                 Caption = 'P&asek stanu'
               end>
             Caption = '&Widok'
+          end
+          item
+            Items = <
+              item
+                Action = ActionPreferences
+              end>
+            Caption = '&Narz'#281'dzia'
           end
           item
             Items = <
@@ -766,8 +774,13 @@ object CMainForm: TCMainForm
     end
     object ActionCheckDatafile: TAction
       Category = 'Plik'
-      Caption = 'Sprawdz plik danych'
+      Caption = 'Sprawd'#378' plik danych'
       OnExecute = ActionCheckDatafileExecute
+    end
+    object ActionPreferences: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Preferencje'
+      OnExecute = ActionPreferencesExecute
     end
   end
   object OpenDialog: TOpenDialog

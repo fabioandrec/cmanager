@@ -84,6 +84,7 @@ type
     procedure DoGetDataId;
     property Canvas: TCanvas read FCanvas;
     destructor Destroy; override;
+    function CanFocus: Boolean; override;
   published
     property DataId: string read FDataId write SetDataId;
     property TextOnEmpty: string read FTextOnEmpty write SetTextOnEmpty;
@@ -117,6 +118,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function CanFocus: Boolean; override;
   published
     property Value: TDateTime read FValue write SetValue;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
@@ -449,6 +451,11 @@ begin
   end;
 end;
 
+function TCStatic.CanFocus: Boolean;
+begin
+  Result := (inherited CanFocus) and FHotTrack;
+end;
+
 procedure TCStatic.Click;
 var xId, xText: String;
     xAccepted: Boolean;
@@ -560,6 +567,7 @@ begin
     end;
   end;
 end;
+
 
 procedure TCStatic.SetTextOnEmpty(const Value: string);
 begin
@@ -985,6 +993,11 @@ begin
   end;
 end;
 
+function TCDateTime.CanFocus: Boolean;
+begin
+  Result := (inherited CanFocus) and FHotTrack;
+end;
+
 procedure TCDateTime.Click;
 var xDate: TDateTime;
 begin
@@ -1244,9 +1257,9 @@ var xRect: TRect;
 begin
   inherited;
   if Message.Msg = WM_PAINT then begin
-    if FInternalIsFocused then begin
+    if FInternalIsFocused and CanFocus then begin
       xRect := ClientRect;
-      InflateRect(xRect, -1, -1);
+      //InflateRect(xRect, -1, -1);
       DrawFocusRect(Canvas.Handle, xRect);
     end;
   end else if Message.Msg = WM_SETFOCUS then begin
@@ -1259,9 +1272,9 @@ var xRect: TRect;
 begin
   inherited;
   if Message.Msg = WM_PAINT then begin
-    if FInternalIsFocused then begin
+    if FInternalIsFocused and CanFocus then begin
       xRect := ClientRect;
-      InflateRect(xRect, -1, -1);
+      //InflateRect(xRect, -1, -1);
       DrawFocusRect(FCanvas.Handle, xRect);
     end;
   end else if Message.Msg = WM_SETFOCUS then begin

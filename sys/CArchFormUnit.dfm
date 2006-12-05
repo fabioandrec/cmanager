@@ -9,6 +9,7 @@ inherited CArchForm: TCArchForm
   inherited PanelButtons: TPanel
     Top = 99
     Width = 456
+    TabOrder = 1
     inherited BitBtnOk: TBitBtn
       Left = 279
     end
@@ -19,10 +20,10 @@ inherited CArchForm: TCArchForm
   inherited PanelConfig: TPanel
     Width = 456
     Height = 99
+    TabOrder = 0
     inherited PageControl: TPageControl
       Width = 456
       Height = 99
-      ActivePage = TabSheetWork
       inherited TabSheetStart: TTabSheet
         object Label2: TLabel
           Left = 64

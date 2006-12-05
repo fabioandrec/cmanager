@@ -94,6 +94,8 @@ inherited CCashpointsFrame: TCCashpointsFrame
     end
   end
   inherited ImageList: TPngImageList
+    Height = 32
+    Width = 32
     Left = 10
     Top = 56
   end
@@ -108,12 +110,12 @@ inherited CCashpointsFrame: TCCashpointsFrame
     end
     object ActionEditCahpoint: TAction
       Caption = 'Edytuj kontrahenta'
-      ImageIndex = 0
+      ImageIndex = 1
       OnExecute = ActionEditCahpointExecute
     end
     object ActionDelCashpoint: TAction
       Caption = 'Usu'#324' kontrahenta'
-      ImageIndex = 0
+      ImageIndex = 2
       OnExecute = ActionDelCashpointExecute
     end
   end

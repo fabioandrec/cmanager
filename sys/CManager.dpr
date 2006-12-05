@@ -60,7 +60,8 @@ uses
   CMemoFormUnit in 'CMemoFormUnit.pas',
   CArchFormUnit in 'CArchFormUnit.pas' {CArchForm},
   CImageListsUnit in 'CImageListsUnit.pas' {CImageLists: TDataModule},
-  CCheckDatafileFormUnit in 'CCheckDatafileFormUnit.pas' {CCheckDatafileFormUnit};
+  CCheckDatafileFormUnit in 'CCheckDatafileFormUnit.pas' {CCheckDatafileFormUnit},
+  CPreferencesFormUnit in 'CPreferencesFormUnit.pas' {CPreferencesForm};
 
 {$R *.res}
 

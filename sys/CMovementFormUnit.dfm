@@ -73,7 +73,7 @@ inherited CMovementForm: TCMovementForm
       Width = 505
       Height = 137
       Caption = ' Opis '
-      TabOrder = 1
+      TabOrder = 2
       object RichEditDesc: TRichEdit
         Left = 24
         Top = 28
@@ -90,13 +90,13 @@ inherited CMovementForm: TCMovementForm
       Width = 505
       Height = 177
       Caption = ' Szczeg'#243#322'y operacji '
-      TabOrder = 2
+      TabOrder = 1
       object PageControl: TPageControl
         Left = 2
         Top = 15
         Width = 501
         Height = 160
-        ActivePage = TabSheetInOutCyclic
+        ActivePage = TabSheetInOutOnce
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -150,7 +150,7 @@ inherited CMovementForm: TCMovementForm
             Width = 209
             Height = 21
             BorderStyle = bsNone
-            TabOrder = 0
+            TabOrder = 4
             Decimals = 2
             ThousandSep = True
             BevelKind = bkTile
@@ -166,7 +166,7 @@ inherited CMovementForm: TCMovementForm
             Caption = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
             Color = clWindow
             ParentColor = False
-            TabOrder = 1
+            TabOrder = 0
             TextOnEmpty = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
             OnGetDataId = CStaticInoutCyclicGetDataId
             OnChanged = CStaticInoutCyclicChanged
@@ -183,7 +183,7 @@ inherited CMovementForm: TCMovementForm
             Caption = '<wybierz konto z listy>'
             Color = clWindow
             ParentColor = False
-            TabOrder = 2
+            TabOrder = 1
             TextOnEmpty = '<wybierz konto z listy>'
             OnGetDataId = CStaticInoutCyclicAccountGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -200,7 +200,7 @@ inherited CMovementForm: TCMovementForm
             Caption = '<wybierz kategori'#281' z listy>'
             Color = clWindow
             ParentColor = False
-            TabOrder = 3
+            TabOrder = 2
             TextOnEmpty = '<wybierz kategori'#281' z listy>'
             OnGetDataId = CStaticInoutCyclicCategoryGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -217,7 +217,7 @@ inherited CMovementForm: TCMovementForm
             Caption = '<wybierz kontrahenta z listy>'
             Color = clWindow
             ParentColor = False
-            TabOrder = 4
+            TabOrder = 3
             TextOnEmpty = '<wybierz kontrahenta z listy>'
             OnGetDataId = CStaticInoutCyclicCashpointGetDataId
             OnChanged = CStaticInoutOnceAccountChanged

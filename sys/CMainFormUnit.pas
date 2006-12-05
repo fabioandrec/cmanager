@@ -50,6 +50,7 @@ type
     ActionBackup: TAction;
     ActionRestore: TAction;
     ActionCheckDatafile: TAction;
+    ActionPreferences: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -70,6 +71,7 @@ type
     procedure ActionBackupExecute(Sender: TObject);
     procedure ActionRestoreExecute(Sender: TObject);
     procedure ActionCheckDatafileExecute(Sender: TObject);
+    procedure ActionPreferencesExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -102,7 +104,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
   CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
-  CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit;
+  CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
+  CPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -380,7 +383,7 @@ begin
       ActionShortcutExecute(ActionShorcutOperations);
       UpdateStatusbar;
     end else begin
-      ShowInfo(itError, xError, xDesc)
+      ShowInfo(itError, xError, xDesc);
     end;
   end;
 end;
@@ -423,6 +426,14 @@ end;
 procedure TCMainForm.ActionCheckDatafileExecute(Sender: TObject);
 begin
   ShowProgressForm(TCCheckDatafileFormUnit);
+end;
+
+procedure TCMainForm.ActionPreferencesExecute(Sender: TObject);
+var xPrefs: TCPreferencesForm;
+begin
+  xPrefs := TCPreferencesForm.Create(Nil);
+  xPrefs.ShowPreferences;
+  xPrefs.Free;
 end;
 
 end.
