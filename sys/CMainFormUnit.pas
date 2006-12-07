@@ -13,7 +13,6 @@ type
   TCMainForm = class(TForm)
     MenuBar: TActionMainMenuBar;
     StatusBar: TStatusBar;
-    ImageListActionManager: TPngImageList;
     ActionManager: TActionManager;
     ActionShortcuts: TAction;
     ActionShorcutOperations: TAction;
@@ -72,6 +71,7 @@ type
     procedure ActionRestoreExecute(Sender: TObject);
     procedure ActionCheckDatafileExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
+    procedure ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -103,9 +103,9 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
-  CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
-  CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
-  CPreferencesFormUnit;
+     CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
+     CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
+     CPreferencesFormUnit, CImageListsUnit;
 
 {$R *.dfm}
 
@@ -118,7 +118,7 @@ begin
   ActionStatusbar.Checked := StatusbarVisible;
   UpdateShortcutList;
   UpdateStatusbar;
-  ShortcutList.RootNodeCount := FShortcutList.Count;
+  ShortcutList.RootNodeCount := FShortcutList.Count + 1;
   PerformShortcutAction(ActionShortcutStart);
 end;
 
@@ -203,7 +203,7 @@ begin
     FActiveFrame.Parent := PanelFrames;
     FActiveFrame.Show;
     LabelShortcut.Caption := AAction.Caption;
-    PngImage.PngImage := ImageListActionManager.PngImages.Items[AAction.ImageIndex].PngImage;
+    //PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
   end;
 end;
 
@@ -224,13 +224,19 @@ end;
 
 procedure TCMainForm.ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 begin
-  CellText := FShortcutList.Strings[Node.Index];
+  if Node.Index = 0 then begin
+    CellText := '';
+  end else begin
+    CellText := FShortcutList.Strings[Node.Index - 1];
+  end;
 end;
 
 procedure TCMainForm.ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
 begin
   if NewNode <> Nil then begin
-    Sender.Cursor := crHandPoint;
+    if NewNode.Index <> 0 then begin
+      Sender.Cursor := crHandPoint;
+    end;
   end else begin
     Sender.Cursor := crDefault;
   end;
@@ -239,9 +245,11 @@ end;
 procedure TCMainForm.ShortcutListClick(Sender: TObject);
 var xAction: TAction;
 begin
-  if ShortcutList.FocusedNode <> Nil then begin
-    xAction := TAction(FShortcutList.Objects[ShortcutList.FocusedNode.Index]);
-    xAction.Execute;
+  if (ShortcutList.FocusedNode <> Nil) then begin
+    if (ShortcutList.FocusedNode.Index <> 0) then begin
+      xAction := TAction(FShortcutList.Objects[ShortcutList.FocusedNode.Index - 1]);
+      xAction.Execute;
+    end;
   end;
 end;
 
@@ -261,10 +269,12 @@ end;
 procedure TCMainForm.ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
 var xIndex, xLeft, xTop: Integer;
 begin
-  xIndex := TAction(FShortcutList.Objects[Node.Index]).ImageIndex;
-  xLeft := ((ShortcutList.Width - ImageListActionManager.Width) div 2);
-  xTop := 0;
-  ImageListActionManager.Draw(TargetCanvas, xLeft, xTop, xIndex);
+  if Node.Index <> 0 then begin
+    xIndex := TAction(FShortcutList.Objects[Node.Index - 1]).ImageIndex;
+    xLeft := ((ShortcutList.Width - CImageLists.MainImageList24x24.Width) div 2);
+    xTop := 0;
+    CImageLists.MainImageList24x24.Draw(TargetCanvas, xLeft, xTop, xIndex);
+  end;
 end;
 
 procedure TCMainForm.ActionShortcutExecute(ASender: TObject);
@@ -434,6 +444,15 @@ begin
   xPrefs := TCPreferencesForm.Create(Nil);
   xPrefs.ShowPreferences;
   xPrefs.Free;
+end;
+
+procedure TCMainForm.ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+begin
+  if Node.Index = 0 then begin
+    NodeHeight := 40;
+  end else begin
+    NodeHeight := 70;
+  end;
 end;
 
 end.

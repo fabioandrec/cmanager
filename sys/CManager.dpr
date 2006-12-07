@@ -75,7 +75,7 @@ begin
     if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc, True) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+      Application.Run;
     end else begin
       ShowInfo(itError, xError, xDesc)
     end;
