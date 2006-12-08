@@ -21,14 +21,13 @@ object CMainForm: TCMainForm
     Top = 0
     Width = 857
     Height = 24
-    UseSystemFont = False
     ActionManager = ActionManager
     Caption = 'MenuBar'
     ColorMap.HighlightColor = 10725814
     ColorMap.BtnSelectedColor = clBtnFace
     ColorMap.UnusedColor = 10725814
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clMenuText
     Font.Height = -11
     Font.Name = 'Microsoft Sans Serif'
     Font.Style = []
@@ -395,22 +394,22 @@ object CMainForm: TCMainForm
     object ActionShortcutStart: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Start'
-      ImageIndex = 8
+      ImageIndex = 0
     end
     object ActionShorcutOperations: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Operacje wykonane'
-      ImageIndex = 5
+      ImageIndex = 1
     end
     object ActionShortcutPlannedDone: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Czynno'#347'ci zaplanowane'
-      ImageIndex = 6
+      ImageIndex = 2
     end
     object ActionShortcutPlanned: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Definicje plan'#243'w'
-      ImageIndex = 7
+      ImageIndex = 3
     end
     object ActionShortcutAccounts: TAction
       Category = 'Skr'#243'ty'
@@ -420,17 +419,17 @@ object CMainForm: TCMainForm
     object ActionShortcutProducts: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Lista kategorii'
-      ImageIndex = 3
+      ImageIndex = 5
     end
     object ActionShortcutCashpoints: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Lista kontrahent'#243'w'
-      ImageIndex = 1
+      ImageIndex = 6
     end
     object ActionShortcutReports: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Statystyka, raporty'
-      ImageIndex = 0
+      ImageIndex = 7
     end
     object ActionStatusbar: TAction
       Category = 'Widok'
@@ -465,7 +464,7 @@ object CMainForm: TCMainForm
     object ActionShortcutFilters: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Filtry'
-      ImageIndex = 2
+      ImageIndex = 8
     end
     object ActionCompact: TAction
       Category = 'Plik'
