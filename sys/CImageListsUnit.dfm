@@ -505,7 +505,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage7'
         Background = clWindow
       end>
-    PngOptions = [pngGrayscaleOnDisabled]
+    PngOptions = []
     Left = 40
     Top = 80
     Bitmap = {}
@@ -804,7 +804,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage7'
         Background = clWindow
       end>
-    PngOptions = [pngGrayscaleOnDisabled]
+    PngOptions = []
     Left = 40
     Top = 16
     Bitmap = {}
@@ -1501,7 +1501,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage7'
         Background = clWindow
       end>
-    PngOptions = [pngGrayscaleOnDisabled]
+    PngOptions = []
     Left = 40
     Top = 152
     Bitmap = {}
@@ -1711,6 +1711,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage2'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 176
     Top = 16
     Bitmap = {}
@@ -1891,6 +1892,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage2'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 176
     Top = 88
     Bitmap = {}
@@ -2070,6 +2072,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage2'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 184
     Top = 152
     Bitmap = {}
@@ -2270,6 +2273,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage2'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 368
     Top = 16
     Bitmap = {}
@@ -2440,6 +2444,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage2'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 376
     Top = 80
     Bitmap = {}
@@ -2507,6 +2512,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage0'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 384
     Top = 144
     Bitmap = {}
@@ -2579,6 +2585,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage0'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 56
     Top = 224
     Bitmap = {}
@@ -2755,6 +2762,7 @@ object CImageLists: TCImageLists
         Name = 'PngImage2'
         Background = clWindow
       end>
+    PngOptions = []
     Left = 184
     Top = 216
     Bitmap = {}

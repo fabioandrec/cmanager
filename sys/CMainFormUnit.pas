@@ -203,7 +203,7 @@ begin
     FActiveFrame.Parent := PanelFrames;
     FActiveFrame.Show;
     LabelShortcut.Caption := AAction.Caption;
-    //PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
+    PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
   end;
 end;
 
@@ -366,6 +366,7 @@ begin
   if not GDataProvider.IsConnected then begin
     for xCount := 0 to FShortcutsFrames.Count - 1 do begin
       FShortcutsFrames.Objects[xCount].Free;
+      FShortcutsFrames.Objects[xCount] := Nil;
     end;
     FShortcutsFrames.Clear;
     FActiveFrame := Nil;

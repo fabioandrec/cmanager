@@ -21,14 +21,13 @@ object CMainForm: TCMainForm
     Top = 0
     Width = 857
     Height = 24
-    UseSystemFont = False
     ActionManager = ActionManager
     Caption = 'MenuBar'
     ColorMap.HighlightColor = 10725814
     ColorMap.BtnSelectedColor = clBtnFace
     ColorMap.UnusedColor = 10725814
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
+    Font.Color = clMenuText
     Font.Height = -11
     Font.Name = 'Microsoft Sans Serif'
     Font.Style = []
