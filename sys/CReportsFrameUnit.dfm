@@ -71,7 +71,7 @@ inherited CReportsFrame: TCReportsFrame
     end
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.StatsImageList24x24
     Left = 11
     Top = 48
     object ActionExecute: TAction

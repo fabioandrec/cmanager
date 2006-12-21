@@ -114,7 +114,7 @@ inherited CPlannedFrame: TCPlannedFrame
     Top = 144
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.CyclicImageList24x24
     Left = 200
     Top = 112
     object ActionMovement: TAction
@@ -124,12 +124,12 @@ inherited CPlannedFrame: TCPlannedFrame
     end
     object ActionEditMovement: TAction
       Caption = 'Edytuj plan'
-      ImageIndex = 3
+      ImageIndex = 1
       OnExecute = ActionEditMovementExecute
     end
     object ActionDelMovement: TAction
       Caption = 'Usu'#324' plan'
-      ImageIndex = 4
+      ImageIndex = 2
       OnExecute = ActionDelMovementExecute
     end
   end

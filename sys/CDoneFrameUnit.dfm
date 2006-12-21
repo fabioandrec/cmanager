@@ -321,7 +321,7 @@ inherited CDoneFrame: TCDoneFrame
     Top = 144
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.DoneImageList24x24
     Left = 200
     Top = 112
     object ActionOperation: TAction

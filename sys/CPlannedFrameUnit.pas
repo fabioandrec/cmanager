@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, PngImageList;
+  Contnrs, PngImageList, CImageListsUnit;
 
 type
   TCPlannedFrame = class(TCBaseFrame)

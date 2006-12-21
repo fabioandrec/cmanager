@@ -105,7 +105,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
-     CPreferencesFormUnit, CImageListsUnit;
+     CPreferencesFormUnit, CImageListsUnit, Types;
 
 {$R *.dfm}
 
@@ -271,9 +271,9 @@ var xIndex, xLeft, xTop: Integer;
 begin
   if Node.Index <> 0 then begin
     xIndex := TAction(FShortcutList.Objects[Node.Index - 1]).ImageIndex;
-    xLeft := ((ShortcutList.Width - CImageLists.MainImageList24x24.Width) div 2);
+    xLeft := ((ItemRect.Right - ItemRect.Left - CImageLists.MainImageList32x32.Width) div 2);
     xTop := 0;
-    CImageLists.MainImageList24x24.Draw(TargetCanvas, xLeft, xTop, xIndex);
+    CImageLists.MainImageList32x32.Draw(TargetCanvas, xLeft, xTop, xIndex);
   end;
 end;
 
@@ -451,7 +451,7 @@ begin
   if Node.Index = 0 then begin
     NodeHeight := 40;
   end else begin
-    NodeHeight := 70;
+    NodeHeight := 80;
   end;
 end;
 

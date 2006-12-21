@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, ExtCtrls, VirtualTrees, Menus,
   VTHeaderPopup, ActnList, CComponents, CDatabase, Contnrs, GraphUtil,
-  StdCtrls, CReports, PngImageList;
+  StdCtrls, CReports, PngImageList, CImageListsUnit;
 
 type
   THelperElement = class(TObjectList)

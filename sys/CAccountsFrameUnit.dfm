@@ -1,10 +1,9 @@
 inherited CAccountsFrame: TCAccountsFrame
-  Height = 275
   object AccountList: TVirtualStringTree [0]
     Left = 0
     Top = 0
     Width = 443
-    Height = 234
+    Height = 236
     Align = alClient
     BevelEdges = [beBottom]
     BevelInner = bvNone
@@ -61,7 +60,7 @@ inherited CAccountsFrame: TCAccountsFrame
   end
   object PanelFrameButtons: TPanel [1]
     Left = 0
-    Top = 234
+    Top = 236
     Width = 443
     Height = 41
     Align = alBottom
@@ -110,7 +109,7 @@ inherited CAccountsFrame: TCAccountsFrame
     Top = 120
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.AccountFrameImageList
     Left = 11
     Top = 64
     object ActionAddAccount: TAction
@@ -120,12 +119,12 @@ inherited CAccountsFrame: TCAccountsFrame
     end
     object ActionEditAccount: TAction
       Caption = 'Edytuj konto'
-      ImageIndex = 0
+      ImageIndex = 1
       OnExecute = ActionEditAccountExecute
     end
     object ActionDelAccount: TAction
       Caption = 'Usu'#324' konto'
-      ImageIndex = 0
+      ImageIndex = 2
       OnExecute = ActionDelAccountExecute
     end
   end

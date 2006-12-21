@@ -98,7 +98,7 @@ inherited CFilterFrame: TCFilterFrame
     Top = 56
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.FilterImageList24x24
     Left = 11
     Top = 16
     object ActionAddFilter: TAction
@@ -108,12 +108,12 @@ inherited CFilterFrame: TCFilterFrame
     end
     object ActionEditFilter: TAction
       Caption = 'Edytuj filtr'
-      ImageIndex = 0
+      ImageIndex = 1
       OnExecute = ActionEditFilterExecute
     end
     object ActionDelFilter: TAction
       Caption = 'Usu'#324' filtr'
-      ImageIndex = 0
+      ImageIndex = 2
       OnExecute = ActionDelFilterExecute
     end
   end

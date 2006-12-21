@@ -36,7 +36,7 @@ inherited CMovementFrame: TCMovementFrame
       object CButtonOut: TCButton
         Left = 13
         Top = 4
-        Width = 116
+        Width = 124
         Height = 33
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -46,9 +46,9 @@ inherited CMovementFrame: TCMovementFrame
         Action = ActionMovement
       end
       object CButtonEdit: TCButton
-        Left = 116
+        Left = 132
         Top = 4
-        Width = 110
+        Width = 125
         Height = 33
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -58,9 +58,9 @@ inherited CMovementFrame: TCMovementFrame
         Action = ActionEditMovement
       end
       object CButtonDel: TCButton
-        Left = 228
+        Left = 260
         Top = 4
-        Width = 110
+        Width = 117
         Height = 33
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -347,7 +347,7 @@ inherited CMovementFrame: TCMovementFrame
     Top = 144
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.OperationsImageList24x24
     Left = 200
     Top = 112
     object ActionMovement: TAction
@@ -362,7 +362,7 @@ inherited CMovementFrame: TCMovementFrame
     end
     object ActionDelMovement: TAction
       Caption = 'Usu'#324' operacj'#281
-      ImageIndex = 4
+      ImageIndex = 2
       OnExecute = ActionDelMovementExecute
     end
   end

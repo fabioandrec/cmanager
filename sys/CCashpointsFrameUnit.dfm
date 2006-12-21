@@ -100,7 +100,7 @@ inherited CCashpointsFrame: TCCashpointsFrame
     Top = 56
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.CashpointImageList24x24
     Left = 11
     Top = 16
     object ActionAddCashpoint: TAction

@@ -108,7 +108,7 @@ inherited CProductsFrame: TCProductsFrame
     end
   end
   object ActionList: TActionList
-    Images = ImageList
+    Images = CImageLists.CategoryImageList24x24
     Left = 11
     Top = 48
     object ActionAddSubCategory: TAction
@@ -118,12 +118,12 @@ inherited CProductsFrame: TCProductsFrame
     end
     object ActionEditCategory: TAction
       Caption = 'Edytuj kategori'#281
-      ImageIndex = 0
+      ImageIndex = 1
       OnExecute = ActionEditCategoryExecute
     end
     object ActionDelCategory: TAction
       Caption = 'Usu'#324' kategori'#281
-      ImageIndex = 0
+      ImageIndex = 2
       OnExecute = ActionDelCategoryExecute
     end
     object ActionAddRootCategory: TAction

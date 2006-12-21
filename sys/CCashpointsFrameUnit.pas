@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, VirtualTrees, Buttons, CDatabase, ImgList,
-  CComponents, ActnList, ExtCtrls, Menus, VTHeaderPopup, PngImageList;
+  CComponents, ActnList, ExtCtrls, Menus, VTHeaderPopup, PngImageList,
+  CImageListsUnit;
 
 type
   TCCashpointsFrame = class(TCBaseFrame)
