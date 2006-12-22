@@ -1,4 +1,5 @@
 inherited CHomeFrame: TCHomeFrame
+  Height = 512
   object Image1: TImage [0]
     Left = 24
     Top = 26
