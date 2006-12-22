@@ -109,7 +109,7 @@ inherited CAccountsFrame: TCAccountsFrame
     Top = 120
   end
   object ActionList: TActionList
-    Images = CImageLists.AccountFrameImageList
+    Images = CImageLists.AccountFrameImageList24x24
     Left = 11
     Top = 64
     object ActionAddAccount: TAction

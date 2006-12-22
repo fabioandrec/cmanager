@@ -361,15 +361,15 @@ end;
 procedure TCMainForm.ActionCloseConnectionExecute(Sender: TObject);
 var xCount: Integer;
 begin
-  GDataProvider.DisconnectFromDatabase;
-  UpdateStatusbar;
-  if not GDataProvider.IsConnected then begin
+  if GDataProvider.IsConnected then begin
     for xCount := 0 to FShortcutsFrames.Count - 1 do begin
       FShortcutsFrames.Objects[xCount].Free;
       FShortcutsFrames.Objects[xCount] := Nil;
     end;
     FShortcutsFrames.Clear;
     FActiveFrame := Nil;
+    GDataProvider.DisconnectFromDatabase;
+    UpdateStatusbar;
   end;
 end;
 
@@ -380,7 +380,7 @@ begin
     if not OpenConnection(OpenDialog.FileName, xError, xDesc) then begin
       ShowInfo(itError, xError, xDesc)
     end else begin
-      ActionShortcutExecute(ActionShorcutOperations);
+      ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
     end;
   end;
@@ -391,7 +391,7 @@ var xError, xDesc: String;
 begin
   if SaveDialog.Execute then begin
     if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True) then begin
-      ActionShortcutExecute(ActionShorcutOperations);
+      ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
     end else begin
       ShowInfo(itError, xError, xDesc);

@@ -61,7 +61,7 @@ begin
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
     if CMainForm.OpenConnection(xPrevDatabase, xError, xDesc) then begin
-      CMainForm.ActionShortcutExecute(CMainForm.ActionShorcutOperations);
+      CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;
     end else begin
       AddToReport('Nie mo¿na otworzyæ pliku danych ' + xError);
