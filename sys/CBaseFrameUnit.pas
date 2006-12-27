@@ -18,6 +18,7 @@ type
   protected
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
+    procedure WndProc(var Message: TMessage); override;
   public
     function GetList: TVirtualStringTree; virtual;
     procedure UpdateOutputData; virtual;
@@ -45,6 +46,8 @@ function FindDataobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtual
 function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtualNode;
 
 implementation
+
+uses CConsts;
 
 {$R *.dfm}
 
@@ -196,6 +199,16 @@ begin
     end;
     if xAll then begin
       FMultipleChecks.Clear;
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.WndProc(var Message: TMessage);
+begin
+  inherited WndProc(Message);
+  if Message.Msg = WM_MUSTREPAINT then begin
+    if GetList <> Nil then begin
+      GetList.Invalidate;
     end;
   end;
 end;

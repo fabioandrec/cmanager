@@ -38,13 +38,15 @@ type
 
 implementation
 
+uses CListPreferencesFormUnit;
+
 {$R *.dfm}
 
 function TCPreferencesForm.ShowPreferences(ATab: Integer): Boolean;
 begin
   Action1.OnExecute := ActionExecute;
   Action2.OnExecute := ActionExecute;
-  ActiveAction := Action1;
+  ActiveAction := TAction(ActionManager1.Actions[ATab]);
   Result := ShowConfig(coEdit);
 end;
 

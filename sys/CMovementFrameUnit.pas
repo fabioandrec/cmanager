@@ -35,6 +35,9 @@ type
     Label4: TLabel;
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
+    PopupMenuOperations: TPopupMenu;
+    N1: TMenuItem;
+    Ustawienialisty1: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -58,6 +61,7 @@ type
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure TodayListDblClick(Sender: TObject);
     procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure Ustawienialisty1Click(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
@@ -84,7 +88,8 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences;
+  Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
+  CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -709,6 +714,16 @@ var xBase: TBaseMovement;
 begin
   xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
   FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
+end;
+
+procedure TCMovementFrame.Ustawienialisty1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences('baseMovement') then begin
+    SendMessageToFrames(TCMovementFrame, WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
 end;
 
 end.

@@ -13,6 +13,7 @@ const
   WM_FORMMINIMIZE = WM_USER + 6;
   WM_OPENCONNECTION = WM_USER + 7;
   WM_CLOSECONNECTION = WM_USER + 8;
+  WM_MUSTREPAINT = WM_USER + 9;
 
 const
   CEmptyDataGid = '';

@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 294
-  Top = 55
+  Left = 298
+  Top = 289
   Caption = 'Preferencje'
   ClientWidth = 604
   PixelsPerInch = 96
