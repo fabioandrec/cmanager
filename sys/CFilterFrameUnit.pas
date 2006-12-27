@@ -42,8 +42,8 @@ type
     procedure WndProc(var Message: TMessage); override;
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
-    function GetList: TVirtualStringTree; override;
   public
+    function GetList: TVirtualStringTree; override;
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;

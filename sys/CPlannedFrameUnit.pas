@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, PngImageList, CImageListsUnit;
+  Contnrs, PngImageList, CImageListsUnit, CDataObjects;
 
 type
   TCPlannedFrame = class(TCBaseFrame)
@@ -32,15 +32,17 @@ type
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
     procedure PlannedListDblClick(Sender: TObject);
+    procedure PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
     FPlannedObjects: TDataObjectList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
+    procedure FindFontAndBackground(AMovement: TPlannedMovement; AFont: TFont; var ABackground: TColor);
   protected
     procedure WndProc(var Message: TMessage); override;
-    function GetList: TVirtualStringTree; override;
   public
+    function GetList: TVirtualStringTree; override;
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
@@ -50,9 +52,9 @@ type
 
 implementation
 
-uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
+uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  CPlannedFormUnit, CDoneFrameUnit, CConsts;
+  CPlannedFormUnit, CDoneFrameUnit, CConsts, CPreferences;
 
 {$R *.dfm}
 
@@ -181,12 +183,19 @@ begin
 end;
 
 procedure TCPlannedFrame.PlannedListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var xBase: TPlannedMovement;
+    xColor: TColor;
 begin
+  xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
   with TargetCanvas do begin
     if not Odd(Node.Index) then begin
       ItemColor := clWindow;
     end else begin
       ItemColor := GetHighLightColor(clWindow, -10);
+    end;
+    FindFontAndBackground(xBase, Nil, xColor);
+    if xColor <> clWindow then begin
+      ItemColor := xColor;
     end;
     EraseAction := eaColor;
   end;
@@ -311,6 +320,28 @@ end;
 procedure TCPlannedFrame.PlannedListDblClick(Sender: TObject);
 begin
   ActionEditMovement.Execute;
+end;
+
+procedure TCPlannedFrame.FindFontAndBackground(AMovement: TPlannedMovement; AFont: TFont; var ABackground: TColor);
+var xKey: String;
+    xPref: TFontPreference;
+begin
+  xKey := AMovement.movementType;
+  xPref := GFontpreferences.FindFontPreference('plannedMovement', xKey);
+  if xPref <> Nil then begin
+    ABackground := xPref.Background;
+    if AFont <> Nil then begin
+      AFont.Assign(xPref.Font);
+    end;
+  end;
+end;
+
+procedure TCPlannedFrame.PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+var xBase: TPlannedMovement;
+    xColor: TColor;
+begin
+  xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
+  FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
 end;
 
 end.

@@ -18,8 +18,8 @@ type
   protected
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
-    function GetList: TVirtualStringTree; virtual;
   public
+    function GetList: TVirtualStringTree; virtual;
     procedure UpdateOutputData; virtual;
     function FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode; virtual;
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;

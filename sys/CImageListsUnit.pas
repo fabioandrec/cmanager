@@ -18,6 +18,7 @@ type
     DoneImageList24x24: TPngImageList;
     StatsImageList24x24: TPngImageList;
     FilterImageList24x24: TPngImageList;
+    MovementIcons16x16: TPngImageList;
   private
     { Private declarations }
   public

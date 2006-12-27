@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, CDataObjects, PngImageList, CImageListsUnit;
+  Contnrs, CDataObjects, PngImageList, CImageListsUnit, CSchedules;
 
 type
   TDoneFrameAdditionalData = class
@@ -60,19 +60,21 @@ type
     procedure DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ActionOperationExecute(Sender: TObject);
     procedure DoneListDblClick(Sender: TObject);
+    procedure DoneListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
     FSumObjects: TSumList;
     FTreeObjects: TObjectList;
     procedure UpdateCustomPeriod;
+    procedure FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
   protected
     procedure WndProc(var Message: TMessage); override;
-    function GetList: TVirtualStringTree; override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
     function GetSelectedId: ShortString; override;
     function GetSelectedText: String; override;
   public
+    function GetList: TVirtualStringTree; override;
     procedure ReloadDone;
     procedure ReloadSums;
     procedure RecreateTreeHelper;
@@ -88,7 +90,7 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit, CSchedules, CConsts;
+  Math, CDoneFormUnit, CConsts, CPreferences;
 
 {$R *.dfm}
 
@@ -283,12 +285,19 @@ begin
 end;
 
 procedure TCDoneFrame.DoneListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var xColor: TColor;
+    xBase: TPlannedTreeItem;
 begin
+  xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
   with TargetCanvas do begin
     if not Odd(Node.Index) then begin
       ItemColor := clWindow;
     end else begin
       ItemColor := GetHighLightColor(clWindow, -10);
+    end;
+    FindFontAndBackground(xBase, Nil, xColor);
+    if xColor <> clWindow then begin
+      ItemColor := xColor;
     end;
     EraseAction := eaColor;
   end;
@@ -712,6 +721,36 @@ end;
 procedure TCDoneFrame.DoneListDblClick(Sender: TObject);
 begin
   ActionOperation.Execute;
+end;
+
+procedure TCDoneFrame.FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
+var xKey: String;
+    xPref: TFontPreference;
+begin
+  if ADone.done <> Nil then begin
+    xKey := 'D' + ADone.done.doneState;
+  end else begin
+    if ADone.triggerDate >= GWorkDate then begin
+      xKey := 'R';
+    end else begin
+      xKey := 'W';
+    end;
+  end;
+  xPref := GFontpreferences.FindFontPreference('plannedDone', xKey);
+  if xPref <> Nil then begin
+    ABackground := xPref.Background;
+    if AFont <> Nil then begin
+      AFont.Assign(xPref.Font);
+    end;
+  end;
+end;
+
+procedure TCDoneFrame.DoneListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+var xBase: TPlannedTreeItem;
+    xColor: TColor;
+begin
+  xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
+  FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
 end;
 
 end.

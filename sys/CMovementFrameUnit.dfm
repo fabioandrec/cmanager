@@ -168,6 +168,7 @@ inherited CMovementFrame: TCMovementFrame
     Header.PopupMenu = VTHeaderPopupMenu
     Header.Style = hsFlatButtons
     HintMode = hmHint
+    Images = CImageLists.MovementIcons16x16
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
@@ -180,6 +181,7 @@ inherited CMovementFrame: TCMovementFrame
     OnDblClick = TodayListDblClick
     OnFocusChanged = TodayListFocusChanged
     OnGetText = TodayListGetText
+    OnPaintText = TodayListPaintText
     OnGetHint = TodayListGetHint
     OnGetNodeDataSize = TodayListGetNodeDataSize
     OnHeaderClick = TodayListHeaderClick

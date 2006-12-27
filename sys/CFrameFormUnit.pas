@@ -34,6 +34,9 @@ begin
   FFrame.Visible := False;
   FFrame.DisableAlign;
   FFrame.InitializeFrame(AAdditionalData, AOutData, AMultipleCheck);
+  if FFrame.GetList <> Nil then begin
+    FFrame.GetList.TabStop := True;
+  end;
   FFrame.PrepareCheckStates;
   FFrame.Parent := PanelFrame;
   FFrame.EnableAlign;

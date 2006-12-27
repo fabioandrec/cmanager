@@ -2767,4 +2767,10 @@ object CImageLists: TCImageLists
     Top = 216
     Bitmap = {}
   end
+  object MovementIcons16x16: TPngImageList
+    PngImages = <>
+    PngOptions = []
+    Left = 384
+    Top = 208
+  end
 end

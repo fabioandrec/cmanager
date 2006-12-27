@@ -61,7 +61,9 @@ uses
   CArchFormUnit in 'CArchFormUnit.pas' {CArchForm},
   CImageListsUnit in 'CImageListsUnit.pas' {CImageLists: TDataModule},
   CCheckDatafileFormUnit in 'CCheckDatafileFormUnit.pas' {CCheckDatafileFormUnit},
-  CPreferencesFormUnit in 'CPreferencesFormUnit.pas' {CPreferencesForm};
+  CPreferencesFormUnit in 'CPreferencesFormUnit.pas' {CPreferencesForm},
+  CListPreferencesFormUnit in 'CListPreferencesFormUnit.pas' {CListPreferencesForm},
+  CPreferences in 'CPreferences.pas';
 
 {$R *.res}
 

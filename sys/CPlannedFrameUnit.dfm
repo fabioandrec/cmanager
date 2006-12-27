@@ -80,6 +80,7 @@ inherited CPlannedFrame: TCPlannedFrame
     OnDblClick = PlannedListDblClick
     OnFocusChanged = PlannedListFocusChanged
     OnGetText = PlannedListGetText
+    OnPaintText = PlannedListPaintText
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
     OnHeaderClick = PlannedListHeaderClick

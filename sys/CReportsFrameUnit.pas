@@ -50,9 +50,8 @@ type
     FTreeHelper: THelperElement;
     procedure RecreateTreeHelper;
     procedure ReloadReports;
-  protected
-    function GetList: TVirtualStringTree; override;
   public
+    function GetList: TVirtualStringTree; override;
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;

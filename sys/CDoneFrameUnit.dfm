@@ -155,6 +155,7 @@ inherited CDoneFrame: TCDoneFrame
     OnDblClick = DoneListDblClick
     OnFocusChanged = DoneListFocusChanged
     OnGetText = DoneListGetText
+    OnPaintText = DoneListPaintText
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
     OnHeaderClick = DoneListHeaderClick

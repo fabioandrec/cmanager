@@ -14,10 +14,15 @@ procedure SaveFormPosition(AForm: TForm); overload;
 procedure LoadFormPosition(AForm: TForm);
 function GetSettingsRoot: IXMLDOMNode;
 function GetSettingsForms: IXMLDOMNode;
+function GetSettingsPreferences: IXMLDOMNode;
+function GetSettingsFonts: IXMLDOMNode;
+procedure SetXmlAttribute(AName: String; ANode: IXMLDOMNode; AValue: OleVariant);
+function GetXmlAttribute(AName: String; ANode: IXMLDOMNode; ADefault: OleVariant): OleVariant;
 
 implementation
 
-uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts;
+uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts,
+  CPreferences;
 
 var GSettings: IXMLDOMDocument = Nil;
 
@@ -59,6 +64,32 @@ begin
     Result := xRoot.selectSingleNode('forms');
     if Result = Nil then begin
       Result := GSettings.createElement('forms');
+      xRoot.appendChild(Result);
+    end;
+  end;
+end;
+
+function GetSettingsPreferences: IXMLDOMNode;
+var xRoot: IXMLDOMNode;
+begin
+  if GSettings <> Nil then begin
+    xRoot := GetSettingsRoot;
+    Result := xRoot.selectSingleNode('preferences');
+    if Result = Nil then begin
+      Result := GSettings.createElement('preferences');
+      xRoot.appendChild(Result);
+    end;
+  end;
+end;
+
+function GetSettingsFonts: IXMLDOMNode;
+var xRoot: IXMLDOMNode;
+begin
+  if GSettings <> Nil then begin
+    xRoot := GetSettingsPreferences;
+    Result := xRoot.selectSingleNode('fonts');
+    if Result = Nil then begin
+      Result := GSettings.createElement('fonts');
       xRoot.appendChild(Result);
     end;
   end;
@@ -131,6 +162,9 @@ begin
     end;
   end else begin
     GetSettingsRoot;
+  end;
+  if Result then begin
+    GFontpreferences.LoadFromXml(GetSettingsPreferences);
   end;
 end;
 

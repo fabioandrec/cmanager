@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, PngImageList, CImageListsUnit;
+  Contnrs, PngImageList, CImageListsUnit, CDataObjects;
 
 type
   TCMovementFrame = class(TCBaseFrame)
@@ -57,6 +57,7 @@ type
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure TodayListDblClick(Sender: TObject);
+    procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
@@ -64,11 +65,12 @@ type
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
     procedure UpdateCustomPeriod;
+    procedure FindFontAndBackground(AMovement: TBaseMovement; AFont: TFont; var ABackground: TColor);
   protected
     procedure WndProc(var Message: TMessage); override;
-    function GetList: TVirtualStringTree; override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
   public
+    function GetList: TVirtualStringTree; override;
     procedure ReloadToday;
     procedure ReloadSums;
     constructor Create(AOwner: TComponent); override;
@@ -80,9 +82,9 @@ type
 
 implementation
 
-uses CFrameFormUnit, CDataObjects, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
+uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Types, CDoneFormUnit, CDoneFrameUnit, CConsts;
+  Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences;
 
 {$R *.dfm}
 
@@ -323,12 +325,19 @@ begin
 end;
 
 procedure TCMovementFrame.TodayListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var xBase: TBaseMovement;
+    xColor: TColor;
 begin
+  xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
   with TargetCanvas do begin
     if not Odd(Node.Index) then begin
       ItemColor := clWindow;
     end else begin
       ItemColor := GetHighLightColor(clWindow, -10);
+    end;
+    FindFontAndBackground(xBase, Nil, xColor);
+    if xColor <> clWindow then begin
+      ItemColor := xColor;
     end;
     EraseAction := eaColor;
   end;
@@ -675,6 +684,31 @@ end;
 procedure TCMovementFrame.TodayListDblClick(Sender: TObject);
 begin
   ActionEditMovement.Execute;
+end;
+
+procedure TCMovementFrame.FindFontAndBackground(AMovement: TBaseMovement; AFont: TFont; var ABackground: TColor);
+var xKey: String;
+    xPref: TFontPreference;
+begin
+  xKey := AMovement.movementType;
+  if AMovement.idPlannedDone <> CEmptyDataGid then begin
+    xKey := 'C' + xKey;
+  end;
+  xPref := GFontpreferences.FindFontPreference('baseMovement', xKey);
+  if xPref <> Nil then begin
+    ABackground := xPref.Background;
+    if AFont <> Nil then begin
+      AFont.Assign(xPref.Font);
+    end;
+  end;
+end;
+
+procedure TCMovementFrame.TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+var xBase: TBaseMovement;
+    xColor: TColor;
+begin
+  xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
+  FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
 end;
 
 end.

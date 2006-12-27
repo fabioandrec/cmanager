@@ -18,8 +18,11 @@ type
     CButton2: TCButton;
     ActionOperationsList: TAction;
     CButton3: TCButton;
+    ActionPreferences: TAction;
+    CButton4: TCButton;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
+    procedure ActionPreferencesExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -29,7 +32,8 @@ type
 implementation
 
 uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
-  CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit;
+  CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
+  CPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -61,6 +65,14 @@ begin
     SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
   end;
   xForm.Free;
+end;
+
+procedure TCHomeFrame.ActionPreferencesExecute(Sender: TObject);
+var xPrefs: TCPreferencesForm;
+begin
+  xPrefs := TCPreferencesForm.Create(Nil);
+  xPrefs.ShowPreferences;
+  xPrefs.Free;
 end;
 
 end.

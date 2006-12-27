@@ -24,8 +24,8 @@ type
   protected
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
-    function GetList: TVirtualStringTree; override;
   public
+    function GetList: TVirtualStringTree; override;
     procedure ReloadList(AItems: TStringList);
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;

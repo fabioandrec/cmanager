@@ -213,7 +213,8 @@ function DataGidToDatabase(ADataGid: TDataGid): String;
 
 implementation
 
-uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools;
+uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
+  CPreferences;
 
 threadvar GTickCounter: Cardinal;
 

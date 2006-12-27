@@ -105,7 +105,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
-     CPreferencesFormUnit, CImageListsUnit, Types;
+     CPreferencesFormUnit, CImageListsUnit, Types, CPreferences;
 
 {$R *.dfm}
 
@@ -149,6 +149,7 @@ procedure TCMainForm.FormDestroy(Sender: TObject);
 begin
   FShortcutsFrames.Free;
   FShortcutList.Free;
+  GFontpreferences.SaveToXml(GetSettingsPreferences);
   SaveFormPosition(Self);
   FinalizeSettings(CSettingsFilename);
 end;
