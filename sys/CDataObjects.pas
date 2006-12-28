@@ -2,7 +2,7 @@ unit CDataObjects;
 
 interface
 
-uses CDatabase, SysUtils, AdoDb, Classes;
+uses CDatabase, SysUtils, AdoDb, Classes, CConsts;
 
 type
   TBaseName = string[40];
@@ -232,6 +232,29 @@ type
     property cashpoints: TStringList read Fcashpoints write Setcashpoints;
   end;
 
+  TProfile = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    FidAccount: TDataGid;
+    FidCashPoint: TDataGid;
+    FidProduct: TDataGid;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: TBaseName);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetidCashPoint(const Value: TDataGid);
+    procedure SetidProduct(const Value: TDataGid);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+    property idProduct: TDataGid read FidProduct write SetidProduct;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -239,13 +262,15 @@ var CashPointProxy: TDataProxy;
     PlannedMovementProxy: TDataProxy;
     PlannedDoneProxy: TDataProxy;
     MovementFilterProxy: TDataProxy;
+    ProfileProxy: TDataProxy;
+
+var GActiveProfileId: TDataGid = CEmptyDataGid;
 
 procedure InitializeProxies;
-procedure CheckDatabase;
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils, CConsts;
+uses DB, CInfoFormUnit, DateUtils;
 
 procedure InitializeProxies;
 begin
@@ -256,6 +281,7 @@ begin
   PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
   PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
   MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
+  ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -1025,9 +1051,68 @@ begin
   end;
 end;
 
-procedure CheckDatabase;
+procedure TProfile.FromDataset(ADataset: TADOQuery);
 begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FidCashPoint := FieldByName('idCashPoint').AsString;
+    FidProduct := FieldByName('idProduct').AsString;
+  end;
+end;
 
+procedure TProfile.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProfile.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProfile.SetidCashPoint(const Value: TDataGid);
+begin
+  if FidCashPoint <> Value then begin
+    FidCashPoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProfile.SetidProduct(const Value: TDataGid);
+begin
+  if FidProduct <> Value then begin
+    FidProduct := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProfile.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProfile.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fname, True, 'profile');
+    AddField('description', Fdescription, True, 'profile');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'profile');
+    AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'profile');
+    AddField('idProduct', DataGidToDatabase(FidProduct), False, 'profile');
+  end;
 end;
 
 end.

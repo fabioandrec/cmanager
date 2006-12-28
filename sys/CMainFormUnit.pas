@@ -50,6 +50,7 @@ type
     ActionRestore: TAction;
     ActionCheckDatafile: TAction;
     ActionPreferences: TAction;
+    ActionShortcutProfiles: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -105,7 +106,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
-     CPreferencesFormUnit, CImageListsUnit, Types, CPreferences;
+     CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
+  CProfileFrameUnit;
 
 {$R *.dfm}
 
@@ -149,7 +151,7 @@ procedure TCMainForm.FormDestroy(Sender: TObject);
 begin
   FShortcutsFrames.Free;
   FShortcutList.Free;
-  GFontpreferences.SaveToXml(GetSettingsPreferences);
+  GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
   SaveFormPosition(Self);
   FinalizeSettings(CSettingsFilename);
 end;
@@ -179,6 +181,8 @@ begin
       xClass := TCReportsFrame;
     end else if AAction = ActionShortcutFilters then begin
       xClass := TCFilterFrame;
+    end else if AAction = ActionShortcutProfiles then begin
+      xClass := TCProfileFrame;
     end else begin
       xClass := TCBaseFrame;
     end;

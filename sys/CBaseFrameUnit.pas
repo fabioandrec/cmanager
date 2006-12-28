@@ -4,13 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList;
+  Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
 
   TCBaseFrame = class(TFrame)
     ImageList: TPngImageList;
+    ListPopupMenu: TPopupMenu;
+    N1: TMenuItem;
+    Ustawienialisty1: TMenuItem;
+    procedure Ustawienialisty1Click(Sender: TObject);
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;
@@ -26,6 +30,7 @@ type
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
     procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
+    class function GetPrefname: String; virtual;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; virtual;
@@ -47,7 +52,7 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtual
 
 implementation
 
-uses CConsts;
+uses CConsts, CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -136,13 +141,19 @@ begin
 end;
 
 procedure TCBaseFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+var xList: TVirtualStringTree;
 begin
   FAdditionalData := AAdditionalData;
   FMultipleChecks := AMultipleCheck;
   FOutputData := AOutputData;
-  if (AMultipleCheck <> Nil) and (GetList <> Nil) then begin
-    GetList.TreeOptions.MiscOptions := GetList.TreeOptions.MiscOptions + [toCheckSupport];
-    GetList.CheckImageKind := ckDarkTick;
+  xList := GetList;
+  if xList <> Nil then begin
+    xList.PopupMenu := ListPopupMenu;
+    Ustawienialisty1.Visible := GetPrefname <> '';
+    if (AMultipleCheck <> Nil) then begin
+      xList.TreeOptions.MiscOptions := xList.TreeOptions.MiscOptions + [toCheckSupport];
+      xList.CheckImageKind := ckDarkTick;
+    end;
   end;
 end;
 
@@ -211,6 +222,21 @@ begin
       GetList.Invalidate;
     end;
   end;
+end;
+
+procedure TCBaseFrame.Ustawienialisty1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(GetPrefname) then begin
+    SendMessageToFrames(TCBaseFrameClass(ClassType), WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
+end;
+
+class function TCBaseFrame.GetPrefname: String;
+begin
+  Result := '';
 end;
 
 initialization

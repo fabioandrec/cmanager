@@ -302,22 +302,22 @@ object CMainForm: TCMainForm
               item
                 Action = ActionShortcutStart
                 Caption = '&Start'
-                ImageIndex = 8
+                ImageIndex = 0
               end
               item
                 Action = ActionShorcutOperations
                 Caption = '&Operacje wykonane'
-                ImageIndex = 5
+                ImageIndex = 1
               end
               item
                 Action = ActionShortcutPlannedDone
                 Caption = '&Czynno'#347'ci zaplanowane'
-                ImageIndex = 6
+                ImageIndex = 2
               end
               item
                 Action = ActionShortcutPlanned
                 Caption = '&Definicje plan'#243'w'
-                ImageIndex = 7
+                ImageIndex = 3
               end
               item
                 Action = ActionShortcutAccounts
@@ -327,12 +327,12 @@ object CMainForm: TCMainForm
               item
                 Action = ActionShortcutProducts
                 Caption = 'L&ista kategorii'
-                ImageIndex = 3
+                ImageIndex = 5
               end
               item
                 Action = ActionShortcutCashpoints
                 Caption = 'Lis&ta kontrahent'#243'w'
-                ImageIndex = 1
+                ImageIndex = 6
               end
               item
                 Action = ActionShortcutReports
@@ -342,7 +342,11 @@ object CMainForm: TCMainForm
               item
                 Action = ActionShortcutFilters
                 Caption = '&Filtry'
-                ImageIndex = 2
+                ImageIndex = 8
+              end
+              item
+                Action = ActionShortcutProfiles
+                ImageIndex = 9
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -362,6 +366,7 @@ object CMainForm: TCMainForm
             Items = <
               item
                 Action = ActionPreferences
+                Caption = '&Preferencje'
               end>
             Caption = '&Narz'#281'dzia'
           end
@@ -490,6 +495,11 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Preferencje'
       OnExecute = ActionPreferencesExecute
+    end
+    object ActionShortcutProfiles: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Profile'
+      ImageIndex = 9
     end
   end
   object OpenDialog: TOpenDialog

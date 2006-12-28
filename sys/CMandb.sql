@@ -134,6 +134,23 @@ create table productFilter (
   constraint fk_productMovementproduct foreign key (idProduct) references product (idProduct)
 );
 
+create table profile (
+  idProfile uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  name varchar(40) not null,
+  description varchar(200),
+  idAccount uniqueidentifier null,
+  idCashPoint uniqueidentifier null,
+  idProduct uniqueidentifier null,
+  primary key (idProfile),
+  constraint fk_productprofile foreign key (idProduct) references product (idProduct),
+  constraint fk_cashpointprofile foreign key (idCashpoint) references cashpoint (idCashpoint),
+  constraint fk_accountprofile foreign key (idAccount) references account (idAccount)
+);
+
+
+
 create table cmanagerInfo (
   version varchar(20) not null,
   created datetime not null

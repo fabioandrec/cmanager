@@ -35,9 +35,6 @@ type
     Label4: TLabel;
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
-    PopupMenuOperations: TPopupMenu;
-    N1: TMenuItem;
-    Ustawienialisty1: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -61,7 +58,6 @@ type
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure TodayListDblClick(Sender: TObject);
     procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure Ustawienialisty1Click(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
@@ -82,6 +78,7 @@ type
     destructor Destroy; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
@@ -693,13 +690,13 @@ end;
 
 procedure TCMovementFrame.FindFontAndBackground(AMovement: TBaseMovement; AFont: TFont; var ABackground: TColor);
 var xKey: String;
-    xPref: TFontPreference;
+    xPref: TFontPref;
 begin
   xKey := AMovement.movementType;
   if AMovement.idPlannedDone <> CEmptyDataGid then begin
     xKey := 'C' + xKey;
   end;
-  xPref := GFontpreferences.FindFontPreference('baseMovement', xKey);
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['baseMovement']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
     ABackground := xPref.Background;
     if AFont <> Nil then begin
@@ -716,14 +713,9 @@ begin
   FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
 end;
 
-procedure TCMovementFrame.Ustawienialisty1Click(Sender: TObject);
-var xPrefs: TCListPreferencesForm;
+class function TCMovementFrame.GetPrefname: String;
 begin
-  xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences('baseMovement') then begin
-    SendMessageToFrames(TCMovementFrame, WM_MUSTREPAINT, 0, 0);
-  end;
-  xPrefs.Free;
+  Result := 'baseMovement';
 end;
 
 end.

@@ -170,7 +170,6 @@ inherited CMovementFrame: TCMovementFrame
     HintMode = hmHint
     Images = CImageLists.MovementIcons16x16
     ParentShowHint = False
-    PopupMenu = PopupMenuOperations
     ShowHint = True
     TabOrder = 1
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -349,7 +348,7 @@ inherited CMovementFrame: TCMovementFrame
   inherited ImageList: TPngImageList
     Top = 144
   end
-  object ActionList: TActionList
+  object ActionList: TActionList [5]
     Images = CImageLists.OperationsImageList24x24
     Left = 200
     Top = 112
@@ -369,19 +368,8 @@ inherited CMovementFrame: TCMovementFrame
       OnExecute = ActionDelMovementExecute
     end
   end
-  object VTHeaderPopupMenu: TVTHeaderPopupMenu
+  object VTHeaderPopupMenu: TVTHeaderPopupMenu [6]
     Left = 80
     Top = 120
-  end
-  object PopupMenuOperations: TPopupMenu
-    Left = 296
-    Top = 56
-    object N1: TMenuItem
-      Caption = '-'
-    end
-    object Ustawienialisty1: TMenuItem
-      Caption = 'Ustawienia listy'
-      OnClick = Ustawienialisty1Click
-    end
   end
 end

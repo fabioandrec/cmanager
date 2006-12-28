@@ -164,7 +164,7 @@ begin
     GetSettingsRoot;
   end;
   if Result then begin
-    GFontpreferences.LoadFromXml(GetSettingsPreferences);
+    GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
   end;
 end;
 

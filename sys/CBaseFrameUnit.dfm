@@ -13,4 +13,15 @@ object CBaseFrame: TCBaseFrame
     Left = 16
     Top = 16
   end
+  object ListPopupMenu: TPopupMenu
+    Left = 72
+    Top = 24
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Ustawienialisty1: TMenuItem
+      Caption = 'Ustawienia listy'
+      OnClick = Ustawienialisty1Click
+    end
+  end
 end

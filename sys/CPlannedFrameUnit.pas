@@ -48,6 +48,7 @@ type
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
@@ -324,10 +325,10 @@ end;
 
 procedure TCPlannedFrame.FindFontAndBackground(AMovement: TPlannedMovement; AFont: TFont; var ABackground: TColor);
 var xKey: String;
-    xPref: TFontPreference;
+    xPref: TFontPref;
 begin
   xKey := AMovement.movementType;
-  xPref := GFontpreferences.FindFontPreference('plannedMovement', xKey);
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['plannedMovement']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
     ABackground := xPref.Background;
     if AFont <> Nil then begin
@@ -342,6 +343,11 @@ var xBase: TPlannedMovement;
 begin
   xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
   FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
+end;
+
+class function TCPlannedFrame.GetPrefname: String;
+begin
+  Result := 'plannedMovement';
 end;
 
 end.

@@ -84,6 +84,7 @@ type
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     function FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
@@ -725,7 +726,7 @@ end;
 
 procedure TCDoneFrame.FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
 var xKey: String;
-    xPref: TFontPreference;
+    xPref: TFontPref;
 begin
   if ADone.done <> Nil then begin
     xKey := 'D' + ADone.done.doneState;
@@ -736,7 +737,7 @@ begin
       xKey := 'W';
     end;
   end;
-  xPref := GFontpreferences.FindFontPreference('plannedDone', xKey);
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['plannedDone']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
     ABackground := xPref.Background;
     if AFont <> Nil then begin
@@ -751,6 +752,11 @@ var xBase: TPlannedTreeItem;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
   FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
+end;
+
+class function TCDoneFrame.GetPrefname: String;
+begin
+  Result := 'plannedDone';
 end;
 
 end.

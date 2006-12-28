@@ -565,6 +565,10 @@ begin
     if FDataId = '' then begin
       Caption := FTextOnEmpty;
     end;
+  end else begin
+    if Value = '' then begin
+      Caption := FTextOnEmpty;
+    end;
   end;
 end;
 
