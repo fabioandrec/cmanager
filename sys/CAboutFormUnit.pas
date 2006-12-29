@@ -51,7 +51,7 @@ end;
 
 procedure TCAboutForm.CButtonMailClick(Sender: TObject);
 begin
-  ShellExecute(0, nil, 'mailto:mabaturo@wp.pl?subject=CManager', nil, nil, SW_SHOWNORMAL);
+  ShellExecute(0, nil, 'mailto:levin_a@users.sourceforge.net?subject=CManager', nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TCAboutForm.CButton1Click(Sender: TObject);

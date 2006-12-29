@@ -44,16 +44,16 @@ inherited CAboutForm: TCAboutForm
       ParentFont = False
     end
     object CButtonMail: TCButton
-      Left = 257
+      Left = 192
       Top = 16
-      Width = 97
+      Width = 162
       Height = 17
       Cursor = crHandPoint
       PicPosition = ppLeft
       PicOffset = 10
       TxtOffset = 15
       Framed = False
-      Caption = 'mabaturo@wp.pl'
+      Caption = 'levin_a@users.sourceforge.net'
       OnClick = CButtonMailClick
       Color = clBtnFace
     end

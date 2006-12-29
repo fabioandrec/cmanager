@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=1
-Build=90
+Build=94
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=
-FileVersion=1.0.1.90
+FileVersion=1.0.1.94
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -136,6 +136,19 @@ ProductVersion=1.0
 Comments=
 [Excluded Packages]
 c:\program files\borland\delphi7\Projects\Bpl\NowaPoczta.bpl=Komponenty Danych Nowa Poczta
+[HistoryLists\hlConditionals]
+Count=2
+Item0=DECLARE_GPL
+Item1=GPL
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=..\..\Trash
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=..\..\Bin
