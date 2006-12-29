@@ -153,7 +153,7 @@ begin
   FShortcutList.Free;
   GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
   SaveFormPosition(Self);
-  FinalizeSettings(CSettingsFilename);
+  FinalizeSettings(GetSystemPathname(CSettingsFilename));
 end;
 
 procedure TCMainForm.PerformShortcutAction(AAction: TAction);
