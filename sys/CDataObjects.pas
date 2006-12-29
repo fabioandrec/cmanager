@@ -247,6 +247,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    procedure DeleteObject; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -1049,6 +1050,14 @@ begin
            'insert into cashpointFilter (idMovementFilter, idCashpoint) values (%s, %s)',
            [DataGidToDatabase(id), DataGidToDatabase(FCashpoints.Strings[xCount])]));
   end;
+end;
+
+procedure TProfile.DeleteObject;
+begin
+  if GActiveProfileId = id then begin
+    GActiveProfileId := CEmptyDataGid;
+  end;
+  inherited DeleteObject;
 end;
 
 procedure TProfile.FromDataset(ADataset: TADOQuery);

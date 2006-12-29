@@ -115,9 +115,16 @@ begin
 end;
 
 procedure TCProfileFrame.ProfileListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+var xProfile: TProfile;
 begin
-  CButtonEditProfile.Enabled := Node <> Nil;
-  CButtonDelProfile.Enabled := Node <> Nil;
+  if Node <> Nil then begin
+    xProfile := TProfile(ProfileList.GetNodeData(Node)^);
+    CButtonEditProfile.Enabled := xProfile.id <> CEmptyDataGid;
+    CButtonDelProfile.Enabled := xProfile.id <> CEmptyDataGid;
+  end else begin
+    CButtonEditProfile.Enabled := False;
+    CButtonDelProfile.Enabled := False;
+  end;
   if Owner.InheritsFrom(TCFrameForm) then begin
     TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
   end;
@@ -183,6 +190,9 @@ end;
 procedure TCProfileFrame.ReloadProfiles;
 begin
   FProfileObjects := TDataObject.GetList(TProfile, ProfileProxy, 'select * from profile');
+  if AdditionalData <> Nil then begin
+    FProfileObjects.Insert(0, AdditionalData);
+  end;
   ProfileList.BeginUpdate;
   ProfileList.Clear;
   ProfileList.RootNodeCount := FProfileObjects.Count;
@@ -261,6 +271,9 @@ end;
 
 destructor TCProfileFrame.Destroy;
 begin
+  if AdditionalData <> Nil then begin
+    FProfileObjects.Extract(AdditionalData);
+  end;
   FProfileObjects.Free;
   inherited Destroy;
 end;

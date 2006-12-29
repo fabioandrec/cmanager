@@ -113,6 +113,7 @@ type
     FIsStatic: Boolean;
     FDataProxy: TDataProxy;
     FDataFieldList: TDataFieldList;
+    FIsRegistered: Boolean;
   protected
     procedure SetState(AState: TDataMemoryState);
     procedure SetMode(AMode: TDataCreationMode);
@@ -130,7 +131,7 @@ type
     procedure AfterPost; virtual;
     class function CanBeDeleted(AId: TDataGid): Boolean; virtual;
   published
-    property id: TDataGid read FId;
+    property id: TDataGid read FId write Fid;
     property created: TDateTime read Fcreated;
     property modified: TDateTime read Fmodified;
     property creationMode: TDataCreationMode read FCreationMode;
@@ -435,6 +436,7 @@ begin
   Fcreated := Now;
   Fmodified := 0;
   FIsStatic := AStatic;
+  FIsRegistered := False;
 end;
 
 constructor TDataObject.CreateObject(ADataProxy: TDataProxy; AIsStatic: Boolean);
@@ -445,6 +447,7 @@ begin
   CreateGUID(xGuid);
   Fid := GUIDToString(xGuid);
   DataProxy.AddDataObject(Self);
+  FIsRegistered := True;
 end;
 
 procedure TDataObject.DeleteObject;
@@ -454,7 +457,9 @@ end;
 
 destructor TDataObject.Destroy;
 begin
-  FDataProxy.DelDataObject(Self);
+  if FIsRegistered then begin
+    FDataProxy.DelDataObject(Self);
+  end;
   FDataFieldList.Free;
   inherited Destroy;
 end;

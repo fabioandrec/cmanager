@@ -86,9 +86,25 @@ begin
 end;
 
 procedure TCMovementForm.ComboBoxTypeChange(Sender: TObject);
+var xProfile: TProfile;
 begin
+  Caption := 'Operacja';
   if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
     PageControl.ActivePage := TabSheetInOutOnce;
+    if Operation = coAdd then begin
+      if GActiveProfileId <> CEmptyDataGid then begin
+        GDataProvider.BeginTransaction;
+        xProfile := TProfile(TProfile.LoadObject(ProfileProxy, GActiveProfileId, False));
+        Caption := Caption + ' - ' + xProfile.name;
+        CStaticInoutOnceAccount.DataId := xProfile.idAccount;
+        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xProfile.idAccount, False)).name;
+        CStaticInoutOnceCashpoint.DataId := xProfile.idCashPoint;
+        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xProfile.idCashPoint, False)).name;
+        CStaticInoutOnceCategory.DataId := xProfile.idProduct;
+        CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProfile.idProduct, False)).name;
+        GDataProvider.RollbackTransaction;
+      end;
+    end;
   end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
     PageControl.ActivePage := TabSheetInOutCyclic;
   end else if (ComboBoxType.ItemIndex = 2) then begin

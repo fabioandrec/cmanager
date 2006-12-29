@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, PngImageList, ExtCtrls, StdCtrls,
-  pngimage, ActnList, CComponents;
+  pngimage, ActnList, CComponents, Menus;
 
 type
   TCHomeFrame = class(TCBaseFrame)
@@ -20,9 +20,14 @@ type
     CButton3: TCButton;
     ActionPreferences: TAction;
     CButton4: TCButton;
+    Image2: TImage;
+    Label2: TLabel;
+    ActionSetProfile: TAction;
+    CButton5: TCButton;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
+    procedure ActionSetProfileExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -33,14 +38,14 @@ implementation
 
 uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
   CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
-  CPreferencesFormUnit;
+  CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit;
 
 {$R *.dfm}
 
 constructor TCHomeFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Label1.Caption := Label1.Caption + ' (' + FormatDateTime('dd MMMM yyyy', Now) + ')';
+  Label1.Caption := Label1.Caption + ' - ' + FormatDateTime('dd MMMM yyyy', Now);
 end;
 
 procedure TCHomeFrame.ActionNewOperationExecute(Sender: TObject);
@@ -73,6 +78,20 @@ begin
   xPrefs := TCPreferencesForm.Create(Nil);
   xPrefs.ShowPreferences;
   xPrefs.Free;
+end;
+
+procedure TCHomeFrame.ActionSetProfileExecute(Sender: TObject);
+var xText: String;
+    xProfileId: String;
+    xMark: TProfile;
+begin
+  xProfileId := GActiveProfileId;
+  xMark := TProfile.Create(True);
+  xMark.id := CEmptyDataGid;
+  xMark.name := '<usuñ aktywny profil>';
+  if TCFrameForm.ShowFrame(TCProfileFrame, xProfileId, xText, xMark) then begin
+    GActiveProfileId := xProfileId;
+  end;
 end;
 
 end.

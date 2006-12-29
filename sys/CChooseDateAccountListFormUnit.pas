@@ -11,8 +11,7 @@ type
     GroupBox2: TGroupBox;
     Label14: TLabel;
     CStaticAccount: TCStatic;
-    procedure CStaticAccountGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     { Private declarations }
   public
@@ -23,7 +22,8 @@ function ChooseDateAccountListByForm(var ADate: TDateTime; var AIdAccounts: TStr
 
 implementation
 
-uses CFrameFormUnit, CAccountsFrameUnit, CConfigFormUnit;
+uses CFrameFormUnit, CAccountsFrameUnit, CConfigFormUnit, CConsts,
+  CDatabase;
 
 {$R *.dfm}
 
@@ -31,6 +31,7 @@ function ChooseDateAccountListByForm(var ADate: TDateTime; var AIdAccounts: TStr
 var xForm: TCChooseDateAccountListForm;
 begin
   xForm := TCChooseDateAccountListForm.Create(Nil);
+  xForm.CDateTime1.Value := GWorkDate;
   Result := xForm.ShowConfig(coEdit);
   if Result then begin
     ADate := xForm.CDateTime1.Value;

@@ -1,7 +1,6 @@
 inherited CChooseDateAccountListForm: TCChooseDateAccountListForm
   Left = 328
   Top = 256
-  Caption = 'CChooseDateAccountListForm'
   ClientHeight = 248
   ClientWidth = 372
   PixelsPerInch = 96

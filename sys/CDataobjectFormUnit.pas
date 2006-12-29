@@ -59,6 +59,7 @@ end;
 
 function TCDataobjectForm.ShowDataobject(AOperation: TConfigOperation; AProxy: TDataProxy; ADataobject: TDataObject; ACreateStatic: Boolean; AAdditionalData: TAdditionalData = Nil): TDataGid;
 begin
+  Operation := AOperation;
   Result := CEmptyDataGid;
   FAdditionalData := AAdditionalData;
   InitializeForm;

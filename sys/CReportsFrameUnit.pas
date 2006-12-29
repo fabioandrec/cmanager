@@ -264,9 +264,9 @@ begin
     if xReport <> Nil then begin
       xReport.ShowReport;
       xReport.Free;
-    end else begin
-      ShowInfo(itError, 'Wybrany raport nie jest jeszcze dostêpny', '')
     end;
+  end else begin
+    ShowInfo(itError, 'Wybrany raport nie jest jeszcze dostêpny', '')
   end;
 end;
 
