@@ -220,6 +220,15 @@ type
     destructor Destroy; override;
   end;
 
+  TAveragesReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FIdFilter: TDataGid;
+  protected
+    function PrepareReportConditions: Boolean; override;
+  end;
+
 implementation
 
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
@@ -228,7 +237,7 @@ uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-  CChoosePeriodFilterFormUnit, CDatatools;
+     CChoosePeriodFilterFormUnit, CDatatools;
 
 function ColToRgb(AColor: TColor): String;
 var xRgb: Integer;
@@ -1455,6 +1464,11 @@ end;
 function TSumReportChart.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAccountListGroupByForm(FStartDate, FEndDate, FIds, FGroupBy);
+end;
+
+function TAveragesReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, True);
 end;
 
 end.

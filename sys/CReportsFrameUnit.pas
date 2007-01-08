@@ -141,9 +141,7 @@ begin
 
   xStats := THelperElement.Create(False, 'Statystyki', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xStats);
-  xStats.Add(THelperElement.Create(True, 'Œrednie dzienne' , Nil, Nil, 'Pokazuje œrednie dzienne rozchody/przychody w wybranym okresie', CNoImage));
-  xStats.Add(THelperElement.Create(True, 'Œrednie tygodniowe' , Nil,Nil,  'Pokazuje œrednie tygodniowe rozchody/przychody w wybranym okresie', CNoImage));
-  xStats.Add(THelperElement.Create(True, 'Œrednie miesiêczne' , Nil,Nil,  'Pokazuje œrednie tygodniowe rozchody/przychody w wybranym okresie', CNoImage));
+  xStats.Add(THelperElement.Create(True, 'Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CNoImage));
   xStats.Add(THelperElement.Create(True, 'Prognozy' , Nil,Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CNoImage));
   xStats.Add(THelperElement.Create(True, 'Podsumowanie' , Nil, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CNoImage));
 end;
