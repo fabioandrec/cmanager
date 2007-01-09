@@ -193,6 +193,7 @@ var GDataProvider: TDataProvider;
     {$ENDIF}
 
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
+function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
@@ -272,6 +273,8 @@ var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
     xError: String;
+    xDataVersion: String;
+    xFileVersion: String;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
@@ -320,6 +323,14 @@ begin
           GDataProvider.DisconnectFromDatabase;
           Result := False;
         end else begin
+          xDataVersion := xDataset.FieldByName('version').AsString;
+          xFileVersion := FileVersion(ParamStr(0));
+          if xFileVersion <> xDataVersion then begin
+            Result := UpdateDatabase(xDataVersion, xFileVersion);
+            if not Result then begin
+              AError := 'Nie uda³o siê uaktualniæ bazy danych z wersji ' + xDataVersion + ' do wersji ' + xFileVersion;
+            end;
+          end;
           xDataset.Free;
         end;
       end;
@@ -1067,6 +1078,11 @@ end;
 function GetSystemPathname(AFilename: String): String;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + ExtractFileName(AFilename);
+end;
+
+function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
+begin
+  Result := True;
 end;
 
 initialization
