@@ -227,6 +227,8 @@ type
     FIdFilter: TDataGid;
   protected
     function PrepareReportConditions: Boolean; override;
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
   end;
 
 implementation
@@ -1464,6 +1466,83 @@ end;
 function TSumReportChart.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAccountListGroupByForm(FStartDate, FEndDate, FIds, FGroupBy);
+end;
+
+function TAveragesReport.GetReportBody: String;
+var xBody: TStringList;
+    xRec: Integer;
+    xSql: String;
+    xDaysBetween: Integer;
+    xWeeksBetween: Integer;
+    xMonthsBetween: Integer;
+    xQuery: TADOQuery;
+begin
+  xBody := TStringList.Create;
+  xDaysBetween := DaysBetween(FEndDate, FStartDate);
+  xWeeksBetween := WeeksBetween(FEndDate, FStartDate);
+  xMonthsBetween := MonthsBetween(FEndDate, FStartDate);
+  with xBody do begin
+    Add('<table class="base" colspan=4>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="40%">Œrednie</td>');
+    Add('<td class="headcash" width="20%">Przychody</td>');
+    Add('<td class="headcash" width="20%">Rozchody</td>');
+    Add('<td class="headcash" width="20%">Saldo</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xRec := 1;
+    xSql := Format('select sum(income) as incomes, sum(expense) as expenses from balances where movementType <> ''%s'' and regDate between %s and %s',
+                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    xQuery := GDataProvider.OpenSql(xSql);
+    if xDaysBetween > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Dzienne</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xDaysBetween) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xDaysBetween) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xDaysBetween) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+    end;
+    if xWeeksBetween > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Tygodniowe</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xWeeksBetween) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xWeeksBetween) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xWeeksBetween) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+    end;
+    if xMonthsBetween > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Miesiêcznie</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xMonthsBetween) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xMonthsBetween) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xMonthsBetween) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+    end;
+    Add('</table>');
+    xQuery.Free;
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TAveragesReport.GetReportTitle: String;
+begin
+  Result := 'Œrednie (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
 function TAveragesReport.PrepareReportConditions: Boolean;

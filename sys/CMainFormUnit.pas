@@ -83,6 +83,7 @@ type
     procedure UpdateShortcutList;
     function GetStatusbarVisible: Boolean;
     procedure SetStatusbarVisible(const Value: Boolean);
+    procedure UnhandledException(Sender: TObject; E: Exception);
   protected
     procedure WndProc(var Message: TMessage); override;
   public
@@ -113,6 +114,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
 
 procedure TCMainForm.FormCreate(Sender: TObject);
 begin
+  Application.OnException := UnhandledException;
   FShortcutsFrames := TStringList.Create;
   CDateTime.Value := GWorkDate;
   FShortcutList := TStringList.Create;
@@ -459,6 +461,12 @@ begin
   end else begin
     NodeHeight := 80;
   end;
+end;
+
+procedure TCMainForm.UnhandledException(Sender: TObject; E: Exception);
+begin
+  ShowInfo(itError, 'Podczas pracy wyst¹pi³ wyj¹tek programowy. CManager zostanie zamkniêty', E.Message);
+  Application.Terminate;
 end;
 
 end.
