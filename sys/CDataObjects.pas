@@ -216,6 +216,7 @@ type
     procedure DeleteSubfilters;
     procedure UpdateSubfilters;
   public
+    class function GetFilterCondition(AIdFilter: TDataGid; AWithAnd: Boolean = True; AAcountField: String = 'idAccount'; ACashpointField: String = 'idCashpoint'; ACategoryField: String = 'idProduct'): String;
     procedure LoadSubfilters;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -948,6 +949,50 @@ begin
   with ADataset do begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+class function TMovementFilter.GetFilterCondition(AIdFilter: TDataGid; AWithAnd: Boolean; AAcountField, ACashpointField, ACategoryField: String): String;
+var xFilter: TMovementFilter;
+    xAccountsPart, xCashpointsPart, xProductsPart: String;
+begin
+  Result := '';
+  if AIdFilter <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, AIdFilter, False));
+    xFilter.LoadSubfilters;
+    if xFilter.Faccounts.Count <> 0 then begin
+      xAccountsPart := AAcountField + ' in (select idAccount from accountFilter where idMovementFilter = ' + DataGidToDatabase(AIdFilter) + ')';
+    end else begin
+      xAccountsPart := '';
+    end;
+    if xFilter.Fcashpoints.Count <> 0 then begin
+      xCashpointsPart := ACashpointField + ' in (select idCashpoint from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(AIdFilter) + ')';
+    end else begin
+      xCashpointsPart := '';
+    end;
+    if xFilter.Fproducts.Count <> 0 then begin
+      xProductsPart := ACategoryField + ' in (select idProduct from productFilter where idMovementFilter = ' + DataGidToDatabase(AIdFilter) + ')';
+    end else begin
+      xProductsPart := '';
+    end;
+    Result := xAccountsPart;
+    if xCashpointsPart <> '' then begin
+      if Result <> '' then begin
+        Result := Result + ' and ';
+      end;
+      Result := Result + xCashpointsPart;
+    end;
+    if xProductsPart <> '' then begin
+      if Result <> '' then begin
+        Result := Result + ' and ';
+      end;
+      Result := Result + xProductsPart;
+    end;
+    if (Result <> '') and AWithAnd then begin
+      Result := ' and ' + Result;
+    end;
+    GDataProvider.RollbackTransaction;
   end;
 end;
 
