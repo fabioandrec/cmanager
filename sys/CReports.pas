@@ -231,6 +231,17 @@ type
     function GetReportBody: String; override;
   end;
 
+  TPeriodSumsReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FIdFilter: TDataGid;
+  protected
+    function PrepareReportConditions: Boolean; override;
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
+  end;
+
 implementation
 
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
@@ -1735,8 +1746,7 @@ begin
       Add('</table>');
     end;
     xQuery.Free;
-
-    //kontrahenci
+    //kategorie
     Add('<hr>');
     Add('<p>');
     xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idProduct, product.name from balances ' +
@@ -1835,6 +1845,166 @@ begin
 end;
 
 function TAveragesReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, True);
+end;
+
+function TPeriodSumsReport.GetReportBody: String;
+var xBody: TStringList;
+    xRec: Integer;
+    xSql: String;
+    xQuery: TADOQuery;
+    xFilter: String;
+begin
+  xBody := TStringList.Create;
+  with xBody do begin
+    Add('<table class="base" colspan=4>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="40%">Sumy ogó³em (wszystkie konta)</td>');
+    Add('<td class="headcash" width="20%">Przychody</td>');
+    Add('<td class="headcash" width="20%">Rozchody</td>');
+    Add('<td class="headcash" width="20%">Saldo</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xRec := 1;
+    xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True);
+    xSql := Format('select sum(income) as incomes, sum(expense) as expenses from balances where movementType <> ''%s'' and regDate between %s and %s',
+                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    if xFilter <> '' then begin
+      xSql := xSql + ' ' + xFilter;
+    end;
+    xQuery := GDataProvider.OpenSql(xSql);
+    if not Odd(xRec) then begin
+      Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+    end else begin
+      Add('<tr class="base">');
+    end;
+    Add('<td class="text" width="40%">W wybranym okresie</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency)) + '</td>');
+    Add('</tr>');
+    Add('</table>');
+    xQuery.Free;
+    //konta
+    Add('<hr>');
+    Add('<p>');
+    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idAccount, account.name from balances ' +
+                   ' left outer join account on account.idAccount = balances.idAccount ' +
+                   '    where movementType <> ''%s'' and regDate between %s and %s',
+                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    if xFilter <> '' then begin
+      xSql := xSql + ' ' + xFilter;
+    end;
+    xSql := xSql + ' group by balances.idAccount, account.name';
+    xQuery := GDataProvider.OpenSql(xSql);
+    Add('<hr>');
+    Add('<table class="base" colspan=1>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="100%">Sumy ogó³em (dla konta)</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xQuery.First;
+    xRec := 1;
+    while not xQuery.Eof do begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency)) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+      xQuery.Next;
+    end;
+    Add('</table>');
+    xQuery.Free;
+    //kontrahenci
+    Add('<hr>');
+    Add('<p>');
+    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idCashpoint, cashpoint.name from balances ' +
+                   ' left outer join cashpoint on cashpoint.idCashpoint = balances.idCashpoint ' +
+                   '    where movementType <> ''%s'' and regDate between %s and %s',
+                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    if xFilter <> '' then begin
+      xSql := xSql + ' ' + xFilter;
+    end;
+    xSql := xSql + ' group by balances.idCashpoint, cashpoint.name';
+    xQuery := GDataProvider.OpenSql(xSql);
+    Add('<hr>');
+    Add('<table class="base" colspan=1>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="100%">Sumy ogó³em (dla kontrahenta)</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xQuery.First;
+    xRec := 1;
+    while not xQuery.Eof do begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency)) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+      xQuery.Next;
+    end;
+    Add('</table>');
+    xQuery.Free;
+    //kategorie
+    Add('<hr>');
+    Add('<p>');
+    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idProduct, product.name from balances ' +
+                   ' left outer join product on product.idProduct = balances.idProduct ' +
+                   '    where movementType <> ''%s'' and regDate between %s and %s',
+                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    if xFilter <> '' then begin
+      xSql := xSql + ' ' + xFilter;
+    end;
+    xSql := xSql + ' group by balances.idProduct, product.name';
+    xQuery := GDataProvider.OpenSql(xSql);
+    Add('<hr>');
+    Add('<table class="base" colspan=1>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="100%">Sumy ogó³em (dla kategorii)</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xQuery.First;
+    xRec := 1;
+    while not xQuery.Eof do begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency)) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+      xQuery.Next;
+    end;
+    Add('</table>');
+    xQuery.Free;
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TPeriodSumsReport.GetReportTitle: String;
+begin
+  Result := 'Podsumowanie (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+end;
+
+function TPeriodSumsReport.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, True);
 end;

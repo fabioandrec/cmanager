@@ -143,7 +143,7 @@ begin
   FTreeHelper.Add(xStats);
   xStats.Add(THelperElement.Create(True, 'Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CNoImage));
   xStats.Add(THelperElement.Create(True, 'Prognozy' , Nil,Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CNoImage));
-  xStats.Add(THelperElement.Create(True, 'Podsumowanie' , Nil, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CNoImage));
+  xStats.Add(THelperElement.Create(True, 'Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CNoImage));
 end;
 
 destructor TCReportsFrame.Destroy;
