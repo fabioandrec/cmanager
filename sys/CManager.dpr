@@ -65,7 +65,8 @@ uses
   CListPreferencesFormUnit in 'CListPreferencesFormUnit.pas' {CListPreferencesForm},
   CPreferences in 'CPreferences.pas',
   CProfileFrameUnit in 'CProfileFrameUnit.pas' {CProfileFrame: TFrame},
-  CProfileFormUnit in 'CProfileFormUnit.pas' {CProfileForm};
+  CProfileFormUnit in 'CProfileFormUnit.pas' {CProfileForm},
+  CChooseFutureFilterFormUnit in 'CChooseFutureFilterFormUnit.pas' {CChooseFutureFilterForm};
 
 {$R *.res}
 
@@ -79,7 +80,7 @@ begin
     if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc, True) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+  Application.Run;
     end else begin
       ShowInfo(itError, xError, xDesc)
     end;

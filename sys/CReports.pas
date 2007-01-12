@@ -242,6 +242,17 @@ type
     function GetReportBody: String; override;
   end;
 
+  TFuturesReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FStartFuture: TDateTime;
+    FEndFuture: TDateTime;
+    FIdFilter: TDataGid;
+  protected
+    function PrepareReportConditions: Boolean; override;
+  end;
+
 implementation
 
 uses Forms, SysUtils, Adodb, CConfigFormUnit,
@@ -250,7 +261,7 @@ uses Forms, SysUtils, Adodb, CConfigFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-     CChoosePeriodFilterFormUnit, CDatatools;
+     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit;
 
 procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
 var SigX, SigY : Double;
@@ -2007,6 +2018,11 @@ end;
 function TPeriodSumsReport.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, True);
+end;
+
+function TFuturesReport.PrepareReportConditions: Boolean;
+begin
+  Result := ChooseFutureFilterByForm(FStartDate, FEndDate, FStartFuture, FEndFuture, FIdFilter, True)
 end;
 
 end.
