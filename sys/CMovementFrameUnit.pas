@@ -35,6 +35,7 @@ type
     Label4: TLabel;
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
+    Wywietljakoraport1: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -58,6 +59,7 @@ type
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure TodayListDblClick(Sender: TObject);
     procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure Wywietljakoraport1Click(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
@@ -86,7 +88,7 @@ implementation
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
-  CListPreferencesFormUnit;
+  CListPreferencesFormUnit, CReports;
 
 {$R *.dfm}
 
@@ -716,6 +718,14 @@ end;
 class function TCMovementFrame.GetPrefname: String;
 begin
   Result := 'baseMovement';
+end;
+
+procedure TCMovementFrame.Wywietljakoraport1Click(Sender: TObject);
+var xReport: TVirtualStringReport;
+begin
+  xReport := TVirtualStringReport.CreateReport(TCVirtualStringTreeParams.Create(TodayList, 'Operacje wykonane'));
+  xReport.ShowReport;
+  xReport.Free;
 end;
 
 end.

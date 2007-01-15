@@ -280,6 +280,8 @@ inherited CMovementFrame: TCMovementFrame
       ParentColor = False
       ParentFont = False
       TabOrder = 1
+      TabStop = True
+      Transparent = False
       DataId = '1'
       TextOnEmpty = '<tylko dzi'#347'>'
       OnGetDataId = CStaticPeriodGetDataId
@@ -306,6 +308,8 @@ inherited CMovementFrame: TCMovementFrame
       ParentColor = False
       ParentFont = False
       TabOrder = 0
+      TabStop = True
+      Transparent = False
       DataId = '1'
       TextOnEmpty = '<dowolny typ>'
       OnGetDataId = CStaticFilterGetDataId
@@ -325,6 +329,8 @@ inherited CMovementFrame: TCMovementFrame
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2
+      TabStop = True
+      Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
     end
@@ -341,6 +347,8 @@ inherited CMovementFrame: TCMovementFrame
       Color = clBtnFace
       ParentColor = False
       TabOrder = 3
+      TabStop = True
+      Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
     end
@@ -348,7 +356,13 @@ inherited CMovementFrame: TCMovementFrame
   inherited ImageList: TPngImageList
     Top = 144
   end
-  object ActionList: TActionList [5]
+  inherited ListPopupMenu: TPopupMenu
+    object Wywietljakoraport1: TMenuItem
+      Caption = 'Wy'#347'wietl jako raport'
+      OnClick = Wywietljakoraport1Click
+    end
+  end
+  object ActionList: TActionList
     Images = CImageLists.OperationsImageList24x24
     Left = 200
     Top = 112
@@ -368,7 +382,7 @@ inherited CMovementFrame: TCMovementFrame
       OnExecute = ActionDelMovementExecute
     end
   end
-  object VTHeaderPopupMenu: TVTHeaderPopupMenu [6]
+  object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80
     Top = 120
   end

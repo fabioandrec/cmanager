@@ -3,9 +3,54 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase;
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils;
 
 type
+  TSumForDayItem = class(TObject)
+  private
+    Fsum: Currency;
+    Fdate: TDateTime;
+  public
+    constructor Create(ADate: TDateTime; ASum: Currency = 0);
+  published
+    property sum: Currency read Fsum write Fsum;
+    property date: TDateTime read Fdate write Fdate;
+  end;
+
+  TRegresionData = record
+    a: Double;
+    b: Double;
+  end;
+
+  TPeriodSums = class(TObjectList)
+  private
+    FstartDate: TDateTime;
+    FendDate: TDateTime;
+    function Getitems(AIndex: Integer): TSumForDayItem;
+    procedure Setitems(AIndex: Integer; const Value: TSumForDayItem);
+    function GetbyDateTime(ADateTime: TDateTime): Currency;
+    procedure SetbyDateTime(ADateTime: TDateTime; const Value: Currency);
+    function Getsum: Currency;
+    function GetDayAvg: Currency;
+    function GetregresionData: TRegresionData;
+    function GetMonthAvg: Currency;
+    function GetWeekAvg: Currency;
+  public
+    constructor Create(AStartDate, AEndDate: TDateTime);
+    procedure FromDataset(ADataset: TDataSet; ASumName: String = 'fieldsum'; ADateName: String = 'fielddate');
+    property Items[AIndex: Integer]: TSumForDayItem read Getitems write Setitems;
+    property ByDate[ADateTime: TDateTime]: Currency read GetbyDateTime write SetbyDateTime;
+    function GetRegLin(AStartDate, AEndDate: TDateTime): TPeriodSums;
+  published
+    property startDate: TDateTime read FstartDate;
+    property endDate: TDateTime read FendDate;
+    property sum: Currency read Getsum;
+    property dayAvg: Currency read GetDayAvg;
+    property weekAvg: Currency read GetWeekAvg;
+    property monthAvg: Currency read GetMonthAvg;
+    property regresion: TRegresionData read GetregresionData;
+  end;
+
   TCReportClass = class of TCBaseReport;
   TCReportFormClass = class of TCReportForm;
   TCReportParams = class(TObject);
@@ -17,6 +62,17 @@ type
     constructor Create(AType: String);
   published
     property movementType: String read FmovementType;
+  end;
+
+  TCVirtualStringTreeParams = class(TCReportParams)
+  private
+    Flist: TVirtualStringTree;
+    Ftitle: String;
+  public
+    constructor Create(AList: TVirtualStringTree; ATitle: String);
+  published
+    property list: TVirtualStringTree read Flist;
+    property title: String read Ftitle;
   end;
 
   TCBaseReport = class(TObject)
@@ -251,17 +307,47 @@ type
     FIdFilter: TDataGid;
   protected
     function PrepareReportConditions: Boolean; override;
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
   end;
+
+  TVirtualStringReport = class(TCHtmlReport)
+  private
+    FWidth: Integer;
+    function GetColumnPercentage(AColumn: TVirtualTreeColumn): Integer;
+  protected
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
+  public
+    constructor CreateReport(AParams: TCReportParams); override;
+  end;
+
 
 implementation
 
-uses Forms, SysUtils, Adodb, CConfigFormUnit,
-     CChooseDateFormUnit, DB, CChoosePeriodFormUnit, CConsts, CDataObjects,
+uses Forms, Adodb, CConfigFormUnit,
+     CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts, CDataObjects,
      DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit;
+     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
+  Math;
+
+function DayCount(AEndDay, AStartDay: TDateTime): Integer;
+begin
+  Result := DaysBetween(AEndDay, AStartDay) + 1;
+end;
+
+function WeekCount(AEndDay, AStartDay: TDateTime): Integer;
+begin
+  Result := Trunc(DayCount(AEndDay, AStartDay) / DaysPerWeek);
+end;
+
+function MonthCount(AEndDay, AStartDay: TDateTime): Integer;
+begin
+  Result := Trunc(DayCount(AEndDay, AStartDay) / ApproxDaysPerMonth);
+end;
 
 procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
 var SigX, SigY : Double;
@@ -1521,9 +1607,9 @@ var xBody: TStringList;
     xFilter: String;
 begin
   xBody := TStringList.Create;
-  xDaysBetween := DaysBetween(FEndDate, FStartDate);
-  xWeeksBetween := WeeksBetween(FEndDate, FStartDate);
-  xMonthsBetween := MonthsBetween(FEndDate, FStartDate);
+  xDaysBetween := DayCount(FEndDate, FStartDate);
+  xWeeksBetween := WeekCount(FEndDate, FStartDate);
+  xMonthsBetween := MonthCount(FEndDate, FStartDate);
   with xBody do begin
     Add('<table class="base" colspan=4>');
     Add('<tr class="base">');
@@ -2020,9 +2106,382 @@ begin
   Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, True);
 end;
 
+function TFuturesReport.GetReportBody: String;
+var xBody: TStringList;
+    xSql: String;
+    xRec: Integer;
+    xQuery: TADOQuery;
+    xFilter: String;
+    xBasePeriodIn, xBasePeriodOut: TPeriodSums;
+    xFuturePeriodIn, xFuturePeriodOut: TPeriodSums;
+begin
+  xBody := TStringList.Create;
+  with xBody do begin
+    xRec := 1;
+    Add('<table class="base" colspan=4>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="40%">Podsumowanie okresu bazowego</td>');
+    Add('<td class="headcash" width="20%">Przychody</td>');
+    Add('<td class="headcash" width="20%">Rozchody</td>');
+    Add('<td class="headcash" width="20%">Saldo</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True);
+    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, regdate from balances where movementType <> ''%s'' and regDate between %s and %s',
+                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    if xFilter <> '' then begin
+      xSql := xSql + ' ' + xFilter;
+    end;
+    xSql := xSql + ' group by regDate';
+    xQuery := GDataProvider.OpenSql(xSql);
+    xBasePeriodIn := TPeriodSums.Create(FStartDate, FEndDate);
+    xBasePeriodOut := TPeriodSums.Create(FStartDate, FEndDate);
+    xBasePeriodIn.FromDataset(xQuery, 'incomes', 'regDate');
+    xBasePeriodOut.FromDataset(xQuery, 'expenses', 'regDate');
+    if not Odd(xRec) then begin
+      Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+    end else begin
+      Add('<tr class="base">');
+    end;
+    Add('<td class="text" width="40%">Razem</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.sum) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.sum) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.sum - xBasePeriodOut.sum)) + '</td>');
+    Add('</tr>');
+    Inc(xRec);
+    if not Odd(xRec) then begin
+      Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+    end else begin
+      Add('<tr class="base">');
+    end;
+    Add('<td class="text" width="40%">Dziennie</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.dayAvg) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.dayAvg) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.dayAvg - xBasePeriodOut.dayAvg)) + '</td>');
+    Add('</tr>');
+    Inc(xRec);
+    if WeekCount(FEndDate, FStartDate) > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Tygodniowo</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.weekAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.weekAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.weekAvg - xBasePeriodOut.weekAvg)) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+    end;
+    if MonthCount(FEndDate, FStartDate) > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Miesiêcznie</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.monthAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.monthAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.monthAvg - xBasePeriodOut.monthAvg)) + '</td>');
+      Add('</tr>');
+    end;
+    Add('</table>');
+    Add('<hr>');
+    Add('<p>');
+    Add('<hr>');
+    Add('<table class="base" colspan=4>');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="40%">Prognoza dla wybranego okresu</td>');
+    Add('<td class="headcash" width="20%">Przychody</td>');
+    Add('<td class="headcash" width="20%">Rozchody</td>');
+    Add('<td class="headcash" width="20%">Saldo</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    xRec := 1;
+    xFuturePeriodIn := xBasePeriodIn.GetRegLin(FStartFuture, FEndFuture);
+    xFuturePeriodOut := xBasePeriodOut.GetRegLin(FStartFuture, FEndFuture);
+    if not Odd(xRec) then begin
+      Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+    end else begin
+      Add('<tr class="base">');
+    end;
+    Add('<td class="text" width="40%">Razem</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.sum) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.sum) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.sum - xFuturePeriodOut.sum)) + '</td>');
+    Add('</tr>');
+    Inc(xRec);
+    if not Odd(xRec) then begin
+      Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+    end else begin
+      Add('<tr class="base">');
+    end;
+    Add('<td class="text" width="40%">Dziennie</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.dayAvg) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.dayAvg) + '</td>');
+    Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.dayAvg - xFuturePeriodOut.dayAvg)) + '</td>');
+    Add('</tr>');
+    Inc(xRec);
+    if WeekCount(FEndFuture, FStartFuture) > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Tygodniowo</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.weekAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.weekAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.weekAvg - xFuturePeriodOut.weekAvg)) + '</td>');
+      Add('</tr>');
+      Inc(xRec);
+    end;
+    if MonthCount(FEndFuture, FStartFuture) > 0 then begin
+      if not Odd(xRec) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      Add('<td class="text" width="40%">Miesiêcznie</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.monthAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.monthAvg) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.monthAvg - xFuturePeriodOut.monthAvg)) + '</td>');
+      Add('</tr>');
+    end;
+    Add('</table>');
+    xQuery.Free;
+    Add('</table>');
+    xFuturePeriodIn.Free;
+    xFuturePeriodOut.Free;
+    xBasePeriodIn.Free;
+    xBasePeriodOut.Free;
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TFuturesReport.GetReportTitle: String;
+begin
+  Result := 'Prognozy (' + GetFormattedDate(FStartFuture, CLongDateFormat) + ' - ' + GetFormattedDate(FEndFuture, CLongDateFormat) + ')';
+end;
+
 function TFuturesReport.PrepareReportConditions: Boolean;
 begin
   Result := ChooseFutureFilterByForm(FStartDate, FEndDate, FStartFuture, FEndFuture, FIdFilter, True)
+end;
+
+constructor TSumForDayItem.Create(ADate: TDateTime; ASum: Currency);
+begin
+  inherited Create;
+  Fsum := ASum;
+  Fdate := ADate;
+end;
+
+constructor TPeriodSums.Create(AStartDate, AEndDate: TDateTime);
+var xCurDate: TDateTime;
+begin
+  inherited Create(True);
+  FstartDate := AStartDate;
+  FendDate := AEndDate;
+  xCurDate := FstartDate;
+  repeat
+    Add(TSumForDayItem.Create(xCurDate));
+    xCurDate := IncDay(xCurDate);
+  until (xCurDate > FendDate);
+end;
+
+procedure TPeriodSums.FromDataset(ADataset: TDataSet; ASumName, ADateName: String);
+begin
+  ADataset.First;
+  while not ADataset.Eof do begin
+    ByDate[ADataset.FieldByName(ADateName).AsDateTime] := ADataset.FieldByName(ASumName).AsCurrency;
+    ADataset.Next;
+  end;
+end;
+
+function TPeriodSums.GetDayAvg: Currency;
+begin
+  Result := sum / DayCount(FEndDate, FStartDate);
+end;
+
+function TPeriodSums.GetbyDateTime(ADateTime: TDateTime): Currency;
+var xCount: Integer;
+    xObj: TSumForDayItem;
+begin
+  xObj := Nil;
+  xCount := 0;
+  while (xCount <= Count - 1) do begin
+    if Items[xCount].date = ADateTime then begin
+      xObj := Items[xCount];
+    end;
+    Inc(xCount);
+  end;
+  if xObj = Nil then begin
+    xObj := TSumForDayItem.Create(ADateTime);
+    Add(xObj);
+  end;
+  Result := xObj.sum;
+end;
+
+function TPeriodSums.Getitems(AIndex: Integer): TSumForDayItem;
+begin
+  Result := TSumForDayItem(inherited Items[AIndex]);
+end;
+
+function TPeriodSums.GetRegLin(AStartDate, AEndDate: TDateTime): TPeriodSums;
+var xCurDate: TDateTime;
+    xRegression: TRegresionData;
+begin
+  Result := TPeriodSums.Create(AStartDate, AEndDate);
+  xCurDate := AStartDate;
+  xRegression := regresion;
+  repeat
+    Result.ByDate[xCurDate] := xRegression.a * xCurDate + xRegression.b;
+    xCurDate := IncDay(xCurDate);
+  until (xCurDate > AEndDate);
+end;
+
+function TPeriodSums.GetregresionData: TRegresionData;
+var xArray: array of Double;
+    yArray: array of Double;
+    xCount: Integer;
+begin
+  SetLength(xArray, Count);
+  SetLength(yArray, Count);
+  for xCount := 0 to Count - 1 do begin
+    xArray[xCount] := Items[xCount].date;
+    yArray[xCount] := Items[xCount].sum;
+  end;
+  RegLin(xArray, yArray, Result.a, Result.b);
+end;
+
+function TPeriodSums.Getsum: Currency;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    Result := Result + Items[xCount].sum;
+  end;
+end;
+
+procedure TPeriodSums.SetbyDateTime(ADateTime: TDateTime; const Value: Currency);
+var xCount: Integer;
+    xObj: TSumForDayItem;
+begin
+  xObj := Nil;
+  xCount := 0;
+  while (xCount <= Count - 1) do begin
+    if Items[xCount].date = ADateTime then begin
+      xObj := Items[xCount];
+    end;
+    Inc(xCount);
+  end;
+  if xObj = Nil then begin
+    xObj := TSumForDayItem.Create(ADateTime);
+    Add(xObj);
+  end;
+  xObj.sum := Value;
+end;
+
+procedure TPeriodSums.Setitems(AIndex: Integer; const Value: TSumForDayItem);
+begin
+  inherited Items[AIndex] := Value;
+end;
+
+function TPeriodSums.GetMonthAvg: Currency;
+begin
+  Result := sum / MonthCount(FendDate, FstartDate);
+end;
+
+function TPeriodSums.GetWeekAvg: Currency;
+begin
+  Result := sum / WeekCount(FendDate, FstartDate);
+end;
+
+constructor TCVirtualStringTreeParams.Create(AList: TVirtualStringTree; ATitle: String);
+begin
+  inherited Create;
+  Flist := AList;
+  Ftitle := ATitle;
+end;
+
+constructor TVirtualStringReport.CreateReport(AParams: TCReportParams);
+begin
+  inherited CreateReport(AParams);
+  FWidth := -1;
+end;
+
+function TVirtualStringReport.GetColumnPercentage(AColumn: TVirtualTreeColumn): Integer;
+var xList: TVirtualStringTree;
+    xScroll: TScrollInfo;
+begin
+  xList := TCVirtualStringTreeParams(FParams).list;
+  if FWidth = -1 then begin
+    xScroll.cbSize := SizeOf(xScroll);
+    xScroll.fMask := SIF_RANGE;
+    if GetScrollInfo(xList.Handle, SB_HORZ, xScroll) then begin
+      FWidth := xScroll.nMax;
+    end else begin
+      FWidth := xList.Width;
+    end;
+    if FWidth = 0 then begin
+      FWidth := xList.Width;
+    end;
+  end;
+  Result := Trunc(AColumn.Width * 100 / FWidth);
+end;
+
+function TVirtualStringReport.GetReportBody: String;
+var xBody: TStringList;
+    xList: TVirtualStringTree;
+    xColumns: TColumnsArray;
+    xCount: Integer;
+    xNode: PVirtualNode;
+    xAl: String;
+begin
+  xList := TCVirtualStringTreeParams(FParams).list;
+  xBody := TStringList.Create;
+  Result := xBody.Text;
+  xColumns := xList.Header.Columns.GetVisibleColumns;
+  with xBody do begin
+    Add('<table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
+    Add('<tr class="base">');
+    for xCount := Low(xColumns) to High(xColumns) do begin
+      if xColumns[xCount].Alignment = taLeftJustify then begin
+        xAl := 'headtext';
+      end else begin
+        xAl := 'headcash';
+      end;
+      Add('<td class="' + xAl + '" width="' + IntToStr(GetColumnPercentage(xColumns[xCount])) + '%">' + xColumns[xCount].Text + '</td>');
+    end;
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
+    xNode := xList.GetFirst;
+    while xNode <> Nil do begin
+      if not Odd(xNode.Index) then begin
+        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+      end else begin
+        Add('<tr class="base">');
+      end;
+      for xCount := Low(xColumns) to High(xColumns) do begin
+        if xColumns[xCount].Alignment = taLeftJustify then begin
+          xAl := 'text';
+        end else begin
+          xAl := 'cash';
+        end;
+        Add(Format('<td class="%s" width="%s">' + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
+      end;
+      Add('</tr>');
+      xNode := xList.GetNext(xNode);
+    end;
+    Add('</table>');
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TVirtualStringReport.GetReportTitle: String;
+begin
+  Result := TCVirtualStringTreeParams(FParams).title;
 end;
 
 end.
