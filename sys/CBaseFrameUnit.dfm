@@ -23,5 +23,9 @@ object CBaseFrame: TCBaseFrame
       Caption = 'Ustawienia listy'
       OnClick = Ustawienialisty1Click
     end
+    object Wywietljakoraport1: TMenuItem
+      Caption = 'Wy'#347'wietl jako raport'
+      OnClick = Wywietljakoraport1Click
+    end
   end
 end

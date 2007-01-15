@@ -62,6 +62,7 @@ procedure TCDoneForm.ComboBoxStatusSelect(Sender: TObject);
 begin
   CDateTime.Enabled := ComboBoxStatus.ItemIndex <> 0;
   CCurrCash.Enabled := ComboBoxStatus.ItemIndex <> 0;
+  RichEditDesc.Enabled := ComboBoxStatus.ItemIndex <> 0;
 end;
 
 end.

@@ -356,12 +356,6 @@ inherited CMovementFrame: TCMovementFrame
   inherited ImageList: TPngImageList
     Top = 144
   end
-  inherited ListPopupMenu: TPopupMenu
-    object Wywietljakoraport1: TMenuItem
-      Caption = 'Wy'#347'wietl jako raport'
-      OnClick = Wywietljakoraport1Click
-    end
-  end
   object ActionList: TActionList
     Images = CImageLists.OperationsImageList24x24
     Left = 200

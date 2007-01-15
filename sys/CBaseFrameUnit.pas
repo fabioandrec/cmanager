@@ -14,7 +14,9 @@ type
     ListPopupMenu: TPopupMenu;
     N1: TMenuItem;
     Ustawienialisty1: TMenuItem;
+    Wywietljakoraport1: TMenuItem;
     procedure Ustawienialisty1Click(Sender: TObject);
+    procedure Wywietljakoraport1Click(Sender: TObject);
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;
@@ -52,7 +54,7 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtual
 
 implementation
 
-uses CConsts, CListPreferencesFormUnit;
+uses CConsts, CListPreferencesFormUnit, CReports;
 
 {$R *.dfm}
 
@@ -237,6 +239,14 @@ end;
 class function TCBaseFrame.GetPrefname: String;
 begin
   Result := '';
+end;
+
+procedure TCBaseFrame.Wywietljakoraport1Click(Sender: TObject);
+var xReport: TVirtualStringReport;
+begin
+  xReport := TVirtualStringReport.CreateReport(TCVirtualStringTreeParams.Create(GetList, GetTitle));
+  xReport.ShowReport;
+  xReport.Free;
 end;
 
 initialization

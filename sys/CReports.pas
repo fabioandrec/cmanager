@@ -2437,6 +2437,8 @@ var xBody: TStringList;
     xCount: Integer;
     xNode: PVirtualNode;
     xAl: String;
+    xLevelPrefix: String;
+    xLevel: Integer;
 begin
   xList := TCVirtualStringTreeParams(FParams).list;
   xBody := TStringList.Create;
@@ -2446,10 +2448,10 @@ begin
     Add('<table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
     Add('<tr class="base">');
     for xCount := Low(xColumns) to High(xColumns) do begin
-      if xColumns[xCount].Alignment = taLeftJustify then begin
-        xAl := 'headtext';
-      end else begin
+      if (xColumns[xCount].Alignment = taRightJustify) and (AnsiUpperCase(xColumns[xCount].Text) <> 'LP') then begin
         xAl := 'headcash';
+      end else begin
+        xAl := 'headtext';
       end;
       Add('<td class="' + xAl + '" width="' + IntToStr(GetColumnPercentage(xColumns[xCount])) + '%">' + xColumns[xCount].Text + '</td>');
     end;
@@ -2457,18 +2459,23 @@ begin
     Add('</table><hr><table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
     xNode := xList.GetFirst;
     while xNode <> Nil do begin
-      if not Odd(xNode.Index) then begin
+      if not Odd(xList.AbsoluteIndex(xNode)) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
       end else begin
         Add('<tr class="base">');
       end;
       for xCount := Low(xColumns) to High(xColumns) do begin
-        if xColumns[xCount].Alignment = taLeftJustify then begin
-          xAl := 'text';
-        end else begin
+        if (xColumns[xCount].Alignment = taRightJustify) and (AnsiUpperCase(xColumns[xCount].Text) <> 'LP') then begin
           xAl := 'cash';
+        end else begin
+          xAl := 'text';
         end;
-        Add(Format('<td class="%s" width="%s">' + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
+        xLevel := 16 * xList.GetNodeLevel(xNode);
+        xLevelPrefix := '';
+        while Length(xLevelPrefix) < xLevel do begin
+          xLevelPrefix := xLevelPrefix + '&nbsp';
+        end;
+        Add(Format('<td class="%s" width="%s">' + xLevelPrefix + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
       end;
       Add('</tr>');
       xNode := xList.GetNext(xNode);
