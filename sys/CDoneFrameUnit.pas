@@ -781,8 +781,6 @@ begin
     xForm := TCMovementForm.Create(Nil);
     xDataGid := xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned));
     if xDataGid <> CEmptyDataGid then begin
-      DoneList.InvalidateNode(xNode);
-      DoneListFocusChanged(DoneList, xNode, 0);
       ReloadSums;
       SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
     end;
