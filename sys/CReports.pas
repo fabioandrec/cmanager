@@ -142,6 +142,12 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
+  TTodayOperationsListReport = class(TDoneOperationsListReport)
+  protected
+    function PrepareReportConditions: Boolean; override;
+    function GetReportTitle: String; override;
+  end;
+
   TOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
@@ -2489,6 +2495,19 @@ end;
 function TVirtualStringReport.GetReportTitle: String;
 begin
   Result := TCVirtualStringTreeParams(FParams).title;
+end;
+
+function TTodayOperationsListReport.GetReportTitle: String;
+begin
+  Result := 'Operacje wykonane (' + GetFormattedDate(FStartDate, CLongDateFormat) + ')';
+end;
+
+function TTodayOperationsListReport.PrepareReportConditions: Boolean;
+begin
+  Result := True;
+  FStartDate := GWorkDate;
+  FEndDate := GWorkDate;
+  FFilterId := CEmptyDataGid;
 end;
 
 end.

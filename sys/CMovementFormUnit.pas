@@ -8,6 +8,17 @@ uses
   CComponents, CDatabase;
 
 type
+  TMovementAdditionalData = class(TAdditionalData)
+  private
+    FtriggerDate: TDateTime;
+    Fplanned: TDataObject;
+  public
+    constructor Create(ATriggerDate: TDateTime; APlanned: TDataObject);
+  published
+    property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
+    property planned: TDataObject read Fplanned write Fplanned;
+  end;
+
   TCMovementForm = class(TCDataobjectForm)
     GroupBox1: TGroupBox;
     Label3: TLabel;
@@ -114,8 +125,25 @@ begin
 end;
 
 procedure TCMovementForm.InitializeForm;
+var xAdd: TMovementAdditionalData;
+    xPlan: TPlannedMovement;
+    xText: String;
 begin
   CDateTime.Value := GWorkDate;
+  if AdditionalData <> Nil then begin
+    xAdd := TMovementAdditionalData(AdditionalData);
+    xPlan := TPlannedMovement(xAdd.planned);
+    if xPlan.movementType = CInMovement then begin
+      ComboBoxType.ItemIndex := 4;
+      xText := xPlan.description + ' (wp³yw do ' + DateToStr(xAdd.triggerDate) + ')'
+    end else if xPlan.movementType = COutMovement then begin
+      ComboBoxType.ItemIndex := 3;
+      xText := xPlan.description + ' (p³atne do ' + DateToStr(xAdd.triggerDate) + ')'
+    end;
+    CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+    CStaticInoutCyclic.Caption := xText;
+    CStaticInoutCyclicChanged(CStaticInoutCyclic);
+  end;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
 end;
@@ -538,6 +566,13 @@ begin
   CCurrEditInoutCyclic.Value := xPlan.cash;
   GDataProvider.RollbackTransaction;
   UpdateDescription;
+end;
+
+constructor TMovementAdditionalData.Create(ATriggerDate: TDateTime; APlanned: TDataObject);
+begin
+  inherited Create;
+  FtriggerDate := ATriggerDate;
+  Fplanned := APlanned;
 end;
 
 end.

@@ -73,14 +73,14 @@ uses
 var xError, xDesc: String;
 
 begin
-  //MemChk;
+  MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc, True) then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+      Application.Run;
     end else begin
       ShowInfo(itError, xError, xDesc)
     end;

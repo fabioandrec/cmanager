@@ -1,5 +1,4 @@
 inherited CHomeFrame: TCHomeFrame
-  Height = 565
   object Image1: TImage [0]
     Left = 24
     Top = 26
@@ -628,6 +627,7 @@ inherited CHomeFrame: TCHomeFrame
     object ActionOperationsList: TAction
       Caption = 'Lista wykonanych dzi'#347' operacji'
       ImageIndex = 2
+      OnExecute = ActionOperationsListExecute
     end
     object ActionPreferences: TAction
       Caption = 'Zmie'#324' preferencje u'#380'ytkownika'

@@ -40,6 +40,8 @@ type
     Panel1: TPanel;
     CButtonsStatus: TCButton;
     Bevel: TBevel;
+    ActionDooperation: TAction;
+    CButtonOperation: TCButton;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -61,6 +63,7 @@ type
     procedure ActionOperationExecute(Sender: TObject);
     procedure DoneListDblClick(Sender: TObject);
     procedure DoneListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure ActionDooperationExecute(Sender: TObject);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -91,7 +94,7 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit, CConsts, CPreferences;
+  Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -602,14 +605,17 @@ procedure TCDoneFrame.DoneListFocusChanged(Sender: TBaseVirtualTree; Node: PVirt
 var xData: TPlannedTreeItem;
     xCanAccept: Boolean;
     xStat: Boolean;
+    xOper: Boolean;
 begin
   xCanAccept := False;
+  xOper := False;
   xStat := False;
   if Node <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
     if xData.done = Nil then begin
       xCanAccept := True;
       xStat := True;
+      xOper := True;
     end else begin
       xStat := xData.done.doneState <> CDoneOperation;
     end;
@@ -618,6 +624,7 @@ begin
     TCFrameForm(Owner).BitBtnOk.Enabled := xCanAccept;
   end;
   CButtonsStatus.Enabled := xStat;
+  CButtonOperation.Enabled := xOper;
 end;
 
 function TCDoneFrame.FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode;
@@ -672,6 +679,7 @@ begin
         GDataProvider.CommitTransaction;
       end;
       DoneList.InvalidateNode(DoneList.FocusedNode);
+      DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0);
       ReloadSums;
     end;
     xForm.Free;
@@ -721,7 +729,9 @@ end;
 
 procedure TCDoneFrame.DoneListDblClick(Sender: TObject);
 begin
-  ActionOperation.Execute;
+  if CButtonsStatus.Enabled then begin
+    ActionOperation.Execute;
+  end;
 end;
 
 procedure TCDoneFrame.FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
@@ -757,6 +767,27 @@ end;
 class function TCDoneFrame.GetPrefname: String;
 begin
   Result := 'plannedDone';
+end;
+
+procedure TCDoneFrame.ActionDooperationExecute(Sender: TObject);
+var xForm: TCMovementForm;
+    xDataGid: TDataGid;
+    xBase: TPlannedTreeItem;
+    xNode: PVirtualNode;
+begin
+  xNode := DoneList.FocusedNode;
+  if xNode <> Nil then begin
+    xBase := TPlannedTreeItem(DoneList.GetNodeData(xNode)^);
+    xForm := TCMovementForm.Create(Nil);
+    xDataGid := xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned));
+    if xDataGid <> CEmptyDataGid then begin
+      DoneList.InvalidateNode(xNode);
+      DoneListFocusChanged(DoneList, xNode, 0);
+      ReloadSums;
+      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
+    end;
+    xForm.Free;
+  end;
 end;
 
 end.

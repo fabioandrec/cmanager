@@ -24,6 +24,40 @@ inherited CDoneFrame: TCDoneFrame
       Align = alBottom
       Shape = bsBottomLine
     end
+    object Panel1: TPanel
+      Left = 0
+      Top = 149
+      Width = 443
+      Height = 40
+      Align = alBottom
+      BevelOuter = bvNone
+      Color = clWindow
+      TabOrder = 2
+      object CButtonsStatus: TCButton
+        Left = 149
+        Top = 4
+        Width = 116
+        Height = 33
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionOperation
+      end
+      object CButtonOperation: TCButton
+        Left = 13
+        Top = 4
+        Width = 132
+        Height = 33
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionDooperation
+      end
+    end
     object Panel2: TPanel
       Left = 0
       Top = 0
@@ -96,28 +130,6 @@ inherited CDoneFrame: TCDoneFrame
           Width = 150
           WideText = 'Saldo'
         end>
-    end
-    object Panel1: TPanel
-      Left = 0
-      Top = 149
-      Width = 443
-      Height = 40
-      Align = alBottom
-      BevelOuter = bvNone
-      Color = clWindow
-      TabOrder = 2
-      object CButtonsStatus: TCButton
-        Left = 13
-        Top = 4
-        Width = 116
-        Height = 33
-        Cursor = crHandPoint
-        PicPosition = ppLeft
-        PicOffset = 10
-        TxtOffset = 15
-        Framed = False
-        Action = ActionOperation
-      end
     end
   end
   object DoneList: TVirtualStringTree [2]
@@ -253,6 +265,8 @@ inherited CDoneFrame: TCDoneFrame
       ParentColor = False
       ParentFont = False
       TabOrder = 0
+      TabStop = True
+      Transparent = False
       DataId = '1'
       TextOnEmpty = '<dowolny typ>'
       OnGetDataId = CStaticFilterGetDataId
@@ -279,6 +293,8 @@ inherited CDoneFrame: TCDoneFrame
       ParentColor = False
       ParentFont = False
       TabOrder = 1
+      TabStop = True
+      Transparent = False
       DataId = '2'
       TextOnEmpty = '<tylko dzi'#347'>'
       OnGetDataId = CStaticPeriodGetDataId
@@ -298,6 +314,8 @@ inherited CDoneFrame: TCDoneFrame
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2
+      TabStop = True
+      Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
     end
@@ -314,6 +332,8 @@ inherited CDoneFrame: TCDoneFrame
       Color = clBtnFace
       ParentColor = False
       TabOrder = 3
+      TabStop = True
+      Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
     end
@@ -329,6 +349,11 @@ inherited CDoneFrame: TCDoneFrame
       Caption = 'Zmie'#324' status'
       ImageIndex = 0
       OnExecute = ActionOperationExecute
+    end
+    object ActionDooperation: TAction
+      Caption = 'Wykonaj operacj'#281
+      ImageIndex = 1
+      OnExecute = ActionDooperationExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

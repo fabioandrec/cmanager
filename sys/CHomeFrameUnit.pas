@@ -28,6 +28,7 @@ type
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
     procedure ActionSetProfileExecute(Sender: TObject);
+    procedure ActionOperationsListExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -38,7 +39,7 @@ implementation
 
 uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
   CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
-  CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit;
+  CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit, CReports;
 
 {$R *.dfm}
 
@@ -92,6 +93,14 @@ begin
   if TCFrameForm.ShowFrame(TCProfileFrame, xProfileId, xText, xMark) then begin
     GActiveProfileId := xProfileId;
   end;
+end;
+
+procedure TCHomeFrame.ActionOperationsListExecute(Sender: TObject);
+var xRep: TTodayOperationsListReport;
+begin
+  xRep := TTodayOperationsListReport.CreateReport(Nil);
+  xRep.ShowReport;
+  xRep.Free;
 end;
 
 end.
