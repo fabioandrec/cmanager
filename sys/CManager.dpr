@@ -74,7 +74,7 @@ var xError, xDesc, xFilename: String;
     xProceed: Boolean;
 
 begin
-  MemChk;
+  //MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin

@@ -362,7 +362,7 @@ end;
 procedure TBasePref.LoadFromXml(ANode: IXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
-  FstartupDatafileMode := GetXmlAttribute('startupfilemode', ANode, CStartupFilemodeLastOpened);
+  FstartupDatafileMode := GetXmlAttribute('startupfilemode', ANode, CStartupFilemodeThisfile);
   FstartupDatafileName := GetXmlAttribute('startupfilename', ANode, GetSystemPathname(CDefaultFilename));
   FlastOpenedDatafilename := GetXmlAttribute('lastopenedfilename', ANode, '');
   FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
