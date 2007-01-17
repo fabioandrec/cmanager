@@ -504,8 +504,6 @@ begin
   FSumObjects.Add(xOvr);
   SumList.RootNodeCount := FSumObjects.Count;
   SumList.EndUpdate;
-  GTodayCashIn := xOvr.cashIn;
-  GTodayCashOut := xOvr.cashOut;
   xDs.Free;
 end;
 

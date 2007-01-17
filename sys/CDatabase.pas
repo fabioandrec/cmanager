@@ -185,8 +185,6 @@ type
 
 var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
-    GTodayCashIn: Currency;
-    GTodayCashOut: Currency;
     GDatabaseName: String;
     {$IFDEF SAVETOLOG}
     GSqllogfile: String;
@@ -216,7 +214,7 @@ function DataGidToDatabase(ADataGid: TDataGid): String;
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
-  CPreferences;
+     CPreferences;
 
 threadvar GTickCounter: Cardinal;
 
@@ -278,9 +276,9 @@ var xResStream: TResourceStream;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
- {$IFDEF SAVETOLOG}
+  {$IFDEF SAVETOLOG}
   GSqllogfile := ChangeFileExt(ADatabaseName, '.log');
- {$ENDIF}
+  {$ENDIF}
   if (not Result) then begin
     if ACanCreate then begin
       Result := CreateDatabase(ADatabaseName, xError);
@@ -1089,8 +1087,6 @@ initialization
   CoInitialize(Nil);
   GDataProvider := TDataProvider.Create;
   GWorkDate := Today;
-  GTodayCashIn := 0;
-  GTodayCashOut := 0;
 finalization
   GDataProvider.Free;
   CoUninitialize;

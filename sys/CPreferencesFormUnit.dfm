@@ -53,11 +53,89 @@ inherited CPreferencesForm: TCPreferencesForm
           object TabSheetBase: TTabSheet
             Caption = 'TabSheetBase'
             TabVisible = False
+            object GroupBox1: TGroupBox
+              Left = 8
+              Top = 8
+              Width = 449
+              Height = 121
+              Caption = ' Przy starcie systemu '
+              TabOrder = 0
+              object RadioButtonLast: TRadioButton
+                Left = 16
+                Top = 32
+                Width = 209
+                Height = 17
+                Caption = 'Otwieraj ostatnio u'#380'ywany plik danych'
+                Checked = True
+                TabOrder = 0
+                TabStop = True
+                OnClick = RadioButtonLastClick
+              end
+              object RadioButtonNever: TRadioButton
+                Left = 16
+                Top = 80
+                Width = 193
+                Height = 17
+                Caption = 'Nie otwieraj '#380'adnego pliku danych'
+                TabOrder = 2
+                OnClick = RadioButtonNeverClick
+              end
+              object RadioButtonThis: TRadioButton
+                Left = 16
+                Top = 56
+                Width = 161
+                Height = 17
+                Caption = 'Otwieraj wybrany plik danych'
+                TabOrder = 1
+                OnClick = RadioButtonThisClick
+              end
+              object CStaticFileName: TCStatic
+                Left = 192
+                Top = 54
+                Width = 241
+                Height = 21
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<kliknij tutaj aby wybra'#263' plik danych>'
+                Color = clWindow
+                ParentColor = False
+                TabOrder = 3
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
+                OnGetDataId = CStaticFileNameGetDataId
+                HotTrack = True
+              end
+            end
           end
           object TabSheetView: TTabSheet
             Caption = 'TabSheetView'
             ImageIndex = 1
             TabVisible = False
+            object GroupBox2: TGroupBox
+              Left = 8
+              Top = 8
+              Width = 449
+              Height = 97
+              Caption = ' Okno g'#322#243'wne '
+              TabOrder = 0
+              object CheckBoxShortcutVisible: TCheckBox
+                Left = 16
+                Top = 32
+                Width = 145
+                Height = 17
+                Caption = 'Pasek skr'#243't'#243'w widoczny'
+                TabOrder = 0
+              end
+              object CheckBoxStatusVisible: TCheckBox
+                Left = 16
+                Top = 56
+                Width = 145
+                Height = 17
+                Caption = 'Pasek statusu widoczny'
+                TabOrder = 1
+              end
+            end
           end
         end
       end
@@ -240,5 +318,13 @@ inherited CPreferencesForm: TCPreferencesForm
     Left = 185
     Top = 240
     Bitmap = {}
+  end
+  object OpenDialog: TOpenDialog
+    DefaultExt = 'dat'
+    Filter = 'Pliki danych|*.dat|Wszystkie pliki|*.*'
+    FilterIndex = 0
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 8
+    Top = 85
   end
 end

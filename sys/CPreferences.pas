@@ -15,9 +15,9 @@ type
   protected
     procedure LoadFromParentNode(AParentNode: IXMLDOMNode);
     procedure SaveToParentNode(AParentNode: IXMLDOMNode);
+  public
     procedure LoadFromXml(ANode: IXMLDOMNode); virtual;
     procedure SaveToXml(ANode: IXMLDOMNode); virtual;
-  public
     procedure Clone(APrefItem: TPrefItem); virtual;
     constructor Create(APrefname: String); virtual;
     function GetNodeName: String; virtual; abstract;
@@ -45,10 +45,9 @@ type
     FBackground: TColor;
     FFont: TFont;
     FDesc: String;
-  protected
+  public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
-  public
     procedure Clone(APrefItem: TPrefItem); override;
     function GetNodeName: String; override;
     property Font: TFont read FFont;
@@ -62,10 +61,9 @@ type
   TViewPref = class(TPrefItem)
   private
     FFontprefs: TPrefList;
-  protected
+  public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
-  public
     procedure Clone(APrefItem: TPrefItem); override;
     function GetNodeName: String; override;
     constructor Create(APrefname: String); override;
@@ -73,11 +71,32 @@ type
     property Fontprefs: TPrefList read FFontprefs;
   end;
 
+  TBasePref = class(TPrefItem)
+  private
+    FstartupDatafileMode: Integer;
+    FstartupDatafileName: String;
+    FlastOpenedDatafilename: String;
+    FshowShortcutBar: Boolean;
+    FshowStatusBar: Boolean;
+  public
+    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    function GetNodeName: String; override;
+    procedure Clone(APrefItem: TPrefItem); override;
+  published
+    property startupDatafileMode: Integer read FstartupDatafileMode write FstartupDatafileMode;
+    property startupDatafileName: String read FstartupDatafileName write FstartupDatafileName;
+    property lastOpenedDatafilename: String read FlastOpenedDatafilename write FlastOpenedDatafilename;
+    property showShortcutBar: Boolean read FshowShortcutBar write FshowShortcutBar;
+    property showStatusBar: Boolean read FshowStatusBar write FshowStatusBar;
+  end;
+
 var GViewsPreferences: TPrefList;
+    GBasePreferences: TBasePref;
 
 implementation
 
-uses CSettings, CMovementFrameUnit;
+uses CSettings, CMovementFrameUnit, CConsts, CDatabase;
 
 procedure SaveFontToXml(ANode: IXMLDOMNode; AFont: TFont);
 begin
@@ -325,6 +344,41 @@ begin
   FFontprefs.SavetToParentNode(xFontprefs);
 end;
 
+procedure TBasePref.Clone(APrefItem: TPrefItem);
+begin
+  inherited Clone(APrefItem);
+  FstartupDatafileMode := TBasePref(APrefItem).startupDatafileMode;
+  FstartupDatafileName := TBasePref(APrefItem).startupDatafileName;
+  FlastOpenedDatafilename := TBasePref(APrefItem).lastOpenedDatafilename;
+  FshowShortcutBar := TBasePref(APrefItem).showShortcutBar;
+  FshowStatusBar := TBasePref(APrefItem).showStatusBar;
+end;
+
+function TBasePref.GetNodeName: String;
+begin
+  Result := 'basepref';
+end;
+
+procedure TBasePref.LoadFromXml(ANode: IXMLDOMNode);
+begin
+  inherited LoadFromXml(ANode);
+  FstartupDatafileMode := GetXmlAttribute('startupfilemode', ANode, CStartupFilemodeLastOpened);
+  FstartupDatafileName := GetXmlAttribute('startupfilename', ANode, GetSystemPathname(CDefaultFilename));
+  FlastOpenedDatafilename := GetXmlAttribute('lastopenedfilename', ANode, '');
+  FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
+  FshowStatusBar := GetXmlAttribute('showStatusBar', ANode, True);
+end;
+
+procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('startupfilemode', ANode, FstartupDatafileMode);
+  SetXmlAttribute('startupfilename', ANode, FstartupDatafileName);
+  SetXmlAttribute('lastopenedfilename', ANode, FlastOpenedDatafilename);
+  SetXmlAttribute('showShortcutBar', ANode, FshowShortcutBar);
+  SetXmlAttribute('showStatusBar', ANode, FshowStatusBar);
+end;
+
 initialization
   GViewsPreferences := TPrefList.Create(TViewPref);
   GViewsPreferences.Add(TViewPref.Create('baseMovement'));
@@ -348,6 +402,13 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód'));
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód'));
   end;
+  GBasePreferences := TBasePref.Create('basepreferences');
+  with GBasePreferences do begin
+    startupDatafileMode := CStartupFilemodeFirsttime;
+    startupDatafileName := GetSystemPathname(CDefaultFilename);
+    lastOpenedDatafilename := '';
+  end;
 finalization
   GViewsPreferences.Free;
+  GBasePreferences.Free;
 end.

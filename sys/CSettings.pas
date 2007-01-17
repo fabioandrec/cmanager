@@ -165,6 +165,7 @@ begin
   end;
   if Result then begin
     GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
+    GBasePreferences.LoadFromXml(GetSettingsPreferences);
   end;
 end;
 

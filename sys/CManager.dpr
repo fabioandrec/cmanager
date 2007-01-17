@@ -70,14 +70,27 @@ uses
 
 {$R *.res}
 
-var xError, xDesc: String;
+var xError, xDesc, xFilename: String;
+    xProceed: Boolean;
 
 begin
   MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
-    if InitializeDataProvider(GetSystemPathname(CDefaultFilename), xError, xDesc, True) then begin
+    if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropern then begin
+      if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
+        xFilename := GetSystemPathname(CDefaultFilename);
+      end else if GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened then begin
+        xFilename := GBasePreferences.lastOpenedDatafilename;
+      end else if GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile then begin
+        xFilename := GBasePreferences.startupDatafileName;
+      end;
+      xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime);
+    end else begin
+      xProceed := True;
+    end;
+    if xProceed then begin
       InitializeProxies;
       Application.CreateForm(TCMainForm, CMainForm);
       Application.Run;

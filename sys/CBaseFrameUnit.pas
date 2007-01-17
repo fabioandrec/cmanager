@@ -243,10 +243,13 @@ end;
 
 procedure TCBaseFrame.Wywietljakoraport1Click(Sender: TObject);
 var xReport: TVirtualStringReport;
+    xParams: TCVirtualStringTreeParams;
 begin
-  xReport := TVirtualStringReport.CreateReport(TCVirtualStringTreeParams.Create(GetList, GetTitle));
+  xParams := TCVirtualStringTreeParams.Create(GetList, GetTitle);
+  xReport := TVirtualStringReport.CreateReport(xParams);
   xReport.ShowReport;
   xReport.Free;
+  xParams.Free;
 end;
 
 initialization

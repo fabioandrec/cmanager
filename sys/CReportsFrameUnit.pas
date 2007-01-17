@@ -65,6 +65,9 @@ uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit,
 {$R *.dfm}
 
 const CNoImage = -1;
+      CHtmlReportImage = 0;
+      CChartReportImage = 1;
+      CLineReportImage = 2;
 
 procedure TCReportsFrame.ReloadReports;
 begin
@@ -100,50 +103,50 @@ var xBase: THelperElement;
 begin
   xBase := THelperElement.Create(False, 'Podstawowe', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xBase);
-  xBase.Add(THelperElement.Create(True, 'Stan kont' , TAccountBalanceOnDayReport, Nil, 'Pokazuje stan wszystkich kont na wybrany dzieñ', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Operacje wykonane' , TDoneOperationsListReport, Nil, 'Pokazuje operacje wykonane w wybranym okresie', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Operacje zaplanowane' , TPlannedOperationsListReport, Nil, 'Pokazuje operacje zaplanowane na wybrany okres', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Przep³yw gotówki' , TCashFlowListReport, Nil, 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Historia konta' , TAccountHistoryReport, Nil, 'Pokazuje historiê wybranego konta w wybranym okresie', CNoImage));
-  xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , TAccountBalanceChartReport, Nil, 'Pokazuje wykres stanu kont w wybranym okresie', CNoImage));
+  xBase.Add(THelperElement.Create(True, 'Stan kont' , TAccountBalanceOnDayReport, Nil, 'Pokazuje stan wszystkich kont na wybrany dzieñ', CHtmlReportImage));
+  xBase.Add(THelperElement.Create(True, 'Operacje wykonane' , TDoneOperationsListReport, Nil, 'Pokazuje operacje wykonane w wybranym okresie', CHtmlReportImage));
+  xBase.Add(THelperElement.Create(True, 'Operacje zaplanowane' , TPlannedOperationsListReport, Nil, 'Pokazuje operacje zaplanowane na wybrany okres', CHtmlReportImage));
+  xBase.Add(THelperElement.Create(True, 'Przep³yw gotówki' , TCashFlowListReport, Nil, 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CHtmlReportImage));
+  xBase.Add(THelperElement.Create(True, 'Historia konta' , TAccountHistoryReport, Nil, 'Pokazuje historiê wybranego konta w wybranym okresie', CHtmlReportImage));
+  xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , TAccountBalanceChartReport, Nil, 'Pokazuje wykres stanu kont w wybranym okresie', CLineReportImage));
 
   xBs := THelperElement.Create(False, 'Rozchody', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xBs);
-  xBs.Add(THelperElement.Create(True, 'Lista operacji rozchodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w wybranym okresie', CNoImage));
+  xBs.Add(THelperElement.Create(True, 'Lista operacji rozchodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w wybranym okresie', CHtmlReportImage));
   xTm := THelperElement.Create(False, 'w/g kategorii', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres rozchodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CNoImage));
-  xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres rozchodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CChartReportImage));
+  xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CHtmlReportImage));
   xTm := THelperElement.Create(False, 'w/g kontrahentów', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres rozchodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CNoImage));
-  xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres rozchodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CChartReportImage));
+  xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CHtmlReportImage));
   xTm := THelperElement.Create(False, 'Sumy', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres sum rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CNoImage));
-  xTm.Add(THelperElement.Create(True, 'Lista sum rozchodów' , TSumReportList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres sum rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CLineReportImage));
+  xTm.Add(THelperElement.Create(True, 'Lista sum rozchodów' , TSumReportList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CHtmlReportImage));
 
   xBs := THelperElement.Create(False, 'Przychody', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xBs);
-  xBs.Add(THelperElement.Create(True, 'Lista operacji przychodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w wybranym okresie', CNoImage));
+  xBs.Add(THelperElement.Create(True, 'Lista operacji przychodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w wybranym okresie', CHtmlReportImage));
   xTm := THelperElement.Create(False, 'w/g kategorii', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres przychodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CNoImage));
-  xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres przychodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CChartReportImage));
+  xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CHtmlReportImage));
   xTm := THelperElement.Create(False, 'w/g kontrahentów', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres przychodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CNoImage));
-  xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodoe w rozbiciu na kontrahentów', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres przychodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CChartReportImage));
+  xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CHtmlReportImage));
   xTm := THelperElement.Create(False, 'Sumy', Nil, Nil, '', CNoImage);
   xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres sum przychodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CNoImage));
-  xTm.Add(THelperElement.Create(True, 'Lista sum przychodów' , TSumReportList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CNoImage));
+  xTm.Add(THelperElement.Create(True, 'Wykres sum przychodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CLineReportImage));
+  xTm.Add(THelperElement.Create(True, 'Lista sum przychodów' , TSumReportList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CHtmlReportImage));
 
   xStats := THelperElement.Create(False, 'Statystyki', Nil, Nil, '', CNoImage);
   FTreeHelper.Add(xStats);
-  xStats.Add(THelperElement.Create(True, 'Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CNoImage));
-  xStats.Add(THelperElement.Create(True, 'Prognozy' , TFuturesReport, Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CNoImage));
-  xStats.Add(THelperElement.Create(True, 'Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CNoImage));
+  xStats.Add(THelperElement.Create(True, 'Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CHtmlReportImage));
+  xStats.Add(THelperElement.Create(True, 'Prognozy' , TFuturesReport, Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CHtmlReportImage));
+  xStats.Add(THelperElement.Create(True, 'Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CHtmlReportImage));
 end;
 
 destructor TCReportsFrame.Destroy;

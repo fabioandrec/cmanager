@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=CManager
-AppVerName=CManager 1.0.2 Beta
+AppVerName=CManager 1.0 Beta
 AppPublisherURL=http://cmanager.sourceforge.net
 AppSupportURL=http://cmanager.sourceforge.net
 AppUpdatesURL=http://cmanager.sourceforge.net

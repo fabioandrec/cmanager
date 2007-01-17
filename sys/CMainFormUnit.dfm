@@ -146,6 +146,8 @@ object CMainForm: TCMainForm
         ParentColor = False
         ParentFont = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         Visible = False
         Value = 38949.000000000000000000
         OnChanged = CDateTimeChanged

@@ -118,6 +118,8 @@ begin
   FShortcutsFrames := TStringList.Create;
   CDateTime.Value := GWorkDate;
   FShortcutList := TStringList.Create;
+  ShortcutsVisible := GBasePreferences.showShortcutBar;
+  StatusbarVisible := GBasePreferences.showStatusBar;
   ActionShortcuts.Checked := ShortcutsVisible;
   ActionStatusbar.Checked := StatusbarVisible;
   UpdateShortcutList;
@@ -154,6 +156,10 @@ begin
   FShortcutsFrames.Free;
   FShortcutList.Free;
   GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
+  if GDataProvider.IsConnected then begin
+    GBasePreferences.lastOpenedDatafilename := GDatabaseName;
+  end;
+  GBasePreferences.SaveToXml(GetSettingsPreferences);
   SaveFormPosition(Self);
   FinalizeSettings(GetSystemPathname(CSettingsFilename));
 end;
@@ -359,6 +365,10 @@ begin
     WindowState := wsMaximized;
   end else if Message.Msg = WM_FORMMINIMIZE then begin
     WindowState := wsMaximized;
+  end else if Message.Msg = WM_PREFERENCESCHANGED then begin
+    ShortcutsVisible := GBasePreferences.showShortcutBar;
+    StatusbarVisible := GBasePreferences.showStatusBar;
+    Invalidate;
   end else if Message.Msg = WM_OPENCONNECTION then begin
   end else if Message.Msg = WM_CLOSECONNECTION then begin
     CMainForm.ActionCloseConnection.Execute;

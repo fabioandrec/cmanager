@@ -14,6 +14,7 @@ const
   WM_OPENCONNECTION = WM_USER + 7;
   WM_CLOSECONNECTION = WM_USER + 8;
   WM_MUSTREPAINT = WM_USER + 9;
+  WM_PREFERENCESCHANGED = WM_USER + 10;
 
 const
   CEmptyDataGid = '';
@@ -55,6 +56,11 @@ const
   CBaseDateFormat = 'yyyy-MM-dd';
   CDayNameDateFormat = 'ddd';
   CMonthnameDateFormat = 'MMMM yyyy';
+
+  CStartupFilemodeLastOpened = 0;
+  CStartupFilemodeThisfile = 1;
+  CStartupFilemodeNeveropern = 2;
+  CStartupFilemodeFirsttime = 3;
 
 implementation
 
