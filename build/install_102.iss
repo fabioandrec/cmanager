@@ -3,17 +3,17 @@
 
 [Setup]
 AppName=CManager
-AppVerName=CManager 1.0.3 Beta
+AppVerName=CManager 1.0.2 Beta
 AppPublisherURL=http://cmanager.sourceforge.net
 AppSupportURL=http://cmanager.sourceforge.net
 AppUpdatesURL=http://cmanager.sourceforge.net
 DefaultDirName={pf}\CManager
 DefaultGroupName=CManager
 AllowNoIcons=yes
-LicenseFile=..\..\docs\license
-OutputDir=..\..\bin
+LicenseFile=D:\CVS\SOURCEFORGE\cmanager\docs\license
+OutputDir=D:\CVS\SOURCEFORGE\cmanager\bin
 OutputBaseFilename=CManagerSetup
-SetupIconFile=..\res\cmanager32.ico
+SetupIconFile=D:\CVS\SOURCEFORGE\cmanager\sources\res\cmanager32.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -25,12 +25,12 @@ Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\bin\CManager.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\docs\readme"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\docs\changelog"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\docs\contrib"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\docs\license"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\docs\Help\index.html"; DestDir: "{app}\Help\"; Flags: ignoreversion
+Source: "D:\CVS\SOURCEFORGE\cmanager\bin\CManager.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\CVS\SOURCEFORGE\cmanager\docs\readme"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\CVS\SOURCEFORGE\cmanager\docs\changelog"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\CVS\SOURCEFORGE\cmanager\docs\contrib"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\CVS\SOURCEFORGE\cmanager\docs\license"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\CVS\SOURCEFORGE\cmanager\docs\Help\index.html"; DestDir: "{app}\Help\"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

@@ -406,6 +406,8 @@ initialization
   with GBasePreferences do begin
     startupDatafileMode := CStartupFilemodeFirsttime;
     startupDatafileName := GetSystemPathname(CDefaultFilename);
+    showShortcutBar := True;
+    showStatusBar := True;
     lastOpenedDatafilename := '';
   end;
 finalization

@@ -159,13 +159,12 @@ begin
     if GSettings.parseError.errorCode <> 0 then begin
       ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GSettings.parseError.reason);
       Result := False;
+    end else begin
+      GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
+      GBasePreferences.LoadFromXml(GetSettingsPreferences);
     end;
   end else begin
     GetSettingsRoot;
-  end;
-  if Result then begin
-    GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
-    GBasePreferences.LoadFromXml(GetSettingsPreferences);
   end;
 end;
 
