@@ -28,6 +28,9 @@ function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 function FileSize(AName: String): Int64;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
+function GetParamValue(AParam: String): String;
+function GetSwitch(ASwitch: String): Boolean;
+function CheckPendingInformations: Boolean;
 
 implementation
 
@@ -413,6 +416,38 @@ var xFilename: String;
 begin
   xFilename := FormatDateTime('yymmdd_hhnnss', Now) + '.cmb';
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ADatabaseName)) + xFilename;
+end;
+
+function GetParamValue(AParam: String): String;
+var xCount: Integer;
+begin
+  Result := '';
+  xCount := 1;
+  while (xCount <= ParamCount) and (Result = '') do begin
+    if AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(AParam) then begin
+      if (xCount + 1) <= ParamCount then begin
+        Result := ParamStr(xCount + 1);
+        xCount := xCount + 2;
+      end;
+    end;
+    Inc(xCount);
+  end;
+end;
+
+function GetSwitch(ASwitch: String): Boolean;
+var xCount: Integer;
+begin
+  Result := False;
+  xCount := 1;
+  while (xCount <= ParamCount) and (not Result) do begin
+    Result := AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(ASwitch);
+    Inc(xCount);
+  end;
+end;
+
+function CheckPendingInformations: Boolean;
+begin
+  Result := False;
 end;
 
 end.

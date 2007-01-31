@@ -66,7 +66,8 @@ uses
   CPreferences in 'CPreferences.pas',
   CProfileFrameUnit in 'CProfileFrameUnit.pas' {CProfileFrame: TFrame},
   CProfileFormUnit in 'CProfileFormUnit.pas' {CProfileForm},
-  CChooseFutureFilterFormUnit in 'CChooseFutureFilterFormUnit.pas' {CChooseFutureFilterForm};
+  CChooseFutureFilterFormUnit in 'CChooseFutureFilterFormUnit.pas' {CChooseFutureFilterForm},
+  CLoans in 'CLoans.pas';
 
 {$R *.res}
 
@@ -78,7 +79,7 @@ begin
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
-    if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropern then begin
+    if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
         xFilename := GetSystemPathname(CDefaultFilename);
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened then begin
@@ -92,8 +93,13 @@ begin
     end;
     if xProceed then begin
       InitializeProxies;
-      Application.CreateForm(TCMainForm, CMainForm);
-      Application.Run;
+      if GetSwitch('/checkonly') then begin
+        xProceed := CheckPendingInformations;
+      end;
+      if xProceed then begin
+        Application.CreateForm(TCMainForm, CMainForm);
+  Application.Run;
+      end;
     end else begin
       ShowInfo(itError, xError, xDesc)
     end;

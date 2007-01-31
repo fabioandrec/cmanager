@@ -137,7 +137,7 @@ procedure TCPreferencesForm.FillForm;
 begin
   inherited FillForm;
   with FBasePrefs do begin
-    if startupDatafileMode = CStartupFilemodeNeveropern then begin
+    if startupDatafileMode = CStartupFilemodeNeveropen then begin
       RadioButtonNever.Checked := True;
     end else if startupDatafileMode = CStartupFilemodeThisfile then begin
       RadioButtonThis.Checked := True;
@@ -157,7 +157,7 @@ begin
   inherited ReadValues;
   with FBasePrefs do begin
     if RadioButtonNever.Checked then begin
-      startupDatafileMode := CStartupFilemodeNeveropern;
+      startupDatafileMode := CStartupFilemodeNeveropen;
     end else if RadioButtonThis.Checked then begin
       startupDatafileMode := CStartupFilemodeThisfile;
     end else begin

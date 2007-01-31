@@ -59,7 +59,7 @@ const
 
   CStartupFilemodeLastOpened = 0;
   CStartupFilemodeThisfile = 1;
-  CStartupFilemodeNeveropern = 2;
+  CStartupFilemodeNeveropen = 2;
   CStartupFilemodeFirsttime = 3;
 
 implementation
