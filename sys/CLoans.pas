@@ -5,8 +5,9 @@ interface
 uses Contnrs;
 
 type
-  TLoanPaymentType = (lptDiscount, lptTotal, lptPrincipal);
+  TLoanPaymentType = (lptTotal, lptPrincipal);
   TLoanPaymentPeriod = (lppWeekly, lppMonthly);
+  TLoanPaymentBalance = (rpbDaily, rpbPeriodicaly);
 
   TLoanRepayment = class(TObject)
   private
@@ -25,24 +26,27 @@ type
   private
     FpaymentType: TLoanPaymentType;
     FpaymentPeriod: TLoanPaymentPeriod;
+    FpaymentBalance: TLoanPaymentBalance;
     Fperiods: Integer;
     FtotalCash: Currency;
     FtaxAmount: Currency;
+    FfirstDay: TDateTime;
     function GetItems(AIndex: Integer): TLoanRepayment;
     procedure SetItems(AIndex: Integer; const Value: TLoanRepayment);
   public
-    constructor Create(APaymentType: TLoanPaymentType; APaymentPeriod: TLoanPaymentPeriod; APeriods: Integer; ATotalcash: Currency; ATaxAmount: Currency);
+    constructor Create(APaymentType: TLoanPaymentType; APaymentPeriod: TLoanPaymentPeriod; APaymentBalance: TLoanPaymentBalance; APeriods: Integer; ATotalcash: Currency; ATaxAmount: Currency; AFirstDay: TDateTime);
     procedure CalculateRepayments;
   public
     property Items[AIndex: Integer]: TLoanRepayment read GetItems write SetItems;
   published
     property paymentType: TLoanPaymentType read FPaymentType write FPaymentType;
     property paymentPeriod: TLoanPaymentPeriod read FPaymentPeriod write FPaymentPeriod;
+    property paymentBalance: TLoanPaymentBalance read FpaymentBalance write FpaymentBalance;
     property periods: Integer read FPeriods write FPeriods;
     property totalCash: Currency read FTotalcash write FTotalcash;
     property taxAmount: Currency read FTaxAmount write FTaxAmount;
+    property firstDay: TDateTime read FfirstDay write FfirstDay;
   end;
-
 
 implementation
 
@@ -64,14 +68,16 @@ begin
   end;
 end;
 
-constructor TLoan.Create(APaymentType: TLoanPaymentType; APaymentPeriod: TLoanPaymentPeriod; APeriods: Integer; ATotalcash, ATaxAmount: Currency);
+constructor TLoan.Create(APaymentType: TLoanPaymentType; APaymentPeriod: TLoanPaymentPeriod; APaymentBalance: TLoanPaymentBalance; APeriods: Integer; ATotalcash, ATaxAmount: Currency; AFirstDay: TDateTime);
 begin
   inherited Create(True);
   FpaymentType := APaymentType;
   FpaymentPeriod := APaymentPeriod;
+  FpaymentBalance := APaymentBalance;
   Fperiods := APeriods;
   FtotalCash := ATotalcash;
   FtaxAmount :=ATaxAmount;
+  FfirstDay := AFirstDay;
   CalculateRepayments;
 end;
 
