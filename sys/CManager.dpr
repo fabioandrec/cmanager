@@ -67,7 +67,8 @@ uses
   CProfileFrameUnit in 'CProfileFrameUnit.pas' {CProfileFrame: TFrame},
   CProfileFormUnit in 'CProfileFormUnit.pas' {CProfileForm},
   CChooseFutureFilterFormUnit in 'CChooseFutureFilterFormUnit.pas' {CChooseFutureFilterForm},
-  CLoans in 'CLoans.pas';
+  CLoans in 'CLoans.pas',
+  CLoanCalculatorFormUnit in 'CLoanCalculatorFormUnit.pas' {CLoanCalculatorForm};
 
 {$R *.res}
 
@@ -98,7 +99,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
       end;
     end else begin
       ShowInfo(itError, xError, xDesc)

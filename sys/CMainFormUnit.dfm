@@ -349,6 +349,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutProfiles
+                Caption = '&Profile'
                 ImageIndex = 9
               end>
             Caption = '&Skr'#243'ty'
@@ -370,6 +371,9 @@ object CMainForm: TCMainForm
               item
                 Action = ActionPreferences
                 Caption = '&Preferencje'
+              end
+              item
+                Action = ActionLoanCalc
               end>
             Caption = '&Narz'#281'dzia'
           end
@@ -503,6 +507,11 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Profile'
       ImageIndex = 9
+    end
+    object ActionLoanCalc: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Kalkulator kredytowy'
+      OnExecute = ActionLoanCalcExecute
     end
   end
   object OpenDialog: TOpenDialog

@@ -51,6 +51,7 @@ type
     ActionCheckDatafile: TAction;
     ActionPreferences: TAction;
     ActionShortcutProfiles: TAction;
+    ActionLoanCalc: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -73,6 +74,7 @@ type
     procedure ActionCheckDatafileExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
     procedure ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure ActionLoanCalcExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -108,7 +110,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
-  CProfileFrameUnit;
+  CProfileFrameUnit, CLoanCalculatorFormUnit;
 
 {$R *.dfm}
 
@@ -477,6 +479,11 @@ procedure TCMainForm.UnhandledException(Sender: TObject; E: Exception);
 begin
   ShowInfo(itError, 'Podczas pracy wyst¹pi³ wyj¹tek programowy. CManager zostanie zamkniêty', E.Message);
   Application.Terminate;
+end;
+
+procedure TCMainForm.ActionLoanCalcExecute(Sender: TObject);
+begin
+  ShowLoanCalculator(False);
 end;
 
 end.

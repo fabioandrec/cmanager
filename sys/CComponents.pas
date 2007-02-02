@@ -149,6 +149,7 @@ type
     procedure SetDecimals(Value: smallint);
     function GetValue: Currency;
     procedure SetValue(Value: Currency);
+    procedure SetCurrencyStr(const Value: String);
   protected
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
@@ -199,6 +200,7 @@ type
     property Decimals: smallint read GetDecimals write SetDecimals;
     property Value: Currency read GetValue write SetValue;
     property ThousandSep: Boolean read FShowKSeps write FShowKSeps;
+    property CurrencyStr: String read FCurrencyStr write SetCurrencyStr;
     property BevelEdges;
     property BevelKind;
     property BevelOuter;
@@ -1284,6 +1286,12 @@ begin
   end else if Message.Msg = WM_SETFOCUS then begin
     Invalidate;
   end;
+end;
+
+procedure TCCurrEdit.SetCurrencyStr(const Value: String);
+begin
+  FCurrencyStr := Value;
+  SetTextFromValue;
 end;
 
 end.
