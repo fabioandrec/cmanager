@@ -50,7 +50,7 @@ object CCalendarForm: TCCalendarForm
     CalColors.TitleBackColor = clBtnShadow
     CalColors.MonthBackColor = clWindow
     CalColors.TrailingTextColor = clBtnFace
-    Date = 38974.605777500000000000
+    Date = 38974.592934097220000000
     ShowToday = False
     ShowTodayCircle = False
     TabOrder = 0

@@ -77,8 +77,12 @@ begin
 end;
 
 procedure TCCalendarForm.MonthCalendarDblClick(Sender: TObject);
+var xPoint: TPoint;
 begin
-  ModalResult := mrOk;
+  xPoint := MonthCalendar.ScreenToClient(Mouse.CursorPos);
+  if xPoint.Y > MonthCalendar.Height / 4 then begin
+    ModalResult := mrOk;
+  end;
 end;
 
 procedure TCCalendarForm.WndProc(var Message: TMessage);

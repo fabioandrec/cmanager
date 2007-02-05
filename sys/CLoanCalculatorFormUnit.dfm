@@ -1,12 +1,14 @@
 inherited CLoanCalculatorForm: TCLoanCalculatorForm
-  Left = 419
-  Top = 187
+  Left = 330
+  Top = 227
   Caption = 'Kalkulator kredytowy'
+  ClientHeight = 445
   ClientWidth = 487
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 487
+    Height = 404
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -202,29 +204,34 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
               Alignment = taRightJustify
               Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 0
+              Width = 60
               WideText = 'Lp'
             end
             item
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 1
-              Width = 80
+              Width = 75
               WideText = 'Data'
             end
             item
               Alignment = taRightJustify
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 2
               Width = 90
               WideText = 'Rata'
             end
             item
               Alignment = taRightJustify
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 3
               Width = 90
               WideText = 'Odsetki'
             end
             item
               Alignment = taRightJustify
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 4
-              Width = 90
+              Width = 80
               WideText = 'Pozosta'#322'o'
             end>
         end
@@ -248,6 +255,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
     end
   end
   inherited PanelButtons: TPanel
+    Top = 404
     Width = 487
     inherited BitBtnOk: TBitBtn
       Left = 310

@@ -61,6 +61,7 @@ begin
     xOperation := coNone;
   end;
   xForm.UpdateLoanData;
+  xForm.CDateTime.Value := GWorkDate;
   if not xForm.ShowConfig(xOperation) then begin
     FreeAndNil(Result);
   end;
@@ -89,12 +90,19 @@ begin
           paymentPeriod := lppWeekly;
         end;
       end;
-      Floan.CalculateRepayments;
+      xValid := Floan.CalculateRepayments;
+    end;
+    if xValid then begin
       PanelError.Visible := False;
       with RepaymentList do begin
         BeginUpdate;
         RootNodeCount := Floan.Count;
         EndUpdate;
+        if Floan.firstDay <> 0 then begin
+          Header.Columns.Items[1].Options := Header.Columns.Items[1].Options + [coVisible];
+        end else begin
+          Header.Columns.Items[1].Options := Header.Columns.Items[1].Options - [coVisible];
+        end;
         Header.Options := Header.Options + [hoVisible];
       end;
     end else begin
@@ -146,13 +154,21 @@ begin
   if Column = 0 then begin
     CellText := xObj.caption;
   end else if Column = 1 then begin
-    CellText := DateToStr(xObj.date);
+    if Floan.IsSumObject(Floan.IndexOf(xObj)) then begin
+      CellText := DateToStr(xObj.date);
+    end else begin
+      CellText := '';
+    end;
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xObj.principal + xObj.tax);
+    CellText := CurrencyToString(xObj.payment);
   end else if Column = 3 then begin
     CellText := CurrencyToString(xObj.tax);
   end else if Column = 4 then begin
-    CellText := CurrencyToString(xObj.left);
+    if Floan.IsSumObject(Floan.IndexOf(xObj)) then begin
+      CellText := CurrencyToString(xObj.left);
+    end else begin
+      CellText := '';
+    end;
   end;
 end;
 

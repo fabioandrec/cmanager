@@ -13,6 +13,7 @@ type
     Fcaption: String;
     Fdate: TDateTime;
     Fprincipal: Currency;
+    Fpayment: Currency;
     Fleft: Currency;
     Ftax: Currency;
   public
@@ -23,6 +24,7 @@ type
     property tax: Currency read Ftax write Ftax;
     property caption: String read Fcaption write Fcaption;
     property left: Currency read Fleft write Fleft;
+    property payment: Currency read Fpayment;
   end;
 
   TLoan = class(TObjectList)
@@ -35,11 +37,15 @@ type
     FfirstDay: TDateTime;
     function GetItems(AIndex: Integer): TLoanRepayment;
     procedure SetItems(AIndex: Integer; const Value: TLoanRepayment);
+    function GetSumPrincipal: Currency;
+    function GetSumTax: Currency;
+    function GetSumPayments: Currency;
+    function GetYearRate: Currency;
   public
     constructor Create;
-    procedure CalculateRepayments;
-  public
+    function CalculateRepayments(AAddSums: Boolean = True): Boolean;
     property Items[AIndex: Integer]: TLoanRepayment read GetItems write SetItems;
+    function IsSumObject(ANumber: Integer): Boolean;
   published
     property paymentType: TLoanPaymentType read FPaymentType write FPaymentType;
     property paymentPeriod: TLoanPaymentPeriod read FPaymentPeriod write FPaymentPeriod;
@@ -47,16 +53,15 @@ type
     property totalCash: Currency read FTotalcash write FTotalcash;
     property taxAmount: Currency read FTaxAmount write FTaxAmount;
     property firstDay: TDateTime read FfirstDay write FfirstDay;
+    property sumPrincipal: Currency read GetSumPrincipal;
+    property sumTax: Currency read GetSumTax;
+    property sumPayments: Currency read GetSumPayments;
+    property yearRate: Currency read GetYearRate;
   end;
 
 implementation
 
 uses Classes, DateUtils, Math, SysUtils;
-
-function RoundCurrency(ACurrency: Currency; ADigits: Byte = 2): Currency;
-begin
-  Result := RoundTo(ACurrency, (-1) * ADigits);
-end;
 
 constructor TLoanRepayment.Create(Adate: TDateTime; Aprincipal, Atax: Currency; ALeft: Currency);
 begin
@@ -65,9 +70,10 @@ begin
   Fprincipal := Aprincipal;
   Ftax := Atax;
   Fleft := ALeft;
+  Fpayment := Ftax + Fprincipal;
 end;
 
-procedure TLoan.CalculateRepayments;
+function TLoan.CalculateRepayments(AAddSums: Boolean = True): Boolean;
 var xOnePrincipal, xOneTax: Currency;
     xLeftCash: Currency;
     xPayment: TLoanRepayment;
@@ -75,26 +81,32 @@ var xOnePrincipal, xOneTax: Currency;
     xCash: Currency;
     xPayDate: TDateTime;
     xCount: Integer;
+    xTaxPerPeriod: Extended;
+    xPeriodsPerYear: Byte;
 begin
   Clear;
+  Result := False;
   try
     xLeftCash := FtotalCash;
-    xOnePrincipal := RoundCurrency(xLeftCash/Fperiods);
+    xOnePrincipal := xLeftCash/Fperiods;
     xDate := FfirstDay;
+    if FpaymentPeriod = lppWeekly then begin
+      xPeriodsPerYear := 52;
+    end else begin
+      xPeriodsPerYear := 12;
+    end;
+    xTaxPerPeriod := FtaxAmount / (100 * xPeriodsPerYear);
     for xCount := 1 to Fperiods do begin
       if FpaymentType = lptTotal then begin
-        xOneTax := RoundCurrency((FtotalCash * (FtaxAmount / (100 * 12))) / Fperiods);
+        xCash := PeriodPayment(xTaxPerPeriod, xCount, Fperiods,  (-1) * FtotalCash, 0, ptEndOfPeriod);
+        xOneTax := InterestPayment(xTaxPerPeriod, xCount, Fperiods,  (-1) * FtotalCash, 0, ptEndOfPeriod);
       end else begin
-        xOneTax := RoundCurrency(xLeftCash * (FtaxAmount / (100 * 12)))
-      end;
-      if xLeftCash > xOnePrincipal then begin
         xCash := xOnePrincipal;
-      end else begin
-        xCash := xLeftCash;
+        xOneTax := xLeftCash * xTaxPerPeriod;
       end;
-      if DayOfWeek(xDate) = DaySaturday then begin
+      if DayOfTheWeek(xDate) = DaySaturday then begin
         xPayDate := IncDay(xDate, 2);
-      end else if DayOfWeek(xDate) = DaySunday then begin
+      end else if DayOfTheWeek(xDate) = DaySunday then begin
         xPayDate := IncDay(xDate, 1);
       end else begin
         xPayDate := xDate;
@@ -109,7 +121,13 @@ begin
         xDate := IncMonth(xDate);
       end;
     end;
+    if AAddSums then begin
+      Add(TLoanRepayment.Create(0, sumPrincipal, sumTax, 0));
+      Items[Count - 1].caption := 'Suma';
+    end;
+    Result := True;
   except
+    Clear;
   end;
 end;
 
@@ -129,9 +147,52 @@ begin
   Result := TLoanRepayment(inherited Items[AIndex]);
 end;
 
+function TLoan.GetSumPayments: Currency;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    if IsSumObject(xCount) then begin
+      Result := Result + Items[xCount].principal + Items[xCount].tax;
+    end;
+  end;
+end;
+
+function TLoan.GetSumPrincipal: Currency;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    if IsSumObject(xCount) then begin
+      Result := Result + Items[xCount].principal;
+    end;
+  end;
+end;
+
+function TLoan.GetSumTax: Currency;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    if IsSumObject(xCount) then begin
+      Result := Result + Items[xCount].tax;
+    end;
+  end;
+end;
+
 procedure TLoan.SetItems(AIndex: Integer; const Value: TLoanRepayment);
 begin
   inherited Items[AIndex] := Value;
+end;
+
+function TLoan.IsSumObject(ANumber: Integer): Boolean;
+begin
+  Result := StrToIntDef(Items[ANumber].caption, -1) <> -1;
+end;
+
+function TLoan.GetYearRate: Currency;
+begin
+  Result := 0;
 end;
 
 end.
