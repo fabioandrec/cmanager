@@ -26,6 +26,7 @@ type
     Panel1: TPanel;
     RepaymentList: TVirtualStringTree;
     PanelError: TPanel;
+    BitBtnPrint: TBitBtn;
     procedure ComboBoxPeriodChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CCurrEditCashChange(Sender: TObject);
@@ -33,6 +34,7 @@ type
     procedure CIntEditTimesChange(Sender: TObject);
     procedure CDateTimeChanged(Sender: TObject);
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure BitBtnOkClick(Sender: TObject);
   private
     Floan: TLoan;
     procedure UpdateLoanData;
@@ -44,9 +46,17 @@ function ShowLoanCalculator(ACanAccept: Boolean): TLoan;
 
 implementation
 
-uses CDatabase;
+uses CDatabase, CReports;
 
 {$R *.dfm}
+
+type
+  TLoanReportParams = class(TCReportParams)
+  private
+    Floan: TLoan;
+  public
+    property loan: TLoan read Floan write Floan;
+  end;
 
 function ShowLoanCalculator(ACanAccept: Boolean): TLoan;
 var xForm: TCLoanCalculatorForm;
@@ -114,6 +124,7 @@ begin
         Header.Options := Header.Options - [hoVisible];
       end;
     end;
+    BitBtnPrint.Enabled := xValid;
   end;
 end;
 
@@ -170,6 +181,18 @@ begin
       CellText := '';
     end;
   end;
+end;
+
+procedure TCLoanCalculatorForm.BitBtnOkClick(Sender: TObject);
+var xParams: TLoanReportParams;
+    xReport: TLoanReport;
+begin
+  xParams := TLoanReportParams.Create;
+  xParams.loan := Floan;
+  xReport := TLoanReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

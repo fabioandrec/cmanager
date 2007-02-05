@@ -328,6 +328,9 @@ type
     constructor CreateReport(AParams: TCReportParams); override;
   end;
 
+  TLoanReport = class(TCHtmlReport)
+  end;
+
 
 implementation
 

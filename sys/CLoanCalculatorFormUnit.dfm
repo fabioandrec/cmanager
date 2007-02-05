@@ -3,11 +3,11 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   Top = 227
   Caption = 'Kalkulator kredytowy'
   ClientHeight = 445
-  ClientWidth = 487
+  ClientWidth = 483
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 487
+    Width = 483
     Height = 404
     object GroupBox1: TGroupBox
       Left = 16
@@ -256,12 +256,25 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   end
   inherited PanelButtons: TPanel
     Top = 404
-    Width = 487
+    Width = 483
     inherited BitBtnOk: TBitBtn
-      Left = 310
+      Left = 306
+      TabOrder = 1
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 398
+      Left = 394
+      TabOrder = 2
+    end
+    object BitBtnPrint: TBitBtn
+      Left = 16
+      Top = 8
+      Width = 75
+      Height = 25
+      Anchors = [akRight, akBottom]
+      Caption = 'Do druku'
+      Enabled = False
+      TabOrder = 0
+      OnClick = BitBtnOkClick
     end
   end
 end
