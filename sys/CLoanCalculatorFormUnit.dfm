@@ -3,21 +3,21 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   Top = 227
   Caption = 'Kalkulator kredytowy'
   ClientHeight = 445
-  ClientWidth = 483
+  ClientWidth = 578
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 483
+    Width = 578
     Height = 404
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 453
+      Width = 545
       Height = 137
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label3: TLabel
-        Left = 236
+        Left = 300
         Top = 96
         Width = 101
         Height = 13
@@ -33,7 +33,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Caption = 'Sp'#322'ata kredytu co'
       end
       object Label1: TLabel
-        Left = 230
+        Left = 294
         Top = 28
         Width = 107
         Height = 13
@@ -49,7 +49,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Caption = 'Ilo'#347#263' rat'
       end
       object Label2: TLabel
-        Left = 221
+        Left = 285
         Top = 62
         Width = 116
         Height = 13
@@ -65,9 +65,9 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Caption = 'Kwota kredytu'
       end
       object CDateTime: TCDateTime
-        Left = 345
+        Left = 409
         Top = 92
-        Width = 87
+        Width = 112
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -82,9 +82,9 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         HotTrack = True
       end
       object ComboBoxType: TComboBox
-        Left = 345
+        Left = 409
         Top = 24
-        Width = 87
+        Width = 112
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -101,7 +101,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       object ComboBoxPeriod: TComboBox
         Left = 110
         Top = 24
-        Width = 99
+        Width = 123
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -118,7 +118,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       object CIntEditTimes: TCIntEdit
         Left = 110
         Top = 92
-        Width = 99
+        Width = 123
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -128,9 +128,9 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         OnChange = CIntEditTimesChange
       end
       object CCurrEditTax: TCCurrEdit
-        Left = 344
+        Left = 408
         Top = 59
-        Width = 87
+        Width = 113
         Height = 21
         BorderStyle = bsNone
         TabOrder = 3
@@ -143,7 +143,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       object CCurrEditCash: TCCurrEdit
         Left = 110
         Top = 59
-        Width = 99
+        Width = 123
         Height = 21
         BorderStyle = bsNone
         TabOrder = 2
@@ -157,14 +157,14 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
     object GroupBox2: TGroupBox
       Left = 16
       Top = 168
-      Width = 453
+      Width = 545
       Height = 225
       Caption = ' Harmonogram '
       TabOrder = 1
       object Panel1: TPanel
         Left = 16
         Top = 24
-        Width = 417
+        Width = 513
         Height = 185
         BevelOuter = bvLowered
         Caption = 'Panel1'
@@ -172,7 +172,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         object RepaymentList: TVirtualStringTree
           Left = 1
           Top = 1
-          Width = 415
+          Width = 511
           Height = 183
           Align = alClient
           BevelEdges = []
@@ -204,7 +204,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
               Alignment = taRightJustify
               Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 0
-              Width = 60
+              Width = 70
               WideText = 'Lp'
             end
             item
@@ -218,25 +218,31 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 2
               Width = 90
-              WideText = 'Rata'
+              WideText = 'Kwota sp'#322'aty'
             end
             item
               Alignment = taRightJustify
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 3
               Width = 90
-              WideText = 'Odsetki'
+              WideText = 'Kapita'#322
             end
             item
               Alignment = taRightJustify
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 4
               Width = 80
+              WideText = 'Odsetki'
+            end
+            item
+              Alignment = taRightJustify
+              Position = 5
+              Width = 80
               WideText = 'Pozosta'#322'o'
             end>
         end
         object PanelError: TPanel
-          Left = 48
+          Left = 96
           Top = 40
           Width = 321
           Height = 41
@@ -256,13 +262,13 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   end
   inherited PanelButtons: TPanel
     Top = 404
-    Width = 483
+    Width = 578
     inherited BitBtnOk: TBitBtn
-      Left = 306
+      Left = 401
       TabOrder = 1
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 394
+      Left = 489
       TabOrder = 2
     end
     object BitBtnPrint: TBitBtn
@@ -270,7 +276,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       Top = 8
       Width = 75
       Height = 25
-      Anchors = [akRight, akBottom]
+      Anchors = [akLeft, akBottom]
       Caption = 'Do druku'
       Enabled = False
       TabOrder = 0

@@ -3,7 +3,7 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils;
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans;
 
 type
   TSumForDayItem = class(TObject)
@@ -328,20 +328,31 @@ type
     constructor CreateReport(AParams: TCReportParams); override;
   end;
 
+  TLoanReportParams = class(TCReportParams)
+  private
+    Floan: TLoan;
+  public
+    constructor Create(ALoan: TLoan);
+  published
+    property loan: TLoan read Floan write Floan;
+  end;
+
   TLoanReport = class(TCHtmlReport)
+  protected
+    function GetReportTitle: String; override;
+    function GetReportBody: String; override;
   end;
 
 
 implementation
 
-uses Forms, Adodb, CConfigFormUnit,
+uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts, CDataObjects,
      DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
-  Math;
+     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
 begin
@@ -2451,7 +2462,6 @@ var xBody: TStringList;
 begin
   xList := TCVirtualStringTreeParams(FParams).list;
   xBody := TStringList.Create;
-  Result := xBody.Text;
   xColumns := xList.Header.Columns.GetVisibleColumns;
   with xBody do begin
     Add('<table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
@@ -2511,6 +2521,107 @@ begin
   FStartDate := GWorkDate;
   FEndDate := GWorkDate;
   FFilterId := CEmptyDataGid;
+end;
+
+constructor TLoanReportParams.Create(ALoan: TLoan);
+begin
+  inherited Create;
+  Floan := ALoan;
+end;
+
+function TLoanReport.GetReportBody: String;
+var xL: TLoan;
+    xPaymentType: String;
+    xPaymentPeriod: String;
+    xBody: TStringList;
+    xCount: Integer;
+begin
+  xL := TLoanReportParams(FParams).loan;
+  if xL.paymentType = lptTotal then begin
+    xPaymentType := 'sta³e';
+  end else begin
+    xPaymentType := 'malej¹ce';
+  end;
+  if xL.paymentPeriod = lppWeekly then begin
+    xPaymentPeriod := 'tygodniowo';
+  end else begin
+    xPaymentPeriod := 'miesiêcznie';
+  end;
+  xBody := TStringList.Create;
+  with xBody do begin
+    Add('<table class="base" colspan="6">');
+    Add('<tr class="base">');
+    Add('<td class="headcenter" width="20%">Kwota</td>');
+    Add('<td class="headcenter" width="10%">Oprocentowanie</td>');
+    Add('<td class="headcenter" width="20%">Iloœæ sp³at</td>');
+    Add('<td class="headcenter" width="20%">Rodzaj sp³at</td>');
+    Add('<td class="headcenter" width="20%">Czêstotliwoœæ</td>');
+    Add('<td class="headcenter" width="10%">Rrso</td>');
+    Add('</tr></table><hr>');
+    Add('<table class="base" colspan="6">');
+    Add('<tr class="base">');
+    Add('<td class="center" width="20%">' + CurrencyToString(xL.totalCash) + '</td>');
+    Add('<td class="center" width="10%">' + CurrencyToString(xL.taxAmount, False, 4) + '%</td>');
+    Add('<td class="center" width="20%">' + IntToStr(xL.periods) + '</td>');
+    Add('<td class="center" width="20%">' + xPaymentType + '</td>');
+    Add('<td class="center" width="20%">' + xPaymentPeriod + '</td>');
+    Add('<td class="center" width="10%">' + CurrencyToString(xL.yearRate, False, 4) + '%</td>');
+    Add('</tr>');
+    Add('</table>');
+    Add('<hr>');
+    Add('<p class="reptitle">Harmonogram sp³at<hr>');
+    Add('<table class="base" colspan="' + IntToStr(IfThen(xL.firstDay <> 0, 6, 5)) + '">');
+    Add('<tr class="base">');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    if xL.firstDay <> 0 then begin
+      Add('<td class="headtext" width="20%">Data</td>');
+    end;
+    Add('<td class="headcash" width="25%">Kwota sp³aty</td>');
+    Add('<td class="headcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">Kapita³</td>');
+    Add('<td class="headcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">Odsetki</td>');
+    Add('<td class="headcash" width="20%">Pozosta³y kapita³</td>');
+    Add('</tr>');
+    Add('</table>');
+    Add('<hr>');
+    Add('<table class="base" colspan="' + IntToStr(IfThen(xL.firstDay <> 0, 6, 5)) + '">');
+    for xCount := 0 to xL.Count - 1 do begin
+      if xL.IsSumObject(xCount) then begin
+        if not Odd(xCount) then begin
+          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+        end else begin
+          Add('<tr class="base">');
+        end;
+        Add('<td class="text" width="5%">' + IntToStr(xCount + 1) + '</td>');
+        if xL.firstDay <> 0 then begin
+          Add('<td class="text" width="20%">' + DateToStr(xL.Items[xCount].date) + '</td>');
+        end;
+        Add('<td class="cash" width="25%">' + CurrencyToString(xL.Items[xCount].payment) + '</td>');
+        Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].principal) + '</td>');
+        Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].tax) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xL.Items[xCount].left) + '</td>');
+        Add('</tr>');
+      end;
+    end;
+    Add('</table><hr><table class="base" colspan="' + IntToStr(IfThen(xL.firstDay <> 0, 6, 5)) + '">');
+    Add('<tr class="base">');
+    Add('<td class="sumtext" width="5%">Razem</td>');
+    if xL.firstDay <> 0 then begin
+      Add('<td class="sumtext" width="20%"></td>');
+    end;
+    Add('<td class="sumcash" width="25%">' + CurrencyToString(xL.sumPayments) + '</td>');
+    Add('<td class="sumcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.sumPrincipal) + '</td>');
+    Add('<td class="sumcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.sumTax) + '</td>');
+    Add('<td class="sumcash" width="20%"></td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TLoanReport.GetReportTitle: String;
+begin
+  Result := 'Informacje o kredycie';
 end;
 
 end.

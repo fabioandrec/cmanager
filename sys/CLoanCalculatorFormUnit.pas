@@ -50,14 +50,6 @@ uses CDatabase, CReports;
 
 {$R *.dfm}
 
-type
-  TLoanReportParams = class(TCReportParams)
-  private
-    Floan: TLoan;
-  public
-    property loan: TLoan read Floan write Floan;
-  end;
-
 function ShowLoanCalculator(ACanAccept: Boolean): TLoan;
 var xForm: TCLoanCalculatorForm;
     xOperation: TConfigOperation;
@@ -71,7 +63,6 @@ begin
     xOperation := coNone;
   end;
   xForm.UpdateLoanData;
-  xForm.CDateTime.Value := GWorkDate;
   if not xForm.ShowConfig(xOperation) then begin
     FreeAndNil(Result);
   end;
@@ -173,8 +164,10 @@ begin
   end else if Column = 2 then begin
     CellText := CurrencyToString(xObj.payment);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(xObj.tax);
+    CellText := CurrencyToString(xObj.principal);
   end else if Column = 4 then begin
+    CellText := CurrencyToString(xObj.tax);
+  end else if Column = 5 then begin
     if Floan.IsSumObject(Floan.IndexOf(xObj)) then begin
       CellText := CurrencyToString(xObj.left);
     end else begin
@@ -187,8 +180,7 @@ procedure TCLoanCalculatorForm.BitBtnOkClick(Sender: TObject);
 var xParams: TLoanReportParams;
     xReport: TLoanReport;
 begin
-  xParams := TLoanReportParams.Create;
-  xParams.loan := Floan;
+  xParams := TLoanReportParams.Create(Floan);
   xReport := TLoanReport.CreateReport(xParams);
   xReport.ShowReport;
   xReport.Free;

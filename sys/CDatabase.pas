@@ -193,7 +193,7 @@ var GDataProvider: TDataProvider;
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
-function CurrencyToString(ACurrency: Currency): String;
+function CurrencyToString(ACurrency: Currency; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
@@ -231,9 +231,13 @@ begin
   Result := CurrToStr(ACurrency, xFormat);
 end;
 
-function CurrencyToString(ACurrency: Currency): String;
+function CurrencyToString(ACurrency: Currency; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
 begin
-  Result := CurrToStrF(ACurrency, ffCurrency, 2);
+  if AWithSymbol then begin
+    Result := CurrToStrF(ACurrency, ffCurrency, ADecimal);
+  end else begin
+    Result := CurrToStrF(ACurrency, ffNumber, ADecimal);
+  end;
 end;
 
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;

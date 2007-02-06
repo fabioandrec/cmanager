@@ -123,7 +123,7 @@ begin
     end;
     if AAddSums then begin
       Add(TLoanRepayment.Create(0, sumPrincipal, sumTax, 0));
-      Items[Count - 1].caption := 'Suma';
+      Items[Count - 1].caption := 'Razem';
     end;
     Result := True;
   except
@@ -191,8 +191,10 @@ begin
 end;
 
 function TLoan.GetYearRate: Currency;
+var xNominal: Extended;
 begin
-  Result := 0;
+  xNominal := InterestRate(Fperiods, FtotalCash / Fperiods, (-1) * sumTax, (-1) * (sumTax + sumPrincipal), ptEndOfPeriod);
+  Result := (Power(1 + xNominal / 100, 12) - 1) * 100;
 end;
 
 end.

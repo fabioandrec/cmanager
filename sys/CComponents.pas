@@ -1010,6 +1010,9 @@ begin
   inherited Click;
   if HotTrack then begin
     xDate := FValue;
+    if FValue = 0 then begin
+      xDate := Today;
+    end;
     if ShowCalendar(Self, xDate) then begin
       Value := xDate;
       if Assigned(FOnChanged) then begin

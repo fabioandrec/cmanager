@@ -23,6 +23,10 @@ td.text
 {
 text-align: left;
 }
+td.center
+{
+text-align: center;
+}
 td.infotext
 {
 font-size: 10px;
@@ -33,6 +37,12 @@ td.headtext
 font-weight: bold;
 background-color: #CCFFCC;
 text-align: left;
+}
+td.headcenter
+{
+font-weight: bold;
+background-color: #CCFFCC;
+text-align: center;
 }
 td.headcash
 {
