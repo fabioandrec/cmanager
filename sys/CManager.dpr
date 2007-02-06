@@ -99,7 +99,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
       end;
     end else begin
       ShowInfo(itError, xError, xDesc)

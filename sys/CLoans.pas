@@ -191,10 +191,20 @@ begin
 end;
 
 function TLoan.GetYearRate: Currency;
-var xNominal: Extended;
+var xArr: array of Double;
+    xCount: Integer;
+    xPeriods: Integer;
 begin
-  xNominal := InterestRate(Fperiods, FtotalCash / Fperiods, (-1) * sumTax, (-1) * (sumTax + sumPrincipal), ptEndOfPeriod);
-  Result := (Power(1 + xNominal / 100, 12) - 1) * 100;
+  SetLength(xArr, Fperiods + 1);
+  xArr[0] := (-1) * FtotalCash;
+  for xCount := 0 to Count - 1 do begin
+    if IsSumObject(xCount) then begin
+      xArr[xCount + 1] := Items[xCount].payment;
+    end;
+  end;
+  Result := InternalRateOfReturn(taxAmount/100, xArr);
+  xPeriods := IfThen(FpaymentPeriod = lppMonthly, 12, 52);
+  Result := (Power(1 + Result, xPeriods) - 1) * 100;
 end;
 
 end.

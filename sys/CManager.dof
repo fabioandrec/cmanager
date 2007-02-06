@@ -94,7 +94,7 @@ OutputDir=..\..\Bin
 UnitOutputDir=..\..\Trash
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=..\others\PngComponents\Source;..\others\Vtv\Source
+SearchPath=$(DELPHI)\Lib\Debug;..\others\PngComponents\Source;..\others\Vtv\Source
 Packages=vcl;rtl;vclx;indy;inet;xmlrtl;vclie;inetdbbde;inetdbxpress;dbrtl;dsnap;dsnapcon;vcldb;soaprtl;VclSmp;dbexpress;dbxcds;inetdb;bdertl;vcldbx;webdsnap;websnap;adortl;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;IntrawebDB_50_70;Intraweb_50_70;Rave50CLX;Rave50VCL;dclOfficeXP;NowaPoczta;KSIUP;Ksiup3
 Conditionals=
 DebugSourceDirs=
@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=3
-Build=5
+Build=6
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=
-FileVersion=1.0.3.5
+FileVersion=1.0.3.6
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -142,8 +142,9 @@ Item1=GPL
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=1
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+Count=2
+Item0=$(DELPHI)\Lib\Debug;..\others\PngComponents\Source;..\others\Vtv\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=..\..\Trash
