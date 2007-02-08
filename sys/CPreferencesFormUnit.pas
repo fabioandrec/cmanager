@@ -37,6 +37,9 @@ type
     GroupBox2: TGroupBox;
     CheckBoxShortcutVisible: TCheckBox;
     CheckBoxStatusVisible: TCheckBox;
+    CButton3: TCButton;
+    Action3: TAction;
+    TabSheetAutostart: TTabSheet;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -68,6 +71,7 @@ function TCPreferencesForm.ShowPreferences(ATab: Integer): Boolean;
 begin
   Action1.OnExecute := ActionExecute;
   Action2.OnExecute := ActionExecute;
+  Action3.OnExecute := ActionExecute;
   ActiveAction := TAction(ActionManager1.Actions[ATab]);
   FViewPrefs.Clone(GViewsPreferences);
   FBasePrefs.Clone(GBasePreferences);
