@@ -68,7 +68,8 @@ uses
   CProfileFormUnit in 'CProfileFormUnit.pas' {CProfileForm},
   CChooseFutureFilterFormUnit in 'CChooseFutureFilterFormUnit.pas' {CChooseFutureFilterForm},
   CLoans in 'CLoans.pas',
-  CLoanCalculatorFormUnit in 'CLoanCalculatorFormUnit.pas' {CLoanCalculatorForm};
+  CLoanCalculatorFormUnit in 'CLoanCalculatorFormUnit.pas' {CLoanCalculatorForm},
+  CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm};
 
 {$R *.res}
 

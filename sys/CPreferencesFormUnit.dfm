@@ -46,6 +46,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 473
           Height = 375
+          ActivePage = TabSheetAutostart
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -140,6 +141,112 @@ inherited CPreferencesForm: TCPreferencesForm
             Caption = 'TabSheetAutostart'
             ImageIndex = 2
             TabVisible = False
+            object GroupBox3: TGroupBox
+              Left = 8
+              Top = 8
+              Width = 449
+              Height = 233
+              Caption = ' Powiadomienia o operacjach  '
+              TabOrder = 0
+              object Label4: TLabel
+                Left = 265
+                Top = 66
+                Width = 39
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Ilo'#347#263' dni'
+              end
+              object Label1: TLabel
+                Left = 352
+                Top = 66
+                Width = 78
+                Height = 13
+                Caption = '(w'#322#261'cznie z dzi'#347')'
+              end
+              object CheckBoxAutostartOperations: TCheckBox
+                Left = 16
+                Top = 32
+                Width = 242
+                Height = 17
+                Caption = 'Powiadamiaj przy starcie systemu o planach na'
+                TabOrder = 0
+                OnClick = CheckBoxAutostartOperationsClick
+              end
+              object ComboBoxDays: TComboBox
+                Left = 264
+                Top = 28
+                Width = 169
+                Height = 21
+                BevelInner = bvNone
+                BevelKind = bkTile
+                Style = csDropDownList
+                ItemHeight = 13
+                ItemIndex = 0
+                TabOrder = 1
+                Text = 'Dzi'#347
+                OnChange = ComboBoxDaysChange
+                Items.Strings = (
+                  'Dzi'#347
+                  'Jutro'
+                  'Ten tydzie'#324
+                  'Przysz'#322'y tydzie'#324
+                  'Ten miesi'#261'c'
+                  'Przysz'#322'y miesi'#261'c'
+                  'Okre'#347'lon'#261' ilo'#347#263' kolejnych dni')
+              end
+              object CIntEditDays: TCIntEdit
+                Left = 312
+                Top = 62
+                Width = 33
+                Height = 21
+                BevelKind = bkTile
+                BorderStyle = bsNone
+                TabOrder = 2
+                Text = '0'
+              end
+              object CheckBoxAutoIn: TCheckBox
+                Left = 16
+                Top = 104
+                Width = 313
+                Height = 17
+                Caption = 'Powiadamiaj o zaplanowanych operacjach przychodowych'
+                TabOrder = 3
+              end
+              object CheckBoxAutoOut: TCheckBox
+                Left = 16
+                Top = 152
+                Width = 313
+                Height = 17
+                Caption = 'Powiadamiaj o zaplanowanych operacjach rozchodowych'
+                TabOrder = 5
+              end
+              object CheckBoxAutoAlways: TCheckBox
+                Left = 16
+                Top = 200
+                Width = 417
+                Height = 17
+                Caption = 
+                  'Wy'#347'wietlaj okno powiadomienia nawet gdy nie ma '#380'adnych informacj' +
+                  'i'
+                TabOrder = 7
+              end
+              object CheckBoxAutoOldIn: TCheckBox
+                Left = 16
+                Top = 128
+                Width = 313
+                Height = 17
+                Caption = 'Powiadamiaj o zaleg'#322'ych operacjach przychodowych'
+                TabOrder = 4
+              end
+              object CheckBoxAutoOldOut: TCheckBox
+                Left = 16
+                Top = 176
+                Width = 313
+                Height = 17
+                Caption = 'Powiadamiaj o zaleg'#322'ych operacjach rozchodowych'
+                TabOrder = 6
+              end
+            end
           end
         end
       end
@@ -386,8 +493,8 @@ inherited CPreferencesForm: TCPreferencesForm
         Name = 'PngImage2'
         Background = clWindow
       end>
-    Left = 185
-    Top = 240
+    Left = 529
+    Top = 200
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog

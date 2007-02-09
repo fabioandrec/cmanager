@@ -123,6 +123,8 @@ procedure TCScheduleForm.ChangeEndCondition;
 begin
   CDateTimeEnd.Enabled := RadioButtonEnd.Checked;
   CIntEditTimes.Enabled := RadioButtonTimes.Checked;
+  Label4.Enabled := RadioButtonTimes.Checked;
+  Label2.Enabled := RadioButtonEnd.Checked;
 end;
 
 procedure TCScheduleForm.ComboBoxTypeChange(Sender: TObject);

@@ -78,6 +78,14 @@ type
     FlastOpenedDatafilename: String;
     FshowShortcutBar: Boolean;
     FshowStatusBar: Boolean;
+    FstartupInfo: Boolean;
+    FstartupInfoType: Integer;
+    FstartupInfoDays: Integer;
+    FstartupInfoIn: Boolean;
+    FstartupInfoOldIn: Boolean;
+    FstartupInfoOut: Boolean;
+    FstartupInfoOldOut: Boolean;
+    FstartupInfoAlways: Boolean;
   public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
@@ -89,6 +97,14 @@ type
     property lastOpenedDatafilename: String read FlastOpenedDatafilename write FlastOpenedDatafilename;
     property showShortcutBar: Boolean read FshowShortcutBar write FshowShortcutBar;
     property showStatusBar: Boolean read FshowStatusBar write FshowStatusBar;
+    property startupInfo: Boolean read FstartupInfo write FstartupInfo;
+    property startupInfoType: Integer read FstartupInfoType write FstartupInfoType;
+    property startupInfoDays: Integer read FstartupInfoDays write FstartupInfoDays;
+    property startupInfoIn: Boolean read FstartupInfoIn write FstartupInfoIn;
+    property startupInfoOut: Boolean read FstartupInfoOut write FstartupInfoOut;
+    property startupInfoOldIn: Boolean read FstartupInfoOldIn write FstartupInfoOldIn;
+    property startupInfoOldOut: Boolean read FstartupInfoOldOut write FstartupInfoOldOut;
+    property startupInfoAlways: Boolean read FstartupInfoAlways write FstartupInfoAlways;
   end;
 
 var GViewsPreferences: TPrefList;
@@ -352,6 +368,14 @@ begin
   FlastOpenedDatafilename := TBasePref(APrefItem).lastOpenedDatafilename;
   FshowShortcutBar := TBasePref(APrefItem).showShortcutBar;
   FshowStatusBar := TBasePref(APrefItem).showStatusBar;
+  FstartupInfo := TBasePref(APrefItem).startupInfo;
+  FstartupInfoType := TBasePref(APrefItem).startupInfoType;
+  FstartupInfoDays := TBasePref(APrefItem).startupInfoDays;
+  FstartupInfoIn := TBasePref(APrefItem).startupInfoIn;
+  FstartupInfoOut := TBasePref(APrefItem).startupInfoOut;
+  FstartupInfoAlways := TBasePref(APrefItem).startupInfoAlways;
+  FstartupInfoOldIn := TBasePref(APrefItem).startupInfoOldIn;
+  FstartupInfoOldOut := TBasePref(APrefItem).startupInfoOldOut;
 end;
 
 function TBasePref.GetNodeName: String;
@@ -367,6 +391,14 @@ begin
   FlastOpenedDatafilename := GetXmlAttribute('lastopenedfilename', ANode, '');
   FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
   FshowStatusBar := GetXmlAttribute('showStatusBar', ANode, True);
+  FstartupInfo := GetXmlAttribute('startupInfo', ANode, False);
+  FstartupInfoType := GetXmlAttribute('startupInfoType', ANode, CStartupInfoToday);
+  FstartupInfoDays := GetXmlAttribute('startupInfoDays', ANode, 1);
+  FstartupInfoIn := GetXmlAttribute('startupInfoIn', ANode, True);
+  FstartupInfoOut := GetXmlAttribute('startupInfoOut', ANode, True);
+  FstartupInfoOldIn := GetXmlAttribute('startupInfoOldIn', ANode, True);
+  FstartupInfoOldOut := GetXmlAttribute('startupInfoOldOut', ANode, True);
+  FstartupInfoAlways := GetXmlAttribute('startupInfoAlways', ANode, True);
 end;
 
 procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
@@ -377,6 +409,14 @@ begin
   SetXmlAttribute('lastopenedfilename', ANode, FlastOpenedDatafilename);
   SetXmlAttribute('showShortcutBar', ANode, FshowShortcutBar);
   SetXmlAttribute('showStatusBar', ANode, FshowStatusBar);
+  SetXmlAttribute('startupInfo', ANode, FstartupInfo);
+  SetXmlAttribute('startupInfoType', ANode, FstartupInfoType);
+  SetXmlAttribute('startupInfoDays', ANode, FstartupInfoDays);
+  SetXmlAttribute('startupInfoIn', ANode, FstartupInfoIn);
+  SetXmlAttribute('startupInfoOut', ANode, FstartupInfoOut);
+  SetXmlAttribute('startupInfoOldIn', ANode, FstartupInfoOldIn);
+  SetXmlAttribute('startupInfoOldOut', ANode, FstartupInfoOldOut);
+  SetXmlAttribute('startupInfoAlways', ANode, FstartupInfoAlways);
 end;
 
 initialization

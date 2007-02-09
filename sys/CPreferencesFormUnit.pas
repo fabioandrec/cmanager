@@ -40,10 +40,23 @@ type
     CButton3: TCButton;
     Action3: TAction;
     TabSheetAutostart: TTabSheet;
+    GroupBox3: TGroupBox;
+    CheckBoxAutostartOperations: TCheckBox;
+    ComboBoxDays: TComboBox;
+    Label4: TLabel;
+    CIntEditDays: TCIntEdit;
+    CheckBoxAutoIn: TCheckBox;
+    CheckBoxAutoOut: TCheckBox;
+    CheckBoxAutoAlways: TCheckBox;
+    Label1: TLabel;
+    CheckBoxAutoOldIn: TCheckBox;
+    CheckBoxAutoOldOut: TCheckBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
     procedure RadioButtonNeverClick(Sender: TObject);
+    procedure ComboBoxDaysChange(Sender: TObject);
+    procedure CheckBoxAutostartOperationsClick(Sender: TObject);
   private
     FActiveAction: TAction;
     FViewPrefs: TPrefList;
@@ -152,7 +165,17 @@ begin
     CStaticFileName.Caption := MinimizeName(startupDatafileName, CStaticFileName.Canvas, CStaticFileName.Width);
     CheckBoxShortcutVisible.Checked := showShortcutBar;
     CheckBoxStatusVisible.Checked := showStatusBar;
+    CheckBoxAutostartOperations.Checked := startupInfo;
+    ComboBoxDays.ItemIndex := startupInfoType;
+    CIntEditDays.Text := IntToStr(startupInfoDays);
+    CheckBoxAutoIn.Checked := startupInfoIn;
+    CheckBoxAutoOut.Checked := startupInfoOut;
+    CheckBoxAutoAlways.Checked := startupInfoAlways;
+    CheckBoxAutoOldIn.Checked := startupInfoOldIn;
+    CheckBoxAutoOldOut.Checked := startupInfoOldOut;
   end;
+  ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
+  CheckBoxAutostartOperationsClick(Nil);
   UpdateFilenameState;
 end;
 
@@ -170,7 +193,33 @@ begin
     startupDatafileName := CStaticFileName.DataId;
     showShortcutBar := CheckBoxShortcutVisible.Checked;
     showStatusBar := CheckBoxStatusVisible.Checked;
+    startupInfo := CheckBoxAutostartOperations.Checked;
+    startupInfoType := ComboBoxDays.ItemIndex;
+    startupInfoDays := CIntEditDays.Value;
+    startupInfoIn := CheckBoxAutoIn.Checked;
+    startupInfoOut := CheckBoxAutoOut.Checked;
+    startupInfoAlways := CheckBoxAutoAlways.Checked;
+    startupInfoOldIn := CheckBoxAutoOldIn.Checked;
+    startupInfoOldOut := CheckBoxAutoOldOut.Checked;
   end;
+end;
+
+procedure TCPreferencesForm.ComboBoxDaysChange(Sender: TObject);
+begin
+  CIntEditDays.Enabled := (ComboBoxDays.ItemIndex = ComboBoxDays.Items.Count - 1) and (CheckBoxAutostartOperations.Checked);
+  Label4.Enabled := CIntEditDays.Enabled;
+  Label1.Enabled := CIntEditDays.Enabled;
+end;
+
+procedure TCPreferencesForm.CheckBoxAutostartOperationsClick(Sender: TObject);
+begin
+  ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
+  CheckBoxAutoIn.Enabled := ComboBoxDays.Enabled;
+  CheckBoxAutoOut.Enabled := ComboBoxDays.Enabled;
+  CheckBoxAutoOldIn.Enabled := ComboBoxDays.Enabled;
+  CheckBoxAutoOldOut.Enabled := ComboBoxDays.Enabled;
+  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled;
+  ComboBoxDaysChange(Nil);
 end;
 
 end.

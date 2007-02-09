@@ -296,13 +296,13 @@ begin
         ADesc := xError;
       end;
     end else begin
-      AError := 'Nie odnaleziono pliku danych.';
+      AError := 'Nie odnaleziono pliku danych ' + ADatabaseName + '.';
     end;
   end;
   if Result then begin
     Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
     if not Result then begin
-      AError := 'Nie uda³o siê otworzyæ pliku danych.';
+      AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';
       ADesc := GDataProvider.LastError;
     end else begin
       if xCommand <> '' then begin
@@ -320,7 +320,7 @@ begin
         GDatabaseName := ADatabaseName;
         xDataset := GDataProvider.OpenSql('select * from cmanagerInfo', False);
         if xDataset = Nil then begin
-          AError := 'Wybrany plik nie jest poprawnym plikiem danych';
+          AError := 'Plik ' + ADatabaseName + ' nie jest poprawnym plikiem danych';
           ADesc := '';
           GDataProvider.DisconnectFromDatabase;
           Result := False;
@@ -330,7 +330,7 @@ begin
           if xFileVersion <> xDataVersion then begin
             Result := UpdateDatabase(xDataVersion, xFileVersion);
             if not Result then begin
-              AError := 'Nie uda³o siê uaktualniæ bazy danych z wersji ' + xDataVersion + ' do wersji ' + xFileVersion;
+              AError := 'Nie uda³o siê uaktualniæ pliku danych z wersji ' + xDataVersion + ' do wersji ' + xFileVersion;
             end;
           end;
           xDataset.Free;

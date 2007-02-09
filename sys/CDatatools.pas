@@ -4,7 +4,7 @@ unit CDatatools;
 
 interface
 
-uses Windows, SysUtils, Classes;
+uses Windows, SysUtils, Classes, Controls;
 
 type
   TProgressEvent = procedure (AStepBy: Integer) of Object;
@@ -35,7 +35,7 @@ function CheckPendingInformations: Boolean;
 implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
-  CDatabase, CDataObjects;
+  CDatabase, CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms;
 
 type
   TBackupRestore = class(TObject)
@@ -446,8 +446,11 @@ begin
 end;
 
 function CheckPendingInformations: Boolean;
+var xInfo: TCStartupInfoForm;
 begin
-  Result := False;
+  xInfo := TCStartupInfoForm.Create(Nil);
+  Result := xInfo.ShowModal = mrOk;
+  xInfo.Free;
 end;
 
 end.

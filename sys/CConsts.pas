@@ -62,6 +62,14 @@ const
   CStartupFilemodeNeveropen = 2;
   CStartupFilemodeFirsttime = 3;
 
+  CStartupInfoToday = 0;
+  CStartupInfoNextday = 1;
+  CStartupInfoThisweek = 2;
+  CStartupInfoNextweek = 3;
+  CStartupInfoThismonth = 4;
+  CStartupInfoNextmonth = 5;
+  CStartupInfoDays = 6;
+
 implementation
 
 end.

@@ -250,7 +250,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           Caption = 'Brak danych do utworzenia harmonogramu'
           Color = clWindow
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clInactiveCaption
+          Font.Color = clGrayText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
           Font.Style = []
