@@ -2,6 +2,7 @@ inherited CStartupInfoForm: TCStartupInfoForm
   Width = 603
   Height = 427
   Caption = 'CManager - Informacje'
+  Position = poDesktopCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -9,6 +10,7 @@ inherited CStartupInfoForm: TCStartupInfoForm
     Top = 4
     Width = 587
     Height = 392
+    Anchors = [akLeft, akTop, akRight, akBottom]
     BevelOuter = bvLowered
     TabOrder = 0
     object Panel2: TPanel
@@ -20,6 +22,9 @@ inherited CStartupInfoForm: TCStartupInfoForm
       BevelOuter = bvNone
       Color = clWindow
       TabOrder = 0
+      DesignSize = (
+        585
+        39)
       object CButton1: TCButton
         Left = 480
         Top = 8
@@ -31,6 +36,7 @@ inherited CStartupInfoForm: TCStartupInfoForm
         TxtOffset = 15
         Framed = False
         Action = Action1
+        Anchors = [akTop, akRight]
       end
       object CButton2: TCButton
         Left = 0
@@ -54,6 +60,9 @@ inherited CStartupInfoForm: TCStartupInfoForm
       BevelOuter = bvNone
       Color = clWindow
       TabOrder = 1
+      DesignSize = (
+        585
+        351)
       object RepaymentList: TVirtualStringTree
         Left = 0
         Top = 0
@@ -91,8 +100,9 @@ inherited CStartupInfoForm: TCStartupInfoForm
         Top = 56
         Width = 321
         Height = 89
+        Anchors = [akLeft, akTop, akRight]
         BevelOuter = bvNone
-        Caption = 'Brak danych do utworzenia harmonogramu'
+        Caption = 'Nie masz aktualnie '#380'adnych powiadomie'#324' do wy'#347'wietlenia'
         Color = clWindow
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clGrayText

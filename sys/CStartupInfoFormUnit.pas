@@ -22,13 +22,14 @@ type
     PngImageList1: TPngImageList;
     procedure Action1Execute(Sender: TObject);
     procedure Action2Execute(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
-    { Private declarations }
-  public
-    { Public declarations }
+    procedure ReloadInfoTree;
   end;
 
 implementation
+
+uses CPreferences;
 
 {$R *.dfm}
 
@@ -40,6 +41,20 @@ end;
 procedure TCStartupInfoForm.Action2Execute(Sender: TObject);
 begin
   ModalResult := mrOk;
+end;
+
+procedure TCStartupInfoForm.FormShow(Sender: TObject);
+begin
+  inherited;
+  ReloadInfoTree;
+end;
+
+procedure TCStartupInfoForm.ReloadInfoTree;
+begin
+  RepaymentList.BeginUpdate;
+  RepaymentList.Clear;
+  RepaymentList.EndUpdate;
+  PanelError.Visible := RepaymentList.RootNodeCount = 0;
 end;
 
 end.
