@@ -159,21 +159,23 @@ begin
   if Result then begin
     GDataProvider.BeginTransaction;
     xAccounts := TAccount.GetList(TAccount, AccountProxy, 'select * from account');
-    xStep := Trunc(100 / xAccounts.Count);
-    for xCount := 0 to xAccounts.Count - 1 do begin
-      xAccount := TAccount(xAccounts.Items[xCount]);
-      AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie konta ' + xAccount.name);
-      xSum := GDataProvider.GetSqlCurrency('select sum(cash) as cash from transactions where idAccount = ' + DataGidToDatabase(xAccount.id), 0);
-      if xSum + xAccount.initialBalance <> xAccount.cash then begin
-        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name +
-                Format(' wynosi %.2f, powinien wynosiæ %.2f', [xAccount.cash, xSum + xAccount.initialBalance]));
-        xAccount.cash := xAccount.initialBalance + xSum;
-        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Zmodyfikowano stan konta ' + xAccount.name);
-        inc(xSuspectedCount);
-      end else begin
-        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name + ' jest poprawny');
+    if xAccounts.Count > 0 then begin
+      xStep := Trunc(100 / xAccounts.Count);
+      for xCount := 0 to xAccounts.Count - 1 do begin
+        xAccount := TAccount(xAccounts.Items[xCount]);
+        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie konta ' + xAccount.name);
+        xSum := GDataProvider.GetSqlCurrency('select sum(cash) as cash from transactions where idAccount = ' + DataGidToDatabase(xAccount.id), 0);
+        if xSum + xAccount.initialBalance <> xAccount.cash then begin
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name +
+                  Format(' wynosi %.2f, powinien wynosiæ %.2f', [xAccount.cash, xSum + xAccount.initialBalance]));
+          xAccount.cash := xAccount.initialBalance + xSum;
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Zmodyfikowano stan konta ' + xAccount.name);
+          inc(xSuspectedCount);
+        end else begin
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name + ' jest poprawny');
+        end;
+        AProgressEvent(xStep);
       end;
-      AProgressEvent(xStep);
     end;
     if Result then begin
       GDataProvider.CommitTransaction;
