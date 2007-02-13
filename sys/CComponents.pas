@@ -7,7 +7,7 @@ uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList
      ActiveX, PngImageList;
 
 type
-  TPicturePosition = (ppLeft, ppTop);
+  TPicturePosition = (ppLeft, ppTop, ppRight);
 
   TCButton = class(TGraphicControl)
   private
@@ -337,6 +337,16 @@ begin
           xTxtX := FTxtOffset;
         end;
         xImgX := FPicOffset;
+        xTxtY := (Height - xTextHeight) div 2;
+      end;
+    ppRight: begin
+        if xImages <> nil then begin
+          xImgY := (Height - xImages.Height) div 2;
+          xTxtX := Width - (xImgX + xImages.Width + FTxtOffset) - Canvas.TextWidth(Caption);
+        end else begin
+          xTxtX := FTxtOffset;
+        end;
+        xImgX := Width - FPicOffset - xImages.Width;
         xTxtY := (Height - xTextHeight) div 2;
       end;
     ppTop: begin

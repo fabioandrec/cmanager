@@ -568,7 +568,7 @@ procedure TCDoneFrame.RecreateTreeHelper;
 var xDF, xDT: TDateTime;
 begin
   GetFilterDates(xDF, xDT);
-  GetScheduledObjects(FTreeObjects, FPlannedObjects, FDoneObjects, xDF, xDT);
+  GetScheduledObjects(FTreeObjects, FPlannedObjects, FDoneObjects, xDF, xDT, sosBoth);
 end;
 
 constructor TDoneFrameAdditionalData.Create(AMovementType: TBaseEnumeration);

@@ -18,8 +18,10 @@ type
     property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
   end;
 
+  TScheduledObjectStates = (sosPlanned, sosDone, sosBoth);
+
 function SortTreeHelperByDate(Item1, Item2: Pointer): Integer;
-procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime);
+procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime; AScheduledObjectStates: TScheduledObjectStates);
 
 implementation
 
@@ -47,7 +49,7 @@ begin
   FtriggerDate := ATriggerDate;
 end;
 
-procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime);
+procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime; AScheduledObjectStates: TScheduledObjectStates);
 
   function FindPlannedDone(APlannedMovement: TPlannedMovement; ATriggerDate: TDateTime): TPlannedDone;
   var xCount: Integer;
@@ -93,8 +95,10 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
       end;
       if xValid then begin
         xDone := FindPlannedDone(AMovement, xCurDate);
-        xElement := TPlannedTreeItem.Create(AMovement, xDone, xCurDate);
-        AList.Add(xElement);
+        if ((xDone <> Nil) and (AScheduledObjectStates in [sosBoth, sosDone])) or ((xDone = Nil) and (AScheduledObjectStates in [sosBoth, sosPlanned])) then begin
+          xElement := TPlannedTreeItem.Create(AMovement, xDone, xCurDate);
+          AList.Add(xElement);
+        end;
       end;
       xCurDate := IncDay(xCurDate, 1);
     end;

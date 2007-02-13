@@ -637,7 +637,7 @@ begin
     Add('<td class="headcash" width="10%">Rozchód</td>');
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=6>');
-    GetScheduledObjects(xList, xPlannedObjects, xDoneObjects, FStartDate, FEndDate);
+    GetScheduledObjects(xList, xPlannedObjects, xDoneObjects, FStartDate, FEndDate, sosBoth);
     xRec := 1;
     for xCount := 1 to xList.Count do begin
       xElement := TPlannedTreeItem(xList.Items[xCount - 1]);

@@ -451,7 +451,10 @@ function CheckPendingInformations: Boolean;
 var xInfo: TCStartupInfoForm;
 begin
   xInfo := TCStartupInfoForm.Create(Nil);
-  Result := xInfo.ShowModal = mrOk;
+  Result := xInfo.ReloadInfoTree;
+  if Result then begin
+    Result := xInfo.ShowModal = mrOk;
+  end;
   xInfo.Free;
 end;
 
