@@ -1,15 +1,15 @@
 inherited CAboutForm: TCAboutForm
-  Left = 392
-  Top = 335
+  Left = 444
+  Top = 213
   Caption = 'O programie'
-  ClientHeight = 313
+  ClientHeight = 333
   ClientWidth = 377
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 377
-    Height = 272
+    Height = 292
     object Image: TImage
       Left = 16
       Top = 16
@@ -18,11 +18,11 @@ inherited CAboutForm: TCAboutForm
       AutoSize = True
     end
     object Label1: TLabel
-      Left = 56
-      Top = 18
-      Width = 58
+      Left = 48
+      Top = 26
+      Width = 50
       Height = 13
-      Caption = 'CManager'
+      Caption = 'Manager'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
@@ -31,10 +31,11 @@ inherited CAboutForm: TCAboutForm
       ParentFont = False
     end
     object Label2: TLabel
-      Left = 56
-      Top = 34
+      Left = 281
+      Top = 26
       Width = 81
       Height = 13
+      Alignment = taRightJustify
       Caption = 'wersja 2.2.2.2'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -44,8 +45,8 @@ inherited CAboutForm: TCAboutForm
       ParentFont = False
     end
     object CButtonMail: TCButton
-      Left = 192
-      Top = 16
+      Left = 200
+      Top = 40
       Width = 162
       Height = 17
       Cursor = crHandPoint
@@ -58,8 +59,8 @@ inherited CAboutForm: TCAboutForm
       Color = clBtnFace
     end
     object CButton1: TCButton
-      Left = 184
-      Top = 32
+      Left = 192
+      Top = 56
       Width = 177
       Height = 17
       Cursor = crHandPoint
@@ -73,9 +74,9 @@ inherited CAboutForm: TCAboutForm
     end
     object RichEditContrib: TRichEdit
       Left = 16
-      Top = 64
+      Top = 80
       Width = 346
-      Height = 199
+      Height = 203
       TabStop = False
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelInner = bvNone
@@ -97,7 +98,7 @@ inherited CAboutForm: TCAboutForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 272
+    Top = 292
     Width = 377
     inherited BitBtnOk: TBitBtn
       Left = 200
