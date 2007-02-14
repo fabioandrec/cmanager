@@ -336,7 +336,7 @@ function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
     xProductVersionLS: DWORD;
 begin
-  FileNumbers(ParamStr(0), xProductVersionMS, xProductVersionLS);
+  FileNumbers(AName, xProductVersionMS, xProductVersionLS);
   Result := IntToStr(HiWord(xProductVersionMS)) + '.' + IntToStr(LoWord(xProductVersionMS)) + '.' + IntToStr(HiWord(xProductVersionLS)) + '.' + IntToStr(LoWord(xProductVersionLS));
 end;
 

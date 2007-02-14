@@ -4,12 +4,14 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CComponents, StdCtrls, ExtCtrls, WinInet, ShellApi;
+  Dialogs, CComponents, StdCtrls, ExtCtrls, WinInet, ShellApi, ComCtrls;
 
 type
   TCUpdateMainForm = class(TForm)
+    Panel2: TPanel;
     Image: TImage;
     Label1: TLabel;
+    Label2: TLabel;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -52,31 +54,6 @@ type
     property ProxyPass: String read FProxyPass write FProxyPass;
     property HttpRequestType: THttpConnectType read FHttpConnectType write FHttpConnectType;
   end;
-
-  TControlThread = class(TThread)
-  private
-    FRequest: THttpRequest;
-    FFinishedEvent: THandle;
-    FTerminatedEvent: THandle;
-  protected
-    procedure Execute; override;
-  end;
-
-procedure TControlThread.Execute;
-var xHandles: array[0..1] of THandle;
-    xRes: Cardinal;
-begin
-  xHandles[0] := FFinishedEvent;
-  xHandles[1] := FTerminatedEvent;
-  xRes := WaitForMultipleObjects(2, @xHandles[0], False, INFINITE);
-  if xRes = WAIT_OBJECT_0 + 1 then begin
-    if (FRequest <> Nil) then begin
-      InternetCloseHandle(FRequest.FRequestHandle);
-      InternetCloseHandle(FRequest.FConnectHandle);
-      InternetCloseHandle(FRequest.FInternetHandle);
-    end;
-  end;
-end;
 
 constructor THttpRequest.Create(AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType);
 begin
