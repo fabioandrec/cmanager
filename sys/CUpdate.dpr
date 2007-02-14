@@ -11,6 +11,5 @@ uses
 
 begin
   Application.Initialize;
-  Application.CreateForm(TCUpdateMainForm, CUpdateMainForm);
-  Application.Run;
+  UpdateSystem;
 end.

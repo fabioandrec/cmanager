@@ -1,11 +1,11 @@
 object CUpdateMainForm: TCUpdateMainForm
-  Left = 412
-  Top = 275
+  Left = 528
+  Top = 411
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Aktualizacja'
   ClientHeight = 165
-  ClientWidth = 331
+  ClientWidth = 316
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object CUpdateMainForm: TCUpdateMainForm
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 331
+    Width = 316
     Height = 165
     Align = alClient
     BevelOuter = bvNone
@@ -47,9 +47,9 @@ object CUpdateMainForm: TCUpdateMainForm
     object Label2: TLabel
       Left = 100
       Top = 26
-      Width = 210
+      Width = 204
       Height = 13
-      Caption = '- trwa sprawdzanie dost'#281'pnych aktualizacji...'
+      Caption = '- trwa sprawdzanie dost'#281'pnych aktualizacji.'
     end
   end
 end

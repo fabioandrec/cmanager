@@ -22,6 +22,8 @@ type
 var
   CUpdateMainForm: TCUpdateMainForm;
 
+procedure UpdateSystem;
+
 implementation
 
 {$R *.dfm}
@@ -54,6 +56,33 @@ type
     property ProxyPass: String read FProxyPass write FProxyPass;
     property HttpRequestType: THttpConnectType read FHttpConnectType write FHttpConnectType;
   end;
+
+function GetParamValue(AParam: String): String;
+var xCount: Integer;
+begin
+  Result := '';
+  xCount := 1;
+  while (xCount <= ParamCount) and (Result = '') do begin
+    if AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(AParam) then begin
+      if (xCount + 1) <= ParamCount then begin
+        Result := ParamStr(xCount + 1);
+        xCount := xCount + 2;
+      end;
+    end;
+    Inc(xCount);
+  end;
+end;
+
+function GetSwitch(ASwitch: String): Boolean;
+var xCount: Integer;
+begin
+  Result := False;
+  xCount := 1;
+  while (xCount <= ParamCount) and (not Result) do begin
+    Result := AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(ASwitch);
+    Inc(xCount);
+  end;
+end;
 
 constructor THttpRequest.Create(AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType);
 begin
@@ -194,6 +223,11 @@ end;
 procedure TCUpdateMainForm.FormCreate(Sender: TObject);
 begin
   Image.Picture.Icon.Handle := LoadIcon(HInstance, 'LARGEICON');
+end;
+
+procedure UpdateSystem;
+begin
+
 end;
 
 end.
