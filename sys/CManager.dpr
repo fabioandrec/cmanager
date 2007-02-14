@@ -69,7 +69,8 @@ uses
   CChooseFutureFilterFormUnit in 'CChooseFutureFilterFormUnit.pas' {CChooseFutureFilterForm},
   CLoans in 'CLoans.pas',
   CLoanCalculatorFormUnit in 'CLoanCalculatorFormUnit.pas' {CLoanCalculatorForm},
-  CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm};
+  CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm},
+  CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame};
 
 {$R *.res}
 
@@ -77,7 +78,7 @@ var xError, xDesc, xFilename: String;
     xProceed: Boolean;
 
 begin
-  //MemChk;
+  MemChk;
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
@@ -100,8 +101,10 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
+        SaveFormPosition(CMainForm);
       end;
+      SaveSettings;
     end else begin
       ShowInfo(itError, xError, xDesc)
     end;

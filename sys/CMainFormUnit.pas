@@ -157,13 +157,6 @@ procedure TCMainForm.FormDestroy(Sender: TObject);
 begin
   FShortcutsFrames.Free;
   FShortcutList.Free;
-  GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
-  if GDataProvider.IsConnected then begin
-    GBasePreferences.lastOpenedDatafilename := GDatabaseName;
-  end;
-  GBasePreferences.SaveToXml(GetSettingsPreferences);
-  SaveFormPosition(Self);
-  FinalizeSettings(GetSystemPathname(CSettingsFilename));
 end;
 
 procedure TCMainForm.PerformShortcutAction(AAction: TAction);

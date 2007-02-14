@@ -442,6 +442,15 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód'));
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód'));
   end;
+  GViewsPreferences.Add(TViewPref.Create('startupInfo'));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('II', 'Zaplanowane operacje przychodowe'));
+    Fontprefs.Add(TFontPref.CreateFontPref('IO', 'Zaplanowane operacje rozchodowe'));
+    Fontprefs.Add(TFontPref.CreateFontPref('OI', 'Zaleg³e operacje przychodowe'));
+    Fontprefs.Add(TFontPref.CreateFontPref('OO', 'Zaleg³e operacje rozchodowe'));
+    Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Elementy grupuj¹ce w/g dat'));
+    Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju operacji'));
+  end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin
     startupDatafileMode := CStartupFilemodeFirsttime;

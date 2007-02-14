@@ -51,12 +51,27 @@ type
     Label1: TLabel;
     CheckBoxAutoOldIn: TCheckBox;
     CheckBoxAutoOldOut: TCheckBox;
+    GroupBox4: TGroupBox;
+    PngImageList: TPngImageList;
+    CButton4: TCButton;
+    ActionManager2: TActionManager;
+    Action4: TAction;
+    Action5: TAction;
+    Action6: TAction;
+    Action7: TAction;
+    CButton5: TCButton;
+    CButton6: TCButton;
+    CButton7: TCButton;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
     procedure RadioButtonNeverClick(Sender: TObject);
     procedure ComboBoxDaysChange(Sender: TObject);
     procedure CheckBoxAutostartOperationsClick(Sender: TObject);
+    procedure Action4Execute(Sender: TObject);
+    procedure Action5Execute(Sender: TObject);
+    procedure Action6Execute(Sender: TObject);
+    procedure Action7Execute(Sender: TObject);
   private
     FActiveAction: TAction;
     FViewPrefs: TPrefList;
@@ -76,7 +91,9 @@ type
 
 implementation
 
-uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts;
+uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
+  CMovementFrameUnit, CBaseFormUnit, CBaseFrameUnit, CDoneFrameUnit,
+  CPlannedFrameUnit, CStartupInfoFrameUnit, Registry;
 
 {$R *.dfm}
 
@@ -180,6 +197,7 @@ begin
 end;
 
 procedure TCPreferencesForm.ReadValues;
+var xReg: TRegistry;
 begin
   inherited ReadValues;
   with FBasePrefs do begin
@@ -201,6 +219,20 @@ begin
     startupInfoAlways := CheckBoxAutoAlways.Checked;
     startupInfoOldIn := CheckBoxAutoOldIn.Checked;
     startupInfoOldOut := CheckBoxAutoOldOut.Checked;
+    xReg := TRegistry.Create;
+    try
+      xReg.RootKey := HKEY_CURRENT_USER;
+      if xReg.OpenKey('Software\Microsoft\Windows\CurrentVersion\Run', False) then begin
+        if startupInfo then begin
+          xReg.WriteString('CManagerCheckOnly', '"' + ExpandFileName(ParamStr(0)) + '" /checkonly');
+        end else begin
+          xReg.DeleteValue('CManagerCheckOnly');
+        end;
+        xReg.CloseKey;
+      end;
+    finally
+      xReg.Free;
+    end;
   end;
 end;
 
@@ -220,6 +252,46 @@ begin
   CheckBoxAutoOldOut.Enabled := ComboBoxDays.Enabled;
   CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled;
   ComboBoxDaysChange(Nil);
+end;
+
+procedure TCPreferencesForm.Action4Execute(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(TCMovementFrame.GetPrefname, FViewPrefs) then begin
+    SendMessageToFrames(TCMovementFrame, WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCPreferencesForm.Action5Execute(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(TCDoneFrame.GetPrefname, FViewPrefs) then begin
+    SendMessageToFrames(TCDoneFrame, WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCPreferencesForm.Action6Execute(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(TCPlannedFrame.GetPrefname, FViewPrefs) then begin
+    SendMessageToFrames(TCPlannedFrame, WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCPreferencesForm.Action7Execute(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(TCStartupInfoFrame.GetPrefname, FViewPrefs) then begin
+    SendMessageToFrames(TCStartupInfoFrame, WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
 end;
 
 end.

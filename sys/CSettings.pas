@@ -9,6 +9,7 @@ const
 
 function InitializeSettings(AFileName: String): Boolean;
 procedure FinalizeSettings(AFilename: String);
+procedure SaveSettings;
 procedure SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer); overload;
 procedure SaveFormPosition(AForm: TForm); overload;
 procedure LoadFormPosition(AForm: TForm);
@@ -166,6 +167,16 @@ begin
   end else begin
     GetSettingsRoot;
   end;
+end;
+
+procedure SaveSettings;
+begin
+  GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
+  if GDataProvider.IsConnected then begin
+    GBasePreferences.lastOpenedDatafilename := GDatabaseName;
+  end;
+  GBasePreferences.SaveToXml(GetSettingsPreferences);
+  FinalizeSettings(GetSystemPathname(CSettingsFilename));
 end;
 
 procedure FinalizeSettings(AFilename: String);

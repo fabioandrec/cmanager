@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus;
+  Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus,
+  CConfigFormUnit;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
@@ -32,6 +33,7 @@ type
     procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
     procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
+    class function GetOperation: TConfigOperation; virtual;
     class function GetPrefname: String; virtual;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -54,7 +56,7 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtual
 
 implementation
 
-uses CConsts, CListPreferencesFormUnit, CReports;
+uses CConsts, CListPreferencesFormUnit, CReports, CPreferences;
 
 {$R *.dfm}
 
@@ -230,7 +232,7 @@ procedure TCBaseFrame.Ustawienialisty1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(GetPrefname) then begin
+  if xPrefs.ShowListPreferences(GetPrefname, GViewsPreferences) then begin
     SendMessageToFrames(TCBaseFrameClass(ClassType), WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
@@ -250,6 +252,11 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+class function TCBaseFrame.GetOperation: TConfigOperation;
+begin
+  Result := coEdit;
 end;
 
 initialization

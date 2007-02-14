@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ActnList, XPStyleActnCtrls, ActnMan, ImgList, PngImageList;
+  ActnList, XPStyleActnCtrls, ActnMan, ImgList, PngImageList, CPreferences;
 
 type
   TCListPreferencesForm = class(TCConfigForm)
@@ -23,13 +23,15 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure Action4Execute(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
+  private
+    FPrefContainer: TPrefList;
   public
-    function ShowListPreferences(AFrameName: String): Boolean;
+    function ShowListPreferences(AFrameName: String; APrefContainer: TPrefList): Boolean;
   end;
 
 implementation
 
-uses CPreferences, Contnrs;
+uses Contnrs;
 
 {$R *.dfm}
 
@@ -55,13 +57,14 @@ begin
   end;
 end;
 
-function TCListPreferencesForm.ShowListPreferences(AFrameName: String): Boolean;
+function TCListPreferencesForm.ShowListPreferences(AFrameName: String; APrefContainer: TPrefList): Boolean;
 var xCount: Integer;
     xViewPref: TViewPref;
     xFontPref: TFontPref;
 begin
+  FPrefContainer := APrefContainer;
   xViewPref := TViewPref.Create(AFrameName);
-  xViewPref.Clone(GViewsPreferences.ByPrefname[AFramename]);
+  xViewPref.Clone(FPrefContainer.ByPrefname[AFramename]);
   for xCount := 0 to xViewPref.Fontprefs.Count - 1 do begin
     xFontPref := TFontPref(xViewPref.Fontprefs.Items[xCount]);
     ComboBoxType.AddItem(xFontPref.Desc, xFontPref);
@@ -70,7 +73,7 @@ begin
   ComboBoxTypeChange(Nil);
   Result := ShowConfig(coEdit);
   if Result then begin
-    GViewsPreferences.ByPrefname[AFramename].Clone(xViewPref);
+    FPrefContainer.ByPrefname[AFramename].Clone(xViewPref);
   end;
   xViewPref.Free;
 end;

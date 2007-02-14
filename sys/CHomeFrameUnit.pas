@@ -24,11 +24,14 @@ type
     Label2: TLabel;
     ActionSetProfile: TAction;
     CButton5: TCButton;
+    CButton6: TCButton;
+    ActionStartupInfo: TAction;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
     procedure ActionSetProfileExecute(Sender: TObject);
     procedure ActionOperationsListExecute(Sender: TObject);
+    procedure ActionStartupInfoExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -39,7 +42,8 @@ implementation
 
 uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
   CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
-  CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit, CReports;
+  CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit, CReports,
+  CStartupInfoFrameUnit;
 
 {$R *.dfm}
 
@@ -101,6 +105,12 @@ begin
   xRep := TTodayOperationsListReport.CreateReport(Nil);
   xRep.ShowReport;
   xRep.Free;
+end;
+
+procedure TCHomeFrame.ActionStartupInfoExecute(Sender: TObject);
+var xData, xText: String;
+begin
+  TCFrameForm.ShowFrame(TCStartupInfoFrame, xData, xText);
 end;
 
 end.
