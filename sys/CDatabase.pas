@@ -214,7 +214,7 @@ function DataGidToDatabase(ADataGid: TDataGid): String;
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
-     CPreferences;
+     CPreferences, CTools;
 
 threadvar GTickCounter: Cardinal;
 

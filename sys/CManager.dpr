@@ -70,7 +70,10 @@ uses
   CLoans in 'CLoans.pas',
   CLoanCalculatorFormUnit in 'CLoanCalculatorFormUnit.pas' {CLoanCalculatorForm},
   CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm},
-  CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame};
+  CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame},
+  CRichtext in 'CRichtext.pas',
+  CXml in 'CXml.pas',
+  CTools in 'CTools.pas';
 
 {$R *.res}
 
@@ -101,7 +104,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
         SaveFormPosition(CMainForm);
       end;
       SaveSettings;

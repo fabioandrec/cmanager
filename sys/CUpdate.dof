@@ -23,7 +23,7 @@ S=0
 T=0
 U=0
 V=1
-W=0
+W=1
 X=1
 Y=1
 Z=1
@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=
+RunParams=/verbose
 HostApplication=
 Launcher=
 UseLauncher=0

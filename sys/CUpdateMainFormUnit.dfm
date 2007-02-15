@@ -1,11 +1,11 @@
 object CUpdateMainForm: TCUpdateMainForm
-  Left = 528
-  Top = 411
+  Left = 422
+  Top = 341
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Aktualizacja'
-  ClientHeight = 165
-  ClientWidth = 316
+  ClientHeight = 274
+  ClientWidth = 413
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,40 +16,53 @@ object CUpdateMainForm: TCUpdateMainForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel2: TPanel
-    Left = 0
-    Top = 0
-    Width = 316
-    Height = 165
-    Align = alClient
-    BevelOuter = bvNone
+  object Image: TImage
+    Left = 16
+    Top = 16
+    Width = 32
+    Height = 32
+    AutoSize = True
+  end
+  object Label1: TLabel
+    Left = 48
+    Top = 26
+    Width = 50
+    Height = 13
+    Caption = 'Manager'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 100
+    Top = 26
+    Width = 201
+    Height = 13
+    Caption = '- trwa sprawdzanie dost'#281'pnych aktualizacji'
+  end
+  object RichEdit: TRichEdit
+    Left = 16
+    Top = 64
+    Width = 385
+    Height = 161
+    BevelInner = bvNone
+    BevelKind = bkTile
+    BorderStyle = bsNone
+    Color = clBtnFace
+    ScrollBars = ssBoth
     TabOrder = 0
-    object Image: TImage
-      Left = 16
-      Top = 16
-      Width = 32
-      Height = 32
-      AutoSize = True
-    end
-    object Label1: TLabel
-      Left = 48
-      Top = 26
-      Width = 50
-      Height = 13
-      Caption = 'Manager'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
-    object Label2: TLabel
-      Left = 100
-      Top = 26
-      Width = 204
-      Height = 13
-      Caption = '- trwa sprawdzanie dost'#281'pnych aktualizacji.'
-    end
+    WordWrap = False
+  end
+  object Button1: TButton
+    Left = 328
+    Top = 240
+    Width = 75
+    Height = 25
+    Caption = '&Przerwij'
+    TabOrder = 1
+    OnClick = Button1Click
   end
 end

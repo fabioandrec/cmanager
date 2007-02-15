@@ -352,7 +352,8 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit;
+     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
+  CTools;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
 begin

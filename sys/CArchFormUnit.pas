@@ -39,7 +39,7 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, CDatabase, CDatatools, CInfoFormUnit, CMainFormUnit,
-     CConsts, StrUtils;
+     CConsts, StrUtils, CTools;
 
 procedure TCArchForm.InitializeForm;
 var xIndex: Integer;

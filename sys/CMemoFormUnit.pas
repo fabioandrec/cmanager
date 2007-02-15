@@ -18,7 +18,7 @@ procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integ
 
 implementation
 
-uses CBaseFormUnit;
+uses CBaseFormUnit, CRichtext;
 
 {$R *.dfm}
 

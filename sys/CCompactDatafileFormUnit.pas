@@ -28,7 +28,7 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, CDatabase, CMainFormUnit, CDatatools, CMemoFormUnit,
-  StrUtils, CInfoFormUnit, CConsts;
+  StrUtils, CInfoFormUnit, CConsts, CTools;
 
 function TCCompactDatafileForm.DoWork: Boolean;
 var xMustReconect: Boolean;

@@ -112,7 +112,7 @@ var GViewsPreferences: TPrefList;
 
 implementation
 
-uses CSettings, CMovementFrameUnit, CConsts, CDatabase;
+uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml;
 
 procedure SaveFontToXml(ANode: IXMLDOMNode; AFont: TFont);
 begin

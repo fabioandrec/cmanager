@@ -23,19 +23,15 @@ function CreateDatabase(AFilename: String; var AError: String): Boolean;
 function CompactDatabase(AFilename: String; var AError: String): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
-function FileVersion(AName: string): String;
-function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
-function FileSize(AName: String): Int64;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
-function GetParamValue(AParam: String): String;
-function GetSwitch(ASwitch: String): Boolean;
 function CheckPendingInformations: Boolean;
 
 implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
-  CDatabase, CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms;
+  CDatabase, CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
+  CTools;
 
 type
   TBackupRestore = class(TObject)
@@ -332,38 +328,6 @@ begin
   end;
 end;
 
-function FileVersion(AName: string): String;
-var xProductVersionMS: DWORD;
-    xProductVersionLS: DWORD;
-begin
-  FileNumbers(AName, xProductVersionMS, xProductVersionLS);
-  Result := IntToStr(HiWord(xProductVersionMS)) + '.' + IntToStr(LoWord(xProductVersionMS)) + '.' + IntToStr(HiWord(xProductVersionLS)) + '.' + IntToStr(LoWord(xProductVersionLS));
-end;
-
-function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
-var xVersionBuffer: Pointer;
-    xVersionSize, xDummy: DWord;
-    xSize: Integer;
-    xVSFixedFileInfo: PVSFixedFileInfo;
-begin
-  Result := False;
-  AMS := 0;
-  ALS := 0;
-  xVersionSize := GetFileVersionInfoSize(PChar(AName), xDummy);
-  if xVersionSize <> 0 then begin
-    xSize := xVersionSize;
-    GetMem(xVersionBuffer, xSize);
-    try
-      if GetFileVersionInfo(PChar(AName), xDummy, xVersionSize, xVersionBuffer) and VerQueryValue(xVersionBuffer, '', Pointer(xVSFixedFileInfo), xVersionSize) then begin
-        AMS := xVSFixedFileInfo^.dwProductVersionMS;
-        ALS := xVSFixedFileInfo^.dwProductVersionLS;
-        Result := True;
-      end;
-    finally
-      FreeMem(xVersionBuffer, xSize);
-    end;
-  end;
-end;
 
 procedure TBackupRestore.OnDecompressProgress(ASender: TObject);
 var xPosition: Integer;
@@ -403,48 +367,11 @@ begin
   AInStream.Seek(soFromBeginning, 0);
 end;
 
-function FileSize(AName: String): Int64;
-var xS: TSearchRec;
-begin
-  Result := 0;
-  if FindFirst(AName, faAnyFile, xS) = 0 then begin
-    Result := Int64(xS.FindData.nFileSizeHigh) shl Int64(32) + Int64(xS.FindData.nFileSizeLow);
-  end;
-  SysUtils.FindClose(xS);
-end;
-
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 var xFilename: String;
 begin
   xFilename := FormatDateTime('yymmdd_hhnnss', Now) + '.cmb';
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ADatabaseName)) + xFilename;
-end;
-
-function GetParamValue(AParam: String): String;
-var xCount: Integer;
-begin
-  Result := '';
-  xCount := 1;
-  while (xCount <= ParamCount) and (Result = '') do begin
-    if AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(AParam) then begin
-      if (xCount + 1) <= ParamCount then begin
-        Result := ParamStr(xCount + 1);
-        xCount := xCount + 2;
-      end;
-    end;
-    Inc(xCount);
-  end;
-end;
-
-function GetSwitch(ASwitch: String): Boolean;
-var xCount: Integer;
-begin
-  Result := False;
-  xCount := 1;
-  while (xCount <= ParamCount) and (not Result) do begin
-    Result := AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(ASwitch);
-    Inc(xCount);
-  end;
 end;
 
 function CheckPendingInformations: Boolean;
