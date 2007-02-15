@@ -1,5 +1,7 @@
 unit CTools;
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 interface
 
 uses Windows;

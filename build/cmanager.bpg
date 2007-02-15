@@ -9,11 +9,15 @@ MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
 DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
-PROJECTS = CManager.exe
+PROJECTS = CManager.exe CUpdate.exe
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
 
 CManager.exe: ..\sys\CManager.dpr
   $(DCC)
+
+CUpdate.exe: ..\sys\CUpdate.dpr
+  $(DCC)
+
 
