@@ -173,6 +173,7 @@ begin
         AProgressEvent(xStep);
       end;
     end;
+    xAccounts.Free;
     if Result then begin
       GDataProvider.CommitTransaction;
     end else begin

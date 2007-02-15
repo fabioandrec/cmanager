@@ -300,6 +300,9 @@ begin
     end;
   end;
   if Result then begin
+    if GDataProvider.IsConnected then begin
+      GDataProvider.DisconnectFromDatabase;
+    end;
     Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
     if not Result then begin
       AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';

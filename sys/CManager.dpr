@@ -104,7 +104,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
         SaveFormPosition(CMainForm);
       end;
       SaveSettings;
