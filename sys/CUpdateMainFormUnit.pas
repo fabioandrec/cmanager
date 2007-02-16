@@ -231,7 +231,7 @@ end;
 procedure TCUpdateMainForm.FormCreate(Sender: TObject);
 var xMask: Integer;
 begin
-  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'XLARGEICON');
+  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'LARGEICON');
   xMask := SendMessage(RichEdit.Handle, EM_GETEVENTMASK, 0, 0);
   SendMessage(RichEdit.Handle, EM_SETEVENTMASK, 0, xMask or ENM_LINK);
   SendMessage(RichEdit.Handle, EM_AUTOURLDETECT, Integer(True), 0);

@@ -35,7 +35,7 @@ var xText: TStringStream;
     xRes: TResourceStream;
 begin
   inherited FillForm;
-  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'XLARGEICON');
+  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'LARGEICON');
   xRes := TResourceStream.Create(HInstance, 'CONTRIB', RT_RCDATA);
   xText := TStringStream.Create('');
   xRes.SaveToStream(xText);

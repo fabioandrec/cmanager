@@ -83,7 +83,7 @@ var xError, xDesc, xFilename: String;
 begin
   MemChk;
   Application.Initialize;
-  Application.Icon.Handle := LoadIcon(HInstance, 'XSMALLICON');
+  Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin

@@ -4,6 +4,7 @@ program CUpdate;
 
 uses
   Forms,
+  Windows,
   CUpdateMainFormUnit in 'CUpdateMainFormUnit.pas' {CUpdateMainForm},
   CComponents in 'CComponents.pas',
   MemCheck in 'MemCheck.pas',
@@ -16,5 +17,6 @@ uses
 begin
   MemChk;
   Application.Initialize;
+  Application.Icon.Handle := LoadIcon(HInstance, 'BASEICON');
   UpdateSystem;
 end.
