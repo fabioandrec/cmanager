@@ -60,6 +60,10 @@ type
     property IsRunning: Boolean read FIsRunning;
   end;
 
+const
+  CUpdateLink = 'http://cmanager.sourceforge.net/update.xml';
+  //CUpdateLink = 'file://d:\cvs\sourceforge\cmanager\docs\homepage\update.xml';
+  
 var
   CUpdateMainForm: TCUpdateMainForm;
   CIsVerbose: Boolean;
@@ -227,7 +231,7 @@ end;
 procedure TCUpdateMainForm.FormCreate(Sender: TObject);
 var xMask: Integer;
 begin
-  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'LARGEICON');
+  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'XLARGEICON');
   xMask := SendMessage(RichEdit.Handle, EM_GETEVENTMASK, 0, 0);
   SendMessage(RichEdit.Handle, EM_SETEVENTMASK, 0, xMask or ENM_LINK);
   SendMessage(RichEdit.Handle, EM_AUTOURLDETECT, Integer(True), 0);
@@ -243,7 +247,7 @@ begin
     CUpdateMainForm.Show;
     CUpdateMainForm.Update;
   end;
-  CUpdateThread := THttpRequest.Create('http://cmanager.sourceforge.net/update.xml', '', '', '', hctPreconfig);
+  CUpdateThread := THttpRequest.Create(CUpdateLink, '', '', '', hctPreconfig);
   CUpdateThread.Resume;
   repeat
     xFinished := WaitForSingleObject(CUpdateThread.Handle, 10) <> WAIT_TIMEOUT;
@@ -255,16 +259,34 @@ begin
     CUpdateMainForm.Button1.Caption := '&Zamknij';
     if CUpdateThread.RequestResult = 0 then begin
       if CFoundNewVersion then begin
-        CUpdateMainForm.Label2.Caption := ' - Sprawdzenie zakoñczono poprawnie';
+        CUpdateMainForm.Label2.Caption := ' - Zakoñczono sprawdzanie aktualizacji';
       end else begin
-        CUpdateMainForm.Label2.Caption := ' - Sprawdzenie zakoñczono poprawnie';
+        CUpdateMainForm.Label2.Caption := ' - Zakoñczono sprawdzanie aktualizacji';
       end;
     end else begin
-      CUpdateMainForm.Label2.Caption := ' - Sprawdzenie nie powiod³o siê';
+      CUpdateMainForm.Label2.Caption := ' - Sprawdzenie aktualizacji nie powiod³o siê';
     end;
     Application.Run;
   end;
   CUpdateThread.Free;
+end;
+
+function CompareVersions(ALatest, ACurrent: String): Boolean;
+var xLatest, xCurrent: TStringList;
+    xCount: Integer;
+begin
+  Result := False;
+  xLatest := TStringList.Create;
+  xLatest.Text := StringReplace(ALatest, '.', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+  xCurrent := TStringList.Create;
+  xCurrent.Text := StringReplace(ACurrent, '.', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+  xCount := 0;
+  while (xCount <= xLatest.Count - 1) and (xCount <= xCurrent.Count - 1) and (not Result) do begin
+    Result := StrToIntDef(xLatest.Strings[xCount], -1) > StrToIntDef(xCurrent.Strings[xCount], -1);
+    Inc(xCount);
+  end;
+  xLatest.Free;
+  xCurrent.Free;
 end;
 
 procedure THttpRequest.Execute;
@@ -296,7 +318,8 @@ begin
       if xNode <> Nil then begin
         xLatestVersion := GetXmlAttribute('version', xNode, '');
         if xLatestVersion <> '' then begin
-          if xLatestVersion <> xCurrentVersion then begin
+          xValid := True;
+          if CompareVersions(xLatestVersion, xCurrentVersion) then begin
             CFoundNewVersion := True;
             AddToReport('Znaleziono now¹ wersjê CManager-a ' + CRtfSB + GetXmlAttribute('name', xNode, '') + CRtfEB);
             AddToReport('Wydanie z dnia ' + GetXmlAttribute('date', xNode, ''));
@@ -317,13 +340,15 @@ begin
               AddToReport('   [' + GetXmlAttribute('type', xItem, '') + '] ' + GetXmlAttribute('info', xItem, ''));
               xItem := xItem.nextSibling;
             end;
-            xValid := True;
+          end else begin
+            AddToReport('Nie znaleziono nowych aktualizacji CManager-a');
           end;
         end;
       end;
     end;
     if not xValid then begin
       AddToReport('Odczytany plik nie zawiera danych o uaktualnieniach.');
+      AddToReport('Sprawdz czy masz dostêp do ' + CUpdateLink);
     end;
     xDocument := Nil;
     CoUninitialize;

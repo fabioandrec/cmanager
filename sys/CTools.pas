@@ -4,6 +4,8 @@ unit CTools;
 
 interface
 
+{$WARN SYMBOL_PLATFORM OFF}	
+
 uses Windows;
 
 function FileVersion(AName: string): String;

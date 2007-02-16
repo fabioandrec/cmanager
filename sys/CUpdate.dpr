@@ -1,6 +1,6 @@
 program CUpdate;
 
-{$R 'icons.res' 'icons.rc'}
+{$R 'cupdateicons.res' 'cupdateicons.rc'}
 
 uses
   Forms,

@@ -374,6 +374,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionLoanCalc
+                Caption = '&Kalkulator kredytowy'
               end>
             Caption = '&Narz'#281'dzia'
           end
@@ -385,6 +386,9 @@ object CMainForm: TCMainForm
               end
               item
                 Caption = '-'
+              end
+              item
+                Action = ActionCheckUpdates
               end
               item
                 Action = ActionAbout
@@ -452,6 +456,11 @@ object CMainForm: TCMainForm
       Category = 'Pomoc'
       Caption = 'Spis tre'#347'ci'
       OnExecute = ActionHelpExecute
+    end
+    object ActionCheckUpdates: TAction
+      Category = 'Pomoc'
+      Caption = 'Sprawd'#378' aktualizacje'
+      OnExecute = ActionCheckUpdatesExecute
     end
     object ActionAbout: TAction
       Category = 'Pomoc'

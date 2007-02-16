@@ -52,6 +52,7 @@ type
     ActionPreferences: TAction;
     ActionShortcutProfiles: TAction;
     ActionLoanCalc: TAction;
+    ActionCheckUpdates: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -75,6 +76,7 @@ type
     procedure ActionPreferencesExecute(Sender: TObject);
     procedure ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
     procedure ActionLoanCalcExecute(Sender: TObject);
+    procedure ActionCheckUpdatesExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -477,6 +479,11 @@ end;
 procedure TCMainForm.ActionLoanCalcExecute(Sender: TObject);
 begin
   ShowLoanCalculator(False);
+end;
+
+procedure TCMainForm.ActionCheckUpdatesExecute(Sender: TObject);
+begin
+  ShellExecute(0, 'open', PChar('cupdate.exe'), '/verbose', '.', SW_SHOW)
 end;
 
 end.

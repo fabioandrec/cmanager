@@ -3,7 +3,7 @@ program CManager;
 {$R 'CMandbpat.res' 'CMandbpat.rc'}
 {%File 'CMandb.sql'}
 {$R 'strings.res' 'strings.rc'}
-{$R 'icons.res' 'icons.rc'}
+{$R 'cmanagericons.res' 'cmanagericons.rc'}
 
 uses
   MemCheck in 'MemCheck.pas',
@@ -83,7 +83,7 @@ var xError, xDesc, xFilename: String;
 begin
   MemChk;
   Application.Initialize;
-  Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
+  Application.Icon.Handle := LoadIcon(HInstance, 'XSMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
@@ -104,7 +104,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
         SaveFormPosition(CMainForm);
       end;
       SaveSettings;
