@@ -580,11 +580,15 @@ begin
     FConnection.Close;
   end;
   FConnection.ConnectionString := AConnectionString;
+  FConnection.Mode := cmShareExclusive;
   FConnection.LoginPrompt := False;
   FConnection.CursorLocation := clUseClient;
   try
     FConnection.Open;
   except
+    on E: EOleException do begin
+      ShowInfo(itWarning, IntToStr(E.ErrorCode), '');
+    end;
     on E: Exception do begin
       FLastError := E.Message;
       Result := False;
