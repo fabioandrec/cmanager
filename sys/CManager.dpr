@@ -81,7 +81,9 @@ var xError, xDesc, xFilename: String;
     xProceed: Boolean;
 
 begin
+  {$IFDEF DEBUG}
   MemChk;
+  {$ENDIF}
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin

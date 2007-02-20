@@ -15,7 +15,9 @@ uses
 {$R *.res}
 
 begin
+  {$IFDEF DEBUG}
   MemChk;
+  {$ENDIF}
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'BASEICON');
   UpdateSystem;

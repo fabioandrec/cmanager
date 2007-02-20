@@ -586,9 +586,6 @@ begin
   try
     FConnection.Open;
   except
-    on E: EOleException do begin
-      ShowInfo(itWarning, IntToStr(E.ErrorCode), '');
-    end;
     on E: Exception do begin
       FLastError := E.Message;
       Result := False;

@@ -12,7 +12,7 @@ DefaultGroupName=CManager
 AllowNoIcons=true
 LicenseFile=..\..\docs\license
 OutputDir=..\..\bin
-OutputBaseFilename=CManagerSetup
+OutputBaseFilename=CManagerSetup_1_0_4
 SetupIconFile=..\res\cmanager32.ico
 Compression=lzma
 SolidCompression=true
@@ -38,7 +38,7 @@ Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Flags: ignoreversion
 [Icons]
 Name: {group}\CManager; Filename: {app}\CManager.exe
 Name: {group}\{cm:UninstallProgram,CManager}; Filename: {uninstallexe}
-Name: {userdesktop}\CManager; Filename: {app}\CManager.exe; Tasks: desktopicon
+Name: {userdesktop}\CManager; Filename: {app}\CManager.exe; Tasks: desktopicon; WorkingDir: {app}
 
 [Run]
 Filename: {app}\CManager.exe; Description: {cm:LaunchProgram,CManager}; Flags: nowait postinstall skipifsilent

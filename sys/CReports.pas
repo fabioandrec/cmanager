@@ -949,7 +949,7 @@ begin
   xText := StringReplace(xText, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
   FreportText.Text := xText;
   FreportText.SaveToFile(FreportPath + 'report.htm');
-  CopyFile('report.css', PChar(FreportPath + 'report.css'), False);
+  CopyFile(PChar(GetSystemPathname('report.css')), PChar(FreportPath + 'report.css'), False);
   TCHtmlReportForm(FForm).CBrowser.Navigate('file://' + FreportPath + 'report.htm');
 end;
 
@@ -957,17 +957,17 @@ procedure TCHtmlReport.PrepareReportPath;
 var xRes: TResourceStream;
 begin
   FreportPath := GetReportPath(IntToStr(GetTickCount));
-  if not FileExists('report.css') then begin
+  if not FileExists(GetSystemPathname('report.css')) then begin
     xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
     xRes.SaveToFile(GetSystemPathname('report.css'));
     xRes.Free;
   end;
-  if not FileExists('report.htm') then begin
+  if not FileExists(GetSystemPathname('report.htm')) then begin
     xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
     xRes.SaveToFile(GetSystemPathname('report.htm'));
     xRes.Free;
   end;
-  FreportText.LoadFromFile('report.htm');
+  FreportText.LoadFromFile(GetSystemPathname('report.htm'));
   ForceDirectories(FreportPath)
 end;
 
