@@ -373,13 +373,15 @@ end;
 
 procedure TCProductsFrame.ActionDelCategoryExecute(Sender: TObject);
 var xData: TDataObject;
+    xBase: TDataObject;
 begin
-  xData := TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject;
-  if TProduct.CanBeDeleted(xData.id) then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ kategoriê o nazwie "' + TProduct(xData).name + '" ?', '') then begin
+  xBase := TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject;
+  if TProduct.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ kategoriê o nazwie "' + TProduct(xBase).name + '" ?', '') then begin
+      xData := TProduct.LoadObject(ProductProxy, xBase.id, False);
       xData.DeleteObject;
       GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCProductsFrame, WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
+      SendMessageToFrames(TCProductsFrame, WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
     end;
   end;
 end;

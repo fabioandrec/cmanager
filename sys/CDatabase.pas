@@ -580,7 +580,7 @@ begin
     FConnection.Close;
   end;
   FConnection.ConnectionString := AConnectionString;
-  FConnection.Mode := cmShareExclusive;
+  FConnection.Mode := cmShareDenyNone;
   FConnection.LoginPrompt := False;
   FConnection.CursorLocation := clUseClient;
   try

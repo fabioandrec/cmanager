@@ -472,6 +472,7 @@ end;
 
 procedure TCMainForm.UnhandledException(Sender: TObject; E: Exception);
 begin
+  CMainForm.ActionCloseConnection.Execute;
   ShowInfo(itError, 'Podczas pracy wyst¹pi³ wyj¹tek programowy. CManager zostanie zamkniêty', E.Message);
   Application.Terminate;
 end;
@@ -483,7 +484,7 @@ end;
 
 procedure TCMainForm.ActionCheckUpdatesExecute(Sender: TObject);
 begin
-  ShellExecute(0, 'open', PChar('cupdate.exe'), '/verbose', '.', SW_SHOW)
+  ShellExecute(0, 'open', PChar('cupdate.exe'), '', '.', SW_SHOW)
 end;
 
 end.

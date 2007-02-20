@@ -165,13 +165,15 @@ end;
 
 procedure TCCashpointsFrame.ActionDelCashpointExecute(Sender: TObject);
 var xData: TDataObject;
+    xBase: TDataObject;
 begin
-  xData := TDataObject(CashpointList.GetNodeData(CashpointList.FocusedNode)^);
-  if TCashPoint.CanBeDeleted(xData.id) then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ kontrahenta o nazwie "' + TCashPoint(xData).name + '" ?', '') then begin
+  xBase := TDataObject(CashpointList.GetNodeData(CashpointList.FocusedNode)^);
+  if TCashPoint.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ kontrahenta o nazwie "' + TCashPoint(xBase).name + '" ?', '') then begin
+      xData := TCashPoint.LoadObject(CashPointProxy, xBase.id, False);
       xData.DeleteObject;
       GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCCashpointsFrame, WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
+      SendMessageToFrames(TCCashpointsFrame, WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
     end;
   end;
 end;

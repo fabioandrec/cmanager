@@ -294,13 +294,15 @@ var xForm: TCPlannedForm;
     xBase: TPlannedMovement;
     xDataGid: TDataGid;
 begin
-  xBase := TPlannedMovement(PlannedList.GetNodeData(PlannedList.FocusedNode)^);
-  xForm := TCPlannedForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, PlannedMovementProxy, xBase, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+  if PlannedList.FocusedNode <> Nil then begin
+    xBase := TPlannedMovement(PlannedList.GetNodeData(PlannedList.FocusedNode)^);
+    xForm := TCPlannedForm.Create(Nil);
+    xDataGid := xForm.ShowDataobject(coEdit, PlannedMovementProxy, xBase, True);
+    if xDataGid <> CEmptyDataGid then begin
+      SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+    end;
+    xForm.Free;
   end;
-  xForm.Free;
 end;
 
 procedure TCPlannedFrame.ActionDelMovementExecute(Sender: TObject);
@@ -313,7 +315,7 @@ begin
       xObject := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovementProxy, xBase.id, False));
       xObject.DeleteObject;
       GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTDELETED, Integer(@xObject.id), 0);
+      SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
     end;
   end;
 end;

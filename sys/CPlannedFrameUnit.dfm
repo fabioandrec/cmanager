@@ -114,7 +114,7 @@ inherited CPlannedFrame: TCPlannedFrame
   inherited ImageList: TPngImageList
     Top = 144
   end
-  object ActionList: TActionList [3]
+  object ActionList: TActionList
     Images = CImageLists.CyclicImageList24x24
     Left = 200
     Top = 112
@@ -134,7 +134,7 @@ inherited CPlannedFrame: TCPlannedFrame
       OnExecute = ActionDelMovementExecute
     end
   end
-  object VTHeaderPopupMenu: TVTHeaderPopupMenu [4]
+  object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80
     Top = 120
   end

@@ -248,13 +248,15 @@ end;
 
 procedure TCAccountsFrame.ActionDelAccountExecute(Sender: TObject);
 var xData: TDataObject;
+    xBase: TDataObject;
 begin
-  xData := TDataObject(AccountList.GetNodeData(AccountList.FocusedNode)^);
-  if TAccount.CanBeDeleted(xData.id) then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ konto o nazwie "' + TAccount(xData).name + '" ?', '') then begin
+  xBase := TDataObject(AccountList.GetNodeData(AccountList.FocusedNode)^);
+  if TAccount.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ konto o nazwie "' + TAccount(xBase).name + '" ?', '') then begin
+      xData := TAccount.LoadObject(AccountProxy, xBase.id, False);
       xData.DeleteObject;
       GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
+      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
     end;
   end;
 end;

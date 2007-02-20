@@ -66,7 +66,7 @@ const
   
 var
   CUpdateMainForm: TCUpdateMainForm;
-  CIsVerbose: Boolean;
+  CIsQuiet: Boolean;
   CUpdateThread: THttpRequest;
   CFoundNewVersion: Boolean;
 
@@ -240,10 +240,10 @@ end;
 procedure UpdateSystem;
 var xFinished: Boolean;
 begin
-  CIsVerbose := GetSwitch('/verbose');
+  CIsQuiet := GetSwitch('/quiet');
   CFoundNewVersion := False;
   Application.CreateForm(TCUpdateMainForm, CUpdateMainForm);
-  if CIsVerbose then begin
+  if not CIsQuiet then begin
     CUpdateMainForm.Show;
     CUpdateMainForm.Update;
   end;
@@ -255,7 +255,7 @@ begin
       Application.ProcessMessages;
     end;
   until xFinished;
-  if CIsVerbose or CFoundNewVersion then begin
+  if (not CIsQuiet) or CFoundNewVersion then begin
     CUpdateMainForm.Button1.Caption := '&Zamknij';
     if CUpdateThread.RequestResult = 0 then begin
       if CFoundNewVersion then begin

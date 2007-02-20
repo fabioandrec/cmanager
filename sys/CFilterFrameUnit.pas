@@ -165,13 +165,15 @@ end;
 
 procedure TCFilterFrame.ActionDelFilterExecute(Sender: TObject);
 var xData: TDataObject;
+    xBase: TDataObject;
 begin
-  xData := TDataObject(FilterList.GetNodeData(FilterList.FocusedNode)^);
-  if TMovementFilter.CanBeDeleted(xData.id) then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ filtr o nazwie "' + TMovementFilter(xData).name + '" ?', '') then begin
+  xBase := TDataObject(FilterList.GetNodeData(FilterList.FocusedNode)^);
+  if TMovementFilter.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ filtr o nazwie "' + TMovementFilter(xBase).name + '" ?', '') then begin
+      xData := TMovementFilter.LoadObject(MovementFilterProxy, xBase.id, False);
       xData.DeleteObject;
       GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCFilterFrame, WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
+      SendMessageToFrames(TCFilterFrame, WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
     end;
   end;
 end;

@@ -1,8 +1,9 @@
 inherited CStartupInfoFrame: TCStartupInfoFrame
+  Width = 500
   object RepaymentList: TVirtualStringTree [0]
     Left = 0
     Top = 0
-    Width = 443
+    Width = 500
     Height = 277
     Align = alClient
     BevelEdges = []
@@ -19,7 +20,7 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
     Header.Height = 21
-    Header.Options = [hoColumnResize, hoVisible]
+    Header.Options = [hoAutoResize, hoColumnResize, hoVisible]
     Header.Style = hsFlatButtons
     HintMode = hmHint
     Indent = 40
@@ -41,21 +42,20 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
       item
         Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
-        Width = 330
+        Width = 450
         WideText = 'Rodzaj/Data/Opis'
       end
       item
         Alignment = taRightJustify
         Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 1
-        Width = 100
         WideText = 'Kwota'
       end>
   end
   object PanelError: TPanel [1]
-    Left = 48
+    Left = 56
     Top = 56
-    Width = 313
+    Width = 370
     Height = 89
     Anchors = [akLeft, akTop, akRight]
     BevelOuter = bvNone

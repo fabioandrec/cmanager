@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=/verbose
+RunParams=/checkonly
 HostApplication=
 Launcher=
 UseLauncher=0
@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=4
-Build=9
+Build=13
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.0.4.9
+FileVersion=1.0.4.13
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=

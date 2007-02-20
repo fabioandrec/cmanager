@@ -137,7 +137,7 @@ begin
     xSqlPlanned := xSqlPlanned + Format(' and (' +
                           '  (scheduleType = ''O'' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
                           '  (scheduleType = ''C'' and scheduleDate <= %s)' +
-                          ' )', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), DatetimeToDatabase(xDt, False)]);
+                          ' )', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), DatetimeToDatabase(xDt, False), DatetimeToDatabase(xDt, False)]);
     xSqlPlanned := xSqlPlanned + Format(' and (' +
                           '  (endCondition = ''N'') or ' +
                           '  (endCondition = ''D'' and endDate >= %s) or ' +
@@ -177,9 +177,16 @@ begin
       end;
     end;
   end;
-  RepaymentList.RootNodeCount := FHelperList.Count;
-  RepaymentList.EndUpdate;
-  PanelError.Visible := RepaymentList.RootNodeCount = 0;
+  with RepaymentList do begin
+    RootNodeCount := FHelperList.Count;
+    EndUpdate;
+    PanelError.Visible := RootNodeCount = 0;
+    if PanelError.Visible then begin
+      Header.Options := Header.Options - [hoVisible];
+    end else begin
+      Header.Options := Header.Options + [hoVisible];
+    end;
+  end;
 end;
 
 constructor TStartupHelper.Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TPlannedTreeItem; AType: TStartupHelperType);

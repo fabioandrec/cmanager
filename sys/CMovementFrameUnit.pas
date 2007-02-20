@@ -107,13 +107,15 @@ var xForm: TCDataobjectForm;
     xBase: TBaseMovement;
     xDataGid: TDataGid;
 begin
-  xBase := TBaseMovement(TodayList.GetNodeData(TodayList.FocusedNode)^);
-  xForm := TCMovementForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+  if TodayList.FocusedNode <> Nil then begin
+    xBase := TBaseMovement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+    xForm := TCMovementForm.Create(Nil);
+    xDataGid := xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase, True);
+    if xDataGid <> CEmptyDataGid then begin
+      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+    end;
+    xForm.Free;
   end;
-  xForm.Free;
 end;
 
 procedure TCMovementFrame.ActionDelMovementExecute(Sender: TObject);

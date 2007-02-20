@@ -82,13 +82,15 @@ end;
 
 procedure TCProfileFrame.ActionDelProfileExecute(Sender: TObject);
 var xData: TDataObject;
+    xBase: TDataObject;
 begin
-  xData := TDataObject(ProfileList.GetNodeData(ProfileList.FocusedNode)^);
-  if TMovementFilter.CanBeDeleted(xData.id) then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ profil o nazwie "' + TProfile(xData).name + '" ?', '') then begin
+  xBase := TDataObject(ProfileList.GetNodeData(ProfileList.FocusedNode)^);
+  if TMovementFilter.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ profil o nazwie "' + TProfile(xBase).name + '" ?', '') then begin
+      xData := TProfile.LoadObject(ProfileProxy, xBase.id, False);
       xData.DeleteObject;
       GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCProfileFrame, WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
+      SendMessageToFrames(TCProfileFrame, WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
     end;
   end;
 end;

@@ -2,41 +2,45 @@ inherited CStartupInfoForm: TCStartupInfoForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager - Powiadomienia na dzi'#347
-  ClientHeight = 400
-  ClientWidth = 527
+  ClientHeight = 441
+  ClientWidth = 631
   Position = poDesktopCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 527
-    Height = 400
+    Width = 631
+    Height = 441
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
+    DesignSize = (
+      631
+      441)
     object Panel2: TPanel
       Left = 2
       Top = 2
-      Width = 523
-      Height = 359
+      Width = 627
+      Height = 400
+      Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
     end
     object Panel3: TPanel
       Left = 0
-      Top = 363
-      Width = 527
+      Top = 404
+      Width = 631
       Height = 37
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       DesignSize = (
-        527
+        631
         37)
       object CButton1: TCButton
-        Left = 396
+        Left = 500
         Top = 6
         Width = 130
         Height = 25

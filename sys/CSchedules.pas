@@ -91,6 +91,8 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
           end;
         end else if AMovement.endCondition = CEndConditionDate then begin
           xValid := xValid and (xCurDate <= AMovement.endDate);
+        end else begin
+          xValid := xValid and (xCurDate >= AMovement.scheduleDate);
         end;
       end;
       if xValid then begin
