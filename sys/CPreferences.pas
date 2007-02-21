@@ -35,6 +35,7 @@ type
     procedure Clone(APrefList: TPrefList);
     constructor Create(AItemClass: TPrefItemClass);
     procedure LoadFromParentNode(AParentNode: IXMLDOMNode);
+    procedure LoadAllFromParentNode(AParentNode: IXMLDOMNode);
     procedure SavetToParentNode(AParentNode: IXMLDOMNode);
     property Items[AIndex: Integer]: TPrefItem read GetItems write SetItems;
     property ByPrefname[APrefname: String]: TPrefItem read GetByPrefname;
@@ -56,6 +57,22 @@ type
     constructor Create(APrefname: String); override;
     constructor CreateFontPref(APrefname: String; ADesc: String);
     destructor Destroy; override;
+  end;
+
+  TViewColumnPref = class(TPrefItem)
+  private
+    Fposition: Integer;
+    Fwidth: Integer;
+    Fvisible: Integer;
+  public
+    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure Clone(APrefItem: TPrefItem); override;
+    function GetNodeName: String; override;
+  published
+    property position: Integer read Fposition write Fposition;
+    property width: Integer read Fwidth write Fwidth;
+    property visible: Integer read Fvisible write Fvisible;
   end;
 
   TViewPref = class(TPrefItem)
@@ -110,11 +127,12 @@ type
   end;
 
 var GViewsPreferences: TPrefList;
+    GColumnsPreferences: TPrefList;
     GBasePreferences: TBasePref;
 
 implementation
 
-uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml;
+uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml, SysUtils;
 
 procedure SaveFontToXml(ANode: IXMLDOMNode; AFont: TFont);
 begin
@@ -227,11 +245,13 @@ end;
 
 function TPrefList.GetByPrefname(APrefname: String): TPrefItem;
 var xCount: Integer;
+    xPrefname: String;
 begin
   xCount := 0;
+  xPrefname := AnsiLowerCase(APrefname);
   Result := Nil;
   while (xCount <= Count - 1) and (Result = Nil) do begin
-    if Items[xCount].Prefname = APrefname then begin
+    if AnsiLowerCase(Items[xCount].Prefname) = xPrefname then begin
       Result := Items[xCount];
     end;
     Inc(xCount);
@@ -241,6 +261,19 @@ end;
 function TPrefList.GetItems(AIndex: Integer): TPrefItem;
 begin
   Result := TPrefItem(inherited Items[AIndex]);
+end;
+
+procedure TPrefList.LoadAllFromParentNode(AParentNode: IXMLDOMNode);
+var xNode: IXMLDOMNode;
+    xItem: TPrefItem;
+begin
+  xNode := AParentNode.firstChild;
+  while (xNode <> Nil) do begin
+    xItem := FItemClass.Create(GetXmlAttribute('name', xNode, ''));
+    xItem.LoadFromXml(xNode);
+    Add(xItem);
+    xNode := xNode.nextSibling;
+  end;
 end;
 
 procedure TPrefList.LoadFromParentNode(AParentNode: IXMLDOMNode);
@@ -424,8 +457,40 @@ begin
   SetXmlAttribute('startupCheckUpdates', ANode, FstartupCheckUpdates);
 end;
 
+{ TViewColumnPref }
+
+procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
+begin
+  inherited Clone(APrefItem);
+  Fposition := TViewColumnPref(APrefItem).position;
+  Fwidth := TViewColumnPref(APrefItem).width;
+  Fvisible := TViewColumnPref(APrefItem).visible;
+end;
+
+function TViewColumnPref.GetNodeName: String;
+begin
+  Result := 'columnPref'; 
+end;
+
+procedure TViewColumnPref.LoadFromXml(ANode: IXMLDOMNode);
+begin
+  inherited LoadFromXml(ANode);
+  Fposition := GetXmlAttribute('position', ANode, -1);
+  Fwidth := GetXmlAttribute('width', ANode, -1);
+  Fvisible := GetXmlAttribute('visible', ANode, -1);
+end;
+
+procedure TViewColumnPref.SaveToXml(ANode: IXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('position', ANode, Fposition);
+  SetXmlAttribute('width', ANode, Fwidth);
+  SetXmlAttribute('visible', ANode, Fvisible);
+end;
+
 initialization
   GViewsPreferences := TPrefList.Create(TViewPref);
+  GColumnsPreferences := TPrefList.Create(TViewColumnPref);
   GViewsPreferences.Add(TViewPref.Create('baseMovement'));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
@@ -467,4 +532,5 @@ initialization
 finalization
   GViewsPreferences.Free;
   GBasePreferences.Free;
+  GColumnsPreferences.Free;
 end.

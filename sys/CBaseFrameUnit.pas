@@ -22,15 +22,18 @@ type
     FAdditionalData: TObject;
     FOutputData: Pointer;
     FMultipleChecks: TStringList;
+    FOwner: TComponent;
   protected
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
   public
+    procedure SaveColumns;
+    procedure LoadColumns;
     function GetList: TVirtualStringTree; virtual;
     procedure UpdateOutputData; virtual;
     function FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode; virtual;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
     procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
     class function GetOperation: TConfigOperation; virtual;
@@ -46,6 +49,7 @@ type
     property List: TVirtualStringTree read GetList;
     property AdditionalData: TObject read FAdditionalData;
     property MultipleChecks: TStringList read FMultipleChecks;
+    property FrameOwner: TComponent read FOwner;
   end;
 
 var GFrames: TObjectList;
@@ -56,7 +60,7 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtual
 
 implementation
 
-uses CConsts, CListPreferencesFormUnit, CReports, CPreferences;
+uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math;
 
 {$R *.dfm}
 
@@ -110,6 +114,7 @@ end;
 
 destructor TCBaseFrame.Destroy;
 begin
+  SaveColumns;
   GFrames.Remove(Self);
   inherited Destroy;
 end;
@@ -144,9 +149,10 @@ begin
   Result := '';
 end;
 
-procedure TCBaseFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCBaseFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 var xList: TVirtualStringTree;
 begin
+  FOwner := AOwner;
   FAdditionalData := AAdditionalData;
   FMultipleChecks := AMultipleCheck;
   FOutputData := AOutputData;
@@ -159,6 +165,7 @@ begin
       xList.CheckImageKind := ckDarkTick;
     end;
   end;
+  LoadColumns;
 end;
 
 function TCBaseFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
@@ -257,6 +264,60 @@ end;
 class function TCBaseFrame.GetOperation: TConfigOperation;
 begin
   Result := coEdit;
+end;
+
+procedure TCBaseFrame.LoadColumns;
+var xList: TVirtualStringTree;
+    xCount: Integer;
+    xColumnPref: TViewColumnPref;
+    xColumn: TVirtualTreeColumn;
+    xPrefname: String;
+begin
+  xList := GetList;
+  if xList <> Nil then begin
+    if xList.Header.Columns.Count > 1 then begin
+      for xCount := 0 to xList.Header.Columns.Count - 1 do begin
+        xPrefname := FOwner.Name + '|' + xList.Name + '|' + IntToStr(xCount);
+        xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
+        if xColumnPref <> Nil then begin
+          xColumn := xList.Header.Columns.Items[xCount];
+          xColumn.Position := xColumnPref.position;
+          xColumn.Width := xColumnPref.width;
+          if xColumnPref.visible = 1 then begin
+            xColumn.Options := xColumn.Options + [coVisible];
+          end else if xColumnPref.visible = 0 then begin
+            xColumn.Options := xColumn.Options - [coVisible];
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.SaveColumns;
+var xList: TVirtualStringTree;
+    xCount: Integer;
+    xColumnPref: TViewColumnPref;
+    xColumn: TVirtualTreeColumn;
+    xPrefname: String;
+begin
+  xList := GetList;
+  if xList <> Nil then begin
+    if xList.Header.Columns.Count > 1 then begin
+      for xCount := 0 to xList.Header.Columns.Count - 1 do begin
+        xPrefname := FOwner.Name + '|' + xList.Name + '|' + IntToStr(xCount);
+        xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
+        if xColumnPref = Nil then begin
+          xColumnPref := TViewColumnPref.Create(xPrefname);
+          GColumnsPreferences.Add(xColumnPref);
+        end;
+        xColumn := xList.Header.Columns.Items[xCount];
+        xColumnPref.position := xColumn.Position;
+        xColumnPref.width := xColumn.Width;
+        xColumnPref.visible := IfThen(coVisible in xColumn.Options, 1, 0);
+      end;
+    end;
+  end;
 end;
 
 initialization

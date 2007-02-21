@@ -75,7 +75,7 @@ type
     procedure ReloadToday;
     procedure ReloadSums;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -208,9 +208,9 @@ begin
   TodayList.EndUpdate;
 end;
 
-procedure TCMovementFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   UpdateCustomPeriod;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;

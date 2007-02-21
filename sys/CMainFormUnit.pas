@@ -93,6 +93,7 @@ type
   public
     procedure ActionShortcutExecute(ASender: TObject);
     procedure UpdateStatusbar;
+    procedure FinalizeMainForm;
     function OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
@@ -197,7 +198,7 @@ begin
     xFrame.Height := PanelFrames.Height;
     xFrame.DisableAlign;
     xFrame.Visible := False;
-    xFrame.InitializeFrame(Nil, Nil, Nil);
+    xFrame.InitializeFrame(Self, Nil, Nil, Nil);
     xFrame.PrepareCheckStates;
     xFrame.Parent := PanelFrames;
     xFrame.EnableAlign;
@@ -485,6 +486,15 @@ end;
 procedure TCMainForm.ActionCheckUpdatesExecute(Sender: TObject);
 begin
   CheckForUpdates(False);
+end;
+
+procedure TCMainForm.FinalizeMainForm;
+var xCount: Integer;
+begin
+  for xCount := 0 to FShortcutsFrames.Count - 1 do begin
+    TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
+  end;
+  SaveFormPosition(Self);
 end;
 
 end.

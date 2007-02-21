@@ -44,7 +44,7 @@ type
     function GetSelectedText: String; override;
   public
     function GetList: TVirtualStringTree; override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -67,9 +67,9 @@ begin
   Result := 'Konta';
 end;
 
-procedure TCAccountsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCAccountsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   ReloadAccounts;
 end;
 

@@ -47,7 +47,7 @@ function TCStartupInfoForm.PrepareInfoFrame: Boolean;
 begin
   FInfoFrame := TCStartupInfoFrame.Create(Self);
   FInfoFrame.Parent := Panel2;
-  FInfoFrame.InitializeFrame(Nil, Nil, Nil);
+  FInfoFrame.InitializeFrame(Self, Nil, Nil, Nil);
   FInfoFrame.Visible := True;
   Result := GBasePreferences.startupInfoAlways or (FInfoFrame.RepaymentList.RootNodeCount <> 0)
 end;

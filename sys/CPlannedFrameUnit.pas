@@ -46,7 +46,7 @@ type
     function GetList: TVirtualStringTree; override;
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     class function GetPrefname: String; override;
@@ -85,9 +85,9 @@ begin
   PlannedList.EndUpdate;
 end;
 
-procedure TCPlannedFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCPlannedFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   ReloadPlanned;
 end;
 

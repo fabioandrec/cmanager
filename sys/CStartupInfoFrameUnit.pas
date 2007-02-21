@@ -31,7 +31,7 @@ type
   public
     procedure ReloadInfoTree;
     destructor Destroy; override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     class function GetTitle: String; override;
     class function GetOperation: TConfigOperation; override;
     class function GetPrefname: String; override;
@@ -332,9 +332,9 @@ begin
   end;
 end;
 
-procedure TCStartupInfoFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCStartupInfoFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   FPlannedObjects := Nil;
   FDoneObjects := Nil;
   FScheduledObjects := TObjectList.Create(True);

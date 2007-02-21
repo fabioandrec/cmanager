@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, VirtualTrees, CDatabase, GraphUtil,
-  PngImageList;
+  PngImageList, Menus;
 
 type
   TCListFrame = class(TCBaseFrame)
@@ -27,7 +27,7 @@ type
   public
     function GetList: TVirtualStringTree; override;
     procedure ReloadList(AItems: TStringList);
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -75,9 +75,9 @@ begin
   Result := 'Wybierz z listy';
 end;
 
-procedure TCListFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCListFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   FGids := TStringList.Create;
   FNames := TStringList.Create;
   ReloadList(TStringList(AAdditionalData));

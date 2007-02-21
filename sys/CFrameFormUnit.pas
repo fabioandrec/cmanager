@@ -33,7 +33,7 @@ begin
   FFrame := AFrameClass.Create(Self);
   FFrame.Visible := False;
   FFrame.DisableAlign;
-  FFrame.InitializeFrame(AAdditionalData, AOutData, AMultipleCheck);
+  FFrame.InitializeFrame(Self, AAdditionalData, AOutData, AMultipleCheck);
   if FFrame.GetList <> Nil then begin
     FFrame.GetList.TabStop := True;
   end;

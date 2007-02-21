@@ -52,7 +52,7 @@ type
     procedure ReloadReports;
   public
     function GetList: TVirtualStringTree; override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
   end;
@@ -160,9 +160,9 @@ begin
   Result := 'Raporty';
 end;
 
-procedure TCReportsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCReportsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   FTreeHelper := THelperElement.Create(False, '', Nil, Nil, '', CNoImage);
   ReloadReports;
 end;

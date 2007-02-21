@@ -59,7 +59,7 @@ type
     function GetSelectedText: String; override;
   public
     function GetList: TVirtualStringTree; override;
-    procedure InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     function FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode; override;
@@ -135,9 +135,9 @@ begin
   Result := 'Kategorie';
 end;
 
-procedure TCProductsFrame.InitializeFrame(AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCProductsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
-  inherited InitializeFrame(AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   FTreeHelper := TTreeObjectList.Create(True);
   ReloadProducts;
 end;
