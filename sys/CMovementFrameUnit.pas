@@ -58,6 +58,7 @@ type
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure TodayListDblClick(Sender: TObject);
     procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FTodayObjects: TDataObjectList;
     FSumObjects: TSumList;
@@ -716,6 +717,21 @@ end;
 class function TCMovementFrame.GetPrefname: String;
 begin
   Result := 'baseMovement';
+end;
+
+procedure TCMovementFrame.TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xBase: TBaseMovement;
+begin
+  if Column = 4 then begin
+    xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
+    if xBase.movementType = CInMovement then begin
+      ImageIndex := 0;
+    end else if xBase.movementType = COutMovement then begin
+      ImageIndex := 1;
+    end else if xBase.movementType = CTransferMovement then begin
+      ImageIndex := 2;
+    end;
+  end;
 end;
 
 end.

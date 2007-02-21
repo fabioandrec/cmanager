@@ -86,6 +86,7 @@ type
     FstartupInfoOut: Boolean;
     FstartupInfoOldOut: Boolean;
     FstartupInfoAlways: Boolean;
+    FstartupCheckUpdates: Boolean;
   public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
@@ -105,6 +106,7 @@ type
     property startupInfoOldIn: Boolean read FstartupInfoOldIn write FstartupInfoOldIn;
     property startupInfoOldOut: Boolean read FstartupInfoOldOut write FstartupInfoOldOut;
     property startupInfoAlways: Boolean read FstartupInfoAlways write FstartupInfoAlways;
+    property startupCheckUpdates: Boolean read FstartupCheckUpdates write FstartupCheckUpdates;
   end;
 
 var GViewsPreferences: TPrefList;
@@ -376,6 +378,7 @@ begin
   FstartupInfoAlways := TBasePref(APrefItem).startupInfoAlways;
   FstartupInfoOldIn := TBasePref(APrefItem).startupInfoOldIn;
   FstartupInfoOldOut := TBasePref(APrefItem).startupInfoOldOut;
+  FstartupCheckUpdates := TBasePref(APrefItem).startupCheckUpdates;
 end;
 
 function TBasePref.GetNodeName: String;
@@ -399,6 +402,7 @@ begin
   FstartupInfoOldIn := GetXmlAttribute('startupInfoOldIn', ANode, True);
   FstartupInfoOldOut := GetXmlAttribute('startupInfoOldOut', ANode, True);
   FstartupInfoAlways := GetXmlAttribute('startupInfoAlways', ANode, True);
+  FstartupCheckUpdates := GetXmlAttribute('startupCheckUpdates', ANode, False);
 end;
 
 procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
@@ -417,6 +421,7 @@ begin
   SetXmlAttribute('startupInfoOldIn', ANode, FstartupInfoOldIn);
   SetXmlAttribute('startupInfoOldOut', ANode, FstartupInfoOldOut);
   SetXmlAttribute('startupInfoAlways', ANode, FstartupInfoAlways);
+  SetXmlAttribute('startupCheckUpdates', ANode, FstartupCheckUpdates);
 end;
 
 initialization

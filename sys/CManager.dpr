@@ -100,6 +100,9 @@ begin
       xProceed := True;
     end;
     if xProceed then begin
+      if GBasePreferences.startupCheckUpdates then begin
+        CheckForUpdates(True);
+      end;
       InitializeProxies;
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;

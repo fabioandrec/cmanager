@@ -46,7 +46,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 473
           Height = 375
-          ActivePage = TabSheetView
+          ActivePage = TabSheetBase
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -57,8 +57,8 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 449
-              Height = 121
-              Caption = ' Przy starcie systemu '
+              Height = 153
+              Caption = ' Przy starcie CManager-a  '
               TabOrder = 0
               object RadioButtonLast: TRadioButton
                 Left = 16
@@ -105,6 +105,14 @@ inherited CPreferencesForm: TCPreferencesForm
                 TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
                 OnGetDataId = CStaticFileNameGetDataId
                 HotTrack = True
+              end
+              object CheckBoxCheckForupdates: TCheckBox
+                Left = 18
+                Top = 112
+                Width = 415
+                Height = 17
+                Caption = 'Sprawdzaj dost'#281'pne aktualizacje'
+                TabOrder = 4
               end
             end
           end

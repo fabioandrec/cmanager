@@ -182,6 +182,7 @@ inherited CMovementFrame: TCMovementFrame
     OnFocusChanged = TodayListFocusChanged
     OnGetText = TodayListGetText
     OnPaintText = TodayListPaintText
+    OnGetImageIndex = TodayListGetImageIndex
     OnGetHint = TodayListGetHint
     OnGetNodeDataSize = TodayListGetNodeDataSize
     OnHeaderClick = TodayListHeaderClick

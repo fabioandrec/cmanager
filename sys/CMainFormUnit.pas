@@ -112,7 +112,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
-  CProfileFrameUnit, CLoanCalculatorFormUnit;
+  CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools;
 
 {$R *.dfm}
 
@@ -484,7 +484,7 @@ end;
 
 procedure TCMainForm.ActionCheckUpdatesExecute(Sender: TObject);
 begin
-  ShellExecute(0, 'open', PChar('cupdate.exe'), '', '.', SW_SHOW)
+  CheckForUpdates(False);
 end;
 
 end.

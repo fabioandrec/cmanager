@@ -4,7 +4,7 @@ unit CDatatools;
 
 interface
 
-uses Windows, SysUtils, Classes, Controls;
+uses Windows, SysUtils, Classes, Controls, ShellApi;
 
 type
   TProgressEvent = procedure (AStepBy: Integer) of Object;
@@ -26,6 +26,7 @@ function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function CheckPendingInformations: Boolean;
+procedure CheckForUpdates(AQuiet: Boolean);
 
 implementation
 
@@ -384,6 +385,17 @@ begin
     Result := xInfo.ShowModal = mrOk;
   end;
   xInfo.Free;
+end;
+
+procedure CheckForUpdates(AQuiet: Boolean);
+var xQuiet: String;
+begin
+  if AQuiet then begin
+    xQuiet := '/quiet';
+  end else begin
+    xQuiet := '';
+  end;
+  ShellExecute(0, 'open', PChar('cupdate.exe'), PChar(xQuiet), '.', SW_SHOW)
 end;
 
 end.

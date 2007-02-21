@@ -155,6 +155,7 @@ inherited CDoneFrame: TCDoneFrame
     Header.PopupMenu = VTHeaderPopupMenu
     Header.Style = hsFlatButtons
     HintMode = hmHint
+    Images = CImageLists.DoneImageList16x16
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
@@ -168,6 +169,7 @@ inherited CDoneFrame: TCDoneFrame
     OnFocusChanged = DoneListFocusChanged
     OnGetText = DoneListGetText
     OnPaintText = DoneListPaintText
+    OnGetImageIndex = DoneListGetImageIndex
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
     OnHeaderClick = DoneListHeaderClick

@@ -64,6 +64,7 @@ type
     procedure DoneListDblClick(Sender: TObject);
     procedure DoneListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ActionDooperationExecute(Sender: TObject);
+    procedure DoneListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -785,6 +786,19 @@ begin
       SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
     end;
     xForm.Free;
+  end;
+end;
+
+procedure TCDoneFrame.DoneListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xBase: TPlannedTreeItem;
+begin
+  if Column = 4 then begin
+    xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
+    if xBase.planned.movementType = CInMovement then begin
+      ImageIndex := 0;
+    end else if xBase.planned.movementType = COutMovement then begin
+      ImageIndex := 1;
+    end;
   end;
 end;
 

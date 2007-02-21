@@ -266,6 +266,7 @@ begin
     end else begin
       CUpdateMainForm.Label2.Caption := ' - Sprawdzenie aktualizacji nie powiod³o siê';
     end;
+    Application.BringToFront;
     Application.Run;
   end;
   CUpdateThread.Free;
