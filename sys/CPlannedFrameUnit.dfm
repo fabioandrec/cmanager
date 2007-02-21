@@ -68,6 +68,7 @@ inherited CPlannedFrame: TCPlannedFrame
     Header.PopupMenu = VTHeaderPopupMenu
     Header.Style = hsFlatButtons
     HintMode = hmHint
+    Images = CImageLists.PlannedImageList16x16
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
@@ -81,6 +82,7 @@ inherited CPlannedFrame: TCPlannedFrame
     OnFocusChanged = PlannedListFocusChanged
     OnGetText = PlannedListGetText
     OnPaintText = PlannedListPaintText
+    OnGetImageIndex = PlannedListGetImageIndex
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
     OnHeaderClick = PlannedListHeaderClick

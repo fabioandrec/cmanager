@@ -21,6 +21,7 @@ type
     MovementIcons16x16: TPngImageList;
     ProfileImageList24x24: TPngImageList;
     DoneImageList16x16: TPngImageList;
+    PlannedImageList16x16: TPngImageList;
   private
     { Private declarations }
   public

@@ -203,6 +203,12 @@ inherited CDoneFrame: TCDoneFrame
         Position = 4
         Width = 150
         WideText = 'Rodzaj'
+      end
+      item
+        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 5
+        Width = 100
+        WideText = 'Status'
       end>
   end
   object Panel: TPanel [3]

@@ -33,6 +33,7 @@ type
     procedure ActionDelMovementExecute(Sender: TObject);
     procedure PlannedListDblClick(Sender: TObject);
     procedure PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure PlannedListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FPlannedObjects: TDataObjectList;
     procedure MessageMovementAdded(AId: TDataGid);
@@ -350,6 +351,19 @@ end;
 class function TCPlannedFrame.GetPrefname: String;
 begin
   Result := 'plannedMovement';
+end;
+
+procedure TCPlannedFrame.PlannedListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xBase: TPlannedMovement;
+begin
+  if Column = 2 then begin
+    xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
+    if xBase.movementType = CInMovement then begin
+      ImageIndex := 0;
+    end else if xBase.movementType = COutMovement then begin
+      ImageIndex := 1;
+    end;
+  end;
 end;
 
 end.

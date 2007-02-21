@@ -224,6 +224,24 @@ begin
     end else if (xData.planned.movementType = COutMovement) then begin
       CellText := 'Rozchód';
     end;
+  end else if Column = 5 then begin
+    if (xData.done <> Nil) then begin
+      if (xData.done.doneState = CDoneOperation) then begin
+        CellText := 'Wykonana';
+      end else if (xData.done.doneState = CDoneDeleted) then begin
+        CellText := 'Odrzucona';
+      end else if (xData.done.doneState = CDoneAccepted) then begin
+        CellText := 'Uznana';
+      end;
+    end else begin
+      if xData.triggerDate = GWorkDate then begin
+        CellText := 'Na dziœ';
+      end else if xData.triggerDate > GWorkDate then begin
+        CellText := 'Zaplanowana';
+      end else begin
+        CellText := 'Zaleg³a';
+      end;
+    end;
   end;
 end;
 
@@ -798,6 +816,25 @@ begin
       ImageIndex := 0;
     end else if xBase.planned.movementType = COutMovement then begin
       ImageIndex := 1;
+    end;
+  end else if Column = 5 then begin
+    xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
+    if (xBase.done <> Nil) then begin
+      if (xBase.done.doneState = CDoneOperation) then begin
+        ImageIndex := 2;
+      end else if (xBase.done.doneState = CDoneDeleted) then begin
+        ImageIndex := 6;
+      end else if (xBase.done.doneState = CDoneAccepted) then begin
+        ImageIndex := 2;
+      end;
+    end else begin
+      if xBase.triggerDate = GWorkDate then begin
+        ImageIndex := 3;
+      end else if xBase.triggerDate > GWorkDate then begin
+        ImageIndex := 5;
+      end else begin
+        ImageIndex := 4;
+      end;
     end;
   end;
 end;
