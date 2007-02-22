@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees, CDatabase,
-  CSchedules, Contnrs, ExtCtrls, GraphUtil, CConfigFormUnit;
+  CSchedules, Contnrs, ExtCtrls, GraphUtil, CConfigFormUnit, VTHeaderPopup,
+  CImageListsUnit;
 
 type
   TStartupHelperType = (shtGroup, shtDate, shtItem);
@@ -16,12 +17,14 @@ type
   TCStartupInfoFrame = class(TCBaseFrame)
     RepaymentList: TVirtualStringTree;
     PanelError: TPanel;
+    VTHeaderPopupMenu: TVTHeaderPopupMenu;
     procedure RepaymentListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure RepaymentListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure RepaymentListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure RepaymentListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure RepaymentListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -146,7 +149,7 @@ begin
     xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
     FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
     FDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
-    GetScheduledObjects(FScheduledObjects, FPlannedObjects, FDoneObjects, xDF, xDT, sosBoth);
+    GetScheduledObjects(FScheduledObjects, FPlannedObjects, FDoneObjects, xDF, xDT, sosPlanned);
     for xCount := 0 to FScheduledObjects.Count - 1 do begin
       xPlannedTreeItem := TPlannedTreeItem(FScheduledObjects.Items[xCount]);
       if (xPlannedTreeItem.done = Nil) and (xPlannedTreeItem.triggerDate < GWorkDate) then begin
@@ -304,6 +307,34 @@ begin
       if xData.helperType = shtItem then begin
         CellText := CurrencyToString(xData.item.planned.cash);
       end;
+    end else if Column = 2 then begin
+      if xData.helperType = shtItem then begin
+        if (xData.item.planned.movementType = CInMovement) then begin
+          CellText := CInMovementDescription;
+        end else if (xData.item.planned.movementType = COutMovement) then begin
+          CellText := COutMovementDescription;
+        end;
+      end;
+    end else if Column = 3 then begin
+      if xData.helperType = shtItem then begin
+        if (xData.item.done <> Nil) then begin
+          if (xData.item.done.doneState = CDoneOperation) then begin
+            CellText := CPlannedDoneDescription;
+          end else if (xData.item.done.doneState = CDoneDeleted) then begin
+            CellText := CPlannedRejectedDescription;
+          end else if (xData.item.done.doneState = CDoneAccepted) then begin
+            CellText := CPlannedAcceptedDescription;
+          end;
+        end else begin
+          if xData.item.triggerDate = GWorkDate then begin
+            CellText := CPlannedScheduledTodayDescription;
+          end else if xData.item.triggerDate > GWorkDate then begin
+            CellText := CPlannedScheduledReady;
+          end else begin
+            CellText := CPlannedScheduledOvertime;
+          end;
+        end;
+      end;
     end;
   end else begin
     if (xData.helperType = shtGroup) and (Column = 0) then begin
@@ -383,6 +414,43 @@ begin
     ABackground := xPref.Background;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+    end;
+  end;
+end;
+
+procedure TCStartupInfoFrame.RepaymentListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xData: TStartupHelper;
+    xBase: TPlannedTreeItem;
+begin
+  xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
+  if Column = 2 then begin
+    if xData.helperType = shtItem then begin
+      if xData.item.planned.movementType = CInMovement then begin
+        ImageIndex := 0;
+      end else if xData.item.planned.movementType = COutMovement then begin
+        ImageIndex := 1;
+      end;
+    end;
+  end else if Column = 3 then begin
+    if xData.helperType = shtItem then begin
+      xBase := xData.item;
+      if (xBase.done <> Nil) then begin
+        if (xBase.done.doneState = CDoneOperation) then begin
+          ImageIndex := 2;
+        end else if (xBase.done.doneState = CDoneDeleted) then begin
+          ImageIndex := 6;
+        end else if (xBase.done.doneState = CDoneAccepted) then begin
+          ImageIndex := 2;
+        end;
+      end else begin
+        if xBase.triggerDate = GWorkDate then begin
+          ImageIndex := 3;
+        end else if xBase.triggerDate > GWorkDate then begin
+          ImageIndex := 5;
+        end else begin
+          ImageIndex := 4;
+        end;
+      end;
     end;
   end;
 end;

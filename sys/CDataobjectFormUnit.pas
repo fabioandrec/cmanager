@@ -23,7 +23,7 @@ type
   public
     function ShowDataobject(AOperation: TConfigOperation; AProxy: TDataProxy; ADataobject: TDataObject; ACreateStatic: Boolean; AAdditionalData: TAdditionalData = Nil): TDataGid;
     property Dataobject: TDataObject read FDataobject write FDataobject;
-    function ShowConfig(AOperation: TConfigOperation): Boolean; override;
+    function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean; override;
     property AdditionalData: TAdditionalData read FAdditionalData;
   end;
 
@@ -41,7 +41,7 @@ procedure TCDataobjectForm.InitializeForm;
 begin
 end;
 
-function TCDataobjectForm.ShowConfig(AOperation: TConfigOperation): Boolean;
+function TCDataobjectForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean;
 begin
   Accepted := False;
   Operation := AOperation;

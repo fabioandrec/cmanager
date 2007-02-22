@@ -220,26 +220,26 @@ begin
     end;
   end else if Column = 4 then begin
     if (xData.planned.movementType = CInMovement) then begin
-      CellText := 'Przychód';
+      CellText := CInMovementDescription;
     end else if (xData.planned.movementType = COutMovement) then begin
-      CellText := 'Rozchód';
+      CellText := COutMovementDescription;
     end;
   end else if Column = 5 then begin
     if (xData.done <> Nil) then begin
       if (xData.done.doneState = CDoneOperation) then begin
-        CellText := 'Wykonana';
+        CellText := CPlannedDoneDescription;
       end else if (xData.done.doneState = CDoneDeleted) then begin
-        CellText := 'Odrzucona';
+        CellText := CPlannedRejectedDescription;
       end else if (xData.done.doneState = CDoneAccepted) then begin
-        CellText := 'Uznana';
+        CellText := CPlannedAcceptedDescription;
       end;
     end else begin
       if xData.triggerDate = GWorkDate then begin
-        CellText := 'Na dziœ';
+        CellText := CPlannedScheduledTodayDescription;
       end else if xData.triggerDate > GWorkDate then begin
-        CellText := 'Zaplanowana';
+        CellText := CPlannedScheduledReady;
       end else begin
-        CellText := 'Zaleg³a';
+        CellText := CPlannedScheduledOvertime;
       end;
     end;
   end;

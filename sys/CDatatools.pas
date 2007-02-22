@@ -27,6 +27,7 @@ function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
+function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 
 implementation
 
@@ -396,6 +397,11 @@ begin
     xQuiet := '';
   end;
   ShellExecute(0, 'open', PChar('cupdate.exe'), PChar(xQuiet), '.', SW_SHOW)
+end;
+
+function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
+begin
+  Result := True;
 end;
 
 end.

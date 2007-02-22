@@ -115,7 +115,9 @@ var xForms: IXMLDOMNode;
     xNode: IXMLDOMNode;
     xPlacement: TWindowPlacement;
     xS: Integer;
+    xLoaded: Boolean;
 begin
+  xLoaded := False;
   if GSettings <> Nil then begin
     xForms := GetSettingsForms;
     xNode := xForms.selectSingleNode(AnsiLowerCase(AForm.Name));
@@ -138,7 +140,12 @@ begin
       end else if xS = -1 then begin
         PostMessage(AForm.Handle, WM_FORMMINIMIZE, 0, 0);
       end;
+      xLoaded := True;
     end;
+  end;
+  if not xLoaded then begin
+    AForm.Left := (Screen.WorkAreaWidth - AForm.Width) div 2;
+    AForm.Top := (Screen.WorkAreaHeight - AForm.Height) div 2;
   end;
 end;
 

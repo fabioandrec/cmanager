@@ -1,9 +1,7 @@
 inherited CStartupInfoForm: TCStartupInfoForm
-  BorderIcons = [biSystemMenu]
-  BorderStyle = bsSingle
+  Width = 639
+  Height = 468
   Caption = 'CManager - Powiadomienia na dzi'#347
-  ClientHeight = 441
-  ClientWidth = 631
   Position = poDesktopCenter
   PixelsPerInch = 96
   TextHeight = 13

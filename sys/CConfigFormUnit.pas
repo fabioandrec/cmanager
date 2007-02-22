@@ -24,7 +24,7 @@ type
     procedure FillForm; virtual;
     procedure ReadValues; virtual;
   public
-    function ShowConfig(AOperation: TConfigOperation): Boolean; virtual;
+    function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean; virtual;
   published
     property Operation: TConfigOperation read FOperation write FOperation;
     property Accepted: Boolean read FAccepted write FAccepted;
@@ -49,8 +49,12 @@ begin
   Result := True;
 end;
 
-function TCConfigForm.ShowConfig(AOperation: TConfigOperation): Boolean;
+function TCConfigForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean;
 begin
+  if ACanResize then begin
+    BorderStyle := bsSizeable;
+    BorderIcons := [biSystemMenu, biMinimize, biMaximize];
+  end;
   FAccepted := False;
   FOperation := AOperation;
   if FOperation = coNone then begin

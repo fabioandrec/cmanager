@@ -70,7 +70,7 @@ begin
   if ARect <> Nil then begin
     xForm.SetBounds(ARect^.Left, ARect^.Top, ARect^.Right, ARect^.Bottom);
   end;
-  if xForm.ShowConfig(AFrameClass.GetOperation) then begin
+  if xForm.ShowConfig(AFrameClass.GetOperation, True) then begin
     ADataId := xForm.FFrame.SelectedId;
     AText := xForm.FFrame.SelectedText;
     if (AOutData <> Nil) or (AMultipleCheck <> Nil) then begin

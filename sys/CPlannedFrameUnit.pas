@@ -121,9 +121,9 @@ begin
     CellText := xData.description;
   end else if Column = 2 then begin
     if (xData.movementType = CInMovement) then begin
-      CellText := 'Przychód';
+      CellText := CInMovementDescription;
     end else if (xData.movementType = COutMovement) then begin
-      CellText := 'Rozchód';
+      CellText := COutMovementDescription;
     end;
   end else begin
     CellText := CurrencyToString(xData.cash);

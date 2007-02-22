@@ -660,11 +660,11 @@ begin
             xOverallOutSum := xOverallOutSum + xElement.done.cash;
           end;
           if xElement.done.doneState = CDoneOperation then begin
-            xStat := 'Zrealizowana';
+            xStat := CPlannedDoneDescription;
           end else if xElement.done.doneState = CDoneDeleted then begin
-            xStat := 'Odrzucona';
+            xStat := CPlannedRejectedDescription;
           end else begin
-            xStat := 'Uznana';
+            xStat := CPlannedAcceptedDescription;
           end;
           xDate := xElement.done.doneDate;
         end else begin

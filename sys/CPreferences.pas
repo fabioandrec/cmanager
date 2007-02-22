@@ -457,8 +457,6 @@ begin
   SetXmlAttribute('startupCheckUpdates', ANode, FstartupCheckUpdates);
 end;
 
-{ TViewColumnPref }
-
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
@@ -528,6 +526,15 @@ initialization
     showShortcutBar := True;
     showStatusBar := True;
     lastOpenedDatafilename := '';
+    startupInfo := False;
+    startupInfoType := CStartupInfoToday;
+    startupInfoDays := 1;
+    startupInfoIn := True;
+    startupInfoOut := True;
+    startupInfoOldIn := True;
+    startupInfoOldOut := True;
+    startupInfoAlways := True;
+    startupCheckUpdates := False;
   end;
 finalization
   GViewsPreferences.Free;

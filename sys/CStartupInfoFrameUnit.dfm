@@ -20,8 +20,10 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     Header.Font.Style = []
     Header.Height = 21
     Header.Options = [hoColumnResize, hoDrag, hoVisible]
+    Header.PopupMenu = VTHeaderPopupMenu
     Header.Style = hsFlatButtons
     HintMode = hmHint
+    Images = CImageLists.DoneImageList16x16
     Indent = 40
     ParentShowHint = False
     ShowHint = True
@@ -34,6 +36,7 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     OnBeforeItemErase = RepaymentListBeforeItemErase
     OnGetText = RepaymentListGetText
     OnPaintText = RepaymentListPaintText
+    OnGetImageIndex = RepaymentListGetImageIndex
     OnGetNodeDataSize = RepaymentListGetNodeDataSize
     OnInitChildren = RepaymentListInitChildren
     OnInitNode = RepaymentListInitNode
@@ -42,14 +45,26 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
         Width = 450
-        WideText = 'Rodzaj/Data/Opis'
+        WideText = 'Opis'
       end
       item
         Alignment = taRightJustify
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 1
-        Width = 10
+        Width = 70
         WideText = 'Kwota'
+      end
+      item
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 2
+        Width = 70
+        WideText = 'Rodzaj'
+      end
+      item
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 3
+        Width = 70
+        WideText = 'Status'
       end>
   end
   object PanelError: TPanel [1]
@@ -68,5 +83,9 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     Font.Style = []
     ParentFont = False
     TabOrder = 1
+  end
+  object VTHeaderPopupMenu: TVTHeaderPopupMenu
+    Left = 160
+    Top = 48
   end
 end

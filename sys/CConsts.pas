@@ -70,6 +70,18 @@ const
   CStartupInfoNextmonth = 5;
   CStartupInfoDays = 6;
 
+const
+  CInMovementDescription = 'Przychód';
+  COutMovementDescription = 'Rozchód';
+  CTransferMovementDescription = 'Transfer';
+
+  CPlannedDoneDescription = 'Wykonana';
+  CPlannedRejectedDescription = 'Odrzucona';
+  CPlannedAcceptedDescription = 'Uznana';
+  CPlannedScheduledTodayDescription = 'Na dziœ';
+  CPlannedScheduledReady = 'Zaplanowana';
+  CPlannedScheduledOvertime = 'Zaleg³a';
+
 implementation
 
 end.

@@ -114,7 +114,9 @@ begin
       end;
       SaveSettings;
     end else begin
-      ShowInfo(itError, xError, xDesc)
+      if xError <> '' then begin
+        ShowInfo(itError, xError, xDesc)
+      end;
     end;
   end;
 end.

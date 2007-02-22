@@ -13,6 +13,7 @@ object CProgressForm: TCProgressForm
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -143,6 +144,8 @@ object CProgressForm: TCProgressForm
           Color = clWindow
           ParentColor = False
           TabOrder = 0
+          TabStop = True
+          Transparent = False
           TextOnEmpty = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
           OnGetDataId = CStaticDescGetDataId
           HotTrack = True

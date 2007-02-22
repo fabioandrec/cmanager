@@ -4,19 +4,20 @@ unit CTools;
 
 interface
 
-{$WARN SYMBOL_PLATFORM OFF}	
+{$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows;
+uses Windows, Types;
 
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 function FileSize(AName: String): Int64;
 function GetParamValue(AParam: String): String;
 function GetSwitch(ASwitch: String): Boolean;
+function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, Classes;
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
@@ -86,6 +87,19 @@ begin
     Result := AnsiUpperCase(ParamStr(xCount)) = AnsiUpperCase(ASwitch);
     Inc(xCount);
   end;
+end;
+
+function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
+var xStr: TStringList;
+    xCount: Integer;
+begin
+  xStr := TStringList.Create;
+  xStr.Text := StringReplace(AString, ADelimeter, sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+  SetLength(Result, xStr.Count);
+  for xCount := 0 to xStr.Count - 1 do begin
+    Result[xCount] := xStr.Strings[xCount];
+  end;
+  xStr.Free;
 end;
 
 end.

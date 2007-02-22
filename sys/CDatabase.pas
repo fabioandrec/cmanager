@@ -4,7 +4,8 @@ interface
 
 {.$DEFINE SAVETOLOG}
 
-uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts;
+uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
+     Types;
 
 type
   TDataGid = ShortString;
@@ -332,9 +333,6 @@ begin
           xFileVersion := FileVersion(ParamStr(0));
           if xFileVersion <> xDataVersion then begin
             Result := UpdateDatabase(xDataVersion, xFileVersion);
-            if not Result then begin
-              AError := 'Nie uda³o siê uaktualniæ pliku danych z wersji ' + xDataVersion + ' do wersji ' + xFileVersion;
-            end;
           end;
           xDataset.Free;
         end;
@@ -1087,8 +1085,37 @@ begin
 end;
 
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
+var xCurDbversion: Integer;
+    xToDbversion: Integer;
+    xCurDynArray, xToDynArray: TStringDynArray;
+    xText: String;
+    xError: String;
 begin
   Result := True;
+  xCurDynArray := StringToStringArray(AFromVersion, '.');
+  xToDynArray := StringToStringArray(AToVersion, '.');
+  xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
+  xToDbversion := StrToIntDef(xToDynArray[1], -1);
+  if xCurDbversion < xToDbversion then begin
+    xText := 'Otwierany plik danych ma strukturê ' + AFromVersion + ' i musi byæ uaktualniony do wersji ' + AToVersion + sLineBreak +
+             'Czy rozpocz¹æ uaktualnianie pliku danych ?';
+    Result := ShowInfo(itQuestion, xText, '');
+    if Result then begin
+      Result := True;
+      while Result and (xCurDbversion <> xToDbversion) do begin
+        Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
+        Inc(xCurDbversion);
+      end;
+      if not Result then begin
+        xText := 'Podczas uaktualniania pliku danych z wersji ' + AFromVersion + ' do ' + AToVersion + ' wyst¹pi³ b³¹d' + sLineBreak +
+                 'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
+        ShowInfo(itError, xText, xError);
+      end;
+    end;
+  end;
+  if Result then begin
+    GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
+  end;
 end;
 
 initialization
