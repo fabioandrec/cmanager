@@ -102,7 +102,7 @@ begin
   end else begin
     xState := 0;
   end;
-  SaveFormPosition(AnsiLowerCase(AForm.Name),
+  SaveFormPosition(AnsiLowerCase(StringReplace(AForm.Name + Copy(AForm.Caption, 1, 12), ' ', '', [rfReplaceAll, rfIgnoreCase])),
                    xPlacement.rcNormalPosition.Left,
                    xPlacement.rcNormalPosition.Top,
                    xPlacement.rcNormalPosition.Right - xPlacement.rcNormalPosition.Left,
@@ -120,7 +120,10 @@ begin
   xLoaded := False;
   if GSettings <> Nil then begin
     xForms := GetSettingsForms;
-    xNode := xForms.selectSingleNode(AnsiLowerCase(AForm.Name));
+    xNode := xForms.selectSingleNode(AnsiLowerCase(StringReplace(AForm.Name + Copy(AForm.Caption, 1, 12), ' ', '', [rfReplaceAll, rfIgnoreCase])));
+    if xNode = Nil then begin
+      xNode := xForms.selectSingleNode(AnsiLowerCase(AForm.Name));
+    end;
     if xNode <> Nil then begin
       xPlacement.length := SizeOf(TWindowPlacement);
       xPlacement.rcNormalPosition.Left := GetXmlAttribute('left', xNode, AForm.Left);
@@ -133,13 +136,13 @@ begin
         xPlacement.rcNormalPosition.Bottom := xPlacement.rcNormalPosition.Top + GetXmlAttribute('height', xNode, AForm.Height);
       end;
       xPlacement.showCmd := SW_HIDE;
-      SetWindowPlacement(AForm.Handle, @xPlacement);
       xS := GetXmlAttribute('state', xNode, 0);
       if xS = 1 then begin
-        PostMessage(AForm.Handle, WM_FORMMAXIMIZE, 0, 0);
+        xPlacement.showCmd := xPlacement.showCmd or SW_SHOWMAXIMIZED;
       end else if xS = -1 then begin
-        PostMessage(AForm.Handle, WM_FORMMINIMIZE, 0, 0);
+        xPlacement.showCmd := xPlacement.showCmd or SW_SHOWMAXIMIZED
       end;
+      SetWindowPlacement(AForm.Handle, @xPlacement);
       xLoaded := True;
     end;
   end;
