@@ -77,6 +77,7 @@ type
     procedure ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
     procedure ActionLoanCalcExecute(Sender: TObject);
     procedure ActionCheckUpdatesExecute(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -88,6 +89,7 @@ type
     function GetStatusbarVisible: Boolean;
     procedure SetStatusbarVisible(const Value: Boolean);
     procedure UnhandledException(Sender: TObject; E: Exception);
+    function CallHelp(ACommand: Word; AData: Longint; var ACallHelp: Boolean): Boolean;
   protected
     procedure WndProc(var Message: TMessage); override;
   public
@@ -113,13 +115,14 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
-  CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools;
+  CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp;
 
 {$R *.dfm}
 
 procedure TCMainForm.FormCreate(Sender: TObject);
 begin
   Application.OnException := UnhandledException;
+  Application.OnHelp := CallHelp;
   FShortcutsFrames := TStringList.Create;
   CDateTime.Value := GWorkDate;
   FShortcutList := TStringList.Create;
@@ -415,14 +418,8 @@ begin
 end;
 
 procedure TCMainForm.ActionHelpExecute(Sender: TObject);
-var xHelpFile: String;
 begin
-  xHelpFile := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + '\help\index.html';
-  if FileExists(xHelpFile) then begin
-    ShellExecute(0, nil, PChar(xHelpFile), nil, nil, SW_SHOWNORMAL);
-  end else begin
-    ShowInfo(itWarning, 'Nie odnaleziono pliku pomocy.', '');
-  end;
+  HelpShowDefault;
 end;
 
 procedure TCMainForm.ActionCompactExecute(Sender: TObject);
@@ -495,6 +492,18 @@ begin
     TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
   end;
   SaveFormPosition(Self);
+end;
+
+function TCMainForm.CallHelp(ACommand: Word; AData: Integer; var ACallHelp: Boolean): Boolean;
+begin
+  ShowMessage('Help');
+  ACallHelp := False;
+  Result := True;
+end;
+
+procedure TCMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  HelpCloseAll;
 end;
 
 end.

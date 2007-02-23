@@ -73,7 +73,8 @@ uses
   CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame},
   CRichtext in 'CRichtext.pas',
   CXml in 'CXml.pas',
-  CTools in 'CTools.pas';
+  CTools in 'CTools.pas',
+  CHelp in 'CHelp.pas';
 
 {$R *.res}
 
@@ -109,7 +110,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;
