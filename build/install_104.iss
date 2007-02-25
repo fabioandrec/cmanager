@@ -12,7 +12,7 @@ DefaultGroupName=CManager
 AllowNoIcons=true
 LicenseFile=..\..\docs\license
 OutputDir=..\..\bin
-OutputBaseFilename=CManagerSetup_1_0_4
+OutputBaseFilename=CManagerSetup_1_0_4_Beta
 SetupIconFile=..\res\cmanager32.ico
 Compression=lzma
 SolidCompression=true
@@ -32,7 +32,7 @@ Source: ..\..\docs\readme; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\docs\changelog; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\docs\contrib; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\docs\license; DestDir: {app}; Flags: ignoreversion
-Source: ..\..\docs\Help\index.html; DestDir: {app}\Help\; Flags: ignoreversion
+Source: ..\..\docs\Help\CManager.chm; DestDir: {app}\Help\; Flags: ignoreversion
 Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Flags: ignoreversion
 
 [Icons]
@@ -46,3 +46,4 @@ Filename: {app}\CManager.exe; Description: {cm:LaunchProgram,CManager}; Flags: n
 [InstallDelete]
 Name: {app}\report.css; Type: files
 Name: {app}\report.htm; Type: files
+Name: {app}\help\index.html; Type: files
