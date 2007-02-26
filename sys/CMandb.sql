@@ -80,6 +80,19 @@ create table plannedDone (
   constraint ck_doneState check (doneState in ('O', 'D', 'A'))
 );
 
+create movementList (
+  idmovementList uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  name varchar(40) not null,
+  description varchar(200),
+  idAccount uniqueidentifier null,
+  idCashPoint uniqueidentifier null,
+  primary key (idmovementList),
+  constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),
+  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
+);
+
 create table baseMovement (
   idBaseMovement uniqueidentifier not null,
   created datetime not null,
@@ -96,12 +109,14 @@ create table baseMovement (
   idCashPoint uniqueidentifier null,
   idProduct uniqueidentifier null,
   idPlannedDone uniqueidentifier null,
+  idMovementList uniqueidentifier null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
   constraint fk_sourceAccount foreign key (idSourceAccount) references account (idAccount),
   constraint fk_cashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_product foreign key (idProduct) references product (idProduct)
+  constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList)  
 );
 
 create table movementFilter (
@@ -148,8 +163,6 @@ create table profile (
   constraint fk_cashpointprofile foreign key (idCashpoint) references cashpoint (idCashpoint),
   constraint fk_accountprofile foreign key (idAccount) references account (idAccount)
 );
-
-
 
 create table cmanagerInfo (
   version varchar(20) not null,
