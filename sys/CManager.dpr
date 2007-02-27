@@ -75,7 +75,8 @@ uses
   CXml in 'CXml.pas',
   CTools in 'CTools.pas',
   CHelp in 'CHelp.pas',
-  CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm};
+  CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm},
+  CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm};
 
 {$R *.res}
 
@@ -111,7 +112,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;
