@@ -496,6 +496,8 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('T', 'Transfer œrodków'));
     Fontprefs.Add(TFontPref.CreateFontPref('CI', 'Planowany przychód'));
     Fontprefs.Add(TFontPref.CreateFontPref('CO', 'Planowany rozchód'));
+    Fontprefs.Add(TFontPref.CreateFontPref('SI', 'Lista przychodów'));
+    Fontprefs.Add(TFontPref.CreateFontPref('SO', 'Lista rozchodów'));
   end;
   GViewsPreferences.Add(TViewPref.Create('plannedDone'));
   with TViewPref(GViewsPreferences.Last) do begin

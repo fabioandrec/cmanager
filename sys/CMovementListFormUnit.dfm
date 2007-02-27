@@ -95,6 +95,7 @@ inherited CMovementListForm: TCMovementListForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+        OnGetDataId = CStaticInoutOnceAccountGetDataId
         HotTrack = True
       end
       object CStaticInoutOnceCashpoint: TCStatic
@@ -112,6 +113,7 @@ inherited CMovementListForm: TCMovementListForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
+        OnGetDataId = CStaticInoutOnceCashpointGetDataId
         HotTrack = True
       end
     end

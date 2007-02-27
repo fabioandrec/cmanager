@@ -742,6 +742,8 @@ begin
     if TBaseMovement(AHelper.Dataobject).idPlannedDone <> CEmptyDataGid then begin
       xKey := 'C' + xKey;
     end;
+  end else begin
+    xKey := 'S' + xKey;
   end;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['baseMovement']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin

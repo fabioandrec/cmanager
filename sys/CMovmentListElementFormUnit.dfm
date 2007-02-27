@@ -13,7 +13,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
       Width = 505
       Height = 137
       Caption = ' Opis '
-      TabOrder = 0
+      TabOrder = 1
       object RichEditDesc: TRichEdit
         Left = 24
         Top = 28
@@ -30,7 +30,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
       Width = 505
       Height = 105
       Caption = ' Szczeg'#243#322'y operacji '
-      TabOrder = 1
+      TabOrder = 0
       object Label2: TLabel
         Left = 59
         Top = 29
@@ -62,6 +62,8 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
+        OnGetDataId = CStaticCategoryGetDataId
+        OnChanged = CStaticCategoryChanged
         HotTrack = True
       end
       object CCurrEdit: TCCurrEdit

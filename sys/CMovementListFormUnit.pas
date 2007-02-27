@@ -31,6 +31,8 @@ type
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
+    procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     { Private declarations }
   public
@@ -39,7 +41,19 @@ type
 
 implementation
 
+uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit;
+
 {$R *.dfm}
+
+procedure TCMovementListForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
+end;
+
+procedure TCMovementListForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText);
+end;
 
 end.
  
