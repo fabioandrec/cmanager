@@ -78,6 +78,7 @@ type
     procedure TodayListDblClick(Sender: TObject);
     procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure ActionAddListExecute(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
@@ -110,7 +111,8 @@ implementation
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
-  CListPreferencesFormUnit, CReports;
+  CListPreferencesFormUnit, CReports, CMovmentListElementFormUnit,
+  CMovementListFormUnit;
 
 {$R *.dfm}
 
@@ -854,6 +856,18 @@ begin
   end else begin
     Result := TmovementList(Dataobject).regDate;
   end;
+end;
+
+procedure TCMovementFrame.ActionAddListExecute(Sender: TObject);
+var xForm: TCMovementListForm;
+    xDataGid: TDataGid;
+begin
+  xForm := TCMovementListForm.Create(Nil);
+  xDataGid := xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
+  if xDataGid <> CEmptyDataGid then begin
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
+  end;
+  xForm.Free;
 end;
 
 end.

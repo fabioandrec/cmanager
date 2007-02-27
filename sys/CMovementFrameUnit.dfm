@@ -391,6 +391,7 @@ inherited CMovementFrame: TCMovementFrame
     object ActionAddList: TAction
       Caption = 'Dodaj list'#281
       ImageIndex = 0
+      OnExecute = ActionAddListExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

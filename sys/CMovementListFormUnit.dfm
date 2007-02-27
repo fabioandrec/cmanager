@@ -2,18 +2,18 @@ inherited CMovementListForm: TCMovementListForm
   Left = 385
   Top = 136
   Caption = 'Lista operacji'
-  ClientHeight = 606
+  ClientHeight = 610
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 536
-    Height = 565
+    Height = 569
     object GroupBox4: TGroupBox
       Left = 16
       Top = 16
       Width = 505
-      Height = 145
+      Height = 137
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label15: TLabel
@@ -119,137 +119,145 @@ inherited CMovementListForm: TCMovementListForm
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 417
+      Top = 449
       Width = 505
-      Height = 137
+      Height = 112
       Caption = ' Opis '
       TabOrder = 1
       object RichEditDesc: TRichEdit
         Left = 24
         Top = 28
         Width = 457
-        Height = 89
+        Height = 61
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 0
       end
     end
-    object Panel1: TPanel
+    object GroupBox1: TGroupBox
       Left = 16
-      Top = 180
+      Top = 168
       Width = 505
-      Height = 217
-      BevelOuter = bvLowered
-      Caption = 'Panel1'
+      Height = 265
+      Caption = ' Lista operacji '
       TabOrder = 2
-      object Bevel1: TBevel
-        Left = 1
-        Top = 173
-        Width = 503
-        Height = 2
-        Align = alBottom
-        Shape = bsBottomLine
-      end
-      object Panel2: TPanel
-        Left = 1
-        Top = 175
-        Width = 503
-        Height = 41
-        Align = alBottom
-        BevelOuter = bvNone
-        Color = clWindow
+      object Panel1: TPanel
+        Left = 24
+        Top = 28
+        Width = 457
+        Height = 213
+        BevelOuter = bvLowered
+        Caption = 'Panel1'
         TabOrder = 0
-        object CButtonOut: TCButton
-          Left = 13
-          Top = 4
-          Width = 124
-          Height = 33
-          Cursor = crHandPoint
-          PicPosition = ppLeft
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action1
+        object Bevel1: TBevel
+          Left = 1
+          Top = 169
+          Width = 455
+          Height = 2
+          Align = alBottom
+          Shape = bsBottomLine
         end
-        object CButtonEdit: TCButton
-          Left = 188
-          Top = 4
-          Width = 125
-          Height = 33
-          Cursor = crHandPoint
-          PicPosition = ppLeft
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action2
-        end
-        object CButtonDel: TCButton
-          Left = 372
-          Top = 4
-          Width = 125
-          Height = 33
-          Cursor = crHandPoint
-          PicPosition = ppLeft
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action3
-        end
-      end
-      object TodayList: TVirtualStringTree
-        Left = 1
-        Top = 1
-        Width = 503
-        Height = 172
-        Align = alClient
-        BevelEdges = []
-        BevelInner = bvNone
-        BevelOuter = bvRaised
-        BevelKind = bkFlat
-        BorderStyle = bsNone
-        DefaultNodeHeight = 24
-        Header.AutoSizeIndex = 1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'MS Sans Serif'
-        Header.Font.Style = []
-        Header.Height = 21
-        Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-        Header.Style = hsFlatButtons
-        HintMode = hmHint
-        Images = CImageLists.MovementIcons16x16
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 1
-        TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-        TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-        TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-        TreeOptions.SelectionOptions = [toFullRowSelect]
-        Columns = <
-          item
-            Alignment = taRightJustify
-            Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
-            Position = 0
-            WideText = 'Lp'
+        object Panel2: TPanel
+          Left = 1
+          Top = 171
+          Width = 455
+          Height = 41
+          Align = alBottom
+          BevelOuter = bvNone
+          Color = clWindow
+          TabOrder = 0
+          object CButtonOut: TCButton
+            Left = 13
+            Top = 4
+            Width = 124
+            Height = 33
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = Action1
           end
-          item
-            Position = 1
-            Width = 353
-            WideText = 'Opis'
-            WideHint = 'Nazwa kontrahenta'
+          object CButtonEdit: TCButton
+            Left = 164
+            Top = 4
+            Width = 125
+            Height = 33
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = Action2
           end
-          item
-            Alignment = taRightJustify
-            Position = 2
-            Width = 100
-            WideText = 'Kwota'
-          end>
+          object CButtonDel: TCButton
+            Left = 316
+            Top = 4
+            Width = 125
+            Height = 33
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = Action3
+          end
+        end
+        object TodayList: TVirtualStringTree
+          Left = 1
+          Top = 1
+          Width = 455
+          Height = 168
+          Align = alClient
+          BevelEdges = []
+          BevelInner = bvNone
+          BevelOuter = bvRaised
+          BevelKind = bkFlat
+          BorderStyle = bsNone
+          DefaultNodeHeight = 24
+          Header.AutoSizeIndex = 1
+          Header.Font.Charset = DEFAULT_CHARSET
+          Header.Font.Color = clWindowText
+          Header.Font.Height = -11
+          Header.Font.Name = 'MS Sans Serif'
+          Header.Font.Style = []
+          Header.Height = 21
+          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          Header.Style = hsFlatButtons
+          HintMode = hmHint
+          Images = CImageLists.MovementIcons16x16
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 1
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+          TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+          TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+          TreeOptions.SelectionOptions = [toFullRowSelect]
+          Columns = <
+            item
+              Alignment = taRightJustify
+              Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+              Position = 0
+              WideText = 'Lp'
+            end
+            item
+              Position = 1
+              Width = 305
+              WideText = 'Opis'
+              WideHint = 'Nazwa kontrahenta'
+            end
+            item
+              Alignment = taRightJustify
+              Position = 2
+              Width = 100
+              WideText = 'Kwota'
+            end>
+        end
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 565
+    Top = 569
     Width = 536
     inherited BitBtnOk: TBitBtn
       Left = 359

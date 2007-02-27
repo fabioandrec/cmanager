@@ -20,17 +20,18 @@ type
     CStaticInoutOnceAccount: TCStatic;
     Label2: TLabel;
     CStaticInoutOnceCashpoint: TCStatic;
-    Panel1: TPanel;
     ActionManager1: TActionManager;
     Action1: TAction;
     Action2: TAction;
     Action3: TAction;
-    Panel2: TPanel;
+    GroupBox1: TGroupBox;
+    Panel1: TPanel;
     Bevel1: TBevel;
-    TodayList: TVirtualStringTree;
+    Panel2: TPanel;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
+    TodayList: TVirtualStringTree;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
