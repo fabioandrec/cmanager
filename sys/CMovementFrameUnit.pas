@@ -9,6 +9,23 @@ uses
   Contnrs, PngImageList, CImageListsUnit, CDataObjects;
 
 type
+  TMovementTreeElementType = (mtObject, mtList);
+
+  TMovementTreeElement = class(TTreeObject)
+  private
+    FelementType: TMovementTreeElementType;
+    function GetDescription: String;
+    function Getcash: Currency;
+    function Getregdate: TDateTime;
+    function GetmovementType: TBaseEnumeration;
+  public
+    property elementType: TMovementTreeElementType read FelementType write FelementType;
+    property description: String read GetDescription;
+    property cash: Currency read Getcash;
+    property regDate: TDateTime read Getregdate;
+    property movementType: TBaseEnumeration read GetmovementType;
+  end;
+
   TCMovementFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
     TodayList: TVirtualStringTree;
@@ -35,6 +52,8 @@ type
     Label4: TLabel;
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
+    ActionAddList: TAction;
+    CButton1: TCButton;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -61,12 +80,16 @@ type
     procedure TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FTodayObjects: TDataObjectList;
+    FTodayLists: TDataObjectList;
+    FTreeHelper: TTreeObjectList;
     FSumObjects: TSumList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
     procedure UpdateCustomPeriod;
-    procedure FindFontAndBackground(AMovement: TBaseMovement; AFont: TFont; var ABackground: TColor);
+    procedure RecreateTreeHelper;
+    procedure FindFontAndBackground(AHelper: TMovementTreeElement; AFont: TFont; var ABackground: TColor);
+    function FindParentMovementList(AListGid: TDataGid): TTreeObjectList;
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
@@ -105,17 +128,19 @@ end;
 
 procedure TCMovementFrame.ActionEditMovementExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
-    xBase: TBaseMovement;
+    xBase: TMovementTreeElement;
     xDataGid: TDataGid;
 begin
   if TodayList.FocusedNode <> Nil then begin
-    xBase := TBaseMovement(TodayList.GetNodeData(TodayList.FocusedNode)^);
-    xForm := TCMovementForm.Create(Nil);
-    xDataGid := xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase, True);
-    if xDataGid <> CEmptyDataGid then begin
-      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+    xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+    if xBase.elementType = mtObject then begin
+      xForm := TCMovementForm.Create(Nil);
+      xDataGid := xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase.Dataobject, True);
+      if xDataGid <> CEmptyDataGid then begin
+        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
+      end;
+      xForm.Free;
     end;
-    xForm.Free;
   end;
 end;
 
@@ -171,6 +196,7 @@ constructor TCMovementFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FTodayObjects := Nil;
+  FTodayLists := Nil;
   FSumObjects := TSumList.Create(True);
 end;
 
@@ -184,26 +210,30 @@ begin
 end;
 
 procedure TCMovementFrame.ReloadToday;
-var xSql: String;
+var xCondition: String;
     xDf, xDt: TDateTime;
 begin
-  xSql := 'select * from baseMovement where ';
   GetFilterDates(xDf, xDt);
-  xSql := xSql + Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+  xCondition := Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if CStaticFilter.DataId = '2' then begin
-    xSql := xSql + Format(' and movementType = ''%s''', [COutMovement]);
+    xCondition := xCondition + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
-    xSql := xSql + Format(' and movementType = ''%s''', [CInMovement]);
+    xCondition := xCondition + Format(' and movementType = ''%s''', [CInMovement]);
   end else if CStaticFilter.DataId = '4' then begin
-    xSql := xSql + ' and movementType = ''' + CTransferMovement + '''';
+    xCondition := xCondition + ' and movementType = ''' + CTransferMovement + '''';
   end;
   if FTodayObjects <> Nil then begin
     FreeAndNil(FTodayObjects);
   end;
-  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, xSql);
+  if FTodayLists <> Nil then begin
+    FreeAndNil(FTodayLists);
+  end;
+  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where ' + xCondition);
+  FTodayLists := TDataObject.GetList(TmovementList, MovementListProxy, 'select * from movementList where ' + xCondition);
+  RecreateTreeHelper;
   TodayList.BeginUpdate;
   TodayList.Clear;
-  TodayList.RootNodeCount := FTodayObjects.Count;
+  TodayList.RootNodeCount := FTreeHelper.Count;
   TodayListFocusChanged(TodayList, TodayList.FocusedNode, 0);
   TodayList.EndUpdate;
 end;
@@ -211,6 +241,7 @@ end;
 procedure TCMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  FTreeHelper := TTreeObjectList.Create(True);
   UpdateCustomPeriod;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
@@ -225,14 +256,27 @@ end;
 
 destructor TCMovementFrame.Destroy;
 begin
+  FTreeHelper.Free;
   FTodayObjects.Free;
+  FTodayLists.Free;
   FSumObjects.Free;
   inherited Destroy;
 end;
 
 procedure TCMovementFrame.TodayListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+var xTreeList: TTreeObjectList;
+    xTreeObject: TTreeObject;
 begin
-  TDataObject(TodayList.GetNodeData(Node)^) := FTodayObjects.Items[Node.Index];
+  if ParentNode = Nil then begin
+    xTreeList := FTreeHelper;
+  end else begin
+    xTreeList := TTreeObject(TodayList.GetNodeData(ParentNode)^).Childobjects;
+  end;
+  xTreeObject := xTreeList.Items[Node.Index];
+  TTreeObject(TodayList.GetNodeData(Node)^) := xTreeObject;
+  if xTreeObject.Childobjects.Count > 0 then begin
+    InitialStates := InitialStates + [ivsHasChildren, ivsExpanded];
+  end;
   if MultipleChecks <> Nil then begin
     Node.CheckType := ctCheckBox;
     Node.CheckState := csCheckedNormal;
@@ -241,13 +285,13 @@ end;
 
 procedure TCMovementFrame.TodayListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
 begin
-  NodeDataSize := SizeOf(TDataObject);
+  NodeDataSize := SizeOf(TMovementTreeElement);
 end;
 
 procedure TCMovementFrame.TodayListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-var xData: TBaseMovement;
+var xData: TMovementTreeElement;
 begin
-  xData := TBaseMovement(TodayList.GetNodeData(Node)^);
+  xData := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   if Column = 0 then begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
@@ -285,11 +329,11 @@ begin
 end;
 
 procedure TCMovementFrame.TodayListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
-var xData1: TBaseMovement;
-    xData2: TBaseMovement;
+var xData1: TMovementTreeElement;
+    xData2: TMovementTreeElement;
 begin
-  xData1 := TBaseMovement(TodayList.GetNodeData(Node1)^);
-  xData2 := TBaseMovement(TodayList.GetNodeData(Node2)^);
+  xData1 := TMovementTreeElement(TodayList.GetNodeData(Node1)^);
+  xData2 := TMovementTreeElement(TodayList.GetNodeData(Node2)^);
   if Column = 0 then begin
     if Node1.Index > Node2.Index then begin
       Result := 1;
@@ -322,18 +366,18 @@ begin
 end;
 
 procedure TCMovementFrame.TodayListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-var xData: TBaseMovement;
+var xData: TMovementTreeElement;
 begin
-  xData := TBaseMovement(TodayList.GetNodeData(Node)^);
+  xData := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   HintText := xData.description;
   LineBreakStyle := hlbForceMultiLine;
 end;
 
 procedure TCMovementFrame.TodayListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-var xBase: TBaseMovement;
+var xBase: TMovementTreeElement;
     xColor: TColor;
 begin
-  xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
+  xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   with TargetCanvas do begin
     if not Odd(Node.Index) then begin
       ItemColor := clWindow;
@@ -689,13 +733,15 @@ begin
   ActionEditMovement.Execute;
 end;
 
-procedure TCMovementFrame.FindFontAndBackground(AMovement: TBaseMovement; AFont: TFont; var ABackground: TColor);
+procedure TCMovementFrame.FindFontAndBackground(AHelper: TMovementTreeElement; AFont: TFont; var ABackground: TColor);
 var xKey: String;
     xPref: TFontPref;
 begin
-  xKey := AMovement.movementType;
-  if AMovement.idPlannedDone <> CEmptyDataGid then begin
-    xKey := 'C' + xKey;
+  xKey := AHelper.movementType;
+  if AHelper.elementType = mtObject then begin
+    if TBaseMovement(AHelper.Dataobject).idPlannedDone <> CEmptyDataGid then begin
+      xKey := 'C' + xKey;
+    end;
   end;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['baseMovement']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
@@ -707,10 +753,10 @@ begin
 end;
 
 procedure TCMovementFrame.TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-var xBase: TBaseMovement;
+var xBase: TMovementTreeElement;
     xColor: TColor;
 begin
-  xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
+  xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
 end;
 
@@ -720,10 +766,10 @@ begin
 end;
 
 procedure TCMovementFrame.TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-var xBase: TBaseMovement;
+var xBase: TMovementTreeElement;
 begin
   if Column = 4 then begin
-    xBase := TBaseMovement(TodayList.GetNodeData(Node)^);
+    xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
     if xBase.movementType = CInMovement then begin
       ImageIndex := 0;
     end else if xBase.movementType = COutMovement then begin
@@ -731,6 +777,80 @@ begin
     end else if xBase.movementType = CTransferMovement then begin
       ImageIndex := 2;
     end;
+  end;
+end;
+
+procedure TCMovementFrame.RecreateTreeHelper;
+var xCount: Integer;
+    xItem: TMovementTreeElement;
+    xParentList: TTreeObjectList;
+begin
+  FTreeHelper.Clear;
+  for xCount := 0 to FTodayLists.Count - 1 do begin
+    xItem := TMovementTreeElement.Create;
+    xItem.elementType := mtList;
+    xItem.Dataobject := FTodayLists.Items[xCount];
+    FTreeHelper.Add(xItem);
+  end;
+  for xCount := 0 to FTodayObjects.Count - 1 do begin
+    xItem := TMovementTreeElement.Create;
+    xItem.elementType := mtObject;
+    xItem.Dataobject := FTodayObjects.Items[xCount];
+    if TBaseMovement(xItem.Dataobject).idMovementList <> CEmptyDataGid then begin
+      xParentList := FindParentMovementList(TBaseMovement(xItem.Dataobject).idMovementList);
+    end else begin
+      xParentList := FTreeHelper;
+    end;
+    xParentList.Add(xItem);
+  end;
+end;
+
+function TCMovementFrame.FindParentMovementList(AListGid: TDataGid): TTreeObjectList;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= FTreeHelper.Count - 1) and (Result = Nil) do begin
+    if FTreeHelper.Items[xCount].Dataobject.id = AListGid then begin
+      Result := FTreeHelper.Items[xCount].Childobjects;
+    end;
+    Inc(xCount);
+  end;
+end;
+
+function TMovementTreeElement.Getcash: Currency;
+begin
+  if FelementType = mtObject then begin
+    Result := TBaseMovement(Dataobject).cash;
+  end else begin
+    Result := TmovementList(Dataobject).cash;
+  end;
+end;
+
+function TMovementTreeElement.GetDescription: String;
+begin
+  if FelementType = mtObject then begin
+    Result := TBaseMovement(Dataobject).description;
+  end else begin
+    Result := TmovementList(Dataobject).description;
+  end;
+end;
+
+function TMovementTreeElement.GetmovementType: TBaseEnumeration;
+begin
+  if FelementType = mtObject then begin
+    Result := TBaseMovement(Dataobject).movementType;
+  end else begin
+    Result := TmovementList(Dataobject).movementType;
+  end;
+end;
+
+function TMovementTreeElement.Getregdate: TDateTime;
+begin
+  if FelementType = mtObject then begin
+    Result := TBaseMovement(Dataobject).regDate;
+  end else begin
+    Result := TmovementList(Dataobject).regDate;
   end;
 end;
 

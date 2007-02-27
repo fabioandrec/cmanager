@@ -80,16 +80,22 @@ create table plannedDone (
   constraint ck_doneState check (doneState in ('O', 'D', 'A'))
 );
 
-create movementList (
+create table movementList (
   idmovementList uniqueidentifier not null,
   created datetime not null,
   modified datetime,
-  name varchar(40) not null,
   description varchar(200),
-  idAccount uniqueidentifier null,
-  idCashPoint uniqueidentifier null,
+  idAccount uniqueidentifier not null,
+  idCashPoint uniqueidentifier not null,
+  regDate datetime not null,
+  weekDate datetime not null,
+  monthDate datetime not null,
+  yearDate datetime not null,
+  movementType varchar(1) not null,  
+  cash money not null,
   primary key (idmovementList),
-  constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),
+  constraint ck_movementTypemovementList check (movementType in ('I', 'O')),  
+  constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),  
   constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
 );
 
@@ -115,8 +121,8 @@ create table baseMovement (
   constraint fk_account foreign key (idAccount) references account (idAccount),
   constraint fk_sourceAccount foreign key (idSourceAccount) references account (idAccount),
   constraint fk_cashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
-  constraint fk_product foreign key (idProduct) references product (idProduct)
-  constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList)  
+  constraint fk_product foreign key (idProduct) references product (idProduct),
+  constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList)
 );
 
 create table movementFilter (

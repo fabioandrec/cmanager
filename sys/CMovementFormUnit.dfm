@@ -44,6 +44,8 @@ inherited CMovementForm: TCMovementForm
         Color = clWindow
         ParentColor = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         HotTrack = True
       end
       object ComboBoxType: TComboBox
@@ -65,6 +67,66 @@ inherited CMovementForm: TCMovementForm
           'Transfer '#347'rodk'#243'w'
           'Planowany rozch'#243'd'
           'Planowany przych'#243'd')
+      end
+      object GroupBox4: TGroupBox
+        Left = 0
+        Top = 0
+        Width = 505
+        Height = 65
+        Caption = ' Dane podstawowe '
+        TabOrder = 2
+        object Label15: TLabel
+          Left = 17
+          Top = 28
+          Width = 23
+          Height = 13
+          Alignment = taRightJustify
+          Caption = 'Data'
+        end
+        object Label16: TLabel
+          Left = 151
+          Top = 28
+          Width = 33
+          Height = 13
+          Alignment = taRightJustify
+          Caption = 'Rodzaj'
+        end
+        object CDateTime1: TCDateTime
+          Left = 48
+          Top = 24
+          Width = 89
+          Height = 21
+          Cursor = crHandPoint
+          AutoSize = False
+          BevelKind = bkTile
+          Caption = '<wybierz dat'#281'>'
+          Color = clWindow
+          ParentColor = False
+          TabOrder = 0
+          TabStop = True
+          Transparent = False
+          HotTrack = True
+        end
+        object ComboBox1: TComboBox
+          Left = 192
+          Top = 24
+          Width = 289
+          Height = 21
+          BevelInner = bvNone
+          BevelKind = bkTile
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 0
+          TabOrder = 1
+          Text = 'Rozch'#243'd jednorazowy'
+          OnChange = ComboBoxTypeChange
+          Items.Strings = (
+            'Rozch'#243'd jednorazowy'
+            'Przych'#243'd jednorazowy'
+            'Transfer '#347'rodk'#243'w'
+            'Planowany rozch'#243'd'
+            'Planowany przych'#243'd')
+        end
       end
     end
     object GroupBox2: TGroupBox
@@ -153,6 +215,7 @@ inherited CMovementForm: TCMovementForm
             TabOrder = 4
             Decimals = 2
             ThousandSep = True
+            CurrencyStr = 'z'#322
             BevelKind = bkTile
           end
           object CStaticInoutCyclic: TCStatic
@@ -167,6 +230,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 0
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
             OnGetDataId = CStaticInoutCyclicGetDataId
             OnChanged = CStaticInoutCyclicChanged
@@ -184,6 +249,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 1
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz konto z listy>'
             OnGetDataId = CStaticInoutCyclicAccountGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -201,6 +268,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 2
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz kategori'#281' z listy>'
             OnGetDataId = CStaticInoutCyclicCategoryGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -218,6 +287,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 3
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz kontrahenta z listy>'
             OnGetDataId = CStaticInoutCyclicCashpointGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -264,6 +335,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 0
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
             OnGetDataId = CStaticTransSourceAccountGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -281,6 +354,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 1
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz konto docelowe z listy>'
             OnGetDataId = CStaticTransDestAccountGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -295,6 +370,7 @@ inherited CMovementForm: TCMovementForm
             TabOrder = 2
             Decimals = 2
             ThousandSep = True
+            CurrencyStr = 'z'#322
             BevelKind = bkTile
           end
         end
@@ -346,6 +422,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 0
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
             OnGetDataId = CStaticInoutOnceAccountGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -363,6 +441,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 1
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz kategori'#281' z listy>'
             OnGetDataId = CStaticInoutOnceCategoryGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -380,6 +460,8 @@ inherited CMovementForm: TCMovementForm
             Color = clWindow
             ParentColor = False
             TabOrder = 2
+            TabStop = True
+            Transparent = False
             TextOnEmpty = '<wybierz kontrahenta z listy>'
             OnGetDataId = CStaticInoutOnceCashpointGetDataId
             OnChanged = CStaticInoutOnceAccountChanged
@@ -394,6 +476,7 @@ inherited CMovementForm: TCMovementForm
             TabOrder = 3
             Decimals = 2
             ThousandSep = True
+            CurrencyStr = 'z'#322
             BevelKind = bkTile
           end
         end

@@ -32,7 +32,7 @@ type
     procedure BeginTransaction;
     procedure RollbackTransaction;
     function CommitTransaction: Boolean;
-    function ExecuteSql(ASql: String): Boolean;
+    function ExecuteSql(ASql: String; AShowError: Boolean = True): Boolean;
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
     function GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
@@ -310,8 +310,8 @@ begin
       ADesc := GDataProvider.LastError;
     end else begin
       if xCommand <> '' then begin
-        Result := GDataProvider.ExecuteSql(xCommand) and
-                  GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]));
+        Result := GDataProvider.ExecuteSql(xCommand, False) and
+                  GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]), False);
         if not Result then begin
           AError := 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.';
           ADesc := GDataProvider.LastError;
@@ -614,7 +614,7 @@ begin
   GDatabaseName := '';
 end;
 
-function TDataProvider.ExecuteSql(ASql: String): Boolean;
+function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True): Boolean;
 var xSqls: TStringList;
     xCount: Integer;
 begin
@@ -630,7 +630,9 @@ begin
       FConnection.Execute(xSqls.Strings[xCount], cmdText, [eoExecuteNoRecords]);
     except
       on E: Exception do begin
-        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+        if AShowError then begin
+           ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+        end;
         FLastError := E.Message;
         Result := False;
       end;

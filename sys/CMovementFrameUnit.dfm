@@ -46,9 +46,9 @@ inherited CMovementFrame: TCMovementFrame
         Action = ActionMovement
       end
       object CButtonEdit: TCButton
-        Left = 132
+        Left = 260
         Top = 4
-        Width = 125
+        Width = 77
         Height = 33
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -58,9 +58,9 @@ inherited CMovementFrame: TCMovementFrame
         Action = ActionEditMovement
       end
       object CButtonDel: TCButton
-        Left = 260
+        Left = 348
         Top = 4
-        Width = 117
+        Width = 77
         Height = 33
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -68,6 +68,18 @@ inherited CMovementFrame: TCMovementFrame
         TxtOffset = 15
         Framed = False
         Action = ActionDelMovement
+      end
+      object CButton1: TCButton
+        Left = 133
+        Top = 4
+        Width = 124
+        Height = 33
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionAddList
       end
     end
     object Panel2: TPanel
@@ -367,14 +379,18 @@ inherited CMovementFrame: TCMovementFrame
       OnExecute = ActionMovementExecute
     end
     object ActionEditMovement: TAction
-      Caption = 'Edytuj operacj'#281
+      Caption = 'Edytuj'
       ImageIndex = 1
       OnExecute = ActionEditMovementExecute
     end
     object ActionDelMovement: TAction
-      Caption = 'Usu'#324' operacj'#281
+      Caption = 'Usu'#324
       ImageIndex = 2
       OnExecute = ActionDelMovementExecute
+    end
+    object ActionAddList: TAction
+      Caption = 'Dodaj list'#281
+      ImageIndex = 0
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

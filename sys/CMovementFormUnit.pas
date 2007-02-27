@@ -56,6 +56,11 @@ type
     CStaticInoutCyclicCategory: TCStatic;
     Label13: TLabel;
     CStaticInoutCyclicCashpoint: TCStatic;
+    GroupBox4: TGroupBox;
+    Label15: TLabel;
+    Label16: TLabel;
+    CDateTime1: TCDateTime;
+    ComboBox1: TComboBox;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

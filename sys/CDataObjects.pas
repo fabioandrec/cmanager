@@ -78,6 +78,38 @@ type
     property productType: TBaseEnumeration read FproductType write SetproductType;
   end;
 
+  TmovementList = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    FidAccount: TDataGid;
+    FidCashPoint: TDataGid;
+    FregDate: TDateTime;
+    FweekDate: TDateTime;
+    FmonthDate: TDateTime;
+    FyearDate: TDateTime;
+    FmovementType: TBaseEnumeration;
+    Fcash: Currency;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetidCashPoint(const Value: TDataGid);
+    procedure SetregDate(const Value: TDateTime);
+    procedure SetmovementType(const Value: TBaseEnumeration);
+    procedure Setcash(const Value: Currency);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+    property regDate: TDateTime read FregDate write SetregDate;
+    property weekDate: TDateTime read FweekDate;
+    property monthDate: TDateTime read FmonthDate;
+    property yearDate: TDateTime read FyearDate;
+    property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property cash: Currency read Fcash write Setcash;
+  end;
+
   TBaseMovement = class(TDataObject)
   private
     Fdescription: TBaseDescription;
@@ -92,6 +124,7 @@ type
     FidCashPoint: TDataGid;
     FidProduct: TDataGid;
     FidPlannedDone: TDataGid;
+    FidMovementList: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -101,6 +134,7 @@ type
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
     procedure SetidPlannedDone(const Value: TDataGid);
+    procedure SetidMovementList(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -114,6 +148,7 @@ type
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
     property idProduct: TDataGid read FidProduct write SetidProduct;
     property idPlannedDone: TDataGid read FidPlannedDone write SetidPlannedDone;
+    property idMovementList: TDataGid read FidMovementList write SetidMovementList;
     property weekDate: TDateTime read FweekDate;
     property monthDate: TDateTime read FmonthDate;
     property yearDate: TDateTime read FyearDate;
@@ -265,6 +300,7 @@ var CashPointProxy: TDataProxy;
     PlannedDoneProxy: TDataProxy;
     MovementFilterProxy: TDataProxy;
     ProfileProxy: TDataProxy;
+    MovementListProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
 
@@ -284,6 +320,7 @@ begin
   PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
   MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
   ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
+  MovementListProxy :=  TDataProxy.Create(GDataProvider, 'movementList', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -509,6 +546,7 @@ begin
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
     FidPlannedDone := FieldByName('idPlannedDone').AsString;
+    FidMovementList := FieldByName('idMovementList').AsString;
   end;
 end;
 
@@ -579,6 +617,7 @@ begin
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'baseMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'baseMovement');
     AddField('idPlannedDone', DataGidToDatabase(FidPlannedDone), False, 'baseMovement');
+    AddField('idMovementList', DataGidToDatabase(FidMovementList), False, 'baseMovement');
   end;
 end;
 
@@ -1166,6 +1205,98 @@ begin
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'profile');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'profile');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'profile');
+  end;
+end;
+
+procedure TBaseMovement.SetidMovementList(const Value: TDataGid);
+begin
+  if FidMovementList <> Value then begin
+    FidMovementList := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FregDate := FieldByName('regDate').AsDateTime;
+    FweekDate := FieldByName('weekDate').AsDateTime;
+    FmonthDate := FieldByName('monthDate').AsDateTime;
+    FyearDate := FieldByName('yearDate').AsDateTime;
+    FidCashPoint := FieldByName('idCashPoint').AsString;
+    FmovementType := FieldByName('movementType').AsString;
+    Fcash := FieldByName('cash').AsCurrency;
+  end;
+end;
+
+procedure TmovementList.Setcash(const Value: Currency);
+begin
+  if Fcash <> Value then begin
+    Fcash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.SetidCashPoint(const Value: TDataGid);
+begin
+  if FidCashPoint <> Value then begin
+    FidCashPoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.SetmovementType(const Value: TBaseEnumeration);
+begin
+  if FmovementType <> Value then begin
+    FmovementType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.SetregDate(const Value: TDateTime);
+begin
+  if FregDate <> Value then begin
+    FregDate := Value;
+    FyearDate := StartOfTheYear(FregDate);
+    FmonthDate := StartOfTheMonth(FregDate);
+    FweekDate := StartOfTheWeek(FregDate);
+    SetState(msModified);
+  end;
+end;
+
+procedure TmovementList.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fdescription, True, 'movementList');
+    AddField('description', Fdescription, True, 'movementList');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'movementList');
+    AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'movementList');
+    AddField('weekDate', DatetimeToDatabase(FweekDate, False), False, 'movementList');
+    AddField('yearDate', DatetimeToDatabase(FyearDate, False), False, 'movementList');
+    AddField('monthDate', DatetimeToDatabase(FmonthDate, False), False, 'movementList');
+    AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'movementList');
+    AddField('movementType', FmovementType, True, 'movementList');
+    AddField('cash', CurrencyToDatabase(Fcash), False, 'movementList');
   end;
 end;
 

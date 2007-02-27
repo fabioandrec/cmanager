@@ -74,7 +74,8 @@ uses
   CRichtext in 'CRichtext.pas',
   CXml in 'CXml.pas',
   CTools in 'CTools.pas',
-  CHelp in 'CHelp.pas';
+  CHelp in 'CHelp.pas',
+  CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm};
 
 {$R *.res}
 
@@ -110,7 +111,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;

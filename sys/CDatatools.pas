@@ -400,8 +400,23 @@ begin
 end;
 
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
+var xResName: String;
+    xResStream: TResourceStream;
+    xCommand: String;
 begin
-  Result := True;
+  Result := False;
+  try
+    xResName := Format('SQLUPD_%d_%d', [AFrom, ATo]);
+    xResStream := TResourceStream.Create(HInstance, xResName, RT_RCDATA);
+    SetLength(xCommand, xResStream.Size);
+    CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
+    xResStream.Free;
+    Result := GDataProvider.ExecuteSql(xCommand, False);
+  except
+    on E: Exception do begin
+      xError := E.Message;
+    end;
+  end;
 end;
 
 end.
