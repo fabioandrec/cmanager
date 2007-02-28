@@ -22,7 +22,6 @@ type
   TCMovementForm = class(TCDataobjectForm)
     GroupBox1: TGroupBox;
     Label3: TLabel;
-    CDateTime: TCDateTime;
     GroupBox2: TGroupBox;
     RichEditDesc: TRichEdit;
     ComboBoxType: TComboBox;
@@ -59,8 +58,8 @@ type
     GroupBox4: TGroupBox;
     Label15: TLabel;
     Label16: TLabel;
-    CDateTime1: TCDateTime;
     ComboBox1: TComboBox;
+    CDateTime: TCDateTime;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

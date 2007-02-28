@@ -168,6 +168,7 @@ inherited CMovementFrame: TCMovementFrame
     BevelOuter = bvRaised
     BevelKind = bkFlat
     BorderStyle = bsNone
+    ButtonStyle = bsTriangle
     DefaultNodeHeight = 24
     Header.AutoSizeIndex = 1
     Header.Font.Charset = DEFAULT_CHARSET
@@ -198,6 +199,7 @@ inherited CMovementFrame: TCMovementFrame
     OnGetHint = TodayListGetHint
     OnGetNodeDataSize = TodayListGetNodeDataSize
     OnHeaderClick = TodayListHeaderClick
+    OnInitChildren = TodayListInitChildren
     OnInitNode = TodayListInitNode
     Columns = <
       item

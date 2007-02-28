@@ -1,4 +1,6 @@
 inherited CHomeFrame: TCHomeFrame
+  Width = 469
+  Height = 572
   object Image1: TImage [0]
     Left = 24
     Top = 26
@@ -86,7 +88,7 @@ inherited CHomeFrame: TCHomeFrame
   end
   object CButton2: TCButton [3]
     Left = 88
-    Top = 176
+    Top = 232
     Width = 249
     Height = 49
     Cursor = crHandPoint
@@ -98,7 +100,7 @@ inherited CHomeFrame: TCHomeFrame
   end
   object CButton3: TCButton [4]
     Left = 88
-    Top = 232
+    Top = 288
     Width = 249
     Height = 49
     Cursor = crHandPoint
@@ -110,7 +112,7 @@ inherited CHomeFrame: TCHomeFrame
   end
   object CButton4: TCButton [5]
     Left = 88
-    Top = 352
+    Top = 408
     Width = 249
     Height = 49
     Cursor = crHandPoint
@@ -122,7 +124,7 @@ inherited CHomeFrame: TCHomeFrame
   end
   object Image2: TImage [6]
     Left = 24
-    Top = 306
+    Top = 362
     Width = 32
     Height = 32
     AutoSize = True
@@ -182,7 +184,7 @@ inherited CHomeFrame: TCHomeFrame
   end
   object Label2: TLabel [7]
     Left = 64
-    Top = 312
+    Top = 368
     Width = 140
     Height = 20
     Caption = 'Ustawienia i profile'
@@ -195,7 +197,7 @@ inherited CHomeFrame: TCHomeFrame
   end
   object CButton5: TCButton [8]
     Left = 88
-    Top = 408
+    Top = 464
     Width = 249
     Height = 49
     Cursor = crHandPoint
@@ -216,6 +218,18 @@ inherited CHomeFrame: TCHomeFrame
     TxtOffset = 15
     Framed = False
     Action = ActionStartupInfo
+  end
+  object CButton7: TCButton [10]
+    Left = 92
+    Top = 176
+    Width = 249
+    Height = 49
+    Cursor = crHandPoint
+    PicPosition = ppLeft
+    PicOffset = 10
+    TxtOffset = 15
+    Framed = False
+    Action = ActionAddNewList
   end
   inherited ImageList: TPngImageList
     Height = 32
@@ -730,6 +744,12 @@ inherited CHomeFrame: TCHomeFrame
       Caption = 'Wy'#347'wietl powiadomienia na dzi'#347
       ImageIndex = 5
       OnExecute = ActionStartupInfoExecute
+    end
+    object ActionAddNewList: TAction
+      Caption = 'Zarejestruj now'#261' list'#281' operacji'
+      ImageIndex = 0
+      ShortCut = 16460
+      OnExecute = ActionAddNewListExecute
     end
   end
 end

@@ -1,14 +1,14 @@
 inherited CMovementListForm: TCMovementListForm
-  Left = 385
-  Top = 136
+  Left = 348
+  Top = 32
   Caption = 'Lista operacji'
-  ClientHeight = 610
+  ClientHeight = 641
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 536
-    Height = 569
+    Height = 600
     object GroupBox4: TGroupBox
       Left = 16
       Top = 16
@@ -119,7 +119,7 @@ inherited CMovementListForm: TCMovementListForm
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 449
+      Top = 481
       Width = 505
       Height = 112
       Caption = ' Opis '
@@ -138,7 +138,7 @@ inherited CMovementListForm: TCMovementListForm
       Left = 16
       Top = 168
       Width = 505
-      Height = 265
+      Height = 297
       Caption = ' Lista operacji '
       TabOrder = 2
       object Panel1: TPanel
@@ -203,7 +203,7 @@ inherited CMovementListForm: TCMovementListForm
             Action = Action3
           end
         end
-        object TodayList: TVirtualStringTree
+        object MovementList: TVirtualStringTree
           Left = 1
           Top = 1
           Width = 455
@@ -233,6 +233,15 @@ inherited CMovementListForm: TCMovementListForm
           TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
           TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
+          OnBeforeItemErase = MovementListBeforeItemErase
+          OnCompareNodes = MovementListCompareNodes
+          OnDblClick = MovementListDblClick
+          OnFocusChanged = MovementListFocusChanged
+          OnGetText = MovementListGetText
+          OnGetHint = MovementListGetHint
+          OnGetNodeDataSize = MovementListGetNodeDataSize
+          OnHeaderClick = MovementListHeaderClick
+          OnInitNode = MovementListInitNode
           Columns = <
             item
               Alignment = taRightJustify
@@ -254,10 +263,39 @@ inherited CMovementListForm: TCMovementListForm
             end>
         end
       end
+      object Panel3: TPanel
+        Left = 184
+        Top = 248
+        Width = 305
+        Height = 41
+        BevelOuter = bvNone
+        Enabled = False
+        TabOrder = 1
+        object Label6: TLabel
+          Left = 21
+          Top = 12
+          Width = 147
+          Height = 13
+          Alignment = taRightJustify
+          Caption = 'Suma kwot wszystkich operacji'
+        end
+        object CCurrEditCash: TCCurrEdit
+          Left = 175
+          Top = 8
+          Width = 123
+          Height = 21
+          BorderStyle = bsNone
+          TabOrder = 0
+          Decimals = 2
+          ThousandSep = True
+          CurrencyStr = 'z'#322
+          BevelKind = bkTile
+        end
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 569
+    Top = 600
     Width = 536
     inherited BitBtnOk: TBitBtn
       Left = 359
@@ -274,14 +312,17 @@ inherited CMovementListForm: TCMovementListForm
     object Action1: TAction
       Caption = 'Dodaj operacj'#281
       ImageIndex = 0
+      OnExecute = Action1Execute
     end
     object Action2: TAction
       Caption = 'Edytuj operacj'#281
       ImageIndex = 1
+      OnExecute = Action2Execute
     end
     object Action3: TAction
       Caption = 'Usu'#324' operacj'#281
       ImageIndex = 2
+      OnExecute = Action3Execute
     end
   end
 end

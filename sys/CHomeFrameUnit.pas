@@ -26,12 +26,15 @@ type
     CButton5: TCButton;
     CButton6: TCButton;
     ActionStartupInfo: TAction;
+    CButton7: TCButton;
+    ActionAddNewList: TAction;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
     procedure ActionSetProfileExecute(Sender: TObject);
     procedure ActionOperationsListExecute(Sender: TObject);
     procedure ActionStartupInfoExecute(Sender: TObject);
+    procedure ActionAddNewListExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -43,7 +46,7 @@ implementation
 uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
   CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
   CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit, CReports,
-  CStartupInfoFrameUnit;
+  CStartupInfoFrameUnit, CMovementListFormUnit;
 
 {$R *.dfm}
 
@@ -111,6 +114,18 @@ procedure TCHomeFrame.ActionStartupInfoExecute(Sender: TObject);
 var xData, xText: String;
 begin
   TCFrameForm.ShowFrame(TCStartupInfoFrame, xData, xText);
+end;
+
+procedure TCHomeFrame.ActionAddNewListExecute(Sender: TObject);
+var xForm: TCMovementListForm;
+    xDataGid: TDataGid;
+begin
+  xForm := TCMovementListForm.Create(Nil);
+  xDataGid := xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
+  if xDataGid <> CEmptyDataGid then begin
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
+  end;
+  xForm.Free;
 end;
 
 end.

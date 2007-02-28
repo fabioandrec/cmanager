@@ -78,7 +78,7 @@ type
     property productType: TBaseEnumeration read FproductType write SetproductType;
   end;
 
-  TmovementList = class(TDataObject)
+  TMovementList = class(TDataObject)
   private
     Fdescription: TBaseDescription;
     FidAccount: TDataGid;
@@ -98,6 +98,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    function GetMovements: TDataObjectList;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property idAccount: TDataGid read FidAccount write SetidAccount;
@@ -1216,7 +1217,7 @@ begin
   end;
 end;
 
-procedure TmovementList.FromDataset(ADataset: TADOQuery);
+procedure TMovementList.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
   with ADataset do begin
@@ -1232,7 +1233,12 @@ begin
   end;
 end;
 
-procedure TmovementList.Setcash(const Value: Currency);
+function TMovementList.GetMovements: TDataObjectList;
+begin
+  Result := TMovementList.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where idmovementList = ' + DataGidToDatabase(id));
+end;
+
+procedure TMovementList.Setcash(const Value: Currency);
 begin
   if Fcash <> Value then begin
     Fcash := Value;
@@ -1240,7 +1246,7 @@ begin
   end;
 end;
 
-procedure TmovementList.Setdescription(const Value: TBaseDescription);
+procedure TMovementList.Setdescription(const Value: TBaseDescription);
 begin
   if Fdescription <> Value then begin
     Fdescription := Value;
@@ -1248,7 +1254,7 @@ begin
   end;
 end;
 
-procedure TmovementList.SetidAccount(const Value: TDataGid);
+procedure TMovementList.SetidAccount(const Value: TDataGid);
 begin
   if FidAccount <> Value then begin
     FidAccount := Value;
@@ -1256,7 +1262,7 @@ begin
   end;
 end;
 
-procedure TmovementList.SetidCashPoint(const Value: TDataGid);
+procedure TMovementList.SetidCashPoint(const Value: TDataGid);
 begin
   if FidCashPoint <> Value then begin
     FidCashPoint := Value;
@@ -1264,7 +1270,7 @@ begin
   end;
 end;
 
-procedure TmovementList.SetmovementType(const Value: TBaseEnumeration);
+procedure TMovementList.SetmovementType(const Value: TBaseEnumeration);
 begin
   if FmovementType <> Value then begin
     FmovementType := Value;
@@ -1272,7 +1278,7 @@ begin
   end;
 end;
 
-procedure TmovementList.SetregDate(const Value: TDateTime);
+procedure TMovementList.SetregDate(const Value: TDateTime);
 begin
   if FregDate <> Value then begin
     FregDate := Value;
@@ -1283,7 +1289,7 @@ begin
   end;
 end;
 
-procedure TmovementList.UpdateFieldList;
+procedure TMovementList.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin

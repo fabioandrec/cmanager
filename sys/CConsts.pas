@@ -16,6 +16,9 @@ const
   WM_MUSTREPAINT = WM_USER + 9;
   WM_PREFERENCESCHANGED = WM_USER + 10;
 
+  WMOPT_BASEMOVEMENT = 0;
+  WMOPT_MOVEMENTLIST = 1;
+
 const
   CEmptyDataGid = '';
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';

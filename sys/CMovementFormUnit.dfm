@@ -32,22 +32,6 @@ inherited CMovementForm: TCMovementForm
         Alignment = taRightJustify
         Caption = 'Rodzaj'
       end
-      object CDateTime: TCDateTime
-        Left = 48
-        Top = 24
-        Width = 89
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
-        Color = clWindow
-        ParentColor = False
-        TabOrder = 0
-        TabStop = True
-        Transparent = False
-        HotTrack = True
-      end
       object ComboBoxType: TComboBox
         Left = 192
         Top = 24
@@ -58,7 +42,7 @@ inherited CMovementForm: TCMovementForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 1
+        TabOrder = 0
         Text = 'Rozch'#243'd jednorazowy'
         OnChange = ComboBoxTypeChange
         Items.Strings = (
@@ -74,7 +58,7 @@ inherited CMovementForm: TCMovementForm
         Width = 505
         Height = 65
         Caption = ' Dane podstawowe '
-        TabOrder = 2
+        TabOrder = 1
         object Label15: TLabel
           Left = 17
           Top = 28
@@ -90,22 +74,6 @@ inherited CMovementForm: TCMovementForm
           Height = 13
           Alignment = taRightJustify
           Caption = 'Rodzaj'
-        end
-        object CDateTime1: TCDateTime
-          Left = 48
-          Top = 24
-          Width = 89
-          Height = 21
-          Cursor = crHandPoint
-          AutoSize = False
-          BevelKind = bkTile
-          Caption = '<wybierz dat'#281'>'
-          Color = clWindow
-          ParentColor = False
-          TabOrder = 0
-          TabStop = True
-          Transparent = False
-          HotTrack = True
         end
         object ComboBox1: TComboBox
           Left = 192
@@ -126,6 +94,22 @@ inherited CMovementForm: TCMovementForm
             'Transfer '#347'rodk'#243'w'
             'Planowany rozch'#243'd'
             'Planowany przych'#243'd')
+        end
+        object CDateTime: TCDateTime
+          Left = 48
+          Top = 24
+          Width = 89
+          Height = 21
+          Cursor = crHandPoint
+          AutoSize = False
+          BevelKind = bkTile
+          Caption = '<wybierz dat'#281'>'
+          Color = clWindow
+          ParentColor = False
+          TabOrder = 0
+          TabStop = True
+          Transparent = False
+          HotTrack = True
         end
       end
     end
