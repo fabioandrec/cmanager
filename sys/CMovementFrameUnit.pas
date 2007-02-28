@@ -305,12 +305,11 @@ end;
 procedure TCMovementFrame.TodayListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 var xData: TMovementTreeElement;
 begin
+  CellText := '';
   xData := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   if Column = 0 then begin
     if Node.Parent = TodayList.RootNode then begin
       CellText := IntToStr(Node.Index + 1);
-    end else begin
-      CellText := IntToStr(Node.Parent.Index + 1) + '.' + IntToStr(Node.Index + 1);
     end;
   end else if Column = 1 then begin
     CellText := xData.description;
