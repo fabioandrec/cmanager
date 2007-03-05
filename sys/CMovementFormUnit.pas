@@ -58,7 +58,6 @@ type
     GroupBox4: TGroupBox;
     Label15: TLabel;
     Label16: TLabel;
-    ComboBox1: TComboBox;
     CDateTime: TCDateTime;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

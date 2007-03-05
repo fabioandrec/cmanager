@@ -32,26 +32,6 @@ inherited CMovementForm: TCMovementForm
         Alignment = taRightJustify
         Caption = 'Rodzaj'
       end
-      object ComboBoxType: TComboBox
-        Left = 192
-        Top = 24
-        Width = 289
-        Height = 21
-        BevelInner = bvNone
-        BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 0
-        TabOrder = 0
-        Text = 'Rozch'#243'd jednorazowy'
-        OnChange = ComboBoxTypeChange
-        Items.Strings = (
-          'Rozch'#243'd jednorazowy'
-          'Przych'#243'd jednorazowy'
-          'Transfer '#347'rodk'#243'w'
-          'Planowany rozch'#243'd'
-          'Planowany przych'#243'd')
-      end
       object GroupBox4: TGroupBox
         Left = 0
         Top = 0
@@ -75,26 +55,6 @@ inherited CMovementForm: TCMovementForm
           Alignment = taRightJustify
           Caption = 'Rodzaj'
         end
-        object ComboBox1: TComboBox
-          Left = 192
-          Top = 24
-          Width = 289
-          Height = 21
-          BevelInner = bvNone
-          BevelKind = bkTile
-          Style = csDropDownList
-          ItemHeight = 13
-          ItemIndex = 0
-          TabOrder = 1
-          Text = 'Rozch'#243'd jednorazowy'
-          OnChange = ComboBoxTypeChange
-          Items.Strings = (
-            'Rozch'#243'd jednorazowy'
-            'Przych'#243'd jednorazowy'
-            'Transfer '#347'rodk'#243'w'
-            'Planowany rozch'#243'd'
-            'Planowany przych'#243'd')
-        end
         object CDateTime: TCDateTime
           Left = 48
           Top = 24
@@ -111,6 +71,26 @@ inherited CMovementForm: TCMovementForm
           Transparent = False
           HotTrack = True
         end
+      end
+      object ComboBoxType: TComboBox
+        Left = 192
+        Top = 24
+        Width = 289
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 0
+        Text = 'Rozch'#243'd jednorazowy'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          'Rozch'#243'd jednorazowy'
+          'Przych'#243'd jednorazowy'
+          'Transfer '#347'rodk'#243'w'
+          'Planowany rozch'#243'd'
+          'Planowany przych'#243'd')
       end
     end
     object GroupBox2: TGroupBox

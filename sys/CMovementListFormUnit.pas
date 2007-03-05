@@ -374,6 +374,7 @@ begin
     CStaticInoutOnceCashpoint.DataId := idCashPoint;
     CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
     CDateTime1.Value := regDate;
+    CCurrEditCash.Value := cash;
     RichEditDesc.Text := description;
     ComboBox1.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
     ComboBox1.Enabled := False;
