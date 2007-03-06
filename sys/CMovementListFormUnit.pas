@@ -55,7 +55,8 @@ type
     Fdeleted: TObjectList;
     Fmodified: TObjectList;
     Fadded: TObjectList;
-    FbaseCash: Currency;
+    FbaseAccount: TDataGid;
+    FbaseCashpoint: TDataGid;
     procedure MessageMovementAdded(AData: TMovementListElement);
     procedure MessageMovementEdited(AData: TMovementListElement);
     procedure MessageMovementDeleted(AData: TMovementListElement);
@@ -191,8 +192,9 @@ begin
   inherited InitializeForm;
   CCurrEditCash.Value := GetCash;
   CDateTime1.Value := GWorkDate;
-  FbaseCash := CCurrEditCash.Value;
   MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
+  FbaseAccount := CEmptyDataGid;
+  FbaseCashpoint := CEmptyDataGid;
 end;
 
 procedure TCMovementListForm.MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
@@ -371,6 +373,8 @@ begin
     GDataProvider.BeginTransaction;
     CStaticInoutOnceAccount.DataId := idAccount;
     CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+    FbaseAccount := idAccount;
+    FbaseCashpoint := idCashPoint;
     CStaticInoutOnceCashpoint.DataId := idCashPoint;
     CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
     CDateTime1.Value := regDate;
@@ -397,21 +401,40 @@ begin
 end;
 
 procedure TCMovementListForm.ReadValues;
+var xBA: TAccount;
 begin
   inherited ReadValues;
   with TMovementList(Dataobject) do begin
+    if Operation = coEdit then begin
+      xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
+      if ComboBox1.ItemIndex = 0 then begin
+        xBa.cash := xBa.cash + cash;
+      end else begin
+        xBa.cash := xBa.cash - cash;
+      end;
+      xBa.ForceUpdate;
+    end;
     description := RichEditDesc.Text;
     idAccount := CStaticInoutOnceAccount.DataId;
     idCashPoint := CStaticInoutOnceCashpoint.DataId;
     regDate := CDateTime1.Value;
     movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
     cash := CCurrEditCash.Value;
+    xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
+    if ComboBox1.ItemIndex = 0 then begin
+      xBa.cash := xBa.cash - cash;
+    end else begin
+      xBa.cash := xBa.cash + cash;
+    end;
+    xBa.ForceUpdate;
   end;
 end;
 
 procedure TCMovementListForm.AfterCommitData;
 var xCount: Integer;
     xMovement: TBaseMovement;
+    xId: TDataGid;
+    xUpdate: String;
 begin
   inherited AfterCommitData;
   GDataProvider.BeginTransaction;
@@ -448,6 +471,26 @@ begin
     end;
   end;
   GDataProvider.CommitTransaction;
+  xId := CStaticInoutOnceAccount.DataId;
+  SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+  if Operation = coEdit then begin
+    xUpdate := '';
+    if FbaseAccount <> CStaticInoutOnceAccount.DataId then begin
+      xUpdate := xUpdate + 'idAccount = ' + DataGidToDatabase(CStaticInoutOnceAccount.DataId);
+    end;
+    if FbaseCashpoint <> CStaticInoutOnceCashpoint.DataId then begin
+      if xUpdate <> '' then begin
+        xUpdate := xUpdate + ', ';
+      end;
+      xUpdate := xUpdate + 'idCashpoint = ' + DataGidToDatabase(CStaticInoutOnceCashpoint.DataId);
+    end;
+    if xUpdate <> '' then begin
+      GDataProvider.ExecuteSql('update baseMovement set ' + xUpdate + ' where idMovementList = ' + DataGidToDatabase(Dataobject.id));
+    end;
+    if xId <> FbaseAccount then begin
+      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+    end;
+  end;
 end;
 
 end.

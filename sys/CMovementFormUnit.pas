@@ -71,6 +71,9 @@ type
     procedure CStaticInoutOnceAccountChanged(Sender: TObject);
     procedure CStaticInoutCyclicGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicChanged(Sender: TObject);
+  private
+    FbaseAccount: TDataGid;
+    FsourceAccount: TDataGid;
   protected
     procedure UpdateDescription;
     procedure InitializeForm; override;
@@ -147,6 +150,8 @@ begin
     CStaticInoutCyclic.Caption := xText;
     CStaticInoutCyclicChanged(CStaticInoutCyclic);
   end;
+  FbaseAccount := CEmptyDataGid;
+  FsourceAccount := CEmptyDataGid;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
 end;
@@ -377,12 +382,15 @@ begin
           CStaticInoutCyclic.Caption := xM.description + ' (wp³yw do ' + DateToStr(xD.triggerDate) + ')'
         end;
       end;
+      FbaseAccount := idAccount;
     end else if (movementType = CTransferMovement) then begin
       CCurrEditTrans.Value := cash;
       CStaticTransDestAccount.DataId := idAccount;
       CStaticTransDestAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
       CStaticTransSourceAccount.DataId := idSourceAccount;
       CStaticTransSourceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False)).name;
+      FbaseAccount := idAccount;
+      FsourceAccount := idSourceAccount;
     end;
     GDataProvider.RollbackTransaction;
     CDateTime.Value := regDate;
@@ -516,15 +524,34 @@ begin
   if (xI = 0) or (xI = 1) then begin
     xId := CStaticInoutOnceAccount.DataId;
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FbaseAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+      end;
+    end;
   end else if (xI = 2) then begin
     xId := CStaticTransDestAccount.DataId;
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FbaseAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+      end;
+    end;
     xId := CStaticTransSourceAccount.DataId;
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FsourceAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FsourceAccount), 0);
+      end;
+    end;
   end else if (xI = 3) or (xI = 4) then begin
     xId := CStaticInoutCyclicAccount.DataId;
     SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FbaseAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+      end;
+    end;
     SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
   end;
 end;
