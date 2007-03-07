@@ -180,6 +180,9 @@ begin
   if GDataProvider.IsConnected then begin
     GBasePreferences.lastOpenedDatafilename := GDatabaseName;
   end;
+  if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
+    GBasePreferences.startupDatafileMode := CStartupFilemodeLastOpened;
+  end;
   GBasePreferences.SaveToXml(GetSettingsPreferences);
   FinalizeSettings(GetSystemPathname(CSettingsFilename));
 end;

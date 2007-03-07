@@ -76,7 +76,8 @@ uses
   CTools in 'CTools.pas',
   CHelp in 'CHelp.pas',
   CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm},
-  CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm};
+  CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm},
+  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm};
 
 {$R *.res}
 
@@ -90,6 +91,7 @@ begin
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
+    InitializeProxies;
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
         xFilename := GetSystemPathname(CDefaultFilename);
@@ -106,7 +108,6 @@ begin
       if GBasePreferences.startupCheckUpdates then begin
         CheckForUpdates(True);
       end;
-      InitializeProxies;
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;
       end;

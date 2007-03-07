@@ -53,6 +53,7 @@ type
     ActionShortcutProfiles: TAction;
     ActionLoanCalc: TAction;
     ActionCheckUpdates: TAction;
+    ActionExport: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -78,6 +79,7 @@ type
     procedure ActionLoanCalcExecute(Sender: TObject);
     procedure ActionCheckUpdatesExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ActionExportExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -115,7 +117,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
-  CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp;
+  CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
+  CExportDatafileFormUnit;
 
 {$R *.dfm}
 
@@ -504,6 +507,11 @@ end;
 procedure TCMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   HelpCloseAll;
+end;
+
+procedure TCMainForm.ActionExportExecute(Sender: TObject);
+begin
+  ShowProgressForm(TCExportDatafileForm);
 end;
 
 end.

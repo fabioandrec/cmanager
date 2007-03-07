@@ -282,7 +282,7 @@ begin
   xCurrent := TStringList.Create;
   xCurrent.Text := StringReplace(ACurrent, '.', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
   xCount := 0;
-  while (xCount <= xLatest.Count - 1) and (xCount <= xCurrent.Count - 1) and (not Result) do begin
+  while (xCount <= xLatest.Count - 2) and (xCount <= xCurrent.Count - 2) and (not Result) do begin
     Result := StrToIntDef(xLatest.Strings[xCount], -1) > StrToIntDef(xCurrent.Strings[xCount], -1);
     Inc(xCount);
   end;

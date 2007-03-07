@@ -21,6 +21,7 @@ type
 
 function CreateDatabase(AFilename: String; var AError: String): Boolean;
 function CompactDatabase(AFilename: String; var AError: String): Boolean;
+function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
@@ -28,6 +29,7 @@ function CheckDatabase(AFilename: String; var AError: String; var AReport: TStri
 function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
+procedure SetDatabaseDefaultData;
 
 implementation
 
@@ -416,6 +418,61 @@ begin
     on E: Exception do begin
       xError := E.Message;
     end;
+  end;
+end;
+
+procedure SetDatabaseDefaultData;
+var xResStream: TResourceStream;
+    xCommand: String;
+begin
+  xCommand := '';
+  xResStream := TResourceStream.Create(HInstance, 'SQLDEFS', RT_RCDATA);
+  SetLength(xCommand, xResStream.Size);
+  if xResStream.Size > 0 then begin
+    CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
+    GDataProvider.ExecuteSql(xCommand, True);
+  end;
+  xResStream.Free;
+end;
+
+function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
+var xError, xDesc: String;
+    xStr: TStringList;
+    xCount: Integer;
+    xMin, xMax: Integer;
+begin
+  Result := InitializeDataProvider(AFilename, xError, xDesc, False);
+  if Result then begin
+    xStr := TStringList.Create;
+    try
+      try
+        xMin := Low(CDatafileTables);
+        xCount := xMin;
+        xMax := High(CDatafileTables);
+        while (xCount <= xMax) and Result do begin
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Eksportowanie tabeli ' + CDatafileTables[xCount]);
+          Result := GDataProvider.ExportTable(CDatafileTables[xCount], xStr);
+          if not Result then begin
+            AError := GDataProvider.LastError;
+            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + xError);
+          end;
+          Inc(xCount);
+          AProgressEvent(Trunc(100 * xCount/(xMax - xMin)));
+        end;
+        xStr.SaveToFile(ATargetFile);
+      except
+        on E: Exception do begin
+          Result := False;
+          AError := E.Message;
+        end;
+      end;
+    finally
+      xStr.Free;
+      GDataProvider.DisconnectFromDatabase;
+    end;
+  end else begin
+    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
+    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
   end;
 end;
 

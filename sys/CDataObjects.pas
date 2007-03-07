@@ -99,6 +99,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetMovements: TDataObjectList;
+    procedure DeleteObject; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property idAccount: TDataGid read FidAccount write SetidAccount;
@@ -305,6 +306,11 @@ var CashPointProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
 
+const CDatafileTables: array[0..12] of string =
+            ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
+             'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
+             'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo');
+
 procedure InitializeProxies;
 
 implementation
@@ -316,12 +322,12 @@ begin
   CashPointProxy := TDataProxy.Create(GDataProvider, 'cashPoint', Nil);
   AccountProxy := TDataProxy.Create(GDataProvider, 'account', Nil);
   ProductProxy := TDataProxy.Create(GDataProvider, 'product', Nil);
+  MovementListProxy :=  TDataProxy.Create(GDataProvider, 'movementList', Nil);
   BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement', Nil);
   PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
   PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
   MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
   ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
-  MovementListProxy :=  TDataProxy.Create(GDataProvider, 'movementList', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -1215,6 +1221,12 @@ begin
     FidMovementList := Value;
     SetState(msModified);
   end;
+end;
+
+procedure TMovementList.DeleteObject;
+begin
+  GDataProvider.ExecuteSql('delete from baseMovement where idMovementList = ' + DataGidToDatabase(id));
+  inherited DeleteObject;
 end;
 
 procedure TMovementList.FromDataset(ADataset: TADOQuery);

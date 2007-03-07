@@ -93,7 +93,7 @@ implementation
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit, CPlannedFrameUnit,
-  CDoneFrameUnit, CConsts;
+  CDoneFrameUnit, CConsts, CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -356,6 +356,12 @@ begin
     CStaticInoutCyclic.Enabled := False;
     ComboBoxTypeChange(ComboBoxType);
     GDataProvider.BeginTransaction;
+    if idMovementList <> CEmptyDataGid then begin
+      CDateTime.Enabled := False;
+      CStaticInoutOnceAccount.Enabled := False;
+      CStaticInoutOnceCashpoint.Enabled := False;
+      Caption := Caption + ' - Lista - ' + TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False)).description;
+    end;
     if (movementType = COutMovement) or (movementType = CInMovement) then begin
       if idPlannedDone = CEmptyDataGid then begin
         CCurrEditInoutOnce.Value := cash;
@@ -406,6 +412,7 @@ end;
 procedure TCMovementForm.ReadValues;
 var xI: Integer;
     xBa, xSa: TAccount;
+    xMl: TMovementList;
     xDone: TPlannedDone;
     xTrDate: TDateTime;
     xTrMove: TDataGid;
@@ -423,6 +430,15 @@ begin
         end;
         xBa.ForceUpdate;
         SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
+        if idMovementList <> CEmptyDataGid then begin
+          xMl := TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False));
+          if xI = 0 then begin
+            xMl.cash := xMl.cash + cash;
+          end else begin
+            xMl.cash := xMl.cash - cash;
+          end;
+          xMl.ForceUpdate;
+        end;
       end else if (xI = 2) then begin
         xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
         xSa := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False));
@@ -462,6 +478,16 @@ begin
       idCashPoint := CStaticInoutOnceCashpoint.DataId;
       idProduct := CStaticInoutOnceCategory.DataId;
       idPlannedDone := CEmptyDataGid;
+      if idMovementList <> CEmptyDataGid then begin
+        xMl := TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False));
+        if xI = 0 then begin
+          xMl.cash := xMl.cash - cash;
+        end else begin
+          xMl.cash := xMl.cash + cash;
+        end;
+        xMl.ForceUpdate;
+        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@idMovementList), WMOPT_MOVEMENTLIST);
+      end;
     end else if (xI = 2) then begin
       movementType := CTransferMovement;
       cash := CCurrEditTrans.Value;

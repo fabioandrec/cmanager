@@ -93,6 +93,8 @@ type
     procedure RecreateTreeHelper;
     procedure FindFontAndBackground(AHelper: TMovementTreeElement; AFont: TFont; var ABackground: TColor);
     function FindParentMovementList(AListGid: TDataGid): TTreeObjectList;
+    function FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
+    procedure DeleteObjectsWithMovementList(AListId: TDataGid);
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
@@ -160,7 +162,8 @@ var xBase: TMovementTreeElement;
     xObject: TDataObject;
     xAccount: TAccount;
     xDone: TPlannedDone;
-    xIdTemp1, xIdTemp2, xIdTemp3: TDataGid;
+    xMovementList: TMovementList;
+    xIdTemp1, xIdTemp2, xIdTemp3, xIdTemp4: TDataGid;
     xIdTemp3Frame: TCBaseFrameClass;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
@@ -170,15 +173,26 @@ begin
       xIdTemp1 := xBase.Dataobject.id;
       xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
       xIdTemp3 := CEmptyDataGid;
+      xIdTemp4 := CEmptyDataGid;
       xIdTemp3Frame := Nil;
       if (xBase.movementType = CInMovement) then begin
         xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
         xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xBase.Dataobject).idAccount, False));
         xAccount.cash := xAccount.cash - xBase.cash;
+        xIdTemp4 := TBaseMovement(xBase.Dataobject).idMovementList;
+        if xIdTemp4 <> CEmptyDataGid then begin
+          xMovementList := TMovementList(TMovementList.LoadObject(MovementListProxy, xIdTemp4, False));
+          xMovementList.cash := xMovementList.cash - xBase.cash;
+        end;
       end else if (xBase.movementType = COutMovement) then begin
         xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
         xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xBase.Dataobject).idAccount, False));
         xAccount.cash := xAccount.cash + xBase.cash;
+        xIdTemp4 := TBaseMovement(xBase.Dataobject).idMovementList;
+        if xIdTemp4 <> CEmptyDataGid then begin
+          xMovementList := TMovementList(TMovementList.LoadObject(MovementListProxy, xIdTemp4, False));
+          xMovementList.cash := xMovementList.cash + xBase.cash;
+        end;
       end else begin
         xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
         xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xObject).idSourceAccount, False));
@@ -199,9 +213,31 @@ begin
       if (xIdTemp3 <> CEmptyDataGid) and (xIdTemp3Frame <> Nil) then begin
         SendMessageToFrames(xIdTemp3Frame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
       end;
+      if (xIdTemp4 <> CEmptyDataGid) then begin
+        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp4), WMOPT_MOVEMENTLIST);
+      end;
       if TBaseMovement(xObject).idPlannedDone > CEmptyDataGid then begin
         SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
       end;
+    end;
+  end else if xBase.elementType = mtList then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ listê operacji ?', '') then begin
+      xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+      xIdTemp1 := xBase.Dataobject.id;
+      xIdTemp2 := TMovementList(xBase.Dataobject).idAccount;
+      if (xBase.movementType = CInMovement) then begin
+        xObject := TMovementList(TMovementList.LoadObject(MovementListProxy, xBase.Dataobject.id, False));
+        xAccount := TAccount(TAccount.LoadObject(AccountProxy, xIdTemp2, False));
+        xAccount.cash := xAccount.cash - xBase.cash;
+      end else begin
+        xObject := TMovementList(TMovementList.LoadObject(MovementListProxy, xBase.Dataobject.id, False));
+        xAccount := TAccount(TAccount.LoadObject(AccountProxy, xIdTemp2, False));
+        xAccount.cash := xAccount.cash + xBase.cash;
+      end;
+      xObject.DeleteObject;
+      GDataProvider.CommitTransaction;
+      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_MOVEMENTLIST);
+      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
     end;
   end;
 end;
@@ -396,7 +432,7 @@ var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
+    if not Odd(Sender.AbsoluteIndex(Node)) then begin
       ItemColor := clWindow;
     end else begin
       ItemColor := GetHighLightColor(clWindow, -10);
@@ -413,6 +449,7 @@ procedure TCMovementFrame.MessageMovementAdded(AId: TDataGid; AOption: Integer);
 var xDataobject: TDataObject;
     xNode: PVirtualNode;
     xTreeElement: TMovementTreeElement;
+    xParent: PVirtualNode;
 begin
   if AOption = WMOPT_BASEMOVEMENT then begin
     xDataobject := TBaseMovement.LoadObject(BaseMovementProxy, AId, True);
@@ -430,7 +467,17 @@ begin
       xTreeElement.elementType := mtList;
     end;
     FTreeHelper.Add(xTreeElement);
-    xNode := TodayList.AddChild(Nil, xTreeElement);
+    if AOption = WMOPT_BASEMOVEMENT then begin
+      if TBaseMovement(xDataobject).idMovementList <> CEmptyDataGid then begin
+        xParent := FindObjectNode(TBaseMovement(xDataobject).idMovementList, WMOPT_MOVEMENTLIST);
+        TMovementTreeElement(TodayList.GetNodeData(xParent)^).Childobjects.Add(xTreeElement);
+      end else begin
+        xParent := Nil;
+      end;
+    end else begin
+      xParent := Nil;
+    end;
+    xNode := TodayList.AddChild(xParent, xTreeElement);
     TodayList.Sort(xNode, TodayList.Header.SortColumn, TodayList.Header.SortDirection);
     TodayList.FocusedNode := xNode;
     TodayList.Selected[xNode] := True;
@@ -443,28 +490,38 @@ end;
 procedure TCMovementFrame.MessageMovementDeleted(AId: TDataGid; AOption: Integer);
 var xNode: PVirtualNode;
 begin
-  xNode := FindDataobjectNode(AId, TodayList);
+  xNode := FindObjectNode(AId, AOption);
   if xNode <> Nil then begin
     TodayList.DeleteNode(xNode);
-    FTodayObjects.Remove(TBaseMovement(TodayList.GetNodeData(xNode)^));
+    if AOption = WMOPT_BASEMOVEMENT then begin
+      FTodayObjects.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject);
+    end else if AOption = WMOPT_MOVEMENTLIST then begin
+      DeleteObjectsWithMovementList(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject.id);
+      FTodayLists.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject)
+    end;
   end;
   ReloadSums;
 end;
 
 procedure TCMovementFrame.MessageMovementEdited(AId: TDataGid; AOption: Integer);
-var xDataobject: TBaseMovement;
-    xNode: PVirtualNode;
+var xNode: PVirtualNode;
+    xBase: TMovementTreeElement;
 begin
-  xNode := FindDataobjectNode(AId, TodayList);
+  xNode := FindObjectNode(AId, AOption);
   if xNode <> Nil then begin
-    xDataobject := TBaseMovement(TodayList.GetNodeData(xNode)^);
-    xDataobject.ReloadObject;
-    if IsValidFilteredObject(xDataobject) then begin
+    xBase := TMovementTreeElement(TodayList.GetNodeData(xNode)^);
+    xBase.Dataobject.ReloadObject;
+    if IsValidFilteredObject(xBase.Dataobject) then begin
       TodayList.InvalidateNode(xNode);
       TodayList.Sort(xNode, TodayList.Header.SortColumn, TodayList.Header.SortDirection);
     end else begin
       TodayList.DeleteNode(xNode);
-      FTodayObjects.Remove(TBaseMovement(TodayList.GetNodeData(xNode)^));
+      if AOption = WMOPT_BASEMOVEMENT then begin
+        FTodayObjects.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject);
+      end else if AOption = WMOPT_MOVEMENTLIST then begin
+        DeleteObjectsWithMovementList(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject.id);
+        FTodayLists.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject)
+      end;
     end;
   end;
   ReloadSums;
@@ -911,6 +968,33 @@ var xData: TMovementTreeElement;
 begin
   xData := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   ChildCount := xData.Childobjects.Count;
+end;
+
+function TCMovementFrame.FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
+var xNode: PVirtualNode;
+    xBase: TMovementTreeElement;
+begin
+  Result := Nil;
+  xNode :=TodayList.GetFirst;
+  while (Result = Nil) and (xNode <> Nil) do begin
+    xBase := TMovementTreeElement(TodayList.GetNodeData(xNode)^);
+    if ((AType = WMOPT_BASEMOVEMENT) and (xBase.elementType = mtObject)) or ((AType = WMOPT_MOVEMENTLIST) and (xBase.elementType = mtList)) then begin
+      if xBase.Dataobject.id = ADataGid then begin
+        Result := xNode;
+      end;
+    end;
+    xNode := TodayList.GetNext(xNode);
+  end;
+end;
+
+procedure TCMovementFrame.DeleteObjectsWithMovementList(AListId: TDataGid);
+var xCount: Integer;
+begin
+  for xCount := FTodayObjects.Count - 1 downto 0 do begin
+    if TBaseMovement(FTodayObjects.Items[xCount]).idMovementList = AListId then begin
+      FTodayObjects.Remove(FTodayObjects.Items[xCount]);
+    end;
+  end;
 end;
 
 end.

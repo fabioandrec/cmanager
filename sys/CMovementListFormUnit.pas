@@ -57,6 +57,7 @@ type
     Fadded: TObjectList;
     FbaseAccount: TDataGid;
     FbaseCashpoint: TDataGid;
+    FbaseDate: TDateTime;
     procedure MessageMovementAdded(AData: TMovementListElement);
     procedure MessageMovementEdited(AData: TMovementListElement);
     procedure MessageMovementDeleted(AData: TMovementListElement);
@@ -79,7 +80,7 @@ implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CBaseFrameUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
-  CDataObjects, StrUtils;
+  CDataObjects, StrUtils, CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -195,6 +196,7 @@ begin
   MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
   FbaseAccount := CEmptyDataGid;
   FbaseCashpoint := CEmptyDataGid;
+  FbaseDate := 0;
 end;
 
 procedure TCMovementListForm.MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
@@ -375,6 +377,7 @@ begin
     CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
     FbaseAccount := idAccount;
     FbaseCashpoint := idCashPoint;
+    FbaseDate := regDate;
     CStaticInoutOnceCashpoint.DataId := idCashPoint;
     CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
     CDateTime1.Value := regDate;
@@ -441,6 +444,7 @@ begin
   for xCount := 0 to Fadded.Count - 1 do begin
     with TMovementListElement(Fadded.Items[xCount]) do begin
       xMovement := TBaseMovement.CreateObject(BaseMovementProxy, False);
+      xMovement.id := id;
       xMovement.description := description;
       xMovement.cash := cash;
       xMovement.movementType := movementType;
@@ -484,12 +488,33 @@ begin
       end;
       xUpdate := xUpdate + 'idCashpoint = ' + DataGidToDatabase(CStaticInoutOnceCashpoint.DataId);
     end;
+    if FbaseDate <> CDateTime1.Value then begin
+      if xUpdate <> '' then begin
+        xUpdate := xUpdate + ', ';
+      end;
+      xUpdate := xUpdate + 'regDate = ' + DatetimeToDatabase(TMovementList(Dataobject).regDate, False) + ', ' +
+                           'weekDate = ' + DatetimeToDatabase(TMovementList(Dataobject).weekDate, False) + ', ' +
+                           'monthDate = ' + DatetimeToDatabase(TMovementList(Dataobject).monthDate, False) + ', ' +
+                           'yearDate = ' + DatetimeToDatabase(TMovementList(Dataobject).yearDate, False);
+    end;
     if xUpdate <> '' then begin
       GDataProvider.ExecuteSql('update baseMovement set ' + xUpdate + ' where idMovementList = ' + DataGidToDatabase(Dataobject.id));
     end;
     if xId <> FbaseAccount then begin
       SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
     end;
+  end;
+  for xCount := 0 to Fadded.Count - 1 do begin
+    xId := TMovementListElement(Fadded.Items[xCount]).id;
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xId), WMOPT_BASEMOVEMENT);
+  end;
+  for xCount := 0 to Fmodified.Count - 1 do begin
+    xId := TMovementListElement(Fmodified.Items[xCount]).id;
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xId), WMOPT_BASEMOVEMENT);
+  end;
+  for xCount := 0 to Fdeleted.Count - 1 do begin
+    xId := TMovementListElement(Fdeleted.Items[xCount]).id;
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xId), WMOPT_BASEMOVEMENT);
   end;
 end;
 

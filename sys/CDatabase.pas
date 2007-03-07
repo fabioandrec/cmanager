@@ -23,6 +23,7 @@ type
     function GetInTransaction: Boolean;
     function GetIsConnected: Boolean;
   public
+    function ExportTable(ATableName: String; AStrings: TStringList): Boolean;
     procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
@@ -319,6 +320,9 @@ begin
           DeleteFile(ADatabaseName);
         end else begin
           GDatabaseName := ADatabaseName;
+          if ShowInfo(itQuestion, 'Utworzono nowy plik danych. Czy chcesz wype³niæ go podstawowymi ustawieniami?', '') then begin
+            SetDatabaseDefaultData;
+          end;
         end;
       end else begin
         GDatabaseName := ADatabaseName;
@@ -573,7 +577,7 @@ end;
 
 function TDataProvider.ConnectToDatabase(AConnectionString: String): Boolean;
 begin
-  Result := True;
+  Result := False;
   if FConnection.Connected then begin
     FConnection.Close;
   end;
@@ -583,10 +587,10 @@ begin
   FConnection.CursorLocation := clUseClient;
   try
     FConnection.Open;
+    Result := True;
   except
     on E: Exception do begin
       FLastError := E.Message;
-      Result := False;
     end;
   end;
 end;
@@ -745,6 +749,59 @@ begin
   ClearProxies(False);
 end;
 
+function TDataProvider.ExportTable(ATableName: String; AStrings: TStringList): Boolean;
+var xDataset: TADOQuery;
+    xStrSchema, xStr: String;
+    xCount: Integer;
+    xField: TField;
+    xVal: String;
+begin
+  Result := False;
+  xDataset := OpenSql('select * from ' + ATableName, False);
+  if xDataset <> Nil then begin
+    Result := True;
+    xStrSchema := 'insert into ' + ATableName + ' (';
+    for xCount := 0 to xDataset.FieldCount - 1 do begin
+      xStrSchema := xStrSchema + xDataset.Fields.Fields[xCount].FieldName;
+      if xCount <> xDataset.FieldCount - 1 then begin
+        xStrSchema := xStrSchema + ', ';
+      end;
+    end;
+    xStrSchema := xStrSchema + ') values (%s);';
+    while not xDataset.Eof do begin
+      xCount := 0;
+      xStr := '';
+      while Result and (xCount <= xDataset.FieldCount - 1) do begin
+        xField := xDataset.Fields.Fields[xCount];
+        if not xField.IsNull then begin
+          if xField.DataType in [ftString, ftMemo, ftFmtMemo, ftFixedChar, ftWideString, ftGuid] then begin
+            xVal := '''' + xField.AsString + '''';
+          end else if xField.DataType in [ftSmallint, ftInteger, ftWord, ftLargeint] then begin
+            xVal := xField.AsString;
+          end else if xField.DataType in [ftDateTime] then begin
+            xVal := DatetimeToDatabase(xField.AsDateTime, True);
+          end else if xField.DataType in [ftCurrency, ftFloat, ftBCD] then begin
+            xVal := CurrencyToDatabase(xField.AsCurrency);
+          end else begin
+            Result := False;
+            FLastError := 'Podczas eksportu tabeli ' + ATableName + ' nie uda³o siê przetworzyæ pola ' + xField.FieldName;
+          end;
+        end else begin
+          xVal := 'null';
+        end;
+        xStr := xStr + xVal;
+        if xCount <> xDataset.FieldCount - 1 then begin
+          xStr := xStr + ', ';
+        end;
+        Inc(xCount);
+      end;
+      AStrings.Add(Format(xStrSchema, [xStr]));
+      xDataset.Next;
+    end;
+    xDataset.Free;
+  end;
+end;
+
 function TDataProxy.FindInCache(AId: TDataGid): TDataObject;
 var xCount: Integer;
 begin
@@ -891,7 +948,11 @@ var xDataset: TADOQuery;
 begin
   xDataset := ADataProxy.GetLoadObjectDataset(AId);
   Result := CreateObject(ADataProxy, AIsStatic);
-  Result.FromDataset(xDataset);
+  if not xDataset.IsEmpty then begin
+    Result.FromDataset(xDataset);
+  end else begin
+    raise Exception.Create('Metoda LoadObject zwróci³a pusty zbiór danych');
+  end;
   xDataset.Free;
 end;
 

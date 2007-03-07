@@ -1,7 +1,7 @@
-inherited CArchForm: TCArchForm
-  Left = 291
-  Top = 220
-  Caption = 'CArchForm'
+inherited CExportDatafileForm: TCExportDatafileForm
+  Left = 406
+  Top = 394
+  Caption = 'Eksport pliku danych'
   ClientHeight = 140
   ClientWidth = 456
   PixelsPerInch = 96
@@ -9,7 +9,6 @@ inherited CArchForm: TCArchForm
   inherited PanelButtons: TPanel
     Top = 99
     Width = 456
-    TabOrder = 1
     inherited BitBtnOk: TBitBtn
       Left = 279
     end
@@ -20,19 +19,13 @@ inherited CArchForm: TCArchForm
   inherited PanelConfig: TPanel
     Width = 456
     Height = 99
-    TabOrder = 0
     inherited PageControl: TPageControl
       Width = 456
       Height = 99
       ActivePage = TabSheetWork
       inherited TabSheetStart: TTabSheet
-        object Label2: TLabel
-          Left = 64
-          Top = 26
-          Width = 63
-          Height = 13
-          Alignment = taRightJustify
-          Caption = 'Plik '#378'r'#243'd'#322'owy'
+        inherited CImageStart: TCImage
+          ImageIndex = 3
         end
         object Label3: TLabel
           Left = 62
@@ -41,6 +34,31 @@ inherited CArchForm: TCArchForm
           Height = 13
           Alignment = taRightJustify
           Caption = 'Plik docelowy'
+        end
+        object Label2: TLabel
+          Left = 64
+          Top = 26
+          Width = 63
+          Height = 13
+          Alignment = taRightJustify
+          Caption = 'Plik '#378'r'#243'd'#322'owy'
+        end
+        object CStaticDest: TCStatic
+          Left = 136
+          Top = 54
+          Width = 273
+          Height = 21
+          AutoSize = False
+          BevelKind = bkTile
+          Caption = '<kliknij tutaj aby wybra'#263' eksportu>'
+          Color = clWindow
+          ParentColor = False
+          TabOrder = 0
+          TabStop = True
+          Transparent = False
+          TextOnEmpty = '<kliknij tutaj aby wybra'#263' eksportu>'
+          OnGetDataId = CStaticDestGetDataId
+          HotTrack = True
         end
         object CStaticSource: TCStatic
           Left = 136
@@ -52,32 +70,18 @@ inherited CArchForm: TCArchForm
           Caption = '<kliknij tutaj aby wybra'#263' plik danych>'
           Color = clWindow
           ParentColor = False
-          TabOrder = 0
+          TabOrder = 1
           TabStop = True
           Transparent = False
           TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
           OnGetDataId = CStaticSourceGetDataId
           HotTrack = True
         end
-        object CStaticDest: TCStatic
-          Left = 136
-          Top = 54
-          Width = 273
-          Height = 21
-          AutoSize = False
-          BevelKind = bkTile
-          Caption = '<kliknij tutaj aby wybra'#263' plik danych>'
-          Color = clWindow
-          ParentColor = False
-          TabOrder = 1
-          TabStop = True
-          Transparent = False
-          TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
-          OnGetDataId = CStaticDestGetDataId
-          HotTrack = True
-        end
       end
       inherited TabSheetWork: TTabSheet
+        inherited CImageWork: TCImage
+          ImageIndex = 3
+        end
         object Label5: TLabel [1]
           Left = 64
           Top = 24
@@ -86,10 +90,6 @@ inherited CArchForm: TCArchForm
           Caption = 'Trwa kompaktowanie pliku danych. Prosz'#281' czeka'#263'...'
         end
         inherited StaticText: TStaticText
-          Left = 64
-          Top = 51
-        end
-        inherited ProgressBar: TProgressBar
           Left = 64
           Top = 51
         end
@@ -299,67 +299,6 @@ inherited CArchForm: TCArchForm
       item
         PngImage.Data = {
           89504E470D0A1A0A0000000D4948445200000020000000200806000000737A7A
-          F4000006AE4944415478DAC5576B4C9367143E5F2F144AB9DFD4028151100575
-          6208973914066CBAB14C1C5932DDACB83893EDC79245374DFCA71B8B1B5B36B3
-          0DCD2810B6E162346124B8C060373533330A967BA1501042E98D5E6C4BE1EBCE
-          F9F0DB908156E2E29BBC295F2FEF79CEF33CE79C17061EF3627CFDE2B973E712
-          050241B2542A958F8E8E8684858579C2C3C34D0E87634828140E96949418FE17
-          006D6D6DA91874677070F0B6C0C0C094808080689665250886F57ABD0EA7D339
-          66B7DB3B715FB2D96C2D45454596470240AD566FF0F7F73F8E5996C864327FCC
-          F2BE07CDCCCC80C562D1994CA62FF1EFCF376FDEEC5C31008D467300B3FE0CB3
-          96310C0398B14FD9202BE0F17800415C4366F6A4A5A5691E1A8056AB55E2412A
-          A49B7B469A1F8651E001231B8308260F418CFB0C00CD153F3D3D7D2B28282898
-          B259C922C0F45B97CB0568D0FA4D9B36BDE63380FEFEFEF7D0481548BDCFB42F
-          C702ADA9A929574848C8DAF4F4749D4F005A5B5B55128944C9D3BFD4C1941D1F
-          80B225A00B65A2CFF86783C100581D05A5A5A5ED3E01A8A9A951A1EB95229108
-          6893F369FBF9F9010203B158CC01E0E5A1E0B3B3B39CF1DC6E375709737373DC
-          7BF4D99D3B77A0A5A5A5F0CC99333FFB04A0A9A9A97A6262623F494007110862
-          033D0158FF1C0802C4334041F8E0140CE5E35E69D1F7D08870F9F2E5C2DADA5A
-          DF00747777575FB87061FFAA55ABB82C513F6E631FF8870102C533C0674B9963
-          D911DD60369B3910B48939ACAAC28A8A0ADF00188DC6AAE6E6E6835D5D5D9092
-          9202919191406C604F006C4A1C00CA8C00F0FA13888500B08A0059A48A825DBB
-          76417B7B7BDED1A3477FF709C0F9F3E755B9B9B9CAC6C6468EDAF8F878C09ECF
-          C9B0D8030B01D077A9EC48024C02C64675909EB616E2E212A1FEBBEF8B4E9E3C
-          D9EA1380CACA4A556161A1128D08BDBDBD5C667CF60B1958E8019E0102405EB0
-          D92CE89750D04C270063BB09BADE3F9EF9E0A34FDA7C0280FAAB46464694F9F9
-          F91CF5442705A3EC497BBEF4EE39E06ED911189BCD0AC39A1EB8D89B0033210A
-          98769840A1AFDEF6D5179FFEE61300BD5EFF4D55555539519C9191013131319C
-          99886202B0B80A7816C888B427C786A05D1706B5FA74786B6B30FC691082493F
-          F46DC7B18CBD3E01E8ECECAC4633EDC7D9CF0597CBE5101A1ACA65486C90C371
-          D05087E3A4A1EF44454541184A66374DC2F5DB0CFCC016C3F614191CCC0A04B5
-          99854B9322D0CC0A0EAB77321F3F10C0E9D3A755BB77EF56E234E43C40195329
-          91F6B44867723A998DDE2783528F7058CDD03B6A8626E94BB05EB1065EDF28C6
-          DFA05971820F635B681970CEA9C501CF77E4333FDD17C0D9B36755111111CA9C
-          9C1CCECD94F162C72FD45E281481CBE98021ED303409B641484232BC9282478A
-          1870B1F3A74748006CB300F557CDE69EE8B02DEAAD8C765900388C6AEAEAEAF6
-          E104031CA39CAEE46C6282AA80D79F9F78E48D91C10168B4248039661DBCAC60
-          C08327DA0927F62A56301F211547CB1C7AB7B2DDD0DB218FCCD46631F625015C
-          B972E543ABD5FA3EB66420104949499CF9F8164B0109148E594E028FC30ADA80
-          58306D298517D7E008C6D32667E86282C1A962F0D983AF127CDE1E8C728CBBE0
-          C42FA6BAAB6FC8F72D09A0BCBCFCE953A74EFD8AF74046A7D3711A532B260F90
-          FE24094D3832210113B31E98CE2A85A21D7920C4483D0E920603C33C00CA9AC5
-          EDC687D57E007B63000E5D34743494453DB924005CA28686869AE2E2E23D7D7D
-          7D806CDC337AF9DECF371FFDED51188DC80259EA46E8B0092121163BA6703E28
-          0BFF6E374AD2ADB6B837C8BCECC0A0FD56F3DBF159CB0180CCCCCC278E1C39F2
-          7576767611654C01F936CCD73DE94F206C08906584D03B6E80318B1D06527780
-          542605BACB70C1BDF36CF4759BADE6B8B0A7301753D71C18218F712F0B80EC83
-          FA27979595BD5B5050F02A521D481E2020FC14E44D483E10E2EB605F374C18AD
-          702DE3004070280780E89FC5EDC2EC27FA4D133DB6F0587887F9CF356BB96B39
-          83D330222E2EAE008753299A311B2B408EE6135123C28EC9DD0F626363B98939
-          717BCC363032A6FE2BF7B0C215BE3A8AC2900179065CDAA921CDA1E8A40736A2
-          A5D850281491D86C92A3A3A3D7E3BD2009E58842FD8390010FCA62C2EA18371A
-          273546A353CBBE595F0BF275EB19D673F7680C2FF203D7CDAE1169ED0B39AC54
-          6AC13B87F361002C5EE2C4C44409B66721362A162BC58D235B82832B3280F184
-          389EAD38E15ABBE339C19C9B017E628A24AC7F4FD345F18FC78ECF89C556FC87
-          474F05B25200CB2D3F944CE40D0A0AF40FDF18EB15DD350BC37885D8400593D7
-          876FDCB84177357661F0470960C5EBB103F81BEF54874E8139BF100000000049
-          454E44AE426082}
-        Name = 'PngImage3'
-        Background = clWindow
-      end
-      item
-        PngImage.Data = {
-          89504E470D0A1A0A0000000D4948445200000020000000200806000000737A7A
           F4000006964944415478DACD57694C5C55143EB33133ECFB3CF6096017980A52
           4BDBD0620D6AC55A54DA18ED6822F68731A6A9509AFEA021311842749A1A7F98
           C63436911823822D85A631D42E4AB1A5D01218B04C816187B20C0CCBCC30ABE7
@@ -414,11 +353,9 @@ inherited CArchForm: TCArchForm
           983AD1DCEE7675752DED8A8FF57F43DC4BE428D830A1DD1462F54950DA9F7A21
           C3ABBDBA4EE81A1F76B9BCC6F0D0837C806DAD25F84FE38903F813508F7F4E41
           787F5F0000000049454E44AE426082}
-        Name = 'PngImage4'
+        Name = 'PngImage3'
         Background = clWindow
       end>
-    Left = 180
-    Top = 88
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog
@@ -430,8 +367,8 @@ inherited CArchForm: TCArchForm
     Top = 85
   end
   object SaveDialog: TSaveDialog
-    DefaultExt = '.cmb'
-    Filter = 'Pliki danych|*.dat|Wszystkie pliki|*.*'
+    DefaultExt = '.sql'
+    Filter = 'Pliki SQL|*.sql|Wszystkie pliki|*.*'
     FilterIndex = 0
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Plik danych'

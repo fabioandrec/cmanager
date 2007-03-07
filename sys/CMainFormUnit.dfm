@@ -286,6 +286,9 @@ object CMainForm: TCMainForm
                     Caption = '&Kompaktuj plik danych'
                   end
                   item
+                    Action = ActionExport
+                  end
+                  item
                     Action = ActionBackup
                     Caption = '&Wykonaj kopi'#281' pliku danych'
                   end
@@ -492,6 +495,11 @@ object CMainForm: TCMainForm
       Category = 'Plik'
       Caption = 'Kompaktuj plik danych'
       OnExecute = ActionCompactExecute
+    end
+    object ActionExport: TAction
+      Category = 'Plik'
+      Caption = 'Eksportuj plik danych'
+      OnExecute = ActionExportExecute
     end
     object ActionBackup: TAction
       Category = 'Plik'
