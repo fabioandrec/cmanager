@@ -81,7 +81,7 @@ begin
   end else begin
     xWhere := '';
   end;
-  FProductObjects := TDataObject.GetList(TProduct, ProductProxy, 'select * from product ' + xWhere + ' order by idParentProduct');
+  FProductObjects := TDataObject.GetList(TProduct, ProductProxy, 'select * from product ' + xWhere + ' order by created, idParentProduct');
   ProductList.BeginUpdate;
   ProductList.Clear;
   RecreateTreeHelper;
