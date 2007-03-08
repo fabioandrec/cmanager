@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls, CDatabase;
+  Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls, CDatabase,
+  CBaseFrameUnit;
 
 type
   TCProductAdditionalData = class(TAdditionalData)
@@ -32,11 +33,12 @@ type
     procedure FillForm; override;
     function CanAccept: Boolean; override;
     procedure InitializeForm; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   end;
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CConsts;
+uses CDataObjects, CInfoFormUnit, CConsts, CProductsFrameUnit;
 
 {$R *.dfm}
 
@@ -66,6 +68,11 @@ end;
 function TCProductForm.GetDataobjectClass: TDataObjectClass;
 begin
   Result := TProduct;
+end;
+
+function TCProductForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCProductsFrame;
 end;
 
 procedure TCProductForm.InitializeForm;

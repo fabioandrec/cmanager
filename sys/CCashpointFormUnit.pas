@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  ImgList, CComponents, CDatabase;
+  ImgList, CComponents, CDatabase, CBaseFrameUnit;
 
 type
   TCCashpointForm = class(TCDataobjectForm)
@@ -19,11 +19,12 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   end;
 
 implementation
 
-uses CDataObjects, CInfoFormUnit;
+uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit;
 
 {$R *.dfm}
 
@@ -48,6 +49,11 @@ end;
 function TCCashpointForm.GetDataobjectClass: TDataObjectClass;
 begin
   Result := TCashpoint;
+end;
+
+function TCCashpointForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCCashpointsFrame;
 end;
 
 procedure TCCashpointForm.ReadValues;

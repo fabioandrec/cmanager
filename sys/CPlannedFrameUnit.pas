@@ -280,28 +280,20 @@ end;
 
 procedure TCPlannedFrame.ActionMovementExecute(Sender: TObject);
 var xForm: TCPlannedForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCPlannedForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, PlannedMovementProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, PlannedMovementProxy, Nil, True);
   xForm.Free;
 end;
 
 procedure TCPlannedFrame.ActionEditMovementExecute(Sender: TObject);
 var xForm: TCPlannedForm;
     xBase: TPlannedMovement;
-    xDataGid: TDataGid;
 begin
   if PlannedList.FocusedNode <> Nil then begin
     xBase := TPlannedMovement(PlannedList.GetNodeData(PlannedList.FocusedNode)^);
     xForm := TCPlannedForm.Create(Nil);
-    xDataGid := xForm.ShowDataobject(coEdit, PlannedMovementProxy, xBase, True);
-    if xDataGid <> CEmptyDataGid then begin
-      SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
-    end;
+    xForm.ShowDataobject(coEdit, PlannedMovementProxy, xBase, True);
     xForm.Free;
   end;
 end;

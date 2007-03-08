@@ -140,6 +140,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    constructor Create(AStatic: Boolean); override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
@@ -191,6 +192,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    constructor Create(AStatic: Boolean); override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
@@ -226,6 +228,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    constructor Create(AStatic: Boolean); override;
   published
     property triggerDate: TDateTime read FtriggerDate write SettriggerDate;
     property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
@@ -340,6 +343,10 @@ begin
     xText := 'istniej¹ zaplanowane operacje z jego udzia³em';
   end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ wykonane operacje z jego udzia³em';
+  end else if GDataProvider.GetSqlInteger('select count(*) from cashpointMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim filtry';
+  end else if GDataProvider.GetSqlInteger('select count(*) from profil where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim profile';
   end;
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ kontrahenta, gdy¿ ' + xText, '');
@@ -451,6 +458,10 @@ begin
     xText := 'istniej¹ zwi¹zane z ni¹ wykonane operacje';
   end else if GDataProvider.GetSqlInteger('select count(*) from product where idParentProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ podkategorie';
+  end else if GDataProvider.GetSqlInteger('select count(*) from productFilter where idProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim filtry';
+  end else if GDataProvider.GetSqlInteger('select count(*) from profile where idProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim profile';
   end;
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ kategorii, gdy¿ ' + xText, '');
@@ -681,6 +692,14 @@ begin
   end;
 end;
 
+constructor TPlannedMovement.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidAccount := CEmptyDataGid;
+  FidCashPoint := CEmptyDataGid;
+  FidProduct := CEmptyDataGid;
+end;
+
 procedure TPlannedMovement.FromDataset(ADataset: TADOQuery);
 var xField: TField;
 begin
@@ -840,6 +859,12 @@ begin
   end;
 end;
 
+constructor TPlannedDone.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidPlannedMovement := CEmptyDataGid;
+end;
+
 procedure TPlannedDone.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -922,6 +947,10 @@ begin
     xText := 'istniej¹ zwi¹zane z nim zaplanowane operacje';
   end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim wykonane operacje';
+  end else if GDataProvider.GetSqlInteger('select count(*) from accountFilter where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim filtry';
+  end else if GDataProvider.GetSqlInteger('select count(*) from profile where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim profile';
   end;
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ konta, gdy¿ ' + xText, '');
@@ -1305,7 +1334,6 @@ procedure TMovementList.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin
-    AddField('name', Fdescription, True, 'movementList');
     AddField('description', Fdescription, True, 'movementList');
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'movementList');
     AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'movementList');
@@ -1316,6 +1344,17 @@ begin
     AddField('movementType', FmovementType, True, 'movementList');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'movementList');
   end;
+end;
+
+constructor TBaseMovement.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidMovementList := CEmptyDataGid;
+  FidAccount := CEmptyDataGid;
+  FidSourceAccount := CEmptyDataGid;
+  FidCashPoint := CEmptyDataGid;
+  FidPlannedDone := CEmptyDataGid;
+  FidProduct := CEmptyDataGid;
 end;
 
 end.

@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, VirtualTrees, ActnList, XPStyleActnCtrls, ActnMan, Contnrs,
-  CMovmentListElementFormUnit, CDatabase;
+  CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit;
 
 type
   TCMovementListForm = class(TCDataobjectForm)
@@ -71,6 +71,9 @@ type
     procedure FillForm; override;
     procedure ReadValues; override;
     procedure AfterCommitData; override;
+    function GetUpdateFrameOption: Integer; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
+    procedure UpdateFrames(ADataGid: ShortString; AMessage: Integer; AOption: Integer); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -79,7 +82,7 @@ type
 implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
-     CBaseFormUnit, CBaseFrameUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
+     CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit;
 
 {$R *.dfm}
@@ -436,7 +439,6 @@ end;
 procedure TCMovementListForm.AfterCommitData;
 var xCount: Integer;
     xMovement: TBaseMovement;
-    xId: TDataGid;
     xUpdate: String;
 begin
   inherited AfterCommitData;
@@ -475,8 +477,6 @@ begin
     end;
   end;
   GDataProvider.CommitTransaction;
-  xId := CStaticInoutOnceAccount.DataId;
-  SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
   if Operation = coEdit then begin
     xUpdate := '';
     if FbaseAccount <> CStaticInoutOnceAccount.DataId then begin
@@ -500,6 +500,27 @@ begin
     if xUpdate <> '' then begin
       GDataProvider.ExecuteSql('update baseMovement set ' + xUpdate + ' where idMovementList = ' + DataGidToDatabase(Dataobject.id));
     end;
+  end;
+end;
+
+function TCMovementListForm.GetUpdateFrameOption: Integer;
+begin
+  Result := WMOPT_MOVEMENTLIST;
+end;
+
+function TCMovementListForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCMovementFrame;
+end;
+
+procedure TCMovementListForm.UpdateFrames(ADataGid: ShortString; AMessage, AOption: Integer);
+var xCount: Integer;
+    xId: TDataGid;
+begin
+  inherited UpdateFrames(ADataGid, AMessage, AOption);
+  xId := CStaticInoutOnceAccount.DataId;
+  SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+  if Operation = coEdit then begin
     if xId <> FbaseAccount then begin
       SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
     end;

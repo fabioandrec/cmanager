@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, CDatabase, ActnList, CScheduleFormUnit;
+  CComponents, CDatabase, ActnList, CScheduleFormUnit, CBaseFrameUnit;
 
 type
   TCPlannedForm = class(TCDataobjectForm)
@@ -51,6 +51,7 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   public
     destructor Destroy; override;
   end;
@@ -59,7 +60,7 @@ implementation
 
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
-  CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit, CConsts;
+  CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit;
 
 {$R *.dfm}
 
@@ -249,6 +250,11 @@ destructor TCPlannedForm.Destroy;
 begin
   FSchedule.Free;
   inherited Destroy;
+end;
+
+function TCPlannedForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCPlannedFrame;
 end;
 
 end.

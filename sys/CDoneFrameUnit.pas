@@ -790,7 +790,6 @@ end;
 
 procedure TCDoneFrame.ActionDooperationExecute(Sender: TObject);
 var xForm: TCMovementForm;
-    xDataGid: TDataGid;
     xBase: TPlannedTreeItem;
     xNode: PVirtualNode;
 begin
@@ -798,12 +797,9 @@ begin
   if xNode <> Nil then begin
     xBase := TPlannedTreeItem(DoneList.GetNodeData(xNode)^);
     xForm := TCMovementForm.Create(Nil);
-    xDataGid := xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned));
-    if xDataGid <> CEmptyDataGid then begin
-      ReloadSums;
-      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-    end;
+    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned));
     xForm.Free;
+    ReloadSums;
   end;
 end;
 

@@ -276,16 +276,17 @@ function CompareVersions(ALatest, ACurrent: String): Boolean;
 var xLatest, xCurrent: TStringList;
     xCount: Integer;
 begin
-  Result := False;
   xLatest := TStringList.Create;
   xLatest.Text := StringReplace(ALatest, '.', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+  for xCount := 0 to xLatest.Count - 1 do begin
+    xLatest.Strings[xCount] := LPad(xLatest.Strings[xCount], '0', 3);
+  end;
   xCurrent := TStringList.Create;
   xCurrent.Text := StringReplace(ACurrent, '.', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
-  xCount := 0;
-  while (xCount <= xLatest.Count - 2) and (xCount <= xCurrent.Count - 2) and (not Result) do begin
-    Result := StrToIntDef(xLatest.Strings[xCount], -1) > StrToIntDef(xCurrent.Strings[xCount], -1);
-    Inc(xCount);
+  for xCount := 0 to xCurrent.Count - 1 do begin
+    xCurrent.Strings[xCount] := LPad(xCurrent.Strings[xCount], '0', 3);
   end;
+  Result := StringReplace(xLatest.Text, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]) > StringReplace(xCurrent.Text, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
   xLatest.Free;
   xCurrent.Free;
 end;

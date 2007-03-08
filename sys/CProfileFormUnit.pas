@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, CDatabase;
+  CComponents, CDatabase, CBaseFrameUnit;
 
 type
   TCProfileForm = class(TCDataobjectForm)
@@ -21,23 +21,22 @@ type
     CStaticAccount: TCStatic;
     CStaticCashpoint: TCStatic;
     CStaticProducts: TCStatic;
-    procedure CStaticCashpointGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
-    procedure CStaticAccountGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
-    procedure CStaticProductsGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticProductsGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   end;
 
 implementation
 
 uses CDataObjects, CInfoFormUnit, CFrameFormUnit, CCashpointsFrameUnit,
-  CAccountsFrameUnit, CProductsFrameUnit;
+  CAccountsFrameUnit, CProductsFrameUnit, CProfileFrameUnit, CConsts,
+  CDatatools;
 
 {$R *.dfm}
 
@@ -56,12 +55,18 @@ begin
   with TProfile(Dataobject) do begin
     EditName.Text := name;
     RichEditDesc.Text := description;
-    CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
-    CStaticAccount.DataId := idAccount;
-    CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
-    CStaticCashpoint.DataId := idCashPoint;
-    CStaticProducts.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
-    CStaticProducts.DataId := idProduct;
+    if idAccount <> CEmptyDataGid then begin
+      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+      CStaticAccount.DataId := idAccount;
+    end;
+    if idCashPoint <> CEmptyDataGid then begin
+      CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
+      CStaticCashpoint.DataId := idCashPoint;
+    end;
+    if idProduct <> CEmptyDataGid then begin
+      CStaticProducts.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
+      CStaticProducts.DataId := idProduct;
+    end;
   end;
 end;
 
@@ -95,6 +100,11 @@ end;
 procedure TCProfileForm.CStaticProductsGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := TCFrameForm.ShowFrame(TCProductsFrame, ADataGid, AText);
+end;
+
+function TCProfileForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCProfileFrame;
 end;
 
 end.

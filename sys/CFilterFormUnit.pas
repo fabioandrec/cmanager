@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  ImgList, CComponents, CDatabase, AdoDB;
+  ImgList, CComponents, CDatabase, AdoDB, CBaseFrameUnit;
 
 type
   TCFilterForm = class(TCDataobjectForm)
@@ -33,6 +33,7 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -41,7 +42,7 @@ type
 implementation
 
 uses CDataObjects, CInfoFormUnit, CFrameFormUnit, CAccountsFrameUnit,
-  CCashpointsFrameUnit, CProductsFrameUnit;
+  CCashpointsFrameUnit, CProductsFrameUnit, CFilterFrameUnit;
 
 {$R *.dfm}
 
@@ -152,6 +153,11 @@ begin
   FFilterProducts.Free;
   FFilterCashpoints.Free;
   inherited Destroy;
+end;
+
+function TCFilterForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCFilterFrame;
 end;
 
 end.

@@ -453,8 +453,7 @@ begin
           AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Eksportowanie tabeli ' + CDatafileTables[xCount]);
           Result := GDataProvider.ExportTable(CDatafileTables[xCount], xStr);
           if not Result then begin
-            AError := GDataProvider.LastError;
-            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + xError);
+            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + GDataProvider.LastError);
           end;
           Inc(xCount);
           AProgressEvent(Trunc(100 * xCount/(xMax - xMin)));

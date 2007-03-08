@@ -14,6 +14,7 @@ function FileSize(AName: String): Int64;
 function GetParamValue(AParam: String): String;
 function GetSwitch(ASwitch: String): Boolean;
 function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
+function LPad(AString: String; AChar: Char; ALength: Integer): String;
 
 implementation
 
@@ -100,6 +101,14 @@ begin
     Result[xCount] := xStr.Strings[xCount];
   end;
   xStr.Free;
+end;
+
+function LPad(AString: String; AChar: Char; ALength: Integer): String;
+begin
+  Result := AString;
+  while Length(Result) < ALength do begin
+    Result := AChar + Result;
+  end;
 end;
 
 end.

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CDatabase;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CDatabase, CBaseFrameUnit;
 
 type
   TCDataobjectFormClass = class of TCDataobjectForm;
@@ -18,8 +18,12 @@ type
     FAdditionalData: TAdditionalData;
   protected
     function GetDataobjectClass: TDataObjectClass; virtual; abstract;
+    function GetUpdateFrameMessage: Integer; virtual;
+    function GetUpdateFrameOption: Integer; virtual;
+    function GetUpdateFrameClass: TCBaseFrameClass; virtual; abstract;
     procedure AfterCommitData; virtual;
     procedure InitializeForm; virtual;
+    procedure UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer); virtual;
   public
     function ShowDataobject(AOperation: TConfigOperation; AProxy: TDataProxy; ADataobject: TDataObject; ACreateStatic: Boolean; AAdditionalData: TAdditionalData = Nil): TDataGid;
     property Dataobject: TDataObject read FDataobject write FDataobject;
@@ -29,7 +33,7 @@ type
 
 implementation
 
-uses CConsts;
+uses CConsts, Math;
 
 {$R *.dfm}
 
@@ -64,7 +68,7 @@ begin
   FAdditionalData := AAdditionalData;
   InitializeForm;
   if AOperation = coEdit then begin
-    FDataobject := ADataobject
+    FDataobject := ADataobject;
   end;
   if ShowConfig(AOperation) then begin
     if Operation = coAdd then begin
@@ -74,6 +78,7 @@ begin
     GDataProvider.CommitTransaction;
     AfterCommitData;
     Result := FDataobject.id;
+    UpdateFrames(Result, GetUpdateFrameMessage, GetUpdateFrameOption);
   end else begin
     GDataProvider.RollbackTransaction;
   end;
@@ -88,6 +93,21 @@ begin
     FreeAndNil(FAdditionalData);
   end;
   inherited;
+end;
+
+procedure TCDataobjectForm.UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer);
+begin
+  SendMessageToFrames(GetUpdateFrameClass, AMessage, Integer(@ADataGid), AOption);
+end;
+
+function TCDataobjectForm.GetUpdateFrameMessage: Integer;
+begin
+  Result := IfThen(Operation = coEdit, WM_DATAOBJECTEDITED, WM_DATAOBJECTADDED);
+end;
+
+function TCDataobjectForm.GetUpdateFrameOption: Integer;
+begin
+  Result := WMOPT_NONE;
 end;
 
 end.

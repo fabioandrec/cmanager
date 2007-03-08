@@ -50,7 +50,7 @@ type
     FTreeHelper: TTreeObjectList;
     procedure ReloadProducts;
     procedure RecreateTreeHelper;
-    procedure MessageCashpointAdded(AId: TDataGid; AParentGid: TDataGid);
+    procedure MessageCashpointAdded(AId: TDataGid);
     procedure MessageCashpointEdited(AId: TDataGid);
     procedure MessageCashpointDeleted(AId: TDataGid);
   protected
@@ -261,7 +261,6 @@ end;
 
 procedure TCProductsFrame.ActionAddRootCategoryExecute(Sender: TObject);
 var xForm: TCProductForm;
-    xDataGid: TDataGid;
     xAdditional: TCProductAdditionalData;
 begin
   xForm := TCProductForm.Create(Nil);
@@ -270,10 +269,7 @@ begin
   end else begin
     xAdditional := Nil;
   end;
-  xDataGid := xForm.ShowDataobject(coAdd, ProductProxy, Nil, True, xAdditional);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCProductsFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, ProductProxy, Nil, True, xAdditional);
   xForm.Free;
 end;
 
@@ -290,7 +286,7 @@ begin
       end else begin
         xParentGid := '';
       end;
-      MessageCashpointAdded(xDataGid, xParentGid);
+      MessageCashpointAdded(xDataGid);
     end else if Msg = WM_DATAOBJECTEDITED then begin
       xDataGid := PDataGid(WParam)^;
       MessageCashpointEdited(xDataGid);
@@ -301,7 +297,7 @@ begin
   end;
 end;
 
-procedure TCProductsFrame.MessageCashpointAdded(AId, AParentGid: TDataGid);
+procedure TCProductsFrame.MessageCashpointAdded(AId: TDataGid);
 var xDataobject: TProduct;
     xNode: PVirtualNode;
     xParent: PVirtualNode;
@@ -312,9 +308,9 @@ begin
   FProductObjects.Add(xDataobject);
   xTreeobject := TTreeObject.Create;
   xTreeobject.Dataobject := xDataobject;
-  if AParentGid <> CEmptyDataGid then begin
-    xParent := FindTreeobjectNode(AParentGid, ProductList);
-    xParentTree := FTreeHelper.FindDataId(AParentGid, FTreeHelper);
+  if xDataobject.idParentProduct <> CEmptyDataGid then begin
+    xParent := FindTreeobjectNode(xDataobject.idParentProduct, ProductList);
+    xParentTree := FTreeHelper.FindDataId(xDataobject.idParentProduct, FTreeHelper);
     xParentTree.Childobjects.Add(xTreeobject);
   end else begin
     FTreeHelper.Add(xTreeobject);
@@ -359,15 +355,11 @@ end;
 
 procedure TCProductsFrame.ActionEditCategoryExecute(Sender: TObject);
 var xForm: TCProductForm;
-    xDataGid: TDataGid;
     xParentGid: TDataGid;
 begin
   xForm := TCProductForm.Create(Nil);
   xParentGid := TProduct(TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject).idParentProduct;
-  xDataGid := xForm.ShowDataobject(coEdit, ProductProxy, TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject, True, TCProductAdditionalData.Create(xParentGid, ''));
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCProductsFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coEdit, ProductProxy, TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject, True, TCProductAdditionalData.Create(xParentGid, ''));
   xForm.Free;
 end;
 
@@ -388,15 +380,11 @@ end;
 
 procedure TCProductsFrame.ActionAddSubCategoryExecute(Sender: TObject);
 var xForm: TCProductForm;
-    xDataGid: TDataGid;
     xParentGid: TDataGid;
 begin
   xForm := TCProductForm.Create(Nil);
   xParentGid := TProduct(TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject).id;
-  xDataGid := xForm.ShowDataobject(coAdd, ProductProxy, Nil, True, TCProductAdditionalData.Create(xParentGid, ''));
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCProductsFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), Integer(@xParentGid));
-  end;
+  xForm.ShowDataobject(coAdd, ProductProxy, Nil, True, TCProductAdditionalData.Create(xParentGid, ''));
   xForm.Free;
 end;
 

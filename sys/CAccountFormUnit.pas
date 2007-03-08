@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ImgList,
-  ComCtrls, CComponents, CDatabase, Mask;
+  ComCtrls, CComponents, CDatabase, CBaseFrameUnit;
 
 type
   TCAccountForm = class(TCDataobjectForm)
@@ -31,12 +31,13 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   end;
 
 implementation
 
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
-  CCashpointsFrameUnit, CConsts;
+  CCashpointsFrameUnit, CConsts, CAccountsFrameUnit;
 
 {$R *.dfm}
 
@@ -85,10 +86,12 @@ begin
       LabelCash.Caption := 'Dostêpne œrodki';
       CCurrEditCash.Enabled := False;
     end;
-    CStaticBank.DataId := idCashPoint;
-    xCashPoint := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, True));
-    CStaticBank.Caption := xCashPoint.name;
-    xCashPoint.Free;
+    if idCashPoint <> CEmptyDataGid then begin
+      CStaticBank.DataId := idCashPoint;
+      xCashPoint := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, True));
+      CStaticBank.Caption := xCashPoint.name;
+      xCashPoint.Free;
+    end;
     EditNumber.Text := accountNumber;
   end;
 end;
@@ -128,6 +131,11 @@ end;
 procedure TCAccountForm.CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText);
+end;
+
+function TCAccountForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCAccountsFrame;
 end;
 
 end.

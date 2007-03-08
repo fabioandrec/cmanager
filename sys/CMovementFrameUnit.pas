@@ -79,8 +79,7 @@ type
     procedure TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ActionAddListExecute(Sender: TObject);
-    procedure TodayListInitChildren(Sender: TBaseVirtualTree;
-      Node: PVirtualNode; var ChildCount: Cardinal);
+    procedure TodayListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
   private
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
@@ -122,36 +121,25 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
 
 procedure TCMovementFrame.ActionMovementExecute(Sender: TObject);
 var xForm: TCMovementForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCMovementForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), WMOPT_BASEMOVEMENT);
-  end;
+  xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True);
   xForm.Free;
 end;
 
 procedure TCMovementFrame.ActionEditMovementExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
     xBase: TMovementTreeElement;
-    xDataGid: TDataGid;
 begin
   if TodayList.FocusedNode <> Nil then begin
     xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
     if xBase.elementType = mtObject then begin
       xForm := TCMovementForm.Create(Nil);
-      xDataGid := xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase.Dataobject, True);
-      if xDataGid <> CEmptyDataGid then begin
-        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), WMOPT_BASEMOVEMENT);
-      end;
+      xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase.Dataobject, True);
       xForm.Free;
     end else if xBase.elementType = mtList then begin
       xForm := TCMovementListForm.Create(Nil);
-      xDataGid := xForm.ShowDataobject(coEdit, MovementListProxy, xBase.Dataobject, True);
-      if xDataGid <> CEmptyDataGid then begin
-        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), WMOPT_MOVEMENTLIST);
-      end;
+      xForm.ShowDataobject(coEdit, MovementListProxy, xBase.Dataobject, True);
       xForm.Free;
     end;
   end;
@@ -191,7 +179,7 @@ begin
         xIdTemp4 := TBaseMovement(xBase.Dataobject).idMovementList;
         if xIdTemp4 <> CEmptyDataGid then begin
           xMovementList := TMovementList(TMovementList.LoadObject(MovementListProxy, xIdTemp4, False));
-          xMovementList.cash := xMovementList.cash + xBase.cash;
+          xMovementList.cash := xMovementList.cash - xBase.cash;
         end;
       end else begin
         xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
@@ -315,14 +303,14 @@ end;
 
 procedure TCMovementFrame.TodayListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 var xTreeList: TTreeObjectList;
-    xTreeObject: TTreeObject;
+    xTreeObject: TMovementTreeElement;
 begin
   if ParentNode = Nil then begin
     xTreeList := FTreeHelper;
   end else begin
     xTreeList := TTreeObject(TodayList.GetNodeData(ParentNode)^).Childobjects;
   end;
-  xTreeObject := xTreeList.Items[Node.Index];
+  xTreeObject := TMovementTreeElement(xTreeList.Items[Node.Index]);
   TTreeObject(TodayList.GetNodeData(Node)^) := xTreeObject;
   if xTreeObject.Childobjects.Count > 0 then begin
     InitialStates := InitialStates + [ivsHasChildren, ivsExpanded];
@@ -460,22 +448,23 @@ begin
     xTreeElement := TMovementTreeElement.Create;
     xTreeElement.Dataobject := xDataobject;
     if AOption = WMOPT_BASEMOVEMENT then begin
-      FTodayObjects.Add(xDataobject);
       xTreeElement.elementType := mtObject;
+      FTodayObjects.Add(xDataobject);
     end else begin
-      FTodayLists.Add(xDataobject);
       xTreeElement.elementType := mtList;
+      FTodayLists.Add(xDataobject);
     end;
-    FTreeHelper.Add(xTreeElement);
     if AOption = WMOPT_BASEMOVEMENT then begin
       if TBaseMovement(xDataobject).idMovementList <> CEmptyDataGid then begin
         xParent := FindObjectNode(TBaseMovement(xDataobject).idMovementList, WMOPT_MOVEMENTLIST);
         TMovementTreeElement(TodayList.GetNodeData(xParent)^).Childobjects.Add(xTreeElement);
       end else begin
         xParent := Nil;
+        FTreeHelper.Add(xTreeElement);
       end;
     end else begin
       xParent := Nil;
+      FTreeHelper.Add(xTreeElement);
     end;
     xNode := TodayList.AddChild(xParent, xTreeElement);
     TodayList.Sort(xNode, TodayList.Header.SortColumn, TodayList.Header.SortDirection);
@@ -489,9 +478,17 @@ end;
 
 procedure TCMovementFrame.MessageMovementDeleted(AId: TDataGid; AOption: Integer);
 var xNode: PVirtualNode;
+    xTreeList: TTreeObjectList;
+    xData: TMovementTreeElement;
 begin
   xNode := FindObjectNode(AId, AOption);
   if xNode <> Nil then begin
+    xData := TMovementTreeElement(TodayList.GetNodeData(xNode)^);
+    if xNode.Parent = TodayList.RootNode then begin
+      xTreeList := FTreeHelper;
+    end else begin
+      xTreeList := TTreeObject(TodayList.GetNodeData(xNode.Parent)^).Childobjects;
+    end;
     TodayList.DeleteNode(xNode);
     if AOption = WMOPT_BASEMOVEMENT then begin
       FTodayObjects.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject);
@@ -499,6 +496,7 @@ begin
       DeleteObjectsWithMovementList(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject.id);
       FTodayLists.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject)
     end;
+    xTreeList.Remove(xData);
   end;
   ReloadSums;
 end;
@@ -506,6 +504,7 @@ end;
 procedure TCMovementFrame.MessageMovementEdited(AId: TDataGid; AOption: Integer);
 var xNode: PVirtualNode;
     xBase: TMovementTreeElement;
+    xTreeList: TTreeObjectList;
 begin
   xNode := FindObjectNode(AId, AOption);
   if xNode <> Nil then begin
@@ -515,6 +514,11 @@ begin
       TodayList.InvalidateNode(xNode);
       TodayList.Sort(xNode, TodayList.Header.SortColumn, TodayList.Header.SortDirection);
     end else begin
+      if xNode.Parent = TodayList.RootNode then begin
+        xTreeList := FTreeHelper;
+      end else begin
+        xTreeList := TTreeObject(TodayList.GetNodeData(xNode.Parent)^).Childobjects;
+      end;
       TodayList.DeleteNode(xNode);
       if AOption = WMOPT_BASEMOVEMENT then begin
         FTodayObjects.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject);
@@ -522,6 +526,7 @@ begin
         DeleteObjectsWithMovementList(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject.id);
         FTodayLists.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject)
       end;
+      xTreeList.Remove(xBase);
     end;
   end;
   ReloadSums;
@@ -953,13 +958,9 @@ end;
 
 procedure TCMovementFrame.ActionAddListExecute(Sender: TObject);
 var xForm: TCMovementListForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCMovementListForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), WMOPT_MOVEMENTLIST);
-  end;
+  xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
   xForm.Free;
 end;
 

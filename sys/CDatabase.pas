@@ -782,6 +782,8 @@ begin
             xVal := DatetimeToDatabase(xField.AsDateTime, True);
           end else if xField.DataType in [ftCurrency, ftFloat, ftBCD] then begin
             xVal := CurrencyToDatabase(xField.AsCurrency);
+          end else if xField.DataType in [ftBoolean] then begin
+            xVal := IntToStr(Integer(xField.AsBoolean));
           end else begin
             Result := False;
             FLastError := 'Podczas eksportu tabeli ' + ATableName + ' nie uda³o siê przetworzyæ pola ' + xField.FieldName;

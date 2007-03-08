@@ -58,25 +58,17 @@ end;
 
 procedure TCHomeFrame.ActionNewOperationExecute(Sender: TObject);
 var xForm: TCMovementForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCMovementForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True);
   xForm.Free;
 end;
 
 procedure TCHomeFrame.ActionNewCyclicExecute(Sender: TObject);
 var xForm: TCPlannedForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCPlannedForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, PlannedMovementProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCPlannedFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, PlannedMovementProxy, Nil, True);
   xForm.Free;
 end;
 
@@ -118,13 +110,9 @@ end;
 
 procedure TCHomeFrame.ActionAddNewListExecute(Sender: TObject);
 var xForm: TCMovementListForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCMovementListForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
   xForm.Free;
 end;
 

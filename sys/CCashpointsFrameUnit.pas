@@ -85,13 +85,9 @@ end;
 
 procedure TCCashpointsFrame.ActionAddCashpointExecute(Sender: TObject);
 var xForm: TCCashpointForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCCashpointForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, CashPointProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCCashpointsFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, CashPointProxy, Nil, True);
   xForm.Free;
 end;
 
@@ -118,13 +114,9 @@ end;
 
 procedure TCCashpointsFrame.ActionEditCahpointExecute(Sender: TObject);
 var xForm: TCCashpointForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCCashpointForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, CashPointProxy, TCashPoint(CashpointList.GetNodeData(CashpointList.FocusedNode)^), True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCCashpointsFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coEdit, CashPointProxy, TCashPoint(CashpointList.GetNodeData(CashpointList.FocusedNode)^), True);
   xForm.Free;
 end;
 

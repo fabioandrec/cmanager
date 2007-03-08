@@ -224,25 +224,17 @@ end;
 
 procedure TCAccountsFrame.ActionAddAccountExecute(Sender: TObject);
 var xForm: TCAccountForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCAccountForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, AccountProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, AccountProxy, Nil, True);
   xForm.Free;
 end;
 
 procedure TCAccountsFrame.ActionEditAccountExecute(Sender: TObject);
 var xForm: TCAccountForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCAccountForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, AccountProxy, TAccount(AccountList.GetNodeData(AccountList.FocusedNode)^), True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coEdit, AccountProxy, TAccount(AccountList.GetNodeData(AccountList.FocusedNode)^), True);
   xForm.Free;
 end;
 

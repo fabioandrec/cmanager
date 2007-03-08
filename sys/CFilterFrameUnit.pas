@@ -85,13 +85,9 @@ end;
 
 procedure TCFilterFrame.ActionAddFilterExecute(Sender: TObject);
 var xForm: TCFilterForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCFilterForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, MovementFilterProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCFilterFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, MovementFilterProxy, Nil, True);
   xForm.Free;
 end;
 
@@ -118,13 +114,9 @@ end;
 
 procedure TCFilterFrame.ActionEditFilterExecute(Sender: TObject);
 var xForm: TCFilterForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCFilterForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, MovementFilterProxy, TMovementFilter(FilterList.GetNodeData(FilterList.FocusedNode)^), True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCFilterFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coEdit, MovementFilterProxy, TMovementFilter(FilterList.GetNodeData(FilterList.FocusedNode)^), True);
   xForm.Free;
 end;
 

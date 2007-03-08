@@ -58,25 +58,17 @@ uses CConfigFormUnit, CDataObjects, CProfileFormUnit, CConsts,
 
 procedure TCProfileFrame.ActionAddProfileExecute(Sender: TObject);
 var xForm: TCProfileForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCProfileForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coAdd, ProfileProxy, Nil, True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCProfileFrame, WM_DATAOBJECTADDED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coAdd, ProfileProxy, Nil, True);
   xForm.Free;
 end;
 
 procedure TCProfileFrame.ActionEditProfileExecute(Sender: TObject);
 var xForm: TCProfileForm;
-    xDataGid: TDataGid;
 begin
   xForm := TCProfileForm.Create(Nil);
-  xDataGid := xForm.ShowDataobject(coEdit, ProfileProxy, TProfile(ProfileList.GetNodeData(ProfileList.FocusedNode)^), True);
-  if xDataGid <> CEmptyDataGid then begin
-    SendMessageToFrames(TCProfileFrame, WM_DATAOBJECTEDITED, Integer(@xDataGid), 0);
-  end;
+  xForm.ShowDataobject(coEdit, ProfileProxy, TProfile(ProfileList.GetNodeData(ProfileList.FocusedNode)^), True);
   xForm.Free;
 end;
 

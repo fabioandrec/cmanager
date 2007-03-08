@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, CDatabase;
+  CComponents, CDatabase, CBaseFrameUnit;
 
 type
   TMovementAdditionalData = class(TAdditionalData)
@@ -85,14 +85,16 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
-    procedure AfterCommitData; override;
+    procedure UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer); override;
+    function GetUpdateFrameOption: Integer; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
   end;
 
 implementation
 
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
-  CConfigFormUnit, CBaseFrameUnit, CInfoFormUnit, CPlannedFrameUnit,
+  CConfigFormUnit, CInfoFormUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit;
 
 {$R *.dfm}
@@ -432,11 +434,7 @@ begin
         SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
         if idMovementList <> CEmptyDataGid then begin
           xMl := TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False));
-          if xI = 0 then begin
-            xMl.cash := xMl.cash + cash;
-          end else begin
-            xMl.cash := xMl.cash - cash;
-          end;
+          xMl.cash := xMl.cash - cash;
           xMl.ForceUpdate;
         end;
       end else if (xI = 2) then begin
@@ -480,11 +478,7 @@ begin
       idPlannedDone := CEmptyDataGid;
       if idMovementList <> CEmptyDataGid then begin
         xMl := TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False));
-        if xI = 0 then begin
-          xMl.cash := xMl.cash - cash;
-        end else begin
-          xMl.cash := xMl.cash + cash;
-        end;
+        xMl.cash := xMl.cash + cash;
         xMl.ForceUpdate;
         SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@idMovementList), WMOPT_MOVEMENTLIST);
       end;
@@ -542,46 +536,6 @@ begin
   end;
 end;
 
-procedure TCMovementForm.AfterCommitData;
-var xId: TDataGid;
-    xI: Integer;
-begin
-  xI := ComboBoxType.ItemIndex;
-  if (xI = 0) or (xI = 1) then begin
-    xId := CStaticInoutOnceAccount.DataId;
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
-    if Operation = coEdit then begin
-      if FbaseAccount <> xId then begin
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
-      end;
-    end;
-  end else if (xI = 2) then begin
-    xId := CStaticTransDestAccount.DataId;
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
-    if Operation = coEdit then begin
-      if FbaseAccount <> xId then begin
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
-      end;
-    end;
-    xId := CStaticTransSourceAccount.DataId;
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
-    if Operation = coEdit then begin
-      if FsourceAccount <> xId then begin
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FsourceAccount), 0);
-      end;
-    end;
-  end else if (xI = 3) or (xI = 4) then begin
-    xId := CStaticInoutCyclicAccount.DataId;
-    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
-    if Operation = coEdit then begin
-      if FbaseAccount <> xId then begin
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
-      end;
-    end;
-    SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
-  end;
-end;
-
 function TCMovementForm.ChoosePlanned(var AId, AText: String): Boolean;
 var xType: TBaseEnumeration;
 begin
@@ -629,6 +583,57 @@ begin
   inherited Create;
   FtriggerDate := ATriggerDate;
   Fplanned := APlanned;
+end;
+
+procedure TCMovementForm.UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer);
+var xId: TDataGid;
+    xI: Integer;
+begin
+  inherited UpdateFrames(ADataGid, AMessage, AOption);
+  xI := ComboBoxType.ItemIndex;
+  if (xI = 0) or (xI = 1) then begin
+    xId := CStaticInoutOnceAccount.DataId;
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FbaseAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+      end;
+    end;
+  end else if (xI = 2) then begin
+    xId := CStaticTransDestAccount.DataId;
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FbaseAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+      end;
+    end;
+    xId := CStaticTransSourceAccount.DataId;
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FsourceAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FsourceAccount), 0);
+      end;
+    end;
+  end else if (xI = 3) or (xI = 4) then begin
+    xId := CStaticInoutCyclicAccount.DataId;
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
+    if Operation = coEdit then begin
+      if FbaseAccount <> xId then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@FbaseAccount), 0);
+      end;
+    end;
+    SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+  end;
+end;
+
+function TCMovementForm.GetUpdateFrameOption: Integer;
+begin
+  Result := WMOPT_BASEMOVEMENT;
+end;
+
+function TCMovementForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCMovementFrame;
 end;
 
 end.

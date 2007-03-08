@@ -1,6 +1,4 @@
 inherited CHomeFrame: TCHomeFrame
-  Width = 469
-  Height = 572
   object Image1: TImage [0]
     Left = 24
     Top = 26
