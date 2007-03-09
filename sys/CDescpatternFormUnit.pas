@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ComCtrls, CPreferences;
+  ComCtrls, CPreferences, ActnList, XPStyleActnCtrls, ActnMan, ImgList,
+  PngImageList, Menus;
 
 type
   TCDescpatternForm = class(TCConfigForm)
@@ -16,10 +17,15 @@ type
     ComboBoxType: TComboBox;
     GroupBox2: TGroupBox;
     RichEditDesc: TRichEdit;
+    PngImageList: TPngImageList;
+    CButton1: TCButton;
+    ActionManager: TActionManager;
+    ActionAdd: TAction;
     procedure ComboBoxOperationChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure RichEditDescChange(Sender: TObject);
+    procedure ActionAddExecute(Sender: TObject);
   private
     FDescPatterns: TDescPatterns;
     FKeyName: String;
@@ -123,6 +129,11 @@ end;
 procedure TCDescpatternForm.RichEditDescChange(Sender: TObject);
 begin
   FDescPatterns.SetPattern(CDescPatternsKeys[ComboBoxOperation.ItemIndex][ComboBoxType.ItemIndex], RichEditDesc.Text);
+end;
+
+procedure TCDescpatternForm.ActionAddExecute(Sender: TObject);
+begin
+  ShowMessage('a');
 end;
 
 end.
