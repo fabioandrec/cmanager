@@ -74,6 +74,7 @@ type
   private
     FbaseAccount: TDataGid;
     FsourceAccount: TDataGid;
+    FbaseList: TDataGid;
   protected
     procedure UpdateDescription;
     procedure InitializeForm; override;
@@ -153,6 +154,7 @@ begin
     CStaticInoutCyclicChanged(CStaticInoutCyclic);
   end;
   FbaseAccount := CEmptyDataGid;
+  FbaseList := CEmptyDataGid;
   FsourceAccount := CEmptyDataGid;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
@@ -403,6 +405,7 @@ begin
     GDataProvider.RollbackTransaction;
     CDateTime.Value := regDate;
     RichEditDesc.Text := description;
+    FbaseList := idMovementList;
   end;
 end;
 
@@ -413,50 +416,12 @@ end;
 
 procedure TCMovementForm.ReadValues;
 var xI: Integer;
-    xBa, xSa: TAccount;
-    xMl: TMovementList;
     xDone: TPlannedDone;
     xTrDate: TDateTime;
     xTrMove: TDataGid;
     xPos: Integer;
 begin
   with TBaseMovement(Dataobject) do begin
-    xI := ComboBoxType.ItemIndex;
-    if Operation = coEdit then begin
-      if (xI = 0) or (xI = 1) then begin
-        xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-        if xI = 0 then begin
-          xBa.cash := xBa.cash + cash;
-        end else begin
-          xBa.cash := xBa.cash - cash;
-        end;
-        xBa.ForceUpdate;
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
-        if idMovementList <> CEmptyDataGid then begin
-          xMl := TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False));
-          xMl.cash := xMl.cash - cash;
-          xMl.ForceUpdate;
-        end;
-      end else if (xI = 2) then begin
-        xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-        xSa := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False));
-        xBa.cash := xBa.cash - cash;
-        xSa.cash := xSa.cash + cash;
-        xBa.ForceUpdate;
-        xSa.ForceUpdate;
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idSourceAccount), 0);
-      end else if (xI = 3) or (xI = 4) then begin
-        xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-        if xI = 3 then begin
-          xBa.cash := xBa.cash + cash;
-        end else begin
-          xBa.cash := xBa.cash - cash;
-        end;
-        xBa.ForceUpdate;
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
-      end;
-    end;
     regDate := CDateTime.Value;
     description := RichEditDesc.Text;
     xI := ComboBoxType.ItemIndex;
@@ -464,36 +429,15 @@ begin
       movementType := IfThen(xI = 0, COutMovement, CInMovement);
       cash := CCurrEditInoutOnce.Value;
       idAccount := CStaticInoutOnceAccount.DataId;
-      xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-      if xI = 0 then begin
-        xBa.cash := xBa.cash - cash;
-      end else begin
-        xBa.cash := xBa.cash + cash;
-      end;
-      xBa.ForceUpdate;
-      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
       idSourceAccount := CEmptyDataGid;
       idCashPoint := CStaticInoutOnceCashpoint.DataId;
       idProduct := CStaticInoutOnceCategory.DataId;
       idPlannedDone := CEmptyDataGid;
-      if idMovementList <> CEmptyDataGid then begin
-        xMl := TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False));
-        xMl.cash := xMl.cash + cash;
-        xMl.ForceUpdate;
-        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@idMovementList), WMOPT_MOVEMENTLIST);
-      end;
     end else if (xI = 2) then begin
       movementType := CTransferMovement;
       cash := CCurrEditTrans.Value;
       idAccount := CStaticTransDestAccount.DataId;
       idSourceAccount := CStaticTransSourceAccount.DataId;
-      xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-      xSa := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False));
-      xBa.cash := xBa.cash + cash;
-      xSa.cash := xSa.cash - cash;
-      xBa.ForceUpdate;
-      xSa.ForceUpdate;
-      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
       idCashPoint := CEmptyDataGid;
       idProduct := CEmptyDataGid;
       idPlannedDone := CEmptyDataGid;
@@ -501,14 +445,6 @@ begin
       movementType := IfThen(xI = 3, COutMovement, CInMovement);
       cash := CCurrEditInoutCyclic.Value;
       idAccount := CStaticInoutCyclicAccount.DataId;
-      xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-      if xI = 3 then begin
-        xBa.cash := xBa.cash - cash;
-      end else begin
-        xBa.cash := xBa.cash + cash;
-      end;
-      xBa.ForceUpdate;
-      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@idAccount), 0);
       idSourceAccount := CEmptyDataGid;
       idCashPoint := CStaticInoutCyclicCashpoint.DataId;
       idProduct := CStaticInoutCyclicCategory.DataId;
@@ -524,13 +460,11 @@ begin
         xDone.description := description;
         xDone.cash := cash;
         idPlannedDone := xDone.id;
-        SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
       end else begin
         xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
         xDone.cash := cash;
         xDone.description := description;
         xDone.doneDate := regDate;
-        SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
       end;
     end;
   end;
@@ -623,6 +557,9 @@ begin
       end;
     end;
     SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+  end;
+  if FbaseList <> CEmptyDataGid then begin
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@FBaseList), WMOPT_MOVEMENTLIST);
   end;
 end;
 

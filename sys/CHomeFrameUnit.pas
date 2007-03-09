@@ -46,7 +46,7 @@ implementation
 uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
   CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
   CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit, CReports,
-  CStartupInfoFrameUnit, CMovementListFormUnit;
+  CStartupInfoFrameUnit, CMovementListFormUnit, CDescpatternFormUnit;
 
 {$R *.dfm}
 

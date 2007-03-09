@@ -9,6 +9,7 @@ type
   TBaseDescription = string[200];
   TAccountNumber = string[50];
   TBaseEnumeration = string[1];
+  TBaseMemo = string;
 
   TCashPoint = class(TDataObject)
   private
@@ -82,6 +83,7 @@ type
   private
     Fdescription: TBaseDescription;
     FidAccount: TDataGid;
+    FprevIdAccount: TDataGid;
     FidCashPoint: TDataGid;
     FregDate: TDateTime;
     FweekDate: TDateTime;
@@ -89,12 +91,14 @@ type
     FyearDate: TDateTime;
     FmovementType: TBaseEnumeration;
     Fcash: Currency;
+    FprevCash: Currency;
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetregDate(const Value: TDateTime);
     procedure SetmovementType(const Value: TBaseEnumeration);
-    procedure Setcash(const Value: Currency);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -109,20 +113,23 @@ type
     property monthDate: TDateTime read FmonthDate;
     property yearDate: TDateTime read FyearDate;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
-    property cash: Currency read Fcash write Setcash;
+    property cash: Currency read Fcash;
   end;
 
   TBaseMovement = class(TDataObject)
   private
     Fdescription: TBaseDescription;
     Fcash: Currency;
+    FprevCash: Currency;
     FmovementType: TBaseEnumeration;
     FidAccount: TDataGid;
+    FprevIdAccount: TDataGid;
     FregDate: TDateTime;
     FweekDate: TDateTime;
     FmonthDate: TDateTime;
     FyearDate: TDateTime;
     FidSourceAccount: TDataGid;
+    FprevIdSourceAccount: TDataGid;
     FidCashPoint: TDataGid;
     FidProduct: TDataGid;
     FidPlannedDone: TDataGid;
@@ -137,6 +144,10 @@ type
     procedure SetidProduct(const Value: TDataGid);
     procedure SetidPlannedDone(const Value: TDataGid);
     procedure SetidMovementList(const Value: TDataGid);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
+    function OnInsertObject(AProxy: TDataProxy): Boolean; override;
+    function OnUpdateObject(AProxy: TDataProxy): Boolean; override;
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -343,9 +354,9 @@ begin
     xText := 'istniej¹ zaplanowane operacje z jego udzia³em';
   end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ wykonane operacje z jego udzia³em';
-  end else if GDataProvider.GetSqlInteger('select count(*) from cashpointMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+  end else if GDataProvider.GetSqlInteger('select count(*) from cashpointFilter where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim filtry';
-  end else if GDataProvider.GetSqlInteger('select count(*) from profil where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+  end else if GDataProvider.GetSqlInteger('select count(*) from profile where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim profile';
   end;
   if xText <> '' then begin
@@ -554,13 +565,16 @@ begin
   with ADataset do begin
     Fdescription := FieldByName('description').AsString;
     Fcash := FieldByName('cash').AsCurrency;
+    FprevCash := Fcash;
     FmovementType := FieldByName('movementType').AsString;
     FidAccount := FieldByName('idAccount').AsString;
+    FprevIdAccount := FidAccount;
     FregDate := FieldByName('regDate').AsDateTime;
     FweekDate := FieldByName('weekDate').AsDateTime;
     FmonthDate := FieldByName('monthDate').AsDateTime;
     FyearDate := FieldByName('yearDate').AsDateTime;
     FidSourceAccount := FieldByName('idSourceAccount').AsString;
+    FprevIdSourceAccount := FidSourceAccount;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
     FidPlannedDone := FieldByName('idPlannedDone').AsString;
@@ -1264,6 +1278,7 @@ begin
   with ADataset do begin
     Fdescription := FieldByName('description').AsString;
     FidAccount := FieldByName('idAccount').AsString;
+    FprevIdAccount := FidAccount;
     FregDate := FieldByName('regDate').AsDateTime;
     FweekDate := FieldByName('weekDate').AsDateTime;
     FmonthDate := FieldByName('monthDate').AsDateTime;
@@ -1271,6 +1286,7 @@ begin
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FmovementType := FieldByName('movementType').AsString;
     Fcash := FieldByName('cash').AsCurrency;
+    FprevCash := Fcash;
   end;
 end;
 
@@ -1279,11 +1295,14 @@ begin
   Result := TMovementList.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where idmovementList = ' + DataGidToDatabase(id));
 end;
 
-procedure TMovementList.Setcash(const Value: Currency);
+function TMovementList.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
-  if Fcash <> Value then begin
-    Fcash := Value;
-    SetState(msModified);
+  Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql('delete from baseMovement where idMovementList = ' + DataGidToDatabase(id));
+  if movementType = CInMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+  end else if movementType = COutMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
   end;
 end;
 
@@ -1355,6 +1374,77 @@ begin
   FidCashPoint := CEmptyDataGid;
   FidPlannedDone := CEmptyDataGid;
   FidProduct := CEmptyDataGid;
+end;
+
+function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  if idMovementList <> CEmptyDataGid then begin
+    AProxy.DataProvider.ExecuteSql('update movementList set cash = cash - ' + CurrencyToDatabase(cash) + ' where idmovementList = ' + DataGidToDatabase(idMovementList));
+  end;
+  if idPlannedDone <> CEmptyDataGid then begin
+    AProxy.DataProvider.ExecuteSql('delete from plannedDone where idPlannedDone = ' + DataGidToDatabase(idPlannedDone));
+  end;
+  if movementType = CTransferMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idSourceAccount));
+  end else if movementType = CInMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+  end else if movementType = COutMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+  end;
+end;
+
+function TBaseMovement.OnInsertObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  if idMovementList <> CEmptyDataGid then begin
+    AProxy.DataProvider.ExecuteSql('update movementList set cash = cash + ' + CurrencyToDatabase(cash) + ' where idmovementList = ' + DataGidToDatabase(idMovementList));
+  end;
+  if movementType = CTransferMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idSourceAccount));
+  end else if movementType = CInMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+  end else if movementType = COutMovement then begin
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+  end;
+end;
+
+function TBaseMovement.OnUpdateObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnUpdateObject(AProxy);
+  if idMovementList <> CEmptyDataGid then begin
+    AProxy.DataProvider.ExecuteSql('update movementList set cash = cash + ' + CurrencyToDatabase(cash - FprevCash) + ' where idmovementList = ' + DataGidToDatabase(idMovementList));
+  end;
+  if movementType = CTransferMovement then begin
+    if FidAccount <> FprevIdAccount then begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(FprevCash) + ' where idAccount = ' + DataGidToDatabase(FprevIdAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(FidAccount));
+    end else begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(FidAccount));
+    end;
+    if FidSourceAccount <> FprevIdSourceAccount then begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(FprevCash) + ' where idAccount = ' + DataGidToDatabase(FprevIdSourceAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(FidSourceAccount));
+    end else begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(FidSourceAccount));
+    end;
+  end else if movementType = CInMovement then begin
+    if FidAccount <> FprevIdAccount then begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(FprevCash) + ' where idAccount = ' + DataGidToDatabase(FprevIdAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+    end else begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+    end;
+  end else if movementType = COutMovement then begin
+    if FidAccount <> FprevIdAccount then begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(FprevCash) + ' where idAccount = ' + DataGidToDatabase(FprevIdAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+    end else begin
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
+    end;
+  end;
 end;
 
 end.

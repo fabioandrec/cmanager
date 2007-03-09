@@ -147,12 +147,7 @@ end;
 
 procedure TCMovementFrame.ActionDelMovementExecute(Sender: TObject);
 var xBase: TMovementTreeElement;
-    xObject: TDataObject;
-    xAccount: TAccount;
-    xDone: TPlannedDone;
-    xMovementList: TMovementList;
-    xIdTemp1, xIdTemp2, xIdTemp3, xIdTemp4: TDataGid;
-    xIdTemp3Frame: TCBaseFrameClass;
+    xIdTemp1, xIdTemp2, xIdTemp3, xIdTemp4, xIdTemp5: TDataGid;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
   if xBase.elementType = mtObject then begin
@@ -160,51 +155,20 @@ begin
       xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
       xIdTemp1 := xBase.Dataobject.id;
       xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
-      xIdTemp3 := CEmptyDataGid;
-      xIdTemp4 := CEmptyDataGid;
-      xIdTemp3Frame := Nil;
-      if (xBase.movementType = CInMovement) then begin
-        xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xBase.Dataobject).idAccount, False));
-        xAccount.cash := xAccount.cash - xBase.cash;
-        xIdTemp4 := TBaseMovement(xBase.Dataobject).idMovementList;
-        if xIdTemp4 <> CEmptyDataGid then begin
-          xMovementList := TMovementList(TMovementList.LoadObject(MovementListProxy, xIdTemp4, False));
-          xMovementList.cash := xMovementList.cash - xBase.cash;
-        end;
-      end else if (xBase.movementType = COutMovement) then begin
-        xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xBase.Dataobject).idAccount, False));
-        xAccount.cash := xAccount.cash + xBase.cash;
-        xIdTemp4 := TBaseMovement(xBase.Dataobject).idMovementList;
-        if xIdTemp4 <> CEmptyDataGid then begin
-          xMovementList := TMovementList(TMovementList.LoadObject(MovementListProxy, xIdTemp4, False));
-          xMovementList.cash := xMovementList.cash - xBase.cash;
-        end;
-      end else begin
-        xObject := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xBase.Dataobject.id, False));
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xObject).idSourceAccount, False));
-        xAccount.cash := xAccount.cash + TBaseMovement(xObject).cash;
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, TBaseMovement(xBase.Dataobject).idAccount, False));
-        xAccount.cash := xAccount.cash - xBase.cash;
-        xIdTemp3 := TBaseMovement(xObject).idSourceAccount;
-        xIdTemp3Frame := TCAccountsFrame;
-      end;
-      if TBaseMovement(xObject).idPlannedDone <> CEmptyDataGid then begin
-        xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, TBaseMovement(xObject).idPlannedDone, False));
-        xDone.DeleteObject;
-      end;
-      xObject.DeleteObject;
+      xIdTemp3 := TBaseMovement(xBase.Dataobject).idSourceAccount;
+      xIdTemp4 :=  TBaseMovement(xBase.Dataobject).idMovementList;
+      xIdTemp5 :=  TBaseMovement(xBase.Dataobject).idPlannedDone;
+      xBase.Dataobject.DeleteObject;
       GDataProvider.CommitTransaction;
       SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_BASEMOVEMENT);
       SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
-      if (xIdTemp3 <> CEmptyDataGid) and (xIdTemp3Frame <> Nil) then begin
-        SendMessageToFrames(xIdTemp3Frame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
+      if (xIdTemp3 <> CEmptyDataGid) then begin
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
       end;
       if (xIdTemp4 <> CEmptyDataGid) then begin
         SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp4), WMOPT_MOVEMENTLIST);
       end;
-      if TBaseMovement(xObject).idPlannedDone > CEmptyDataGid then begin
+      if xIdTemp5 <> CEmptyDataGid then begin
         SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
       end;
     end;
@@ -213,16 +177,7 @@ begin
       xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
       xIdTemp1 := xBase.Dataobject.id;
       xIdTemp2 := TMovementList(xBase.Dataobject).idAccount;
-      if (xBase.movementType = CInMovement) then begin
-        xObject := TMovementList(TMovementList.LoadObject(MovementListProxy, xBase.Dataobject.id, False));
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, xIdTemp2, False));
-        xAccount.cash := xAccount.cash - xBase.cash;
-      end else begin
-        xObject := TMovementList(TMovementList.LoadObject(MovementListProxy, xBase.Dataobject.id, False));
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, xIdTemp2, False));
-        xAccount.cash := xAccount.cash + xBase.cash;
-      end;
-      xObject.DeleteObject;
+      xBase.Dataobject.DeleteObject;
       GDataProvider.CommitTransaction;
       SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_MOVEMENTLIST);
       SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);

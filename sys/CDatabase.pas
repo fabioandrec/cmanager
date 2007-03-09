@@ -37,6 +37,9 @@ type
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
     function GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
+    function GetSqlString(ASql: String; ADefault: String): String;
+    function GetCmanagerParam(AName: String; ADefault: String = ''): String;
+    procedure SetCmanagerParam(AName: String; AValue: String);
   published
     property DataProxyList: TObjectList read FDataProxyList;
     property InTransaction: Boolean read GetInTransaction;
@@ -117,6 +120,9 @@ type
     FDataFieldList: TDataFieldList;
     FIsRegistered: Boolean;
   protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; virtual;
+    function OnUpdateObject(AProxy: TDataProxy): Boolean; virtual;
+    function OnInsertObject(AProxy: TDataProxy): Boolean; virtual;
     procedure SetState(AState: TDataMemoryState);
     procedure SetMode(AMode: TDataCreationMode);
   public
@@ -509,8 +515,11 @@ begin
       until (xProxy = Nil);
       xCountSql := 0;
       while Result and (xCountSql <= xTableNames.Count - 1) do begin
-        xSql := xObj.DataFieldList.GetDeleteSql(xObj.Id, xTableNames.Strings[xCountSql]);
-        Result := FDataProvider.ExecuteSql(xSql);
+        Result := xObj.OnDeleteObject(Self);
+        if Result then begin
+          xSql := xObj.DataFieldList.GetDeleteSql(xObj.Id, xTableNames.Strings[xCountSql]);
+          Result := FDataProvider.ExecuteSql(xSql);
+        end;
         Inc(xCountSql);
       end;
       xTableNames.Free;
@@ -865,8 +874,11 @@ begin
       until (xProxy = Nil);
       xCountSql := xTableNames.Count - 1;
       while Result and (xCountSql >= 0) do begin
-        xSql := xObj.DataFieldList.GetInsertSql(xObj.Id, xTableNames.Strings[xCountSql]);
-        Result := FDataProvider.ExecuteSql(xSql);
+        Result := xObj.OnInsertObject(Self);
+        if Result then begin
+          xSql := xObj.DataFieldList.GetInsertSql(xObj.Id, xTableNames.Strings[xCountSql]);
+          Result := FDataProvider.ExecuteSql(xSql);
+        end;
         if Result then begin
           xObj.AfterPost;
         end;
@@ -901,8 +913,11 @@ begin
       until (xProxy = Nil);
       xCountSql := xTableNames.Count - 1;
       while Result and (xCountSql >= 0) do begin
-        xSql := xObj.DataFieldList.GetUpdateSql(xObj.Id, xTableNames.Strings[xCountSql]);
-        Result := FDataProvider.ExecuteSql(xSql);
+        Result := xObj.OnUpdateObject(Self);
+        if Result then begin
+          xSql := xObj.DataFieldList.GetUpdateSql(xObj.Id, xTableNames.Strings[xCountSql]);
+          Result := FDataProvider.ExecuteSql(xSql);
+        end;
         if Result then begin
           xObj.AfterPost;
         end;
@@ -956,6 +971,21 @@ begin
     raise Exception.Create('Metoda LoadObject zwróci³a pusty zbiór danych');
   end;
   xDataset.Free;
+end;
+
+function TDataObject.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := True;
+end;
+
+function TDataObject.OnInsertObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := True;
+end;
+
+function TDataObject.OnUpdateObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := True;
 end;
 
 procedure TDataObject.ReloadObject;
@@ -1181,6 +1211,37 @@ begin
   if Result then begin
     GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
   end;
+end;
+
+function TDataProvider.GetCmanagerParam(AName, ADefault: String): String;
+begin
+  Result := GetSqlString('select paramValue from cmanagerParams where paramName = ''' + AName + '''', ADefault);
+end;
+
+function TDataProvider.GetSqlString(ASql, ADefault: String): String;
+var xQ: TADOQuery;
+begin
+  Result := ADefault;
+  xQ := OpenSql(ASql);
+  if xQ <> Nil then begin
+    if not xQ.IsEmpty then begin
+      Result := xQ.Fields[0].AsString;
+    end;
+    xQ.Free;
+  end;
+end;
+
+procedure TDataProvider.SetCmanagerParam(AName, AValue: String);
+var xCount: Integer;
+    xSql: String;
+begin
+  xCount := GetSqlInteger('select count(*) from cmanagerParams where paramName = ''' + AName + '''', 0);
+  if xCount = 0 then begin
+    xSql := Format('insert into cmanagerParams (paramName, paramValue) values (''%s'', ''%s'')', [AName, AValue]);
+  end else begin
+    xSql := Format('update cmanagerParams set paramValue = ''%s'' where paramName = ''%s''', [AName, AValue]);
+  end;
+  ExecuteSql(xSql);
 end;
 
 initialization

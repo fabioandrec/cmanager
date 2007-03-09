@@ -17,5 +17,20 @@ create table movementList (
   constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
 );
 
+create table cmanagerParams (
+  paramName varchar(40),
+  paramValue text
+);
+
 alter table baseMovement add idmovementList uniqueidentifier null;
 alter table baseMovement add constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList);
+
+create index ix_baseMovement_movementType on baseMovement (movementType);
+create index ix_cmanagerParams_name on cmanagerParams (paramName);
+create index ix_movementList_regDate on movementList (regDate);
+
+create index ix_baseMovement_idAccount on baseMovement (idAccount);
+create index ix_baseMovement_idSourceAccount on baseMovement (idSourceAccount);
+create index ix_baseMovement_idProduct on baseMovement (idProduct);
+create index ix_baseMovement_idCashpoint on baseMovement (idCashPoint);
+create index ix_baseMovement_idMovementList on baseMovement (idMovementList);

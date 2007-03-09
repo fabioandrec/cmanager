@@ -86,6 +86,18 @@ const
   CPlannedScheduledReady = 'Zaplanowana';
   CPlannedScheduledOvertime = 'Zaleg³a';
 
+const
+  CDescPatternsKeys: array[0..2, 0..4] of string =
+    (('BaseMovementOut', 'BaseMovementIn', 'BaseMovementTr', 'BaseMovementPlannedOut', 'BaseMovementPlannedIn'),
+     ('MovementListOut', 'MovementListIn', '', '', ''),
+     ('PlannedMovementOut', 'PlannedMovementIn', '', '', ''));
+
+  CDescPatternsNames: array[0..2, 0..4] of string =
+    (('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód'),
+     ('Rozchód', 'Przychód', '', '', ''),
+     ('Rozchód', 'Przychód', '', '', ''));
+
+
 implementation
 
 end.

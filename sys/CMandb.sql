@@ -170,6 +170,11 @@ create table profile (
   constraint fk_accountprofile foreign key (idAccount) references account (idAccount)
 );
 
+create table cmanagerParams (
+  paramName varchar(40),
+  paramValue text
+);
+
 create table cmanagerInfo (
   version varchar(20) not null,
   created datetime not null
@@ -194,4 +199,14 @@ create view balances as select * from (
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense from baseMovement where movementType = 'T') as v;
 
 create index ix_baseMovement_regDate on baseMovement (regDate);
+create index ix_movementList_regDate on movementList (regDate);
+create index ix_baseMovement_movementType on baseMovement (movementType);
 create index ix_plannedDone_triggerDate on plannedDone (triggerDate);
+create index ix_cmanagerParams_name on cmanagerParams (paramName);
+create index ix_baseMovement_idAccount on baseMovement (idAccount);
+create index ix_baseMovement_idSourceAccount on baseMovement (idSourceAccount);
+create index ix_baseMovement_idProduct on baseMovement (idProduct);
+create index ix_baseMovement_idCashpoint on baseMovement (idCashPoint);
+create index ix_baseMovement_idMovementList on baseMovement (idMovementList);
+
+

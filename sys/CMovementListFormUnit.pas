@@ -192,6 +192,7 @@ begin
 end;
 
 procedure TCMovementListForm.InitializeForm;
+var xProfile: TProfile;
 begin
   inherited InitializeForm;
   CCurrEditCash.Value := GetCash;
@@ -200,6 +201,18 @@ begin
   FbaseAccount := CEmptyDataGid;
   FbaseCashpoint := CEmptyDataGid;
   FbaseDate := 0;
+  if Operation = coAdd then begin
+    if GActiveProfileId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      xProfile := TProfile(TProfile.LoadObject(ProfileProxy, GActiveProfileId, False));
+      Caption := Caption + ' - ' + xProfile.name;
+      CStaticInoutOnceAccount.DataId := xProfile.idAccount;
+      CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xProfile.idAccount, False)).name;
+      CStaticInoutOnceCashpoint.DataId := xProfile.idCashPoint;
+      CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xProfile.idCashPoint, False)).name;
+      GDataProvider.RollbackTransaction;
+    end;
+  end;
 end;
 
 procedure TCMovementListForm.MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
@@ -407,32 +420,14 @@ begin
 end;
 
 procedure TCMovementListForm.ReadValues;
-var xBA: TAccount;
 begin
   inherited ReadValues;
   with TMovementList(Dataobject) do begin
-    if Operation = coEdit then begin
-      xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-      if ComboBox1.ItemIndex = 0 then begin
-        xBa.cash := xBa.cash + cash;
-      end else begin
-        xBa.cash := xBa.cash - cash;
-      end;
-      xBa.ForceUpdate;
-    end;
     description := RichEditDesc.Text;
     idAccount := CStaticInoutOnceAccount.DataId;
     idCashPoint := CStaticInoutOnceCashpoint.DataId;
     regDate := CDateTime1.Value;
     movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
-    cash := CCurrEditCash.Value;
-    xBa := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False));
-    if ComboBox1.ItemIndex = 0 then begin
-      xBa.cash := xBa.cash - cash;
-    end else begin
-      xBa.cash := xBa.cash + cash;
-    end;
-    xBa.ForceUpdate;
   end;
 end;
 

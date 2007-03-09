@@ -177,12 +177,12 @@ begin
         AProgressEvent(xStep);
       end;
     end;
-    xAccounts.Free;
     if Result then begin
       GDataProvider.CommitTransaction;
     end else begin
       GDataProvider.RollbackTransaction;
     end;
+    xAccounts.Free;
     GDataProvider.DisconnectFromDatabase;
     if xSuspectedCount = 0 then begin
       AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Nie znaleziono ¿adnych nieprawid³owoœci');

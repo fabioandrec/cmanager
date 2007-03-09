@@ -126,9 +126,21 @@ type
     property startupCheckUpdates: Boolean read FstartupCheckUpdates write FstartupCheckUpdates;
   end;
 
+  TDescPatterns = class(TStringList)
+  private
+    FSaveToDatabase: Boolean;
+  public
+    constructor Create(ASaveToDatabase: Boolean);
+    function GetPattern(AName, ADefault: String): String;
+    procedure SetPattern(AName, APattern: String);
+    function GetPatternOperation(AName: String): Integer;
+    function GetPattetnType(AName: String): Integer;
+  end;
+
 var GViewsPreferences: TPrefList;
     GColumnsPreferences: TPrefList;
     GBasePreferences: TBasePref;
+    GDescPatterns: TDescPatterns;
 
 implementation
 
@@ -486,7 +498,66 @@ begin
   SetXmlAttribute('visible', ANode, Fvisible);
 end;
 
+constructor TDescPatterns.Create(ASaveToDatabase: Boolean);
+begin
+  inherited Create;
+  FSaveToDatabase := ASaveToDatabase;
+end;
+
+function TDescPatterns.GetPattern(AName, ADefault: String): String;
+begin
+  if IndexOfName(AName) > -1 then begin
+    Result := Values[AName];
+  end else begin
+    Result := GDataProvider.GetCmanagerParam(AName, ADefault);
+    Values[AName] := Result;
+  end;
+end;
+
+function TDescPatterns.GetPatternOperation(AName: String): Integer;
+var xO, xT: Integer;
+begin
+  xO := Low(CDescPatternsKeys);
+  Result := -1;
+  while (xO <= High(CDescPatternsKeys)) and (Result = -1) do begin
+    xT := Low(CDescPatternsKeys[xO]);
+    while (xT <= High(CDescPatternsKeys[xO])) and (Result = -1) do begin
+      if CDescPatternsKeys[xO][xT] = AName then begin
+        Result := xO;
+      end;
+      Inc(xT);
+    end;
+    Inc(xO);
+  end;
+end;
+
+function TDescPatterns.GetPattetnType(AName: String): Integer;
+var xO, xT: Integer;
+begin
+  xO := Low(CDescPatternsKeys);
+  Result := -1;
+  while (xO <= High(CDescPatternsKeys)) and (Result = -1) do begin
+    xT := Low(CDescPatternsKeys[xO]);
+    while (xT <= High(CDescPatternsKeys[xO])) and (Result = -1) do begin
+      if CDescPatternsKeys[xO][xT] = AName then begin
+        Result := xT;
+      end;
+      Inc(xT);
+    end;
+    Inc(xO);
+  end;
+end;
+
+procedure TDescPatterns.SetPattern(AName, APattern: String);
+begin
+  Values[AName] := APattern;
+  if FSaveToDatabase then begin
+    GDataProvider.SetCmanagerParam(AName, APattern);
+  end;
+end;
+
 initialization
+  GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
   GColumnsPreferences := TPrefList.Create(TViewColumnPref);
   GViewsPreferences.Add(TViewPref.Create('baseMovement'));
@@ -542,4 +613,5 @@ finalization
   GViewsPreferences.Free;
   GBasePreferences.Free;
   GColumnsPreferences.Free;
+  GDescPatterns.Free;
 end.

@@ -77,7 +77,8 @@ uses
   CHelp in 'CHelp.pas',
   CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm},
   CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm},
-  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm};
+  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm},
+  CDescpatternFormUnit in 'CDescpatternFormUnit.pas' {CDescpatternForm};
 
 {$R *.res}
 
@@ -113,7 +114,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;
