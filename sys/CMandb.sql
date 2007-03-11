@@ -4,6 +4,7 @@ create table cashPoint (
   modified datetime,
   name varchar(40) not null,
   description varchar(200),
+  cashpointType varchar(1) not null,
   primary key (idCashPoint)
 );
 

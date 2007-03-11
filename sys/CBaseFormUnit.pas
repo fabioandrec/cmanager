@@ -3,10 +3,10 @@ unit CBaseFormUnit;
 interface
 
 uses
-  Windows, Forms, Classes, ComCtrls, Graphics, SysUtils, Messages;
+  Windows, Forms, Classes, ComCtrls, Graphics, SysUtils, Messages, CTemplates;
 
 type
-  TCBaseForm = class(TForm)
+  TCBaseForm = class(TForm, IDescTemplateExpander)
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -14,11 +14,13 @@ type
     procedure CloseForm; virtual;
     procedure WndProc(var Message: TMessage); override;
     procedure Loaded; override;
+  public
+    function ExpandTemplate(ATemplate: String): String; virtual;
   end;
 
 implementation
 
-uses CSettings, CBaseFrameUnit, CConsts, CComponents;
+uses CSettings, CBaseFrameUnit, CConsts, CComponents, CTools, DateUtils;
 
 {$R *.dfm}
 
@@ -63,6 +65,14 @@ begin
       TCStatic(Components[xCount]).TabStop := True;
       TCStatic(Components[xCount]).Transparent := False;
     end;
+  end;
+end;
+
+function TCBaseForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := '<nieznana>';
+  if ATemplate = '@godz' then begin
+    Result := LPad(IntToStr(HourOf(Now)), '0', 2);
   end;
 end;
 

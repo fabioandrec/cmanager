@@ -1,9 +1,9 @@
 inherited CCashpointsFrame: TCCashpointsFrame
   object CashpointList: TVirtualStringTree [0]
     Left = 0
-    Top = 0
+    Top = 21
     Width = 443
-    Height = 236
+    Height = 215
     Align = alClient
     BevelEdges = [beBottom]
     BevelInner = bvNone
@@ -91,6 +91,50 @@ inherited CCashpointsFrame: TCCashpointsFrame
       TxtOffset = 15
       Framed = False
       Action = ActionDelCashpoint
+    end
+  end
+  object Panel: TPanel [2]
+    Left = 0
+    Top = 0
+    Width = 443
+    Height = 21
+    Align = alTop
+    Alignment = taLeftJustify
+    TabOrder = 2
+    object Label2: TLabel
+      Left = 8
+      Top = 4
+      Width = 36
+      Height = 13
+      Caption = 'Rodzaj:'
+    end
+    object CStaticFilter: TCStatic
+      Left = 49
+      Top = 4
+      Width = 136
+      Height = 15
+      Cursor = crHandPoint
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '<dowolny>'
+      Color = clBtnFace
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentColor = False
+      ParentFont = False
+      TabOrder = 0
+      TabStop = True
+      Transparent = False
+      DataId = '0'
+      TextOnEmpty = '<dowolny typ>'
+      OnGetDataId = CStaticFilterGetDataId
+      OnChanged = CStaticFilterChanged
+      HotTrack = True
     end
   end
   inherited ImageList: TPngImageList

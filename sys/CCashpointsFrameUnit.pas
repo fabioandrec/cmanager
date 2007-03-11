@@ -6,9 +6,18 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, VirtualTrees, Buttons, CDatabase, ImgList,
   CComponents, ActnList, ExtCtrls, Menus, VTHeaderPopup, PngImageList,
-  CImageListsUnit;
+  CImageListsUnit, StdCtrls, CDataObjects;
 
 type
+  TCashpointFrameAdditionalData = class
+  private
+    FcashpointType: TBaseEnumeration;
+  public
+    constructor Create(ACashpointType: TBaseEnumeration);
+  published
+    property cashpointType: TBaseEnumeration read FcashpointType;
+  end;
+
   TCCashpointsFrame = class(TCBaseFrame)
     ActionList: TActionList;
     ActionAddCashpoint: TAction;
@@ -20,6 +29,9 @@ type
     CButtonAddCashpoint: TCButton;
     CButtonEditCashpoint: TCButton;
     CButtonDelCashpoint: TCButton;
+    Panel: TPanel;
+    Label2: TLabel;
+    CStaticFilter: TCStatic;
     procedure ActionAddCashpointExecute(Sender: TObject);
     procedure ActionEditCahpointExecute(Sender: TObject);
     procedure ActionDelCashpointExecute(Sender: TObject);
@@ -32,6 +44,8 @@ type
     procedure CashpointListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure CashpointListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure CashpointListDblClick(Sender: TObject);
+    procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticFilterChanged(Sender: TObject);
   private
     FCashpointObjects: TDataObjectList;
     procedure ReloadCashpoints;
@@ -47,12 +61,13 @@ type
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
+    function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
   end;
 
 implementation
 
-uses CDataObjects, CCashpointFormUnit, CConfigFormUnit, CFrameFormUnit, CMainFormUnit,
-     CInfoFormUnit, GraphUtil, CConsts;
+uses CCashpointFormUnit, CConfigFormUnit, CFrameFormUnit, CMainFormUnit,
+     CInfoFormUnit, GraphUtil, CConsts, CListFrameUnit;
 
 {$R *.dfm}
 
@@ -70,12 +85,34 @@ end;
 procedure TCCashpointsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  if AAdditionalData <> Nil then begin
+    if TCashpointFrameAdditionalData(AAdditionalData).cashpointType = CCashpointTypeAll then begin
+      CStaticFilter.DataId := '1';
+      CStaticFilter.Caption := '<dostêpne wszêdzie>';
+    end else if TCashpointFrameAdditionalData(AAdditionalData).cashpointType = CCashpointTypeIn then begin
+      CStaticFilter.DataId := '3';
+      CStaticFilter.Caption := '<tylko przychody>';
+    end else if TCashpointFrameAdditionalData(AAdditionalData).cashpointType = CCashpointTypeOut then begin
+      CStaticFilter.DataId := '2';
+      CStaticFilter.Caption := '<tylko rozchody>';
+    end;
+  end;
   ReloadCashpoints;
 end;
 
 procedure TCCashpointsFrame.ReloadCashpoints;
+var xCondition: String;
 begin
-  FCashpointObjects := TDataObject.GetList(TCashPoint, CashPointProxy, 'select * from cashPoint');
+  if CStaticFilter.DataId = '0' then begin
+    xCondition := '';
+  end else if CStaticFilter.DataId = '1' then begin
+    xCondition := ' where cashpointType = ''' + CCashpointTypeAll + '''';
+  end else if CStaticFilter.DataId = '2' then begin
+    xCondition := ' where cashpointType <> ''' + CCashpointTypeOut + '''';
+  end else if CStaticFilter.DataId = '3' then begin
+    xCondition := ' where cashpointType <> ''' + CCashpointTypeIn + '''';
+  end;
+  FCashpointObjects := TDataObject.GetList(TCashPoint, CashPointProxy, 'select * from cashPoint' + xCondition);
   CashpointList.BeginUpdate;
   CashpointList.Clear;
   CashpointList.RootNodeCount := FCashpointObjects.Count;
@@ -273,6 +310,51 @@ end;
 function TCCashpointsFrame.GetList: TVirtualStringTree;
 begin
   Result := CashpointList;
+end;
+
+procedure TCCashpointsFrame.CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xList: TStringList;
+    xGid, xText: String;
+    xRect: TRect;
+begin
+  xList := TStringList.Create;
+  xList.Add('0=<dowolny>');
+  xList.Add('1=<dostêpne wszêdzie>');
+  xList.Add('2=<tylko rozchody>');
+  xList.Add('3=<tylko przychody>');
+  xGid := CEmptyDataGid;
+  xText := '';
+  xRect := Rect(10, 10, 200, 300);
+  AAccepted := TCFrameForm.ShowFrame(TCListFrame, xGid, xText, xList, @xRect);
+  if AAccepted then begin
+    ADataGid := xGid;
+    AText := xText;
+  end;
+end;
+
+procedure TCCashpointsFrame.CStaticFilterChanged(Sender: TObject);
+begin
+  ReloadCashpoints;
+end;
+
+function TCCashpointsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
+var xFt: String;
+begin
+  xFt := '';
+  if CStaticFilter.DataId = '1' then begin
+    xFt := CCashpointTypeAll;
+  end else if CStaticFilter.DataId = '2' then begin
+    xFt := CCashpointTypeIn;
+  end else if CStaticFilter.DataId = '3' then begin
+    xFt := CCashpointTypeOut;
+  end;
+  Result := (xFt = '') or (TCashPoint(AObject).cashpointType = xFt); 
+end;
+
+constructor TCashpointFrameAdditionalData.Create(ACashpointType: TBaseEnumeration);
+begin
+  inherited Create;
+  FcashpointType := ACashpointType;
 end;
 
 end.

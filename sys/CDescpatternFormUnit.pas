@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, CPreferences, ActnList, XPStyleActnCtrls, ActnMan, ImgList,
-  PngImageList, Menus;
+  PngImageList, Menus, Contnrs;
 
 type
   TCDescpatternForm = class(TCConfigForm)
@@ -40,7 +40,7 @@ function EditDescPattern(AName: String; var APattern: String): Boolean;
 
 implementation
 
-uses CConsts;
+uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit, CTemplates;
 
 {$R *.dfm}
 
@@ -132,8 +132,25 @@ begin
 end;
 
 procedure TCDescpatternForm.ActionAddExecute(Sender: TObject);
+var xId, xText, xDesc: String;
+    xData: TObjectList;
+    xSelStart, xSelLength: Integer;
 begin
-  ShowMessage('a');
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GMovementTemplatesList);
+  if TCFrameForm.ShowFrame(TCDescTemplatesFrame, xId, xText, xData) then begin
+    RichEditDesc.Lines.BeginUpdate;
+    xDesc := RichEditDesc.Text;
+    xSelStart := RichEditDesc.SelStart + 1;
+    xSelLength := RichEditDesc.SelLength;
+    System.Delete(xDesc, xSelStart, xSelLength);
+    xDesc := Copy(xDesc, 1, xSelStart - 1) + xId + Copy(xDesc, xSelStart, MaxInt);
+    RichEditDesc.Text := xDesc;
+    RichEditDesc.SelStart := xSelStart + Length(xId) - 1;
+    RichEditDesc.SelLength := 0;
+    RichEditDesc.Lines.EndUpdate
+  end;
 end;
 
 end.

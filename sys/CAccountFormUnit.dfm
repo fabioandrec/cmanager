@@ -92,6 +92,7 @@ inherited CAccountForm: TCAccountForm
         TabOrder = 2
         Decimals = 2
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
       end
     end
@@ -140,6 +141,8 @@ inherited CAccountForm: TCAccountForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz bank z listy>'
         OnGetDataId = CStaticBankGetDataId
         HotTrack = True

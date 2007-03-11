@@ -181,8 +181,14 @@ begin
 end;
 
 function TCMovementForm.ChooseCashpoint(var AId, AText: String): Boolean;
+var xCt: String;
 begin
-  Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText);
+  if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 3) then begin
+    xCt := CCashpointTypeOut;
+  end else if (ComboBoxType.ItemIndex = 1) or (ComboBoxType.ItemIndex = 4) then begin
+    xCt := CCashpointTypeIn;
+  end;
+  Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText, TCashpointFrameAdditionalData.Create(xCt));
 end;
 
 procedure TCMovementForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

@@ -14,6 +14,8 @@ type
     Label1: TLabel;
     RichEditDesc: TRichEdit;
     Label2: TLabel;
+    ComboBoxType: TComboBox;
+    Label3: TLabel;
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -24,7 +26,7 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit;
+uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit, CConsts;
 
 {$R *.dfm}
 
@@ -43,6 +45,13 @@ begin
   with TCashPoint(Dataobject) do begin
     EditName.Text := name;
     RichEditDesc.Text := description;
+    if cashpointType = CCashpointTypeAll then begin
+      ComboBoxType.ItemIndex := 0;
+    end else if cashpointType = CCashpointTypeIn then begin
+      ComboBoxType.ItemIndex := 1;
+    end else if cashpointType = CCashpointTypeOut then begin
+      ComboBoxType.ItemIndex := 2;
+    end;
   end;
 end;
 
@@ -62,6 +71,13 @@ begin
   with TCashPoint(Dataobject) do begin
     name := EditName.Text;
     description := RichEditDesc.Text;
+    if ComboBoxType.ItemIndex = 0 then begin
+      cashpointType := CCashpointTypeAll;
+    end else if ComboBoxType.ItemIndex = 1 then begin
+      cashpointType := CCashpointTypeIn;
+    end else if ComboBoxType.ItemIndex = 2 then begin
+      cashpointType := CCashpointTypeOut;
+    end;
   end;
 end;
 

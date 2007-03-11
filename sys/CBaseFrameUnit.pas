@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus,
-  CConfigFormUnit;
+  CConfigFormUnit, CBaseFormUnit;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
@@ -27,6 +27,7 @@ type
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
+    function GetBaseForm: TCBaseForm;
   public
     procedure SaveColumns;
     procedure LoadColumns;
@@ -317,6 +318,15 @@ begin
         xColumnPref.visible := IfThen(coVisible in xColumn.Options, 1, 0);
       end;
     end;
+  end;
+end;
+
+function TCBaseFrame.GetBaseForm: TCBaseForm;
+begin
+  if FOwner.InheritsFrom(TCBaseForm) then begin
+    Result := TCBaseForm(FOwner);
+  end else begin
+    Result := Nil;
   end;
 end;
 

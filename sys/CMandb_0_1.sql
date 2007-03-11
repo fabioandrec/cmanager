@@ -25,6 +25,9 @@ create table cmanagerParams (
 alter table baseMovement add idmovementList uniqueidentifier null;
 alter table baseMovement add constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList);
 
+alter table cashpoint add cashpointType varchar(1) not null;
+update cashpoint set cashpointType = 'W';
+
 create index ix_baseMovement_movementType on baseMovement (movementType);
 create index ix_cmanagerParams_name on cmanagerParams (paramName);
 create index ix_movementList_regDate on movementList (regDate);

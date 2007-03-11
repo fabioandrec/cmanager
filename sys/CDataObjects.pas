@@ -15,8 +15,10 @@ type
   private
     Fname: TBaseName;
     Fdescription: TBaseDescription;
+    FcashpointType: TBaseEnumeration;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
+    procedure SetcashpointType(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -24,6 +26,7 @@ type
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
+    property cashpointType: TBaseEnumeration read FcashpointType write SetcashpointType;
   end;
 
   TAccount = class(TDataObject)
@@ -371,6 +374,15 @@ begin
   with ADataset do begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
+    FcashpointType := FieldByName('cashpointType').AsString;
+  end;
+end;
+
+procedure TCashPoint.SetcashpointType(const Value: TBaseEnumeration);
+begin
+  if FcashpointType <> Value then begin
+    FcashpointType := Value;
+    SetState(msModified);
   end;
 end;
 
@@ -396,6 +408,7 @@ begin
   with DataFieldList do begin
     AddField('name', Fname, True, 'cashPoint');
     AddField('description', Fdescription, True, 'cashPoint');
+    AddField('cashpointType', FcashpointType, True, 'cashPoint');
   end;
 end;
 

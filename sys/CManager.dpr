@@ -4,6 +4,8 @@ program CManager;
 {%File 'CMandb.sql'}
 {$R 'strings.res' 'strings.rc'}
 {$R 'cmanagericons.res' 'cmanagericons.rc'}
+{%File 'CMandb_0_1.sql'}
+{%File 'CMandf.sql'}
 
 uses
   MemCheck in 'MemCheck.pas',
@@ -78,7 +80,9 @@ uses
   CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm},
   CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm},
   CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm},
-  CDescpatternFormUnit in 'CDescpatternFormUnit.pas' {CDescpatternForm};
+  CDescpatternFormUnit in 'CDescpatternFormUnit.pas' {CDescpatternForm},
+  CTemplates in 'CTemplates.pas',
+  CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame};
 
 {$R *.res}
 

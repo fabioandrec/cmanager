@@ -74,6 +74,10 @@ const
   CStartupInfoNextmonth = 5;
   CStartupInfoDays = 6;
 
+  CCashpointTypeAll = 'W';
+  CCashpointTypeIn = 'I';
+  CCashpointTypeOut = 'O';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

@@ -102,8 +102,14 @@ begin
 end;
 
 procedure TCMovementListForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xCt: String;
 begin
-  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText);
+  if ComboBox1.ItemIndex = 0 then begin
+    xCt := CCashpointTypeOut;
+  end else begin
+    xCt := CCashpointTypeIn;
+  end;
+  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCashpointFrameAdditionalData.Create(xCt));
 end;
 
 destructor TCMovementListForm.Destroy;

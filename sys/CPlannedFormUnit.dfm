@@ -77,6 +77,8 @@ inherited CPlannedForm: TCPlannedForm
         Color = clWindow
         ParentColor = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
         OnGetDataId = CStaticAccountGetDataId
         OnChanged = CStaticAccountChanged
@@ -94,6 +96,8 @@ inherited CPlannedForm: TCPlannedForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
         OnGetDataId = CStaticCategoryGetDataId
         OnChanged = CStaticAccountChanged
@@ -111,6 +115,8 @@ inherited CPlannedForm: TCPlannedForm
         Color = clWindow
         ParentColor = False
         TabOrder = 2
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
         OnGetDataId = CStaticCashpointGetDataId
         OnChanged = CStaticAccountChanged
@@ -125,6 +131,7 @@ inherited CPlannedForm: TCPlannedForm
         TabOrder = 3
         Decimals = 2
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
       end
     end
@@ -205,6 +212,8 @@ inherited CPlannedForm: TCPlannedForm
         Color = clWindow
         ParentColor = False
         TabOrder = 2
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<ustaw harmonogram wykonywania operacji>'
         OnGetDataId = CStaticScheduleGetDataId
         HotTrack = True
