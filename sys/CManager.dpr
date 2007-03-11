@@ -117,9 +117,8 @@ begin
         xProceed := CheckPendingInformations;
       end;
       if xProceed then begin
-        EditDescPattern('', GDatabaseName);
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;

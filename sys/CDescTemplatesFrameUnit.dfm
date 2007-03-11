@@ -44,7 +44,7 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
         Width = 150
-        WideText = 'Nazwa/Mnemonik'
+        WideText = 'Mnemonik'
         WideHint = 'Nazwa kontrahenta'
       end
       item

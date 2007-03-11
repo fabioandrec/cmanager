@@ -1,14 +1,14 @@
 inherited CMovementForm: TCMovementForm
-  Left = 443
-  Top = 165
+  Left = 252
+  Top = 32
   Caption = 'Operacja'
-  ClientHeight = 477
+  ClientHeight = 501
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 536
-    Height = 436
+    Height = 460
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -97,9 +97,35 @@ inherited CMovementForm: TCMovementForm
       Left = 16
       Top = 288
       Width = 505
-      Height = 137
+      Height = 161
       Caption = ' Opis '
       TabOrder = 2
+      object CButton1: TCButton
+        Left = 14
+        Top = 124
+        Width = 217
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionAdd
+        Color = clBtnFace
+      end
+      object CButton2: TCButton
+        Left = 320
+        Top = 124
+        Width = 161
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionTemplate
+        Color = clBtnFace
+      end
       object RichEditDesc: TRichEdit
         Left = 24
         Top = 28
@@ -448,13 +474,29 @@ inherited CMovementForm: TCMovementForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 436
+    Top = 460
     Width = 536
     inherited BitBtnOk: TBitBtn
       Left = 359
     end
     inherited BitBtnCancel: TBitBtn
       Left = 447
+    end
+  end
+  object ActionManager: TActionManager
+    Images = CImageLists.TemplateImageList16x16
+    Left = 56
+    Top = 226
+    StyleName = 'XP Style'
+    object ActionAdd: TAction
+      Caption = 'Dodaj mnemonik w wybranym miejscu'
+      ImageIndex = 0
+      OnExecute = ActionAddExecute
+    end
+    object ActionTemplate: TAction
+      Caption = 'Konfiguruj szablony opis'#243'w'
+      ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
 end

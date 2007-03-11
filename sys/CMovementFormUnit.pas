@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, CDatabase, CBaseFrameUnit;
+  CComponents, CDatabase, CBaseFrameUnit, ActnList, XPStyleActnCtrls,
+  ActnMan, CImageListsUnit, Contnrs;
 
 type
   TMovementAdditionalData = class(TAdditionalData)
@@ -59,6 +60,11 @@ type
     Label15: TLabel;
     Label16: TLabel;
     CDateTime: TCDateTime;
+    ActionManager: TActionManager;
+    ActionAdd: TAction;
+    CButton1: TCButton;
+    ActionTemplate: TAction;
+    CButton2: TCButton;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -71,6 +77,8 @@ type
     procedure CStaticInoutOnceAccountChanged(Sender: TObject);
     procedure CStaticInoutCyclicGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicChanged(Sender: TObject);
+    procedure ActionTemplateExecute(Sender: TObject);
+    procedure ActionAddExecute(Sender: TObject);
   private
     FbaseAccount: TDataGid;
     FsourceAccount: TDataGid;
@@ -96,7 +104,8 @@ implementation
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CPlannedFrameUnit,
-  CDoneFrameUnit, CConsts, CMovementFrameUnit;
+  CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
+  CTemplates;
 
 {$R *.dfm}
 
@@ -577,6 +586,22 @@ end;
 function TCMovementForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCMovementFrame;
+end;
+
+procedure TCMovementForm.ActionTemplateExecute(Sender: TObject);
+var xPattern: String;
+begin
+  if EditDescPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], xPattern) then begin
+  end;
+end;
+
+procedure TCMovementForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GMovementTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc);
 end;
 
 end.

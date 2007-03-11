@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, CPreferences, ActnList, XPStyleActnCtrls, ActnMan, ImgList,
-  PngImageList, Menus, Contnrs;
+  PngImageList, Menus, Contnrs, CImageListsUnit, CTemplates;
 
 type
   TCDescpatternForm = class(TCConfigForm)
@@ -17,7 +17,6 @@ type
     ComboBoxType: TComboBox;
     GroupBox2: TGroupBox;
     RichEditDesc: TRichEdit;
-    PngImageList: TPngImageList;
     CButton1: TCButton;
     ActionManager: TActionManager;
     ActionAdd: TAction;
@@ -37,10 +36,11 @@ type
   end;
 
 function EditDescPattern(AName: String; var APattern: String): Boolean;
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit): Boolean;
 
 implementation
 
-uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit, CTemplates;
+uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit;
 
 {$R *.dfm}
 
@@ -89,12 +89,10 @@ begin
     xT := GDescPatterns.GetPattetnType(FKeyName);
     if xO <> -1 then begin
       ComboBoxOperation.ItemIndex := xO;
-      ComboBoxOperation.Enabled := False;
     end;
     ComboBoxOperationChange(Nil);
     if xT <> -1 then begin
       ComboBoxType.ItemIndex := xT;
-      ComboBoxType.Enabled := False;
     end;
     ComboBoxTypeChange(Nil);
   end else begin
@@ -132,24 +130,30 @@ begin
 end;
 
 procedure TCDescpatternForm.ActionAddExecute(Sender: TObject);
-var xId, xText, xDesc: String;
-    xData: TObjectList;
-    xSelStart, xSelLength: Integer;
+var xData: TObjectList;
 begin
   xData := TObjectList.Create(False);
   xData.Add(GBaseTemlatesList);
   xData.Add(GMovementTemplatesList);
-  if TCFrameForm.ShowFrame(TCDescTemplatesFrame, xId, xText, xData) then begin
-    RichEditDesc.Lines.BeginUpdate;
-    xDesc := RichEditDesc.Text;
-    xSelStart := RichEditDesc.SelStart + 1;
-    xSelLength := RichEditDesc.SelLength;
+  EditAddTemplate(xData, Self, RichEditDesc);
+end;
+
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit): Boolean;
+var xId, xText, xDesc: String;
+    xSelStart, xSelLength: Integer;
+begin
+  Result := TCFrameForm.ShowFrame(TCDescTemplatesFrame, xId, xText, ATemplates);
+  if Result then begin
+    ARiched.Lines.BeginUpdate;
+    xDesc := ARiched.Text;
+    xSelStart := ARiched.SelStart + 1;
+    xSelLength := ARiched.SelLength;
     System.Delete(xDesc, xSelStart, xSelLength);
     xDesc := Copy(xDesc, 1, xSelStart - 1) + xId + Copy(xDesc, xSelStart, MaxInt);
-    RichEditDesc.Text := xDesc;
-    RichEditDesc.SelStart := xSelStart + Length(xId) - 1;
-    RichEditDesc.SelLength := 0;
-    RichEditDesc.Lines.EndUpdate
+    ARiched.Text := xDesc;
+    ARiched.SelStart := xSelStart + Length(xId) - 1;
+    ARiched.SelLength := 0;
+    ARiched.Lines.EndUpdate
   end;
 end;
 
