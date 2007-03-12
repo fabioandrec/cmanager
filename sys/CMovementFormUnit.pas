@@ -65,6 +65,7 @@ type
     CButton1: TCButton;
     ActionTemplate: TAction;
     CButton2: TCButton;
+    ComboBoxTemplate: TComboBox;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -80,6 +81,7 @@ type
     procedure ActionTemplateExecute(Sender: TObject);
     procedure ActionAddExecute(Sender: TObject);
     procedure CDateTimeChanged(Sender: TObject);
+    procedure ComboBoxTemplateChange(Sender: TObject);
   private
     FbaseAccount: TDataGid;
     FsourceAccount: TDataGid;
@@ -237,10 +239,12 @@ end;
 procedure TCMovementForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
-  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-  xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
-  SimpleRichText(xDesc, RichEditDesc);
+  if ComboBoxTemplate.ItemIndex = 1 then begin
+    xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
+    xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+    xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
+    SimpleRichText(xDesc, RichEditDesc);
+  end;
 end;
 
 procedure TCMovementForm.CStaticInoutOnceAccountChanged(Sender: TObject);
@@ -385,6 +389,7 @@ begin
     GDataProvider.RollbackTransaction;
     CDateTime.Value := regDate;
     SimpleRichText(description, RichEditDesc);
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     FbaseList := idMovementList;
   end;
 end;
@@ -628,6 +633,11 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TCMovementForm.ComboBoxTemplateChange(Sender: TObject);
+begin
+  UpdateDescription;
 end;
 
 end.

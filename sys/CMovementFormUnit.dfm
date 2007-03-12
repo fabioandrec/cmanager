@@ -2,13 +2,13 @@ inherited CMovementForm: TCMovementForm
   Left = 252
   Top = 32
   Caption = 'Operacja'
-  ClientHeight = 501
+  ClientHeight = 504
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 536
-    Height = 460
+    Height = 463
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -98,13 +98,13 @@ inherited CMovementForm: TCMovementForm
       Left = 16
       Top = 288
       Width = 505
-      Height = 161
+      Height = 169
       Caption = ' Opis '
       TabOrder = 2
       object CButton1: TCButton
-        Left = 14
-        Top = 124
-        Width = 217
+        Left = 238
+        Top = 125
+        Width = 115
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -115,9 +115,9 @@ inherited CMovementForm: TCMovementForm
         Color = clBtnFace
       end
       object CButton2: TCButton
-        Left = 320
-        Top = 124
-        Width = 161
+        Left = 356
+        Top = 125
+        Width = 129
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -135,6 +135,23 @@ inherited CMovementForm: TCMovementForm
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 0
+      end
+      object ComboBoxTemplate: TComboBox
+        Left = 24
+        Top = 128
+        Width = 97
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 1
+        TabOrder = 1
+        Text = 'W/g szablonu'
+        OnChange = ComboBoxTemplateChange
+        Items.Strings = (
+          'W'#322'asny'
+          'W/g szablonu')
       end
     end
     object GroupBox3: TGroupBox
@@ -475,7 +492,7 @@ inherited CMovementForm: TCMovementForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 460
+    Top = 463
     Width = 536
     inherited BitBtnOk: TBitBtn
       Left = 359
@@ -490,12 +507,12 @@ inherited CMovementForm: TCMovementForm
     Top = 226
     StyleName = 'XP Style'
     object ActionAdd: TAction
-      Caption = 'Dodaj mnemonik w wybranym miejscu'
+      Caption = 'Wstaw mnemonik'
       ImageIndex = 0
       OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
-      Caption = 'Konfiguruj szablony opis'#243'w'
+      Caption = 'Konfiguruj szablony'
       ImageIndex = 1
       OnExecute = ActionTemplateExecute
     end
