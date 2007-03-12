@@ -211,8 +211,10 @@ var xNode: PVirtualNode;
 begin
   xNode := FindDataobjectNode(AId, ProfileList);
   if xNode <> Nil then begin
-    ProfileList.DeleteNode(xNode);
+    ProfileList.BeginUpdate;
     FProfileObjects.Remove(TProfile(ProfileList.GetNodeData(xNode)^));
+    ProfileList.DeleteNode(xNode);
+    ProfileList.EndUpdate;
   end;
 end;
 

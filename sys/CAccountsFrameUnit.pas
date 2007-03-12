@@ -90,8 +90,10 @@ var xNode: PVirtualNode;
 begin
   xNode := FindDataobjectNode(AId, AccountList);
   if xNode <> Nil then begin
-    AccountList.DeleteNode(xNode);
+    AccountList.BeginUpdate;
     FAccountObjects.Remove(TAccount(AccountList.GetNodeData(xNode)^));
+    AccountList.DeleteNode(xNode);
+    AccountList.EndUpdate;
   end;
 end;
 

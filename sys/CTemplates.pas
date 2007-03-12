@@ -100,44 +100,44 @@ initialization
   GPlannedMovementTemplatesList := TDescTemplateList.Create('Mnemoniki planowanych operacji');
   GMovementListElementsTemplatesList := TDescTemplateList.Create('Mnemoniki elementów listy operacji');
   with GBaseTemlatesList do begin
-    AddTemplate('@godz', 'aktualna godzina w formacie HH');
-    AddTemplate('@min', 'aktualna minuta w formacie MM');
-    AddTemplate('@czas', 'aktualny czas w formacie HH:MM');
-    AddTemplate('@dzien', 'aktualny dzieñ w formacie DD');
-    AddTemplate('@miesiac', 'aktualny miesiac w formacie MM');
-    AddTemplate('@rok', 'aktualny rok w formacie RRRR');
-    AddTemplate('@rokkrotki', 'aktualny rok w formacie RR');
-    AddTemplate('@dzientygodnia', 'numer dnia w tygodni');
-    AddTemplate('@nazwadnia', 'nazwa dnia');
-    AddTemplate('@nazwamiesiaca', 'nazwa miesi¹ca');
-    AddTemplate('@data', 'aktualna data w formacie DD-MM-RRRR');
-    AddTemplate('@dataczas', 'aktualna data i czas w formacie DD-MM-RRRR HH:MM');
-    AddTemplate('@wersja', 'wersja programu CManager');
+    AddTemplate('@godz@', 'aktualna godzina w formacie HH');
+    AddTemplate('@min@', 'aktualna minuta w formacie MM');
+    AddTemplate('@czas@', 'aktualny czas w formacie HH:MM');
+    AddTemplate('@dzien@', 'aktualny dzieñ w formacie DD');
+    AddTemplate('@miesiac@', 'aktualny miesiac w formacie MM');
+    AddTemplate('@rok@', 'aktualny rok w formacie RRRR');
+    AddTemplate('@rokkrotki@', 'aktualny rok w formacie RR');
+    AddTemplate('@dzientygodnia@', 'numer dnia w tygodni');
+    AddTemplate('@nazwadnia@', 'nazwa dnia');
+    AddTemplate('@nazwamiesiaca@', 'nazwa miesi¹ca');
+    AddTemplate('@data@', 'aktualna data w formacie RRRR-MM-DD');
+    AddTemplate('@dataczas@', 'aktualna data i czas w formacie RRRR-MM-DD HH:MM');
+    AddTemplate('@wersja@', 'wersja programu CManager');
   end;
   with GBaseMovementTemplatesList do begin
-    AddTemplate('@dataoperacji', 'data operacji w formacie DD-MM-RRRR');
-    AddTemplate('@rodzaj', 'rodzaj operacji');
-    AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
-    AddTemplate('@kontodocelowe', 'nazwa konta docelowego dla operacji');
-    AddTemplate('@kategoria', 'nazwa kategorii wybranej w operacji');
-    AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');
+    AddTemplate('@rodzaj@', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kontodocelowe@', 'nazwa konta docelowego dla operacji');
+    AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
   end;
   with GMovementListTemplatesList do begin
-    AddTemplate('@dataoperacji', 'data operacji w formacie DD-MM-RRRR');
-    AddTemplate('@rodzaj', 'rodzaj operacji');
-    AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
-    AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');
+    AddTemplate('@rodzaj@', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
   end;
   with GPlannedMovementTemplatesList do begin
-    AddTemplate('@status', 'aktywnoœæ planowanej operacji');
-    AddTemplate('@rodzaj', 'rodzaj operacji');
-    AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
-    AddTemplate('@kategoria', 'nazwa kategorii wybranej w operacji');
-    AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
-    AddTemplate('@harmonogram', 'opis harmonogramu wykonywania');
+    AddTemplate('@status@', 'aktywnoœæ planowanej operacji');
+    AddTemplate('@rodzaj@', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@harmonogram@', 'opis harmonogramu wykonywania');
   end;
   with GMovementListElementsTemplatesList do begin
-    AddTemplate('@kategoria', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
   end;
 finalization
   GMovementListElementsTemplatesList.Free;

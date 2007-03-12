@@ -186,7 +186,7 @@ var xNode: PVirtualNode;
 begin
   xNode := FindNodeByData(AData);
   if xNode <> Nil then begin
-    MovementList.DeleteNode(xNode);
+    MovementList.BeginUpdate;
     if Fmodified.IndexOf(AData) <> -1 then begin
       Fmodified.Remove(AData);
     end;
@@ -195,6 +195,8 @@ begin
     end;
     xData := TMovementListElement(Fmovements.Extract(AData));
     Fdeleted.Add(xData);
+    MovementList.DeleteNode(xNode);
+    MovementList.EndUpdate;
   end;
   CCurrEditCash.Value := GetCash;
 end;
@@ -605,16 +607,16 @@ end;
 function TCMovementListForm.ExpandTemplate(ATemplate: String): String;
 begin
   Result := inherited ExpandTemplate(ATemplate);
-  if ATemplate = '@dataoperacji' then begin
-    Result := GetFormattedDate(CDateTime1.Value, 'dd-MM-yyyy');
-  end else if ATemplate = '@rodzaj' then begin
+  if ATemplate = '@dataoperacji@' then begin
+    Result := GetFormattedDate(CDateTime1.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@rodzaj@' then begin
     Result := ComboBox1.Text;
-  end else if ATemplate = '@kontozrodlowe' then begin
+  end else if ATemplate = '@kontozrodlowe@' then begin
     Result := '<konto Ÿród³owe>';
     if CStaticInoutOnceAccount.DataId <> CEmptyDataGid then begin
       Result := CStaticInoutOnceAccount.Caption;
     end;
-  end else if ATemplate = '@kontrahent' then begin
+  end else if ATemplate = '@kontrahent@' then begin
     Result := '<kontrahent>';
     if CStaticInoutOnceCashpoint.DataId <> CEmptyDataGid then begin
       Result := CStaticInoutOnceCashpoint.Caption;

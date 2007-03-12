@@ -579,11 +579,11 @@ end;
 function TCMovementForm.ExpandTemplate(ATemplate: String): String;
 begin
   Result := inherited ExpandTemplate(ATemplate);
-  if ATemplate = '@dataoperacji' then begin
-    Result := GetFormattedDate(CDateTime.Value, 'dd-MM-yyyy');
-  end else if ATemplate = '@rodzaj' then begin
+  if ATemplate = '@dataoperacji@' then begin
+    Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@rodzaj@' then begin
     Result := ComboBoxType.Text;
-  end else if ATemplate = '@kontozrodlowe' then begin
+  end else if ATemplate = '@kontozrodlowe@' then begin
     Result := '<konto Ÿród³owe>';
     if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
       if CStaticInoutOnceAccount.DataId <> CEmptyDataGid then begin
@@ -598,14 +598,14 @@ begin
         Result := CStaticTransSourceAccount.Caption;
       end;
     end;
-  end else if ATemplate = '@kontodocelowe' then begin
+  end else if ATemplate = '@kontodocelowe@' then begin
     Result := '<konto docelowe>';
     if (ComboBoxType.ItemIndex = 2) then begin
       if CStaticTransDestAccount.DataId <> CEmptyDataGid then begin
         Result := CStaticTransDestAccount.Caption;
       end;
     end;
-  end else if ATemplate = '@kategoria' then begin
+  end else if ATemplate = '@kategoria@' then begin
     Result := '<kategoria>';
     if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
       if CStaticInoutOnceCategory.DataId <> CEmptyDataGid then begin
@@ -616,7 +616,7 @@ begin
         Result := CStaticInoutCyclicCategory.Caption;
       end;
     end;
-  end else if ATemplate = '@kontrahent' then begin
+  end else if ATemplate = '@kontrahent@' then begin
     Result := '<kontrahent>';
     if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
       if CStaticInoutOnceCashpoint.DataId <> CEmptyDataGid then begin

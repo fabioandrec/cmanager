@@ -282,24 +282,24 @@ begin
   Result := inherited ExpandTemplate(ATemplate);
   if ATemplate = '@status' then begin
     Result := ComboBoxStatus.Text;
-  end else if ATemplate = '@rodzaj' then begin
+  end else if ATemplate = '@rodzaj@' then begin
     Result := ComboBoxType.Text;
-  end else if ATemplate = '@kontozrodlowe' then begin
+  end else if ATemplate = '@kontozrodlowe@' then begin
     Result := '<konto Ÿród³owe>';
     if CStaticAccount.DataId <> CEmptyDataGid then begin
       Result := CStaticAccount.Caption;
     end;
-  end else if ATemplate = '@kategoria' then begin
+  end else if ATemplate = '@kategoria@' then begin
     Result := '<kategoria>';
     if CStaticCategory.DataId <> CEmptyDataGid then begin
       Result := CStaticCategory.Caption;
     end;
-  end else if ATemplate = '@kontrahent' then begin
+  end else if ATemplate = '@kontrahent@' then begin
     Result := '<kontrahent>';
     if CStaticCashpoint.DataId <> CEmptyDataGid then begin
       Result := CStaticCashpoint.Caption;
     end;
-  end else if ATemplate = '@harmonogram' then begin
+  end else if ATemplate = '@harmonogram@' then begin
     Result := FSchedule.AsString;
   end;
 end;

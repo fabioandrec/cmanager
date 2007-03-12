@@ -225,8 +225,10 @@ var xNode: PVirtualNode;
 begin
   xNode := FindDataobjectNode(AId, PlannedList);
   if xNode <> Nil then begin
-    PlannedList.DeleteNode(xNode);
+    PlannedList.BeginUpdate;
     FPlannedObjects.Remove(TPlannedMovement(PlannedList.GetNodeData(xNode)^));
+    PlannedList.DeleteNode(xNode);
+    PlannedList.EndUpdate;
   end;
   SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
 end;

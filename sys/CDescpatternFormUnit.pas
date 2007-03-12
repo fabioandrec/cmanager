@@ -58,6 +58,7 @@ begin
   if ComboBoxType.Items.Count > 0 then begin
     ComboBoxType.ItemIndex := 0;
   end;
+  ComboBoxType.Enabled := ComboBoxType.Items.Count > 1;
   ComboBoxTypeChange(Nil);
 end;
 

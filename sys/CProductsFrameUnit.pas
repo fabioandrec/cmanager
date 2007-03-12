@@ -328,7 +328,7 @@ var xNode: PVirtualNode;
 begin
   xNode := FindTreeobjectNode(AId, ProductList);
   if xNode <> Nil then begin
-    ProductList.DeleteNode(xNode);
+    ProductList.BeginUpdate;
     xTree := FTreeHelper.FindDataId(AId, FTreeHelper);
     if TProduct(xTree.Dataobject).idParentProduct <> CEmptyDataGid then begin
       xParentTree := FTreeHelper.FindDataId(TProduct(xTree.Dataobject).idParentProduct, FTreeHelper);
@@ -337,6 +337,8 @@ begin
       FTreeHelper.Remove(xTree);
     end;
     FProductObjects.Remove(TProduct(ProductList.GetNodeData(xNode)^));
+    ProductList.DeleteNode(xNode);
+    ProductList.EndUpdate;
   end;
 end;
 

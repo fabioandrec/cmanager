@@ -287,7 +287,7 @@ begin
   CellText := '';
   xData := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   if Column = 0 then begin
-    if Node.Parent = TodayList.RootNode then begin
+    if TodayList.NodeParent[Node] = Nil then begin
       CellText := IntToStr(Node.Index + 1);
     end;
   end else if Column = 1 then begin
@@ -439,12 +439,12 @@ begin
   xNode := FindObjectNode(AId, AOption);
   if xNode <> Nil then begin
     xData := TMovementTreeElement(TodayList.GetNodeData(xNode)^);
-    if xNode.Parent = TodayList.RootNode then begin
+    if TodayList.NodeParent[xNode] = Nil then begin
       xTreeList := FTreeHelper;
     end else begin
       xTreeList := TTreeObject(TodayList.GetNodeData(xNode.Parent)^).Childobjects;
     end;
-    TodayList.DeleteNode(xNode);
+    TodayList.BeginUpdate;
     if AOption = WMOPT_BASEMOVEMENT then begin
       FTodayObjects.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject);
     end else if AOption = WMOPT_MOVEMENTLIST then begin
@@ -452,6 +452,8 @@ begin
       FTodayLists.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject)
     end;
     xTreeList.Remove(xData);
+    TodayList.DeleteNode(xNode);
+    TodayList.EndUpdate;
   end;
   ReloadSums;
 end;
@@ -469,12 +471,12 @@ begin
       TodayList.InvalidateNode(xNode);
       TodayList.Sort(xNode, TodayList.Header.SortColumn, TodayList.Header.SortDirection);
     end else begin
-      if xNode.Parent = TodayList.RootNode then begin
+      if TodayList.NodeParent[xNode] = Nil then begin
         xTreeList := FTreeHelper;
       end else begin
         xTreeList := TTreeObject(TodayList.GetNodeData(xNode.Parent)^).Childobjects;
       end;
-      TodayList.DeleteNode(xNode);
+      TodayList.BeginUpdate;
       if AOption = WMOPT_BASEMOVEMENT then begin
         FTodayObjects.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject);
       end else if AOption = WMOPT_MOVEMENTLIST then begin
@@ -482,6 +484,8 @@ begin
         FTodayLists.Remove(TMovementTreeElement(TodayList.GetNodeData(xNode)^).Dataobject)
       end;
       xTreeList.Remove(xBase);
+      TodayList.DeleteNode(xNode);
+      TodayList.EndUpdate;
     end;
   end;
   ReloadSums;

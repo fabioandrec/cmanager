@@ -208,8 +208,10 @@ var xNode: PVirtualNode;
 begin
   xNode := FindDataobjectNode(AId, FilterList);
   if xNode <> Nil then begin
-    FilterList.DeleteNode(xNode);
+    FilterList.BeginUpdate;
     FFilterObjects.Remove(TMovementFilter(FilterList.GetNodeData(xNode)^));
+    FilterList.DeleteNode(xNode);
+    FilterList.EndUpdate;
   end;
 end;
 

@@ -210,7 +210,12 @@ end;
 procedure SimpleRichText(AText: String; ARichEdit: TRichEdit);
 begin
   SendMessage(ARichEdit.Handle, $400 + 120, 0, 0);
+  ARichEdit.Lines.BeginUpdate;
+  ARichEdit.Lines.Clear;
   ARichEdit.Text := AText;
+  ARichEdit.Lines.EndUpdate;
+  ARichEdit.SelStart := Length(ARichEdit.Text) + 1;
+  ARichEdit.SelLength := 0;
 end;
 
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);

@@ -167,7 +167,7 @@ end;
 function TCMovmentListElementForm.ExpandTemplate(ATemplate: String): String;
 begin
   Result := inherited ExpandTemplate(ATemplate);
-  if ATemplate = '@kategoria' then begin
+  if ATemplate = '@kategoria@' then begin
     Result := '<kategoria>';
     if CStaticCategory.DataId <> CEmptyDataGid then begin
       Result := CStaticCategory.Caption;

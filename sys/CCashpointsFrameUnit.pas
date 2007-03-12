@@ -245,8 +245,10 @@ var xNode: PVirtualNode;
 begin
   xNode := FindDataobjectNode(AId, CashpointList);
   if xNode <> Nil then begin
-    CashpointList.DeleteNode(xNode);
+    CashpointList.BeginUpdate;
     FCashpointObjects.Remove(TCashPoint(CashpointList.GetNodeData(xNode)^));
+    CashpointList.DeleteNode(xNode);
+    CashpointList.EndUpdate;
   end;
 end;
 

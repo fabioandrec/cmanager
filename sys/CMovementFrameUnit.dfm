@@ -124,7 +124,6 @@ inherited CMovementFrame: TCMovementFrame
       TreeOptions.SelectionOptions = [toFullRowSelect]
       OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
-      OnFocusChanged = TodayListFocusChanged
       OnGetText = SumListGetText
       OnGetHint = TodayListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
