@@ -140,6 +140,8 @@ begin
     xData.Add(GMovementListTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 2 then begin
     xData.Add(GPlannedMovementTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 3 then begin
+    xData.Add(GMovementListElementsTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;

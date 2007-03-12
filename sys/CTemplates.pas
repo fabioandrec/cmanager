@@ -38,6 +38,7 @@ type
 var GBaseTemlatesList: TDescTemplateList;
     GBaseMovementTemplatesList: TDescTemplateList;
     GMovementListTemplatesList: TDescTemplateList;
+    GMovementListElementsTemplatesList: TDescTemplateList;
     GPlannedMovementTemplatesList: TDescTemplateList;
 
 implementation
@@ -97,6 +98,7 @@ initialization
   GBaseMovementTemplatesList := TDescTemplateList.Create('Mnemoniki wykonanych operacji');
   GMovementListTemplatesList := TDescTemplateList.Create('Mnemoniki list operacji');
   GPlannedMovementTemplatesList := TDescTemplateList.Create('Mnemoniki planowanych operacji');
+  GMovementListElementsTemplatesList := TDescTemplateList.Create('Mnemoniki elementów listy operacji');
   with GBaseTemlatesList do begin
     AddTemplate('@godz', 'aktualna godzina w formacie HH');
     AddTemplate('@min', 'aktualna minuta w formacie MM');
@@ -121,6 +123,7 @@ initialization
     AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
   end;
 finalization
+  GMovementListElementsTemplatesList.Free;
   GBaseTemlatesList.Free;
   GPlannedMovementTemplatesList.Free;
   GBaseMovementTemplatesList.Free;

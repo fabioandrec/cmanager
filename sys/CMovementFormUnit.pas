@@ -580,7 +580,7 @@ function TCMovementForm.ExpandTemplate(ATemplate: String): String;
 begin
   Result := inherited ExpandTemplate(ATemplate);
   if ATemplate = '@dataoperacji' then begin
-    Result := GetFormattedDate(Now, 'dd-MM-yyyy');
+    Result := GetFormattedDate(CDateTime.Value, 'dd-MM-yyyy');
   end else if ATemplate = '@rodzaj' then begin
     Result := ComboBoxType.Text;
   end else if ATemplate = '@kontozrodlowe' then begin

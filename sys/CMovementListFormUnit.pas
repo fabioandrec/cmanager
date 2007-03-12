@@ -89,6 +89,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
@@ -599,6 +600,26 @@ end;
 procedure TCMovementListForm.CStaticInoutOnceCashpointChanged(Sender: TObject);
 begin
   UpdateDescription;
+end;
+
+function TCMovementListForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@dataoperacji' then begin
+    Result := GetFormattedDate(CDateTime1.Value, 'dd-MM-yyyy');
+  end else if ATemplate = '@rodzaj' then begin
+    Result := ComboBox1.Text;
+  end else if ATemplate = '@kontozrodlowe' then begin
+    Result := '<konto Ÿród³owe>';
+    if CStaticInoutOnceAccount.DataId <> CEmptyDataGid then begin
+      Result := CStaticInoutOnceAccount.Caption;
+    end;
+  end else if ATemplate = '@kontrahent' then begin
+    Result := '<kontrahent>';
+    if CStaticInoutOnceCashpoint.DataId <> CEmptyDataGid then begin
+      Result := CStaticInoutOnceCashpoint.Caption;
+    end;
+  end;
 end;
 
 end.

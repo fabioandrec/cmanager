@@ -41,14 +41,13 @@ inherited CDescpatternForm: TCDescpatternForm
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
-        ItemIndex = 0
         TabOrder = 0
-        Text = 'Operacje wykonane'
         OnChange = ComboBoxOperationChange
         Items.Strings = (
           'Operacje wykonane'
           'Listy operacji wykonanych'
-          'Operacje zaplanowane')
+          'Operacje zaplanowane'
+          'Elementy listy operacji')
       end
       object ComboBoxType: TComboBox
         Left = 304

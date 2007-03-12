@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, CDatabase, CDataObjects;
+  CComponents, CDatabase, CDataObjects, ActnList, XPStyleActnCtrls, ActnMan;
 
 type
   TMovementListElement = class(TObject)
@@ -33,8 +33,15 @@ type
     Label9: TLabel;
     CStaticCategory: TCStatic;
     CCurrEdit: TCCurrEdit;
+    ActionManager: TActionManager;
+    ActionAdd: TAction;
+    ActionTemplate: TAction;
+    CButton1: TCButton;
+    CButton2: TCButton;
     procedure CStaticCategoryChanged(Sender: TObject);
     procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure ActionTemplateExecute(Sender: TObject);
   private
     Felement: TMovementListElement;
     function ChooseProduct(var AId, AText: String): Boolean;
@@ -50,13 +57,18 @@ type
 implementation
 
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
-     CInfoFormUnit;
+     CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
+     CPreferences;
 
 {$R *.dfm}
 
 procedure TCMovmentListElementForm.UpdateDescription;
+var xDesc: String;
 begin
-  //TODO
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][IfThen(Felement.movementType = COutMovement, 0, 1)], '');
+  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+  xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
+  RichEditDesc.Text := xDesc;
 end;
 
 procedure TCMovmentListElementForm.CStaticCategoryChanged(Sender: TObject);
@@ -130,6 +142,24 @@ begin
   inherited Create;
   CreateGUID(xGuid);
   Fid := GUIDToString(xGuid);
+end;
+
+procedure TCMovmentListElementForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GBaseMovementTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc, True);
+  xData.Free;
+end;
+
+procedure TCMovmentListElementForm.ActionTemplateExecute(Sender: TObject);
+var xPattern: String;
+begin
+  if EditDescPattern(CDescPatternsKeys[0][IfThen(Felement.movementType = COutMovement, 0, 1)], xPattern) then begin
+    UpdateDescription;
+  end;
 end;
 
 end.
