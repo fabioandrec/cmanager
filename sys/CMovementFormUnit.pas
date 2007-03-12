@@ -108,7 +108,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
-  CTemplates, CPreferences;
+  CTemplates, CPreferences, CRichtext;
 
 {$R *.dfm}
 
@@ -240,7 +240,7 @@ begin
   xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
   xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
   xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
-  RichEditDesc.Text := xDesc;
+  SimpleRichText(xDesc, RichEditDesc);
 end;
 
 procedure TCMovementForm.CStaticInoutOnceAccountChanged(Sender: TObject);
@@ -384,7 +384,7 @@ begin
     end;
     GDataProvider.RollbackTransaction;
     CDateTime.Value := regDate;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     FbaseList := idMovementList;
   end;
 end;
@@ -605,7 +605,7 @@ begin
         Result := CStaticTransDestAccount.Caption;
       end;
     end;
-  end else if ATemplate = '@kategria' then begin
+  end else if ATemplate = '@kategoria' then begin
     Result := '<kategoria>';
     if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
       if CStaticInoutOnceCategory.DataId <> CEmptyDataGid then begin

@@ -97,7 +97,7 @@ implementation
 uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
-  CDescpatternFormUnit;
+  CDescpatternFormUnit, CRichtext;
 
 {$R *.dfm}
 
@@ -419,7 +419,7 @@ begin
     CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
     CDateTime1.Value := regDate;
     CCurrEditCash.Value := cash;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     ComboBox1.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
     ComboBox1.Enabled := False;
     xList := GetMovements;
@@ -576,10 +576,10 @@ end;
 procedure TCMovementListForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBox1.ItemIndex], '');
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[1][ComboBox1.ItemIndex], '');
   xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
   xDesc := GMovementListTemplatesList.ExpandTemplates(xDesc, Self);
-  RichEditDesc.Text := xDesc;
+  SimpleRichText(xDesc, RichEditDesc);
 end;
 
 procedure TCMovementListForm.CDateTime1Changed(Sender: TObject);

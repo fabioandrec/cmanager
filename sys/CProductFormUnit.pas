@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CConsts, CProductsFrameUnit;
+uses CDataObjects, CInfoFormUnit, CConsts, CProductsFrameUnit, CRichtext;
 
 {$R *.dfm}
 
@@ -56,7 +56,7 @@ procedure TCProductForm.FillForm;
 begin
   with TProduct(Dataobject) do begin
     EditName.Text := name;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     if productType = CInProduct then begin
       ComboBoxType.ItemIndex := 1;
     end else begin

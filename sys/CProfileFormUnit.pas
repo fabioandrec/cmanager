@@ -36,7 +36,7 @@ implementation
 
 uses CDataObjects, CInfoFormUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CAccountsFrameUnit, CProductsFrameUnit, CProfileFrameUnit, CConsts,
-  CDatatools;
+  CDatatools, CRichtext;
 
 {$R *.dfm}
 
@@ -54,7 +54,7 @@ procedure TCProfileForm.FillForm;
 begin
   with TProfile(Dataobject) do begin
     EditName.Text := name;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     if idAccount <> CEmptyDataGid then begin
       CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
       CStaticAccount.DataId := idAccount;

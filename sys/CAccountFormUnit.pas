@@ -37,7 +37,7 @@ type
 implementation
 
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
-  CCashpointsFrameUnit, CConsts, CAccountsFrameUnit;
+  CCashpointsFrameUnit, CConsts, CAccountsFrameUnit, CRichtext;
 
 {$R *.dfm}
 
@@ -72,7 +72,7 @@ var xCashPoint: TCashPoint;
 begin
   with TAccount(Dataobject) do begin
     EditName.Text := name;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     if accountType = CBankAccount then begin
       ComboBoxType.ItemIndex := 1;
     end else begin

@@ -40,7 +40,7 @@ function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpand
 
 implementation
 
-uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit;
+uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit, CRichtext;
 
 {$R *.dfm}
 
@@ -63,7 +63,7 @@ end;
 
 procedure TCDescpatternForm.ComboBoxTypeChange(Sender: TObject);
 begin
-  RichEditDesc.Text := FDescPatterns.GetPattern(CDescPatternsKeys[ComboBoxOperation.ItemIndex][ComboBoxType.ItemIndex], '');
+  AssignRichText(FDescPatterns.GetPattern(CDescPatternsKeys[ComboBoxOperation.ItemIndex][ComboBoxType.ItemIndex], ''), RichEditDesc);
 end;
 
 constructor TCDescpatternForm.Create(AOwner: TComponent);

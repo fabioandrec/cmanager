@@ -18,6 +18,7 @@ const
   CRtFCA = '<c>';
 
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
+procedure SimpleRichText(AText: String; ARichEdit: TRichEdit);
 procedure AddRichText(AText: String; ARichEdit: TRichEdit);
 
 implementation
@@ -206,6 +207,12 @@ begin
   ARichEdit.SelLength := 0;
 end;
 
+procedure SimpleRichText(AText: String; ARichEdit: TRichEdit);
+begin
+  SendMessage(ARichEdit.Handle, $400 + 120, 0, 0);
+  ARichEdit.Text := AText;
+end;
+
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
 var xLines: TStringList;
     xCount_1, xCount_2: Integer;
@@ -256,6 +263,8 @@ begin
     ARichEdit.Text := AText;
   end;
   ARichEdit.Lines.EndUpdate;
+  ARichEdit.SelStart := Length(ARichEdit.Text) + 1;
+  ARichEdit.SelLength := 0;
 end;
 
 end.

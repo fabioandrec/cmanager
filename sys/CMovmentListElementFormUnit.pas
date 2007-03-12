@@ -42,6 +42,7 @@ type
     procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     Felement: TMovementListElement;
     function ChooseProduct(var AId, AText: String): Boolean;
@@ -52,23 +53,24 @@ type
   public
     procedure UpdateDescription;
     constructor CreateFormElement(AOwner: TComponent; AElement: TMovementListElement);
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
 
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
      CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
-     CPreferences;
+     CPreferences, CRichtext;
 
 {$R *.dfm}
 
 procedure TCMovmentListElementForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][IfThen(Felement.movementType = COutMovement, 0, 1)], '');
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[3][0], '');
   xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-  xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
-  RichEditDesc.Text := xDesc;
+  xDesc := GMovementListElementsTemplatesList.ExpandTemplates(xDesc, Self);
+  SimpleRichText(xDesc, RichEditDesc);
 end;
 
 procedure TCMovmentListElementForm.CStaticCategoryChanged(Sender: TObject);
@@ -103,7 +105,7 @@ var xProduct: TProduct;
 begin
   inherited FillForm;
   if Operation = coEdit then begin
-    RichEditDesc.Text := Felement.description;
+    AssignRichText(Felement.description, RichEditDesc);
     CCurrEdit.Value := Felement.cash;
     CStaticCategory.DataId := Felement.productId;
     GDataProvider.BeginTransaction;
@@ -149,7 +151,7 @@ var xData: TObjectList;
 begin
   xData := TObjectList.Create(False);
   xData.Add(GBaseTemlatesList);
-  xData.Add(GBaseMovementTemplatesList);
+  xData.Add(GMovementListElementsTemplatesList);
   EditAddTemplate(xData, Self, RichEditDesc, True);
   xData.Free;
 end;
@@ -157,9 +159,26 @@ end;
 procedure TCMovmentListElementForm.ActionTemplateExecute(Sender: TObject);
 var xPattern: String;
 begin
-  if EditDescPattern(CDescPatternsKeys[0][IfThen(Felement.movementType = COutMovement, 0, 1)], xPattern) then begin
+  if EditDescPattern(CDescPatternsKeys[3][IfThen(Felement.movementType = COutMovement, 0, 1)], xPattern) then begin
     UpdateDescription;
   end;
+end;
+
+function TCMovmentListElementForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@kategoria' then begin
+    Result := '<kategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      Result := CStaticCategory.Caption;
+    end;
+  end;
+end;
+
+procedure TCMovmentListElementForm.FormShow(Sender: TObject);
+begin
+  inherited;
+  UpdateDescription;
 end;
 
 end.

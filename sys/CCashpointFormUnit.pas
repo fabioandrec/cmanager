@@ -26,7 +26,7 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit, CConsts;
+uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit, CConsts, CRichtext;
 
 {$R *.dfm}
 
@@ -44,7 +44,7 @@ procedure TCCashpointForm.FillForm;
 begin
   with TCashPoint(Dataobject) do begin
     EditName.Text := name;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     if cashpointType = CCashpointTypeAll then begin
       ComboBoxType.ItemIndex := 0;
     end else if cashpointType = CCashpointTypeIn then begin

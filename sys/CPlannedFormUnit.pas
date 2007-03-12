@@ -62,6 +62,7 @@ type
     function GetUpdateFrameClass: TCBaseFrameClass; override;
   public
     destructor Destroy; override;
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
@@ -69,7 +70,7 @@ implementation
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit, CTemplates,
-  CDescpatternFormUnit, CPreferences;
+  CDescpatternFormUnit, CPreferences, CRichtext;
 
 {$R *.dfm}
 
@@ -87,8 +88,8 @@ procedure TCPlannedForm.InitializeForm;
 begin
   FSchedule := TSchedule.Create;
   ComboBoxTypeChange(ComboBoxType);
-  UpdateDescription;
   CStaticSchedule.Caption := FSchedule.AsString;
+  UpdateDescription;
 end;
 
 procedure TCPlannedForm.CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -156,10 +157,10 @@ end;
 procedure TCPlannedForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[2][ComboBoxType.ItemIndex], '');
   xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
   xDesc := GPlannedMovementTemplatesList.ExpandTemplates(xDesc, Self);
-  RichEditDesc.Text := xDesc;
+  SimpleRichText(xDesc, RichEditDesc);
 end;
 
 procedure TCPlannedForm.CStaticAccountChanged(Sender: TObject);
@@ -182,7 +183,7 @@ end;
 procedure TCPlannedForm.FillForm;
 begin
   with TPlannedMovement(Dataobject) do begin
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     CCurrEdit.Value := cash;
     ComboBoxType.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
     ComboBoxStatus.ItemIndex := IfThen(isActive, 0, 1);
@@ -273,6 +274,33 @@ var xPattern: String;
 begin
   if EditDescPattern(CDescPatternsKeys[2][ComboBoxType.ItemIndex], xPattern) then begin
     UpdateDescription;
+  end;
+end;
+
+function TCPlannedForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@status' then begin
+    Result := ComboBoxStatus.Text;
+  end else if ATemplate = '@rodzaj' then begin
+    Result := ComboBoxType.Text;
+  end else if ATemplate = '@kontozrodlowe' then begin
+    Result := '<konto Ÿród³owe>';
+    if CStaticAccount.DataId <> CEmptyDataGid then begin
+      Result := CStaticAccount.Caption;
+    end;
+  end else if ATemplate = '@kategoria' then begin
+    Result := '<kategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      Result := CStaticCategory.Caption;
+    end;
+  end else if ATemplate = '@kontrahent' then begin
+    Result := '<kontrahent>';
+    if CStaticCashpoint.DataId <> CEmptyDataGid then begin
+      Result := CStaticCashpoint.Caption;
+    end;
+  end else if ATemplate = '@harmonogram' then begin
+    Result := FSchedule.AsString;
   end;
 end;
 

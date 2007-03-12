@@ -119,8 +119,25 @@ initialization
     AddTemplate('@rodzaj', 'rodzaj operacji');
     AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
     AddTemplate('@kontodocelowe', 'nazwa konta docelowego dla operacji');
-    AddTemplate('@kategria', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@kategoria', 'nazwa kategorii wybranej w operacji');
     AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
+  end;
+  with GMovementListTemplatesList do begin
+    AddTemplate('@dataoperacji', 'data operacji w formacie DD-MM-RRRR');
+    AddTemplate('@rodzaj', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
+  end;
+  with GPlannedMovementTemplatesList do begin
+    AddTemplate('@status', 'aktywnoœæ planowanej operacji');
+    AddTemplate('@rodzaj', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kategoria', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@harmonogram', 'opis harmonogramu wykonywania');
+  end;
+  with GMovementListElementsTemplatesList do begin
+    AddTemplate('@kategoria', 'nazwa kategorii wybranej w operacji');
   end;
 finalization
   GMovementListElementsTemplatesList.Free;

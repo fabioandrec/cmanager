@@ -32,7 +32,7 @@ type
 
 implementation
 
-uses CDatabase, CDataObjects, CConsts;
+uses CDatabase, CDataObjects, CConsts, CRichtext;
 
 {$R *.dfm}
 
@@ -51,7 +51,7 @@ begin
     end else begin
       ComboBoxStatus.ItemIndex := 2;
     end;
-    RichEditDesc.Text := FData.done.description;
+    AssignRichText(FData.done.description, RichEditDesc);
     CCurrCash.Value := FData.done.cash;
   end;
   GDataProvider.RollbackTransaction;

@@ -42,7 +42,7 @@ type
 implementation
 
 uses CDataObjects, CInfoFormUnit, CFrameFormUnit, CAccountsFrameUnit,
-  CCashpointsFrameUnit, CProductsFrameUnit, CFilterFrameUnit;
+  CCashpointsFrameUnit, CProductsFrameUnit, CFilterFrameUnit, CRichtext;
 
 {$R *.dfm}
 
@@ -60,7 +60,7 @@ procedure TCFilterForm.FillForm;
 begin
   with TMovementFilter(Dataobject) do begin
     EditName.Text := name;
-    RichEditDesc.Text := description;
+    SimpleRichText(description, RichEditDesc);
     LoadSubfilters;
     FFilterAccounts.Text := accounts.Text;
     FFilterProducts.Text := products.Text;
