@@ -36,7 +36,7 @@ type
   end;
 
 function EditDescPattern(AName: String; var APattern: String): Boolean;
-function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit): Boolean;
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit; AInserValue: Boolean): Boolean;
 
 implementation
 
@@ -134,21 +134,33 @@ var xData: TObjectList;
 begin
   xData := TObjectList.Create(False);
   xData.Add(GBaseTemlatesList);
-  xData.Add(GMovementTemplatesList);
-  EditAddTemplate(xData, Self, RichEditDesc);
+  if ComboBoxOperation.ItemIndex = 0 then begin
+    xData.Add(GBaseMovementTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 1 then begin
+    xData.Add(GMovementListTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 2 then begin
+    xData.Add(GPlannedMovementTemplatesList);
+  end;
+  EditAddTemplate(xData, Self, RichEditDesc, False);
+  xData.Free;
 end;
 
-function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit): Boolean;
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit; AInserValue: Boolean): Boolean;
 var xId, xText, xDesc: String;
     xSelStart, xSelLength: Integer;
+    xData: TDescAdditionalData;
 begin
-  Result := TCFrameForm.ShowFrame(TCDescTemplatesFrame, xId, xText, ATemplates);
+  xData := TDescAdditionalData.Create(ATemplates);
+  Result := TCFrameForm.ShowFrame(TCDescTemplatesFrame, xId, xText, xData);
   if Result then begin
     ARiched.Lines.BeginUpdate;
     xDesc := ARiched.Text;
     xSelStart := ARiched.SelStart + 1;
     xSelLength := ARiched.SelLength;
     System.Delete(xDesc, xSelStart, xSelLength);
+    if AInserValue then begin
+      xId := AExpander.ExpandTemplate(xId);
+    end;
     xDesc := Copy(xDesc, 1, xSelStart - 1) + xId + Copy(xDesc, xSelStart, MaxInt);
     ARiched.Text := xDesc;
     ARiched.SelStart := xSelStart + Length(xId) - 1;

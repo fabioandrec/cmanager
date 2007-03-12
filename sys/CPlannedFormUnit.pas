@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, CDatabase, ActnList, CScheduleFormUnit, CBaseFrameUnit;
+  CComponents, CDatabase, ActnList, CScheduleFormUnit, CBaseFrameUnit,
+  XPStyleActnCtrls, ActnMan, Contnrs;
 
 type
   TCPlannedForm = class(TCDataobjectForm)
@@ -27,6 +28,11 @@ type
     ComboBoxStatus: TComboBox;
     Label1: TLabel;
     CStaticSchedule: TCStatic;
+    ActionManager: TActionManager;
+    ActionAdd: TAction;
+    ActionTemplate: TAction;
+    CButton1: TCButton;
+    CButton2: TCButton;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -39,6 +45,8 @@ type
     procedure CStaticAccountChanged(Sender: TObject);
     procedure ComboBoxModeChange(Sender: TObject);
     procedure CStaticScheduleGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure ActionTemplateExecute(Sender: TObject);
   private
     FSchedule: TSchedule;
   protected
@@ -60,7 +68,8 @@ implementation
 
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
-  CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit;
+  CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit, CTemplates,
+  CDescpatternFormUnit, CPreferences;
 
 {$R *.dfm}
 
@@ -145,26 +154,12 @@ begin
 end;
 
 procedure TCPlannedForm.UpdateDescription;
-var xI: Integer;
-    xText: String;
+var xDesc: String;
 begin
-  xI := ComboBoxType.ItemIndex;
-  GDataProvider.BeginTransaction;
-  if (xI = 0) then begin
-    if CStaticCategory.DataId <> CEmptyDataGid then begin
-      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).name;
-    end else begin
-      xText := '[kategoria rozchodu]';
-    end;
-  end else if (xI = 1) then begin
-    if CStaticCategory.DataId <> CEmptyDataGid then begin
-      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).name;
-    end else begin
-      xText := '[kategoria przychodu]';
-    end;
-  end;
-  RichEditDesc.Text := xText;
-  GDataProvider.RollbackTransaction;
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
+  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+  xDesc := GPlannedMovementTemplatesList.ExpandTemplates(xDesc, Self);
+  RichEditDesc.Text := xDesc;
 end;
 
 procedure TCPlannedForm.CStaticAccountChanged(Sender: TObject);
@@ -261,6 +256,24 @@ end;
 function TCPlannedForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCPlannedFrame;
+end;
+
+procedure TCPlannedForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GPlannedMovementTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc, True);
+  xData.Free;
+end;
+
+procedure TCPlannedForm.ActionTemplateExecute(Sender: TObject);
+var xPattern: String;
+begin
+  if EditDescPattern(CDescPatternsKeys[2][ComboBoxType.ItemIndex], xPattern) then begin
+    UpdateDescription;
+  end;
 end;
 
 end.

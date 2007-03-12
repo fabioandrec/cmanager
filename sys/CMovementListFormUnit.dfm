@@ -2,13 +2,13 @@ inherited CMovementListForm: TCMovementListForm
   Left = 348
   Top = 32
   Caption = 'Lista operacji'
-  ClientHeight = 641
+  ClientHeight = 667
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 536
-    Height = 600
+    Height = 626
     object GroupBox4: TGroupBox
       Left = 16
       Top = 16
@@ -62,6 +62,7 @@ inherited CMovementListForm: TCMovementListForm
         TabOrder = 0
         TabStop = True
         Transparent = False
+        OnChanged = CDateTime1Changed
         HotTrack = True
       end
       object ComboBox1: TComboBox
@@ -76,6 +77,7 @@ inherited CMovementListForm: TCMovementListForm
         ItemIndex = 0
         TabOrder = 1
         Text = 'Rozch'#243'd'
+        OnChange = ComboBox1Change
         Items.Strings = (
           'Rozch'#243'd'
           'Przych'#243'd')
@@ -96,6 +98,7 @@ inherited CMovementListForm: TCMovementListForm
         Transparent = False
         TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
         OnGetDataId = CStaticInoutOnceAccountGetDataId
+        OnChanged = CStaticInoutOnceAccountChanged
         HotTrack = True
       end
       object CStaticInoutOnceCashpoint: TCStatic
@@ -114,6 +117,7 @@ inherited CMovementListForm: TCMovementListForm
         Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
         OnGetDataId = CStaticInoutOnceCashpointGetDataId
+        OnChanged = CStaticInoutOnceCashpointChanged
         HotTrack = True
       end
     end
@@ -121,9 +125,35 @@ inherited CMovementListForm: TCMovementListForm
       Left = 16
       Top = 481
       Width = 505
-      Height = 112
+      Height = 136
       Caption = ' Opis '
       TabOrder = 1
+      object CButton1: TCButton
+        Left = 14
+        Top = 95
+        Width = 217
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionAdd
+        Color = clBtnFace
+      end
+      object CButton2: TCButton
+        Left = 320
+        Top = 95
+        Width = 161
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionTemplate
+        Color = clBtnFace
+      end
       object RichEditDesc: TRichEdit
         Left = 24
         Top = 28
@@ -295,7 +325,7 @@ inherited CMovementListForm: TCMovementListForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 600
+    Top = 626
     Width = 536
     inherited BitBtnOk: TBitBtn
       Left = 359
@@ -323,6 +353,22 @@ inherited CMovementListForm: TCMovementListForm
       Caption = 'Usu'#324' operacj'#281
       ImageIndex = 2
       OnExecute = Action3Execute
+    end
+  end
+  object ActionManager: TActionManager
+    Images = CImageLists.TemplateImageList16x16
+    Left = 56
+    Top = 226
+    StyleName = 'XP Style'
+    object ActionAdd: TAction
+      Caption = 'Dodaj mnemonik w wybranym miejscu'
+      ImageIndex = 0
+      OnExecute = ActionAddExecute
+    end
+    object ActionTemplate: TAction
+      Caption = 'Konfiguruj szablony opis'#243'w'
+      ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
 end

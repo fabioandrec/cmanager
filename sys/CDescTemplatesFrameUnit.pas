@@ -4,9 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees, GraphUtil;
+  Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees, GraphUtil,
+  Contnrs;
 
 type
+  TDescAdditionalData = class(TObject)
+  private
+    FTemplates: TObjectList;
+  public
+    constructor Create(ATemplates: TObjectList);
+  end;
+
   TCDescTemplatesFrame = class(TCBaseFrame)
     TempList: TVirtualStringTree;
     procedure TempListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
@@ -28,7 +36,7 @@ type
 
 implementation
 
-uses Contnrs, CTemplates, CBaseFormUnit, CFrameFormUnit;
+uses CTemplates, CBaseFormUnit, CFrameFormUnit;
 
 {$R *.dfm}
 
@@ -53,7 +61,7 @@ procedure TCDescTemplatesFrame.TempListInitNode(Sender: TBaseVirtualTree; Parent
 begin
   if ParentNode = Nil then begin
     InitialStates := InitialStates + [ivsHasChildren, ivsExpanded];
-    TObject(TempList.GetNodeData(Node)^) := TObjectList(AdditionalData).Items[Node.Index];
+    TObject(TempList.GetNodeData(Node)^) := TDescAdditionalData(AdditionalData).FTemplates.Items[Node.Index];
   end else begin
     TDescTemplate(TempList.GetNodeData(Node)^) := TDescTemplateList(TempList.GetNodeData(ParentNode)^).Items[Node.Index];
   end;
@@ -67,7 +75,7 @@ end;
 procedure TCDescTemplatesFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
-  TempList.RootNodeCount := TObjectList(AAdditionalData).Count;
+  TempList.RootNodeCount := TDescAdditionalData(AdditionalData).FTemplates.Count;
   TempListFocusChanged(TempList, TempList.FocusedNode, 0);
 end;
 
@@ -139,6 +147,12 @@ end;
 function TCDescTemplatesFrame.GetSelectedText: String;
 begin
   Result := TDescTemplate(TempList.GetNodeData(TempList.FocusedNode)^).description;
+end;
+
+constructor TDescAdditionalData.Create(ATemplates: TObjectList);
+begin
+  inherited Create;
+  FTemplates := ATemplates;
 end;
 
 end.

@@ -36,6 +36,11 @@ type
     Panel3: TPanel;
     Label6: TLabel;
     CCurrEditCash: TCCurrEdit;
+    ActionManager: TActionManager;
+    ActionAdd: TAction;
+    ActionTemplate: TAction;
+    CButton1: TCButton;
+    CButton2: TCButton;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -50,6 +55,12 @@ type
     procedure Action2Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
     procedure MovementListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure ActionTemplateExecute(Sender: TObject);
+    procedure CDateTime1Changed(Sender: TObject);
+    procedure ComboBox1Change(Sender: TObject);
+    procedure CStaticInoutOnceAccountChanged(Sender: TObject);
+    procedure CStaticInoutOnceCashpointChanged(Sender: TObject);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -74,6 +85,7 @@ type
     function GetUpdateFrameOption: Integer; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure UpdateFrames(ADataGid: ShortString; AMessage: Integer; AOption: Integer); override;
+    procedure UpdateDescription;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -83,7 +95,8 @@ implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
-  CDataObjects, StrUtils, CMovementFrameUnit;
+  CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
+  CDescpatternFormUnit;
 
 {$R *.dfm}
 
@@ -219,6 +232,7 @@ begin
       GDataProvider.RollbackTransaction;
     end;
   end;
+  UpdateDescription;
 end;
 
 procedure TCMovementListForm.MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
@@ -538,6 +552,53 @@ begin
     xId := TMovementListElement(Fdeleted.Items[xCount]).id;
     SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xId), WMOPT_BASEMOVEMENT);
   end;
+end;
+
+procedure TCMovementListForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GMovementListTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc, True);
+  xData.Free;
+end;
+
+procedure TCMovementListForm.ActionTemplateExecute(Sender: TObject);
+var xPattern: String;
+begin
+  if EditDescPattern(CDescPatternsKeys[1][ComboBox1.ItemIndex], xPattern) then begin
+    UpdateDescription;
+  end;
+end;
+
+procedure TCMovementListForm.UpdateDescription;
+var xDesc: String;
+begin
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBox1.ItemIndex], '');
+  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+  xDesc := GMovementListTemplatesList.ExpandTemplates(xDesc, Self);
+  RichEditDesc.Text := xDesc;
+end;
+
+procedure TCMovementListForm.CDateTime1Changed(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCMovementListForm.ComboBox1Change(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCMovementListForm.CStaticInoutOnceAccountChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCMovementListForm.CStaticInoutOnceCashpointChanged(Sender: TObject);
+begin
+  UpdateDescription;
 end;
 
 end.

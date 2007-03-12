@@ -79,6 +79,7 @@ type
     procedure CStaticInoutCyclicChanged(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
     procedure ActionAddExecute(Sender: TObject);
+    procedure CDateTimeChanged(Sender: TObject);
   private
     FbaseAccount: TDataGid;
     FsourceAccount: TDataGid;
@@ -97,6 +98,8 @@ type
     procedure UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer); override;
     function GetUpdateFrameOption: Integer; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
+  public
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
@@ -105,7 +108,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
-  CTemplates;
+  CTemplates, CPreferences;
 
 {$R *.dfm}
 
@@ -232,50 +235,12 @@ begin
 end;
 
 procedure TCMovementForm.UpdateDescription;
-var xI: Integer;
-    xText: String;
+var xDesc: String;
 begin
-  xI := ComboBoxType.ItemIndex;
-  GDataProvider.BeginTransaction;
-  if (xI = 0) then begin
-    if CStaticInoutOnceCategory.DataId <> CEmptyDataGid then begin
-      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticInoutOnceCategory.DataId, False)).name;
-    end else begin
-      xText := '[kategoria rozchodu]';
-    end;
-  end else if (xI = 1) then begin
-    if CStaticInoutOnceCategory.DataId <> CEmptyDataGid then begin
-      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticInoutOnceCategory.DataId, False)).name;
-    end else begin
-      xText := '[kategoria przychodu]';
-    end;
-  end else if (xI = 2) then begin
-    xText := 'Transfer z ';
-    if CStaticTransSourceAccount.DataId <> CEmptyDataGid then begin
-      xText := xText + TAccount(TAccount.LoadObject(AccountProxy, CStaticTransSourceAccount.DataId, False)).name;
-    end else begin
-      xText := xText + '[konto Ÿród³owe]';
-    end;
-    if CStaticTransDestAccount.DataId <> CEmptyDataGid then begin
-      xText := xText + ' do ' + TAccount(TAccount.LoadObject(AccountProxy, CStaticTransDestAccount.DataId, False)).name;
-    end else begin
-      xText := xText + ' do ' + '[konto docelowe]';
-    end;
-  end else if (xI = 3) then begin
-    if CStaticInoutCyclicCategory.DataId <> CEmptyDataGid then begin
-      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticInoutCyclicCategory.DataId, False)).name;
-    end else begin
-      xText := '[kategoria rozchodu]';
-    end;
-  end else if (xI = 4) then begin
-    if CStaticInoutCyclicCategory.DataId <> CEmptyDataGid then begin
-      xText := TProduct(TProduct.LoadObject(ProductProxy, CStaticInoutCyclicCategory.DataId, False)).name;
-    end else begin
-      xText := '[kategoria przychodu]';
-    end;
-  end;
-  RichEditDesc.Text := xText;
-  GDataProvider.RollbackTransaction;
+  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
+  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+  xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
+  RichEditDesc.Text := xDesc;
 end;
 
 procedure TCMovementForm.CStaticInoutOnceAccountChanged(Sender: TObject);
@@ -592,6 +557,7 @@ procedure TCMovementForm.ActionTemplateExecute(Sender: TObject);
 var xPattern: String;
 begin
   if EditDescPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], xPattern) then begin
+    UpdateDescription;
   end;
 end;
 
@@ -600,8 +566,68 @@ var xData: TObjectList;
 begin
   xData := TObjectList.Create(False);
   xData.Add(GBaseTemlatesList);
-  xData.Add(GMovementTemplatesList);
-  EditAddTemplate(xData, Self, RichEditDesc);
+  xData.Add(GBaseMovementTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc, True);
+  xData.Free;
+end;
+
+procedure TCMovementForm.CDateTimeChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+function TCMovementForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@dataoperacji' then begin
+    Result := GetFormattedDate(Now, 'dd-MM-yyyy');
+  end else if ATemplate = '@rodzaj' then begin
+    Result := ComboBoxType.Text;
+  end else if ATemplate = '@kontozrodlowe' then begin
+    Result := '<konto Ÿród³owe>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInoutOnceAccount.DataId <> CEmptyDataGid then begin
+        Result := CStaticInoutOnceAccount.Caption;
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInoutCyclicAccount.DataId <> CEmptyDataGid then begin
+        Result := CStaticInoutCyclicAccount.Caption;
+      end;
+    end else if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransSourceAccount.DataId <> CEmptyDataGid then begin
+        Result := CStaticTransSourceAccount.Caption;
+      end;
+    end;
+  end else if ATemplate = '@kontodocelowe' then begin
+    Result := '<konto docelowe>';
+    if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransDestAccount.DataId <> CEmptyDataGid then begin
+        Result := CStaticTransDestAccount.Caption;
+      end;
+    end;
+  end else if ATemplate = '@kategria' then begin
+    Result := '<kategoria>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInoutOnceCategory.DataId <> CEmptyDataGid then begin
+        Result := CStaticInoutOnceCategory.Caption;
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInoutCyclicCategory.DataId <> CEmptyDataGid then begin
+        Result := CStaticInoutCyclicCategory.Caption;
+      end;
+    end;
+  end else if ATemplate = '@kontrahent' then begin
+    Result := '<kontrahent>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInoutOnceCashpoint.DataId <> CEmptyDataGid then begin
+        Result := CStaticInoutOnceCashpoint.Caption;
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInoutCyclicCashpoint.DataId <> CEmptyDataGid then begin
+        Result := CStaticInoutCyclicCashpoint.Caption;
+      end;
+    end;
+  end;
 end;
 
 end.

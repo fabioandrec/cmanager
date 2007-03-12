@@ -211,6 +211,7 @@ function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
+function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
 {$IFDEF SAVETOLOG}
 procedure StartTickcounting;
@@ -1150,6 +1151,18 @@ begin
   FreeMem(xRes);
 end;
 
+function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
+var xTime: TSystemTime;
+    xRes: PChar;
+begin
+  GetMem(xRes, $FF);
+  DateTimeToSystemTime(ADate, xTime);
+  if GetTimeFormat(GetThreadLocale, 0, @xTime, PChar(AFormat), xRes, $FF) <> 0 then begin
+    Result := String(xRes);
+  end;
+  FreeMem(xRes);
+end;
+
 {$IFDEF SAVETOLOG}
 procedure SaveToLog(AText: String);
 var xStream: TFileStream;
@@ -1239,7 +1252,7 @@ begin
   if xCount = 0 then begin
     xSql := Format('insert into cmanagerParams (paramName, paramValue) values (''%s'', ''%s'')', [AName, AValue]);
   end else begin
-    xSql := Format('update cmanagerParams set paramValue = ''%s'' where paramName = ''%s''', [AName, AValue]);
+    xSql := Format('update cmanagerParams set paramValue = ''%s'' where paramName = ''%s''', [AValue, AName]);
   end;
   ExecuteSql(xSql);
 end;

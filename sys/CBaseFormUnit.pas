@@ -20,7 +20,8 @@ type
 
 implementation
 
-uses CSettings, CBaseFrameUnit, CConsts, CComponents, CTools, DateUtils;
+uses CSettings, CBaseFrameUnit, CConsts, CComponents, CTools, DateUtils,
+  CDatabase;
 
 {$R *.dfm}
 
@@ -73,6 +74,30 @@ begin
   Result := '<nieznana>';
   if ATemplate = '@godz' then begin
     Result := LPad(IntToStr(HourOf(Now)), '0', 2);
+  end else if ATemplate = '@min' then begin
+    Result := LPad(IntToStr(MinuteOf(Now)), '0', 2);
+  end else if ATemplate = '@czas' then begin
+    Result := GetFormattedTime(Now, 'HH:mm');
+  end else if ATemplate = '@dzien' then begin
+    Result := LPad(IntToStr(DayOf(Now)), '0', 2);
+  end else if ATemplate = '@miesiac' then begin
+    Result := LPad(IntToStr(MonthOf(Now)), '0', 2);
+  end else if ATemplate = '@rok' then begin
+    Result := IntToStr(YearOf(Now));
+  end else if ATemplate = '@rokkrotki' then begin
+    Result := Copy(IntToStr(YearOf(Now)), 3, 2);
+  end else if ATemplate = '@dzientygodnia' then begin
+    Result := IntToStr(DayOfTheWeek(Now));
+  end else if ATemplate = '@nazwadnia' then begin
+    Result := GetFormattedDate(Now, 'dddd');
+  end else if ATemplate = '@nazwamiesiaca' then begin
+    Result := GetFormattedDate(Now, 'MMMM');
+  end else if ATemplate = '@data' then begin
+    Result := GetFormattedDate(Now, 'dd-MM-yyyy');
+  end else if ATemplate = '@dataczas' then begin
+    Result := GetFormattedDate(Now, 'dd-MM-yyyy') + ' ' + GetFormattedTime(Now, 'HH:mm');
+  end else if ATemplate = '@wersja' then begin
+    Result := FileVersion(ParamStr(0));
   end;
 end;
 

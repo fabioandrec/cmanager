@@ -69,6 +69,7 @@ inherited CMovementForm: TCMovementForm
           TabOrder = 0
           TabStop = True
           Transparent = False
+          OnChanged = CDateTimeChanged
           HotTrack = True
         end
       end
@@ -148,7 +149,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 160
-        ActivePage = TabSheetInOutOnce
+        ActivePage = TabSheetInOutCyclic
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0

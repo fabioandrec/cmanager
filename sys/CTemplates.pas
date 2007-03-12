@@ -36,7 +36,9 @@ type
   end;
 
 var GBaseTemlatesList: TDescTemplateList;
-    GMovementTemplatesList: TDescTemplateList;
+    GBaseMovementTemplatesList: TDescTemplateList;
+    GMovementListTemplatesList: TDescTemplateList;
+    GPlannedMovementTemplatesList: TDescTemplateList;
 
 implementation
 
@@ -92,14 +94,35 @@ end;
 
 initialization
   GBaseTemlatesList := TDescTemplateList.Create('Mnemoniki podstawowe');
-  GMovementTemplatesList := TDescTemplateList.Create('Mnemoniko wykonanych operacji');
+  GBaseMovementTemplatesList := TDescTemplateList.Create('Mnemoniki wykonanych operacji');
+  GMovementListTemplatesList := TDescTemplateList.Create('Mnemoniki list operacji');
+  GPlannedMovementTemplatesList := TDescTemplateList.Create('Mnemoniki planowanych operacji');
   with GBaseTemlatesList do begin
     AddTemplate('@godz', 'aktualna godzina w formacie HH');
+    AddTemplate('@min', 'aktualna minuta w formacie MM');
+    AddTemplate('@czas', 'aktualny czas w formacie HH:MM');
+    AddTemplate('@dzien', 'aktualny dzieñ w formacie DD');
+    AddTemplate('@miesiac', 'aktualny miesiac w formacie MM');
+    AddTemplate('@rok', 'aktualny rok w formacie RRRR');
+    AddTemplate('@rokkrotki', 'aktualny rok w formacie RR');
+    AddTemplate('@dzientygodnia', 'numer dnia w tygodni');
+    AddTemplate('@nazwadnia', 'nazwa dnia');
+    AddTemplate('@nazwamiesiaca', 'nazwa miesi¹ca');
+    AddTemplate('@data', 'aktualna data w formacie DD-MM-RRRR');
+    AddTemplate('@dataczas', 'aktualna data i czas w formacie DD-MM-RRRR HH:MM');
+    AddTemplate('@wersja', 'wersja programu CManager');
   end;
-  with GMovementTemplatesList do begin
-    AddTemplate('@data', 'data operacji w formacie DD-MM-RRRR');
+  with GBaseMovementTemplatesList do begin
+    AddTemplate('@dataoperacji', 'data operacji w formacie DD-MM-RRRR');
+    AddTemplate('@rodzaj', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kontodocelowe', 'nazwa konta docelowego dla operacji');
+    AddTemplate('@kategria', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@kontrahent', 'nazwa kontrahenta wybranego w operacji');
   end;
 finalization
   GBaseTemlatesList.Free;
-  GMovementTemplatesList.Free;
+  GPlannedMovementTemplatesList.Free;
+  GBaseMovementTemplatesList.Free;
+  GMovementListTemplatesList.Free;
 end.
