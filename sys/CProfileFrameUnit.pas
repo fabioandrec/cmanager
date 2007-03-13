@@ -183,12 +183,15 @@ end;
 
 procedure TCProfileFrame.ReloadProfiles;
 begin
+  ProfileList.BeginUpdate;
+  ProfileList.Clear;
+  if FProfileObjects <> Nil then begin
+    FreeAndNil(FProfileObjects);
+  end;
   FProfileObjects := TDataObject.GetList(TProfile, ProfileProxy, 'select * from profile');
   if AdditionalData <> Nil then begin
     FProfileObjects.Insert(0, AdditionalData);
   end;
-  ProfileList.BeginUpdate;
-  ProfileList.Clear;
   ProfileList.RootNodeCount := FProfileObjects.Count;
   ProfileListFocusChanged(ProfileList, ProfileList.FocusedNode, 0);
   ProfileList.EndUpdate;

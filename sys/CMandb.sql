@@ -177,6 +177,17 @@ create table cmanagerParams (
   paramValue text
 );
 
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedOut', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('MovementListOut', '@kontrahent@');
+insert into cmanagerParams (paramName, paramValue) values ('MovementListIn', '@kontrahent@');
+insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementOut', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('MovementListElement', '@kategoria@');
+
 create table cmanagerInfo (
   version varchar(20) not null,
   created datetime not null
@@ -210,5 +221,3 @@ create index ix_baseMovement_idSourceAccount on baseMovement (idSourceAccount);
 create index ix_baseMovement_idProduct on baseMovement (idProduct);
 create index ix_baseMovement_idCashpoint on baseMovement (idCashPoint);
 create index ix_baseMovement_idMovementList on baseMovement (idMovementList);
-
-

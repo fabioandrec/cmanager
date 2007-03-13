@@ -76,18 +76,21 @@ uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit,
 procedure TCProductsFrame.ReloadProducts;
 var xWhere: String;
 begin
+  ProductList.BeginUpdate;
+  ProductList.Clear;
+  if FProductObjects <> Nil then begin
+    FreeAndNil(FProductObjects);
+  end;
   if Assigned(AdditionalData) then begin
     xWhere := 'where productType = ''' + TProductsFrameAdditionalData(AdditionalData).productType + '''';
   end else begin
     xWhere := '';
   end;
   FProductObjects := TDataObject.GetList(TProduct, ProductProxy, 'select * from product ' + xWhere + ' order by created, idParentProduct');
-  ProductList.BeginUpdate;
-  ProductList.Clear;
   RecreateTreeHelper;
   ProductList.RootNodeCount := FTreeHelper.Count;
-  ProductListFocusChanged(ProductList, ProductList.FocusedNode, 0);
   ProductList.EndUpdate;
+  ProductListFocusChanged(ProductList, ProductList.FocusedNode, 0);
 end;
 
 procedure TCProductsFrame.ProductListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);

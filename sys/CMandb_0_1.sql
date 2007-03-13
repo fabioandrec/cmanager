@@ -22,6 +22,17 @@ create table cmanagerParams (
   paramValue text
 );
 
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedOut', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('MovementListOut', '@kontrahent@');
+insert into cmanagerParams (paramName, paramValue) values ('MovementListIn', '@kontrahent@');
+insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementOut', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('MovementListElement', '@kategoria@');
+
 alter table baseMovement add idmovementList uniqueidentifier null;
 alter table baseMovement add constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList);
 

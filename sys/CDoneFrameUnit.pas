@@ -112,6 +112,8 @@ procedure TCDoneFrame.ReloadDone;
 var xSqlPlanned, xSqlDone: String;
     xDf, xDt: TDateTime;
 begin
+  DoneList.BeginUpdate;
+  DoneList.Clear;
   xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
   if CStaticFilter.DataId = '2' then begin
     xSqlPlanned := xSqlPlanned + Format(' and movementType = ''%s''', [COutMovement]);
@@ -138,8 +140,6 @@ begin
   FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
   FDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
   RecreateTreeHelper;
-  DoneList.BeginUpdate;
-  DoneList.Clear;
   DoneList.RootNodeCount := FTreeObjects.Count;
   DoneList.EndUpdate;
   ReloadSums;

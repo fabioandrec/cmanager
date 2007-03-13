@@ -127,6 +127,17 @@ begin
   xForm.Free;
 end;
 
+function SortByDate(AItem1, AItem2: Pointer): Integer;
+begin
+  if TTreeObject(AItem1).Dataobject.created > TTreeObject(AItem2).Dataobject.created then begin
+    Result := 1;
+  end else if TTreeObject(AItem1).Dataobject.created < TTreeObject(AItem2).Dataobject.created then begin
+    Result := -1;
+  end else begin
+    Result := 0;
+  end;
+end;
+
 procedure TCMovementFrame.ActionEditMovementExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
     xBase: TMovementTreeElement;
@@ -206,6 +217,8 @@ procedure TCMovementFrame.ReloadToday;
 var xCondition: String;
     xDf, xDt: TDateTime;
 begin
+  TodayList.BeginUpdate;
+  TodayList.Clear;
   GetFilterDates(xDf, xDt);
   xCondition := Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if CStaticFilter.DataId = '2' then begin
@@ -221,11 +234,9 @@ begin
   if FTodayLists <> Nil then begin
     FreeAndNil(FTodayLists);
   end;
-  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where ' + xCondition);
-  FTodayLists := TDataObject.GetList(TmovementList, MovementListProxy, 'select * from movementList where ' + xCondition);
+  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where ' + xCondition + ' order by created');
+  FTodayLists := TDataObject.GetList(TMovementList, MovementListProxy, 'select * from movementList where ' + xCondition + ' order by created');
   RecreateTreeHelper;
-  TodayList.BeginUpdate;
-  TodayList.Clear;
   TodayList.RootNodeCount := FTreeHelper.Count;
   TodayListFocusChanged(TodayList, TodayList.FocusedNode, 0);
   TodayList.EndUpdate;
@@ -864,6 +875,7 @@ begin
     end;
     xParentList.Add(xItem);
   end;
+  FTreeHelper.Sort(SortByDate);
 end;
 
 function TCMovementFrame.FindParentMovementList(AListGid: TDataGid): TTreeObjectList;

@@ -112,12 +112,15 @@ end;
 
 procedure TCAccountsFrame.ReloadAccounts;
 begin
-  FAccountObjects := TDataObject.GetList(TAccount, AccountProxy, 'select * from account');
   AccountList.BeginUpdate;
   AccountList.Clear;
+  if FAccountObjects <> Nil then begin
+    FreeAndNil(FAccountObjects);
+  end;
+  FAccountObjects := TDataObject.GetList(TAccount, AccountProxy, 'select * from account');
   AccountList.RootNodeCount := FAccountObjects.Count;
-  AccountListFocusChanged(AccountList, AccountList.FocusedNode, 0);
   AccountList.EndUpdate;
+  AccountListFocusChanged(AccountList, AccountList.FocusedNode, 0);
 end;
 
 procedure TCAccountsFrame.WndProc(var Message: TMessage);

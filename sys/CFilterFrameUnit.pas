@@ -75,12 +75,15 @@ end;
 
 procedure TCFilterFrame.ReloadFilters;
 begin
-  FFilterObjects := TDataObject.GetList(TMovementFilter, MovementFilterProxy, 'select * from movementFilter');
   FilterList.BeginUpdate;
   FilterList.Clear;
+  if FFilterObjects <> Nil then begin
+    FreeAndNil(FFilterObjects);
+  end;
+  FFilterObjects := TDataObject.GetList(TMovementFilter, MovementFilterProxy, 'select * from movementFilter');
   FilterList.RootNodeCount := FFilterObjects.Count;
-  FilterListFocusChanged(FilterList, FilterList.FocusedNode, 0);
   FilterList.EndUpdate;
+  FilterListFocusChanged(FilterList, FilterList.FocusedNode, 0);
 end;
 
 procedure TCFilterFrame.ActionAddFilterExecute(Sender: TObject);

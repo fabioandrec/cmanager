@@ -106,6 +106,11 @@ end;
 procedure TCCashpointsFrame.ReloadCashpoints;
 var xCondition: String;
 begin
+  CashpointList.BeginUpdate;
+  CashpointList.Clear;
+  if FCashpointObjects <> Nil then begin
+    FreeAndNil(FCashpointObjects);
+  end;
   if CStaticFilter.DataId = '0' then begin
     xCondition := '';
   end else if CStaticFilter.DataId = '1' then begin
@@ -115,14 +120,12 @@ begin
   end else if CStaticFilter.DataId = '3' then begin
     xCondition := ' where cashpointType not in (''' + CCashpointTypeIn + ''', ''' + CCashpointTypeOther + ''')';
   end else if CStaticFilter.DataId = '4' then begin
-    xCondition := ' where cashpointType  = ''' + CCashpointTypeOther + '''';
+    xCondition := ' where cashpointType  not in (''' + CCashpointTypeIn + ''', ''' + CCashpointTypeOut + ''')';
   end;
   FCashpointObjects := TDataObject.GetList(TCashPoint, CashPointProxy, 'select * from cashPoint' + xCondition);
-  CashpointList.BeginUpdate;
-  CashpointList.Clear;
   CashpointList.RootNodeCount := FCashpointObjects.Count;
-  CashpointListFocusChanged(CashpointList, CashpointList.FocusedNode, 0);
   CashpointList.EndUpdate;
+  CashpointListFocusChanged(CashpointList, CashpointList.FocusedNode, 0);
 end;
 
 procedure TCCashpointsFrame.ActionAddCashpointExecute(Sender: TObject);

@@ -77,12 +77,15 @@ end;
 
 procedure TCPlannedFrame.ReloadPlanned;
 begin
-  FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, 'select * from plannedMovement');
   PlannedList.BeginUpdate;
   PlannedList.Clear;
+  if FPlannedObjects <> Nil then begin
+    FreeAndNil(FPlannedObjects);
+  end;
+  FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, 'select * from plannedMovement');
   PlannedList.RootNodeCount := FPlannedObjects.Count;
-  PlannedListFocusChanged(PlannedList, PlannedList.FocusedNode, 0);
   PlannedList.EndUpdate;
+  PlannedListFocusChanged(PlannedList, PlannedList.FocusedNode, 0);
 end;
 
 procedure TCPlannedFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
