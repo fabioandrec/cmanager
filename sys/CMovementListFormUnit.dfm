@@ -129,9 +129,9 @@ inherited CMovementListForm: TCMovementListForm
       Caption = ' Opis '
       TabOrder = 1
       object CButton1: TCButton
-        Left = 14
-        Top = 95
-        Width = 217
+        Left = 238
+        Top = 97
+        Width = 123
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -142,9 +142,9 @@ inherited CMovementListForm: TCMovementListForm
         Color = clBtnFace
       end
       object CButton2: TCButton
-        Left = 320
-        Top = 95
-        Width = 161
+        Left = 356
+        Top = 97
+        Width = 129
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -162,6 +162,23 @@ inherited CMovementListForm: TCMovementListForm
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 0
+      end
+      object ComboBoxTemplate: TComboBox
+        Left = 24
+        Top = 99
+        Width = 97
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 1
+        TabOrder = 1
+        Text = 'W/g szablonu'
+        OnChange = ComboBoxTemplateChange
+        Items.Strings = (
+          'W'#322'asny'
+          'W/g szablonu')
       end
     end
     object GroupBox1: TGroupBox
@@ -361,12 +378,12 @@ inherited CMovementListForm: TCMovementListForm
     Top = 226
     StyleName = 'XP Style'
     object ActionAdd: TAction
-      Caption = 'Dodaj mnemonik w wybranym miejscu'
+      Caption = 'Wstaw mnemonik'
       ImageIndex = 0
       OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
-      Caption = 'Konfiguruj szablony opis'#243'w'
+      Caption = 'Konfiguruj szablony'
       ImageIndex = 1
       OnExecute = ActionTemplateExecute
     end

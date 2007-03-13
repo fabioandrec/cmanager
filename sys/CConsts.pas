@@ -77,6 +77,7 @@ const
   CCashpointTypeAll = 'W';
   CCashpointTypeIn = 'I';
   CCashpointTypeOut = 'O';
+  CCashpointTypeOther = 'X';
 
 const
   CInMovementDescription = 'Przychód';

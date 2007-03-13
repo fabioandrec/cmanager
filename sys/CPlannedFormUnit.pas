@@ -33,6 +33,7 @@ type
     ActionTemplate: TAction;
     CButton1: TCButton;
     CButton2: TCButton;
+    ComboBoxTemplate: TComboBox;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -47,6 +48,7 @@ type
     procedure CStaticScheduleGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
+    procedure ComboBoxTemplateChange(Sender: TObject);
   private
     FSchedule: TSchedule;
   protected
@@ -157,10 +159,14 @@ end;
 procedure TCPlannedForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[2][ComboBoxType.ItemIndex], '');
-  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-  xDesc := GPlannedMovementTemplatesList.ExpandTemplates(xDesc, Self);
-  SimpleRichText(xDesc, RichEditDesc);
+  if ComboBoxTemplate.ItemIndex = 1 then begin
+    xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[2][ComboBoxType.ItemIndex], '');
+    if xDesc <> '' then begin
+      xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+      xDesc := GPlannedMovementTemplatesList.ExpandTemplates(xDesc, Self);
+      SimpleRichText(xDesc, RichEditDesc);
+    end;
+  end;
 end;
 
 procedure TCPlannedForm.CStaticAccountChanged(Sender: TObject);
@@ -183,6 +189,7 @@ end;
 procedure TCPlannedForm.FillForm;
 begin
   with TPlannedMovement(Dataobject) do begin
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     SimpleRichText(description, RichEditDesc);
     CCurrEdit.Value := cash;
     ComboBoxType.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
@@ -302,6 +309,11 @@ begin
   end else if ATemplate = '@harmonogram@' then begin
     Result := FSchedule.AsString;
   end;
+end;
+
+procedure TCPlannedForm.ComboBoxTemplateChange(Sender: TObject);
+begin
+  UpdateDescription
 end;
 
 end.

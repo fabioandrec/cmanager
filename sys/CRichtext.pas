@@ -2,7 +2,7 @@ unit CRichtext;
 
 interface
 
-uses ComCtrls, Graphics, Classes, SysUtils, Windows;
+uses Forms, ComCtrls, Graphics, Classes, SysUtils, Windows;
 
 const
   CRtfSB = '<b>';

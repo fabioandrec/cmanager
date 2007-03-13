@@ -241,9 +241,11 @@ var xDesc: String;
 begin
   if ComboBoxTemplate.ItemIndex = 1 then begin
     xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[0][ComboBoxType.ItemIndex], '');
-    xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-    xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
-    SimpleRichText(xDesc, RichEditDesc);
+    if xDesc <> '' then begin
+      xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+      xDesc := GBaseMovementTemplatesList.ExpandTemplates(xDesc, Self);
+      SimpleRichText(xDesc, RichEditDesc);
+    end;
   end;
 end;
 
@@ -328,6 +330,7 @@ var xI: Integer;
     xM: TPlannedMovement;
 begin
   with TBaseMovement(Dataobject) do begin
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     if (movementType = CInMovement) or (movementType = COutMovement) then begin
       if idPlannedDone = CEmptyDataGid then begin
         xI := IfThen(movementType = COutMovement, 0, 1);
@@ -389,7 +392,6 @@ begin
     GDataProvider.RollbackTransaction;
     CDateTime.Value := regDate;
     SimpleRichText(description, RichEditDesc);
-    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     FbaseList := idMovementList;
   end;
 end;

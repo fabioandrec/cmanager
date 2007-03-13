@@ -51,6 +51,8 @@ begin
       ComboBoxType.ItemIndex := 1;
     end else if cashpointType = CCashpointTypeOut then begin
       ComboBoxType.ItemIndex := 2;
+    end else if cashpointType = CCashpointTypeOther then begin
+      ComboBoxType.ItemIndex := 3;
     end;
   end;
 end;
@@ -77,6 +79,8 @@ begin
       cashpointType := CCashpointTypeIn;
     end else if ComboBoxType.ItemIndex = 2 then begin
       cashpointType := CCashpointTypeOut;
+    end else if ComboBoxType.ItemIndex = 3 then begin
+      cashpointType := CCashpointTypeOther;
     end;
   end;
 end;

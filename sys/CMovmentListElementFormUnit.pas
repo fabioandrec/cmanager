@@ -38,11 +38,13 @@ type
     ActionTemplate: TAction;
     CButton1: TCButton;
     CButton2: TCButton;
+    ComboBoxTemplate: TComboBox;
     procedure CStaticCategoryChanged(Sender: TObject);
     procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ComboBoxTemplateChange(Sender: TObject);
   private
     Felement: TMovementListElement;
     function ChooseProduct(var AId, AText: String): Boolean;
@@ -67,10 +69,14 @@ uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
 procedure TCMovmentListElementForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[3][0], '');
-  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-  xDesc := GMovementListElementsTemplatesList.ExpandTemplates(xDesc, Self);
-  SimpleRichText(xDesc, RichEditDesc);
+  if ComboBoxTemplate.ItemIndex = 1 then begin
+    xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[3][0], '');
+    if xDesc <> '' then begin
+      xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+      xDesc := GMovementListElementsTemplatesList.ExpandTemplates(xDesc, Self);
+      SimpleRichText(xDesc, RichEditDesc);
+    end;
+  end;
 end;
 
 procedure TCMovmentListElementForm.CStaticCategoryChanged(Sender: TObject);
@@ -104,6 +110,7 @@ procedure TCMovmentListElementForm.FillForm;
 var xProduct: TProduct;
 begin
   inherited FillForm;
+  ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
   if Operation = coEdit then begin
     AssignRichText(Felement.description, RichEditDesc);
     CCurrEdit.Value := Felement.cash;
@@ -178,6 +185,11 @@ end;
 procedure TCMovmentListElementForm.FormShow(Sender: TObject);
 begin
   inherited;
+  UpdateDescription;
+end;
+
+procedure TCMovmentListElementForm.ComboBoxTemplateChange(Sender: TObject);
+begin
   UpdateDescription;
 end;
 

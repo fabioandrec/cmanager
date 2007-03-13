@@ -27,6 +27,8 @@ alter table baseMovement add constraint fk_movementList foreign key (idMovementL
 
 alter table cashpoint add cashpointType varchar(1) not null;
 update cashpoint set cashpointType = 'W';
+alter table cashpoint add constraint ck_cashpointType check (cashpointType in ('I', 'O', 'W', 'X'));
+
 
 create index ix_baseMovement_movementType on baseMovement (movementType);
 create index ix_cmanagerParams_name on cmanagerParams (paramName);

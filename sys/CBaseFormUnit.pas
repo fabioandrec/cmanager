@@ -3,7 +3,8 @@ unit CBaseFormUnit;
 interface
 
 uses
-  Windows, Forms, Classes, ComCtrls, Graphics, SysUtils, Messages, CTemplates;
+  Windows, Forms, Classes, ComCtrls, Graphics, SysUtils, Messages, CTemplates,
+  Controls;
 
 type
   TCBaseForm = class(TForm, IDescTemplateExpander)
@@ -65,6 +66,8 @@ begin
     if Components[xCount].InheritsFrom(TCStatic) then begin
       TCStatic(Components[xCount]).TabStop := True;
       TCStatic(Components[xCount]).Transparent := False;
+    end else if Components[xCount].InheritsFrom(TRichEdit) then begin
+      TRichEdit(Components[xCount]).Font.Name := 'Microsoft Sans Serif';
     end;
   end;
 end;

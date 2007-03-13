@@ -95,6 +95,9 @@ begin
     end else if TCashpointFrameAdditionalData(AAdditionalData).cashpointType = CCashpointTypeOut then begin
       CStaticFilter.DataId := '2';
       CStaticFilter.Caption := '<tylko rozchody>';
+    end else if TCashpointFrameAdditionalData(AAdditionalData).cashpointType = CCashpointTypeOther then begin
+      CStaticFilter.DataId := '4';
+      CStaticFilter.Caption := '<pozosta³e>';
     end;
   end;
   ReloadCashpoints;
@@ -108,9 +111,11 @@ begin
   end else if CStaticFilter.DataId = '1' then begin
     xCondition := ' where cashpointType = ''' + CCashpointTypeAll + '''';
   end else if CStaticFilter.DataId = '2' then begin
-    xCondition := ' where cashpointType <> ''' + CCashpointTypeOut + '''';
+    xCondition := ' where cashpointType not in (''' + CCashpointTypeOut + ''', ''' + CCashpointTypeOther + ''')';
   end else if CStaticFilter.DataId = '3' then begin
-    xCondition := ' where cashpointType <> ''' + CCashpointTypeIn + '''';
+    xCondition := ' where cashpointType not in (''' + CCashpointTypeIn + ''', ''' + CCashpointTypeOther + ''')';
+  end else if CStaticFilter.DataId = '4' then begin
+    xCondition := ' where cashpointType  = ''' + CCashpointTypeOther + '''';
   end;
   FCashpointObjects := TDataObject.GetList(TCashPoint, CashPointProxy, 'select * from cashPoint' + xCondition);
   CashpointList.BeginUpdate;
@@ -324,6 +329,7 @@ begin
   xList.Add('1=<dostêpne wszêdzie>');
   xList.Add('2=<tylko rozchody>');
   xList.Add('3=<tylko przychody>');
+  xList.Add('4=<pozosta³e>');
   xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 200, 300);

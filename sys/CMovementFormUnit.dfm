@@ -103,7 +103,7 @@ inherited CMovementForm: TCMovementForm
       TabOrder = 2
       object CButton1: TCButton
         Left = 238
-        Top = 125
+        Top = 126
         Width = 115
         Height = 25
         Cursor = crHandPoint
@@ -116,7 +116,7 @@ inherited CMovementForm: TCMovementForm
       end
       object CButton2: TCButton
         Left = 356
-        Top = 125
+        Top = 126
         Width = 129
         Height = 25
         Cursor = crHandPoint

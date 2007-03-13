@@ -41,6 +41,7 @@ type
     ActionTemplate: TAction;
     CButton1: TCButton;
     CButton2: TCButton;
+    ComboBoxTemplate: TComboBox;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -61,6 +62,7 @@ type
     procedure ComboBox1Change(Sender: TObject);
     procedure CStaticInoutOnceAccountChanged(Sender: TObject);
     procedure CStaticInoutOnceCashpointChanged(Sender: TObject);
+    procedure ComboBoxTemplateChange(Sender: TObject);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -411,6 +413,7 @@ var xList: TDataObjectList;
 begin
   inherited FillForm;
   with TMovementList(Dataobject) do begin
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     GDataProvider.BeginTransaction;
     CStaticInoutOnceAccount.DataId := idAccount;
     CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
@@ -578,10 +581,14 @@ end;
 procedure TCMovementListForm.UpdateDescription;
 var xDesc: String;
 begin
-  xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[1][ComboBox1.ItemIndex], '');
-  xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-  xDesc := GMovementListTemplatesList.ExpandTemplates(xDesc, Self);
-  SimpleRichText(xDesc, RichEditDesc);
+  if ComboBoxTemplate.ItemIndex = 1 then begin
+    xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[1][ComboBox1.ItemIndex], '');
+    if xDesc <> '' then begin
+      xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+      xDesc := GMovementListTemplatesList.ExpandTemplates(xDesc, Self);
+      SimpleRichText(xDesc, RichEditDesc);
+    end;
+  end;
 end;
 
 procedure TCMovementListForm.CDateTime1Changed(Sender: TObject);
@@ -622,6 +629,11 @@ begin
       Result := CStaticInoutOnceCashpoint.Caption;
     end;
   end;
+end;
+
+procedure TCMovementListForm.ComboBoxTemplateChange(Sender: TObject);
+begin
+  UpdateDescription;
 end;
 
 end.

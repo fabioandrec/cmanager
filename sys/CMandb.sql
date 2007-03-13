@@ -5,7 +5,8 @@ create table cashPoint (
   name varchar(40) not null,
   description varchar(200),
   cashpointType varchar(1) not null,
-  primary key (idCashPoint)
+  primary key (idCashPoint),
+  constraint ck_cashpointType check (cashpointType in ('I', 'O', 'W', 'X'))
 );
 
 create table account (

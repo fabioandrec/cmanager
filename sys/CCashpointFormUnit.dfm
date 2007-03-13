@@ -74,7 +74,8 @@ inherited CCashpointForm: TCCashpointForm
         Items.Strings = (
           'Dost'#281'pny wsz'#281'dzie'
           'Tylko rozchody'
-          'Tylko przychody')
+          'Tylko przychody'
+          'Pozosta'#322'e')
       end
     end
   end
