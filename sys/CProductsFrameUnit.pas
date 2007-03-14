@@ -361,10 +361,16 @@ end;
 procedure TCProductsFrame.ActionEditCategoryExecute(Sender: TObject);
 var xForm: TCProductForm;
     xParentGid: TDataGid;
+    xAdditional: TCProductAdditionalData;
 begin
   xForm := TCProductForm.Create(Nil);
   xParentGid := TProduct(TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject).idParentProduct;
-  xForm.ShowDataobject(coEdit, ProductProxy, TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject, True, TCProductAdditionalData.Create(xParentGid, ''));
+  if xParentGid <> CEmptyDataGid then begin
+    xAdditional := TCProductAdditionalData.Create(xParentGid, '');
+  end else begin
+    xAdditional := Nil;
+  end;
+  xForm.ShowDataobject(coEdit, ProductProxy, TTreeObject(ProductList.GetNodeData(ProductList.FocusedNode)^).Dataobject, True, xAdditional);
   xForm.Free;
 end;
 

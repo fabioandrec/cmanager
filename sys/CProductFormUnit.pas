@@ -55,6 +55,9 @@ end;
 procedure TCProductForm.FillForm;
 begin
   with TProduct(Dataobject) do begin
+    if AdditionalData = Nil then begin
+      ComboBoxType.Enabled := not HasSubcategory(id);
+    end;
     EditName.Text := name;
     SimpleRichText(description, RichEditDesc);
     if productType = CInProduct then begin

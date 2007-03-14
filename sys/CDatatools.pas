@@ -35,7 +35,7 @@ implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDatabase, CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
-  CTools;
+  CTools, StrUtils;
 
 type
   TBackupRestore = class(TObject)

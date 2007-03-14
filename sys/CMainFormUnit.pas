@@ -54,6 +54,7 @@ type
     ActionLoanCalc: TAction;
     ActionCheckUpdates: TAction;
     ActionExport: TAction;
+    ActionRandom: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -80,6 +81,7 @@ type
     procedure ActionCheckUpdatesExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ActionExportExecute(Sender: TObject);
+    procedure ActionRandomExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -118,7 +120,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
   CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
-  CExportDatafileFormUnit;
+  CExportDatafileFormUnit, CRandomFormUnit;
 
 {$R *.dfm}
 
@@ -133,6 +135,9 @@ begin
   StatusbarVisible := GBasePreferences.showStatusBar;
   ActionShortcuts.Checked := ShortcutsVisible;
   ActionStatusbar.Checked := StatusbarVisible;
+  {$IFNDEF DEBUG}
+  ActionRandom.Visible := False;
+  {$ENDIF}
   UpdateShortcutList;
   UpdateStatusbar;
   ShortcutList.RootNodeCount := FShortcutList.Count + 1;
@@ -512,6 +517,11 @@ end;
 procedure TCMainForm.ActionExportExecute(Sender: TObject);
 begin
   ShowProgressForm(TCExportDatafileForm);
+end;
+
+procedure TCMainForm.ActionRandomExecute(Sender: TObject);
+begin
+  FillDatabaseExampleData;
 end;
 
 end.

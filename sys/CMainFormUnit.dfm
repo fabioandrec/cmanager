@@ -287,6 +287,7 @@ object CMainForm: TCMainForm
                   end
                   item
                     Action = ActionExport
+                    Caption = '&Eksportuj plik danych'
                   end
                   item
                     Action = ActionBackup
@@ -299,6 +300,9 @@ object CMainForm: TCMainForm
                   item
                     Action = ActionCheckDatafile
                     Caption = '&Sprawd'#378' plik danych'
+                  end
+                  item
+                    Action = ActionRandom
                   end>
                 Caption = 'N&arz'#281'dzia'
               end>
@@ -530,6 +534,11 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Kalkulator kredytowy'
       OnExecute = ActionLoanCalcExecute
+    end
+    object ActionRandom: TAction
+      Category = 'Plik'
+      Caption = 'Wype'#322'nij losowo dane'
+      OnExecute = ActionRandomExecute
     end
   end
   object OpenDialog: TOpenDialog

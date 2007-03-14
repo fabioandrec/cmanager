@@ -82,7 +82,8 @@ uses
   CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm},
   CDescpatternFormUnit in 'CDescpatternFormUnit.pas' {CDescpatternForm},
   CTemplates in 'CTemplates.pas',
-  CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame};
+  CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame},
+  CRandomFormUnit in 'CRandomFormUnit.pas' {CRandomForm};
 
 {$R *.res}
 

@@ -76,6 +76,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    class function HasSubcategory(AId: TDataGid): Boolean; 
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -529,6 +530,11 @@ begin
     end;
   end;
   xStr.Free;
+end;
+
+class function TProduct.HasSubcategory(AId: TDataGid): Boolean;
+begin
+  Result := GDataProvider.GetSqlInteger('select count(*) from product where idParentProduct = ' + DataGidToDatabase(AId), 0) <> 0;
 end;
 
 procedure TProduct.Setdescription(const Value: TBaseDescription);
