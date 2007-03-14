@@ -230,10 +230,14 @@ begin
       GDataProvider.BeginTransaction;
       xProfile := TProfile(TProfile.LoadObject(ProfileProxy, GActiveProfileId, False));
       Caption := Caption + ' - ' + xProfile.name;
-      CStaticInoutOnceAccount.DataId := xProfile.idAccount;
-      CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xProfile.idAccount, False)).name;
-      CStaticInoutOnceCashpoint.DataId := xProfile.idCashPoint;
-      CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xProfile.idCashPoint, False)).name;
+      if xProfile.idAccount <> CEmptyDataGid then begin
+        CStaticInoutOnceAccount.DataId := xProfile.idAccount;
+        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xProfile.idAccount, False)).name;
+      end;
+      if xProfile.idCashPoint <> CEmptyDataGid then begin
+        CStaticInoutOnceCashpoint.DataId := xProfile.idCashPoint;
+        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xProfile.idCashPoint, False)).name;
+      end;
       GDataProvider.RollbackTransaction;
     end;
   end;

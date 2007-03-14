@@ -26,6 +26,8 @@ type
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+  private
+    FmovementCount: Integer;
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -79,12 +81,14 @@ begin
       ComboBoxType.ItemIndex := 0;
     end;
     ComboBoxTypeChange(ComboBoxType);
-    CCurrEditCash.Value := cash;
-    if Operation = coAdd then begin
+    FmovementCount := GetMovementCount(id);
+    if (Operation = coAdd) or (FmovementCount = 0) then begin
       LabelCash.Caption := 'Œrodki pocz¹tkowe';
+      CCurrEditCash.Value := initialBalance;
     end else begin
       LabelCash.Caption := 'Dostêpne œrodki';
       CCurrEditCash.Enabled := False;
+      CCurrEditCash.Value := cash;
     end;
     if idCashPoint <> CEmptyDataGid then begin
       CStaticBank.DataId := idCashPoint;
@@ -121,6 +125,8 @@ begin
     end;
     if Operation = coAdd then begin
       cash := CCurrEditCash.Value;
+      initialBalance := CCurrEditCash.Value;
+    end else if FmovementCount = 0 then begin
       initialBalance := CCurrEditCash.Value;
     end;
     idCashPoint := CStaticBank.DataId;

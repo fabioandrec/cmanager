@@ -44,17 +44,19 @@ type
     procedure SetaccountType(const Value: TBaseEnumeration);
     procedure SetaccountNumber(const Value: TAccountNumber);
     procedure SetidCashPoint(const Value: TDataGid);
+    procedure SetinitialBalance(const Value: Currency);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class function AccountBalanceOnDay(AIdAccount: TDataGid; ADateTime: TDateTime): Currency;
+    class function GetMovementCount(AIdAccount: TDataGid): Integer;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
     property accountType: TBaseEnumeration read FaccountType write SetaccountType;
     property cash: Currency read Fcash write Setcash;
-    property initialBalance: Currency read FinitialBalance write FinitialBalance;
+    property initialBalance: Currency read FinitialBalance write SetinitialBalance;
     property accountNumber: TAccountNumber read FaccountNumber write SetaccountNumber;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
   end;
@@ -1457,6 +1459,20 @@ begin
     end else begin
       AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
     end;
+  end;
+end;
+
+class function TAccount.GetMovementCount(AIdAccount: TDataGid): Integer;
+begin
+  Result := GDataProvider.GetSqlInteger(Format('select count(*) from baseMovement where idAccount = %s or idSourceAccount = %s',
+      [DataGidToDatabase(AIdAccount), DataGidToDatabase(AIdAccount)]), 0);
+end;
+
+procedure TAccount.SetinitialBalance(const Value: Currency);
+begin
+  if FinitialBalance <> Value then begin
+    FinitialBalance := Value;
+    SetState(msModified);
   end;
 end;
 
