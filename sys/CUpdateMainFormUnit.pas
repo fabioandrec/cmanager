@@ -60,12 +60,9 @@ type
     property IsRunning: Boolean read FIsRunning;
   end;
 
-const
-  CUpdateLink = 'http://cmanager.sourceforge.net/update.xml';
-  //CUpdateLink = 'file://d:\cvs\sourceforge\cmanager\docs\homepage\update.xml';
-  
 var
   CUpdateMainForm: TCUpdateMainForm;
+  CUpdateLink: String;
   CIsQuiet: Boolean;
   CUpdateThread: THttpRequest;
   CFoundNewVersion: Boolean;
@@ -239,6 +236,7 @@ end;
 
 procedure UpdateSystem;
 var xFinished: Boolean;
+
 begin
   CIsQuiet := GetSwitch('/quiet');
   CFoundNewVersion := False;
@@ -246,6 +244,10 @@ begin
   if not CIsQuiet then begin
     CUpdateMainForm.Show;
     CUpdateMainForm.Update;
+  end;
+  CUpdateLink := GetParamValue('/site');
+  if CUpdateLink = '' then begin
+    CUpdateLink := 'http://cmanager.sourceforge.net/update.xml';  
   end;
   CUpdateThread := THttpRequest.Create(CUpdateLink, '', '', '', hctPreconfig);
   CUpdateThread.Resume;
