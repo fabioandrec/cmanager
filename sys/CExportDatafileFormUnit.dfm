@@ -22,7 +22,6 @@ inherited CExportDatafileForm: TCExportDatafileForm
     inherited PageControl: TPageControl
       Width = 456
       Height = 99
-      ActivePage = TabSheetWork
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
           ImageIndex = 3
@@ -90,6 +89,10 @@ inherited CExportDatafileForm: TCExportDatafileForm
           Caption = 'Trwa kompaktowanie pliku danych. Prosz'#281' czeka'#263'...'
         end
         inherited StaticText: TStaticText
+          Left = 184
+          Top = 51
+        end
+        inherited ProgressBar: TProgressBar
           Left = 64
           Top = 51
         end

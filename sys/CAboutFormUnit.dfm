@@ -2,14 +2,14 @@ inherited CAboutForm: TCAboutForm
   Left = 439
   Top = 141
   Caption = 'O programie'
-  ClientHeight = 391
+  ClientHeight = 404
   ClientWidth = 377
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 377
-    Height = 350
+    Height = 363
     object Image: TImage
       Left = 16
       Top = 16
@@ -72,11 +72,25 @@ inherited CAboutForm: TCAboutForm
       OnClick = CButton1Click
       Color = clBtnFace
     end
+    object CButton2: TCButton
+      Left = 248
+      Top = 72
+      Width = 117
+      Height = 17
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Caption = 'gadu-gadu: 4963605'
+      OnClick = CButton2Click
+      Color = clBtnFace
+    end
     object RichEditContrib: TRichEdit
       Left = 16
-      Top = 80
+      Top = 96
       Width = 346
-      Height = 261
+      Height = 258
       TabStop = False
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelInner = bvNone
@@ -98,7 +112,7 @@ inherited CAboutForm: TCAboutForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 350
+    Top = 363
     Width = 377
     inherited BitBtnOk: TBitBtn
       Left = 200

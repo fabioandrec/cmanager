@@ -114,6 +114,7 @@ end;
 procedure TCCheckDatafileFormUnit.ProgressEvent(AStepBy: Integer);
 begin
   ProgressBar.StepBy(AStepBy);
+  Application.ProcessMessages;
 end;
 
 end.

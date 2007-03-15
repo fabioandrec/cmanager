@@ -179,6 +179,11 @@ begin
     if CStaticCategory.DataId <> CEmptyDataGid then begin
       Result := CStaticCategory.Caption;
     end;
+  end else if ATemplate = '@pelnakategoria@' then begin
+    Result := '<pelnakategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      Result := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).treeDesc;
+    end;
   end;
 end;
 

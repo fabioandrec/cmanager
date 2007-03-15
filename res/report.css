@@ -17,47 +17,65 @@ height: 25px
 }
 td.cash
 {
+padding-left: 8px;
+padding-right: 8px;
 text-align: right;
 }
 td.text
 {
+padding-left: 8px;
+padding-right: 8px;
 text-align: left;
 }
 td.center
 {
+padding-left: 8px;
+padding-right: 8px;
 text-align: center;
 }
 td.infotext
 {
+padding-left: 8px;
+padding-right: 8px;
 font-size: 10px;
 text-align: left;
 }
 td.headtext
 {
+padding-left: 8px;
+padding-right: 8px;
 font-weight: bold;
 background-color: #CCFFCC;
 text-align: left;
 }
 td.headcenter
 {
+padding-left: 8px;
+padding-right: 8px;
 font-weight: bold;
 background-color: #CCFFCC;
 text-align: center;
 }
 td.headcash
 {
+padding-left: 8px;
+padding-right: 8px;
 font-weight: bold;
 text-align: right;
 background-color: #CCFFCC;
 }
 td.sumtext
 {
+padding-left: 8px;
+padding-right: 8px;
 font-weight: bold;
 background-color: #CCCCFF;
 text-align: left;
 }
 td.sumcash
 {
+padding-left: 8px;
+padding-right: 8px;
 font-weight: bold;
 text-align: right;
 background-color: #CCCCFF;

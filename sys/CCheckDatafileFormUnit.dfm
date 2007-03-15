@@ -45,6 +45,8 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
           Color = clWindow
           ParentColor = False
           TabOrder = 0
+          TabStop = True
+          Transparent = False
           TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
           OnGetDataId = CStaticNameGetDataId
           HotTrack = True

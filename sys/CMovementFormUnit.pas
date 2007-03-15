@@ -629,6 +629,17 @@ begin
         Result := CStaticInoutCyclicCategory.Caption;
       end;
     end;
+  end else if ATemplate = '@pelnakategoria@' then begin
+    Result := '<pelnakategoria>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInoutOnceCategory.DataId <> CEmptyDataGid then begin
+        Result := TProduct(TProduct.LoadObject(ProductProxy, CStaticInoutOnceCategory.DataId, False)).treeDesc;
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInoutCyclicCategory.DataId <> CEmptyDataGid then begin
+        TProduct(TProduct.LoadObject(ProductProxy, CStaticInoutCyclicCategory.DataId, False)).treeDesc;
+      end;
+    end;
   end else if ATemplate = '@kontrahent@' then begin
     Result := '<kontrahent>';
     if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin

@@ -120,6 +120,7 @@ initialization
     AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
     AddTemplate('@kontodocelowe@', 'nazwa konta docelowego dla operacji');
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
     AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
   end;
   with GMovementListTemplatesList do begin
@@ -133,8 +134,10 @@ initialization
     AddTemplate('@rodzaj@', 'rodzaj operacji');
     AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
     AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
     AddTemplate('@harmonogram@', 'opis harmonogramu wykonywania');
+    AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
   end;
   with GMovementListElementsTemplatesList do begin
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');

@@ -152,6 +152,7 @@ end;
 procedure TCExportDatafileForm.ProgressEvent(AStepBy: Integer);
 begin
   ProgressBar.Position := AStepBy;
+  Application.ProcessMessages;
 end;
 
 procedure TCExportDatafileForm.InitializeForm;

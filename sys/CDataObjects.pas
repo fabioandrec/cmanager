@@ -526,7 +526,7 @@ begin
   for xCount := xStr.Count - 1 downto 0 do begin
     Result := Result + xStr.Strings[xCount];
     if xCount <> 0 then begin
-      Result := Result + '/';
+      Result := Result + '\';
     end;
   end;
   xStr.Free;

@@ -236,6 +236,7 @@ end;
 procedure TCArchForm.ProgressEvent(AStepBy: Integer);
 begin
   ProgressBar.Position := AStepBy;
+  Application.ProcessMessages;
 end;
 
 function TCArchForm.GetProgressType: TWaitType;

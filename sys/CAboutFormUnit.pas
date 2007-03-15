@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, ShellApi, ComCtrls,
-  CComponents;
+  CComponents, ClipBrd;
 
 type
   TCAboutForm = class(TCConfigForm)
@@ -17,16 +17,19 @@ type
     RichEditContrib: TRichEdit;
     CButtonMail: TCButton;
     CButton1: TCButton;
+    CButton2: TCButton;
     procedure FormCreate(Sender: TObject);
     procedure CButtonMailClick(Sender: TObject);
     procedure CButton1Click(Sender: TObject);
+    procedure CButton2Click(Sender: TObject);
   protected
     procedure FillForm; override;
   end;
 
 implementation
 
-uses CBaseFormUnit, CDatabase, CDatatools, CRichtext, CTools;
+uses CBaseFormUnit, CDatabase, CDatatools, CRichtext, CTools,
+  CInfoFormUnit;
 
 {$R *.dfm}
 
@@ -57,6 +60,15 @@ end;
 procedure TCAboutForm.CButton1Click(Sender: TObject);
 begin
   ShellExecute(0, nil, 'http://cmanager.sourceforge.net', nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TCAboutForm.CButton2Click(Sender: TObject);
+begin
+  Clipboard.Open;
+  Clipboard.Clear;
+  Clipboard.AsText := '4963605';
+  Clipboard.Close;
+  ShowInfo(itInfo, 'Numer gadu-gadu zosta³ skopiowany do schowka', '');
 end;
 
 end.
