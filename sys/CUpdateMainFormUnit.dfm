@@ -62,7 +62,17 @@ object CUpdateMainForm: TCUpdateMainForm
     Width = 75
     Height = 25
     Caption = '&Przerwij'
-    TabOrder = 1
+    TabOrder = 2
     OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 16
+    Top = 240
+    Width = 75
+    Height = 25
+    Caption = 'P&obierz'
+    TabOrder = 1
+    Visible = False
+    OnClick = Button2Click
   end
 end

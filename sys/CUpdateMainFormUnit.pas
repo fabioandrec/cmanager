@@ -14,8 +14,10 @@ type
     Label2: TLabel;
     RichEdit: TRichEdit;
     Button1: TButton;
+    Button2: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   protected
     procedure WndProc(var Message: TMessage); override;
   end;
@@ -66,6 +68,7 @@ var
   CIsQuiet: Boolean;
   CUpdateThread: THttpRequest;
   CFoundNewVersion: Boolean;
+  CDownloadLink: String = '';
 
 procedure UpdateSystem;
 
@@ -268,6 +271,7 @@ begin
     end else begin
       CUpdateMainForm.Label2.Caption := ' - Sprawdzenie aktualizacji nie powiod³o siê';
     end;
+    CUpdateMainForm.Button2.Visible := CFoundNewVersion;
     Application.BringToFront;
     Application.Run;
   end;
@@ -333,6 +337,7 @@ begin
               AddToReport(xDesc);
             end;
             AddToReport('');
+            CDownloadLink := GetXmlAttribute('direct', xNode, '');
             AddToReport('Pobierz aktualizacjê z ' + GetXmlAttribute('direct', xNode, ''));
             AddToReport('Otwórz stronê domow¹ ' + GetXmlAttribute('homepage', xNode, ''));
             AddToReport('');
@@ -406,6 +411,13 @@ begin
     end
   end;
   inherited;
+end;
+
+procedure TCUpdateMainForm.Button2Click(Sender: TObject);
+begin
+  if CDownloadLink <> '' then begin
+    ShellExecute(0, nil, PChar(CDownloadLink), nil, nil, SW_SHOWNORMAL);
+  end;
 end;
 
 end.
