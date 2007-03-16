@@ -55,6 +55,7 @@ type
     ActionCheckUpdates: TAction;
     ActionExport: TAction;
     ActionRandom: TAction;
+    ActionShortcutLimits: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -120,7 +121,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
   CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
-  CExportDatafileFormUnit, CRandomFormUnit;
+  CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit;
 
 {$R *.dfm}
 
@@ -200,6 +201,8 @@ begin
       xClass := TCFilterFrame;
     end else if AAction = ActionShortcutProfiles then begin
       xClass := TCProfileFrame;
+    end else if AAction = ActionShortcutLimits then begin
+      xClass := TCLimitsFrame;
     end else begin
       xClass := TCBaseFrame;
     end;

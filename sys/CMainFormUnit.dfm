@@ -540,6 +540,11 @@ object CMainForm: TCMainForm
       Caption = 'Wype'#322'nij losowo dane'
       OnExecute = ActionRandomExecute
     end
+    object ActionShortcutLimits: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Limity'
+      ImageIndex = 10
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

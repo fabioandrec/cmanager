@@ -18,6 +18,7 @@ function GetSettingsForms: IXMLDOMNode;
 function GetSettingsPreferences: IXMLDOMNode;
 function GetSettingsFonts: IXMLDOMNode;
 function GetSettingsColumns: IXMLDOMNode;
+function GetSettingsBackups: IXMLDOMNode;
 
 implementation
 
@@ -71,6 +72,19 @@ begin
     Result := xRoot.selectSingleNode('columns');
     if Result = Nil then begin
       Result := GSettings.createElement('columns');
+      xRoot.appendChild(Result);
+    end;
+  end;
+end;
+
+function GetSettingsBackups: IXMLDOMNode;
+var xRoot: IXMLDOMNode;
+begin
+  if GSettings <> Nil then begin
+    xRoot := GetSettingsPreferences;
+    Result := xRoot.selectSingleNode('backups');
+    if Result = Nil then begin
+      Result := GSettings.createElement('backups');
       xRoot.appendChild(Result);
     end;
   end;
@@ -166,6 +180,7 @@ begin
     end else begin
       GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
       GColumnsPreferences.LoadAllFromParentNode(GetSettingsColumns);
+      GBackupsPreferences.LoadAllFromParentNode(GetSettingsBackups);
       GBasePreferences.LoadFromXml(GetSettingsPreferences);
     end;
   end else begin
@@ -177,6 +192,7 @@ procedure SaveSettings;
 begin
   GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
   GColumnsPreferences.SavetToParentNode(GetSettingsColumns);
+  GBackupsPreferences.SavetToParentNode(GetSettingsBackups);
   if GDataProvider.IsConnected then begin
     GBasePreferences.lastOpenedDatafilename := GDatabaseName;
   end;

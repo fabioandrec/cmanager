@@ -41,6 +41,17 @@ type
     property ByPrefname[APrefname: String]: TPrefItem read GetByPrefname;
   end;
 
+  TBackupPref = class(TPrefItem)
+  private
+    FlastBackup: TDateTime;
+  public
+    function GetNodeName: String; override;
+    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    constructor CreateBackupPref(AFilename: String; ALastBackup: TDateTime);
+    property lastBackup: TDateTime read FlastBackup write FlastBackup;
+  end;
+
   TFontPref = class(TPrefItem)
   private
     FBackground: TColor;
@@ -139,6 +150,7 @@ type
 
 var GViewsPreferences: TPrefList;
     GColumnsPreferences: TPrefList;
+    GBackupsPreferences: TPrefList;
     GBasePreferences: TBasePref;
     GDescPatterns: TDescPatterns;
 
@@ -556,10 +568,49 @@ begin
   end;
 end;
 
+constructor TBackupPref.CreateBackupPref(AFilename: String; ALastBackup: TDateTime);
+begin
+  inherited Create(AFilename);
+  FlastBackup := ALastBackup;
+end;
+
+function TBackupPref.GetNodeName: String;
+begin
+  Result := 'backuppref';
+end;
+
+procedure TBackupPref.LoadFromXml(ANode: IXMLDOMNode);
+var xDateStr: String;
+    xY, xM, xD, xH, xN, xS: Word;
+    xTime: TDateTime;
+begin
+  inherited LoadFromXml(ANode);
+  xDateStr := GetXmlAttribute('lastBackup', ANode, '');
+  FlastBackup := 0;
+  if xDateStr <> '' then begin
+    xD := StrToIntDef(Copy(xDateStr, 1, 2), 0);
+    xM := StrToIntDef(Copy(xDateStr, 3, 2), 0);
+    xY := StrToIntDef(Copy(xDateStr, 5, 4), 0);
+    xH := StrToIntDef(Copy(xDateStr, 9, 2), 0);
+    xN := StrToIntDef(Copy(xDateStr, 11, 2), 0);
+    xS := StrToIntDef(Copy(xDateStr, 13, 2), 0);
+    TryEncodeDate(xY, xM, xD, FlastBackup);
+    TryEncodeTime(xH, xN, xS, 0, xTime);
+    FlastBackup := FlastBackup + xTime;
+  end;
+end;
+
+procedure TBackupPref.SaveToXml(ANode: IXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('lastBackup', ANode, FormatDateTime('ddmmyyyyhhnnss', FlastBackup));
+end;
+
 initialization
   GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
   GColumnsPreferences := TPrefList.Create(TViewColumnPref);
+  GBackupsPreferences := TPrefList.Create(TBackupPref);
   GViewsPreferences.Add(TViewPref.Create('baseMovement'));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
@@ -613,5 +664,6 @@ finalization
   GViewsPreferences.Free;
   GBasePreferences.Free;
   GColumnsPreferences.Free;
+  GBackupsPreferences.Free;
   GDescPatterns.Free;
 end.

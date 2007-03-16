@@ -23,6 +23,7 @@ type
     DoneImageList16x16: TPngImageList;
     PlannedImageList16x16: TPngImageList;
     TemplateImageList16x16: TPngImageList;
+    LimitsImageList24x24: TPngImageList;
   private
     { Private declarations }
   public

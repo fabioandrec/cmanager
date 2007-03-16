@@ -83,7 +83,8 @@ uses
   CDescpatternFormUnit in 'CDescpatternFormUnit.pas' {CDescpatternForm},
   CTemplates in 'CTemplates.pas',
   CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame},
-  CRandomFormUnit in 'CRandomFormUnit.pas' {CRandomForm};
+  CRandomFormUnit in 'CRandomFormUnit.pas' {CRandomForm},
+  CLimitsFrameUnit in 'CLimitsFrameUnit.pas' {CLimitsFrame: TFrame};
 
 {$R *.res}
 
@@ -119,7 +120,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-        Application.Run;
+  Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;

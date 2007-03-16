@@ -39,7 +39,7 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, CDatabase, CDatatools, CInfoFormUnit, CMainFormUnit,
-     CConsts, StrUtils, CTools;
+     CConsts, StrUtils, CTools, CPreferences;
 
 procedure TCArchForm.InitializeForm;
 var xIndex: Integer;
@@ -167,6 +167,7 @@ var xMustReconect: Boolean;
     xBeforeSize, xAfterSize: Int64;
     xText: String;
     xPrevDatabase: String;
+    xBackupPref: TBackupPref;
 begin
   if FArchOperation = aoBackup then begin
     AddToReport('Rozpoczêcie wykonywania kopii pliku danych...');
@@ -197,6 +198,13 @@ begin
     xAfterSize := FileSize(CStaticDest.DataId);
     if FArchOperation = aoBackup then begin
       xText := 'Wykonano kopiê pliku danych';
+      xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[CStaticSource.DataId]);
+      if xBackupPref = Nil then begin
+        xBackupPref := TBackupPref.CreateBackupPref(CStaticSource.DataId, Now);
+        GBackupsPreferences.Add(xBackupPref);
+      end else begin
+        xBackupPref.lastBackup := Now;
+      end;
     end else begin
       xText := 'Wgrano plik danych z kopii';
     end;
