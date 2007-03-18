@@ -19,7 +19,7 @@ type
   end;
 
   TCProductsFrame = class(TCBaseFrame)
-    ProductList: TVirtualStringTree;
+    ProductList: TCList;
     ActionList: TActionList;
     ActionAddSubCategory: TAction;
     ActionEditCategory: TAction;
@@ -36,9 +36,7 @@ type
     procedure ProductListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ProductListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ProductListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure ProductListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ProductListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-    procedure ProductListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ProductListDblClick(Sender: TObject);
     procedure ProductListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionAddRootCategoryExecute(Sender: TObject);
@@ -58,11 +56,11 @@ type
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
-    function FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode; override;
+    function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
     function FindNodeId(ANode: PVirtualNode): ShortString; override;
   end;
 
@@ -184,41 +182,12 @@ begin
   CellText := TProduct(xData.Dataobject).name;
 end;
 
-procedure TCProductsFrame.ProductListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCProductsFrame.ProductListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
 var xData: TTreeObject;
 begin
   xData := TTreeObject(ProductList.GetNodeData(Node)^);
   HintText := TProduct(xData.Dataobject).description;
   LineBreakStyle := hlbForceMultiLine;
-end;
-
-procedure TCProductsFrame.ProductListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Sender.AbsoluteIndex(Node)) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
 end;
 
 procedure TCProductsFrame.ProductListDblClick(Sender: TObject);
@@ -241,7 +210,7 @@ begin
   Result := AnsiCompareText(TProduct(xData1.Dataobject).name, TProduct(xData2.Dataobject).name);
 end;
 
-function TCProductsFrame.GetList: TVirtualStringTree;
+function TCProductsFrame.GetList: TCList;
 begin
   Result := ProductList;
 end;
@@ -405,7 +374,7 @@ begin
   FproductType := AType;
 end;
 
-function TCProductsFrame.FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode;
+function TCProductsFrame.FindNode(ADataId: ShortString; AList: TCList): PVirtualNode;
 begin
   Result := FindTreeobjectNode(ADataId, AList);
 end;

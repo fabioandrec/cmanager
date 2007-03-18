@@ -1,5 +1,5 @@
 inherited CStartupInfoFrame: TCStartupInfoFrame
-  object RepaymentList: TVirtualStringTree [0]
+  object RepaymentList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -33,7 +33,6 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
     TreeOptions.SelectionOptions = [toDisableDrawSelection, toFullRowSelect]
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
-    OnBeforeItemErase = RepaymentListBeforeItemErase
     OnGetText = RepaymentListGetText
     OnPaintText = RepaymentListPaintText
     OnGetImageIndex = RepaymentListGetImageIndex

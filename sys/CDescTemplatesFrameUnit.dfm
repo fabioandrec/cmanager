@@ -1,5 +1,5 @@
 inherited CDescTemplatesFrame: TCDescTemplatesFrame
-  object TempList: TVirtualStringTree [0]
+  object TempList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -31,7 +31,6 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = TempListBeforeItemErase
     OnDblClick = TempListDblClick
     OnFocusChanged = TempListFocusChanged
     OnGetText = TempListGetText

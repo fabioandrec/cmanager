@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees, GraphUtil,
-  Contnrs;
+  Contnrs, CComponents;
 
 type
   TDescAdditionalData = class(TObject)
@@ -16,8 +16,7 @@ type
   end;
 
   TCDescTemplatesFrame = class(TCBaseFrame)
-    TempList: TVirtualStringTree;
-    procedure TempListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    TempList: TCList;
     procedure TempListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure TempListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure TempListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
@@ -30,7 +29,7 @@ type
     function GetSelectedText: String; override;
   public
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     class function GetTitle: String; override;
   end;
 
@@ -39,18 +38,6 @@ implementation
 uses CTemplates, CBaseFormUnit, CFrameFormUnit;
 
 {$R *.dfm}
-
-procedure TCDescTemplatesFrame.TempListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Sender.AbsoluteIndex(Node)) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
 
 procedure TCDescTemplatesFrame.TempListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
 begin
@@ -103,7 +90,7 @@ begin
   end;
 end;
 
-function TCDescTemplatesFrame.GetList: TVirtualStringTree;
+function TCDescTemplatesFrame.GetList: TCList;
 begin
   Result := TempList;
 end;

@@ -23,6 +23,8 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -379,6 +381,16 @@ begin
     Fdescription := FieldByName('description').AsString;
     FcashpointType := FieldByName('cashpointType').AsString;
   end;
+end;
+
+function TCashPoint.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TCashPoint.GetElementText: String;
+begin
+  Result := Fname;
 end;
 
 procedure TCashPoint.SetcashpointType(const Value: TBaseEnumeration);

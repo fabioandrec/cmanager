@@ -29,7 +29,8 @@ requires
   vcl,
   vclie,
   PNG_D7,
-  PngComponentsD7;
+  PngComponentsD7,
+  VirtualTreesD7;
 
 contains
   CComponents in 'CComponents.pas',

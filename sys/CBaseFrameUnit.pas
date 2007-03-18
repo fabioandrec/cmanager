@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus,
-  CConfigFormUnit, CBaseFormUnit;
+  CConfigFormUnit, CBaseFormUnit, CComponents;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
@@ -31,9 +31,9 @@ type
   public
     procedure SaveColumns;
     procedure LoadColumns;
-    function GetList: TVirtualStringTree; virtual;
+    function GetList: TCList; virtual;
     procedure UpdateOutputData; virtual;
-    function FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode; virtual;
+    function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; virtual;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
     procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
@@ -47,7 +47,7 @@ type
   published
     property SelectedId: TDataGid read GetSelectedId;
     property SelectedText: String read GetSelectedText;
-    property List: TVirtualStringTree read GetList;
+    property List: TCList read GetList;
     property AdditionalData: TObject read FAdditionalData;
     property MultipleChecks: TStringList read FMultipleChecks;
     property FrameOwner: TComponent read FOwner;
@@ -56,8 +56,8 @@ type
 var GFrames: TObjectList;
 
 procedure SendMessageToFrames(AFrameClass: TCBaseFrameClass; AMsg: Cardinal; AWParam: Cardinal; ALParam: Cardinal);
-function FindDataobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtualNode;
-function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtualNode;
+function FindDataobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
+function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 
 implementation
 
@@ -75,7 +75,7 @@ begin
   end;
 end;
 
-function FindDataobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtualNode;
+function FindDataobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 var xCurNode: PVirtualNode;
     xDataobject: TDataObject;
 begin
@@ -91,7 +91,7 @@ begin
   end;
 end;
 
-function FindTreeobjectNode(AGid: TDataGid; AList: TVirtualStringTree): PVirtualNode;
+function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 var xCurNode: PVirtualNode;
     xTreeobject: TTreeObject;
 begin
@@ -120,7 +120,7 @@ begin
   inherited Destroy;
 end;
 
-function TCBaseFrame.FindNode(ADataId: TDataGid; AList: TVirtualStringTree): PVirtualNode;
+function TCBaseFrame.FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode;
 begin
   Result := FindDataobjectNode(ADataId, AList);
 end;
@@ -130,7 +130,7 @@ begin
   Result := TDataObject(GetList.GetNodeData(ANode)^).id;
 end;
 
-function TCBaseFrame.GetList: TVirtualStringTree;
+function TCBaseFrame.GetList: TCList;
 begin
   Result := Nil;
 end;
@@ -151,7 +151,7 @@ begin
 end;
 
 procedure TCBaseFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
-var xList: TVirtualStringTree;
+var xList: TCList;
 begin
   FOwner := AOwner;
   FAdditionalData := AAdditionalData;
@@ -176,7 +176,7 @@ end;
 
 procedure TCBaseFrame.PrepareCheckStates;
 var xNode: PVirtualNode;
-    xList: TVirtualStringTree;
+    xList: TCList;
     xAll: Boolean;
     xId: TDataGid;
     xChecked: Boolean;
@@ -204,7 +204,7 @@ end;
 
 procedure TCBaseFrame.UpdateOutputData;
 var xNode: PVirtualNode;
-    xList: TVirtualStringTree;
+    xList: TCList;
     xAll: Boolean;
 begin
   xList := GetList;
@@ -268,7 +268,7 @@ begin
 end;
 
 procedure TCBaseFrame.LoadColumns;
-var xList: TVirtualStringTree;
+var xList: TCList;
     xCount: Integer;
     xColumnPref: TViewColumnPref;
     xColumn: TVirtualTreeColumn;
@@ -296,7 +296,7 @@ begin
 end;
 
 procedure TCBaseFrame.SaveColumns;
-var xList: TVirtualStringTree;
+var xList: TCList;
     xCount: Integer;
     xColumnPref: TViewColumnPref;
     xColumn: TVirtualTreeColumn;

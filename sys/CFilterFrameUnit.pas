@@ -14,7 +14,7 @@ type
     ActionAddFilter: TAction;
     ActionEditFilter: TAction;
     ActionDelFilter: TAction;
-    FilterList: TVirtualStringTree;
+    FilterList: TCList;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     PanelFrameButtons: TPanel;
     CButtonAddFilter: TCButton;
@@ -27,10 +27,8 @@ type
     procedure FilterListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure FilterListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure FilterListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-    procedure FilterListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FilterListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure FilterListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-    procedure FilterListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure FilterListDblClick(Sender: TObject);
   private
     FFilterObjects: TDataObjectList;
@@ -43,7 +41,7 @@ type
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
@@ -129,23 +127,6 @@ begin
   CButtonDelFilter.Enabled := Node <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
     TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
-  end;
-end;
-
-procedure TCFilterFrame.FilterListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
   end;
 end;
 
@@ -236,18 +217,6 @@ begin
   end;
 end;
 
-procedure TCFilterFrame.FilterListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
-
 function TCFilterFrame.GetSelectedId: TDataGid;
 begin
   Result := '';
@@ -275,7 +244,7 @@ begin
   end;
 end;
 
-function TCFilterFrame.GetList: TVirtualStringTree;
+function TCFilterFrame.GetList: TCList;
 begin
   Result := FilterList;
 end;

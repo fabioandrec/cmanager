@@ -68,7 +68,7 @@ inherited CDoneFrame: TCDoneFrame
       Caption = '  Sumy niezrealizowanych operacji w wybranym okresie'
       TabOrder = 0
     end
-    object SumList: TVirtualStringTree
+    object SumList: TCList
       Left = 0
       Top = 21
       Width = 443
@@ -98,12 +98,10 @@ inherited CDoneFrame: TCDoneFrame
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
       OnGetText = SumListGetText
       OnGetHint = DoneListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
-      OnHeaderClick = SumListHeaderClick
       OnInitNode = SumListInitNode
       Columns = <
         item
@@ -132,7 +130,7 @@ inherited CDoneFrame: TCDoneFrame
         end>
     end
   end
-  object DoneList: TVirtualStringTree [2]
+  object DoneList: TCList [2]
     Left = 0
     Top = 21
     Width = 443
@@ -172,7 +170,6 @@ inherited CDoneFrame: TCDoneFrame
     OnGetImageIndex = DoneListGetImageIndex
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
-    OnHeaderClick = DoneListHeaderClick
     OnInitNode = DoneListInitNode
     Columns = <
       item

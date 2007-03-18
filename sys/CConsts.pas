@@ -27,6 +27,7 @@ const
   CCompactDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
   CDefaultFilename = 'CManager.dat';
 
+  CFilterAllElements = '@';
 
   CInMovement = 'I';
   COutMovement = 'O';

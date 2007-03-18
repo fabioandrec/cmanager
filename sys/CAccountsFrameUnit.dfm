@@ -1,5 +1,5 @@
 inherited CAccountsFrame: TCAccountsFrame
-  object AccountList: TVirtualStringTree [0]
+  object AccountList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -30,14 +30,12 @@ inherited CAccountsFrame: TCAccountsFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = AccountListBeforeItemErase
     OnCompareNodes = AccountListCompareNodes
     OnDblClick = AccountListDblClick
     OnFocusChanged = AccountListFocusChanged
     OnGetText = AccountListGetText
     OnGetHint = AccountListGetHint
     OnGetNodeDataSize = AccountListGetNodeDataSize
-    OnHeaderClick = AccountListHeaderClick
     OnInitNode = AccountListInitNode
     Columns = <
       item

@@ -24,7 +24,7 @@ type
     CCurrEditCash: TCCurrEdit;
     GroupBox2: TGroupBox;
     Panel1: TPanel;
-    RepaymentList: TVirtualStringTree;
+    RepaymentList: TCList;
     PanelError: TPanel;
     BitBtnPrint: TBitBtn;
     procedure ComboBoxPeriodChange(Sender: TObject);

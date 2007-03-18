@@ -4,7 +4,7 @@ unit CDatatools;
 
 interface
 
-uses Windows, SysUtils, Classes, Controls, ShellApi;
+uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents;
 
 type
   TProgressEvent = procedure (AStepBy: Integer) of Object;
@@ -30,11 +30,12 @@ function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 procedure SetDatabaseDefaultData;
+procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
 
 implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
-  CDatabase, CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
+  CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
   CTools, StrUtils;
 
 type
@@ -472,6 +473,17 @@ begin
   end else begin
     AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
     AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
+  end;
+end;
+
+procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
+var xCount: Integer;
+    xElement: TCListDataElement;
+begin
+  for xCount := 0 to AList.Count - 1 do begin
+    xElement := TCListDataElement.Create(ARootElement.ParentList);
+    xElement.Data := AList.Items[xCount];
+    ARootElement.Add(xElement);
   end;
 end;
 

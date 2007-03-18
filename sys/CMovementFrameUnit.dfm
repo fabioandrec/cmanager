@@ -92,7 +92,7 @@ inherited CMovementFrame: TCMovementFrame
       Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
       TabOrder = 1
     end
-    object SumList: TVirtualStringTree
+    object SumList: TCList
       Left = 0
       Top = 21
       Width = 443
@@ -122,13 +122,12 @@ inherited CMovementFrame: TCMovementFrame
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
       OnGetText = SumListGetText
       OnGetHint = TodayListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
-      OnHeaderClick = SumListHeaderClick
       OnInitNode = SumListInitNode
+      OddColor = 12437200
       Columns = <
         item
           Position = 0
@@ -154,9 +153,10 @@ inherited CMovementFrame: TCMovementFrame
           Width = 150
           WideText = 'Saldo'
         end>
+      WideDefaultText = ''
     end
   end
-  object TodayList: TVirtualStringTree [2]
+  object TodayList: TCList [2]
     Left = 0
     Top = 21
     Width = 443
@@ -197,9 +197,9 @@ inherited CMovementFrame: TCMovementFrame
     OnGetImageIndex = TodayListGetImageIndex
     OnGetHint = TodayListGetHint
     OnGetNodeDataSize = TodayListGetNodeDataSize
-    OnHeaderClick = TodayListHeaderClick
     OnInitChildren = TodayListInitChildren
     OnInitNode = TodayListInitNode
+    OddColor = 12437200
     Columns = <
       item
         Alignment = taRightJustify
@@ -230,6 +230,7 @@ inherited CMovementFrame: TCMovementFrame
         Width = 150
         WideText = 'Rodzaj'
       end>
+    WideDefaultText = ''
   end
   object Panel: TPanel [3]
     Left = 0

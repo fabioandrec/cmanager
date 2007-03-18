@@ -45,7 +45,7 @@ inherited CPlannedFrame: TCPlannedFrame
       Action = ActionMovement
     end
   end
-  object PlannedList: TVirtualStringTree [1]
+  object PlannedList: TCList [1]
     Left = 0
     Top = 0
     Width = 443
@@ -85,7 +85,6 @@ inherited CPlannedFrame: TCPlannedFrame
     OnGetImageIndex = PlannedListGetImageIndex
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
-    OnHeaderClick = PlannedListHeaderClick
     OnInitNode = PlannedListInitNode
     Columns = <
       item

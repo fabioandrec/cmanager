@@ -84,7 +84,8 @@ uses
   CTemplates in 'CTemplates.pas',
   CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame},
   CRandomFormUnit in 'CRandomFormUnit.pas' {CRandomForm},
-  CLimitsFrameUnit in 'CLimitsFrameUnit.pas' {CLimitsFrame: TFrame};
+  CLimitsFrameUnit in 'CLimitsFrameUnit.pas' {CLimitsFrame: TFrame},
+  CDataobjectFrameUnit in 'CDataobjectFrameUnit.pas' {CDataobjectFrame: TFrame};
 
 {$R *.res}
 

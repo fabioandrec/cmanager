@@ -10,7 +10,7 @@ uses
 
 type
   TCAccountsFrame = class(TCBaseFrame)
-    AccountList: TVirtualStringTree;
+    AccountList: TCList;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     ActionList: TActionList;
     ActionAddAccount: TAction;
@@ -24,13 +24,11 @@ type
     procedure AccountListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure AccountListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure AccountListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-    procedure AccountListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure AccountListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure AccountListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure ActionAddAccountExecute(Sender: TObject);
     procedure ActionEditAccountExecute(Sender: TObject);
     procedure ActionDelAccountExecute(Sender: TObject);
-    procedure AccountListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure AccountListDblClick(Sender: TObject);
   private
     FAccountObjects: TDataObjectList;
@@ -43,7 +41,7 @@ type
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
@@ -181,23 +179,6 @@ begin
   end;
 end;
 
-procedure TCAccountsFrame.AccountListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCAccountsFrame.AccountListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TAccount;
     xData2: TAccount;
@@ -258,19 +239,7 @@ begin
   end;
 end;
 
-procedure TCAccountsFrame.AccountListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
-
-function TCAccountsFrame.GetList: TVirtualStringTree;
+function TCAccountsFrame.GetList: TCList;
 begin
   Result := AccountList;
 end;

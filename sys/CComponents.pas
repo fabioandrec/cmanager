@@ -4,7 +4,7 @@ interface
 
 uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList,
      Buttons, StdCtrls, ExtCtrls, SysUtils, ComCtrls, IntfUIHandlers, ShDocVw,
-     ActiveX, PngImageList;
+     ActiveX, PngImageList, VirtualTrees, GraphUtil, Contnrs, Types;
 
 type
   TPicturePosition = (ppLeft, ppTop, ppRight);
@@ -247,17 +247,88 @@ type
     property Value: Integer read GetValue;
   end;
 
+  TCDataList = class;
+
+  TCDataListElementObject = class
+    function GetElementType: String; virtual; abstract;
+    function GetElementId: String; virtual; abstract;
+    function GetElementText: String; virtual; abstract;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; virtual; abstract;
+    function GetColumnImage(AColumnIndex: Integer): Integer; virtual; abstract;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; virtual; abstract;
+    procedure GetElementReload; virtual; abstract;
+  end;
+
+  TCListDataElement = class(TObjectList)
+  private
+    FParentList: TCDataList;
+    FData: TCDataListElementObject;
+    FNode: PVirtualNode;
+    function GetItems(AIndex: Integer): TCListDataElement;
+    procedure SetItems(AIndex: Integer; const Value: TCListDataElement);
+  public
+    constructor Create(AParentList: TCDataList);
+    function FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
+    procedure DeleteDataElement(AId: String; AElementType: String = '');
+    procedure RefreshDataElement(AId: String; AElementType: String = '');
+    procedure AppendDataElement(ANodeData: TCListDataElement; AParentData: TCListDataElement = Nil);
+    property Items[AIndex: Integer]: TCListDataElement read GetItems write SetItems;
+    property ParentList: TCDataList read FParentList write FParentList;
+    property Data: TCDataListElementObject read FData write FData;
+    property Node: PVirtualNode read FNode write FNode;
+  end;
+
+  TCList = class(TVirtualStringTree)
+  private
+    FOddColor: TColor;
+    procedure SetOddColor(const Value: TColor);
+  protected
+    procedure DoBeforeItemErase(Canvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var Color: TColor; var EraseAction: TItemEraseAction); override;
+    procedure DoHeaderClick(Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property OddColor: TColor read FOddColor write SetOddColor;
+  end;
+
+  TCDataListOnReloadTree = procedure (Sender: TCDataList; ARootElement: TCListDataElement) of object;
+
+  TCDataList = class(TCList)
+  private
+    FCOnReloadTree: TCDataListOnReloadTree;
+    FRootElement: TCListDataElement;
+    function GetSelectedId: String;
+    function GetSelectedText: String;
+    function GetSelectedElement: TCListDataElement;
+  protected
+    procedure ValidateNodeDataSize(var Size: Integer); override;
+    procedure DoInitNode(Parent, Node: PVirtualNode; var InitStates: TVirtualNodeInitStates); override;
+    procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var Text: WideString); override;
+    function DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer): TCustomImageList; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure ReloadTree;
+    function GetTreeElement(ANode: PVirtualNode): TCListDataElement;
+    property RootElement: TCListDataElement read FRootElement;
+    property SelectedId: String read GetSelectedId;
+    property SelectedText: String read GetSelectedText;
+    property SelectedElement: TCListDataElement read GetSelectedElement;
+  published
+    property OnCDataListReloadTree: TCDataListOnReloadTree read FCOnReloadTree write FCOnReloadTree;
+  end;
+
 function GetCurrencySymbol: string;
 
 procedure Register;
 
 implementation
 
-uses Forms, CCalendarFormUnit, Types, DateUtils;
+uses Forms, CCalendarFormUnit, DateUtils, ComObj;
 
 procedure Register;
 begin
-  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit]);
+  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList]);
 end;
 
 procedure TCButton.ActionChange(Sender: TObject; CheckDefaults: Boolean);
@@ -361,7 +432,7 @@ begin
       end;
   end;
   if (Action <> nil) then begin
-    if TCustomAction(Action).ImageIndex <> -1 then begin
+    if (TCustomAction(Action).ImageIndex <> -1) and (xImages <> Nil) then begin
       ImageList_Draw(xImages.Handle, TCustomAction(Action).ImageIndex, xDC, xImgX, xImgY, ILD_NORMAL);
     end;
   end;
@@ -1305,6 +1376,226 @@ procedure TCCurrEdit.SetCurrencyStr(const Value: String);
 begin
   FCurrencyStr := Value;
   SetTextFromValue;
+end;
+
+constructor TCList.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FOddColor := GetHighLightColor(clWindow, -10);
+  DefaultText := '';
+end;
+
+procedure TCList.DoBeforeItemErase(Canvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var Color: TColor; var EraseAction: TItemEraseAction);
+begin
+  with Canvas do begin
+    if not Odd(AbsoluteIndex(Node)) then begin
+      Color := clWindow;
+    end else begin
+      Color := FOddColor;
+    end;
+    EraseAction := eaColor;
+  end;
+  inherited;
+end;
+
+procedure TCList.DoHeaderClick(Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbLeft then begin
+    if Header.SortColumn <> Column then begin
+      Header.SortColumn := Column;
+      Header.SortDirection := sdAscending;
+    end else begin
+      case Header.SortDirection of
+        sdAscending: Header.SortDirection := sdDescending;
+        sdDescending: Header.SortDirection := sdAscending;
+      end;
+    end;
+  end;
+  inherited;
+end;
+
+procedure TCList.SetOddColor(const Value: TColor);
+begin
+  if FOddColor <> Value then begin
+    FOddColor := Value;
+    Refresh;
+  end;
+end;
+
+procedure TCListDataElement.AppendDataElement(ANodeData, AParentData: TCListDataElement);
+var xParentNode: PVirtualNode;
+    xNode: PVirtualNode;
+begin
+  FParentList.BeginUpdate;
+  if AParentData = Nil then begin
+    xParentNode := Nil;
+  end else begin
+    xParentNode := AParentData.Node;
+  end;
+  xNode := FParentList.AddChild(xParentNode, ANodeData);
+  Add(ANodeData);
+  TCListDataElement(FParentList.GetNodeData(xNode)^).Node := xNode;
+  FParentList.FocusedNode := xNode;
+  FParentList.Selected[xNode] := True;
+  FParentList.Sort(xNode, FParentList.Header.SortColumn, FParentList.Header.SortDirection);
+  FParentList.EndUpdate;
+end;
+
+constructor TCListDataElement.Create(AParentList: TCDataList);
+begin
+  inherited Create(True);
+  FParentList := AParentList;
+  FData := Nil;
+end;
+
+procedure TCListDataElement.DeleteDataElement(AId, AElementType: String);
+var xElement: TCListDataElement;
+begin
+  xElement := FindDataElement(AId, AElementType);
+  if xElement <> Nil then begin
+    FParentList.BeginUpdate;
+    FParentList.DeleteNode(xElement.Node);
+    Remove(xElement);
+    FParentList.EndUpdate;
+  end;
+end;
+
+function TCListDataElement.FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
+var xCount: Integer;
+    xElement: TCListDataElement;
+begin
+  xCount := 0;
+  Result := Nil;
+  while (xCount <= Count - 1) and (Result = Nil) do begin
+    xElement := Items[xCount];
+    if (xElement.Data.GetElementType = AElementType) and (xElement.Data.GetElementId = AId) then begin
+      Result := xElement;
+    end;
+    Inc(xCount);
+  end;
+  if (Result = Nil) and ARecursive then begin
+    xCount := 0;
+    while (xCount <= Count - 1) and (Result = Nil) do begin
+      Result := Items[xCount].FindDataElement(AId, AElementType, ARecursive);
+      Inc(xCount);
+    end;
+  end;
+end;
+
+function TCListDataElement.GetItems(AIndex: Integer): TCListDataElement;
+begin
+  Result := TCListDataElement(inherited Items[AIndex]);
+end;
+
+procedure TCListDataElement.RefreshDataElement(AId, AElementType: String);
+var xElement: TCListDataElement;
+begin
+  xElement := FindDataElement(AId, AElementType);
+  if xElement <> Nil then begin
+    FParentList.BeginUpdate;
+    xElement.Data.GetElementReload;
+    FParentList.InvalidateNode(xElement.Node);
+    FParentList.Sort(xElement.Node, FParentList.Header.SortColumn, FParentList.Header.SortDirection);
+    FParentList.EndUpdate;
+  end;
+end;
+
+procedure TCListDataElement.SetItems(AIndex: Integer; const Value: TCListDataElement);
+begin
+  inherited Items[AIndex] := Value;
+end;
+
+constructor TCDataList.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FRootElement := TCListDataElement.Create(Self);
+  FCOnReloadTree := Nil;
+end;
+
+destructor TCDataList.Destroy;
+begin
+  FRootElement.Free;
+  inherited Destroy;
+end;
+
+procedure TCDataList.DoInitNode(Parent, Node: PVirtualNode; var InitStates: TVirtualNodeInitStates);
+var xData: TCListDataElement;
+    xParent: TCListDataElement;
+begin
+  if Parent = Nil then begin
+    xData := FRootElement.Items[Node.Index];
+  end else begin
+    xParent := TCListDataElement(GetNodeData(Node)^);
+    xData := xParent.Items[Node.Index];
+  end;
+  TCListDataElement(GetNodeData(Node)^) := xData;
+  xData.Node := Node;
+  if xData.Count > 0 then begin
+    InitStates := InitStates + [ivsHasChildren];
+  end;
+end;
+
+function TCDataList.GetTreeElement(ANode: PVirtualNode): TCListDataElement;
+begin
+  Result := TCListDataElement(GetNodeData(ANode)^);
+end;
+
+function TCDataList.GetSelectedId: String;
+begin
+  Result := '';
+  if FocusedNode <> Nil then begin
+    Result := GetTreeElement(FocusedNode).Data.GetElementId;
+  end;
+end;
+
+function TCDataList.GetSelectedText: String;
+begin
+  Result := '';
+  if FocusedNode <> Nil then begin
+    Result := GetTreeElement(FocusedNode).Data.GetElementText;
+  end;
+end;
+
+procedure TCDataList.ReloadTree;
+begin
+  BeginUpdate;
+  Clear;
+  FRootElement.Clear;
+  if Assigned(FCOnReloadTree) then begin
+    FCOnReloadTree(Self, FRootElement);
+  end;
+  RootNodeCount := FRootElement.Count;
+  EndUpdate;
+end;
+
+procedure TCDataList.ValidateNodeDataSize(var Size: Integer);
+begin
+  Size := SizeOf(TCListDataElement);
+end;
+
+procedure TCDataList.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var Text: WideString);
+begin
+  inherited DoGetText(Node, Column, TextType, Text);
+  if Text = '' then begin
+    Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic);
+  end;
+end;
+
+function TCDataList.DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer): TCustomImageList;
+begin
+  inherited DoGetImageIndex(Node, Kind, Column, Ghosted, Index);
+  if Index = -1 then begin
+    Index := GetTreeElement(Node).Data.GetColumnImage(Column);
+  end;
+  Result := Nil;
+end;
+
+function TCDataList.GetSelectedElement: TCListDataElement;
+begin
+  Result := Nil;
+  if FocusedNode <> Nil then begin
+    Result := GetTreeElement(FocusedNode);
+  end;
 end;
 
 end.

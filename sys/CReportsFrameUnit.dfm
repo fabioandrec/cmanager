@@ -1,5 +1,5 @@
 inherited CReportsFrame: TCReportsFrame
-  object ReportList: TVirtualStringTree [0]
+  object ReportList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -32,7 +32,6 @@ inherited CReportsFrame: TCReportsFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = ReportListBeforeItemErase
     OnDblClick = ReportListDblClick
     OnFocusChanged = ReportListFocusChanged
     OnGetText = ReportListGetText

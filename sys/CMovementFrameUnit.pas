@@ -28,7 +28,7 @@ type
 
   TCMovementFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
-    TodayList: TVirtualStringTree;
+    TodayList: TCList;
     ActionList: TActionList;
     ActionMovement: TAction;
     ActionEditMovement: TAction;
@@ -43,7 +43,7 @@ type
     CStaticFilter: TCStatic;
     Panel2: TPanel;
     Splitter1: TSplitter;
-    SumList: TVirtualStringTree;
+    SumList: TCList;
     Label2: TLabel;
     Label1: TLabel;
     CStaticPeriod: TCStatic;
@@ -61,17 +61,14 @@ type
     procedure TodayListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure TodayListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure TodayListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure TodayListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TodayListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure TodayListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure TodayListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticFilterChanged(Sender: TObject);
-    procedure SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure SumListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure SumListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure SumListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CDateTimePerStartChanged(Sender: TObject);
@@ -98,7 +95,7 @@ type
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure ReloadToday;
     procedure ReloadSums;
     constructor Create(AOwner: TComponent); override;
@@ -318,23 +315,6 @@ begin
   end;
 end;
 
-procedure TCMovementFrame.TodayListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCMovementFrame.TodayListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TMovementTreeElement;
     xData2: TMovementTreeElement;
@@ -386,16 +366,10 @@ var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    if not Odd(Sender.AbsoluteIndex(Node)) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
     FindFontAndBackground(xBase, Nil, xColor);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
-    EraseAction := eaColor;
   end;
 end;
 
@@ -502,7 +476,7 @@ begin
   ReloadSums;
 end;
 
-function TCMovementFrame.GetList: TVirtualStringTree;
+function TCMovementFrame.GetList: TCList;
 begin
   Result := TodayList;
 end;
@@ -624,18 +598,6 @@ begin
   xDs.Free;
 end;
 
-procedure TCMovementFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
-
 procedure TCMovementFrame.SumListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TSumElement;
     xData2: TSumElement;
@@ -643,13 +605,13 @@ begin
   xData1 := TSumElement(SumList.GetNodeData(Node1)^);
   xData2 := TSumElement(SumList.GetNodeData(Node2)^);
   if (xData1.id = '*') then begin
-    if TVirtualStringTree(Sender).Header.SortDirection = sdAscending then begin
+    if TCList(Sender).Header.SortDirection = sdAscending then begin
       Result := -11;
     end else begin
       Result := 1;
     end;
   end else if (xData2.id = '*') then begin
-    if TVirtualStringTree(Sender).Header.SortDirection = sdAscending then begin
+    if TCList(Sender).Header.SortDirection = sdAscending then begin
       Result := 1;
     end else begin
       Result := -1;
@@ -702,23 +664,6 @@ begin
     CellText := CurrencyToString(xData.cashIn);
   end else if Column = 3 then begin
     CellText := CurrencyToString(xData.cashIn - xData.cashOut);
-  end;
-end;
-
-procedure TCMovementFrame.SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
   end;
 end;
 

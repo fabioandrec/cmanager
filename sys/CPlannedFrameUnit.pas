@@ -11,7 +11,7 @@ uses
 type
   TCPlannedFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
-    PlannedList: TVirtualStringTree;
+    PlannedList: TCList;
     ActionList: TActionList;
     ActionMovement: TAction;
     ActionEditMovement: TAction;
@@ -24,7 +24,6 @@ type
     procedure PlannedListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure PlannedListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure PlannedListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure PlannedListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PlannedListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure PlannedListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure PlannedListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
@@ -43,7 +42,7 @@ type
   protected
     procedure WndProc(var Message: TMessage); override;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
@@ -133,23 +132,6 @@ begin
   end;
 end;
 
-procedure TCPlannedFrame.PlannedListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCPlannedFrame.PlannedListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TPlannedMovement;
     xData2: TPlannedMovement;
@@ -193,16 +175,10 @@ var xBase: TPlannedMovement;
 begin
   xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
     FindFontAndBackground(xBase, Nil, xColor);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
-    EraseAction := eaColor;
   end;
 end;
 
@@ -255,7 +231,7 @@ begin
   SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
 end;
 
-function TCPlannedFrame.GetList: TVirtualStringTree;
+function TCPlannedFrame.GetList: TCList;
 begin
   Result := PlannedList;
 end;

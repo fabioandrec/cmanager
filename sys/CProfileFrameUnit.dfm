@@ -1,5 +1,5 @@
 inherited CProfileFrame: TCProfileFrame
-  object ProfileList: TVirtualStringTree [0]
+  object ProfileList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -30,14 +30,12 @@ inherited CProfileFrame: TCProfileFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = ProfileListBeforeItemErase
     OnCompareNodes = ProfileListCompareNodes
     OnDblClick = ProfileListDblClick
     OnFocusChanged = ProfileListFocusChanged
     OnGetText = ProfileListGetText
     OnGetHint = ProfileListGetHint
     OnGetNodeDataSize = ProfileListGetNodeDataSize
-    OnHeaderClick = ProfileListHeaderClick
     OnInitNode = ProfileListInitNode
     Columns = <
       item

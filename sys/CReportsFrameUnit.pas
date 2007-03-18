@@ -30,7 +30,7 @@ type
   end;
 
   TCReportsFrame = class(TCBaseFrame)
-    ReportList: TVirtualStringTree;
+    ReportList: TCList;
     ActionList: TActionList;
     ActionExecute: TAction;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
@@ -42,7 +42,6 @@ type
     procedure ReportListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ReportListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ReportListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-    procedure ReportListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ReportListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
     procedure ReportListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -51,7 +50,7 @@ type
     procedure RecreateTreeHelper;
     procedure ReloadReports;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
@@ -214,18 +213,6 @@ begin
   LineBreakStyle := hlbForceMultiLine;
 end;
 
-procedure TCReportsFrame.ReportListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Sender.AbsoluteIndex(Node)) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
-
 procedure TCReportsFrame.ReportListDblClick(Sender: TObject);
 begin
   if ReportList.FocusedNode <> Nil then begin
@@ -239,7 +226,7 @@ begin
   end;
 end;
 
-function TCReportsFrame.GetList: TVirtualStringTree;
+function TCReportsFrame.GetList: TCList;
 begin
   Result := ReportList;
 end;

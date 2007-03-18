@@ -1,5 +1,5 @@
 inherited CProductsFrame: TCProductsFrame
-  object ProductList: TVirtualStringTree [0]
+  object ProductList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -32,14 +32,12 @@ inherited CProductsFrame: TCProductsFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = ProductListBeforeItemErase
     OnCompareNodes = ProductListCompareNodes
     OnDblClick = ProductListDblClick
     OnFocusChanged = ProductListFocusChanged
     OnGetText = ProductListGetText
     OnGetHint = ProductListGetHint
     OnGetNodeDataSize = ProductListGetNodeDataSize
-    OnHeaderClick = ProductListHeaderClick
     OnInitChildren = ProductListInitChildren
     OnInitNode = ProductListInitNode
     Columns = <

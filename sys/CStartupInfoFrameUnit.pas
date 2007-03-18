@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees, CDatabase,
   CSchedules, Contnrs, ExtCtrls, GraphUtil, CConfigFormUnit, VTHeaderPopup,
-  CImageListsUnit;
+  CImageListsUnit, CComponents;
 
 type
   TStartupHelperType = (shtGroup, shtDate, shtItem);
@@ -15,7 +15,7 @@ type
   TStartupHelper = class;
 
   TCStartupInfoFrame = class(TCBaseFrame)
-    RepaymentList: TVirtualStringTree;
+    RepaymentList: TCList;
     PanelError: TPanel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     procedure RepaymentListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
@@ -23,7 +23,6 @@ type
     procedure RepaymentListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure RepaymentListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure RepaymentListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FPlannedObjects: TDataObjectList;
@@ -38,7 +37,7 @@ type
     class function GetTitle: String; override;
     class function GetOperation: TConfigOperation; override;
     class function GetPrefname: String; override;
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
   end;
 
   TStartupHelper = class(TObject)
@@ -351,18 +350,6 @@ begin
   FindFontAndBackground(xData, TargetCanvas.Font, xColor);
 end;
 
-procedure TCStartupInfoFrame.RepaymentListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Sender.AbsoluteIndex(Node)) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
-
 procedure TCStartupInfoFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
@@ -388,7 +375,7 @@ begin
   Result := 'startupInfo';
 end;
 
-function TCStartupInfoFrame.GetList: TVirtualStringTree;
+function TCStartupInfoFrame.GetList: TCList;
 begin
   Result := RepaymentList;
 end;

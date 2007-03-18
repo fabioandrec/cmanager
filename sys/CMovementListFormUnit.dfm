@@ -250,7 +250,7 @@ inherited CMovementListForm: TCMovementListForm
             Action = Action3
           end
         end
-        object MovementList: TVirtualStringTree
+        object MovementList: TCList
           Left = 1
           Top = 1
           Width = 455
@@ -280,15 +280,14 @@ inherited CMovementListForm: TCMovementListForm
           TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
           TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
-          OnBeforeItemErase = MovementListBeforeItemErase
           OnCompareNodes = MovementListCompareNodes
           OnDblClick = MovementListDblClick
           OnFocusChanged = MovementListFocusChanged
           OnGetText = MovementListGetText
           OnGetHint = MovementListGetHint
           OnGetNodeDataSize = MovementListGetNodeDataSize
-          OnHeaderClick = MovementListHeaderClick
           OnInitNode = MovementListInitNode
+          OddColor = 12437200
           Columns = <
             item
               Alignment = taRightJustify
@@ -308,6 +307,7 @@ inherited CMovementListForm: TCMovementListForm
               Width = 100
               WideText = 'Kwota'
             end>
+          WideDefaultText = ''
         end
       end
       object Panel3: TPanel

@@ -110,7 +110,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
-  CTemplates, CPreferences, CRichtext;
+  CTemplates, CPreferences, CRichtext, CDataobjectFrameUnit;
 
 {$R *.dfm}
 
@@ -208,7 +208,7 @@ begin
   end else if (ComboBoxType.ItemIndex = 1) or (ComboBoxType.ItemIndex = 4) then begin
     xCt := CCashpointTypeIn;
   end;
-  Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText, TCashpointFrameAdditionalData.Create(xCt));
+  Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText, TCDataobjectFrameData.CreateWithFilter(xCt));
 end;
 
 procedure TCMovementForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

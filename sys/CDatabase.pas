@@ -5,7 +5,7 @@ interface
 {.$DEFINE SAVETOLOG}
 
 uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
-     Types;
+     Types, CComponents;
 
 type
   TDataGid = ShortString;
@@ -108,7 +108,7 @@ type
     property Items[AIndex: Integer]: TDataField read GetItems write SetItems;
   end;
 
-  TDataObject = class(TObject)
+  TDataObject = class(TCDataListElementObject)
   private
     Fid: TDataGid;
     Fcreated: TDateTime;
@@ -138,6 +138,13 @@ type
     procedure ForceUpdate;
     procedure AfterPost; virtual;
     class function CanBeDeleted(AId: TDataGid): Boolean; virtual;
+    function GetElementId: String; override;
+    function GetElementType: String; override;
+    function GetElementText: String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    procedure GetElementReload; override;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
   published
     property id: TDataGid read FId write Fid;
     property created: TDateTime read Fcreated;
@@ -944,6 +951,44 @@ begin
     Fcreated := FieldByName('created').AsDateTime;
     Fmodified := FieldByName('modified').AsDateTime;
   end;
+end;
+
+function TDataObject.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := -1;
+end;
+
+function TDataObject.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := '';
+end;
+
+function TDataObject.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+var xV1, xV2: String;
+begin
+  xV1 := GetColumnText(AColumnIndex, False);
+  xV2 := ACompareWith.GetColumnText(AColumnIndex, False);
+  Result := AnsiCompareStr(xV1, xV2);
+end;
+
+function TDataObject.GetElementId: String;
+begin
+  Result := Fid;
+end;
+
+procedure TDataObject.GetElementReload;
+begin
+
+end;
+
+function TDataObject.GetElementText: String;
+begin
+  Result := '';
+end;
+
+function TDataObject.GetElementType: String;
+begin
+  Result := ClassName;
 end;
 
 class function TDataObject.GetList(AClass: TDataObjectClass; ADataProxy: TDataProxy; ASql: String): TDataObjectList;

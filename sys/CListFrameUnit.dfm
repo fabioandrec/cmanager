@@ -1,5 +1,5 @@
 inherited CListFrame: TCListFrame
-  object List: TVirtualStringTree [0]
+  object List: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -28,13 +28,11 @@ inherited CListFrame: TCListFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = ListBeforeItemErase
     OnCompareNodes = ListCompareNodes
     OnDblClick = ListDblClick
     OnFocusChanged = ListFocusChanged
     OnGetText = ListGetText
     OnGetNodeDataSize = ListGetNodeDataSize
-    OnHeaderClick = ListHeaderClick
     OnInitNode = ListInitNode
     Columns = <
       item

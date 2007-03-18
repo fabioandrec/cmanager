@@ -26,7 +26,8 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit, CConsts, CRichtext;
+uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit, CConsts, CRichtext,
+  CLimitsFrameUnit;
 
 {$R *.dfm}
 
@@ -47,9 +48,9 @@ begin
     SimpleRichText(description, RichEditDesc);
     if cashpointType = CCashpointTypeAll then begin
       ComboBoxType.ItemIndex := 0;
-    end else if cashpointType = CCashpointTypeIn then begin
-      ComboBoxType.ItemIndex := 1;
     end else if cashpointType = CCashpointTypeOut then begin
+      ComboBoxType.ItemIndex := 1;
+    end else if cashpointType = CCashpointTypeIn then begin
       ComboBoxType.ItemIndex := 2;
     end else if cashpointType = CCashpointTypeOther then begin
       ComboBoxType.ItemIndex := 3;
@@ -76,9 +77,9 @@ begin
     if ComboBoxType.ItemIndex = 0 then begin
       cashpointType := CCashpointTypeAll;
     end else if ComboBoxType.ItemIndex = 1 then begin
-      cashpointType := CCashpointTypeIn;
-    end else if ComboBoxType.ItemIndex = 2 then begin
       cashpointType := CCashpointTypeOut;
+    end else if ComboBoxType.ItemIndex = 2 then begin
+      cashpointType := CCashpointTypeIn;
     end else if ComboBoxType.ItemIndex = 3 then begin
       cashpointType := CCashpointTypeOther;
     end;

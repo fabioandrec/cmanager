@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CBaseFrameUnit;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CBaseFrameUnit,
+  CComponents;
 
 type
   TCFrameForm = class(TCConfigForm)
@@ -55,7 +56,7 @@ end;
 class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil): Boolean;
 var xForm: TCFrameForm;
     xNode: PVirtualNode;
-    xList: TVirtualStringTree;
+    xList: TCList;
 begin
   Result := False;
   xForm := TCFrameForm.CreateFrame(Application, AFrameClass, AAdditionalData, AOutData, AMultipleCheck);

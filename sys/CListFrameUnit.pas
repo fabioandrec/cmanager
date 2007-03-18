@@ -5,17 +5,15 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, VirtualTrees, CDatabase, GraphUtil,
-  PngImageList, Menus;
+  PngImageList, Menus, CComponents;
 
 type
   TCListFrame = class(TCBaseFrame)
-    List: TVirtualStringTree;
+    List: TCList;
     procedure ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure ListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure ListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
-    procedure ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ListDblClick(Sender: TObject);
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
@@ -25,7 +23,7 @@ type
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure ReloadList(AItems: TStringList);
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
@@ -45,7 +43,7 @@ begin
   inherited Destroy;
 end;
 
-function TCListFrame.GetList: TVirtualStringTree;
+function TCListFrame.GetList: TCList;
 begin
   Result := List;
 end;
@@ -100,23 +98,6 @@ begin
   CellText := FNames.Strings[xData];
 end;
 
-procedure TCListFrame.ListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCListFrame.ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: Integer;
     xData2: Integer;
@@ -125,18 +106,6 @@ begin
     xData1 := Integer(List.GetNodeData(Node1)^);
     xData2 := Integer(List.GetNodeData(Node2)^);
     Result := AnsiCompareText(FNames.Strings[xData1], FNames.Strings[xData2]);
-  end;
-end;
-
-procedure TCListFrame.ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
   end;
 end;
 

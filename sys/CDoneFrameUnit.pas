@@ -20,14 +20,14 @@ type
 
   TCDoneFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
-    DoneList: TVirtualStringTree;
+    DoneList: TCList;
     ActionList: TActionList;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     Panel: TPanel;
     CStaticFilter: TCStatic;
     Panel2: TPanel;
     Splitter1: TSplitter;
-    SumList: TVirtualStringTree;
+    SumList: TCList;
     Label2: TLabel;
     Label1: TLabel;
     CStaticPeriod: TCStatic;
@@ -45,17 +45,14 @@ type
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure DoneListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure DoneListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure DoneListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure DoneListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticFilterChanged(Sender: TObject);
-    procedure SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure SumListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure SumListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure SumListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CDateTimePerStartChanged(Sender: TObject);
@@ -78,7 +75,7 @@ type
     function GetSelectedId: ShortString; override;
     function GetSelectedText: String; override;
   public
-    function GetList: TVirtualStringTree; override;
+    function GetList: TCList; override;
     procedure ReloadDone;
     procedure ReloadSums;
     procedure RecreateTreeHelper;
@@ -87,7 +84,7 @@ type
     destructor Destroy; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
-    function FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode; override;
+    function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
     class function GetPrefname: String; override;
   end;
 
@@ -245,23 +242,6 @@ begin
   end;
 end;
 
-procedure TCDoneFrame.DoneListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCDoneFrame.DoneListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TPlannedTreeItem;
     xData2: TPlannedTreeItem;
@@ -313,20 +293,14 @@ var xColor: TColor;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
     FindFontAndBackground(xBase, Nil, xColor);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
-    EraseAction := eaColor;
   end;
 end;
 
-function TCDoneFrame.GetList: TVirtualStringTree;
+function TCDoneFrame.GetList: TCList;
 begin
   Result := DoneList;
 end;
@@ -390,18 +364,6 @@ begin
   ReloadDone;
 end;
 
-procedure TCDoneFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
-end;
-
 procedure TCDoneFrame.SumListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TSumElement;
     xData2: TSumElement;
@@ -409,13 +371,13 @@ begin
   xData1 := TSumElement(SumList.GetNodeData(Node1)^);
   xData2 := TSumElement(SumList.GetNodeData(Node2)^);
   if (xData1.id = '*') then begin
-    if TVirtualStringTree(Sender).Header.SortDirection = sdAscending then begin
+    if TCList(Sender).Header.SortDirection = sdAscending then begin
       Result := -1;
     end else begin
       Result := 1;
     end;
   end else if (xData2.id = '*') then begin
-    if TVirtualStringTree(Sender).Header.SortDirection = sdAscending then begin
+    if TCList(Sender).Header.SortDirection = sdAscending then begin
       Result := 1;
     end else begin
       Result := -1;
@@ -468,23 +430,6 @@ begin
     CellText := CurrencyToString(xData.cashIn);
   end else if Column = 3 then begin
     CellText := CurrencyToString(xData.cashIn - xData.cashOut);
-  end;
-end;
-
-procedure TCDoneFrame.SumListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
   end;
 end;
 
@@ -646,7 +591,7 @@ begin
   CButtonOperation.Enabled := xOper;
 end;
 
-function TCDoneFrame.FindNode(ADataId: ShortString; AList: TVirtualStringTree): PVirtualNode;
+function TCDoneFrame.FindNode(ADataId: ShortString; AList: TCList): PVirtualNode;
 var xCurNode: PVirtualNode;
     xDataobject: TPlannedTreeItem;
 begin

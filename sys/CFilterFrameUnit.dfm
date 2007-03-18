@@ -1,5 +1,5 @@
 inherited CFilterFrame: TCFilterFrame
-  object FilterList: TVirtualStringTree [0]
+  object FilterList: TCList [0]
     Left = 0
     Top = 0
     Width = 443
@@ -30,14 +30,12 @@ inherited CFilterFrame: TCFilterFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = FilterListBeforeItemErase
     OnCompareNodes = FilterListCompareNodes
     OnDblClick = FilterListDblClick
     OnFocusChanged = FilterListFocusChanged
     OnGetText = FilterListGetText
     OnGetHint = FilterListGetHint
     OnGetNodeDataSize = FilterListGetNodeDataSize
-    OnHeaderClick = FilterListHeaderClick
     OnInitNode = FilterListInitNode
     Columns = <
       item

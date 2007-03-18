@@ -32,7 +32,7 @@ type
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
-    MovementList: TVirtualStringTree;
+    MovementList: TCList;
     Panel3: TPanel;
     Label6: TLabel;
     CCurrEditCash: TCCurrEdit;
@@ -48,10 +48,8 @@ type
     procedure MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure MovementListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure MovementListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure MovementListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure MovementListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure MovementListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-    procedure MovementListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure MovementListDblClick(Sender: TObject);
     procedure Action2Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
@@ -99,7 +97,7 @@ implementation
 uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
-  CDescpatternFormUnit, CRichtext;
+  CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit;
 
 {$R *.dfm}
 
@@ -125,7 +123,7 @@ begin
   end else begin
     xCt := CCashpointTypeIn;
   end;
-  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCashpointFrameAdditionalData.Create(xCt));
+  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCDataobjectFrameData.CreateWithFilter(xCt));
 end;
 
 destructor TCMovementListForm.Destroy;
@@ -267,23 +265,6 @@ begin
   end;
 end;
 
-procedure TCMovementListForm.MovementListHeaderClick(Sender: TVTHeader; Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then begin
-    with Sender do begin
-      if SortColumn <> Column then begin
-        SortColumn := Column;
-        SortDirection := sdAscending;
-      end else begin
-        case SortDirection of
-          sdAscending: SortDirection := sdDescending;
-          sdDescending: SortDirection := sdAscending;
-        end;
-      end;
-    end;
-  end;
-end;
-
 procedure TCMovementListForm.MovementListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
 var xData1: TMovementListElement;
     xData2: TMovementListElement;
@@ -317,18 +298,6 @@ begin
   xData := TMovementListElement(MovementList.GetNodeData(Node)^);
   HintText := xData.description;
   LineBreakStyle := hlbForceMultiLine;
-end;
-
-procedure TCMovementListForm.MovementListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  with TargetCanvas do begin
-    if not Odd(Node.Index) then begin
-      ItemColor := clWindow;
-    end else begin
-      ItemColor := GetHighLightColor(clWindow, -10);
-    end;
-    EraseAction := eaColor;
-  end;
 end;
 
 procedure TCMovementListForm.MovementListDblClick(Sender: TObject);

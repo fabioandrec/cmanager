@@ -72,7 +72,7 @@ implementation
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit, CTemplates,
-  CDescpatternFormUnit, CPreferences, CRichtext;
+  CDescpatternFormUnit, CPreferences, CRichtext, CDataobjectFrameUnit;
 
 {$R *.dfm}
 
@@ -122,7 +122,7 @@ begin
   end else begin
     xCt := CCashpointTypeIn;
   end;
-  Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText, TCashpointFrameAdditionalData.Create(xCt));
+  Result := TCFrameForm.ShowFrame(TCCashpointsFrame, AId, AText, TCDataobjectFrameData.CreateWithFilter(xCt));
 end;
 
 procedure TCPlannedForm.CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
