@@ -1,138 +1,63 @@
 inherited CProductsFrame: TCProductsFrame
-  object ProductList: TCList [0]
-    Left = 0
-    Top = 0
-    Width = 443
-    Height = 236
-    Align = alClient
-    BevelEdges = [beBottom]
-    BevelInner = bvNone
-    BevelOuter = bvRaised
-    BevelKind = bkFlat
-    BorderStyle = bsNone
-    ButtonStyle = bsTriangle
-    DefaultNodeHeight = 24
-    Header.AutoSizeIndex = 0
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
-    Header.Font.Style = []
-    Header.Height = 21
-    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-    Header.PopupMenu = VTHeaderPopupMenu
-    Header.SortColumn = 0
-    Header.Style = hsFlatButtons
-    HintMode = hmHint
-    Indent = 20
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 0
-    TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-    TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-    TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-    TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnCompareNodes = ProductListCompareNodes
-    OnDblClick = ProductListDblClick
-    OnFocusChanged = ProductListFocusChanged
-    OnGetText = ProductListGetText
-    OnGetHint = ProductListGetHint
-    OnGetNodeDataSize = ProductListGetNodeDataSize
-    OnInitChildren = ProductListInitChildren
-    OnInitNode = ProductListInitNode
+  Width = 788
+  inherited Bevel: TBevel
+    Width = 788
+  end
+  inherited FilterPanel: TPanel
+    Width = 788
+  end
+  inherited List: TCDataList
+    Width = 788
+    Header.MainColumn = 0
     Columns = <
       item
         Position = 0
-        Width = 443
+        Width = 788
         WideText = 'Nazwa'
-        WideHint = 'Nazwa kontrahenta'
       end>
+    WideDefaultText = ''
   end
-  object PanelFrameButtons: TPanel [1]
-    Left = 0
-    Top = 236
-    Width = 443
-    Height = 41
-    Align = alBottom
-    BevelOuter = bvNone
-    Color = clWindow
-    TabOrder = 1
-    object CButtonAddCategory: TCButton
-      Left = 13
-      Top = 5
-      Width = 137
-      Height = 33
-      Cursor = crHandPoint
-      PicPosition = ppLeft
-      PicOffset = 10
-      TxtOffset = 15
-      Framed = False
-      Action = ActionAddRootCategory
+  inherited ButtonPanel: TPanel
+    Width = 788
+    inherited CButtonAdd: TCButton
+      Width = 136
+    end
+    inherited CButtonEdit: TCButton
+      Left = 288
+      Width = 136
+    end
+    inherited CButtonDelete: TCButton
+      Left = 424
+      Width = 136
     end
     object CButtonAddSubcategory: TCButton
-      Left = 157
-      Top = 5
-      Width = 137
-      Height = 33
+      Left = 144
+      Top = 8
+      Width = 145
+      Height = 30
       Cursor = crHandPoint
       PicPosition = ppLeft
       PicOffset = 10
       TxtOffset = 15
       Framed = False
-      Action = ActionAddSubCategory
-    end
-    object CButtonEditCategory: TCButton
-      Left = 301
-      Top = 5
-      Width = 137
-      Height = 33
-      Cursor = crHandPoint
-      PicPosition = ppLeft
-      PicOffset = 10
-      TxtOffset = 15
-      Framed = False
-      Action = ActionEditCategory
-    end
-    object CButtonDelCategory: TCButton
-      Left = 449
-      Top = 5
-      Width = 137
-      Height = 33
-      Cursor = crHandPoint
-      PicPosition = ppLeft
-      PicOffset = 10
-      TxtOffset = 15
-      Framed = False
-      Action = ActionDelCategory
+      Action = ActionAddSubcategory
     end
   end
-  object ActionList: TActionList
+  inherited ActionListButtons: TActionList
     Images = CImageLists.CategoryImageList24x24
-    Left = 11
-    Top = 48
-    object ActionAddSubCategory: TAction
+    inherited ActionAdd: TAction
+      Caption = 'Dodaj kategori'#281
+    end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj kategori'#281
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' kategori'#281
+    end
+    object ActionAddSubcategory: TAction
       Caption = 'Dodaj podkategori'#281
       ImageIndex = 0
-      OnExecute = ActionAddSubCategoryExecute
+      OnExecute = ActionAddSubcategoryExecute
     end
-    object ActionEditCategory: TAction
-      Caption = 'Edytuj kategori'#281
-      ImageIndex = 1
-      OnExecute = ActionEditCategoryExecute
-    end
-    object ActionDelCategory: TAction
-      Caption = 'Usu'#324' kategori'#281
-      ImageIndex = 2
-      OnExecute = ActionDelCategoryExecute
-    end
-    object ActionAddRootCategory: TAction
-      Caption = 'Dodaj kategori'#281
-      ImageIndex = 0
-      OnExecute = ActionAddRootCategoryExecute
-    end
-  end
-  object VTHeaderPopupMenu: TVTHeaderPopupMenu
-    Left = 80
-    Top = 152
   end
 end

@@ -62,7 +62,7 @@ implementation
 
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
      CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
-     CPreferences, CRichtext;
+     CPreferences, CRichtext, CDataobjectFrameUnit;
 
 {$R *.dfm}
 
@@ -92,7 +92,7 @@ begin
   end else begin
     xProd := CInProduct;
   end;
-  Result := TCFrameForm.ShowFrame(TCProductsFrame, AId, AText, TProductsFrameAdditionalData.Create(xProd));
+  Result := TCFrameForm.ShowFrame(TCProductsFrame, AId, AText, TCDataobjectFrameData.CreateWithFilter(xProd));
 end;
 
 procedure TCMovmentListElementForm.CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

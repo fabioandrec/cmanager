@@ -2,7 +2,7 @@ unit CDataObjects;
 
 interface
 
-uses CDatabase, SysUtils, AdoDb, Classes, CConsts;
+uses CDatabase, SysUtils, AdoDb, Classes, CConsts, CComponents, Math;
 
 type
   TBaseName = string[40];
@@ -53,6 +53,9 @@ type
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class function AccountBalanceOnDay(AIdAccount: TDataGid; ADateTime: TDateTime): Currency;
     class function GetMovementCount(AIdAccount: TDataGid): Integer;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -79,6 +82,8 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class function HasSubcategory(AId: TDataGid): Boolean; 
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -284,6 +289,8 @@ type
     procedure AfterPost; override;
     procedure DeleteObject; override;
     function IsValid(AAccountId, ACashpointId, AProductId: TDataGid): Boolean;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -308,6 +315,8 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure DeleteObject; override;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -337,7 +346,7 @@ procedure InitializeProxies;
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils;
+uses DB, CInfoFormUnit, DateUtils, StrUtils;
 
 procedure InitializeProxies;
 begin
@@ -517,6 +526,16 @@ begin
     FidParentProduct := FieldByName('idParentProduct').AsString;
     FproductType := FieldByName('productType').AsString;
   end;
+end;
+
+function TProduct.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TProduct.GetElementText: String;
+begin
+  Result := Fname;
 end;
 
 function TProduct.GettreeDesc: String;
@@ -1074,6 +1093,16 @@ begin
   end;
 end;
 
+function TMovementFilter.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TMovementFilter.GetElementText: String;
+begin
+  Result := Fname;
+end;
+
 class function TMovementFilter.GetFilterCondition(AIdFilter: TDataGid; AWithAnd: Boolean; AAcountField, ACashpointField, ACategoryField: String): String;
 var xFilter: TMovementFilter;
     xAccountsPart, xCashpointsPart, xProductsPart: String;
@@ -1237,6 +1266,16 @@ begin
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
   end;
+end;
+
+function TProfile.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TProfile.GetElementText: String;
+begin
+  Result := Fname;
 end;
 
 procedure TProfile.Setdescription(const Value: TBaseDescription);
@@ -1491,6 +1530,31 @@ begin
   if FinitialBalance <> Value then begin
     FinitialBalance := Value;
     SetState(msModified);
+  end;
+end;
+
+function TAccount.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 2 then begin
+    Result := CurrencyToString(Fcash);
+  end else if AColumnIndex = 1 then begin
+    Result := IfThen(FaccountType = CCashAccount, 'gotówkowe', 'bankowe');
+  end else begin
+    Result := Fname;
+  end;
+end;
+
+function TAccount.GetElementText: String;
+begin
+  Result := Fname;
+end;
+
+function TAccount.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+begin
+  if AColumnIndex = 2 then begin
+    Result := Sign(Fcash - TAccount(ACompareWith).cash);
+  end else begin
+    Result := inherited GetElementCompare(AColumnIndex, ACompareWith);
   end;
 end;
 

@@ -271,7 +271,7 @@ type
     function FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
     procedure DeleteDataElement(AId: String; AElementType: String = '');
     procedure RefreshDataElement(AId: String; AElementType: String = '');
-    procedure AppendDataElement(ANodeData: TCListDataElement; AParentData: TCListDataElement = Nil);
+    procedure AppendDataElement(ANodeData: TCListDataElement);
     property Items[AIndex: Integer]: TCListDataElement read GetItems write SetItems;
     property ParentList: TCDataList read FParentList write FParentList;
     property Data: TCDataListElementObject read FData write FData;
@@ -281,6 +281,7 @@ type
   TCList = class(TVirtualStringTree)
   private
     FOddColor: TColor;
+    FAutoExpand: Boolean;
     procedure SetOddColor(const Value: TColor);
   protected
     procedure DoBeforeItemErase(Canvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var Color: TColor; var EraseAction: TItemEraseAction); override;
@@ -289,6 +290,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property OddColor: TColor read FOddColor write SetOddColor;
+    property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
   end;
 
   TCDataListOnReloadTree = procedure (Sender: TCDataList; ARootElement: TCListDataElement) of object;
@@ -305,6 +307,7 @@ type
     procedure DoInitNode(Parent, Node: PVirtualNode; var InitStates: TVirtualNodeInitStates); override;
     procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var Text: WideString); override;
     function DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer): TCustomImageList; override;
+    procedure DoInitChildren(Node: PVirtualNode; var ChildCount: Cardinal); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1382,6 +1385,7 @@ constructor TCList.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FOddColor := GetHighLightColor(clWindow, -10);
+  FAutoExpand := True;
   DefaultText := '';
 end;
 
@@ -1422,17 +1426,11 @@ begin
   end;
 end;
 
-procedure TCListDataElement.AppendDataElement(ANodeData, AParentData: TCListDataElement);
-var xParentNode: PVirtualNode;
-    xNode: PVirtualNode;
+procedure TCListDataElement.AppendDataElement(ANodeData: TCListDataElement);
+var xNode: PVirtualNode;
 begin
   FParentList.BeginUpdate;
-  if AParentData = Nil then begin
-    xParentNode := Nil;
-  end else begin
-    xParentNode := AParentData.Node;
-  end;
-  xNode := FParentList.AddChild(xParentNode, ANodeData);
+  xNode := FParentList.AddChild(Node, ANodeData);
   Add(ANodeData);
   TCListDataElement(FParentList.GetNodeData(xNode)^).Node := xNode;
   FParentList.FocusedNode := xNode;
@@ -1525,13 +1523,16 @@ begin
   if Parent = Nil then begin
     xData := FRootElement.Items[Node.Index];
   end else begin
-    xParent := TCListDataElement(GetNodeData(Node)^);
+    xParent := TCListDataElement(GetNodeData(Parent)^);
     xData := xParent.Items[Node.Index];
   end;
   TCListDataElement(GetNodeData(Node)^) := xData;
   xData.Node := Node;
   if xData.Count > 0 then begin
     InitStates := InitStates + [ivsHasChildren];
+    if AutoExpand then begin
+      InitStates := InitStates + [ivsExpanded];
+    end;
   end;
 end;
 
@@ -1566,6 +1567,7 @@ begin
   end;
   RootNodeCount := FRootElement.Count;
   EndUpdate;
+  UpdateScrollBars(False);
 end;
 
 procedure TCDataList.ValidateNodeDataSize(var Size: Integer);
@@ -1595,6 +1597,14 @@ begin
   Result := Nil;
   if FocusedNode <> Nil then begin
     Result := GetTreeElement(FocusedNode);
+  end;
+end;
+
+procedure TCDataList.DoInitChildren(Node: PVirtualNode; var ChildCount: Cardinal);
+begin
+  inherited DoInitChildren(Node, ChildCount);
+  if ChildCount = 0 then begin
+    ChildCount := GetTreeElement(Node).Count;
   end;
 end;
 

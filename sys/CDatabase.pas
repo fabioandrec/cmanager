@@ -978,7 +978,7 @@ end;
 
 procedure TDataObject.GetElementReload;
 begin
-
+  ReloadObject;
 end;
 
 function TDataObject.GetElementText: String;

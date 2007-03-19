@@ -123,10 +123,8 @@ begin
     end else begin
       accountType := CBankAccount;
     end;
-    if Operation = coAdd then begin
+    if (Operation = coAdd) or (FmovementCount = 0) then begin
       cash := CCurrEditCash.Value;
-      initialBalance := CCurrEditCash.Value;
-    end else if FmovementCount = 0 then begin
       initialBalance := CCurrEditCash.Value;
     end;
     idCashPoint := CStaticBank.DataId;

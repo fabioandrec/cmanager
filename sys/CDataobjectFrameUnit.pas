@@ -41,9 +41,8 @@ type
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ListDblClick(Sender: TObject);
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
-  private
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
   protected
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
     procedure WndProc(var Message: TMessage); override;
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
     procedure MessageMovementEdited(AId: TDataGid; AOptions: Integer); virtual;
@@ -62,6 +61,7 @@ type
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; virtual; abstract;
+    function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; virtual;
     function GetStaticFilter: TStringList; virtual;
     procedure ReloadSums; virtual;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -124,6 +124,7 @@ end;
 
 procedure TCDataobjectFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
 begin
+  ReloadDataobjects;
   RecreateTreeHelper;
 end;
 
@@ -141,7 +142,7 @@ begin
     xElement := TCListDataElement.Create(List);
     xElement.Data := xDataobject;
     Dataobjects.Add(xDataobject);
-    List.RootElement.AppendDataElement(xElement);
+    GetDataobjectParent(xDataobject).AppendDataElement(xElement, );
   end else begin
     xDataobject.Free;
   end;
@@ -236,7 +237,6 @@ end;
 
 procedure TCDataobjectFrame.RecreateTreeHelper;
 begin
-  ReloadDataobjects;
   CopyListToTreeHelper(Dataobjects, List.RootElement);
 end;
 
@@ -312,6 +312,11 @@ begin
     xSecond := List.GetTreeElement(Node2).Data;
     Result := xFirst.GetElementCompare(Column, xSecond);
   end;
+end;
+
+function TCDataobjectFrame.GetDataobjectParent(ADataobject: TDataObject): TCListDataElement;
+begin
+  Result := List.RootElement;
 end;
 
 end.
