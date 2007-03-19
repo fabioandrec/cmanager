@@ -1,52 +1,11 @@
 inherited CReportsFrame: TCReportsFrame
-  object ReportList: TCList [0]
+  object Bevel: TBevel [0]
     Left = 0
-    Top = 0
+    Top = 233
     Width = 443
-    Height = 236
-    Align = alClient
-    BevelEdges = [beBottom]
-    BevelInner = bvNone
-    BevelOuter = bvRaised
-    BevelKind = bkFlat
-    BorderStyle = bsNone
-    ButtonStyle = bsTriangle
-    DefaultNodeHeight = 24
-    Header.AutoSizeIndex = 0
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
-    Header.Font.Style = []
-    Header.Height = 21
-    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-    Header.PopupMenu = VTHeaderPopupMenu
-    Header.Style = hsFlatButtons
-    HintMode = hmHint
-    Images = ImageList
-    Indent = 20
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 0
-    TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-    TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-    TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-    TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnDblClick = ReportListDblClick
-    OnFocusChanged = ReportListFocusChanged
-    OnGetText = ReportListGetText
-    OnGetImageIndex = ReportListGetImageIndex
-    OnGetHint = ReportListGetHint
-    OnGetNodeDataSize = ReportListGetNodeDataSize
-    OnInitChildren = ReportListInitChildren
-    OnInitNode = ReportListInitNode
-    Columns = <
-      item
-        Position = 0
-        Width = 443
-        WideText = 'Nazwa'
-        WideHint = 'Nazwa kontrahenta'
-      end>
+    Height = 3
+    Align = alBottom
+    Shape = bsBottomLine
   end
   object PanelFrameButtons: TPanel [1]
     Left = 0
@@ -56,7 +15,7 @@ inherited CReportsFrame: TCReportsFrame
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
-    TabOrder = 1
+    TabOrder = 0
     object CButtonExecute: TCButton
       Left = 13
       Top = 5
@@ -69,6 +28,51 @@ inherited CReportsFrame: TCReportsFrame
       Framed = False
       Action = ActionExecute
     end
+  end
+  object List: TCDataList [2]
+    Left = 0
+    Top = 0
+    Width = 443
+    Height = 233
+    Align = alClient
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvRaised
+    BevelKind = bkFlat
+    BorderStyle = bsNone
+    ButtonStyle = bsTriangle
+    DefaultNodeHeight = 24
+    Header.AutoSizeIndex = -1
+    Header.Font.Charset = DEFAULT_CHARSET
+    Header.Font.Color = clWindowText
+    Header.Font.Height = -11
+    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Style = []
+    Header.Height = 21
+    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+    Header.PopupMenu = VTHeaderPopupMenu
+    Header.Style = hsFlatButtons
+    HintMode = hmHint
+    Images = ImageList
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 1
+    TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+    TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+    TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+    TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnDblClick = ListDblClick
+    OnFocusChanged = ListFocusChanged
+    OddColor = 12437200
+    AutoExpand = False
+    OnCDataListReloadTree = ListCDataListReloadTree
+    Columns = <
+      item
+        Position = 0
+        Width = 443
+        WideText = 'Nazwa'
+      end>
+    WideDefaultText = ''
   end
   inherited ImageList: TPngImageList
     PngImages = <

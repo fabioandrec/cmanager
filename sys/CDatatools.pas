@@ -481,8 +481,7 @@ var xCount: Integer;
     xElement: TCListDataElement;
 begin
   for xCount := 0 to AList.Count - 1 do begin
-    xElement := TCListDataElement.Create(ARootElement.ParentList);
-    xElement.Data := AList.Items[xCount];
+    xElement := TCListDataElement.Create(ARootElement.ParentList, AList.Items[xCount]);
     ARootElement.Add(xElement);
   end;
 end;

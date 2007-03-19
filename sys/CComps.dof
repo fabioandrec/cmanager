@@ -91,7 +91,7 @@ ImageBase=4194304
 ExeDescription=
 [Directories]
 OutputDir=
-UnitOutputDir=
+UnitOutputDir=..\..\trash
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=..\others\pngcomponents\source;..\others\vtv\source
@@ -134,3 +134,13 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=..\others\pngcomponents\source;..\others\vtv\source
+[HistoryLists\hlUnitOutputDirectory]
+Count=2
+Item0=..\..\trash
+Item1=..\trash

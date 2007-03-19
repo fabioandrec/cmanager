@@ -9,7 +9,7 @@ uses
   StdCtrls, CReports, PngImageList, CImageListsUnit;
 
 type
-  THelperElement = class(TObjectList)
+  TReportListElement = class(TCDataListElementObject)
   private
     FisReport: Boolean;
     FreportClass: TCReportClass;
@@ -18,48 +18,44 @@ type
     Fdesc: String;
     Fimage: Integer;
   public
-    constructor Create(AIsReport: Boolean; AName: String; AClass: TCReportClass; AParams: TCReportParams; ADesc: String; AImage: Integer);
+    constructor CreateReport(AName: String; AReportClass: TCReportClass; AReportParams: TCReportParams; ADesc: String; AImage: Integer);
+    constructor CreateGroup(AName: String; ADesc: String; AImage: Integer);
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementId: String; override;
+    function GetElementType: String; override;
+    function GetElementText: String; override;
+    procedure GetElementReload; override;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
     destructor Destroy; override;
   published
     property isReport: Boolean read FisReport;
     property reportClass: TCReportClass read FreportClass;
     property reportParams: TCReportParams read FreportParams;
-    property name: String read Fname;
-    property desc: String read Fdesc;
-    property image: Integer read Fimage;
   end;
 
   TCReportsFrame = class(TCBaseFrame)
-    ReportList: TCList;
     ActionList: TActionList;
     ActionExecute: TAction;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     PanelFrameButtons: TPanel;
     CButtonExecute: TCButton;
-    procedure ReportListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-    procedure ReportListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-    procedure ReportListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
-    procedure ReportListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
-    procedure ReportListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure ReportListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-    procedure ReportListDblClick(Sender: TObject);
+    List: TCDataList;
+    Bevel: TBevel;
+    procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure ListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
-    procedure ReportListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-  private
-    FTreeHelper: THelperElement;
-    procedure RecreateTreeHelper;
-    procedure ReloadReports;
+    procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
   public
     function GetList: TCList; override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
-    destructor Destroy; override;
     class function GetTitle: String; override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
   end;
 
 implementation
 
-uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit,
-     CInfoFormUnit, CConsts;
+uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts;
 
 {$R *.dfm}
 
@@ -68,90 +64,13 @@ const CNoImage = -1;
       CChartReportImage = 1;
       CLineReportImage = 2;
 
-procedure TCReportsFrame.ReloadReports;
-begin
-  ReportList.BeginUpdate;
-  ReportList.Clear;
-  RecreateTreeHelper;
-  ReportList.RootNodeCount := FTreeHelper.Count;
-  ReportListFocusChanged(ReportList, ReportList.FocusedNode, 0);
-  ReportList.EndUpdate;
-end;
-
-procedure TCReportsFrame.ReportListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-var xData: THelperElement;
+procedure TCReportsFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 begin
   if Node <> Nil then begin
-    xData := THelperElement(ReportList.GetNodeData(Node)^);
-    CButtonExecute.Enabled := xData.isReport;
-    if Owner.InheritsFrom(TCFrameForm) then begin
-      TCFrameForm(Owner).BitBtnOk.Enabled := xData.isReport;
-    end;
+    CButtonExecute.Enabled := TReportListElement(List.GetTreeElement(Node).Data).isReport;
   end else begin
     CButtonExecute.Enabled := False;
-    if Owner.InheritsFrom(TCFrameForm) then begin
-      TCFrameForm(Owner).BitBtnOk.Enabled := False;
-    end;
   end;
-end;
-
-procedure TCReportsFrame.RecreateTreeHelper;
-var xBase: THelperElement;
-    xStats: THelperElement;
-    xBs, xTm: THelperElement;
-begin
-  xBase := THelperElement.Create(False, 'Podstawowe', Nil, Nil, '', CNoImage);
-  FTreeHelper.Add(xBase);
-  xBase.Add(THelperElement.Create(True, 'Stan kont' , TAccountBalanceOnDayReport, Nil, 'Pokazuje stan wszystkich kont na wybrany dzieñ', CHtmlReportImage));
-  xBase.Add(THelperElement.Create(True, 'Operacje wykonane' , TDoneOperationsListReport, Nil, 'Pokazuje operacje wykonane w wybranym okresie', CHtmlReportImage));
-  xBase.Add(THelperElement.Create(True, 'Operacje zaplanowane' , TPlannedOperationsListReport, Nil, 'Pokazuje operacje zaplanowane na wybrany okres', CHtmlReportImage));
-  xBase.Add(THelperElement.Create(True, 'Przep³yw gotówki' , TCashFlowListReport, Nil, 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CHtmlReportImage));
-  xBase.Add(THelperElement.Create(True, 'Historia konta' , TAccountHistoryReport, Nil, 'Pokazuje historiê wybranego konta w wybranym okresie', CHtmlReportImage));
-  xBase.Add(THelperElement.Create(True, 'Wykres stanu kont' , TAccountBalanceChartReport, Nil, 'Pokazuje wykres stanu kont w wybranym okresie', CLineReportImage));
-
-  xBs := THelperElement.Create(False, 'Rozchody', Nil, Nil, '', CNoImage);
-  FTreeHelper.Add(xBs);
-  xBs.Add(THelperElement.Create(True, 'Lista operacji rozchodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w wybranym okresie', CHtmlReportImage));
-  xTm := THelperElement.Create(False, 'w/g kategorii', Nil, Nil, '', CNoImage);
-  xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres rozchodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CChartReportImage));
-  xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CHtmlReportImage));
-  xTm := THelperElement.Create(False, 'w/g kontrahentów', Nil, Nil, '', CNoImage);
-  xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres rozchodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CChartReportImage));
-  xTm.Add(THelperElement.Create(True, 'Lista rozchodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CHtmlReportImage));
-  xTm := THelperElement.Create(False, 'Sumy', Nil, Nil, '', CNoImage);
-  xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres sum rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CLineReportImage));
-  xTm.Add(THelperElement.Create(True, 'Lista sum rozchodów' , TSumReportList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CHtmlReportImage));
-
-  xBs := THelperElement.Create(False, 'Przychody', Nil, Nil, '', CNoImage);
-  FTreeHelper.Add(xBs);
-  xBs.Add(THelperElement.Create(True, 'Lista operacji przychodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w wybranym okresie', CHtmlReportImage));
-  xTm := THelperElement.Create(False, 'w/g kategorii', Nil, Nil, '', CNoImage);
-  xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres przychodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CChartReportImage));
-  xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CHtmlReportImage));
-  xTm := THelperElement.Create(False, 'w/g kontrahentów', Nil, Nil, '', CNoImage);
-  xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres przychodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CChartReportImage));
-  xTm.Add(THelperElement.Create(True, 'Lista przychodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CHtmlReportImage));
-  xTm := THelperElement.Create(False, 'Sumy', Nil, Nil, '', CNoImage);
-  xBs.Add(xTm);
-  xTm.Add(THelperElement.Create(True, 'Wykres sum przychodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CLineReportImage));
-  xTm.Add(THelperElement.Create(True, 'Lista sum przychodów' , TSumReportList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CHtmlReportImage));
-
-  xStats := THelperElement.Create(False, 'Statystyki', Nil, Nil, '', CNoImage);
-  FTreeHelper.Add(xStats);
-  xStats.Add(THelperElement.Create(True, 'Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CHtmlReportImage));
-  xStats.Add(THelperElement.Create(True, 'Prognozy' , TFuturesReport, Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CHtmlReportImage));
-  xStats.Add(THelperElement.Create(True, 'Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CHtmlReportImage));
-end;
-
-destructor TCReportsFrame.Destroy;
-begin
-  FTreeHelper.Free;
-  inherited Destroy;
 end;
 
 class function TCReportsFrame.GetTitle: String;
@@ -159,94 +78,25 @@ begin
   Result := 'Raporty';
 end;
 
-procedure TCReportsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCReportsFrame.ListDblClick(Sender: TObject);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
-  FTreeHelper := THelperElement.Create(False, '', Nil, Nil, '', CNoImage);
-  ReloadReports;
-end;
-
-procedure TCReportsFrame.ReportListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-var xTreeList: THelperElement;
-    xTreeObject: THelperElement;
-begin
-  if ParentNode = Nil then begin
-    xTreeList := FTreeHelper;
-  end else begin
-    xTreeList := THelperElement(ReportList.GetNodeData(ParentNode)^);
-  end;
-  xTreeObject := THelperElement(xTreeList.Items[Node.Index]);
-  THelperElement(ReportList.GetNodeData(Node)^) := xTreeObject;
-  if xTreeObject.Count > 0 then begin
-    InitialStates := InitialStates + [ivsHasChildren];
-  end;
-  if MultipleChecks <> Nil then begin
-    Node.CheckType := ctCheckBox;
-    Node.CheckState := csCheckedNormal;
-  end;
-end;
-
-procedure TCReportsFrame.ReportListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
-begin
-  NodeDataSize := SizeOf(THelperElement);
-end;
-
-procedure TCReportsFrame.ReportListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
-var xData: THelperElement;
-begin
-  xData := THelperElement(ReportList.GetNodeData(Node)^);
-  ChildCount := xData.Count;
-end;
-
-procedure TCReportsFrame.ReportListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-var xData: THelperElement;
-begin
-  xData := THelperElement(ReportList.GetNodeData(Node)^);
-  CellText := xData.name;
-end;
-
-procedure TCReportsFrame.ReportListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-var xData: THelperElement;
-begin
-  xData := THelperElement(ReportList.GetNodeData(Node)^);
-  HintText := xData.desc;
-  LineBreakStyle := hlbForceMultiLine;
-end;
-
-procedure TCReportsFrame.ReportListDblClick(Sender: TObject);
-begin
-  if ReportList.FocusedNode <> Nil then begin
-    if Owner.InheritsFrom(TCFrameForm) then begin
-      TCFrameForm(Owner).BitBtnOkClick(Nil);
-    end else begin
-      if CButtonExecute.Enabled then begin
-        ActionExecute.Execute;
-      end;
+  if List.FocusedNode <> Nil then begin
+    if CButtonExecute.Enabled then begin
+      ActionExecute.Execute;
     end;
   end;
 end;
 
 function TCReportsFrame.GetList: TCList;
 begin
-  Result := ReportList;
-end;
-
-constructor THelperElement.Create(AIsReport: Boolean; AName: String; AClass: TCReportClass; AParams: TCReportParams; ADesc: String; AImage: Integer);
-begin
-  inherited Create(True);
-  FisReport := AIsReport;
-  FreportClass := AClass;
-  Fname := AName;
-  Fdesc := ADesc;
-  Fimage := AImage;
-  FreportParams := AParams;
+  Result := List;
 end;
 
 procedure TCReportsFrame.ActionExecuteExecute(Sender: TObject);
-var xData: THelperElement;
+var xData: TReportListElement;
     xReport: TCBaseReport;
 begin
-  xData := THelperElement(ReportList.GetNodeData(ReportList.FocusedNode)^);
+  xData := TReportListElement(List.SelectedElement.Data);
   if xData.reportClass <> Nil then begin
     xReport := xData.reportClass.CreateReport(xData.reportParams);
     if xReport <> Nil then begin
@@ -258,7 +108,29 @@ begin
   end;
 end;
 
-destructor THelperElement.Destroy;
+constructor TReportListElement.CreateGroup(AName: String; ADesc: String; AImage: Integer);
+begin
+  inherited Create;
+  Fname := AName;
+  Fdesc := ADesc;
+  FisReport := False;
+  Fimage := AImage;
+  FreportParams := Nil;
+  FreportClass := Nil;
+end;
+
+constructor TReportListElement.CreateReport(AName: String; AReportClass: TCReportClass; AReportParams: TCReportParams; ADesc: String; AImage: Integer);
+begin
+  inherited Create;
+  Fname := AName;
+  Fdesc := ADesc;
+  FisReport := True;
+  Fimage := AImage;
+  FreportParams := AReportParams;
+  FreportClass := AReportClass;
+end;
+
+destructor TReportListElement.Destroy;
 begin
   if FreportParams <> Nil then begin
     FreportParams.Free;
@@ -266,11 +138,99 @@ begin
   inherited Destroy;
 end;
 
-procedure TCReportsFrame.ReportListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-var xData: THelperElement;
+function TReportListElement.GetColumnImage(AColumnIndex: Integer): Integer;
 begin
-  xData := THelperElement(ReportList.GetNodeData(Node)^);
-  ImageIndex := xData.image;
+  Result := Fimage;
+end;
+
+function TReportListElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TReportListElement.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+begin
+  Result := AnsiCompareStr(GetColumnText(AColumnIndex, False), ACompareWith.GetColumnText(AColumnIndex, False));
+end;
+
+function TReportListElement.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdesc;
+end;
+
+function TReportListElement.GetElementId: String;
+begin
+  Result := Fname;
+end;
+
+procedure TCReportsFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+var xBase: TCListDataElement;
+    xStats: TCListDataElement;
+    xBs, xTm: TCListDataElement;
+begin
+  xBase := TCListDataElement.Create(List, TReportListElement.CreateGroup('Podstawowe', '', CNoImage), True);
+  ARootElement.Add(xBase);
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Stan kont' , TAccountBalanceOnDayReport, Nil, 'Pokazuje stan wszystkich kont na wybrany dzieñ', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Operacje wykonane' , TDoneOperationsListReport, Nil, 'Pokazuje operacje wykonane w wybranym okresie', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Operacje zaplanowane' , TPlannedOperationsListReport, Nil, 'Pokazuje operacje zaplanowane na wybrany okres', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Przep³yw gotówki' , TCashFlowListReport, Nil, 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia konta' , TAccountHistoryReport, Nil, 'Pokazuje historiê wybranego konta w wybranym okresie', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres stanu kont' , TAccountBalanceChartReport, Nil, 'Pokazuje wykres stanu kont w wybranym okresie', CLineReportImage), True));
+  xBs := TCListDataElement.Create(List, TReportListElement.CreateGroup('Rozchody', '', CNoImage), True);
+  ARootElement.Add(xBs);
+  xBs.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista operacji rozchodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w wybranym okresie', CHtmlReportImage), True));
+  xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('w/g kategorii', '', CNoImage), True);
+  xBs.Add(xTm);
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres rozchodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CChartReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista rozchodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kategorie', CHtmlReportImage), True));
+  xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('w/g kontrahentów', '', CNoImage), True);
+  xBs.Add(xTm);
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres rozchodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CChartReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista rozchodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CHtmlReportImage), True));
+  xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('Sumy', '', CNoImage), True);
+  xBs.Add(xTm);
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres sum rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CLineReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista sum rozchodów' , TSumReportList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CHtmlReportImage), True));
+  xBs := TCListDataElement.Create(List, TReportListElement.CreateGroup('Przychody', '', CNoImage), True);
+  ARootElement.Add(xBs);
+  xBs.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista operacji przychodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w wybranym okresie', CHtmlReportImage), True));
+  xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('w/g kategorii', '', CNoImage), True);
+  xBs.Add(xTm);
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres przychodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CChartReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista przychodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CHtmlReportImage), True));
+  xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('w/g kontrahentów', '', CNoImage), True);
+  xBs.Add(xTm);
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres przychodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CChartReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista przychodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CHtmlReportImage), True));
+  xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('Sumy', '', CNoImage), True);
+  xBs.Add(xTm);
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres sum przychodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CLineReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista sum przychodów' , TSumReportList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CHtmlReportImage), True));
+  xStats := TCListDataElement.Create(List, TReportListElement.CreateGroup('Statystyki', '', CNoImage), True);
+  ARootElement.Add(xStats);
+  xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CHtmlReportImage), True));
+  xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Prognozy' , TFuturesReport, Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CHtmlReportImage), True));
+  xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CHtmlReportImage), True));
+end;
+
+procedure TReportListElement.GetElementReload;
+begin
+end;
+
+function TReportListElement.GetElementText: String;
+begin
+end;
+
+function TReportListElement.GetElementType: String;
+begin
+  Result := ClassName;
+end;
+
+procedure TCReportsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+begin
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  List.RootElement.FreeDataOnClear := True;
+  List.ReloadTree;
 end;
 
 end.

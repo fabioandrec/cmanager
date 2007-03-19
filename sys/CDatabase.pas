@@ -145,6 +145,7 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     procedure GetElementReload; override;
     function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property id: TDataGid read FId write Fid;
     property created: TDateTime read Fcreated;
@@ -969,6 +970,11 @@ begin
   xV1 := GetColumnText(AColumnIndex, False);
   xV2 := ACompareWith.GetColumnText(AColumnIndex, False);
   Result := AnsiCompareStr(xV1, xV2);
+end;
+
+function TDataObject.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := '';
 end;
 
 function TDataObject.GetElementId: String;

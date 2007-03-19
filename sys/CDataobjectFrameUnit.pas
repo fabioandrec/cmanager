@@ -139,8 +139,7 @@ var xDataobject: TDataObject;
 begin
   xDataobject := GetDataobjectClass(AOptions).LoadObject(GetDataobjectProxy(AOptions), AId, True);
   if IsValidFilteredObject(xDataobject) then begin
-    xElement := TCListDataElement.Create(List);
-    xElement.Data := xDataobject;
+    xElement := TCListDataElement.Create(List, xDataobject);
     Dataobjects.Add(xDataobject);
     GetDataobjectParent(xDataobject).AppendDataElement(xElement, );
   end else begin

@@ -73,8 +73,7 @@ var xCount: Integer;
 begin
   for xCount := 0 to Dataobjects.Count - 1 do begin
     xDataobject := TProduct(Dataobjects.Items[xCount]);
-    xElement := TCListDataElement.Create(List);
-    xElement.Data := xDataobject;
+    xElement := TCListDataElement.Create(List, xDataobject);
     if xDataobject.idParentProduct = CEmptyDataGid then begin
       xParent := List.RootElement;;
     end else begin

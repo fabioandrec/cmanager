@@ -253,6 +253,7 @@ type
     function GetElementType: String; virtual; abstract;
     function GetElementId: String; virtual; abstract;
     function GetElementText: String; virtual; abstract;
+    function GetElementHint(AColumnIndex: Integer): String; virtual; abstract;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; virtual; abstract;
     function GetColumnImage(AColumnIndex: Integer): Integer; virtual; abstract;
     function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; virtual; abstract;
@@ -261,13 +262,14 @@ type
 
   TCListDataElement = class(TObjectList)
   private
+    FFreeDataOnClear: Boolean;
     FParentList: TCDataList;
     FData: TCDataListElementObject;
     FNode: PVirtualNode;
     function GetItems(AIndex: Integer): TCListDataElement;
     procedure SetItems(AIndex: Integer; const Value: TCListDataElement);
   public
-    constructor Create(AParentList: TCDataList);
+    constructor Create(AParentList: TCDataList; AData: TCDataListElementObject; AFreeDataOnClear: Boolean = False);
     function FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
     procedure DeleteDataElement(AId: String; AElementType: String = '');
     procedure RefreshDataElement(AId: String; AElementType: String = '');
@@ -276,6 +278,8 @@ type
     property ParentList: TCDataList read FParentList write FParentList;
     property Data: TCDataListElementObject read FData write FData;
     property Node: PVirtualNode read FNode write FNode;
+    destructor Destroy; override;
+    property FreeDataOnClear: Boolean read FFreeDataOnClear write FFreeDataOnClear;
   end;
 
   TCList = class(TVirtualStringTree)
@@ -308,6 +312,7 @@ type
     procedure DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var Text: WideString); override;
     function DoGetImageIndex(Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var Index: Integer): TCustomImageList; override;
     procedure DoInitChildren(Node: PVirtualNode; var ChildCount: Cardinal); override;
+    function DoGetNodeHint(Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle): WideString; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1439,11 +1444,12 @@ begin
   FParentList.EndUpdate;
 end;
 
-constructor TCListDataElement.Create(AParentList: TCDataList);
+constructor TCListDataElement.Create(AParentList: TCDataList; AData: TCDataListElementObject; AFreeDataOnClear: Boolean = False);
 begin
   inherited Create(True);
   FParentList := AParentList;
-  FData := Nil;
+  FFreeDataOnClear := AFreeDataOnClear;
+  FData := AData;
 end;
 
 procedure TCListDataElement.DeleteDataElement(AId, AElementType: String);
@@ -1456,6 +1462,14 @@ begin
     Remove(xElement);
     FParentList.EndUpdate;
   end;
+end;
+
+destructor TCListDataElement.Destroy;
+begin
+  if FFreeDataOnClear and Assigned(FData) then begin
+    FreeAndNil(FData);
+  end;
+  inherited Destroy;
 end;
 
 function TCListDataElement.FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
@@ -1506,7 +1520,7 @@ end;
 constructor TCDataList.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRootElement := TCListDataElement.Create(Self);
+  FRootElement := TCListDataElement.Create(Self, Nil);
   FCOnReloadTree := Nil;
 end;
 
@@ -1605,6 +1619,15 @@ begin
   inherited DoInitChildren(Node, ChildCount);
   if ChildCount = 0 then begin
     ChildCount := GetTreeElement(Node).Count;
+  end;
+end;
+
+function TCDataList.DoGetNodeHint(Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle): WideString;
+begin
+  Result := inherited DoGetNodeHint(Node, Column, LineBreakStyle);
+  if Result = '' then begin
+    Result := GetTreeElement(Node).Data.GetElementHint(Column);
+    LineBreakStyle := hlbDefault;
   end;
 end;
 

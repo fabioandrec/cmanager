@@ -25,6 +25,7 @@ type
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -56,6 +57,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -84,6 +86,7 @@ type
     class function HasSubcategory(AId: TDataGid): Boolean; 
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -291,6 +294,7 @@ type
     function IsValid(AAccountId, ACashpointId, AProductId: TDataGid): Boolean;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -317,6 +321,7 @@ type
     procedure DeleteObject; override;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -395,6 +400,11 @@ end;
 function TCashPoint.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
   Result := Fname;
+end;
+
+function TCashPoint.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
 end;
 
 function TCashPoint.GetElementText: String;
@@ -531,6 +541,11 @@ end;
 function TProduct.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
   Result := Fname;
+end;
+
+function TProduct.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
 end;
 
 function TProduct.GetElementText: String;
@@ -1098,6 +1113,11 @@ begin
   Result := Fname;
 end;
 
+function TMovementFilter.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
 function TMovementFilter.GetElementText: String;
 begin
   Result := Fname;
@@ -1271,6 +1291,11 @@ end;
 function TProfile.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
   Result := Fname;
+end;
+
+function TProfile.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
 end;
 
 function TProfile.GetElementText: String;
@@ -1556,6 +1581,11 @@ begin
   end else begin
     Result := inherited GetElementCompare(AColumnIndex, ACompareWith);
   end;
+end;
+
+function TAccount.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
 end;
 
 end.
