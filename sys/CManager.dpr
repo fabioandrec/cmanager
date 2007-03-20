@@ -85,7 +85,8 @@ uses
   CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame},
   CRandomFormUnit in 'CRandomFormUnit.pas' {CRandomForm},
   CLimitsFrameUnit in 'CLimitsFrameUnit.pas' {CLimitsFrame: TFrame},
-  CDataobjectFrameUnit in 'CDataobjectFrameUnit.pas' {CDataobjectFrame: TFrame};
+  CDataobjectFrameUnit in 'CDataobjectFrameUnit.pas' {CDataobjectFrame: TFrame},
+  CLimitFormUnit in 'CLimitFormUnit.pas' {CLimitForm};
 
 {$R *.res}
 
@@ -121,7 +122,7 @@ begin
       end;
       if xProceed then begin
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;

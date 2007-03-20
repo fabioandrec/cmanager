@@ -80,6 +80,9 @@ const
   CCashpointTypeOut = 'O';
   CCashpointTypeOther = 'X';
 
+  CLimitActive = '1';
+  CLimitDisabled = '0';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

@@ -46,7 +46,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 473
           Height = 375
-          ActivePage = TabSheetBase
+          ActivePage = TabSheetAutostart
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1

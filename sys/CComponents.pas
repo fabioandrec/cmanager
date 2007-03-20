@@ -638,6 +638,11 @@ begin
   inherited;
   if Key = VK_SPACE then begin
     Click;
+  end else if Key = VK_DELETE then begin
+    DataId := '';
+    if Assigned(FOnChanged) then begin
+       FOnChanged(Self);
+    end;
   end;
 end;
 
@@ -714,7 +719,7 @@ procedure TCCurrEdit.DoEnter;
 begin
   FEditMode := True;
   SetTextFromValue;
-  FOldText := Text; //Backup the Text (for Undo with Esc)
+  FOldText := Text;
   SelectAll;
   inherited DoEnter;
 end;
@@ -734,52 +739,41 @@ var
   DoBeep: Boolean;
 begin
   if ReadOnly then Exit;
-
-  DoBeep := False; //Defaults
+  DoBeep := False;
   InputParsed := False;
-
-  if Key = VK_DELETE then {//del-button only} begin
+  if Key = VK_DELETE then begin
     cPos := SelStart;
     txt := FormatIt(StrToCurr(Text), False);
     tlen := Length(txt);
-
-    if ((cPos = tlen) or (cPos = tlen - FDecimals - 1)) then {//forbidden Del-Positions} begin
-      InputParsed := True; //Job done
-      DoBeep := True; //Input Error
+    if ((cPos = tlen) or (cPos = tlen - FDecimals - 1)) then begin
+      InputParsed := True;
+      DoBeep := True;
     end;
-
-    if ((not InputParsed) and (SelStart = 0) and (SelLength = tlen)) then {//Delete complete} begin
+    if ((not InputParsed) and (SelStart = 0) and (SelLength = tlen)) then begin
       txt := FormatIt(0, False);
       InputParsed := True;
     end;
-
-    if ((not InputParsed) and (cPos >= tlen - FDecimals - 1) and (cPos < tlen)) then {//Deleting in Decimal Area} begin
+    if ((not InputParsed) and (cPos >= tlen - FDecimals - 1) and (cPos < tlen)) then begin
       if SelLength = 0 then begin
-        if cPos < tlen - 1 then txt := DeleteChars(txt, cPos, 1) + '0' //Delete and Fillup with Zero
-        else txt := ReplaceChars(txt, '0', cPos); //Replace Zero on Last Position
-
-      end
-      else begin
+        if cPos < tlen - 1 then txt := DeleteChars(txt, cPos, 1) + '0'
+        else txt := ReplaceChars(txt, '0', cPos);
+      end else begin
         txt := ReplaceChars2(txt, '0', cPos, SelLength);
       end;
-      InputParsed := True; //Job done
+      InputParsed := True;
     end;
-
-    if ((not InputParsed) and (cPos <= tlen - FDecimals - 1)) then {//General Deleting-Handling} begin
+    if ((not InputParsed) and (cPos <= tlen - FDecimals - 1)) then begin
       if SelLength = 0 then begin
-        if LeftStr(txt, 1) <> '0' then {//No Leading Zero?} begin
-          if tlen = FDecimals + 2 then txt := ReplaceChars(txt, '0', cPos) //Special-Handling for x.xx
+        if LeftStr(txt, 1) <> '0' then begin
+          if tlen = FDecimals + 2 then txt := ReplaceChars(txt, '0', cPos)
           else txt := DeleteChars(txt, cPos, 1);
-        end
-        else begin
-          DoBeep := True; //Cannot delete Leading Zero in this case!
+        end else begin
+          DoBeep := True;
         end;
-      end
-      else begin
+      end else begin
         if cPos + SelLength <= tlen - FDecimals - 1 then begin
           txt := DeleteChars(txt, cPos, SelLength);
-        end
-        else begin
+        end else begin
           DoBeep := True;
         end;
       end;
@@ -790,13 +784,10 @@ begin
       SelStart := cPos;
       Modified := True;
     end;
-    Key := 0; //Eat the Key
+    Key := 0;
   end;
-
   if DoBeep then Beep;
-
   inherited KeyDown(Key, Shift);
-
 end;
 
 procedure TCCurrEdit.KeyPress(var Key: Char);

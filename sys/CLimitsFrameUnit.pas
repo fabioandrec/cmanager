@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, CComponents,
   ExtCtrls, VirtualTrees, ActnList, VTHeaderPopup, CDataobjectFrameUnit, CDatabase,
-  CDataObjectFormUnit, StdCtrls;
+  CDataObjectFormUnit, StdCtrls, CImageListsUnit;
 
 type
   TCLimitsFrame = class(TCDataobjectFrame)
@@ -16,42 +16,55 @@ type
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetStaticFilter: TStringList; override;
+    function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
   end;
 
 implementation
 
-uses CDataObjects, CDatatools, CCashpointFormUnit;
+uses CDataObjects, CDatatools, CCashpointFormUnit, CLimitFormUnit, CConsts;
 
 {$R *.dfm}
 
 function TCLimitsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
-  Result := TCashPoint;
+  Result := TMovementLimit;
 end;
 
 function TCLimitsFrame.GetDataobjectForm(AOption: Integer): TCDataobjectFormClass;
 begin
-  Result := TCCashpointForm;
+  Result := TCLimitForm;
 end;
 
 function TCLimitsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
-  Result := CashPointProxy;
+  Result := MovementLimitProxy;
 end;
 
 function TCLimitsFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
-  Result.Add('0=<wszystkie elementy>');
-  Result.Add('1=<dostêpne wszêdzie>');
-  Result.Add('2=<tylko rozchody>');
-  Result.Add('3=<tylko przychody>');
-  Result.Add('4=<pozosta³e>');
+  Result.Add(CFilterAllElements + '=<wszystkie elementy>');
+  Result.Add(CLimitActive + '=<aktywne>');
+  Result.Add(CLimitDisabled + '=<wy³¹czone>');
+end;
+
+function TCLimitsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
+begin
+  Result := inherited IsValidFilteredObject(AObject) or (IntToStr(Integer(TMovementLimit(AObject).isActive)) = CStaticFilter.DataId); 
 end;
 
 procedure TCLimitsFrame.ReloadDataobjects;
+var xCondition: String;
 begin
-  Dataobjects := TCashPoint.GetList(TCashPoint, CashPointProxy, 'select * from cashpoint');
+  inherited ReloadDataobjects;
+  if CStaticFilter.DataId = CFilterAllElements then begin
+    xCondition := '';
+  end else if CStaticFilter.DataId = CLimitActive then begin
+    xCondition := ' where isActive = 1'
+  end else if CStaticFilter.DataId = CLimitDisabled then begin
+    xCondition := ' where isActive = 0'
+  end;
+  Dataobjects := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, 'select * from movementLimit' + xCondition);
 end;
 
 end.

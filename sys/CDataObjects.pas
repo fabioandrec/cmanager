@@ -83,7 +83,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
-    class function HasSubcategory(AId: TDataGid): Boolean; 
+    class function HasSubcategory(AId: TDataGid): Boolean;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
@@ -330,6 +330,38 @@ type
     property idProduct: TDataGid read FidProduct write SetidProduct;
   end;
 
+  TMovementLimit = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    FisActive: Boolean;
+    FidFilter: TDataGid;
+    FboundaryAmount: Currency;
+    FboundaryType: TBaseEnumeration;
+    FboundaryDays: Integer;
+    procedure SetboundaryAmount(const Value: Currency);
+    procedure SetboundaryDays(const Value: Integer);
+    procedure SetboundaryType(const Value: TBaseEnumeration);
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidFilter(const Value: TDataGid);
+    procedure SetisActive(const Value: Boolean);
+    procedure Setname(const Value: TBaseName);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property isActive: Boolean read FisActive write SetisActive;
+    property idFilter: TDataGid read FidFilter write SetidFilter;
+    property boundaryAmount: Currency read FboundaryAmount write SetboundaryAmount;
+    property boundaryType: TBaseEnumeration read FboundaryType write SetboundaryType;
+    property boundaryDays: Integer read FboundaryDays write SetboundaryDays;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -339,13 +371,15 @@ var CashPointProxy: TDataProxy;
     MovementFilterProxy: TDataProxy;
     ProfileProxy: TDataProxy;
     MovementListProxy: TDataProxy;
+    MovementLimitProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
 
-const CDatafileTables: array[0..12] of string =
+const CDatafileTables: array[0..14] of string =
             ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
-             'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo');
+             'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
+             'cmanagerParams', 'movementLimit');
 
 procedure InitializeProxies;
 
@@ -364,6 +398,7 @@ begin
   PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
   MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
   ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
+  MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -1586,6 +1621,105 @@ end;
 function TAccount.GetElementHint(AColumnIndex: Integer): String;
 begin
   Result := Fdescription;
+end;
+
+procedure TMovementLimit.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+    FidFilter := FieldByName('idMovementFilter').AsString;
+    FboundaryAmount := FieldByName('boundaryAmount').AsCurrency;
+    FboundaryType := FieldByName('boundaryType').AsString;
+    FboundaryDays := FieldByName('boundaryDays').AsInteger;
+    FisActive := FieldByName('isActive').AsBoolean;
+  end;
+end;
+
+function TMovementLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TMovementLimit.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TMovementLimit.GetElementText: String;
+begin
+  Result := Fname;
+end;
+
+procedure TMovementLimit.SetboundaryAmount(const Value: Currency);
+begin
+  if FboundaryAmount <> Value then begin
+    FboundaryAmount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.SetboundaryDays(const Value: Integer);
+begin
+  if FboundaryDays <> Value then begin
+    FboundaryDays := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.SetboundaryType(const Value: TBaseEnumeration);
+begin
+  if FboundaryType <> Value then begin
+    FboundaryType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.SetidFilter(const Value: TDataGid);
+begin
+  if FidFilter <> Value then begin
+    FidFilter := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.SetisActive(const Value: Boolean);
+begin
+  if FisActive <> Value then begin
+    FisActive := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('isActive', IntToStr(Integer(FisActive)), False, 'movementLimit');
+    AddField('description', Fdescription, True, 'movementLimit');
+    AddField('name', Fname, True, 'movementLimit');
+    AddField('idmovementFilter', DataGidToDatabase(FidFilter), False, 'movementLimit');
+    AddField('boundaryAmount', CurrencyToDatabase(FboundaryAmount), False, 'movementLimit');
+    AddField('boundaryType', FboundaryType, True, 'movementLimit');
+    AddField('boundaryDays', IntToStr(FboundaryDays), False, 'movementLimit');
+  end;
 end;
 
 end.

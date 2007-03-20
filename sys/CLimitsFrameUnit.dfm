@@ -22,4 +22,16 @@ inherited CLimitsFrame: TCLimitsFrame
     Left = 80
     Top = 80
   end
+  inherited ActionListButtons: TActionList
+    Images = CImageLists.LimitsImageList24x24
+    inherited ActionAdd: TAction
+      Caption = 'Dodaj limit'
+    end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj limit'
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' limit'
+    end
+  end
 end
