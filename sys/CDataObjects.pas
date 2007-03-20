@@ -338,6 +338,7 @@ type
     FidFilter: TDataGid;
     FboundaryAmount: Currency;
     FboundaryType: TBaseEnumeration;
+    FboundaryCondition: TBaseName;
     FboundaryDays: Integer;
     procedure SetboundaryAmount(const Value: Currency);
     procedure SetboundaryDays(const Value: Integer);
@@ -346,6 +347,7 @@ type
     procedure SetidFilter(const Value: TDataGid);
     procedure SetisActive(const Value: Boolean);
     procedure Setname(const Value: TBaseName);
+    procedure SetboundaryCondition(const Value: TBaseName);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -359,6 +361,7 @@ type
     property idFilter: TDataGid read FidFilter write SetidFilter;
     property boundaryAmount: Currency read FboundaryAmount write SetboundaryAmount;
     property boundaryType: TBaseEnumeration read FboundaryType write SetboundaryType;
+    property boundaryCondition: TBaseName read FboundaryCondition write SetboundaryCondition;
     property boundaryDays: Integer read FboundaryDays write SetboundaryDays;
   end;
 
@@ -1632,6 +1635,7 @@ begin
     FidFilter := FieldByName('idMovementFilter').AsString;
     FboundaryAmount := FieldByName('boundaryAmount').AsCurrency;
     FboundaryType := FieldByName('boundaryType').AsString;
+    FboundaryCondition := FieldByName('boundaryCondition').AsString;
     FboundaryDays := FieldByName('boundaryDays').AsInteger;
     FisActive := FieldByName('isActive').AsBoolean;
   end;
@@ -1656,6 +1660,14 @@ procedure TMovementLimit.SetboundaryAmount(const Value: Currency);
 begin
   if FboundaryAmount <> Value then begin
     FboundaryAmount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TMovementLimit.SetboundaryCondition(const Value: TBaseName);
+begin
+  if FboundaryCondition <> Value then begin
+    FboundaryCondition := Value;
     SetState(msModified);
   end;
 end;
@@ -1718,6 +1730,7 @@ begin
     AddField('idmovementFilter', DataGidToDatabase(FidFilter), False, 'movementLimit');
     AddField('boundaryAmount', CurrencyToDatabase(FboundaryAmount), False, 'movementLimit');
     AddField('boundaryType', FboundaryType, True, 'movementLimit');
+    AddField('boundaryCondition', FboundaryCondition, True, 'movementLimit');
     AddField('boundaryDays', IntToStr(FboundaryDays), False, 'movementLimit');
   end;
 end;

@@ -43,9 +43,11 @@ end;
 function TCLimitsFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
-  Result.Add(CFilterAllElements + '=<wszystkie elementy>');
-  Result.Add(CLimitActive + '=<aktywne>');
-  Result.Add(CLimitDisabled + '=<wy³¹czone>');
+  with Result do begin
+    Add(CFilterAllElements + '=<wszystkie elementy>');
+    Add(CLimitActive + '=<aktywne>');
+    Add(CLimitDisabled + '=<wy³¹czone>');
+  end;
 end;
 
 function TCLimitsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
@@ -66,5 +68,6 @@ begin
   end;
   Dataobjects := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, 'select * from movementLimit' + xCondition);
 end;
+
 
 end.

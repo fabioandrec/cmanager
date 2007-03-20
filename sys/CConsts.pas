@@ -83,6 +83,21 @@ const
   CLimitActive = '1';
   CLimitDisabled = '0';
 
+
+  CLimitBoundaryTypeToday = 'T';
+  CLimitBoundaryTypeWeek = 'W';
+  CLimitBoundaryTypeMonth = 'M';
+  CLimitBoundaryTypeQuarter = 'Q';
+  CLimitBoundaryTypeHalfyear = 'H';
+  CLimitBoundaryTypeYear = 'Y';
+  CLimitBoundaryTypeDays = 'D';
+
+  CLimitBoundaryCondEqual = '=';
+  CLimitBoundaryCondLess = '<';
+  CLimitBoundaryCondGreater = '>';
+  CLimitBoundaryCondLessEqual = '<=';
+  CLimitBoundaryCondGreaterEqual = '>=';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

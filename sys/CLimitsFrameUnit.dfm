@@ -1,9 +1,4 @@
 inherited CLimitsFrame: TCLimitsFrame
-  inherited FilterPanel: TPanel
-    inherited CStaticFilter: TCStatic
-      OnChanged = nil
-    end
-  end
   inherited List: TCDataList
     Header.MainColumn = 0
     Columns = <
