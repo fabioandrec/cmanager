@@ -39,6 +39,8 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     OnGetNodeDataSize = RepaymentListGetNodeDataSize
     OnInitChildren = RepaymentListInitChildren
     OnInitNode = RepaymentListInitNode
+    OddColor = 12437200
+    AutoExpand = True
     Columns = <
       item
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
@@ -65,6 +67,7 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
         Width = 70
         WideText = 'Status'
       end>
+    WideDefaultText = ''
   end
   object PanelError: TPanel [1]
     Left = 56

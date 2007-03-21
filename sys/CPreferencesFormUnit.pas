@@ -63,6 +63,8 @@ type
     CButton6: TCButton;
     CButton7: TCButton;
     CheckBoxCheckForupdates: TCheckBox;
+    CheckBoxSurpassed: TCheckBox;
+    CheckBoxValid: TCheckBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -192,6 +194,8 @@ begin
     CheckBoxAutoOldIn.Checked := startupInfoOldIn;
     CheckBoxAutoOldOut.Checked := startupInfoOldOut;
     CheckBoxCheckForupdates.Checked := startupCheckUpdates;
+    CheckBoxSurpassed.Checked := startupInfoSurpassedLimit;
+    CheckBoxValid.Checked := startupInfoValidLimits;
   end;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
@@ -222,6 +226,8 @@ begin
     startupInfoOldIn := CheckBoxAutoOldIn.Checked;
     startupInfoOldOut := CheckBoxAutoOldOut.Checked;
     startupCheckUpdates := CheckBoxCheckForupdates.Checked;
+    startupInfoSurpassedLimit := CheckBoxSurpassed.Checked;
+    startupInfoValidLimits := CheckBoxValid.Checked;
     xReg := TRegistry.Create;
     try
       xReg.RootKey := HKEY_CURRENT_USER;

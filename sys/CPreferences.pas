@@ -115,6 +115,8 @@ type
     FstartupInfoOldOut: Boolean;
     FstartupInfoAlways: Boolean;
     FstartupCheckUpdates: Boolean;
+    FstartupInfoSurpassedLimit: Boolean;
+    FstartupInfoValidLimits: Boolean;
   public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
@@ -135,6 +137,8 @@ type
     property startupInfoOldOut: Boolean read FstartupInfoOldOut write FstartupInfoOldOut;
     property startupInfoAlways: Boolean read FstartupInfoAlways write FstartupInfoAlways;
     property startupCheckUpdates: Boolean read FstartupCheckUpdates write FstartupCheckUpdates;
+    property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
+    property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
   end;
 
   TDescPatterns = class(TStringList)
@@ -436,6 +440,8 @@ begin
   FstartupInfoOldIn := TBasePref(APrefItem).startupInfoOldIn;
   FstartupInfoOldOut := TBasePref(APrefItem).startupInfoOldOut;
   FstartupCheckUpdates := TBasePref(APrefItem).startupCheckUpdates;
+  FstartupInfoSurpassedLimit := TBasePref(APrefItem).startupInfoSurpassedLimit;
+  FstartupInfoValidLimits := TBasePref(APrefItem).startupInfoValidLimits;
 end;
 
 function TBasePref.GetNodeName: String;
@@ -460,6 +466,8 @@ begin
   FstartupInfoOldOut := GetXmlAttribute('startupInfoOldOut', ANode, True);
   FstartupInfoAlways := GetXmlAttribute('startupInfoAlways', ANode, True);
   FstartupCheckUpdates := GetXmlAttribute('startupCheckUpdates', ANode, False);
+  FstartupInfoSurpassedLimit := GetXmlAttribute('startupInfoSurpassedLimit', ANode, True);
+  FstartupInfoValidLimits := GetXmlAttribute('startupInfoValidLimits', ANode, False);
 end;
 
 procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
@@ -479,6 +487,8 @@ begin
   SetXmlAttribute('startupInfoOldOut', ANode, FstartupInfoOldOut);
   SetXmlAttribute('startupInfoAlways', ANode, FstartupInfoAlways);
   SetXmlAttribute('startupCheckUpdates', ANode, FstartupCheckUpdates);
+  SetXmlAttribute('startupInfoSurpassedLimit', ANode, FstartupInfoSurpassedLimit);
+  SetXmlAttribute('startupInfoValidLimits', ANode, FstartupInfoValidLimits);
 end;
 
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
@@ -641,7 +651,9 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('OI', 'Zaleg³e operacje przychodowe'));
     Fontprefs.Add(TFontPref.CreateFontPref('OO', 'Zaleg³e operacje rozchodowe'));
     Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Elementy grupuj¹ce w/g dat'));
-    Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju operacji'));
+    Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju'));
+    Fontprefs.Add(TFontPref.CreateFontPref('SL', 'Przekroczone limity'));
+    Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'));
   end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin
@@ -658,6 +670,8 @@ initialization
     startupInfoOldIn := True;
     startupInfoOldOut := True;
     startupInfoAlways := True;
+    startupInfoSurpassedLimit := True;
+    startupInfoValidLimits := False;
     startupCheckUpdates := False;
   end;
 finalization

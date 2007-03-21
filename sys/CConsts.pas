@@ -102,6 +102,7 @@ const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';
   CTransferMovementDescription = 'Transfer';
+  CLimitDescription = 'Limit';
 
   CPlannedDoneDescription = 'Wykonana';
   CPlannedRejectedDescription = 'Odrzucona';

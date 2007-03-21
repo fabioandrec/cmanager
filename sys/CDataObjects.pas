@@ -295,6 +295,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -348,12 +349,15 @@ type
     procedure SetisActive(const Value: Boolean);
     procedure Setname(const Value: TBaseName);
     procedure SetboundaryCondition(const Value: TBaseName);
+    function GetcurrentAmount: Currency;
+    procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    function IsSurpassed(ACurrentValue: Currency): Boolean;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -363,6 +367,7 @@ type
     property boundaryType: TBaseEnumeration read FboundaryType write SetboundaryType;
     property boundaryCondition: TBaseName read FboundaryCondition write SetboundaryCondition;
     property boundaryDays: Integer read FboundaryDays write SetboundaryDays;
+    property currentAmount: Currency read GetcurrentAmount;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -1098,6 +1103,19 @@ begin
   UpdateSubfilters;
 end;
 
+class function TMovementFilter.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from movementLimit where idmovementFilter = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim limity';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ filtru, gdy¿ ' + xText, '');
+    Result := False;
+  end;
+end;
+
 constructor TMovementFilter.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
@@ -1164,10 +1182,14 @@ end;
 class function TMovementFilter.GetFilterCondition(AIdFilter: TDataGid; AWithAnd: Boolean; AAcountField, ACashpointField, ACategoryField: String): String;
 var xFilter: TMovementFilter;
     xAccountsPart, xCashpointsPart, xProductsPart: String;
+    xInTr: Boolean;
 begin
   Result := '';
   if AIdFilter <> CEmptyDataGid then begin
-    GDataProvider.BeginTransaction;
+    xInTr := GDataProvider.InTransaction;
+    if not xInTr then begin
+      GDataProvider.BeginTransaction;
+    end;
     xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, AIdFilter, False));
     xFilter.LoadSubfilters;
     if xFilter.Faccounts.Count <> 0 then begin
@@ -1201,7 +1223,9 @@ begin
     if (Result <> '') and AWithAnd then begin
       Result := ' and ' + Result;
     end;
-    GDataProvider.RollbackTransaction;
+    if not xInTr then begin
+      GDataProvider.RollbackTransaction;
+    end;
   end;
 end;
 
@@ -1646,6 +1670,19 @@ begin
   Result := Fname;
 end;
 
+function TMovementLimit.GetcurrentAmount: Currency;
+var xSd, xEd: TDateTime;
+    xSql: String;
+begin
+  GetFilterDates(xSd, xEd);
+  xSql := Format('select sum(cash) from transactions where movementType <> ''%s'' and regDate between %s and %s %s',
+          [CTransferMovement,
+           DatetimeToDatabase(xSd, False),
+           DatetimeToDatabase(xEd, False),
+           TMovementFilter.GetFilterCondition(idFilter, True)]);
+  Result := GDataProvider.GetSqlCurrency(xSql, 0);
+end;
+
 function TMovementLimit.GetElementHint(AColumnIndex: Integer): String;
 begin
   Result := Fdescription;
@@ -1654,6 +1691,49 @@ end;
 function TMovementLimit.GetElementText: String;
 begin
   Result := Fname;
+end;
+
+procedure TMovementLimit.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+begin
+  ADateFrom := 0;
+  ADateTo := 0;
+  if boundaryType = CLimitBoundaryTypeToday then begin
+    ADateFrom := GWorkDate;
+    ADateTo := GWorkDate;
+  end else if boundaryType = CLimitBoundaryTypeWeek then begin
+    ADateFrom := StartOfTheWeek(GWorkDate);
+    ADateTo := EndOfTheWeek(GWorkDate);
+  end else if boundaryType = CLimitBoundaryTypeMonth then begin
+    ADateFrom := StartOfTheMonth(GWorkDate);
+    ADateTo := EndOfTheMonth(GWorkDate);
+  end else if boundaryType = CLimitBoundaryTypeQuarter then begin
+    ADateFrom := GetStartQuarterOfTheYear(GWorkDate);
+    ADateTo := GetEndQuarterOfTheYear(GWorkDate);
+  end else if boundaryType = CLimitBoundaryTypeHalfyear then begin
+    ADateFrom := GetStartHalfOfTheYear(GWorkDate);
+    ADateTo := GetEndHalfOfTheYear(GWorkDate);
+  end else if boundaryType = CLimitBoundaryTypeYear then begin
+    ADateFrom := StartOfTheYear(GWorkDate);
+    ADateTo := EndOfTheYear(GWorkDate);
+  end else if boundaryType = CLimitBoundaryTypeDays then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, - (boundaryDays - 1));
+  end;
+end;
+
+function TMovementLimit.IsSurpassed(ACurrentValue: Currency): Boolean;
+begin
+  if boundaryCondition = CLimitBoundaryCondLess then begin
+    Result := ACurrentValue < FboundaryAmount;
+  end else if boundaryCondition = CLimitBoundaryCondLessEqual then begin
+    Result := ACurrentValue <= FboundaryAmount;
+  end else if boundaryCondition =  CLimitBoundaryCondGreater then begin
+    Result := ACurrentValue > FboundaryAmount;
+  end else if boundaryCondition = CLimitBoundaryCondGreaterEqual then begin
+    Result := ACurrentValue >= FboundaryAmount;
+  end else begin
+    Result := ACurrentValue = boundaryAmount;
+  end;
 end;
 
 procedure TMovementLimit.SetboundaryAmount(const Value: Currency);

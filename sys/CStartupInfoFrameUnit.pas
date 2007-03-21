@@ -6,11 +6,11 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees, CDatabase,
   CSchedules, Contnrs, ExtCtrls, GraphUtil, CConfigFormUnit, VTHeaderPopup,
-  CImageListsUnit, CComponents;
+  CImageListsUnit, CComponents, CDataObjects;
 
 type
-  TStartupHelperType = (shtGroup, shtDate, shtItem);
-  TStartupHelperGroup = (shgIntimeIn, shgIntimeOut, shgOvertimeIn, shgOvertimeOut);
+  TStartupHelperType = (shtGroup, shtDate, shtPlannedItem, shtLimit);
+  TStartupHelperGroup = (shgIntimeIn, shgIntimeOut, shgOvertimeIn, shgOvertimeOut, shgLimit);
   TStartupHelperList = class;
   TStartupHelper = class;
 
@@ -28,6 +28,7 @@ type
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
     FScheduledObjects: TObjectList;
+    FLimitData: TDataObjectList;
     FHelperList: TStartupHelperList;
     procedure FindFontAndBackground(AHelper: TStartupHelper; AFont: TFont; var ABackground: TColor);
   public
@@ -45,19 +46,19 @@ type
     FhelperType: TStartupHelperType;
     Fdate: TDateTime;
     Fgroup: TStartupHelperGroup;
-    FplannedCount: Integer;
-    FplannedSum: Currency;
+    Fcount: Integer;
+    Fsum: Currency;
     Fchilds: TStartupHelperList;
-    Fitem: TPlannedTreeItem;
+    Fitem: TObject;
   public
-    constructor Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TPlannedTreeItem; AType: TStartupHelperType);
+    constructor Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TObject; AType: TStartupHelperType);
     property childs: TStartupHelperList read Fchilds write Fchilds;
     property helperType: TStartupHelperType read FhelperType write FhelperType;
     property group: TStartupHelperGroup read Fgroup write Fgroup;
     property date: TDateTime read Fdate write Fdate;
-    property item: TPlannedTreeItem read Fitem write Fitem;
-    property plannedCount: Integer read FplannedCount write FplannedCount;
-    property plannedSum: Currency read FplannedSum write FplannedSum;
+    property item: TObject read Fitem write Fitem;
+    property count: Integer read Fcount write Fcount;
+    property sum: Currency read Fsum write Fsum;
     destructor Destroy; override;
   end;
 
@@ -73,7 +74,7 @@ type
 
 implementation
 
-uses CPreferences, CConsts, DateUtils, CDataObjects;
+uses CPreferences, CConsts, DateUtils;
 
 {$R *.dfm}
 
@@ -82,6 +83,7 @@ begin
   FreeAndNil(FPlannedObjects);
   FreeAndNil(FDoneObjects);
   FreeAndNil(FScheduledObjects);
+  FreeAndNil(FLimitData);
   FreeAndNil(FHelperList);
   inherited Destroy;
 end;
@@ -92,10 +94,12 @@ var xDf, xDt: TDateTime;
     xSqlPlanned, xSqlDone: String;
     xCount: Integer;
     xPlannedTreeItem: TPlannedTreeItem;
+    xLimit: TMovementLimit;
     xItemGroup: TStartupHelperGroup;
     xGroup: TStartupHelper;
     xDate: TStartupHelper;
     xItem: TStartupHelper;
+    xAmount: Currency;
 begin
   RepaymentList.BeginUpdate;
   RepaymentList.Clear;
@@ -170,12 +174,35 @@ begin
          ((xItemGroup = shgOvertimeOut) and startupInfoOldOut) then begin
         xGroup := FHelperList.ByGroup(xItemGroup, True);
         xDate := xGroup.childs.ByDate(xPlannedTreeItem.triggerDate, xItemGroup, True);
-        xItem := TStartupHelper.Create(xPlannedTreeItem.triggerDate, xItemGroup, xPlannedTreeItem, shtItem);
+        xItem := TStartupHelper.Create(xPlannedTreeItem.triggerDate, xItemGroup, xPlannedTreeItem, shtPlannedItem);
         xDate.childs.Add(xItem);
-        xGroup.plannedCount := xGroup.plannedCount + 1;
-        xGroup.plannedSum := xGroup.plannedSum + xPlannedTreeItem.planned.cash;
-        xDate.plannedCount := xDate.plannedCount + 1;
-        xDate.plannedSum := xDate.plannedSum + xPlannedTreeItem.planned.cash;
+        xGroup.count := xGroup.count + 1;
+        xGroup.sum := xGroup.sum + xPlannedTreeItem.planned.cash;
+        xDate.count := xDate.count + 1;
+        xDate.sum := xDate.sum + xPlannedTreeItem.planned.cash;
+      end;
+    end;
+    if startupInfoSurpassedLimit or startupInfoValidLimits then begin
+      FLimitData := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, 'select * from movementLimit where isActive = true');
+      for xCount := 0 to FLimitData.Count - 1 do begin
+        xLimit := TMovementLimit(FLimitData.Items[xCount]);
+        xAmount := xLimit.currentAmount;
+        xGroup := Nil;
+        if xLimit.IsSurpassed(xAmount) then begin
+          if startupInfoSurpassedLimit then begin
+            xGroup := FHelperList.ByGroup(shgLimit, True);
+          end;
+        end else begin
+          if startupInfoValidLimits then begin
+            xGroup := FHelperList.ByGroup(shgLimit, True);
+          end;
+        end;
+        if xGroup <> Nil then begin
+          xItem := TStartupHelper.Create(GWorkDate, xGroup.group, xLimit, shtLimit);
+          xItem.sum := xAmount;
+          xGroup.count := xGroup.count + 1;
+          xGroup.childs.Add(xItem);
+        end;
       end;
     end;
   end;
@@ -191,7 +218,7 @@ begin
   end;
 end;
 
-constructor TStartupHelper.Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TPlannedTreeItem; AType: TStartupHelperType);
+constructor TStartupHelper.Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TObject; AType: TStartupHelperType);
 begin
   inherited Create;
   Fdate := ADate;
@@ -199,8 +226,8 @@ begin
   Fitem := AItem;
   FhelperType := AType;
   Fchilds := TStartupHelperList.Create(True);
-  FplannedCount := 0;
-  FplannedSum := 0;
+  Fcount := 0;
+  Fsum := 0;
 end;
 
 destructor TStartupHelper.Destroy;
@@ -290,6 +317,7 @@ begin
           shgIntimeOut: CellText := 'Zaplanowane operacje rozchodowe';
           shgOvertimeIn: CellText := 'Zaleg³e operacje przychodowe';
           shgOvertimeOut: CellText := 'Zaleg³e operacje rozchodowe';
+          shgLimit: CellText := 'Limity';
         end;
       end else if xData.helperType = shtDate then begin
         if xData.date = GWorkDate then begin
@@ -299,45 +327,63 @@ begin
         end else begin
           CellText := GetFormattedDate(xData.date, CLongDateFormat);
         end;
-      end else if xData.helperType = shtItem then begin
-        CellText := xData.item.planned.description;
+      end else if xData.helperType = shtPlannedItem then begin
+        CellText := TPlannedTreeItem(xData.item).planned.description;
+      end else if xData.helperType = shtLimit then begin
+        CellText := TMovementLimit(xData.item).name;
       end;
     end else if Column = 1 then begin
-      if xData.helperType = shtItem then begin
-        CellText := CurrencyToString(xData.item.planned.cash);
+      if xData.helperType = shtPlannedItem then begin
+        CellText := CurrencyToString(TPlannedTreeItem(xData.item).planned.cash);
+      end else if xData.helperType = shtLimit then begin
+        CellText := CurrencyToString(TStartupHelper(xData).sum);
       end;
     end else if Column = 2 then begin
-      if xData.helperType = shtItem then begin
-        if (xData.item.planned.movementType = CInMovement) then begin
+      if xData.helperType = shtPlannedItem then begin
+        if (TPlannedTreeItem(xData.item).planned.movementType = CInMovement) then begin
           CellText := CInMovementDescription;
-        end else if (xData.item.planned.movementType = COutMovement) then begin
+        end else if (TPlannedTreeItem(xData.item).planned.movementType = COutMovement) then begin
           CellText := COutMovementDescription;
         end;
+      end else if xData.helperType = shtLimit then begin
+        CellText := CLimitDescription;
       end;
     end else if Column = 3 then begin
-      if xData.helperType = shtItem then begin
-        if (xData.item.done <> Nil) then begin
-          if (xData.item.done.doneState = CDoneOperation) then begin
+      if xData.helperType = shtPlannedItem then begin
+        if (TPlannedTreeItem(xData.item).done <> Nil) then begin
+          if (TPlannedTreeItem(xData.item).done.doneState = CDoneOperation) then begin
             CellText := CPlannedDoneDescription;
-          end else if (xData.item.done.doneState = CDoneDeleted) then begin
+          end else if (TPlannedTreeItem(xData.item).done.doneState = CDoneDeleted) then begin
             CellText := CPlannedRejectedDescription;
-          end else if (xData.item.done.doneState = CDoneAccepted) then begin
+          end else if (TPlannedTreeItem(xData.item).done.doneState = CDoneAccepted) then begin
             CellText := CPlannedAcceptedDescription;
           end;
         end else begin
-          if xData.item.triggerDate = GWorkDate then begin
+          if TPlannedTreeItem(xData.item).triggerDate = GWorkDate then begin
             CellText := CPlannedScheduledTodayDescription;
-          end else if xData.item.triggerDate > GWorkDate then begin
+          end else if TPlannedTreeItem(xData.item).triggerDate > GWorkDate then begin
             CellText := CPlannedScheduledReady;
           end else begin
             CellText := CPlannedScheduledOvertime;
+          end;
+        end;
+      end else if xData.helperType = shtLimit then begin
+        if xData.group = shgLimit then begin
+          if TMovementLimit(xData.item).IsSurpassed(xData.sum) then begin
+            CellText := 'Przekroczony';
+          end else begin
+            CellText := 'Poprawny';
           end;
         end;
       end;
     end;
   end else begin
     if (xData.helperType = shtGroup) and (Column = 0) then begin
-      CellText := '(razem ' + IntToStr(xData.plannedCount) + ', na kwotê ' + CurrencyToString(xData.plannedSum) + ')';
+      if xData.group <> shgLimit then begin
+        CellText := '(razem ' + IntToStr(xData.count) + ', na kwotê ' + CurrencyToString(xData.sum) + ')';
+      end else begin
+        CellText := '(razem ' + IntToStr(xData.count) + ')';
+      end;
     end;
   end;
 end;
@@ -388,13 +434,19 @@ begin
     xKey := 'TT';
   end else if AHelper.helperType = shtDate then begin
     xKey := 'DD';
+  end else if AHelper.helperType = shtLimit then begin
+    if TMovementLimit(AHelper.item).IsSurpassed(AHelper.sum) then begin
+      xKey := 'SL';
+    end else begin
+      xKey := 'VL';
+    end;
   end else begin
-    if AHelper.item.triggerDate < GWorkDate then begin
+    if TPlannedTreeItem(AHelper.item).triggerDate < GWorkDate then begin
       xKey := 'O';
     end else begin
       xKey := 'I';
     end;
-    xKey := xKey + AHelper.item.planned.movementType;
+    xKey := xKey + TPlannedTreeItem(AHelper.item).planned.movementType;
   end;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['startupInfo']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
@@ -411,16 +463,18 @@ var xData: TStartupHelper;
 begin
   xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
   if Column = 2 then begin
-    if xData.helperType = shtItem then begin
-      if xData.item.planned.movementType = CInMovement then begin
+    if xData.helperType = shtPlannedItem then begin
+      if TPlannedTreeItem(xData.item).planned.movementType = CInMovement then begin
         ImageIndex := 0;
-      end else if xData.item.planned.movementType = COutMovement then begin
+      end else if TPlannedTreeItem(xData.item).planned.movementType = COutMovement then begin
         ImageIndex := 1;
       end;
+    end else if xData.helperType = shtLimit then begin
+      ImageIndex := 7;
     end;
   end else if Column = 3 then begin
-    if xData.helperType = shtItem then begin
-      xBase := xData.item;
+    if xData.helperType = shtPlannedItem then begin
+      xBase := TPlannedTreeItem(xData.item);
       if (xBase.done <> Nil) then begin
         if (xBase.done.doneState = CDoneOperation) then begin
           ImageIndex := 2;
@@ -437,6 +491,12 @@ begin
         end else begin
           ImageIndex := 4;
         end;
+      end;
+    end else if xData.helperType = shtLimit then begin
+      if TMovementLimit(xData.item).IsSurpassed(xData.sum) then begin
+        ImageIndex := 4;
+      end else begin
+        ImageIndex := 2;
       end;
     end;
   end;

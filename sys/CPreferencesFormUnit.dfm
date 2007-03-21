@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 298
-  Top = 289
+  Left = 288
+  Top = 171
   Caption = 'Preferencje'
   ClientWidth = 604
   PixelsPerInch = 96
@@ -213,8 +213,8 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 449
-              Height = 233
-              Caption = ' Powiadomienia o operacjach  '
+              Height = 305
+              Caption = ' Powiadomienia o operacjach i limitach '
               TabOrder = 0
               object Label4: TLabel
                 Left = 265
@@ -290,13 +290,13 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxAutoAlways: TCheckBox
                 Left = 16
-                Top = 200
+                Top = 272
                 Width = 417
                 Height = 17
                 Caption = 
                   'Wy'#347'wietlaj okno powiadomienia nawet gdy nie ma '#380'adnych informacj' +
                   'i'
-                TabOrder = 7
+                TabOrder = 9
               end
               object CheckBoxAutoOldIn: TCheckBox
                 Left = 16
@@ -313,6 +313,22 @@ inherited CPreferencesForm: TCPreferencesForm
                 Height = 17
                 Caption = 'Powiadamiaj o zaleg'#322'ych operacjach rozchodowych'
                 TabOrder = 6
+              end
+              object CheckBoxSurpassed: TCheckBox
+                Left = 16
+                Top = 200
+                Width = 313
+                Height = 17
+                Caption = 'Powiadamiaj o przekroczonych limitach'
+                TabOrder = 7
+              end
+              object CheckBoxValid: TCheckBox
+                Left = 16
+                Top = 224
+                Width = 233
+                Height = 17
+                Caption = 'Powiadamiaj o poprawnych limitach'
+                TabOrder = 8
               end
             end
           end
