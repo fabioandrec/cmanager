@@ -15,6 +15,11 @@ type
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
 
+  TDataGids = class(TStringList)
+  public
+    constructor CreateFromGid(ADataGid: TDataGid); 
+  end;
+
   TDataProvider = class(TObject)
   private
     FLastError: String;
@@ -38,6 +43,7 @@ type
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
     function GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
     function GetSqlString(ASql: String; ADefault: String): String;
+    function GetSqlStringList(ASql: String): TStringList;
     function GetCmanagerParam(AName: String; ADefault: String = ''): String;
     procedure SetCmanagerParam(AName: String; AValue: String);
   published
@@ -1306,6 +1312,26 @@ begin
     xSql := Format('update cmanagerParams set paramValue = ''%s'' where paramName = ''%s''', [AValue, AName]);
   end;
   ExecuteSql(xSql);
+end;
+
+constructor TDataGids.CreateFromGid(ADataGid: TDataGid);
+begin
+  inherited Create;
+  Add(ADataGid);
+end;
+
+function TDataProvider.GetSqlStringList(ASql: String): TStringList;
+var xQ: TADOQuery;
+begin
+  Result := TStringList.Create;
+  xQ := OpenSql(ASql);
+  if xQ <> Nil then begin
+    while not xQ.Eof do begin
+      Result.Add(xQ.Fields[0].AsString);
+      xQ.Next;
+    end;
+    xQ.Free;
+  end;
 end;
 
 initialization

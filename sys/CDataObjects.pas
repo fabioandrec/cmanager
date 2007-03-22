@@ -341,6 +341,8 @@ type
     FboundaryType: TBaseEnumeration;
     FboundaryCondition: TBaseName;
     FboundaryDays: Integer;
+    FcurrenAmount: Currency;
+    FisCalculated: Boolean;
     procedure SetboundaryAmount(const Value: Currency);
     procedure SetboundaryDays(const Value: Integer);
     procedure SetboundaryType(const Value: TBaseEnumeration);
@@ -349,8 +351,7 @@ type
     procedure SetisActive(const Value: Boolean);
     procedure Setname(const Value: TBaseName);
     procedure SetboundaryCondition(const Value: TBaseName);
-    function GetcurrentAmount: Currency;
-    procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+    procedure GetFilterDates(ADateTime: TDateTime; var ADateFrom, ADateTo: TDateTime);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -358,6 +359,8 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     function IsSurpassed(ACurrentValue: Currency): Boolean;
+    function GetCurrentAmount(ADate: TDateTime; AMustRecalculate: Boolean): Currency;
+    constructor Create(AStatic: Boolean); override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -367,7 +370,6 @@ type
     property boundaryType: TBaseEnumeration read FboundaryType write SetboundaryType;
     property boundaryCondition: TBaseName read FboundaryCondition write SetboundaryCondition;
     property boundaryDays: Integer read FboundaryDays write SetboundaryDays;
-    property currentAmount: Currency read GetcurrentAmount;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -1650,6 +1652,12 @@ begin
   Result := Fdescription;
 end;
 
+constructor TMovementLimit.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FisCalculated := False;
+end;
+
 procedure TMovementLimit.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -1670,17 +1678,22 @@ begin
   Result := Fname;
 end;
 
-function TMovementLimit.GetcurrentAmount: Currency;
+function TMovementLimit.GetCurrentAmount(ADate: TDateTime; AMustRecalculate: Boolean): Currency;
 var xSd, xEd: TDateTime;
     xSql: String;
 begin
-  GetFilterDates(xSd, xEd);
-  xSql := Format('select sum(cash) from transactions where movementType <> ''%s'' and regDate between %s and %s %s',
-          [CTransferMovement,
-           DatetimeToDatabase(xSd, False),
-           DatetimeToDatabase(xEd, False),
-           TMovementFilter.GetFilterCondition(idFilter, True)]);
-  Result := GDataProvider.GetSqlCurrency(xSql, 0);
+  if (not FisCalculated) or AMustRecalculate then begin
+    GetFilterDates(ADate, xSd, xEd);
+    xSql := Format('select sum(cash) from transactions where movementType <> ''%s'' and regDate between %s and %s %s',
+            [CTransferMovement,
+             DatetimeToDatabase(xSd, False),
+             DatetimeToDatabase(xEd, False),
+             TMovementFilter.GetFilterCondition(idFilter, True)]);
+    Result := GDataProvider.GetSqlCurrency(xSql, 0);
+    FcurrenAmount := Result;
+  end else begin
+    Result := FcurrenAmount;
+  end;
 end;
 
 function TMovementLimit.GetElementHint(AColumnIndex: Integer): String;
@@ -1693,31 +1706,31 @@ begin
   Result := Fname;
 end;
 
-procedure TMovementLimit.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+procedure TMovementLimit.GetFilterDates(ADateTime: TDateTime; var ADateFrom, ADateTo: TDateTime);
 begin
   ADateFrom := 0;
   ADateTo := 0;
   if boundaryType = CLimitBoundaryTypeToday then begin
-    ADateFrom := GWorkDate;
-    ADateTo := GWorkDate;
+    ADateFrom := ADateTime;
+    ADateTo := ADateTime;
   end else if boundaryType = CLimitBoundaryTypeWeek then begin
-    ADateFrom := StartOfTheWeek(GWorkDate);
-    ADateTo := EndOfTheWeek(GWorkDate);
+    ADateFrom := StartOfTheWeek(ADateTime);
+    ADateTo := EndOfTheWeek(ADateTime);
   end else if boundaryType = CLimitBoundaryTypeMonth then begin
-    ADateFrom := StartOfTheMonth(GWorkDate);
-    ADateTo := EndOfTheMonth(GWorkDate);
+    ADateFrom := StartOfTheMonth(ADateTime);
+    ADateTo := EndOfTheMonth(ADateTime);
   end else if boundaryType = CLimitBoundaryTypeQuarter then begin
-    ADateFrom := GetStartQuarterOfTheYear(GWorkDate);
-    ADateTo := GetEndQuarterOfTheYear(GWorkDate);
+    ADateFrom := GetStartQuarterOfTheYear(ADateTime);
+    ADateTo := GetEndQuarterOfTheYear(ADateTime);
   end else if boundaryType = CLimitBoundaryTypeHalfyear then begin
-    ADateFrom := GetStartHalfOfTheYear(GWorkDate);
-    ADateTo := GetEndHalfOfTheYear(GWorkDate);
+    ADateFrom := GetStartHalfOfTheYear(ADateTime);
+    ADateTo := GetEndHalfOfTheYear(ADateTime);
   end else if boundaryType = CLimitBoundaryTypeYear then begin
-    ADateFrom := StartOfTheYear(GWorkDate);
-    ADateTo := EndOfTheYear(GWorkDate);
+    ADateFrom := StartOfTheYear(ADateTime);
+    ADateTo := EndOfTheYear(ADateTime);
   end else if boundaryType = CLimitBoundaryTypeDays then begin
-    ADateFrom := GWorkDate;
-    ADateTo := IncDay(GWorkDate, - (boundaryDays - 1));
+    ADateFrom := ADateTime;
+    ADateTo := IncDay(ADateTime, - (boundaryDays - 1));
   end;
 end;
 

@@ -1,0 +1,186 @@
+unit CSurpassedFormUnit;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CBaseFrameUnit, CDatabase,
+  VirtualTrees, CComponents, Contnrs, CDataObjects, CImageListsUnit, CTools;
+
+type
+  TSurpassedLimit = class(TCDataListElementObject)
+  private
+    Flimit: TMovementLimit;
+    Famount: Currency;
+  public
+    constructor Create(AMovementLimit: TMovementLimit; ACash: Currency);
+    function GetElementHint(AColumnIndex: Integer): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
+  end;
+
+  TCSurpassedForm = class(TCConfigForm)
+    PanelFrame: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    SurpassedList: TCDataList;
+    procedure SurpassedListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+  private
+    FDate: TDateTime;
+    FDataobjects: TDataObjectList;
+    FAccountIds: TDataGids;
+    FCategorySums: TSumList;
+    FCashpointIds: TDataGids;
+  public
+    destructor Destroy; override;
+  end;
+
+function CheckSurpassedLimits(ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
+
+implementation
+
+uses CConsts;
+
+{$R *.dfm}
+
+function CheckSurpassedLimits(ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
+var xForm: TCSurpassedForm;
+begin
+  xForm := TCSurpassedForm.Create(Application);
+  xForm.FDate := ADate;
+  xForm.FAccountIds := AAccountIds;
+  xForm.FCategorySums := ACategorySums;
+  xForm.FCashpointIds := ACashpointIds;
+  xForm.SurpassedList.ReloadTree;
+  if xForm.SurpassedList.RootNodeCount <> 0 then begin
+    Result := xForm.ShowConfig(coEdit);
+  end else begin
+    Result := True;
+  end;
+  xForm.Free;
+end;
+
+destructor TCSurpassedForm.Destroy;
+begin
+  if FAccountIds <> Nil then begin
+    FAccountIds.Free;
+  end;
+  if FCategorySums <> Nil then begin
+    FCategorySums.Free;
+  end;
+  if FCashpointIds <> Nil then begin
+    FCashpointIds.Free;
+  end;
+  FDataobjects.Free;
+  inherited Destroy;
+end;
+
+procedure TCSurpassedForm.SurpassedListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+var xSql: String;
+    xCondition, xCondA, xCondC, xCondP: String;
+    xCount: Integer;
+    xLimit: TMovementLimit;
+    xElement: TCListDataElement;
+    xAmount: Currency;
+    xCash: Currency;
+    xFilterCats: TStringList;
+begin
+  xCondA := '';
+  xCondC := '';
+  xCondP := '';
+  xCondition := '';
+  for xCount := 0 to FAccountIds.Count - 1 do begin
+    xCondA := xCondition + DataGidToDatabase(FAccountIds.Strings[xCount]);
+    if xCount <> FAccountIds.Count - 1 then begin
+      xCondA := xCondA + ', ';
+    end;
+  end;
+  if FAccountIds.Count > 0 then begin
+    xCondition := xCondition + 'idAccount in (' + xCondA + ')';
+  end;
+  for xCount := 0 to FCategorySums.Count - 1 do begin
+    xCondP := xCondP + DataGidToDatabase(FCategorySums.Items[xCount].name);
+    if xCount <> FCategorySums.Count - 1 then begin
+      xCondP := xCondP + ', ';
+    end;
+  end;
+  if FCategorySums.Count > 0 then begin
+    if xCondition <> '' then begin
+      xCondition := xCondition + ' or ';
+    end;
+    xCondition := xCondition + 'idProduct in (' + xCondP + ')';
+  end;
+  for xCount := 0 to FCashpointIds.Count - 1 do begin
+    xCondC := xCondC + DataGidToDatabase(FCashpointIds.Strings[xCount]);
+    if xCount <> FCashpointIds.Count - 1 then begin
+      xCondC := xCondC + ', ';
+    end;
+  end;
+  if FCashpointIds.Count > 0 then begin
+    if xCondition <> '' then begin
+      xCondition := xCondition + ' or ';
+    end;
+    xCondition := xCondition + 'idCashpoint in (' + xCondC + ')';
+  end;
+  if xCondition <> '' then begin
+    xCondition := ' where ' + xCondition;
+  end;
+  xSql := 'select * from movementLimit where isActive = true and (idMovementFilter is null or idMovementFilter in (select distinct(idMovementFilter) from filters' + xCondition + '))';
+  FDataobjects := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, xSql);
+  for xCount := 0 to FDataobjects.Count - 1 do begin
+    xLimit := TMovementLimit(FDataobjects.Items[xCount]);
+    if xLimit.idFilter = CEmptyDataGid then begin
+      xCash := FCategorySums.GetSum;
+    end else begin
+      xFilterCats := GDataProvider.GetSqlStringList('select idProduct from productFilter where idMovementFilter = ' + DataGidToDatabase(xLimit.idFilter));
+      xCash := FCategorySums.GetSum(xFilterCats);
+      xFilterCats.Free;
+    end;
+    xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+    if xLimit.IsSurpassed(xAmount) then begin
+      xElement := TCListDataElement.Create(SurpassedList, TSurpassedLimit.Create(xLimit, xAmount), True);
+      ARootElement.Add(xElement);
+    end;
+  end;
+end;
+
+constructor TSurpassedLimit.Create(AMovementLimit: TMovementLimit; ACash: Currency);
+begin
+  inherited Create;
+  Flimit := AMovementLimit;
+  Famount := ACash;
+end;
+
+function TSurpassedLimit.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := -1;
+  if AColumnIndex = 2 then begin
+    if Flimit.IsSurpassed(Famount) then begin
+      Result := 4;
+    end else begin
+      Result := 2;
+    end;
+  end;
+end;
+
+function TSurpassedLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 0 then begin
+    Result := Flimit.name;
+  end else if AColumnIndex = 1 then begin
+    Result := CurrencyToString(Famount);
+  end else begin
+    if Flimit.IsSurpassed(Famount) then begin
+      Result := CLimitSupressedDesc;
+    end else begin
+      Result := CLimitValidDesc;
+    end;
+  end;
+end;
+
+function TSurpassedLimit.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Flimit.description;
+end;
+
+end.

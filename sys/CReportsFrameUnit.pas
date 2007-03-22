@@ -176,6 +176,7 @@ begin
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Przep³yw gotówki' , TCashFlowListReport, Nil, 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CHtmlReportImage), True));
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia konta' , TAccountHistoryReport, Nil, 'Pokazuje historiê wybranego konta w wybranym okresie', CHtmlReportImage), True));
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres stanu kont' , TAccountBalanceChartReport, Nil, 'Pokazuje wykres stanu kont w wybranym okresie', CLineReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Sumy przychodów i rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement + COutMovement), 'Pokazuje sumy przychodów\rozchodów w wybranym okresie', CLineReportImage), True));
   xBs := TCListDataElement.Create(List, TReportListElement.CreateGroup('Rozchody', '', CNoImage), True);
   ARootElement.Add(xBs);
   xBs.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista operacji rozchodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w wybranym okresie', CHtmlReportImage), True));

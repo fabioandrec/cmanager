@@ -26,7 +26,12 @@ type
     Panel1: TPanel;
     RepaymentList: TVirtualStringTree;
     PanelError: TPanel;
+    Label7: TLabel;
+    CCurrEditOthers: TCCurrEdit;
     BitBtnPrint: TBitBtn;
+    Label8: TLabel;
+    Panel2: TPanel;
+    CCurrEditRrso: TCCurrEdit;
     procedure ComboBoxPeriodChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CCurrEditCashChange(Sender: TObject);
@@ -80,6 +85,7 @@ begin
         totalCash := CCurrEditCash.Value;
         taxAmount := CCurrEditTax.Value;
         firstDay := CDateTime.Value;
+        otherTaxes := CCurrEditOthers.Value;
         if ComboBoxType.ItemIndex = 0 then begin
           paymentType := lptTotal;
         end else begin
@@ -106,6 +112,7 @@ begin
         end;
         Header.Options := Header.Options + [hoVisible];
       end;
+      CCurrEditRrso.Value := Floan.yearRate;
     end else begin
       PanelError.Visible := True;
       with RepaymentList do begin

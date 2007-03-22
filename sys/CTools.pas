@@ -6,7 +6,33 @@ interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows, Types;
+uses Windows, Types, Contnrs, Classes;
+
+type
+  TSum = class(TObject)
+  private
+    Fvalue: Currency;
+    Fname: String;
+  public
+    property value: Currency read Fvalue write Fvalue;
+    property name: String read Fname write Fname;
+  end;
+
+  TSumList = class(TObjectList)
+  private
+    function GetItems(AIndex: Integer): TSum;
+    procedure SetItems(AIndex: Integer; const Value: TSum);
+    function GetByName(AName: String): TSum;
+  public
+    constructor CreateWithSum(AName: String; AValue: Currency);
+    procedure AddSum(AName: String; AValue: Currency);
+    function GetSum(AName: String): Currency; overload;
+    function GetSum(ANames: TStringList): Currency; overload;
+    function GetSum: Currency; overload;
+    property Items[AIndex: Integer]: TSum read GetItems write SetItems;
+    property ByName[AName: String]: TSum read GetByName;
+  end;
+
 
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
@@ -18,7 +44,7 @@ function LPad(AString: String; AChar: Char; ALength: Integer): String;
 
 implementation
 
-uses SysUtils, Classes;
+uses SysUtils;
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
@@ -109,6 +135,78 @@ begin
   while Length(Result) < ALength do begin
     Result := AChar + Result;
   end;
+end;
+
+procedure TSumList.AddSum(AName: String; AValue: Currency);
+var xSum: TSum;
+begin
+  xSum := ByName[AName];
+  if xSum = Nil then begin
+    xSum := TSum.Create;
+    xSum.name := AName;
+    xSum.value := AValue;
+    Add(xSum);
+  end else begin
+    xSum.value := xSum.value + AValue;
+  end;
+end;
+
+constructor TSumList.CreateWithSum(AName: String; AValue: Currency);
+begin
+  inherited Create(True);
+  AddSum(AName, AValue);
+end;
+
+function TSumList.GetByName(AName: String): TSum;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (Result = Nil) and (xCount <= Count - 1) do begin
+    if Items[xCount].name = AName then begin
+      Result := Items[xCount];
+    end;
+    Inc(xCount);
+  end;
+end;
+
+function TSumList.GetItems(AIndex: Integer): TSum;
+begin
+  Result := TSum(inherited Items[AIndex]);
+end;
+
+function TSumList.GetSum(AName: String): Currency;
+var xSum: TSum;
+begin
+  xSum := ByName[AName];
+  if xSum = Nil then begin
+    Result := 0;
+  end else begin
+    Result := xSum.value;
+  end;
+end;
+
+function TSumList.GetSum(ANames: TStringList): Currency;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to ANames.Count - 1 do begin
+    Result := Result + GetSum(ANames.Strings[xCount]);
+  end;
+end;
+
+function TSumList.GetSum: Currency;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    Result := Result + Items[xCount].value;
+  end;
+end;
+
+procedure TSumList.SetItems(AIndex: Integer; const Value: TSum);
+begin
+  inherited Items[AIndex] := Value;
 end;
 
 end.

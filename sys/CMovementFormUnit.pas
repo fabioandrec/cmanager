@@ -110,7 +110,8 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
-  CTemplates, CPreferences, CRichtext, CDataobjectFrameUnit;
+  CTemplates, CPreferences, CRichtext, CDataobjectFrameUnit,
+  CSurpassedFormUnit, CTools;
 
 {$R *.dfm}
 
@@ -326,6 +327,19 @@ begin
       if ShowInfo(itQuestion, 'Nie wybrano kontrahenta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
         CStaticInoutCyclicCashpoint.DoGetDataId;
       end;
+    end;
+  end;
+  if Result then begin
+    if (xI = 0) or (xI = 1) then begin
+      Result := CheckSurpassedLimits(CDateTime.Value,
+                                     TDataGids.CreateFromGid(CStaticInoutOnceAccount.DataId),
+                                     TDataGids.CreateFromGid(CStaticInoutOnceCashpoint.DataId),
+                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, IfThen(xI = 0, (-1) * CCurrEditInoutOnce.Value, CCurrEditInoutOnce.Value)));
+    end else if (xI = 3) or (xI = 4) then begin
+      Result := CheckSurpassedLimits(CDateTime.Value,
+                                     TDataGids.CreateFromGid(CStaticInoutCyclicAccount.DataId),
+                                     TDataGids.CreateFromGid(CStaticInoutCyclicCategory.DataId),
+                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, IfThen(xI = 3, (-1) * CCurrEditInoutCyclic.Value, CCurrEditInoutCyclic.Value)));
     end;
   end;
 end;

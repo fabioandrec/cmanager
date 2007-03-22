@@ -15,3 +15,9 @@ create table movementLimit (
   constraint ck_boundaryConditionlimit check (boundarycondition in ('=', '<', '>', '<=', '>=')),  
   constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter)
 );
+
+create view filters as
+  select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m
+    left outer join accountFilter a on a.idMovementFilter = m.idMovementFilter)
+    left join cashpointFilter c on c.idMovementFilter = m.idMovementFilter)
+    left join productFilter p on p.idMovementFilter = m.idMovementFilter);

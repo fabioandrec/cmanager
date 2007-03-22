@@ -1,19 +1,19 @@
 inherited CLoanCalculatorForm: TCLoanCalculatorForm
-  Left = 330
-  Top = 227
+  Left = 338
+  Top = 30
   Caption = 'Kalkulator kredytowy'
-  ClientHeight = 445
+  ClientHeight = 523
   ClientWidth = 578
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 578
-    Height = 404
+    Height = 482
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
       Width = 545
-      Height = 137
+      Height = 161
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label3: TLabel
@@ -63,6 +63,14 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kwota kredytu'
+      end
+      object Label7: TLabel
+        Left = 270
+        Top = 130
+        Width = 131
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Suma prowizji i innych op'#322'at'
       end
       object CDateTime: TCDateTime
         Left = 409
@@ -128,9 +136,9 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         OnChange = CIntEditTimesChange
       end
       object CCurrEditTax: TCCurrEdit
-        Left = 408
+        Left = 409
         Top = 59
-        Width = 113
+        Width = 112
         Height = 21
         BorderStyle = bsNone
         TabOrder = 3
@@ -153,19 +161,43 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         CurrencyStr = 'z'#322
         BevelKind = bkTile
       end
+      object CCurrEditOthers: TCCurrEdit
+        Left = 409
+        Top = 127
+        Width = 112
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 6
+        OnChange = CCurrEditCashChange
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+      end
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 168
+      Top = 200
       Width = 545
-      Height = 225
-      Caption = ' Harmonogram '
+      Height = 273
+      Caption = ' Dane szczeg'#243#322'owe i harmonogram  '
       TabOrder = 1
+      DesignSize = (
+        545
+        273)
+      object Label8: TLabel
+        Left = 207
+        Top = 241
+        Width = 202
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Rzeczywista roczna stopa oprocentowania'
+      end
       object Panel1: TPanel
         Left = 16
-        Top = 24
+        Top = 27
         Width = 513
-        Height = 185
+        Height = 192
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
@@ -173,7 +205,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           Left = 1
           Top = 1
           Width = 511
-          Height = 183
+          Height = 190
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -258,29 +290,50 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           TabOrder = 1
         end
       end
+      object BitBtnPrint: TBitBtn
+        Left = 16
+        Top = 235
+        Width = 75
+        Height = 25
+        Anchors = [akLeft, akBottom]
+        Caption = 'Do druku'
+        Enabled = False
+        TabOrder = 1
+        OnClick = BitBtnOkClick
+      end
+      object Panel2: TPanel
+        Left = 413
+        Top = 232
+        Width = 129
+        Height = 33
+        BevelOuter = bvNone
+        Enabled = False
+        TabOrder = 2
+        object CCurrEditRrso: TCCurrEdit
+          Left = 5
+          Top = 4
+          Width = 112
+          Height = 21
+          BorderStyle = bsNone
+          Enabled = False
+          TabOrder = 0
+          OnChange = CCurrEditTaxChange
+          Decimals = 4
+          ThousandSep = True
+          CurrencyStr = '%'
+          BevelKind = bkTile
+        end
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 404
+    Top = 482
     Width = 578
     inherited BitBtnOk: TBitBtn
       Left = 401
-      TabOrder = 1
     end
     inherited BitBtnCancel: TBitBtn
       Left = 489
-      TabOrder = 2
-    end
-    object BitBtnPrint: TBitBtn
-      Left = 16
-      Top = 8
-      Width = 75
-      Height = 25
-      Anchors = [akLeft, akBottom]
-      Caption = 'Do druku'
-      Enabled = False
-      TabOrder = 0
-      OnClick = BitBtnOkClick
     end
   end
 end

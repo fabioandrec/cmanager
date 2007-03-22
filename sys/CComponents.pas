@@ -250,14 +250,15 @@ type
   TCDataList = class;
 
   TCDataListElementObject = class
-    function GetElementType: String; virtual; abstract;
-    function GetElementId: String; virtual; abstract;
-    function GetElementText: String; virtual; abstract;
-    function GetElementHint(AColumnIndex: Integer): String; virtual; abstract;
+  public
+    function GetElementType: String; virtual;
+    function GetElementId: String; virtual;
+    function GetElementText: String; virtual;
+    function GetElementHint(AColumnIndex: Integer): String; virtual;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; virtual; abstract;
-    function GetColumnImage(AColumnIndex: Integer): Integer; virtual; abstract;
-    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; virtual; abstract;
-    procedure GetElementReload; virtual; abstract;
+    function GetColumnImage(AColumnIndex: Integer): Integer; virtual;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; virtual;
+    procedure GetElementReload; virtual; 
   end;
 
   TCListDataElement = class(TObjectList)
@@ -1620,6 +1621,42 @@ begin
     Result := GetTreeElement(Node).Data.GetElementHint(Column);
     LineBreakStyle := hlbDefault;
   end;
+end;
+
+{ TCDataListElementObject }
+
+function TCDataListElementObject.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := -1;
+end;
+
+function TCDataListElementObject.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+begin
+  Result := AnsiCompareStr(GetColumnText(AColumnIndex, False), ACompareWith.GetColumnText(AColumnIndex, False));
+end;
+
+function TCDataListElementObject.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := GetElementText;
+end;
+
+function TCDataListElementObject.GetElementId: String;
+begin
+  Result := '';
+end;
+
+procedure TCDataListElementObject.GetElementReload;
+begin
+end;
+
+function TCDataListElementObject.GetElementText: String;
+begin
+  Result := GetElementId;
+end;
+
+function TCDataListElementObject.GetElementType: String;
+begin
+  Result := ClassName;
 end;
 
 end.

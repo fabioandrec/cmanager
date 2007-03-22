@@ -1533,7 +1533,9 @@ var xOperations: TADOQuery;
     xGbSum: Currency;
     xName: String;
     xCurDate: TDateTime;
-    xSerie: TBarSeries;
+    xInSerie, xOutSerie: TBarSeries;
+    xInMovements: Boolean;
+    xOutMovements: Boolean;
 begin
   xGb := 'regDate';
   xName := 'Dzieñ';
@@ -1544,44 +1546,93 @@ begin
     xGb := 'monthDate';
     xName := 'Miesi¹c';
   end;
-  xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
-                             [xGb, TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
-  with xOperations do begin
-    if FGroupBy = CGroupByWeek then begin
-      xCurDate := StartOfTheWeek(FStartDate);
-    end else if FGroupBy = CGroupByMonth then begin
-      xCurDate := StartOfTheMonth(FStartDate);
-    end else begin
-      xCurDate := FStartDate;
-    end;
-    xSerie := TBarSeries.Create(GetChart);
-    with TBarSeries(xSerie) do begin
-      Title := xName;
-      Marks.ArrowLength := 0;
-      Marks.Style := smsValue;
-      HorizAxis := aBottomAxis;
-      XValues.DateTime := True;
-    end;
-    while (xCurDate <= FEndDate) do begin
-      Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
-      Filtered := True;
-      First;
-      xGbSum := 0;
-      while not Eof do begin
-        if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
-          xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
-        end;
-        Next;
-      end;
-      xSerie.AddXY(xCurDate, xGbSum, GetDescription(xCurDate));
+  xInSerie := Nil;
+  xOutSerie := Nil;
+  xInMovements := Pos(CInMovement, TCSelectedMovementTypeParams(FParams).movementType) > 0;
+  xOutMovements := Pos(COutMovement, TCSelectedMovementTypeParams(FParams).movementType) > 0;
+  if xInMovements then begin
+    xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
+                               [xGb, CInMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
+    with xOperations do begin
       if FGroupBy = CGroupByWeek then begin
-        xCurDate := IncWeek(xCurDate, 1);
+        xCurDate := StartOfTheWeek(FStartDate);
       end else if FGroupBy = CGroupByMonth then begin
-        xCurDate := IncMonth(xCurDate, 1);
+        xCurDate := StartOfTheMonth(FStartDate);
       end else begin
-        xCurDate := IncDay(xCurDate, 1);
+        xCurDate := FStartDate;
+      end;
+      xInSerie := TBarSeries.Create(GetChart);
+      with TBarSeries(xInSerie) do begin
+        Title := xName;
+        Marks.ArrowLength := 0;
+        Marks.Style := smsValue;
+        HorizAxis := aBottomAxis;
+        XValues.DateTime := True;
+      end;
+      while (xCurDate <= FEndDate) do begin
+        Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
+        Filtered := True;
+        First;
+        xGbSum := 0;
+        while not Eof do begin
+          if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
+            xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
+          end;
+          Next;
+        end;
+        xInSerie.AddXY(xCurDate, xGbSum, GetDescription(xCurDate));
+        if FGroupBy = CGroupByWeek then begin
+          xCurDate := IncWeek(xCurDate, 1);
+        end else if FGroupBy = CGroupByMonth then begin
+          xCurDate := IncMonth(xCurDate, 1);
+        end else begin
+          xCurDate := IncDay(xCurDate, 1);
+        end;
       end;
     end;
+    xOperations.Free;
+  end;
+  if xOutMovements then begin
+    xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
+                               [xGb, COutMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
+    with xOperations do begin
+      if FGroupBy = CGroupByWeek then begin
+        xCurDate := StartOfTheWeek(FStartDate);
+      end else if FGroupBy = CGroupByMonth then begin
+        xCurDate := StartOfTheMonth(FStartDate);
+      end else begin
+        xCurDate := FStartDate;
+      end;
+      xOutSerie := TBarSeries.Create(GetChart);
+      with TBarSeries(xOutSerie) do begin
+        Title := xName;
+        Marks.ArrowLength := 0;
+        Marks.Style := smsValue;
+        HorizAxis := aBottomAxis;
+        XValues.DateTime := True;
+      end;
+      while (xCurDate <= FEndDate) do begin
+        Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
+        Filtered := True;
+        First;
+        xGbSum := 0;
+        while not Eof do begin
+          if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
+            xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
+          end;
+          Next;
+        end;
+        xOutSerie.AddXY(xCurDate, xGbSum, GetDescription(xCurDate));
+        if FGroupBy = CGroupByWeek then begin
+          xCurDate := IncWeek(xCurDate, 1);
+        end else if FGroupBy = CGroupByMonth then begin
+          xCurDate := IncMonth(xCurDate, 1);
+        end else begin
+          xCurDate := IncDay(xCurDate, 1);
+        end;
+      end;
+    end;
+    xOperations.Free;
   end;
   with GetChart do begin
     with BottomAxis do begin
@@ -1607,9 +1658,18 @@ begin
       Title.Caption := '[' + GetCurrencySymbol + ']';
       Title.Angle := 90;
     end;
-    AddSeries(xSerie);
+    if xInMovements then begin
+      AddSeries(xInSerie);
+    end;
+    if xOutMovements then begin
+      AddSeries(xOutSerie);
+    end;
+    if xInMovements and xOutMovements then begin
+      xInSerie.Title := 'Przychody';
+      xOutSerie.Title := 'Rozchody';
+      Legend.Visible := True;
+    end;
   end;
-  xOperations.Free;
 end;
 
 function TSumReportChart.PrepareReportConditions: Boolean;
@@ -2554,18 +2614,20 @@ begin
     Add('<tr class="base">');
     Add('<td class="headcenter" width="20%">Kwota</td>');
     Add('<td class="headcenter" width="10%">Oprocentowanie</td>');
-    Add('<td class="headcenter" width="20%">Iloœæ sp³at</td>');
-    Add('<td class="headcenter" width="20%">Rodzaj sp³at</td>');
-    Add('<td class="headcenter" width="20%">Czêstotliwoœæ</td>');
+    Add('<td class="headcenter" width="15%">Prowizje i op³aty</td>');
+    Add('<td class="headcenter" width="15%">Iloœæ sp³at</td>');
+    Add('<td class="headcenter" width="15%">Rodzaj sp³at</td>');
+    Add('<td class="headcenter" width="15%">Czêstotliwoœæ</td>');
     Add('<td class="headcenter" width="10%">Rrso</td>');
     Add('</tr></table><hr>');
     Add('<table class="base" colspan="6">');
     Add('<tr class="base">');
     Add('<td class="center" width="20%">' + CurrencyToString(xL.totalCash) + '</td>');
     Add('<td class="center" width="10%">' + CurrencyToString(xL.taxAmount, False, 4) + '%</td>');
-    Add('<td class="center" width="20%">' + IntToStr(xL.periods) + '</td>');
-    Add('<td class="center" width="20%">' + xPaymentType + '</td>');
-    Add('<td class="center" width="20%">' + xPaymentPeriod + '</td>');
+    Add('<td class="center" width="15%">' + CurrencyToString(xL.otherTaxes) + '</td>');
+    Add('<td class="center" width="15%">' + IntToStr(xL.periods) + '</td>');
+    Add('<td class="center" width="15%">' + xPaymentType + '</td>');
+    Add('<td class="center" width="15%">' + xPaymentPeriod + '</td>');
     Add('<td class="center" width="10%">' + CurrencyToString(xL.yearRate, False, 4) + '%</td>');
     Add('</tr>');
     Add('</table>');

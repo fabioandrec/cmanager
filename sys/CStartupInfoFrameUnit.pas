@@ -186,7 +186,7 @@ begin
       FLimitData := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, 'select * from movementLimit where isActive = true');
       for xCount := 0 to FLimitData.Count - 1 do begin
         xLimit := TMovementLimit(FLimitData.Items[xCount]);
-        xAmount := xLimit.currentAmount;
+        xAmount := xLimit.GetCurrentAmount(GWorkDate, False);
         xGroup := Nil;
         if xLimit.IsSurpassed(xAmount) then begin
           if startupInfoSurpassedLimit then begin
@@ -370,9 +370,9 @@ begin
       end else if xData.helperType = shtLimit then begin
         if xData.group = shgLimit then begin
           if TMovementLimit(xData.item).IsSurpassed(xData.sum) then begin
-            CellText := 'Przekroczony';
+            CellText := CLimitSupressedDesc;
           end else begin
-            CellText := 'Poprawny';
+            CellText := CLimitValidDesc;
           end;
         end;
       end;

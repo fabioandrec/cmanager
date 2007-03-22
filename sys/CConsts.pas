@@ -104,6 +104,9 @@ const
   CTransferMovementDescription = 'Transfer';
   CLimitDescription = 'Limit';
 
+  CLimitSupressedDesc = 'Przekroczony';
+  CLimitValidDesc = 'Poprawny';
+
   CPlannedDoneDescription = 'Wykonana';
   CPlannedRejectedDescription = 'Odrzucona';
   CPlannedAcceptedDescription = 'Uznana';

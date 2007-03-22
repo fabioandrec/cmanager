@@ -303,6 +303,7 @@ object CMainForm: TCMainForm
                   end
                   item
                     Action = ActionRandom
+                    Caption = 'W&ype'#322'nij losowo dane'
                   end>
                 Caption = 'N&arz'#281'dzia'
               end>
@@ -359,6 +360,10 @@ object CMainForm: TCMainForm
                 Action = ActionShortcutProfiles
                 Caption = '&Profile'
                 ImageIndex = 9
+              end
+              item
+                Action = ActionShortcutLimits
+                ImageIndex = 10
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -397,6 +402,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionCheckUpdates
+                Caption = 'S&prawd'#378' aktualizacje'
               end
               item
                 Action = ActionAbout

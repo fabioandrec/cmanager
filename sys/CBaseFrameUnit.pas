@@ -127,7 +127,7 @@ end;
 
 function TCBaseFrame.FindNodeId(ANode: PVirtualNode): TDataGid;
 begin
-  Result := TDataObject(GetList.GetNodeData(ANode)^).id;
+  Result := CEmptyDataGid;
 end;
 
 function TCBaseFrame.GetList: TCList;

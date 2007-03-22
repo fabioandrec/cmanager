@@ -14,10 +14,13 @@ type
     FFrame: TCBaseFrame;
     FAdditionalData: TObject;
     FOutData: Pointer;
+    FIsChoice: Boolean;
   public
-    constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil);
-    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil): Boolean;
+    constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True);
+    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True): Boolean;
     destructor Destroy; override;
+  published
+    property IsChoice: Boolean read FIsChoice;
   end;
 
 implementation
@@ -26,11 +29,12 @@ uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts;
 
 {$R *.dfm}
 
-constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil);
+constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True);
 begin
   inherited Create(AOwner);
   FAdditionalData := AAdditionalData;
   FOutData := AOutData;
+  FIsChoice := AIsChoice;
   FFrame := AFrameClass.Create(Self);
   FFrame.Visible := False;
   FFrame.DisableAlign;
@@ -47,19 +51,20 @@ end;
 
 destructor TCFrameForm.Destroy;
 begin
+  FreeAndNil(FFrame);
   if Assigned(FAdditionalData) then begin
     FAdditionalData.Free;
   end;
   inherited Destroy;
 end;
 
-class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil): Boolean;
+class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True): Boolean;
 var xForm: TCFrameForm;
     xNode: PVirtualNode;
     xList: TCList;
 begin
   Result := False;
-  xForm := TCFrameForm.CreateFrame(Application, AFrameClass, AAdditionalData, AOutData, AMultipleCheck);
+  xForm := TCFrameForm.CreateFrame(Nil, AFrameClass, AAdditionalData, AOutData, AMultipleCheck, AIsChoice);
   xList := xForm.FFrame.List;
   if (ADataId <> CEmptyDataGid) and (xList <> Nil) then begin
     xNode := xForm.FFrame.FindNode(ADataId, xList);

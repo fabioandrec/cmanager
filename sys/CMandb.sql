@@ -228,6 +228,12 @@ create view balances as select * from (
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense from baseMovement where movementType = 'T'
  union all
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense from baseMovement where movementType = 'T') as v;
+ 
+create view filters as
+  select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m
+    left outer join accountFilter a on a.idMovementFilter = m.idMovementFilter)
+    left join cashpointFilter c on c.idMovementFilter = m.idMovementFilter)
+    left join productFilter p on p.idMovementFilter = m.idMovementFilter);
 
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);

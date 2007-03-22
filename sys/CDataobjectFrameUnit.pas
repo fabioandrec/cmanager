@@ -65,6 +65,8 @@ type
     function GetStaticFilter: TStringList; virtual;
     procedure ReloadSums; virtual;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
+    function FindNodeId(ANode: PVirtualNode): ShortString; override;
+    function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; override;
   end;
 
 implementation
@@ -181,7 +183,11 @@ begin
   ActionEdit.Enabled := List.FocusedNode <> Nil;
   ActionDelete.Enabled := List.FocusedNode <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := AIsSelectedSomething or (MultipleChecks <> Nil);
+    if TCFrameForm(Owner).IsChoice then begin
+      TCFrameForm(Owner).BitBtnOk.Enabled := AIsSelectedSomething or (MultipleChecks <> Nil);
+    end else begin
+      TCFrameForm(Owner).BitBtnOk.Enabled := True;
+    end;
   end;
 end;
 
@@ -316,6 +322,27 @@ end;
 function TCDataobjectFrame.GetDataobjectParent(ADataobject: TDataObject): TCListDataElement;
 begin
   Result := List.RootElement;
+end;
+
+function TCDataobjectFrame.FindNodeId(ANode: PVirtualNode): ShortString;
+begin
+  Result := List.GetTreeElement(ANode).Data.GetElementId;
+end;
+
+function TCDataobjectFrame.FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode;
+var xCurNode: PVirtualNode;
+    xData: TCListDataElement;
+begin
+  Result := Nil;
+  xCurNode := AList.GetFirst;
+  while (Result = Nil) and (xCurNode <> Nil) do begin
+    xData := TCDataList(AList).GetTreeElement(xCurNode);
+    if xData.Data.GetElementId = ADataId then begin
+      Result := xCurNode;
+    end else begin
+      xCurNode := AList.GetNext(xCurNode);
+    end;
+  end;
 end;
 
 end.

@@ -35,6 +35,7 @@ type
     FtotalCash: Currency;
     FtaxAmount: Currency;
     FfirstDay: TDateTime;
+    FotherTaxes: Currency;
     function GetItems(AIndex: Integer): TLoanRepayment;
     procedure SetItems(AIndex: Integer; const Value: TLoanRepayment);
     function GetSumPrincipal: Currency;
@@ -57,6 +58,7 @@ type
     property sumTax: Currency read GetSumTax;
     property sumPayments: Currency read GetSumPayments;
     property yearRate: Currency read GetYearRate;
+    property otherTaxes: Currency read FotherTaxes write FotherTaxes;
   end;
 
 implementation
@@ -194,6 +196,7 @@ function TLoan.GetYearRate: Currency;
 var xArr: array of Double;
     xCount: Integer;
     xPeriods: Integer;
+    xOtherRate: Currency;
 begin
   SetLength(xArr, Fperiods + 1);
   xArr[0] := (-1) * FtotalCash;
@@ -205,6 +208,10 @@ begin
   Result := InternalRateOfReturn(taxAmount/100, xArr);
   xPeriods := IfThen(FpaymentPeriod = lppMonthly, 12, 52);
   Result := (Power(1 + Result, xPeriods) - 1) * 100;
+  if FotherTaxes <> 0 then begin
+    xOtherRate := (FotherTaxes * 100 / FtotalCash) / (Fperiods / xPeriods);
+    Result := Result + xOtherRate;
+  end;
 end;
 
 end.
