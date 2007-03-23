@@ -331,15 +331,15 @@ begin
   end;
   if Result then begin
     if (xI = 0) or (xI = 1) then begin
-      Result := CheckSurpassedLimits(CDateTime.Value,
+      Result := CheckSurpassedLimits(IfThen(xI = 0, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticInoutOnceAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticInoutOnceCashpoint.DataId),
-                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, IfThen(xI = 0, (-1) * CCurrEditInoutOnce.Value, CCurrEditInoutOnce.Value)));
+                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, CCurrEditInoutOnce.Value));
     end else if (xI = 3) or (xI = 4) then begin
-      Result := CheckSurpassedLimits(CDateTime.Value,
+      Result := CheckSurpassedLimits(IfThen(xI = 3, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticInoutCyclicAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticInoutCyclicCategory.DataId),
-                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, IfThen(xI = 3, (-1) * CCurrEditInoutCyclic.Value, CCurrEditInoutCyclic.Value)));
+                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, CCurrEditInoutCyclic.Value));
     end;
   end;
 end;

@@ -67,7 +67,7 @@ inherited CSurpassedForm: TCSurpassedForm
         Columns = <
           item
             Position = 0
-            Width = 300
+            Width = 200
             WideText = 'Nazwa'
           end
           item
@@ -77,7 +77,12 @@ inherited CSurpassedForm: TCSurpassedForm
           end
           item
             Position = 2
-            Width = 189
+            Width = 150
+            WideText = 'Rodzaj'
+          end
+          item
+            Position = 3
+            Width = 139
             WideText = 'Status'
           end>
         WideDefaultText = ''

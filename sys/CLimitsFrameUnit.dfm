@@ -1,11 +1,22 @@
 inherited CLimitsFrame: TCLimitsFrame
   inherited List: TCDataList
     Header.MainColumn = 0
+    Images = CImageLists.DoneImageList16x16
     Columns = <
       item
         Position = 0
-        Width = 443
+        Width = 200
         WideText = 'Nazwa'
+      end
+      item
+        Position = 1
+        Width = 143
+        WideText = 'Aktywno'#347#263
+      end
+      item
+        Position = 2
+        Width = 100
+        WideText = 'Rodzaj'
       end>
     WideDefaultText = ''
   end

@@ -28,6 +28,8 @@ type
     Label8: TLabel;
     Label10: TLabel;
     CCurrEditBound: TCCurrEdit;
+    Label9: TLabel;
+    ComboBoxSum: TComboBox;
     procedure ComboBoxDaysChange(Sender: TObject);
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
@@ -83,6 +85,14 @@ begin
     idFilter := CStaticFilter.DataId;
     boundaryAmount := CCurrEditBound.Value;
     boundaryDays := CIntEditDays.Value;
+    xI := ComboBoxSum.ItemIndex;
+    if xI = 0 then begin
+      sumType := CLimitSumtypeOut;
+    end else if xI = 1 then begin
+      sumType := CLimitSumtypeIn;
+    end else begin
+      sumType := CLimitSumtypeBalance;
+    end;
     xI := ComboBoxDays.ItemIndex;
     if xI = 1 then begin
       boundaryType := CLimitBoundaryTypeWeek;
@@ -129,6 +139,14 @@ begin
       CStaticFilter.Caption := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, idFilter, False)).name;
       GDataProvider.RollbackTransaction;
     end;
+    if sumType = CLimitSumtypeOut then begin
+      xI := 0;
+    end else if sumType = CLimitSumtypeIn then begin
+      xI := 1;
+    end else begin
+      xI := 2;
+    end;
+    ComboBoxSum.ItemIndex := xI;
     if boundaryType = CLimitBoundaryTypeWeek then begin
       xI := 1;
     end else if boundaryType = CLimitBoundaryTypeMonth then begin

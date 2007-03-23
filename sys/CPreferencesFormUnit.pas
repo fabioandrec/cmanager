@@ -65,6 +65,14 @@ type
     CheckBoxCheckForupdates: TCheckBox;
     CheckBoxSurpassed: TCheckBox;
     CheckBoxValid: TCheckBox;
+    GroupBox5: TGroupBox;
+    CheckBoxMon: TCheckBox;
+    CheckBoxFri: TCheckBox;
+    CheckBoxTue: TCheckBox;
+    CheckBoxSat: TCheckBox;
+    CheckBoxWed: TCheckBox;
+    CheckBoxSun: TCheckBox;
+    CheckBoxThu: TCheckBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -75,7 +83,10 @@ type
     procedure Action5Execute(Sender: TObject);
     procedure Action6Execute(Sender: TObject);
     procedure Action7Execute(Sender: TObject);
+    procedure CheckBoxSurpassedClick(Sender: TObject);
+    procedure CheckBoxValidClick(Sender: TObject);
   private
+    FPrevWorkDays: String;
     FActiveAction: TAction;
     FViewPrefs: TPrefList;
     FBasePrefs: TBasePref;
@@ -85,6 +96,7 @@ type
   protected
     procedure FillForm; override;
     procedure ReadValues; override;
+    function CanAccept: Boolean; override;
   public
     function ShowPreferences(ATab: Integer = CPreferencesFirstTab): Boolean;
     property ActiveAction: TAction read FActiveAction write SetActiveAction;
@@ -96,7 +108,7 @@ implementation
 
 uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CMovementFrameUnit, CBaseFormUnit, CBaseFrameUnit, CDoneFrameUnit,
-  CPlannedFrameUnit, CStartupInfoFrameUnit, Registry;
+  CPlannedFrameUnit, CStartupInfoFrameUnit, Registry, CInfoFormUnit;
 
 {$R *.dfm}
 
@@ -112,6 +124,9 @@ begin
   if Result then begin
     GViewsPreferences.Clone(FViewPrefs);
     GBasePreferences.Clone(FBasePrefs);
+    if FPrevWorkDays <> FBasePrefs.workDays then begin
+      SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+    end;
     Application.MainForm.Perform(WM_PREFERENCESCHANGED, 0, 0);
   end;
 end;
@@ -196,6 +211,14 @@ begin
     CheckBoxCheckForupdates.Checked := startupCheckUpdates;
     CheckBoxSurpassed.Checked := startupInfoSurpassedLimit;
     CheckBoxValid.Checked := startupInfoValidLimits;
+    CheckBoxMon.Checked := workDays[1] = '+';
+    CheckBoxTue.Checked := workDays[2] = '+';
+    CheckBoxWed.Checked := workDays[3] = '+';
+    CheckBoxThu.Checked := workDays[4] = '+';
+    CheckBoxFri.Checked := workDays[5] = '+';
+    CheckBoxSat.Checked := workDays[6] = '+';
+    CheckBoxSun.Checked := workDays[7] = '+';
+    FPrevWorkDays := workDays;
   end;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
@@ -228,6 +251,13 @@ begin
     startupCheckUpdates := CheckBoxCheckForupdates.Checked;
     startupInfoSurpassedLimit := CheckBoxSurpassed.Checked;
     startupInfoValidLimits := CheckBoxValid.Checked;
+    workDays := ifThen(CheckBoxMon.Checked, '+', '-');
+    workDays := workDays + ifThen(CheckBoxTue.Checked, '+', '-');
+    workDays := workDays + ifThen(CheckBoxWed.Checked, '+', '-');
+    workDays := workDays + ifThen(CheckBoxThu.Checked, '+', '-');
+    workDays := workDays + ifThen(CheckBoxFri.Checked, '+', '-');
+    workDays := workDays + ifThen(CheckBoxSat.Checked, '+', '-');
+    workDays := workDays + ifThen(CheckBoxSun.Checked, '+', '-');
     xReg := TRegistry.Create;
     try
       xReg.RootKey := HKEY_CURRENT_USER;
@@ -259,7 +289,9 @@ begin
   CheckBoxAutoOut.Enabled := ComboBoxDays.Enabled;
   CheckBoxAutoOldIn.Enabled := ComboBoxDays.Enabled;
   CheckBoxAutoOldOut.Enabled := ComboBoxDays.Enabled;
-  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled;
+  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
+                                CheckBoxSurpassed.Checked or
+                                CheckBoxValid.Checked;
   ComboBoxDaysChange(Nil);
 end;
 
@@ -301,6 +333,32 @@ begin
     SendMessageToFrames(TCStartupInfoFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
+end;
+
+procedure TCPreferencesForm.CheckBoxSurpassedClick(Sender: TObject);
+begin
+  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
+                                CheckBoxSurpassed.Checked or
+                                CheckBoxValid.Checked;
+end;
+
+procedure TCPreferencesForm.CheckBoxValidClick(Sender: TObject);
+begin
+  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
+                                CheckBoxSurpassed.Checked or
+                                CheckBoxValid.Checked;
+end;
+
+function TCPreferencesForm.CanAccept: Boolean;
+begin
+  Result := True;
+  if not (CheckBoxMon.Checked or CheckBoxTue.Checked or
+          CheckBoxWed.Checked or CheckBoxThu.Checked or
+          CheckBoxFri.Checked or CheckBoxSat.Checked or CheckBoxSun.Checked) then begin
+    SetActiveAction(Action1);
+    ShowInfo(itError, 'Nie okreœlono ¿adnego pracuj¹cego dnia, ustaw przynajmniej jeden', '');
+    Result := False;
+  end;
 end;
 
 end.

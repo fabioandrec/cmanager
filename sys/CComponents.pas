@@ -274,7 +274,7 @@ type
     function FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
     procedure DeleteDataElement(AId: String; AElementType: String = '');
     procedure RefreshDataElement(AId: String; AElementType: String = '');
-    procedure AppendDataElement(ANodeData: TCListDataElement);
+    function AppendDataElement(ANodeData: TCListDataElement): PVirtualNode;
     property Items[AIndex: Integer]: TCListDataElement read GetItems write SetItems;
     property ParentList: TCDataList read FParentList write FParentList;
     property Data: TCDataListElementObject read FData write FData;
@@ -1423,16 +1423,15 @@ begin
   end;
 end;
 
-procedure TCListDataElement.AppendDataElement(ANodeData: TCListDataElement);
-var xNode: PVirtualNode;
+function TCListDataElement.AppendDataElement(ANodeData: TCListDataElement): PVirtualNode;
 begin
   FParentList.BeginUpdate;
-  xNode := FParentList.AddChild(Node, ANodeData);
+  Result := FParentList.AddChild(Node, ANodeData);
   Add(ANodeData);
-  TCListDataElement(FParentList.GetNodeData(xNode)^).Node := xNode;
-  FParentList.FocusedNode := xNode;
-  FParentList.Selected[xNode] := True;
-  FParentList.Sort(xNode, FParentList.Header.SortColumn, FParentList.Header.SortDirection);
+  TCListDataElement(FParentList.GetNodeData(Result)^).Node := Result;
+  FParentList.FocusedNode := Result;
+  FParentList.Selected[Result] := True;
+  FParentList.Sort(Result, FParentList.Header.SortColumn, FParentList.Header.SortDirection);
   FParentList.EndUpdate;
 end;
 

@@ -98,11 +98,19 @@ const
   CLimitBoundaryCondLessEqual = '<=';
   CLimitBoundaryCondGreaterEqual = '>=';
 
+  CLimitSumtypeOut = 'O';
+  CLimitSumtypeIn = 'I';
+  CLimitSumtypeBalance = 'B';
+
+  CLimitSumtypeOutDescription = 'Rozchody';
+  CLimitSumtypeInDescription = 'Przychody';
+  CLimitSumtypeBalanceDescription = 'Saldo';
+
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';
   CTransferMovementDescription = 'Transfer';
-  CLimitDescription = 'Limit';
 
   CLimitSupressedDesc = 'Przekroczony';
   CLimitValidDesc = 'Poprawny';

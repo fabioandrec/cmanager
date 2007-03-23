@@ -26,6 +26,7 @@ type
     SurpassedList: TCDataList;
     procedure SurpassedListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
   private
+    FMovementType: TBaseEnumeration;
     FDate: TDateTime;
     FDataobjects: TDataObjectList;
     FAccountIds: TDataGids;
@@ -35,7 +36,7 @@ type
     destructor Destroy; override;
   end;
 
-function CheckSurpassedLimits(ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
+function CheckSurpassedLimits(AMovementType: TBaseEnumeration; ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
 
 implementation
 
@@ -43,7 +44,7 @@ uses CConsts;
 
 {$R *.dfm}
 
-function CheckSurpassedLimits(ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
+function CheckSurpassedLimits(AMovementType: TBaseEnumeration; ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
 var xForm: TCSurpassedForm;
 begin
   xForm := TCSurpassedForm.Create(Application);
@@ -51,6 +52,7 @@ begin
   xForm.FAccountIds := AAccountIds;
   xForm.FCategorySums := ACategorySums;
   xForm.FCashpointIds := ACashpointIds;
+  xForm.FMovementType := AMovementType;
   xForm.SurpassedList.ReloadTree;
   if xForm.SurpassedList.RootNodeCount <> 0 then begin
     Result := xForm.ShowConfig(coEdit);
@@ -136,7 +138,25 @@ begin
       xCash := FCategorySums.GetSum(xFilterCats);
       xFilterCats.Free;
     end;
-    xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+    if xLimit.sumType = CLimitSumtypeOut then begin
+      if FMovementType = COutMovement then begin
+        xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+      end else begin
+        xAmount := 0;
+      end;
+    end else if xLimit.sumType = CLimitSumtypeIn then begin
+      if FMovementType = CInMovement then begin
+        xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+      end else begin
+        xAmount := 0;
+      end;
+    end else begin
+      if FMovementType = CInMovement then begin
+        xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+      end else begin
+        xAmount := xLimit.GetCurrentAmount(FDate, False) - xCash;
+      end;
+    end;
     if xLimit.IsSurpassed(xAmount) then begin
       xElement := TCListDataElement.Create(SurpassedList, TSurpassedLimit.Create(xLimit, xAmount), True);
       ARootElement.Add(xElement);
@@ -155,6 +175,14 @@ function TSurpassedLimit.GetColumnImage(AColumnIndex: Integer): Integer;
 begin
   Result := -1;
   if AColumnIndex = 2 then begin
+    if Flimit.sumType = CLimitSumtypeOut then begin
+      Result := 1;
+    end else if Flimit.sumType = CLimitSumtypeIn then begin
+      Result := 0;
+    end else begin
+      Result := 7;
+    end;
+  end else if AColumnIndex = 3 then begin
     if Flimit.IsSurpassed(Famount) then begin
       Result := 4;
     end else begin
@@ -169,6 +197,14 @@ begin
     Result := Flimit.name;
   end else if AColumnIndex = 1 then begin
     Result := CurrencyToString(Famount);
+  end else if AColumnIndex = 2 then begin
+    if Flimit.sumType = CLimitSumtypeOut then begin
+      Result := CLimitSumtypeOutDescription;
+    end else if Flimit.sumType = CLimitSumtypeOut then begin
+      Result := CLimitSumtypeInDescription;
+    end else begin
+      Result := CLimitSumtypeBalanceDescription;
+    end;
   end else begin
     if Flimit.IsSurpassed(Famount) then begin
       Result := CLimitSupressedDesc;

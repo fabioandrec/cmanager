@@ -189,9 +189,11 @@ create table movementLimit (
   boundaryType varchar(1) not null,
   boundarycondition varchar(2) not null,
   boundaryDays int,  
+  sumType varchar(1) not null,
   primary key (idMovementLimit),
   constraint ck_boundaryTypelimit check (boundaryType in ('T', 'W', 'M', 'Q', 'H', 'Y', 'D')),  
   constraint ck_boundaryConditionlimit check (boundarycondition in ('=', '<', '>', '<=', '>=')),  
+  constraint ck_sumTypelimit check (sumType in ('I', 'O', 'B')),  
   constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter)
 );
 

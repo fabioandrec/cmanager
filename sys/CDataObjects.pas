@@ -341,6 +341,7 @@ type
     FboundaryType: TBaseEnumeration;
     FboundaryCondition: TBaseName;
     FboundaryDays: Integer;
+    FsumType: TBaseEnumeration;
     FcurrenAmount: Currency;
     FisCalculated: Boolean;
     procedure SetboundaryAmount(const Value: Currency);
@@ -352,6 +353,7 @@ type
     procedure Setname(const Value: TBaseName);
     procedure SetboundaryCondition(const Value: TBaseName);
     procedure GetFilterDates(ADateTime: TDateTime; var ADateFrom, ADateTo: TDateTime);
+    procedure SetsumType(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -361,6 +363,7 @@ type
     function IsSurpassed(ACurrentValue: Currency): Boolean;
     function GetCurrentAmount(ADate: TDateTime; AMustRecalculate: Boolean): Currency;
     constructor Create(AStatic: Boolean); override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -370,6 +373,7 @@ type
     property boundaryType: TBaseEnumeration read FboundaryType write SetboundaryType;
     property boundaryCondition: TBaseName read FboundaryCondition write SetboundaryCondition;
     property boundaryDays: Integer read FboundaryDays write SetboundaryDays;
+    property sumType: TBaseEnumeration read FsumType write SetsumType;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -1670,26 +1674,71 @@ begin
     FboundaryCondition := FieldByName('boundaryCondition').AsString;
     FboundaryDays := FieldByName('boundaryDays').AsInteger;
     FisActive := FieldByName('isActive').AsBoolean;
+    FsumType := FieldByName('sumType').AsString;
+  end;
+end;
+
+function TMovementLimit.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := -1;
+  if AColumnIndex = 2 then begin
+    if FsumType = CLimitSumtypeOut then begin
+      Result := 1;
+    end else if FsumType = CLimitSumtypeIn then begin
+      Result := 0;
+    end else begin
+      Result := 7;
+    end;
   end;
 end;
 
 function TMovementLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
-  Result := Fname;
+  if AColumnIndex = 2 then begin
+    if FsumType = CLimitSumtypeOut then begin
+      Result := CLimitSumtypeOutDescription;
+    end else if FsumType = CLimitSumtypeIn then begin
+      Result := CLimitSumtypeInDescription;
+    end else begin
+      Result := CLimitSumtypeBalanceDescription;
+    end;
+  end else if AColumnIndex = 1 then begin
+    if FisActive then begin
+      Result := 'Aktywny';
+    end else begin
+      Result := 'Wy³¹czony';
+    end;
+  end else begin
+    Result := Fname;
+  end;
 end;
 
 function TMovementLimit.GetCurrentAmount(ADate: TDateTime; AMustRecalculate: Boolean): Currency;
 var xSd, xEd: TDateTime;
     xSql: String;
+    xQ: TADOQuery;
 begin
   if (not FisCalculated) or AMustRecalculate then begin
+    Result := 0;
     GetFilterDates(ADate, xSd, xEd);
-    xSql := Format('select sum(cash) from transactions where movementType <> ''%s'' and regDate between %s and %s %s',
+    xSql := Format('select sum(income) as income, sum(expense) as expense from balances where movementType <> ''%s'' and regDate between %s and %s %s',
             [CTransferMovement,
              DatetimeToDatabase(xSd, False),
              DatetimeToDatabase(xEd, False),
              TMovementFilter.GetFilterCondition(idFilter, True)]);
-    Result := GDataProvider.GetSqlCurrency(xSql, 0);
+    xQ := GDataProvider.OpenSql(xSql);
+    if xQ <> Nil then begin
+      if not xQ.IsEmpty then begin
+        if FsumType = CLimitSumtypeOut then begin
+          Result := xQ.FieldByName('expense').AsCurrency;
+        end else if FsumType = CLimitSumtypeIn then begin
+          Result := xQ.FieldByName('income').AsCurrency;
+        end else begin
+          Result := xQ.FieldByName('income').AsCurrency - xQ.FieldByName('expense').AsCurrency;
+        end;
+      end;
+      xQ.Free;
+    end;
     FcurrenAmount := Result;
   end else begin
     Result := FcurrenAmount;
@@ -1813,6 +1862,14 @@ begin
   end;
 end;
 
+procedure TMovementLimit.SetsumType(const Value: TBaseEnumeration);
+begin
+  if FsumType <> Value then begin
+    FsumType := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TMovementLimit.UpdateFieldList;
 begin
   inherited UpdateFieldList;
@@ -1825,6 +1882,7 @@ begin
     AddField('boundaryType', FboundaryType, True, 'movementLimit');
     AddField('boundaryCondition', FboundaryCondition, True, 'movementLimit');
     AddField('boundaryDays', IntToStr(FboundaryDays), False, 'movementLimit');
+    AddField('sumType', FsumType, True, 'movementLimit');
   end;
 end;
 

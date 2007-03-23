@@ -346,7 +346,13 @@ begin
           CellText := COutMovementDescription;
         end;
       end else if xData.helperType = shtLimit then begin
-        CellText := CLimitDescription;
+        if TMovementLimit(xData.item).sumType = CLimitSumtypeOut then begin
+          CellText := CLimitSumtypeOutDescription;
+        end else if TMovementLimit(xData.item).sumType = CLimitSumtypeOut then begin
+          CellText := CLimitSumtypeInDescription;
+        end else begin
+          CellText := CLimitSumtypeBalanceDescription;
+        end;
       end;
     end else if Column = 3 then begin
       if xData.helperType = shtPlannedItem then begin
@@ -470,7 +476,13 @@ begin
         ImageIndex := 1;
       end;
     end else if xData.helperType = shtLimit then begin
-      ImageIndex := 7;
+      if TMovementLimit(xData.item).sumType = CLimitSumtypeOut then begin
+        ImageIndex := 1;
+      end else if TMovementLimit(xData.item).sumType = CLimitSumtypeIn then begin
+        ImageIndex := 0;
+      end else begin
+        ImageIndex := 7;
+      end;
     end;
   end else if Column = 3 then begin
     if xData.helperType = shtPlannedItem then begin

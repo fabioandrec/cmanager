@@ -138,12 +138,17 @@ end;
 procedure TCDataobjectFrame.MessageMovementAdded(AId: TDataGid; AOptions: Integer);
 var xDataobject: TDataObject;
     xElement: TCListDataElement;
+    xNode: PVirtualNode;
 begin
   xDataobject := GetDataobjectClass(AOptions).LoadObject(GetDataobjectProxy(AOptions), AId, True);
   if IsValidFilteredObject(xDataobject) then begin
     xElement := TCListDataElement.Create(List, xDataobject);
     Dataobjects.Add(xDataobject);
-    GetDataobjectParent(xDataobject).AppendDataElement(xElement, );
+    xNode := GetDataobjectParent(xDataobject).AppendDataElement(xElement);
+    if MultipleChecks <> Nil then begin
+      xNode.CheckType := ctCheckBox;
+      xNode.CheckState := csCheckedNormal;
+    end;
   end else begin
     xDataobject.Free;
   end;

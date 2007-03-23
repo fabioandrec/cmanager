@@ -2,16 +2,18 @@ inherited CPreferencesForm: TCPreferencesForm
   Left = 288
   Top = 171
   Caption = 'Preferencje'
+  ClientHeight = 470
   ClientWidth = 604
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 604
+    Height = 429
     object PanelMain: TPanel
       Left = 0
       Top = 0
       Width = 604
-      Height = 398
+      Height = 429
       Align = alClient
       BevelOuter = bvNone
       Caption = 'PanelMain'
@@ -20,7 +22,7 @@ inherited CPreferencesForm: TCPreferencesForm
         Left = 129
         Top = 0
         Width = 475
-        Height = 398
+        Height = 429
         Align = alClient
         BevelOuter = bvLowered
         TabOrder = 0
@@ -45,8 +47,8 @@ inherited CPreferencesForm: TCPreferencesForm
           Left = 1
           Top = 22
           Width = 473
-          Height = 375
-          ActivePage = TabSheetAutostart
+          Height = 406
+          ActivePage = TabSheetBase
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -57,7 +59,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 449
-              Height = 153
+              Height = 145
               Caption = ' Przy starcie CManager-a  '
               TabOrder = 0
               object RadioButtonLast: TRadioButton
@@ -113,6 +115,70 @@ inherited CPreferencesForm: TCPreferencesForm
                 Height = 17
                 Caption = 'Sprawdzaj dost'#281'pne aktualizacje'
                 TabOrder = 4
+              end
+            end
+            object GroupBox5: TGroupBox
+              Left = 8
+              Top = 168
+              Width = 121
+              Height = 217
+              Caption = ' Dni pracuj'#261'ce '
+              TabOrder = 1
+              object CheckBoxMon: TCheckBox
+                Left = 16
+                Top = 32
+                Width = 97
+                Height = 17
+                Caption = 'Poniedzia'#322'ek'
+                TabOrder = 0
+              end
+              object CheckBoxFri: TCheckBox
+                Left = 16
+                Top = 128
+                Width = 97
+                Height = 17
+                Caption = 'Pi'#261'tek'
+                TabOrder = 4
+              end
+              object CheckBoxTue: TCheckBox
+                Left = 16
+                Top = 56
+                Width = 97
+                Height = 17
+                Caption = 'Wtorek'
+                TabOrder = 1
+              end
+              object CheckBoxSat: TCheckBox
+                Left = 16
+                Top = 152
+                Width = 97
+                Height = 17
+                Caption = 'Sobota'
+                TabOrder = 5
+              end
+              object CheckBoxWed: TCheckBox
+                Left = 16
+                Top = 80
+                Width = 97
+                Height = 17
+                Caption = #346'roda'
+                TabOrder = 2
+              end
+              object CheckBoxSun: TCheckBox
+                Left = 16
+                Top = 176
+                Width = 97
+                Height = 17
+                Caption = 'Niedziela'
+                TabOrder = 6
+              end
+              object CheckBoxThu: TCheckBox
+                Left = 16
+                Top = 104
+                Width = 97
+                Height = 17
+                Caption = 'Czwartek'
+                TabOrder = 3
               end
             end
           end
@@ -321,6 +387,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Height = 17
                 Caption = 'Powiadamiaj o przekroczonych limitach'
                 TabOrder = 7
+                OnClick = CheckBoxSurpassedClick
               end
               object CheckBoxValid: TCheckBox
                 Left = 16
@@ -329,6 +396,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Height = 17
                 Caption = 'Powiadamiaj o poprawnych limitach'
                 TabOrder = 8
+                OnClick = CheckBoxValidClick
               end
             end
           end
@@ -338,7 +406,7 @@ inherited CPreferencesForm: TCPreferencesForm
         Left = 0
         Top = 0
         Width = 129
-        Height = 398
+        Height = 429
         Align = alLeft
         BevelOuter = bvLowered
         Color = clWindow
@@ -399,6 +467,7 @@ inherited CPreferencesForm: TCPreferencesForm
     end
   end
   inherited PanelButtons: TPanel
+    Top = 429
     Width = 604
     inherited BitBtnOk: TBitBtn
       Left = 427

@@ -117,6 +117,7 @@ type
     FstartupCheckUpdates: Boolean;
     FstartupInfoSurpassedLimit: Boolean;
     FstartupInfoValidLimits: Boolean;
+    FworkDays: String;
   public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
@@ -139,6 +140,7 @@ type
     property startupCheckUpdates: Boolean read FstartupCheckUpdates write FstartupCheckUpdates;
     property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
     property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
+    property workDays: String read FworkDays write FworkDays;
   end;
 
   TDescPatterns = class(TStringList)
@@ -158,9 +160,12 @@ var GViewsPreferences: TPrefList;
     GBasePreferences: TBasePref;
     GDescPatterns: TDescPatterns;
 
+function GetWorkDay(ADate: TDateTime): TDateTime;
+
 implementation
 
-uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml, SysUtils;
+uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml, SysUtils,
+  DateUtils;
 
 procedure SaveFontToXml(ANode: IXMLDOMNode; AFont: TFont);
 begin
@@ -442,6 +447,7 @@ begin
   FstartupCheckUpdates := TBasePref(APrefItem).startupCheckUpdates;
   FstartupInfoSurpassedLimit := TBasePref(APrefItem).startupInfoSurpassedLimit;
   FstartupInfoValidLimits := TBasePref(APrefItem).startupInfoValidLimits;
+  FworkDays := TBasePref(APrefItem).workDays;
 end;
 
 function TBasePref.GetNodeName: String;
@@ -468,6 +474,10 @@ begin
   FstartupCheckUpdates := GetXmlAttribute('startupCheckUpdates', ANode, False);
   FstartupInfoSurpassedLimit := GetXmlAttribute('startupInfoSurpassedLimit', ANode, True);
   FstartupInfoValidLimits := GetXmlAttribute('startupInfoValidLimits', ANode, False);
+  FworkDays := GetXmlAttribute('workDays', ANode, '+++++--');
+  if Length(FworkDays) <> 7 then begin
+    FworkDays := '+++++--';
+  end;
 end;
 
 procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
@@ -489,6 +499,7 @@ begin
   SetXmlAttribute('startupCheckUpdates', ANode, FstartupCheckUpdates);
   SetXmlAttribute('startupInfoSurpassedLimit', ANode, FstartupInfoSurpassedLimit);
   SetXmlAttribute('startupInfoValidLimits', ANode, FstartupInfoValidLimits);
+  SetXmlAttribute('workDays', ANode, FworkDays);
 end;
 
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
@@ -616,6 +627,17 @@ begin
   SetXmlAttribute('lastBackup', ANode, FormatDateTime('ddmmyyyyhhnnss', FlastBackup));
 end;
 
+function GetWorkDay(ADate: TDateTime): TDateTime;
+var xDay: Integer;
+begin
+  xDay := DayOfTheWeek(ADate);
+  if GBasePreferences.workDays[xDay] = '+' then begin
+    Result := ADate;
+  end else begin
+    Result := GetWorkDay(IncDay(ADate));
+  end;
+end;
+
 initialization
   GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
@@ -673,6 +695,7 @@ initialization
     startupInfoSurpassedLimit := True;
     startupInfoValidLimits := False;
     startupCheckUpdates := False;
+    workDays := '+++++--';
   end;
 finalization
   GViewsPreferences.Free;

@@ -2,13 +2,13 @@ inherited CLimitForm: TCLimitForm
   Left = 217
   Top = 128
   Caption = 'Limit'
-  ClientHeight = 401
+  ClientHeight = 436
   ClientWidth = 533
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 533
-    Height = 360
+    Height = 395
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
@@ -80,28 +80,28 @@ inherited CLimitForm: TCLimitForm
       Left = 16
       Top = 208
       Width = 497
-      Height = 145
+      Height = 181
       Caption = ' Definicja limitu '
       TabOrder = 1
       object Label3: TLabel
-        Left = 22
-        Top = 36
-        Width = 98
+        Left = 23
+        Top = 68
+        Width = 89
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Je'#380'eli suma w/g filtru'
+        Caption = 'z operacji w/g filtru'
       end
       object Label6: TLabel
-        Left = 20
-        Top = 72
-        Width = 100
+        Left = 52
+        Top = 104
+        Width = 60
         Height = 13
         Alignment = taRightJustify
-        Caption = 'operacji wykonanych'
+        Caption = 'wykonanych'
       end
       object Label4: TLabel
         Left = 305
-        Top = 72
+        Top = 104
         Width = 39
         Height = 13
         Alignment = taRightJustify
@@ -109,14 +109,14 @@ inherited CLimitForm: TCLimitForm
       end
       object Label5: TLabel
         Left = 395
-        Top = 72
+        Top = 104
         Width = 78
         Height = 13
         Caption = '(w'#322#261'cznie z dzi'#347')'
       end
       object Label8: TLabel
-        Left = 104
-        Top = 108
+        Left = 96
+        Top = 140
         Width = 16
         Height = 13
         Alignment = taRightJustify
@@ -124,16 +124,24 @@ inherited CLimitForm: TCLimitForm
       end
       object Label10: TLabel
         Left = 303
-        Top = 108
+        Top = 140
         Width = 43
         Height = 13
         Alignment = taRightJustify
         Caption = 'od kwoty'
       end
-      object CStaticFilter: TCStatic
-        Left = 128
+      object Label9: TLabel
+        Left = 17
         Top = 33
-        Width = 345
+        Width = 94
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Przekroczono, je'#380'eli'
+      end
+      object CStaticFilter: TCStatic
+        Left = 120
+        Top = 65
+        Width = 353
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -141,7 +149,7 @@ inherited CLimitForm: TCLimitForm
         Caption = '<wszystkie operacje>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 0
+        TabOrder = 1
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wszystkie operacje>'
@@ -149,8 +157,8 @@ inherited CLimitForm: TCLimitForm
         HotTrack = True
       end
       object ComboBoxDays: TComboBox
-        Left = 128
-        Top = 68
+        Left = 120
+        Top = 100
         Width = 161
         Height = 21
         BevelInner = bvNone
@@ -158,7 +166,7 @@ inherited CLimitForm: TCLimitForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 1
+        TabOrder = 2
         Text = 'Dzi'#347
         OnChange = ComboBoxDaysChange
         Items.Strings = (
@@ -172,17 +180,17 @@ inherited CLimitForm: TCLimitForm
       end
       object CIntEditDays: TCIntEdit
         Left = 352
-        Top = 68
+        Top = 100
         Width = 33
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
-        TabOrder = 2
+        TabOrder = 3
         Text = '1'
       end
       object ComboBoxCondition: TComboBox
-        Left = 128
-        Top = 104
+        Left = 120
+        Top = 136
         Width = 161
         Height = 21
         BevelInner = bvNone
@@ -190,7 +198,7 @@ inherited CLimitForm: TCLimitForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 3
+        TabOrder = 4
         Text = 'wieksza'
         OnChange = ComboBoxDaysChange
         Items.Strings = (
@@ -202,20 +210,38 @@ inherited CLimitForm: TCLimitForm
       end
       object CCurrEditBound: TCCurrEdit
         Left = 352
-        Top = 104
+        Top = 136
         Width = 121
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 4
+        TabOrder = 5
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
       end
+      object ComboBoxSum: TComboBox
+        Left = 119
+        Top = 29
+        Width = 354
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 0
+        Text = 'Suma rozchod'#243'w'
+        OnChange = ComboBoxDaysChange
+        Items.Strings = (
+          'Suma rozchod'#243'w'
+          'Suma przychod'#243'w'
+          'Saldo')
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 360
+    Top = 395
     Width = 533
     inherited BitBtnOk: TBitBtn
       Left = 356
