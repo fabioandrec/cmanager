@@ -211,6 +211,7 @@ begin
     FSchedule.endDate := endDate;
     FSchedule.triggerType := triggerType;
     FSchedule.triggerDay := triggerDay;
+    FSchedule.freeDays := freeDays;
     ComboBoxTypeChange(ComboBoxType);
     CStaticSchedule.Caption := FSchedule.AsString;
   end;
@@ -238,6 +239,7 @@ begin
     endDate := FSchedule.endDate;
     triggerType := FSchedule.triggerType;
     triggerDay := FSchedule.triggerDay;
+    freeDays := FSchedule.freeDays;
   end;
 end;
 

@@ -2,7 +2,7 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, MsXml;
+uses Classes, Graphics, Contnrs, MsXml, Math;
 
 type
   TPrefList = class;
@@ -160,7 +160,7 @@ var GViewsPreferences: TPrefList;
     GBasePreferences: TBasePref;
     GDescPatterns: TDescPatterns;
 
-function GetWorkDay(ADate: TDateTime): TDateTime;
+function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 
 implementation
 
@@ -627,14 +627,14 @@ begin
   SetXmlAttribute('lastBackup', ANode, FormatDateTime('ddmmyyyyhhnnss', FlastBackup));
 end;
 
-function GetWorkDay(ADate: TDateTime): TDateTime;
+function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 var xDay: Integer;
 begin
   xDay := DayOfTheWeek(ADate);
   if GBasePreferences.workDays[xDay] = '+' then begin
     Result := ADate;
   end else begin
-    Result := GetWorkDay(IncDay(ADate));
+    Result := GetWorkDay(IncDay(ADate, IfThen(AForward, 1, -1)), AForward);
   end;
 end;
 

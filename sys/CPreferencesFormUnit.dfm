@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 288
-  Top = 171
+  Left = 154
+  Top = 82
   Caption = 'Preferencje'
   ClientHeight = 470
   ClientWidth = 604
@@ -59,7 +59,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 449
-              Height = 145
+              Height = 137
               Caption = ' Przy starcie CManager-a  '
               TabOrder = 0
               object RadioButtonLast: TRadioButton
@@ -110,76 +110,84 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxCheckForupdates: TCheckBox
                 Left = 18
-                Top = 112
+                Top = 104
                 Width = 415
                 Height = 17
-                Caption = 'Sprawdzaj dost'#281'pne aktualizacje'
+                Caption = 'Sprawdzaj dost'#281'pne aktualizacje CManager-a'
                 TabOrder = 4
               end
             end
             object GroupBox5: TGroupBox
               Left = 8
-              Top = 168
-              Width = 121
-              Height = 217
+              Top = 160
+              Width = 449
+              Height = 73
               Caption = ' Dni pracuj'#261'ce '
               TabOrder = 1
+              object CheckBoxSat: TCheckBox
+                Left = 344
+                Top = 32
+                Width = 35
+                Height = 17
+                Caption = 'So'
+                TabOrder = 5
+              end
+              object CheckBoxTue: TCheckBox
+                Left = 72
+                Top = 32
+                Width = 35
+                Height = 17
+                Caption = 'Wt'
+                TabOrder = 1
+              end
+              object CheckBoxWed: TCheckBox
+                Left = 128
+                Top = 32
+                Width = 35
+                Height = 17
+                Caption = #346'r'
+                TabOrder = 2
+              end
               object CheckBoxMon: TCheckBox
                 Left = 16
                 Top = 32
-                Width = 97
+                Width = 35
                 Height = 17
-                Caption = 'Poniedzia'#322'ek'
+                Caption = 'Pn'
                 TabOrder = 0
               end
               object CheckBoxFri: TCheckBox
-                Left = 16
-                Top = 128
-                Width = 97
+                Left = 240
+                Top = 32
+                Width = 35
                 Height = 17
-                Caption = 'Pi'#261'tek'
+                Caption = 'Pt'
                 TabOrder = 4
               end
-              object CheckBoxTue: TCheckBox
-                Left = 16
-                Top = 56
-                Width = 97
-                Height = 17
-                Caption = 'Wtorek'
-                TabOrder = 1
-              end
-              object CheckBoxSat: TCheckBox
-                Left = 16
-                Top = 152
-                Width = 97
-                Height = 17
-                Caption = 'Sobota'
-                TabOrder = 5
-              end
-              object CheckBoxWed: TCheckBox
-                Left = 16
-                Top = 80
-                Width = 97
-                Height = 17
-                Caption = #346'roda'
-                TabOrder = 2
-              end
               object CheckBoxSun: TCheckBox
-                Left = 16
-                Top = 176
-                Width = 97
+                Left = 400
+                Top = 32
+                Width = 35
                 Height = 17
-                Caption = 'Niedziela'
+                Caption = 'N'
                 TabOrder = 6
               end
               object CheckBoxThu: TCheckBox
-                Left = 16
-                Top = 104
-                Width = 97
+                Left = 184
+                Top = 32
+                Width = 35
                 Height = 17
-                Caption = 'Czwartek'
+                Caption = 'Cz'
                 TabOrder = 3
               end
+            end
+            object GroupBox6: TGroupBox
+              Left = 8
+              Top = 248
+              Width = 449
+              Height = 129
+              Caption = ' Kopie pliku danych '
+              TabOrder = 2
             end
           end
           object TabSheetView: TTabSheet

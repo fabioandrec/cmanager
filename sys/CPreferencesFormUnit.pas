@@ -73,6 +73,7 @@ type
     CheckBoxWed: TCheckBox;
     CheckBoxSun: TCheckBox;
     CheckBoxThu: TCheckBox;
+    GroupBox6: TGroupBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);

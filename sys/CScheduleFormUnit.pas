@@ -17,6 +17,7 @@ type
     FendDate: TDateTime;
     FtriggerType: TBaseEnumeration;
     FtriggerDay: Integer;
+    FfreeDays: TBaseEnumeration;
     function GetAsString: String;
   public
     constructor Create;
@@ -29,6 +30,7 @@ type
     property endDate: TDateTime read FendDate write FendDate;
     property triggerType: TBaseEnumeration read FtriggerType write FtriggerType;
     property triggerDay: Integer read FtriggerDay write FtriggerDay;
+    property freeDays: TBaseEnumeration read FfreeDays write FfreeDays;
   end;
 
   TCScheduleForm = class(TCConfigForm)
@@ -52,6 +54,7 @@ type
     ComboBoxWeekday: TComboBox;
     ComboBoxMonthday: TComboBox;
     Label7: TLabel;
+    ComboBoxFreedays: TComboBox;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure RadioButtonTimesClick(Sender: TObject);
     procedure ComboBoxIntervalChange(Sender: TObject);
@@ -93,6 +96,7 @@ begin
   FendDate := 0;
   FtriggerType := CTriggerTypeMonthly;
   FtriggerDay := 0;
+  FfreeDays := CFreeDayIncrements;
 end;
 
 function TSchedule.GetAsString: String;
@@ -110,7 +114,7 @@ begin
     if FtriggerType = CTriggerTypeWeekly then begin
       xDayNumber := FtriggerDay + 2;
       if xDayNumber > 7 then begin
-        xDayNumber := xDayNumber - 6;
+        xDayNumber := xDayNumber - 7;
       end;
       Result := Result + ', ka¿dy ' + ShortDayNames[xDayNumber];
     end else begin
@@ -137,7 +141,7 @@ begin
   end else begin
     GroupBox2.Visible := True;
     GroupBox3.Visible := True;
-    Height := 401;
+    Height := 427;
   end;
 end;
 
@@ -162,6 +166,13 @@ begin
       ComboBoxWeekday.ItemIndex := 0;
       ComboBoxMonthday.ItemIndex := triggerDay;
     end;
+    if FfreeDays = CFreeDayExedcutes then begin
+      ComboBoxFreedays.ItemIndex := 2;
+    end else if FfreeDays = CFreeDayDecrements then begin
+      ComboBoxFreedays.ItemIndex := 1;
+    end else begin
+      ComboBoxFreedays.ItemIndex := 0;
+    end;
     ComboBoxInterval.ItemIndex := IfThen(triggerType = CTriggerTypeWeekly, 0, 1);
   end;
   ChangeEndCondition;
@@ -180,10 +191,12 @@ begin
     ComboBoxWeekday.Visible := True;
     ComboBoxMonthday.Visible := False;
     Label7.Visible := False;
+    ComboBoxFreedays.Visible := False;
   end else begin
     ComboBoxWeekday.Visible := False;
     ComboBoxMonthday.Visible := True;
     Label7.Visible := True;
+    ComboBoxFreedays.Visible := True;
   end;
 end;
 
@@ -210,6 +223,13 @@ begin
       triggerDay := ComboBoxWeekday.ItemIndex;
     end else begin
       triggerDay := ComboBoxMonthday.ItemIndex;
+    end;
+    if ComboBoxFreedays.ItemIndex = 2 then begin
+      freeDays := CFreeDayExedcutes;
+    end else if ComboBoxFreedays.ItemIndex = 1 then begin
+      freeDays := CFreeDayDecrements;
+    end else begin
+      freeDays := CFreeDayIncrements;
     end;
   end;
 end;

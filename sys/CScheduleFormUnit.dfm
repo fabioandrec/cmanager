@@ -2,14 +2,13 @@ inherited CScheduleForm: TCScheduleForm
   Left = 275
   Top = 86
   Caption = 'Harmonogram'
-  ClientHeight = 374
+  ClientHeight = 400
   ClientWidth = 491
-  Position = poDesigned
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 491
-    Height = 333
+    Height = 359
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -62,6 +61,8 @@ inherited CScheduleForm: TCScheduleForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+        TabStop = True
+        Transparent = False
         HotTrack = True
       end
     end
@@ -129,6 +130,8 @@ inherited CScheduleForm: TCScheduleForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+        TabStop = True
+        Transparent = False
         HotTrack = True
       end
       object CIntEditTimes: TCIntEdit
@@ -146,7 +149,7 @@ inherited CScheduleForm: TCScheduleForm
       Left = 16
       Top = 248
       Width = 457
-      Height = 73
+      Height = 105
       Caption = ' Warunek wykonania '
       TabOrder = 2
       object Label5: TLabel
@@ -158,24 +161,24 @@ inherited CScheduleForm: TCScheduleForm
         Caption = 'Wykonaj'
       end
       object Label6: TLabel
-        Left = 185
-        Top = 32
+        Left = 33
+        Top = 68
         Width = 39
         Height = 13
         Alignment = taRightJustify
         Caption = 'w ka'#380'dy'
       end
       object Label7: TLabel
-        Left = 369
-        Top = 32
+        Left = 153
+        Top = 68
         Width = 69
         Height = 13
         Caption = 'dzie'#324' miesi'#261'ca'
       end
       object ComboBoxWeekday: TComboBox
-        Left = 232
-        Top = 28
-        Width = 201
+        Left = 80
+        Top = 64
+        Width = 185
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -196,7 +199,7 @@ inherited CScheduleForm: TCScheduleForm
       object ComboBoxInterval: TComboBox
         Left = 80
         Top = 28
-        Width = 97
+        Width = 185
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -204,16 +207,16 @@ inherited CScheduleForm: TCScheduleForm
         ItemHeight = 13
         ItemIndex = 1
         TabOrder = 0
-        Text = 'Co miesi'#261#263
+        Text = 'Co miesi'#261'c'
         OnChange = ComboBoxIntervalChange
         Items.Strings = (
           'Co tydzie'#324
-          'Co miesi'#261#263)
+          'Co miesi'#261'c')
       end
       object ComboBoxMonthday: TComboBox
-        Left = 232
-        Top = 28
-        Width = 129
+        Left = 80
+        Top = 64
+        Width = 65
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -256,10 +259,28 @@ inherited CScheduleForm: TCScheduleForm
           '30'
           '31')
       end
+      object ComboBoxFreedays: TComboBox
+        Left = 264
+        Top = 64
+        Width = 170
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 3
+        Text = 'Dzie'#324' wolny wyd'#322'u'#380'a termin'
+        OnChange = ComboBoxIntervalChange
+        Items.Strings = (
+          'Dzie'#324' wolny wyd'#322'u'#380'a termin'
+          'Dzie'#324' wolny skraca termin'
+          'Termin r'#243'wnie'#380' w dzie'#324' wolny')
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 333
+    Top = 359
     Width = 491
     inherited BitBtnOk: TBitBtn
       Left = 314

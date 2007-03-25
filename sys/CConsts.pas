@@ -46,6 +46,10 @@ const
   CEndConditionDate = 'D';
   CEndConditionNever = 'N';
 
+  CFreeDayExedcutes = 'E';
+  CFreeDayIncrements = 'I';
+  CFreeDayDecrements = 'D';
+
   CTriggerTypeWeekly = 'W';
   CTriggerTypeMonthly = 'M';
 

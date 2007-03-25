@@ -201,6 +201,7 @@ type
     FtriggerType: TBaseEnumeration;
     FtriggerDay: Integer;
     FdoneCount: Integer;
+    FfreeDays: TBaseEnumeration;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -215,11 +216,13 @@ type
     procedure SettriggerDay(const Value: Integer);
     procedure SettriggerType(const Value: TBaseEnumeration);
     procedure SetisActive(const Value: Boolean);
+    procedure SetfreeDays(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     constructor Create(AStatic: Boolean); override;
+    function GetboundaryDate(AtriggerDate: TDateTime): TDateTime;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
@@ -236,6 +239,7 @@ type
     property triggerType: TBaseEnumeration read FtriggerType write SettriggerType;
     property triggerDay: Integer read FtriggerDay write SettriggerDay;
     property doneCount: Integer read FdoneCount;
+    property freeDays: TBaseEnumeration read FfreeDays write SetfreeDays;
   end;
 
   TPlannedDone = class(TDataObject)
@@ -399,7 +403,7 @@ procedure InitializeProxies;
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils, StrUtils;
+uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences;
 
 procedure InitializeProxies;
 begin
@@ -849,9 +853,22 @@ begin
     FendDate := FieldByName('endDate').AsDateTime;
     FtriggerType := FieldByName('triggerType').AsString;
     FtriggerDay := FieldByName('triggerDay').AsInteger;
+    FfreeDays := FieldByName('freeDays').AsString;
     xField := FindField('doneCount');
     if xField <> Nil then begin
       FdoneCount := xField.AsInteger;
+    end;
+  end;
+end;
+
+function TPlannedMovement.GetboundaryDate(AtriggerDate: TDateTime): TDateTime;
+begin
+  Result := AtriggerDate;
+  if (FscheduleType = CScheduleTypeCyclic) and (FtriggerType = CTriggerTypeMonthly) then begin
+    if FfreeDays = CFreeDayIncrements then begin
+      Result := GetWorkDay(AtriggerDate, True);
+    end else if FfreeDays = CFreeDayDecrements then begin
+      Result := GetWorkDay(AtriggerDate, False);
     end;
   end;
 end;
@@ -892,6 +909,14 @@ procedure TPlannedMovement.SetendDate(const Value: TDateTime);
 begin
   if FendDate <> Value then begin
     FendDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TPlannedMovement.SetfreeDays(const Value: TBaseEnumeration);
+begin
+  if FfreeDays <> Value then begin
+    FfreeDays := Value;
     SetState(msModified);
   end;
 end;
@@ -986,6 +1011,7 @@ begin
     AddField('endDate', DatetimeToDatabase(FendDate, False), False, 'plannedMovement');
     AddField('triggerType', FtriggerType, True, 'plannedMovement');
     AddField('triggerDay', IntToStr(FtriggerDay), False, 'plannedMovement');
+    AddField('freeDays', FfreeDays, True, 'plannedMovement');
   end;
 end;
 

@@ -23,3 +23,8 @@ create view filters as
     left outer join accountFilter a on a.idMovementFilter = m.idMovementFilter)
     left join cashpointFilter c on c.idMovementFilter = m.idMovementFilter)
     left join productFilter p on p.idMovementFilter = m.idMovementFilter);
+
+alter table plannedMovement add freeDays varchar(1) not null;
+update plannedMovement set freeDays = 'E';
+alter table plannedMovement add constraint ck_freeDays check (freeDays in ('E', 'D', 'I'));
+  
