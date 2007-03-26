@@ -87,7 +87,8 @@ uses
   CLimitsFrameUnit in 'CLimitsFrameUnit.pas' {CLimitsFrame: TFrame},
   CDataobjectFrameUnit in 'CDataobjectFrameUnit.pas' {CDataobjectFrame: TFrame},
   CLimitFormUnit in 'CLimitFormUnit.pas' {CLimitForm},
-  CSurpassedFormUnit in 'CSurpassedFormUnit.pas' {CSurpassedForm};
+  CSurpassedFormUnit in 'CSurpassedFormUnit.pas' {CSurpassedForm},
+  Cbackups in 'Cbackups.pas';
 
 {$R *.res}
 

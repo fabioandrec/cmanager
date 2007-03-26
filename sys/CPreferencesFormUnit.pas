@@ -7,7 +7,7 @@ interface
 uses  CConfigFormUnit, StdCtrls, Dialogs, ImgList, Controls,
   PngImageList, Classes, ActnList, XPStyleActnCtrls, ActnMan, CComponents,
   ComCtrls, Buttons, ExtCtrls, Windows, Messages, SysUtils, Variants, Graphics,
-  Forms, VirtualTrees, CPreferences;
+  Forms, VirtualTrees, CPreferences, Contnrs;
 
 const
   CPreferencesFirstTab = 0;
@@ -74,6 +74,17 @@ type
     CheckBoxSun: TCheckBox;
     CheckBoxThu: TCheckBox;
     GroupBox6: TGroupBox;
+    ComboBoxBackupAction: TComboBox;
+    CStaticBackupCat: TCStatic;
+    CIntEditBackupAge: TCIntEdit;
+    Label3: TLabel;
+    Label2: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    EditBackupName: TEdit;
+    ActionManager: TActionManager;
+    ActionAdd: TAction;
+    CButton8: TCButton;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -86,6 +97,9 @@ type
     procedure Action7Execute(Sender: TObject);
     procedure CheckBoxSurpassedClick(Sender: TObject);
     procedure CheckBoxValidClick(Sender: TObject);
+    procedure ComboBoxBackupActionChange(Sender: TObject);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -109,7 +123,8 @@ implementation
 
 uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CMovementFrameUnit, CBaseFormUnit, CBaseFrameUnit, CDoneFrameUnit,
-  CPlannedFrameUnit, CStartupInfoFrameUnit, Registry, CInfoFormUnit;
+  CPlannedFrameUnit, CStartupInfoFrameUnit, Registry, CInfoFormUnit,
+  CTemplates, CDescpatternFormUnit;
 
 {$R *.dfm}
 
@@ -220,9 +235,15 @@ begin
     CheckBoxSat.Checked := workDays[6] = '+';
     CheckBoxSun.Checked := workDays[7] = '+';
     FPrevWorkDays := workDays;
+    ComboBoxBackupAction.ItemIndex := action;
+    CIntEditBackupAge.Text := IntToStr(daysOld);
+    CStaticBackupCat.DataId := directory;
+    CStaticBackupCat.Caption := MinimizeName(directory, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
+    EditBackupName.Text := fileName;
   end;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
+  ComboBoxBackupActionChange(Nil);
   UpdateFilenameState;
 end;
 
@@ -259,6 +280,10 @@ begin
     workDays := workDays + ifThen(CheckBoxFri.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxSat.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxSun.Checked, '+', '-');
+    action := ComboBoxBackupAction.ItemIndex;
+    daysOld := CIntEditBackupAge.Value;
+    directory := CStaticBackupCat.DataId;;
+    fileName := EditBackupName.Text;
     xReg := TRegistry.Create;
     try
       xReg.RootKey := HKEY_CURRENT_USER;
@@ -359,6 +384,43 @@ begin
     SetActiveAction(Action1);
     ShowInfo(itError, 'Nie okreœlono ¿adnego pracuj¹cego dnia, ustaw przynajmniej jeden', '');
     Result := False;
+  end else if CIntEditBackupAge.Enabled and (CIntEditBackupAge.Value = 0) then begin
+    Result := False;
+    SetActiveAction(Action1);
+    ShowInfo(itError, 'Iloœæ dni nie mo¿e byæ równa zero', '');
+    CIntEditBackupAge.SetFocus;
+  end else if EditBackupName.Enabled and (EditBackupName.Text = '') then begin
+    Result := False;
+    SetActiveAction(Action1);
+    ShowInfo(itError, 'Nazwa kopii nie mo¿e byæ pusta', '');
+    EditBackupName.SetFocus;
+  end;
+end;
+
+procedure TCPreferencesForm.ComboBoxBackupActionChange(Sender: TObject);
+begin
+  CStaticBackupCat.Enabled := (ComboBoxBackupAction.ItemIndex = 0) or (ComboBoxBackupAction.ItemIndex = 1);
+  EditBackupName.Enabled := CStaticBackupCat.Enabled;
+  ActionAdd.Enabled := EditBackupName.Enabled;
+  CIntEditBackupAge.Enabled := (ComboBoxBackupAction.ItemIndex = 2);
+end;
+
+procedure TCPreferencesForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  EditAddTemplate(xData, Self, EditBackupName, False);
+  xData.Free;
+end;
+
+procedure TCPreferencesForm.CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xDir: String;
+begin
+  AAccepted := SelectDirectory('Wybierz katalog kopii', ADataGid, xDir);
+  if AAccepted then begin
+    AText := MinimizeName(xDir, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
+    ADataGid := xDir;
   end;
 end;
 

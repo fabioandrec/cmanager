@@ -25,7 +25,6 @@ type
 
 procedure ShowWaitForm(AType: TWaitType; AText: String; AMin: Integer = 0; AMax: Integer = 100);
 procedure StepWaitForm(AStep: Integer);
-procedure PositionWaitForm(APosition: Integer);
 procedure HideWaitForm;
 
 implementation
@@ -66,15 +65,6 @@ begin
   if GWaitForm <> Nil then begin
     if GWaitForm.FWaitType = wtProgressbar then begin
       GWaitForm.ProgressBar.StepBy(AStep);
-    end;
-  end;
-end;
-
-procedure PositionWaitForm(APosition: Integer);
-begin
-  if GWaitForm <> Nil then begin
-    if GWaitForm.FWaitType = wtProgressbar then begin
-      GWaitForm.ProgressBar.Position := APosition;
     end;
   end;
 end;

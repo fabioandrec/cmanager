@@ -118,6 +118,10 @@ type
     FstartupInfoSurpassedLimit: Boolean;
     FstartupInfoValidLimits: Boolean;
     FworkDays: String;
+    Faction: Integer;
+    FdaysOld: Integer;
+    Fdirectory: String;
+    FfileName: String;
   public
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
@@ -141,6 +145,10 @@ type
     property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
     property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
     property workDays: String read FworkDays write FworkDays;
+    property action: Integer read Faction write Faction;
+    property daysOld: Integer read FdaysOld write FdaysOld;
+    property directory: String read Fdirectory write Fdirectory;
+    property fileName: String read FfileName write FfileName;
   end;
 
   TDescPatterns = class(TStringList)
@@ -448,6 +456,10 @@ begin
   FstartupInfoSurpassedLimit := TBasePref(APrefItem).startupInfoSurpassedLimit;
   FstartupInfoValidLimits := TBasePref(APrefItem).startupInfoValidLimits;
   FworkDays := TBasePref(APrefItem).workDays;
+  Faction := TBasePref(APrefItem).action;
+  FdaysOld := TBasePref(APrefItem).daysOld;
+  Fdirectory := TBasePref(APrefItem).directory;
+  FfileName := TBasePref(APrefItem).fileName;
 end;
 
 function TBasePref.GetNodeName: String;
@@ -478,6 +490,10 @@ begin
   if Length(FworkDays) <> 7 then begin
     FworkDays := '+++++--';
   end;
+  Faction := GetXmlAttribute('action', ANode, CBackupActionAsk);
+  FdaysOld := GetXmlAttribute('daysOld', ANode, 7);
+  Fdirectory := GetXmlAttribute('directory', ANode, ExpandFileName(ExtractFilePath(ParamStr(0))));
+  FfileName := GetXmlAttribute('fileName', ANode, '@data@.cmb');
 end;
 
 procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
@@ -500,6 +516,10 @@ begin
   SetXmlAttribute('startupInfoSurpassedLimit', ANode, FstartupInfoSurpassedLimit);
   SetXmlAttribute('startupInfoValidLimits', ANode, FstartupInfoValidLimits);
   SetXmlAttribute('workDays', ANode, FworkDays);
+  SetXmlAttribute('action', ANode, Faction);
+  SetXmlAttribute('daysOld', ANode, FdaysOld);
+  SetXmlAttribute('directory', ANode, Fdirectory);
+  SetXmlAttribute('fileName', ANode, FfileName);
 end;
 
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
@@ -696,6 +716,10 @@ initialization
     startupInfoValidLimits := False;
     startupCheckUpdates := False;
     workDays := '+++++--';
+    action := CBackupActionAsk;
+    daysOld := 7;
+    directory := ExpandFileName(ExtractFilePath(ParamStr(0)));
+    fileName := '@data@ @godz@ @min@.cmb';
   end;
 finalization
   GViewsPreferences.Free;

@@ -111,7 +111,7 @@ inherited CPreferencesForm: TCPreferencesForm
               object CheckBoxCheckForupdates: TCheckBox
                 Left = 18
                 Top = 104
-                Width = 415
+                Width = 247
                 Height = 17
                 Caption = 'Sprawdzaj dost'#281'pne aktualizacje CManager-a'
                 TabOrder = 4
@@ -121,12 +121,12 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 160
               Width = 449
-              Height = 73
+              Height = 61
               Caption = ' Dni pracuj'#261'ce '
               TabOrder = 1
               object CheckBoxSat: TCheckBox
                 Left = 344
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = 'So'
@@ -134,7 +134,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxTue: TCheckBox
                 Left = 72
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = 'Wt'
@@ -142,7 +142,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxWed: TCheckBox
                 Left = 128
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = #346'r'
@@ -150,7 +150,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxMon: TCheckBox
                 Left = 16
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = 'Pn'
@@ -158,7 +158,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxFri: TCheckBox
                 Left = 240
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = 'Pt'
@@ -166,7 +166,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxSun: TCheckBox
                 Left = 400
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = 'N'
@@ -174,7 +174,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxThu: TCheckBox
                 Left = 184
-                Top = 32
+                Top = 28
                 Width = 35
                 Height = 17
                 Caption = 'Cz'
@@ -183,11 +183,111 @@ inherited CPreferencesForm: TCPreferencesForm
             end
             object GroupBox6: TGroupBox
               Left = 8
-              Top = 248
+              Top = 240
               Width = 449
-              Height = 129
-              Caption = ' Kopie pliku danych '
+              Height = 137
+              Caption = ' Automatyczne kopie plik'#243'w danych '
               TabOrder = 2
+              object Label3: TLabel
+                Left = 416
+                Top = 32
+                Width = 14
+                Height = 13
+                Caption = 'dni'
+              end
+              object Label2: TLabel
+                Left = 17
+                Top = 68
+                Width = 61
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Katalog kopii'
+              end
+              object Label5: TLabel
+                Left = 51
+                Top = 32
+                Width = 27
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Akcja'
+              end
+              object Label6: TLabel
+                Left = 22
+                Top = 104
+                Width = 58
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Nazwa kopii'
+              end
+              object CButton8: TCButton
+                Left = 318
+                Top = 96
+                Width = 115
+                Height = 25
+                Cursor = crHandPoint
+                PicPosition = ppLeft
+                PicOffset = 10
+                TxtOffset = 15
+                Framed = False
+                Action = ActionAdd
+                Color = clBtnFace
+              end
+              object ComboBoxBackupAction: TComboBox
+                Left = 88
+                Top = 28
+                Width = 265
+                Height = 21
+                BevelInner = bvNone
+                BevelKind = bkTile
+                Style = csDropDownList
+                ItemHeight = 13
+                ItemIndex = 2
+                TabOrder = 0
+                Text = 'Monituj, je'#380'eli ostatnia kopia jest starsza ni'#380
+                OnChange = ComboBoxBackupActionChange
+                Items.Strings = (
+                  'Wykonaj raz dziennie, przy pierwszym uruchomieniu'
+                  'Wykonaj zawsze podczas uruchamiania'
+                  'Monituj, je'#380'eli ostatnia kopia jest starsza ni'#380
+                  'Nie wykonuj kopii, po prostu uruchom CManager-a')
+              end
+              object CStaticBackupCat: TCStatic
+                Left = 88
+                Top = 64
+                Width = 321
+                Height = 21
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<kliknij tutaj aby wybra'#263' katalog kopii>'
+                Color = clWindow
+                ParentColor = False
+                TabOrder = 1
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<kliknij tutaj aby wybra'#263' katalog kopii>'
+                OnGetDataId = CStaticBackupCatGetDataId
+                HotTrack = True
+              end
+              object CIntEditBackupAge: TCIntEdit
+                Left = 376
+                Top = 28
+                Width = 33
+                Height = 21
+                BevelKind = bkTile
+                BorderStyle = bsNone
+                TabOrder = 2
+                Text = '7'
+              end
+              object EditBackupName: TEdit
+                Left = 88
+                Top = 100
+                Width = 233
+                Height = 21
+                BevelKind = bkTile
+                BorderStyle = bsNone
+                MaxLength = 40
+                TabOrder = 3
+              end
             end
           end
           object TabSheetView: TTabSheet
@@ -907,6 +1007,17 @@ inherited CPreferencesForm: TCPreferencesForm
       Caption = 'Ustawienia dla listy powiadomie'#324
       ImageIndex = 3
       OnExecute = Action7Execute
+    end
+  end
+  object ActionManager: TActionManager
+    Images = CImageLists.TemplateImageList16x16
+    Left = 80
+    Top = 378
+    StyleName = 'XP Style'
+    object ActionAdd: TAction
+      Caption = 'Wstaw mnemonik'
+      ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
   end
 end

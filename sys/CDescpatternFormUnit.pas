@@ -36,7 +36,8 @@ type
   end;
 
 function EditDescPattern(AName: String; var APattern: String): Boolean;
-function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit; AInserValue: Boolean): Boolean;
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; ARiched: TRichEdit; AInserValue: Boolean): Boolean; overload;
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; AEdit: TEdit; AInserValue: Boolean): Boolean; overload;
 
 implementation
 
@@ -169,6 +170,28 @@ begin
     ARiched.SelStart := xSelStart + Length(xId) - 1;
     ARiched.SelLength := 0;
     ARiched.Lines.EndUpdate
+  end;
+end;
+
+function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpander; AEdit: TEdit; AInserValue: Boolean): Boolean; overload;
+var xId, xText, xDesc: String;
+    xSelStart, xSelLength: Integer;
+    xData: TDescAdditionalData;
+begin
+  xData := TDescAdditionalData.Create(ATemplates);
+  Result := TCFrameForm.ShowFrame(TCDescTemplatesFrame, xId, xText, xData);
+  if Result then begin
+    xDesc := AEdit.Text;
+    xSelStart := AEdit.SelStart + 1;
+    xSelLength := AEdit.SelLength;
+    System.Delete(xDesc, xSelStart, xSelLength);
+    if AInserValue then begin
+      xId := AExpander.ExpandTemplate(xId);
+    end;
+    xDesc := Copy(xDesc, 1, xSelStart - 1) + xId + Copy(xDesc, xSelStart, MaxInt);
+    AEdit.Text := xDesc;
+    AEdit.SelStart := xSelStart + Length(xId) - 1;
+    AEdit.SelLength := 0;
   end;
 end;
 

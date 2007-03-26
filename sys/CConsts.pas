@@ -140,6 +140,11 @@ const
      ('Wszystkie elementy', '', '', '', ''));
 
 
+  CBackupActionOnce = 0;
+  CBackupActionAlways = 1;
+  CBackupActionAsk = 2;
+  CBackupActionNever = 3;
+
 implementation
 
 end.
