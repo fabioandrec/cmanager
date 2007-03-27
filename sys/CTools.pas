@@ -224,4 +224,20 @@ begin
   end;
 end;
 
+procedure DisableProcessWindowsGhosting; 
+type TDisableProcessWindowsGhostingProc = procedure; stdcall;
+const CUser32 = 'User32.dll';
+var xModH: HMODULE;
+    xDisableProcessWindowsGhosting: TDisableProcessWindowsGhostingProc;
+begin
+  xModH := GetModuleHandle(CUser32);
+  if xModH <> 0 then begin
+    @xDisableProcessWindowsGhosting := nil;
+    @xDisableProcessWindowsGhosting := GetProcAddress(xModH, 'DisableProcessWindowsGhosting');
+    If Assigned(xDisableProcessWindowsGhosting) then begin
+      xDisableProcessWindowsGhosting;
+    end;
+  end;
+end;
+
 end.
