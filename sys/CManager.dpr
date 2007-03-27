@@ -88,7 +88,7 @@ uses
   CDataobjectFrameUnit in 'CDataobjectFrameUnit.pas' {CDataobjectFrame: TFrame},
   CLimitFormUnit in 'CLimitFormUnit.pas' {CLimitForm},
   CSurpassedFormUnit in 'CSurpassedFormUnit.pas' {CSurpassedForm},
-  Cbackups in 'Cbackups.pas';
+  CBackups in 'CBackups.pas';
 
 {$R *.res}
 
@@ -116,15 +116,16 @@ begin
       xProceed := True;
     end;
     if xProceed then begin
-      if GBasePreferences.startupCheckUpdates then begin
-        CheckForUpdates(True);
-      end;
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;
       end;
       if xProceed then begin
+        if GBasePreferences.startupCheckUpdates then begin
+          CheckForUpdates(True);
+        end;
+        CheckForBackups;
         Application.CreateForm(TCMainForm, CMainForm);
-  Application.Run;
+        Application.Run;
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;

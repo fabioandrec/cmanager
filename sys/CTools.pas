@@ -209,4 +209,19 @@ begin
   inherited Items[AIndex] := Value;
 end;
 
+function RunApp(AAppName: String; AParams: String; AWorkpath: String): Boolean;
+var xStartup: TStartupInfo;
+    xProcess: TProcessInformation;
+    xExit: Cardinal;
+begin
+  Result := False;
+  FillChar(xStartup, SizeOf(TStartupInfo), #0);
+  xStartup.cb := SizeOf(STARTUPINFO);
+  if CreateProcess(Nil, PChar(AAppName + ' ' + AParams), Nil, Nil, False, 0, Nil, PChar(ExtractFilePath(AWorkpath)), xStartup, xProcess) then begin
+    WaitForSingleObject(xProcess.hProcess, INFINITE);
+    GetExitCodeProcess(xProcess.hProcess, xExit);
+    Result := (xExit = 0);
+  end;
+end;
+
 end.

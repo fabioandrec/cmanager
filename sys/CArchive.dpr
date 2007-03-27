@@ -47,11 +47,27 @@ begin
       xFile := GetParamValue('-u');
       xBackup := GetParamValue('-b');
       if xFile = '' then begin
-        MessageBox(0, 'Nie podano nazwy pliku danych', 'B³¹d', MB_OK + MB_ICONERROR);
+        xText := 'Nie podano nazwy pliku danych';
       end else if xBackup = '' then begin
-        MessageBox(0, 'Nie podano nazwy kopii pliku danych', 'B³¹d', MB_OK + MB_ICONERROR);
+        xText := 'Nie podano nazwy kopii pliku danych';
       end else begin
-        //todo
+        if xAction = $01 then begin
+          if CmbBackup(xFile, xBackup, xOverride, xText) then begin
+            xExitCode := $00;
+          end;
+        end else begin
+          if CmbRestore(xBackup, xFile, xOverride, xText) then begin
+            xExitCode := $00;
+          end;
+        end;
+      end;
+      if xExitCode <> $00 then begin
+        if xAction = $01 then begin
+          xText := 'Podczas wykonywania kopii pliku danych wyst¹pi³ b³¹d.' + sLineBreak + 'Szczegó³y: ' + xText;
+        end else begin
+          xText := 'Podczas odtwarzania pliku danych z kopii wyst¹pi³ b³¹d.' + sLineBreak + 'Szczegó³y: ' + xText;
+        end;
+        MessageBox(0, PChar(xText), 'B³¹d', MB_OK + MB_ICONERROR);
       end;
     end;
   end;

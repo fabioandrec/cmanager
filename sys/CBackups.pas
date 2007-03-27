@@ -36,6 +36,9 @@ type
 
 const ARCHIVE_TYPE = 'CMB';
 
+function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+
 implementation
 
 function TBackupRestore.Compress(AInStream, AOutStream: TStream; var AError: String): Boolean;
@@ -87,8 +90,8 @@ begin
       xExists := not DeleteFile(AOutFile);
     end;
     if not xExists then begin
-      xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareExclusive);
-      xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareExclusive);
+      xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareDenyNone);
+      xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareDenyNone);
       Result := Compress(xInStream, xOutStream, AError);
       if not Result then begin
         DeleteFile(AOutFile);
@@ -149,8 +152,8 @@ begin
       xExists := not DeleteFile(AOutFile);
     end;
     if not xExists then begin
-      xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareExclusive);
-      xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareExclusive);
+      xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareDenyNone);
+      xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareDenyNone);
       Result := Decompress(xInStream, xOutStream, AError);
       if not Result then begin
         DeleteFile(AOutFile);
@@ -209,6 +212,22 @@ begin
     end;
   end;
   AInStream.Seek(soFromBeginning, 0);
+end;
+
+function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+var xBackup: TBackupRestore;
+begin
+  xBackup := TBackupRestore.Create(ACanoverride);
+  Result := xBackup.CompressFile(AFilename, ABackupname, AError);
+  xBackup.Free;
+end;
+
+function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+var xBackup: TBackupRestore;
+begin
+  xBackup := TBackupRestore.Create(ACanoverride);
+  Result := xBackup.DecompressFile(AFilename, ABackupname, AError);
+  xBackup.Free;
 end;
 
 end.

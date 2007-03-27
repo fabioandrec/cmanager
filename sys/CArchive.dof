@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=-h
+RunParams=-x -b x.bak -u cmanager.dat
 HostApplication=
 Launcher=
 UseLauncher=0

@@ -4,7 +4,8 @@ unit CDatatools;
 
 interface
 
-uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups;
+uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
+     DateUtils;
 
 function CreateDatabase(AFilename: String; var AError: String): Boolean;
 function CompactDatabase(AFilename: String; var AError: String): Boolean;
@@ -15,6 +16,7 @@ function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
+procedure CheckForBackups;
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
@@ -23,7 +25,7 @@ implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
-  CTools, StrUtils;
+  CTools, StrUtils, CPreferences;
 
 function CreateDatabase(AFilename: String; var AError: String): Boolean;
 var xCatalog : OLEVariant;
@@ -273,6 +275,24 @@ begin
   for xCount := 0 to AList.Count - 1 do begin
     xElement := TCListDataElement.Create(ARootElement.ParentList, AList.Items[xCount]);
     ARootElement.Add(xElement);
+  end;
+end;
+
+procedure CheckForBackups;
+var xPref: TBackupPref;
+    xMustbackup: Boolean;
+begin
+  xMustbackup := False;
+  xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDatabaseName]);
+  if GBasePreferences.action = CBackupActionOnce then begin
+    if xPref <> Nil then begin
+      xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
+    end else begin
+      xMustbackup := True;
+    end;
+  end else if GBasePreferences.action = CBackupActionAlways then begin
+    xMustbackup := True;
+  end else if GBasePreferences.action = CBackupActionAsk then begin
   end;
 end;
 
