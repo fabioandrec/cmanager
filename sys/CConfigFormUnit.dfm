@@ -1,35 +1,35 @@
 inherited CConfigForm: TCConfigForm
-  Left = 297
-  Top = 170
+  Left = 298
+  Top = 171
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'ConfigForm'
-  ClientHeight = 439
-  ClientWidth = 593
+  ClientHeight = 437
+  ClientWidth = 591
   PixelsPerInch = 96
   TextHeight = 13
   object PanelConfig: TPanel
     Left = 0
     Top = 0
-    Width = 593
-    Height = 398
+    Width = 591
+    Height = 396
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
   end
   object PanelButtons: TPanel
     Left = 0
-    Top = 398
-    Width = 593
+    Top = 396
+    Width = 591
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      593
+      591
       41)
     object BitBtnOk: TBitBtn
-      Left = 416
+      Left = 414
       Top = 8
       Width = 75
       Height = 25
@@ -40,7 +40,7 @@ inherited CConfigForm: TCConfigForm
       OnClick = BitBtnOkClick
     end
     object BitBtnCancel: TBitBtn
-      Left = 504
+      Left = 502
       Top = 8
       Width = 75
       Height = 25

@@ -2,7 +2,7 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, MsXml, Math;
+uses Classes, Graphics, Contnrs, MsXml, Math, Windows, CTemplates;
 
 type
   TPrefList = class;
@@ -52,6 +52,25 @@ type
     property lastBackup: TDateTime read FlastBackup write FlastBackup;
   end;
 
+  TBackupThread = class(TThread)
+  private
+    FFilein: String;
+    FTempfile: String;
+    FReport: TStringList;
+    FIsRunning: Boolean;
+    procedure Progress(AStepBy: Integer);
+    procedure AddToReport(AText: String);
+  protected
+    function PrepareFile: Boolean;
+    procedure Execute; override;
+  public
+    constructor Create(AFilein: String);
+    procedure WaitFor;
+    property Report: TStringList read FReport;
+    property IsRunning: Boolean read FIsRunning;
+    destructor Destroy; override;
+  end;
+
   TFontPref = class(TPrefItem)
   private
     FBackground: TColor;
@@ -99,7 +118,7 @@ type
     property Fontprefs: TPrefList read FFontprefs;
   end;
 
-  TBasePref = class(TPrefItem)
+  TBasePref = class(TPrefItem, IDescTemplateExpander)
   private
     FstartupDatafileMode: Integer;
     FstartupDatafileName: String;
@@ -118,15 +137,22 @@ type
     FstartupInfoSurpassedLimit: Boolean;
     FstartupInfoValidLimits: Boolean;
     FworkDays: String;
-    Faction: Integer;
-    FdaysOld: Integer;
-    Fdirectory: String;
-    FfileName: String;
+    FbackupAction: Integer;
+    FbackupDaysOld: Integer;
+    FbakupDirectory: String;
+    FbackupFileName: String;
+    FbackupOverwrite: Boolean;
   public
+    function GetBackupfilename: String;
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
     function GetNodeName: String; override;
     procedure Clone(APrefItem: TPrefItem); override;
+    function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+  public
+    function ExpandTemplate(ATemplate: String): String; virtual;
   published
     property startupDatafileMode: Integer read FstartupDatafileMode write FstartupDatafileMode;
     property startupDatafileName: String read FstartupDatafileName write FstartupDatafileName;
@@ -145,10 +171,11 @@ type
     property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
     property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
     property workDays: String read FworkDays write FworkDays;
-    property action: Integer read Faction write Faction;
-    property daysOld: Integer read FdaysOld write FdaysOld;
-    property directory: String read Fdirectory write Fdirectory;
-    property fileName: String read FfileName write FfileName;
+    property backupAction: Integer read FbackupAction write FbackupAction;
+    property backupDaysOld: Integer read FbackupDaysOld write FbackupDaysOld;
+    property backupDirectory: String read FbakupDirectory write FbakupDirectory;
+    property backupFileName: String read FbackupFileName write FbackupFileName;
+    property backupOverwrite: Boolean read FbackupOverwrite write FbackupOverwrite;
   end;
 
   TDescPatterns = class(TStringList)
@@ -167,13 +194,21 @@ var GViewsPreferences: TPrefList;
     GBackupsPreferences: TPrefList;
     GBasePreferences: TBasePref;
     GDescPatterns: TDescPatterns;
+    GBackupThread: TBackupThread;
 
 function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 
 implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml, SysUtils,
-  DateUtils;
+     DateUtils, CBackups, CTools, Forms;
+
+procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
+begin
+  if Application.MainForm <> Nil then begin
+    SendMessage(Application.MainForm.Handle, AMsg, AWParam, ALParam);
+  end;
+end;
 
 procedure SaveFontToXml(ANode: IXMLDOMNode; AFont: TFont);
 begin
@@ -456,10 +491,48 @@ begin
   FstartupInfoSurpassedLimit := TBasePref(APrefItem).startupInfoSurpassedLimit;
   FstartupInfoValidLimits := TBasePref(APrefItem).startupInfoValidLimits;
   FworkDays := TBasePref(APrefItem).workDays;
-  Faction := TBasePref(APrefItem).action;
-  FdaysOld := TBasePref(APrefItem).daysOld;
-  Fdirectory := TBasePref(APrefItem).directory;
-  FfileName := TBasePref(APrefItem).fileName;
+  FbackupAction := TBasePref(APrefItem).backupAction;
+  FbackupDaysOld := TBasePref(APrefItem).backupDaysOld;
+  FbakupDirectory := TBasePref(APrefItem).backupDirectory;
+  FbackupFileName := TBasePref(APrefItem).backupFileName;
+  FbackupOverwrite := TBasePref(APrefItem).backupOverwrite;
+end;
+
+function TBasePref.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := '<nieznana>';
+  if ATemplate = '@godz@' then begin
+    Result := LPad(IntToStr(HourOf(Now)), '0', 2);
+  end else if ATemplate = '@min@' then begin
+    Result := LPad(IntToStr(MinuteOf(Now)), '0', 2);
+  end else if ATemplate = '@czas@' then begin
+    Result := GetFormattedTime(Now, 'HH:mm');
+  end else if ATemplate = '@dzien@' then begin
+    Result := LPad(IntToStr(DayOf(Now)), '0', 2);
+  end else if ATemplate = '@miesiac@' then begin
+    Result := LPad(IntToStr(MonthOf(Now)), '0', 2);
+  end else if ATemplate = '@rok@' then begin
+    Result := IntToStr(YearOf(Now));
+  end else if ATemplate = '@rokkrotki@' then begin
+    Result := Copy(IntToStr(YearOf(Now)), 3, 2);
+  end else if ATemplate = '@dzientygodnia@' then begin
+    Result := IntToStr(DayOfTheWeek(Now));
+  end else if ATemplate = '@nazwadnia@' then begin
+    Result := GetFormattedDate(Now, 'dddd');
+  end else if ATemplate = '@nazwamiesiaca@' then begin
+    Result := GetFormattedDate(Now, 'MMMM');
+  end else if ATemplate = '@data@' then begin
+    Result := GetFormattedDate(Now, 'yyyy-MM-dd');
+  end else if ATemplate = '@dataczas@' then begin
+    Result := GetFormattedDate(Now, 'yyyy-MM-dd') + ' ' + GetFormattedTime(Now, 'HH:mm');
+  end else if ATemplate = '@wersja@' then begin
+    Result := FileVersion(ParamStr(0));
+  end;
+end;
+
+function TBasePref.GetBackupfilename: String;
+begin
+  Result := IncludeTrailingPathDelimiter(backupDirectory) + GBaseTemlatesList.ExpandTemplates(FbackupFileName, Self);
 end;
 
 function TBasePref.GetNodeName: String;
@@ -490,10 +563,20 @@ begin
   if Length(FworkDays) <> 7 then begin
     FworkDays := '+++++--';
   end;
-  Faction := GetXmlAttribute('action', ANode, CBackupActionAsk);
-  FdaysOld := GetXmlAttribute('daysOld', ANode, 7);
-  Fdirectory := GetXmlAttribute('directory', ANode, ExpandFileName(ExtractFilePath(ParamStr(0))));
-  FfileName := GetXmlAttribute('fileName', ANode, '@data@.cmb');
+  FbackupAction := GetXmlAttribute('backupAction', ANode, CBackupActionAsk);
+  FbackupDaysOld := GetXmlAttribute('backupDaysOld', ANode, 7);
+  FbakupDirectory := GetXmlAttribute('backupDirectory', ANode, ExpandFileName(ExtractFilePath(ParamStr(0))));
+  FbackupFileName := GetXmlAttribute('backupFilename', ANode, '@data@.cmb');
+  FbackupOverwrite := GetXmlAttribute('backupOverwrite', ANode, False);
+end;
+
+function TBasePref.QueryInterface(const IID: TGUID; out Obj): HRESULT;
+begin
+  if GetInterface(IID, Obj) then begin
+    Result := 0
+  end else begin
+    Result := E_NOINTERFACE;
+  end;
 end;
 
 procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
@@ -516,10 +599,11 @@ begin
   SetXmlAttribute('startupInfoSurpassedLimit', ANode, FstartupInfoSurpassedLimit);
   SetXmlAttribute('startupInfoValidLimits', ANode, FstartupInfoValidLimits);
   SetXmlAttribute('workDays', ANode, FworkDays);
-  SetXmlAttribute('action', ANode, Faction);
-  SetXmlAttribute('daysOld', ANode, FdaysOld);
-  SetXmlAttribute('directory', ANode, Fdirectory);
-  SetXmlAttribute('fileName', ANode, FfileName);
+  SetXmlAttribute('backupAction', ANode, FbackupAction);
+  SetXmlAttribute('backupDaysOld', ANode, FbackupDaysOld);
+  SetXmlAttribute('backupDirectory', ANode, FbakupDirectory);
+  SetXmlAttribute('backupFilename', ANode, FbackupFileName);
+  SetXmlAttribute('backupOverwrite', ANode, FbackupOverwrite);
 end;
 
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
@@ -658,6 +742,107 @@ begin
   end;
 end;
 
+procedure TBackupThread.AddToReport(AText: String);
+begin
+  FReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + AText);
+end;
+
+constructor TBackupThread.Create(AFilein: String);
+begin
+  inherited Create(True);
+  FreeOnTerminate := False;
+  FFilein := AFilein;
+  FTempfile := '';
+  SetThreadPriority(Handle, THREAD_PRIORITY_BELOW_NORMAL);
+  FReport := TStringList.Create;
+  Resume;
+end;
+
+destructor TBackupThread.Destroy;
+begin
+  FReport.Free;
+  inherited Destroy;
+end;
+
+procedure TBackupThread.Execute;
+var xBackupname: String;
+    xBackupPref: TBackupPref;
+    xOk: Boolean;
+    xText: String;
+begin
+  FIsRunning := True;
+  SendMessageToMainForm(WM_STATBACKUPSTARTED, 0, 0);
+  xOk := False;
+  if PrepareFile then begin
+    xBackupname := GBasePreferences.GetBackupfilename;
+    AddToReport('Rozpoczêto tworzenie kopii pliku danych ' +  FFilein);
+    if CmbBackup(FTempfile, xBackupname, GBasePreferences.backupOverwrite, xText, Progress) then begin
+      xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[FFilein]);
+      if xBackupPref = Nil then begin
+        xBackupPref := TBackupPref.CreateBackupPref(FFilein, Now);
+        GBackupsPreferences.Add(xBackupPref);
+      end else begin
+        xBackupPref.lastBackup := Now;
+      end;
+      xOk := True;
+      AddToReport('Wykonano poprawnie kopiê pliku danych ' +  FFilein);
+      AddToReport('Kopia znajduje siê w pliku ' +  xBackupname);
+    end else begin
+      AddToReport('Podczas tworzenia kopii pliku danych ' + FFilein + ' wyst¹pi³ b³¹d');
+      AddToReport(xText);
+      AddToReport('Kopia nie zosta³a utworzona');
+    end;
+    if DeleteFile(FTempfile) then begin
+      AddToReport('Usuniêto utworzony plik tymczasowy');
+    end else begin
+      AddToReport('Nie uda³o siê usun¹æ utworzonego pliku tymczasowego');
+    end;
+  end;
+  if not xOk then begin
+    SendMessageToMainForm(WM_STATBACKUPFINISHEDERR, 0, 0);
+  end else begin
+    SendMessageToMainForm(WM_STATBACKUPFINISHEDSUCC, 0, 0);
+    WaitForSingleObject(Handle, 3000);
+    SendMessageToMainForm(WM_STATCLEAR, 0, 0);
+  end;
+  FIsRunning := False;
+end;
+
+function TBackupThread.PrepareFile: Boolean;
+begin
+  FTempfile := FormatDateTime('yyyymmddhhnnss', Now) + ExtractFileExt(FFilein);
+  AddToReport('Rozpoczêto tworzenie pliku tymczasowego');
+  Result := CopyFile(PChar(FFilein), PChar(FTempfile), False);
+  if not Result then begin
+    AddToReport('Podczas tworzenia pliku tymczasowego wyst¹pi³ b³¹d');
+    AddToReport(SysErrorMessage(GetLastError));
+  end else begin
+    AddToReport('Utworzono plik tymczasowy ' + FTempfile);
+  end;
+end;
+
+function TBasePref._AddRef: Integer;
+begin
+  Result := 0;
+end;
+
+function TBasePref._Release: Integer;
+begin
+  Result := 0;
+end;
+
+procedure TBackupThread.Progress(AStepBy: Integer);
+begin
+  SendMessageToMainForm(WM_STATPROGRESS, 0, AStepBy);
+end;
+
+procedure TBackupThread.WaitFor;
+begin
+  while FIsRunning do begin
+    Sleep(10);
+  end;
+end;
+
 initialization
   GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
@@ -716,12 +901,19 @@ initialization
     startupInfoValidLimits := False;
     startupCheckUpdates := False;
     workDays := '+++++--';
-    action := CBackupActionAsk;
-    daysOld := 7;
-    directory := ExpandFileName(ExtractFilePath(ParamStr(0)));
-    fileName := '@data@ @godz@ @min@.cmb';
+    backupAction := CBackupActionAsk;
+    backupDaysOld := 7;
+    backupDirectory := ExpandFileName(ExtractFilePath(ParamStr(0)));
+    backupFileName := '@data@ @godz@ @min@.cmb';
+    backupOverwrite := False;
   end;
 finalization
+  if GBackupThread <> Nil then begin
+    if GBackupThread.IsRunning then begin
+      GBackupThread.WaitFor;
+    end;
+    GBackupThread.Free;
+  end;
   GViewsPreferences.Free;
   GBasePreferences.Free;
   GColumnsPreferences.Free;

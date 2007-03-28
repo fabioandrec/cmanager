@@ -1,19 +1,19 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 154
-  Top = 82
+  Left = 155
+  Top = 83
   Caption = 'Preferencje'
-  ClientHeight = 470
-  ClientWidth = 604
+  ClientHeight = 485
+  ClientWidth = 602
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 604
-    Height = 429
+    Width = 602
+    Height = 444
     object PanelMain: TPanel
       Left = 0
       Top = 0
-      Width = 604
-      Height = 429
+      Width = 602
+      Height = 444
       Align = alClient
       BevelOuter = bvNone
       Caption = 'PanelMain'
@@ -21,15 +21,15 @@ inherited CPreferencesForm: TCPreferencesForm
       object PanelShortcuts: TPanel
         Left = 129
         Top = 0
-        Width = 475
-        Height = 429
+        Width = 473
+        Height = 444
         Align = alClient
         BevelOuter = bvLowered
         TabOrder = 0
         object PanelShortcutsTitle: TPanel
           Left = 1
           Top = 1
-          Width = 473
+          Width = 471
           Height = 21
           Align = alTop
           Alignment = taLeftJustify
@@ -46,8 +46,8 @@ inherited CPreferencesForm: TCPreferencesForm
         object PageControl: TPageControl
           Left = 1
           Top = 22
-          Width = 473
-          Height = 406
+          Width = 471
+          Height = 421
           ActivePage = TabSheetBase
           Align = alClient
           Style = tsFlatButtons
@@ -185,7 +185,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 240
               Width = 449
-              Height = 137
+              Height = 161
               Caption = ' Automatyczne kopie plik'#243'w danych '
               TabOrder = 2
               object Label3: TLabel
@@ -220,7 +220,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Caption = 'Nazwa kopii'
               end
               object CButton8: TCButton
-                Left = 318
+                Left = 316
                 Top = 96
                 Width = 115
                 Height = 25
@@ -281,12 +281,20 @@ inherited CPreferencesForm: TCPreferencesForm
               object EditBackupName: TEdit
                 Left = 88
                 Top = 100
-                Width = 233
+                Width = 227
                 Height = 21
                 BevelKind = bkTile
                 BorderStyle = bsNone
                 MaxLength = 40
                 TabOrder = 3
+              end
+              object CheckBoxCanOverwrite: TCheckBox
+                Left = 88
+                Top = 124
+                Width = 353
+                Height = 17
+                Caption = 'Zezwalaj na nadpisywanie istniej'#261'cych kopii'
+                TabOrder = 4
               end
             end
           end
@@ -514,7 +522,7 @@ inherited CPreferencesForm: TCPreferencesForm
         Left = 0
         Top = 0
         Width = 129
-        Height = 429
+        Height = 444
         Align = alLeft
         BevelOuter = bvLowered
         Color = clWindow
@@ -575,13 +583,13 @@ inherited CPreferencesForm: TCPreferencesForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 429
-    Width = 604
+    Top = 444
+    Width = 602
     inherited BitBtnOk: TBitBtn
-      Left = 427
+      Left = 425
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 515
+      Left = 513
     end
   end
   object ActionManager1: TActionManager

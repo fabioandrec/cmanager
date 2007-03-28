@@ -12,7 +12,7 @@ uses
 type
   TCMainForm = class(TForm)
     MenuBar: TActionMainMenuBar;
-    StatusBar: TStatusBar;
+    StatusBar: TCStatusBar;
     ActionManager: TActionManager;
     ActionShortcuts: TAction;
     ActionShorcutOperations: TAction;
@@ -83,6 +83,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ActionExportExecute(Sender: TObject);
     procedure ActionRandomExecute(Sender: TObject);
+    procedure StatusBarClick(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -121,7 +122,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
   CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
-  CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit;
+  CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
+  CReportFormUnit, CMemoFormUnit;
 
 {$R *.dfm}
 
@@ -339,10 +341,10 @@ begin
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
     Caption := 'CManager - obs³uga finansów (na dzieñ ' + DateToStr(GWorkDate) + ')';
-    StatusBar.SimpleText := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
   end else begin
     Caption := 'CManager - obs³uga finansów';
-    StatusBar.SimpleText := ' (brak otwartego pliku danych)';
+    StatusBar.Panels.Items[0].Text := ' (brak otwartego pliku danych)';
   end;
   for xCount := 0 to ActionManager.ActionCount - 1 do begin
     xAction := TAction(ActionManager.Actions[xCount]);
@@ -383,7 +385,24 @@ begin
     Invalidate;
   end else if Message.Msg = WM_OPENCONNECTION then begin
   end else if Message.Msg = WM_CLOSECONNECTION then begin
-    CMainForm.ActionCloseConnection.Execute;
+    ActionCloseConnection.Execute;
+  end else if Message.Msg = WM_STATCLEAR then begin
+    StatusBar.Panels.Items[1].Text := '';
+    TCStatusPanel(StatusBar.Panels.Items[1]).ImageIndex := -1;
+    TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := False;
+  end else if Message.Msg = WM_STATBACKUPSTARTED then begin
+    StatusBar.Panels.Items[1].Text := 'Trwa automatyczne wykonywanie kopii pliku danych. Wykonano 0%';
+    TCStatusPanel(StatusBar.Panels.Items[1]).ImageIndex := 1;
+  end else if Message.Msg = WM_STATPROGRESS then begin
+    StatusBar.Panels.Items[1].Text := 'Trwa automatyczne wykonywanie kopii pliku danych. Wykonano ' + IntToStr(Message.LParam) + '%';
+  end else if Message.Msg = WM_STATBACKUPFINISHEDSUCC then begin
+    StatusBar.Panels.Items[1].Text := 'Poprawnie wykonano kopiê pliku danych';
+    TCStatusPanel(StatusBar.Panels.Items[1]).ImageIndex := 2;
+    TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := True;
+  end else if Message.Msg = WM_STATBACKUPFINISHEDERR then begin
+    StatusBar.Panels.Items[1].Text := 'Podczas wykonywania kopii pliku danych wyst¹pi³ b³¹d';
+    TCStatusPanel(StatusBar.Panels.Items[1]).ImageIndex := 3;
+    TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := True;
   end;
 end;
 
@@ -525,6 +544,20 @@ end;
 procedure TCMainForm.ActionRandomExecute(Sender: TObject);
 begin
   FillDatabaseExampleData;
+end;
+
+procedure TCMainForm.StatusBarClick(Sender: TObject);
+var xPanel: TCStatusPanel;
+begin
+  xPanel := TCStatusPanel(StatusBar.GetPanelWithMouse);
+  if xPanel = StatusBar.Panels.Items[1] then begin
+    if GBackupThread <> Nil then begin
+      xPanel.Clickable := False;
+      xPanel.ImageIndex := -1;
+      xPanel.Text := '';
+      ShowReport('Raport z wykonania kopii pliku danych', GBackupThread.Report.Text, 400, 300);
+    end;
+  end;
 end;
 
 end.

@@ -85,6 +85,7 @@ type
     ActionManager: TActionManager;
     ActionAdd: TAction;
     CButton8: TCButton;
+    CheckBoxCanOverwrite: TCheckBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -235,11 +236,12 @@ begin
     CheckBoxSat.Checked := workDays[6] = '+';
     CheckBoxSun.Checked := workDays[7] = '+';
     FPrevWorkDays := workDays;
-    ComboBoxBackupAction.ItemIndex := action;
-    CIntEditBackupAge.Text := IntToStr(daysOld);
-    CStaticBackupCat.DataId := directory;
-    CStaticBackupCat.Caption := MinimizeName(directory, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
-    EditBackupName.Text := fileName;
+    ComboBoxBackupAction.ItemIndex := backupAction;
+    CIntEditBackupAge.Text := IntToStr(backupDaysOld);
+    CStaticBackupCat.DataId := backupDirectory;
+    CStaticBackupCat.Caption := MinimizeName(backupDirectory, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
+    EditBackupName.Text := backupFileName;
+    CheckBoxCanOverwrite.Checked := backupOverwrite;
   end;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
@@ -280,10 +282,11 @@ begin
     workDays := workDays + ifThen(CheckBoxFri.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxSat.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxSun.Checked, '+', '-');
-    action := ComboBoxBackupAction.ItemIndex;
-    daysOld := CIntEditBackupAge.Value;
-    directory := CStaticBackupCat.DataId;;
-    fileName := EditBackupName.Text;
+    backupAction := ComboBoxBackupAction.ItemIndex;
+    backupDaysOld := CIntEditBackupAge.Value;
+    backupDirectory := CStaticBackupCat.DataId;;
+    backupFileName := EditBackupName.Text;
+    backupOverwrite := CheckBoxCanOverwrite.Checked;
     xReg := TRegistry.Create;
     try
       xReg.RootKey := HKEY_CURRENT_USER;
@@ -401,6 +404,7 @@ procedure TCPreferencesForm.ComboBoxBackupActionChange(Sender: TObject);
 begin
   CStaticBackupCat.Enabled := (ComboBoxBackupAction.ItemIndex = 0) or (ComboBoxBackupAction.ItemIndex = 1);
   EditBackupName.Enabled := CStaticBackupCat.Enabled;
+  CheckBoxCanOverwrite.Enabled := CStaticBackupCat.Enabled;
   ActionAdd.Enabled := EditBackupName.Enabled;
   CIntEditBackupAge.Enabled := (ComboBoxBackupAction.ItemIndex = 2);
 end;
@@ -417,7 +421,8 @@ end;
 procedure TCPreferencesForm.CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 var xDir: String;
 begin
-  AAccepted := SelectDirectory('Wybierz katalog kopii', ADataGid, xDir);
+  xDir := ADataGid;
+  AAccepted := SelectDirectory('Wybierz katalog kopii', '', xDir);
   if AAccepted then begin
     AText := MinimizeName(xDir, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
     ADataGid := xDir;

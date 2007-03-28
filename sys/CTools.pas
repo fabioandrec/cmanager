@@ -33,6 +33,31 @@ type
     property ByName[AName: String]: TSum read GetByName;
   end;
 
+  TConsoleRedirect = class(TObject)
+  private
+    FStartupInfo: TStartupInfo;
+    FProcessInfo: TProcessInformation;
+    FStdSecurityAttributes: TSecurityAttributes;
+    FErrSecurityAttributes: TSecurityAttributes;
+    FIsRunning: Boolean;
+    FCmdLine: String;
+    FParameters: String;
+    FReadStdPipe: THandle;
+    FWriteStdPipe: THandle;
+    FReadErrPipe: THandle;
+    FWriteErrPipe: THandle;
+    procedure ReadRedirectedOutput(APipe: THandle; AOutput: TStrings);
+  public
+    constructor Create(ACmdLine, AParameters: String);
+    function Execute(AStdOutput: TStrings; AErrOutput: TStrings; var AExitCode: Cardinal): Cardinal;
+  published
+    property StartupInfo: TStartupInfo read FStartupInfo;
+    property ProcessInfo: TProcessInformation read FProcessInfo;
+    property IsRunning: Boolean read FIsRunning;
+    property CmdLine: String read FCmdLine;
+    property Parameters: String read FParameters;
+  end;
+
 
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
@@ -41,6 +66,7 @@ function GetParamValue(AParam: String): String;
 function GetSwitch(ASwitch: String): Boolean;
 function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
 function LPad(AString: String; AChar: Char; ALength: Integer): String;
+function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 
 implementation
 
@@ -238,6 +264,130 @@ begin
       xDisableProcessWindowsGhosting;
     end;
   end;
+end;
+
+constructor TConsoleRedirect.Create(ACmdLine, AParameters: String);
+begin
+  inherited Create;
+  FCmdLine := ACmdLine;
+  FParameters := AParameters;
+  FIsRunning := False;
+end;
+
+function TConsoleRedirect.Execute(AStdOutput: TStrings; AErrOutput: TStrings; var AExitCode: Cardinal): Cardinal;
+var xCommand: String;
+    xRes: Cardinal;
+begin
+  FIsRunning := False;
+  Result := ERROR_SUCCESS;
+  xCommand := '"' + FCmdLine + '" ' + FParameters;
+  FillChar(FStartupInfo, SizeOf(FStartupInfo), #0);
+  FillChar(FStdSecurityAttributes, SizeOf(FStdSecurityAttributes), #0);
+  FillChar(FErrSecurityAttributes, SizeOf(FErrSecurityAttributes), #0);
+  FillChar(FProcessInfo, SizeOf(FProcessInfo), #0);
+  with FStdSecurityAttributes do begin
+    nLength := Sizeof(FStdSecurityAttributes);
+    bInheritHandle := True
+  end;
+  with FErrSecurityAttributes do begin
+    nLength := Sizeof(FErrSecurityAttributes);
+    bInheritHandle := True
+  end;
+  if CreatePipe(FReadStdPipe, FWriteStdPipe, @FStdSecurityAttributes, 0) then begin
+    if CreatePipe(FReadErrPipe, FWriteErrPipe, @FErrSecurityAttributes, 0) then begin
+      try
+        SetHandleInformation(FReadStdPipe, HANDLE_FLAG_INHERIT, 0);
+        SetHandleInformation(FReadErrPipe, HANDLE_FLAG_INHERIT, 0);
+        with FStartupInfo do begin
+          cb := SizeOf(StartupInfo);
+          dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
+          wShowWindow := SW_HIDE;
+          hStdOutput := FWriteStdPipe;
+          hStdError := FWriteErrPipe;
+        end;
+        if CreateProcess(nil, PChar(xCommand), nil, nil, True, CREATE_NEW_CONSOLE, nil, nil, FStartupInfo, FProcessInfo) then begin
+          CloseHandle(FWriteStdPipe);
+          FWriteStdPipe := INVALID_HANDLE_VALUE;
+          CloseHandle(FWriteErrPipe);
+          FWriteErrPipe := INVALID_HANDLE_VALUE;
+          try
+            FIsRunning := True;
+            repeat
+              ReadRedirectedOutput(FReadStdPipe, AStdOutput);
+              ReadRedirectedOutput(FReadErrPipe, AErrOutput);
+              xRes := WaitForSingleObject(ProcessInfo.hProcess, 0);
+              if xRes = WAIT_OBJECT_0 then begin
+                FIsRunning := False;
+              end else if xRes = WAIT_FAILED then begin
+                FIsRunning := False;
+                Result := GetLastError;
+              end;
+            until not FIsRunning;
+          finally
+            CloseHandle(FProcessInfo.hThread);
+            CloseHandle(FProcessInfo.hProcess);
+          end;
+        end else begin
+          Result := GetLastError;
+        end;
+      finally
+        CloseHandle(FReadStdPipe);
+        CloseHandle(FReadErrPipe);
+        if FWriteStdPipe <> INVALID_HANDLE_VALUE then begin
+          CloseHandle(FWriteStdPipe);
+        end;
+        if FWriteErrPipe <> INVALID_HANDLE_VALUE then begin
+          CloseHandle(FWriteErrPipe);
+        end;
+      end;
+    end else begin
+      Result := GetLastError;
+    end;
+  end else begin
+    Result := GetLastError;
+  end;
+end;
+
+procedure TConsoleRedirect.ReadRedirectedOutput(APipe: THandle; AOutput: TStrings);
+var xBuffer: Array[0..1024] of Char;
+    xRead: Cardinal;
+    xFinished: Boolean;
+begin
+  xFinished := False;
+  repeat
+    if ReadFile(APipe, xBuffer, 1024, xRead, Nil) then begin
+      if xRead > 0 then begin
+        xBuffer[xRead + 1] := #0;
+        AOutput.Text := AOutput.Text + StrPas(xBuffer);
+      end else begin
+        xFinished := True;
+      end;
+    end else begin
+      xFinished := True;
+    end;
+  until xFinished;
+end;
+
+function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
+var xRedir: TConsoleRedirect;
+    xOut, xErr: TStringList;
+    xExitCode: Cardinal;
+    xResult: Cardinal;
+begin
+  xOut := TStringList.Create;
+  xErr := TStringList.Create;
+  xRedir := TConsoleRedirect.Create(ACmdline, AParams);
+  xResult := xRedir.Execute(xOut, xErr, xExitCode);
+  if xResult <> ERROR_SUCCESS then begin
+    AOutputInfo := SysErrorMessage(xResult);
+    Result := False;
+  end else begin
+    AOutputInfo := xOut.Text;
+    Result := xExitCode = 0;
+  end;
+  xRedir.Free;
+  xErr.Free;
+  xOut.Free;
 end;
 
 end.

@@ -284,15 +284,27 @@ var xPref: TBackupPref;
 begin
   xMustbackup := False;
   xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDatabaseName]);
-  if GBasePreferences.action = CBackupActionOnce then begin
+  if GBasePreferences.backupAction = CBackupActionOnce then begin
     if xPref <> Nil then begin
       xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
     end else begin
       xMustbackup := True;
     end;
-  end else if GBasePreferences.action = CBackupActionAlways then begin
+  end else if GBasePreferences.backupAction = CBackupActionAlways then begin
     xMustbackup := True;
-  end else if GBasePreferences.action = CBackupActionAsk then begin
+  end else if GBasePreferences.backupAction = CBackupActionAsk then begin
+    if xPref = Nil then begin
+      xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.' + sLineBreak +
+                                          'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
+    end else begin
+      if DaysBetween(Today, xPref.lastBackup) + 1 >= GBasePreferences.backupDaysOld then begin
+        xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.' + sLineBreak +
+                                            'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
+      end;
+    end;
+  end;
+  if xMustbackup then begin
+    GBackupThread := TBackupThread.Create(GDatabaseName);
   end;
 end;
 

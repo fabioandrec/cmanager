@@ -327,6 +327,36 @@ type
     property OnCDataListReloadTree: TCDataListOnReloadTree read FCOnReloadTree write FCOnReloadTree;
   end;
 
+  TCStatusPanel = class(TStatusPanel)
+  private
+    FImageIndex: Integer;
+    FClickable: Boolean;
+    procedure SetImageIndex(const Value: Integer);
+  public
+    constructor Create(Collection: TCollection); override;
+  published
+    property ImageIndex: Integer read FImageIndex write SetImageIndex;
+    property Clickable: Boolean read FClickable write FClickable;
+  end;
+
+  TCStatusBar = class(TStatusBar)
+  private
+    FImageList: TPngImageList;
+  protected
+    function GetPanelClass: TStatusPanelClass; override;
+    procedure DrawPanel(Panel: TStatusPanel; const Rect: TRect); override;
+    procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure MouseMove(Shift: TShiftState; X: Integer; Y: Integer); override;
+  public
+    procedure SetPngImageList(const Value: TPngImageList);
+    procedure UpdateCursor;
+    function GetPanelWithMouse: TCStatusPanel;
+    constructor Create(AOwner: TComponent); override;
+  published
+    property ImageList: TPngImageList read FImageList write SetPngImageList;
+  end;
+
 function GetCurrencySymbol: string;
 
 procedure Register;
@@ -337,7 +367,7 @@ uses Forms, CCalendarFormUnit, DateUtils, ComObj;
 
 procedure Register;
 begin
-  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList]);
+  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar]);
 end;
 
 procedure TCButton.ActionChange(Sender: TObject; CheckDefaults: Boolean);
@@ -1656,6 +1686,110 @@ end;
 function TCDataListElementObject.GetElementType: String;
 begin
   Result := ClassName;
+end;
+
+procedure TCStatusBar.CMMouseenter(var Message: TMessage);
+begin
+  UpdateCursor;
+end;
+
+procedure TCStatusBar.CMMouseleave(var Message: TMessage);
+begin
+  if (not (csDesigning in ComponentState)) and Enabled then begin
+    Cursor := crDefault;
+  end;
+end;
+
+constructor TCStatusBar.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  ControlStyle := ControlStyle + [csAcceptsControls];
+  FImageList := Nil;
+end;
+
+procedure TCStatusBar.DrawPanel(Panel: TStatusPanel; const Rect: TRect);
+var xImageIndex: Integer;
+    xMargin: Integer;
+begin
+  inherited DrawPanel(Panel, Rect);
+  if Panel.Style = psOwnerDraw then begin
+    xMargin := 0;
+    if (FImageList <> Nil) then begin
+      xImageIndex := TCStatusPanel(Panel).ImageIndex;
+      if xImageIndex <> -1 then begin
+        ImageList.Draw(Canvas, Rect.Left + 2, Rect.Top, xImageIndex);
+        xMargin := ImageList.Width + 4;
+      end;
+    end;
+    Canvas.TextOut(Rect.Left + xMargin, 4, Panel.Text);
+  end;
+end;
+
+function TCStatusBar.GetPanelClass: TStatusPanelClass;
+begin
+  Result := TCStatusPanel;
+end;
+
+function TCStatusBar.GetPanelWithMouse: TCStatusPanel;
+var xP: TPoint;
+    xCount: Integer;
+    xRect: TRect;
+begin
+  Result := Nil;
+  xP := Self.ScreenToClient(Mouse.CursorPos);
+  xCount := 0;
+  while (xCount <= Panels.Count - 1) and (Result = Nil) do begin
+    if SendMessage(Handle, SB_GETRECT, xCount, Integer(@xRect)) = 1 then begin
+      if (xP.X >= xRect.Left) and (xP.X <= xRect.Right) then begin
+        Result := TCStatusPanel(Panels.Items[xCount]);
+      end;
+    end;
+    Inc(xCount);
+  end;
+end;
+
+procedure TCStatusBar.MouseMove(Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+  UpdateCursor;
+end;
+
+procedure TCStatusBar.SetPngImageList(const Value: TPngImageList);
+begin
+  if FImageList <> Value then begin
+    FImageList := Value;
+    Invalidate;
+  end;
+end;
+
+constructor TCStatusPanel.Create(Collection: TCollection);
+begin
+  inherited Create(Collection);
+  FImageIndex := -1;
+  FClickable := False;
+end;
+
+procedure TCStatusPanel.SetImageIndex(const Value: Integer);
+begin
+  if FImageIndex <> Value then begin
+    FImageIndex := Value;
+    TStatusBar(TStatusPanels(Collection).Owner).Invalidate;
+  end;
+end;
+
+procedure TCStatusBar.UpdateCursor;
+var xPanel: TCStatusPanel;
+begin
+  if (not (csDesigning in ComponentState)) and Enabled then begin
+    xPanel := GetPanelWithMouse;
+    if (xPanel <> Nil) then begin
+      if xPanel.Clickable then begin
+        Cursor := crHandPoint;
+      end else begin
+        Cursor := crDefault;
+      end;
+    end;
+  end;
 end;
 
 end.

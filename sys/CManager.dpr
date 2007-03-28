@@ -123,8 +123,9 @@ begin
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;
-        CheckForBackups;
         Application.CreateForm(TCMainForm, CMainForm);
+        CheckForBackups;
+        Application.ProcessMessages;
         Application.Run;
         CMainForm.FinalizeMainForm;
       end;

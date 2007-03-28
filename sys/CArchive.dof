@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=-x -b x.bak -u cmanager.dat
+RunParams=-x -u cmanage1r.dat -b a.xxx
 HostApplication=
 Launcher=
 UseLauncher=0
@@ -110,12 +110,12 @@ ActiveLang=
 ProjectLang=
 RootDir=
 [Version Info]
-IncludeVerInfo=0
-AutoIncBuild=0
+IncludeVerInfo=1
+AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=0
-Build=0
+Build=1
 Debug=0
 PreRelease=0
 Special=0
@@ -125,13 +125,13 @@ Locale=1045
 CodePage=1250
 [Version Info Keys]
 CompanyName=
-FileDescription=
-FileVersion=1.0.0.0
+FileDescription=CArchive - tworzenie kopii plików danych
+FileVersion=1.0.0.1
 InternalName=
 LegalCopyright=
 LegalTrademarks=
-OriginalFilename=
-ProductName=
+OriginalFilename=CArchive
+ProductName=CArchive
 ProductVersion=1.0.0.0
 Comments=
 [HistoryLists\hlConditionals]

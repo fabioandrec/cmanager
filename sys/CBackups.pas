@@ -36,7 +36,7 @@ type
 
 const ARCHIVE_TYPE = 'CMB';
 
-function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string; AProgressEvent: TProgressEvent): Boolean;
 function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
 
 implementation
@@ -82,6 +82,7 @@ end;
 function TBackupRestore.CompressFile(AInFile, AOutFile: String; var AError: String): Boolean;
 var xInStream, xOutStream: TFileStream;
     xExists: Boolean;
+    xWasError: Boolean;
 begin
   Result := False;
   if FileExists(AInFile) then begin
@@ -90,14 +91,40 @@ begin
       xExists := not DeleteFile(AOutFile);
     end;
     if not xExists then begin
-      xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareDenyNone);
-      xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareDenyNone);
-      Result := Compress(xInStream, xOutStream, AError);
-      if not Result then begin
-        DeleteFile(AOutFile);
+      xInStream := Nil;
+      xOutStream := Nil;
+      try
+        xWasError := False;
+        try
+          xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareDenyNone);
+        except
+          on E: Exception do begin
+            AError := E.Message;
+            xWasError := True;
+          end;
+        end;
+        try
+          xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareDenyNone);
+        except
+          on E: Exception do begin
+            AError := E.Message;
+            xWasError := True;
+          end;
+        end;
+        if not xWasError then begin
+          Result := Compress(xInStream, xOutStream, AError);
+        end;
+        if not Result then begin
+          DeleteFile(AOutFile);
+        end;
+      finally
+        if xInStream <> Nil then begin
+          xInStream.Free;
+        end;
+        if xOutStream <> Nil then begin
+          xOutStream.Free;
+        end;
       end;
-      xInStream.Free;
-      xOutStream.Free;
     end else begin
       AError := 'Plik ' + AOutFile + ' ju¿ istnieje';
     end;
@@ -161,7 +188,7 @@ begin
       xInStream.Free;
       xOutStream.Free;
     end else begin
-      AError := 'Plik ' + AInFile + ' ju¿ istnieje';
+      AError := 'Plik ' + AOutFile + ' ju¿ istnieje';
     end;
   end else begin
     AError := 'Nie mo¿na odnaleŸæ pliku ' + AInFile;
@@ -214,10 +241,10 @@ begin
   AInStream.Seek(soFromBeginning, 0);
 end;
 
-function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string; AProgressEvent: TProgressEvent): Boolean;
 var xBackup: TBackupRestore;
 begin
-  xBackup := TBackupRestore.Create(ACanoverride);
+  xBackup := TBackupRestore.Create(ACanoverride, AProgressEvent);
   Result := xBackup.CompressFile(AFilename, ABackupname, AError);
   xBackup.Free;
 end;
@@ -226,7 +253,7 @@ function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolea
 var xBackup: TBackupRestore;
 begin
   xBackup := TBackupRestore.Create(ACanoverride);
-  Result := xBackup.DecompressFile(AFilename, ABackupname, AError);
+  Result := xBackup.DecompressFile(ABackupname, AFilename, AError);
   xBackup.Free;
 end;
 
