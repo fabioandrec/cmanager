@@ -16,13 +16,22 @@ type
     N1: TMenuItem;
     Ustawienialisty1: TMenuItem;
     Wywietljakoraport1: TMenuItem;
+    Eksportuj1: TMenuItem;
+    ExportSaveDialog: TSaveDialog;
+    JakoplikTXT1: TMenuItem;
+    JakoplikRTF1: TMenuItem;
+    JakoplikHTML1: TMenuItem;
     procedure Ustawienialisty1Click(Sender: TObject);
     procedure Wywietljakoraport1Click(Sender: TObject);
+    procedure JakoplikTXT1Click(Sender: TObject);
+    procedure JakoplikRTF1Click(Sender: TObject);
+    procedure JakoplikHTML1Click(Sender: TObject);
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;
     FMultipleChecks: TStringList;
     FOwner: TComponent;
+    function ExportTree(AType: Integer): String;
   protected
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
@@ -328,6 +337,63 @@ begin
   end else begin
     Result := Nil;
   end;
+end;
+
+function TCBaseFrame.ExportTree(AType: Integer): String;
+var xFilter: String;
+    xStr: TStringList;
+    xDef: String;
+    xReport: TVirtualStringReport;
+    xParams: TCVirtualStringTreeParams;
+begin
+  case AType of
+    0: begin
+      xFilter := 'pliki HTML|*.html';
+      xDef := '.html';
+    end;
+    1: begin
+      xFilter := 'pliki RTF|*.rtf';
+      xDef := '.rtf';
+    end;
+    2: begin
+      xFilter := 'pliki TXT|*.txt';
+      xDef := '.txt';
+    end;
+  end;
+  ExportSaveDialog.Filter := xFilter;
+  ExportSaveDialog.DefaultExt := xDef;
+  if ExportSaveDialog.Execute then begin
+    xStr := TStringList.Create;
+    case AType of
+      0: begin
+        xParams := TCVirtualStringTreeParams.Create(GetList, GetTitle);
+        xReport := TVirtualStringReport.CreateReport(xParams);
+        xStr.Text := xReport.PrepareContent;
+        xReport.Free;
+        xParams.Free;
+      end;
+      1: xStr.Text := GetList.ContentToRTF(tstAll);
+      2: xStr.Text := GetList.ContentToText(tstAll, #9);
+    end;
+    Result := xStr.Text;
+    xStr.SaveToFile(ExportSaveDialog.FileName);
+    xStr.Free;
+  end;
+end;
+
+procedure TCBaseFrame.JakoplikTXT1Click(Sender: TObject);
+begin
+  ExportTree(2);
+end;
+
+procedure TCBaseFrame.JakoplikRTF1Click(Sender: TObject);
+begin
+  ExportTree(1);
+end;
+
+procedure TCBaseFrame.JakoplikHTML1Click(Sender: TObject);
+begin
+  ExportTree(0);
 end;
 
 initialization

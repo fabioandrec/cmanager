@@ -86,6 +86,7 @@ type
     function GetFormClass: TCReportFormClass; virtual; abstract;
     procedure PrepareReportData; virtual; abstract;
     procedure CleanReportData; virtual; abstract;
+    procedure SaveContentToFile(AFilename: String); virtual; abstract;
   public
     constructor CreateReport(AParams: TCReportParams); virtual;
     procedure ShowReport;
@@ -96,7 +97,8 @@ type
   private
     FreportPath: String;
     FreportText: TStringList;
-    procedure PrepareReportPath;
+    procedure PrepareReportPath(AInTemp: Boolean);
+    procedure PrepareReportContent;
   protected
     procedure CleanReportData; override;
     procedure PrepareReportData; override;
@@ -105,6 +107,7 @@ type
     function GetFormClass: TCReportFormClass; override;
   public
     constructor CreateReport(AParams: TCReportParams); override;
+    function PrepareContent: String;
     destructor Destroy; override;
   end;
 
@@ -115,7 +118,6 @@ type
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
     function GetChart: TChart;
-    procedure CleanReportData; override;
   end;
 
   TAccountBalanceOnDayReport = class(TCHtmlReport)
@@ -896,10 +898,10 @@ begin
   if PrepareReportConditions then begin
     GDataProvider.BeginTransaction;
     PrepareReportData;
+    GDataProvider.RollbackTransaction;
     Fform.Caption := 'Raport';
     Fform.ShowConfig(coNone);
     CleanReportData;
-    GDataProvider.RollbackTransaction;
   end;
   Fform.Free;
 end;
@@ -939,21 +941,36 @@ begin
   Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
 end;
 
-procedure TCHtmlReport.PrepareReportData;
+function TCHtmlReport.PrepareContent: String;
+begin
+  GDataProvider.BeginTransaction;
+  PrepareReportPath(False);
+  PrepareReportContent;
+  GDataProvider.RollbackTransaction;
+  Result := FreportText.Text;
+  CleanReportData;
+end;
+
+procedure TCHtmlReport.PrepareReportContent;
 var xText: String;
 begin
-  PrepareReportPath;
   xText := FreportText.Text;
   xText := StringReplace(xText, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
   xText := StringReplace(xText, '[repbody]', GetReportBody, [rfReplaceAll, rfIgnoreCase]);
   xText := StringReplace(xText, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
   FreportText.Text := xText;
+end;
+
+procedure TCHtmlReport.PrepareReportData;
+begin
+  PrepareReportPath(True);
+  PrepareReportContent;
   FreportText.SaveToFile(FreportPath + 'report.htm');
   CopyFile(PChar(GetSystemPathname('report.css')), PChar(FreportPath + 'report.css'), False);
   TCHtmlReportForm(FForm).CBrowser.Navigate('file://' + FreportPath + 'report.htm');
 end;
 
-procedure TCHtmlReport.PrepareReportPath;
+procedure TCHtmlReport.PrepareReportPath(AInTemp: Boolean);
 var xRes: TResourceStream;
 begin
   FreportPath := GetReportPath(IntToStr(GetTickCount));
@@ -968,11 +985,9 @@ begin
     xRes.Free;
   end;
   FreportText.LoadFromFile(GetSystemPathname('report.htm'));
-  ForceDirectories(FreportPath)
-end;
-
-procedure TCChartReport.CleanReportData;
-begin
+  if AInTemp then begin
+    ForceDirectories(FreportPath)
+  end;
 end;
 
 function TCChartReport.GetChart: TChart;

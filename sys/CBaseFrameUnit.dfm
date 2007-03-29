@@ -27,5 +27,24 @@ object CBaseFrame: TCBaseFrame
       Caption = 'Wy'#347'wietl jako raport'
       OnClick = Wywietljakoraport1Click
     end
+    object Eksportuj1: TMenuItem
+      Caption = 'Zapisz jako'
+      object JakoplikTXT1: TMenuItem
+        Caption = 'prosty tekst'
+        OnClick = JakoplikTXT1Click
+      end
+      object JakoplikRTF1: TMenuItem
+        Caption = 'tekst sformatowany'
+        OnClick = JakoplikRTF1Click
+      end
+      object JakoplikHTML1: TMenuItem
+        Caption = 'strona web'
+        OnClick = JakoplikHTML1Click
+      end
+    end
+  end
+  object ExportSaveDialog: TSaveDialog
+    Left = 72
+    Top = 120
   end
 end
