@@ -27,4 +27,3 @@ create view filters as
 alter table plannedMovement add freeDays varchar(1) not null;
 update plannedMovement set freeDays = 'E';
 alter table plannedMovement add constraint ck_freeDays check (freeDays in ('E', 'D', 'I'));
-  
