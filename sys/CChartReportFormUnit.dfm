@@ -112,7 +112,12 @@ inherited CChartReportForm: TCChartReportForm
     end
   end
   inherited PanelButtons: TPanel
-    inherited BitBtn2: TBitBtn
+    inherited CButton3: TCButton
+      Left = 76
+    end
+  end
+  inherited ActionList: TActionList
+    inherited Action2: TAction
       Visible = False
     end
   end

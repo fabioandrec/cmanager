@@ -4,14 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls, Printers, ActiveX;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls, Printers, ActiveX,
+  ActnList, CComponents;
 
 type
   TCMemoForm = class(TCConfigForm)
     RichEdit: TRichEdit;
-    SpeedButton1: TSpeedButton;
     PrinterSetupDialog: TPrinterSetupDialog;
-    procedure SpeedButton1Click(Sender: TObject);
+    ActionList: TActionList;
+    Action1: TAction;
+    CButton1: TCButton;
+    procedure Action1Execute(Sender: TObject);
   end;
 
 procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer);
@@ -34,7 +37,7 @@ begin
   xForm.Free;
 end;
 
-procedure TCMemoForm.SpeedButton1Click(Sender: TObject);
+procedure TCMemoForm.Action1Execute(Sender: TObject);
 begin
   if Printer.Printers.Count > 0 then begin
     if PrinterSetupDialog.Execute then begin

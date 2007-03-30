@@ -85,7 +85,6 @@ type
     function GetReportFooter: String; virtual; abstract;
     function GetFormClass: TCReportFormClass; virtual; abstract;
     procedure PrepareReportData; virtual; abstract;
-    procedure CleanReportData; virtual; abstract;
     procedure SaveContentToFile(AFilename: String); virtual; abstract;
   public
     constructor CreateReport(AParams: TCReportParams); virtual;
@@ -95,12 +94,11 @@ type
 
   TCHtmlReport = class(TCBaseReport)
   private
-    FreportPath: String;
     FreportText: TStringList;
-    procedure PrepareReportPath(AInTemp: Boolean);
+    FreportStyle: TStringList;
+    procedure PrepareReportPath;
     procedure PrepareReportContent;
   protected
-    procedure CleanReportData; override;
     procedure PrepareReportData; override;
     function GetReportBody: String; virtual; abstract;
     function GetReportFooter: String; override;
@@ -109,6 +107,7 @@ type
     constructor CreateReport(AParams: TCReportParams); override;
     function PrepareContent: String;
     destructor Destroy; override;
+    property reportText: TStringList read FreportText;
   end;
 
   TCChartReport = class(TCBaseReport)
@@ -894,40 +893,28 @@ end;
 
 procedure TCBaseReport.ShowReport;
 begin
-  Fform := GetFormClass.Create(Nil);
+  Fform := GetFormClass.CreateForm(Self);
   if PrepareReportConditions then begin
     GDataProvider.BeginTransaction;
     PrepareReportData;
     GDataProvider.RollbackTransaction;
     Fform.Caption := 'Raport';
     Fform.ShowConfig(coNone);
-    CleanReportData;
   end;
   Fform.Free;
-end;
-
-procedure TCHtmlReport.CleanReportData;
-var xRec: TSearchRec;
-    xRes: Integer;
-begin
-  xRes := FindFirst(FreportPath + '*.*', faAnyFile, xRec);
-  while (xRes = 0) do begin
-    DeleteFile(FreportPath + xRec.Name);
-    xRes := FindNext(xRec);
-  end;
-  FindClose(xRec);
-  RemoveDir(FreportPath);
 end;
 
 constructor TCHtmlReport.CreateReport(AParams: TCReportParams);
 begin
   inherited CreateReport(AParams);
   FreportText := TStringList.Create;
+  FreportStyle := TStringList.Create;
 end;
 
 destructor TCHtmlReport.Destroy;
 begin
   FreportText.Free;
+  FreportStyle.Free;
   inherited Destroy;
 end;
 
@@ -944,17 +931,17 @@ end;
 function TCHtmlReport.PrepareContent: String;
 begin
   GDataProvider.BeginTransaction;
-  PrepareReportPath(False);
+  PrepareReportPath;
   PrepareReportContent;
   GDataProvider.RollbackTransaction;
   Result := FreportText.Text;
-  CleanReportData;
 end;
 
 procedure TCHtmlReport.PrepareReportContent;
 var xText: String;
 begin
   xText := FreportText.Text;
+  xText := StringReplace(xText, '[repstyle]', FreportStyle.Text, [rfReplaceAll, rfIgnoreCase]);
   xText := StringReplace(xText, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
   xText := StringReplace(xText, '[repbody]', GetReportBody, [rfReplaceAll, rfIgnoreCase]);
   xText := StringReplace(xText, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
@@ -963,17 +950,14 @@ end;
 
 procedure TCHtmlReport.PrepareReportData;
 begin
-  PrepareReportPath(True);
+  PrepareReportPath;
   PrepareReportContent;
-  FreportText.SaveToFile(FreportPath + 'report.htm');
-  CopyFile(PChar(GetSystemPathname('report.css')), PChar(FreportPath + 'report.css'), False);
-  TCHtmlReportForm(FForm).CBrowser.Navigate('file://' + FreportPath + 'report.htm');
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
 end;
 
-procedure TCHtmlReport.PrepareReportPath(AInTemp: Boolean);
+procedure TCHtmlReport.PrepareReportPath;
 var xRes: TResourceStream;
 begin
-  FreportPath := GetReportPath(IntToStr(GetTickCount));
   if not FileExists(GetSystemPathname('report.css')) then begin
     xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
     xRes.SaveToFile(GetSystemPathname('report.css'));
@@ -985,9 +969,7 @@ begin
     xRes.Free;
   end;
   FreportText.LoadFromFile(GetSystemPathname('report.htm'));
-  if AInTemp then begin
-    ForceDirectories(FreportPath)
-  end;
+  FreportStyle.LoadFromFile(GetSystemPathname('report.css'));
 end;
 
 function TCChartReport.GetChart: TChart;

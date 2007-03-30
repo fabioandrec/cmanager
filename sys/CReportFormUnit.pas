@@ -5,35 +5,35 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, OleCtrls, SHDocVw,
-  CComponents;
+  CComponents, ActnList, ImgList, PngImageList, CImageListsUnit;
 
 type
   TCReportForm = class(TCConfigForm)
-    BitBtn1: TBitBtn;
-    BitBtn2: TBitBtn;
-    procedure BitBtn2Click(Sender: TObject);
-    procedure BitBtn1Click(Sender: TObject);
+    ActionList: TActionList;
+    Action1: TAction;
+    Action2: TAction;
+    Action3: TAction;
+    CButton1: TCButton;
+    CButton2: TCButton;
+    CButton3: TCButton;
+    SaveDialog: TSaveDialog;
+    procedure Action1Execute(Sender: TObject);
+    procedure Action3Execute(Sender: TObject);
+    procedure Action2Execute(Sender: TObject);
   private
+    FReport: TObject;
   protected
     procedure DoPrint; virtual;
     procedure DoPreview; virtual;
+    procedure DoSave; virtual;
   public
-    { Public declarations }
+    constructor CreateForm(AReport: TObject);
+    property Report: TObject read FReport;
   end;
 
 implementation
 
 {$R *.dfm}
-
-procedure TCReportForm.BitBtn2Click(Sender: TObject);
-begin
-  DoPreview;
-end;
-
-procedure TCReportForm.BitBtn1Click(Sender: TObject);
-begin
-  DoPrint;
-end;
 
 procedure TCReportForm.DoPreview;
 begin
@@ -41,6 +41,32 @@ end;
 
 procedure TCReportForm.DoPrint;
 begin
+end;
+
+procedure TCReportForm.Action1Execute(Sender: TObject);
+begin
+  DoPrint;
+end;
+
+procedure TCReportForm.Action3Execute(Sender: TObject);
+begin
+  DoSave;
+end;
+
+procedure TCReportForm.DoSave;
+begin
+  DoSave;
+end;
+
+procedure TCReportForm.Action2Execute(Sender: TObject);
+begin
+  DoPreview;
+end;
+
+constructor TCReportForm.CreateForm(AReport: TObject);
+begin
+  inherited Create(Nil);
+  FReport := AReport;
 end;
 
 end.

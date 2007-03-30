@@ -25,6 +25,7 @@ type
     TemplateImageList16x16: TPngImageList;
     LimitsImageList24x24: TPngImageList;
     StatusbarImagesList16x16: TPngImageList;
+    ActionImageList: TPngImageList;
   private
     { Private declarations }
   public
