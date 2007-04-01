@@ -291,7 +291,7 @@ begin
     try
       xReg.RootKey := HKEY_CURRENT_USER;
       if xReg.OpenKey('Software\Microsoft\Windows\CurrentVersion\Run', False) then begin
-        if startupInfo then begin
+        if startupInfo or startupInfoSurpassedLimit then begin
           xReg.WriteString('CManagerCheckOnly', '"' + ExpandFileName(ParamStr(0)) + '" /checkonly');
         end else begin
           xReg.DeleteValue('CManagerCheckOnly');

@@ -5,4 +5,4 @@ brcc32 carchiveicons.rc
 brcc32 strings.rc
 dcc32 /b /q cmanager.dpr
 dcc32 /b /q cupdate.dpr
-dcc32 /b /q archive.dpr
+dcc32 /b /q carchive.dpr

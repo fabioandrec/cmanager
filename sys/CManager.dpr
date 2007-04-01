@@ -124,7 +124,9 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        CheckForBackups;
+        if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
+          CheckForBackups;
+        end;
         Application.ProcessMessages;
         Application.Run;
         CMainForm.FinalizeMainForm;

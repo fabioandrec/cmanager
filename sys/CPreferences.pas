@@ -557,7 +557,7 @@ begin
   FstartupInfoOldOut := GetXmlAttribute('startupInfoOldOut', ANode, True);
   FstartupInfoAlways := GetXmlAttribute('startupInfoAlways', ANode, True);
   FstartupCheckUpdates := GetXmlAttribute('startupCheckUpdates', ANode, False);
-  FstartupInfoSurpassedLimit := GetXmlAttribute('startupInfoSurpassedLimit', ANode, True);
+  FstartupInfoSurpassedLimit := GetXmlAttribute('startupInfoSurpassedLimit', ANode, False);
   FstartupInfoValidLimits := GetXmlAttribute('startupInfoValidLimits', ANode, False);
   FworkDays := GetXmlAttribute('workDays', ANode, '+++++--');
   if Length(FworkDays) <> 7 then begin
@@ -897,7 +897,7 @@ initialization
     startupInfoOldIn := True;
     startupInfoOldOut := True;
     startupInfoAlways := True;
-    startupInfoSurpassedLimit := True;
+    startupInfoSurpassedLimit := False;
     startupInfoValidLimits := False;
     startupCheckUpdates := False;
     workDays := '+++++--';
