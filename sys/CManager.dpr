@@ -88,7 +88,8 @@ uses
   CDataobjectFrameUnit in 'CDataobjectFrameUnit.pas' {CDataobjectFrame: TFrame},
   CLimitFormUnit in 'CLimitFormUnit.pas' {CLimitForm},
   CSurpassedFormUnit in 'CSurpassedFormUnit.pas' {CSurpassedForm},
-  CBackups in 'CBackups.pas';
+  CBackups in 'CBackups.pas',
+  CAdox in 'CAdox.pas';
 
 {$R *.res}
 
@@ -124,7 +125,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
+  if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
         end;
         Application.ProcessMessages;

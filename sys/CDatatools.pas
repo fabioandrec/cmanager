@@ -7,8 +7,6 @@ interface
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
      DateUtils;
 
-function CreateDatabase(AFilename: String; var AError: String): Boolean;
-function CompactDatabase(AFilename: String; var AError: String): Boolean;
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -26,61 +24,6 @@ implementation
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
   CTools, StrUtils, CPreferences;
-
-function CreateDatabase(AFilename: String; var AError: String): Boolean;
-var xCatalog : OLEVariant;
-begin
-  Result := False;
-  try
-    try
-      xCatalog := CreateOleObject('ADOX.Catalog');
-      xCatalog.Create(Format(CCreateDatabaseString, [AFilename]));
-      Result := True;
-    except
-      on E: Exception do begin
-        AError := E.Message;
-      end;
-    end
-  finally
-    xCatalog := Unassigned;
-  end;
-end;
-
-function CompactDatabase(AFilename: String; var AError: String): Boolean;
-var xJetEngine: OLEVariant;
-    xCompactedFilename: String;
-    xTempbackupFilename: String;
-begin
-  Result := False;
-  xCompactedFilename := IncludeTrailingPathDelimiter(ExtractFilePath(AFilename)) + FormatDateTime('yyyymmddhhnnss', Now) + '.dat';
-  xTempbackupFilename := ChangeFileExt(xCompactedFilename, '.bak');
-  if FileExists(xCompactedFilename) then begin
-    DeleteFile(xCompactedFilename);
-  end;
-  if FileExists(xTempbackupFilename) then begin
-    DeleteFile(xTempbackupFilename);
-  end;
-  try
-    try
-      xJetEngine := CreateOleObject('JRO.JetEngine');
-      xJetEngine.CompactDatabase(Format(CCompactDatabaseString, [AFilename]), Format(CCompactDatabaseString, [xCompactedFilename]));
-    except
-      on E: Exception do begin
-        AError := E.Message;
-      end;
-    end
-  finally
-    xJetEngine := Unassigned;
-    if RenameFile(AFilename, xTempbackupFilename) then begin
-      if RenameFile(xCompactedFilename, AFilename) then begin
-        DeleteFile(xTempbackupFilename);
-        Result := True;
-      end else begin
-        RenameFile(xTempbackupFilename, AFilename);
-      end;
-    end;
-  end;
-end;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
