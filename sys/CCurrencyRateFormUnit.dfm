@@ -1,14 +1,18 @@
 inherited CCurrencyRateForm: TCCurrencyRateForm
+  Left = 201
+  Top = 152
   Caption = 'Kurs waluty'
-  ClientHeight = 470
+  ClientHeight = 205
+  ClientWidth = 461
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 429
+    Width = 461
+    Height = 164
     object GroupBox4: TGroupBox
       Left = 16
       Top = 16
-      Width = 473
+      Width = 433
       Height = 65
       Caption = ' Dane podstawowe '
       TabOrder = 0
@@ -28,7 +32,7 @@ inherited CCurrencyRateForm: TCCurrencyRateForm
         Alignment = taRightJustify
         Caption = 'w/g'
       end
-      object CDateTime1: TCDateTime
+      object CDateTime: TCDateTime
         Left = 88
         Top = 24
         Width = 89
@@ -44,10 +48,10 @@ inherited CCurrencyRateForm: TCCurrencyRateForm
         Transparent = False
         HotTrack = True
       end
-      object CStaticInoutOnceCashpoint: TCStatic
+      object CStaticCashpoint: TCStatic
         Left = 213
         Top = 25
-        Width = 233
+        Width = 196
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -59,128 +63,92 @@ inherited CCurrencyRateForm: TCCurrencyRateForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
+        OnGetDataId = CStaticCashpointGetDataId
         HotTrack = True
       end
     end
-    object GroupBox2: TGroupBox
+    object GroupBox1: TGroupBox
       Left = 16
-      Top = 260
-      Width = 505
-      Height = 136
-      Caption = ' Opis '
+      Top = 92
+      Width = 433
+      Height = 65
+      Caption = ' Przelicznik '
       TabOrder = 1
-      object CButton1: TCButton
-        Left = 238
-        Top = 97
-        Width = 123
-        Height = 25
-        Cursor = crHandPoint
-        PicPosition = ppLeft
-        PicOffset = 10
-        TxtOffset = 15
-        Framed = False
-        Action = ActionAdd
-        Color = clBtnFace
-      end
-      object CButton2: TCButton
-        Left = 356
-        Top = 97
-        Width = 129
-        Height = 25
-        Cursor = crHandPoint
-        PicPosition = ppLeft
-        PicOffset = 10
-        TxtOffset = 15
-        Framed = False
-        Action = ActionTemplate
-        Color = clBtnFace
-      end
-      object RichEditDesc: TRichEdit
-        Left = 24
+      object Label1: TLabel
+        Left = 198
         Top = 28
-        Width = 457
-        Height = 61
+        Width = 39
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'kosztuje'
+      end
+      object CIntQuantity: TCIntEdit
+        Left = 24
+        Top = 24
+        Width = 65
+        Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 0
+        Text = '1'
       end
-      object ComboBoxTemplate: TComboBox
-        Left = 24
-        Top = 99
-        Width = 97
+      object CStaticBaseCurrencydef: TCStatic
+        Left = 101
+        Top = 24
+        Width = 89
         Height = 21
-        BevelInner = bvNone
+        Cursor = crHandPoint
+        AutoSize = False
         BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 1
+        Caption = '<wybierz walut'#281'>'
+        Color = clWindow
+        ParentColor = False
         TabOrder = 1
-        Text = 'W/g szablonu'
-        Items.Strings = (
-          'W'#322'asny'
-          'W/g szablonu')
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz walut'#281'>'
+        OnGetDataId = CStaticBaseCurrencydefGetDataId
+        HotTrack = True
       end
-    end
-    object CIntEditTimes: TCIntEdit
-      Left = 144
-      Top = 181
-      Width = 89
-      Height = 21
-      BevelKind = bkTile
-      BorderStyle = bsNone
-      TabOrder = 2
-      Text = '1'
-    end
-    object CStaticInoutOnceAccount: TCStatic
-      Left = 245
-      Top = 181
-      Width = 89
-      Height = 21
-      Cursor = crHandPoint
-      AutoSize = False
-      BevelKind = bkTile
-      Caption = '<wybierz walut'#281'>'
-      Color = clWindow
-      ParentColor = False
-      TabOrder = 3
-      TabStop = True
-      Transparent = False
-      TextOnEmpty = '<wybierz walut'#281'>'
-      HotTrack = True
-    end
-    object CStatic1: TCStatic
-      Left = 269
-      Top = 216
-      Width = 89
-      Height = 21
-      Cursor = crHandPoint
-      AutoSize = False
-      BevelKind = bkTile
-      Caption = '<wybierz walut'#281'>'
-      Color = clWindow
-      ParentColor = False
-      TabOrder = 4
-      TabStop = True
-      Transparent = False
-      TextOnEmpty = '<wybierz walut'#281'>'
-      HotTrack = True
+      object CStaticTargetCurrencydef: TCStatic
+        Left = 321
+        Top = 24
+        Width = 89
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz walut'#281'>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 3
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz walut'#281'>'
+        OnGetDataId = CStaticTargetCurrencydefGetDataId
+        HotTrack = True
+      end
+      object CCurrRate: TCCurrEdit
+        Left = 245
+        Top = 24
+        Width = 64
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 2
+        Decimals = 4
+        ThousandSep = True
+        BevelKind = bkTile
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 429
-  end
-  object ActionManager: TActionManager
-    Images = CImageLists.TemplateImageList16x16
-    Left = 56
-    Top = 226
-    StyleName = 'XP Style'
-    object ActionAdd: TAction
-      Caption = 'Wstaw mnemonik'
-      ImageIndex = 0
+    Top = 164
+    Width = 461
+    inherited BitBtnOk: TBitBtn
+      Left = 284
     end
-    object ActionTemplate: TAction
-      Caption = 'Konfiguruj szablony'
-      ImageIndex = 1
+    inherited BitBtnCancel: TBitBtn
+      Left = 372
     end
   end
 end

@@ -57,31 +57,34 @@ type
 
   TCurrencyRate = class(TDataObject)
   private
-    Fdescription: TBaseDescription;
     FidSourceCurrencyDef: TDataGid;
+    FsourceIso: TBaseName;
     FidTargetCurrencyDef: TDataGid;
+    FtargetIso: TBaseName;
     FidCashpoint: TDataGid;
     Fquantity: Integer;
     Frate: Currency;
     FbindingDate: TDateTime;
     procedure SetbindingDate(const Value: TDateTime);
-    procedure Setdescription(const Value: TBaseDescription);
     procedure SetidCashpoint(const Value: TDataGid);
     procedure SetidSourceCurrencyDef(const Value: TDataGid);
     procedure SetidTargetCurrencyDef(const Value: TDataGid);
     procedure Setquantity(const Value: Integer);
     procedure Setrate(const Value: Currency);
+    procedure SetsourceIso(const Value: TBaseName);
+    procedure SettargetIso(const Value: TBaseName);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
   published
-    property description: TBaseDescription read Fdescription write Setdescription;
     property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write SetidSourceCurrencyDef;
     property idTargetCurrencyDef: TDataGid read FidTargetCurrencyDef write SetidTargetCurrencyDef;
     property idCashpoint: TDataGid read FidCashpoint write SetidCashpoint;
     property quantity: Integer read Fquantity write Setquantity;
     property rate: Currency read Frate write Setrate;
     property bindingDate: TDateTime read FbindingDate write SetbindingDate;
+    property sourceIso: TBaseName read FsourceIso write SetsourceIso;
+    property targetIso: TBaseName read FtargetIso write SettargetIso;
   end;
 
   TAccount = class(TDataObject)
@@ -1995,7 +1998,7 @@ end;
 
 function TCurrencyDef.GetElementText: String;
 begin
-  Result := Fname;
+  Result := Fiso;
 end;
 
 procedure TCurrencyDef.Setdescription(const Value: TBaseDescription);
@@ -2041,19 +2044,18 @@ begin
   end;
 end;
 
-{ TCurrencyRate }
-
 procedure TCurrencyRate.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
   with ADataset do begin
-    Fdescription := FieldByName('description').AsString;
     FidSourceCurrencyDef := FieldByName('idSourceCurrencyDef').AsString;
     FidTargetCurrencyDef := FieldByName('idTargetCurrencyDef').AsString;
     FidCashpoint := FieldByName('idCashpoint').AsString;
     Fquantity := FieldByName('quantity').AsInteger;
     Frate := FieldByName('rate').AsCurrency;
     FbindingDate := FieldByName('bindingDate').AsDateTime;
+    FsourceIso := FieldByName('sourceIso').AsString;
+    FtargetIso := FieldByName('targetIso').AsString;
   end;
 end;
 
@@ -2061,14 +2063,6 @@ procedure TCurrencyRate.SetbindingDate(const Value: TDateTime);
 begin
   if FbindingDate <> Value then begin
     FbindingDate := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TCurrencyRate.Setdescription(const Value: TBaseDescription);
-begin
-  if Fdescription <> Value then begin
-    Fdescription := Value;
     SetState(msModified);
   end;
 end;
@@ -2113,17 +2107,34 @@ begin
   end;
 end;
 
+procedure TCurrencyRate.SetsourceIso(const Value: TBaseName);
+begin
+  if FsourceIso <> Value then begin
+    FsourceIso := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.SettargetIso(const Value: TBaseName);
+begin
+  if FtargetIso <> Value then begin
+    FtargetIso := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TCurrencyRate.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin
-    AddField('description', Fdescription, True, 'currencyRate');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'currencyRate');
     AddField('idSourceCurrencyDef', DataGidToDatabase(FidSourceCurrencyDef), False, 'currencyRate');
     AddField('idTargetCurrencyDef', DataGidToDatabase(FidTargetCurrencyDef), False, 'currencyRate');
     AddField('quantity', IntToStr(Fquantity), False, 'currencyRate');
     AddField('rate', CurrencyToDatabase(Frate), False, 'currencyRate');
     AddField('bindingDate', DataGidToDatabase(FidTargetCurrencyDef), False, 'currencyRate');
+    AddField('sourceIso', FsourceIso, True, 'currencyRate');
+    AddField('targetIso', FtargetIso, True, 'currencyRate');
   end;
 end;
 
