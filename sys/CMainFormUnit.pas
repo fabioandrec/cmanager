@@ -56,6 +56,7 @@ type
     ActionExport: TAction;
     ActionRandom: TAction;
     ActionShortcutLimits: TAction;
+    ActionShortcutCurrencydef: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -123,7 +124,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
   CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
   CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
-  CReportFormUnit, CMemoFormUnit;
+  CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit;
 
 {$R *.dfm}
 
@@ -205,6 +206,8 @@ begin
       xClass := TCProfileFrame;
     end else if AAction = ActionShortcutLimits then begin
       xClass := TCLimitsFrame;
+    end else if AAction = ActionShortcutCurrencydef then begin
+      xClass := TCCurrencydefFrame;
     end else begin
       xClass := TCBaseFrame;
     end;
@@ -230,7 +233,9 @@ begin
     FActiveFrame.Parent := PanelFrames;
     FActiveFrame.Show;
     LabelShortcut.Caption := AAction.Caption;
-    PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
+    if AAction.ImageIndex <> -1 then begin
+      PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
+    end;
   end;
 end;
 

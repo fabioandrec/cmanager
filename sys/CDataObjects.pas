@@ -32,6 +32,58 @@ type
     property cashpointType: TBaseEnumeration read FcashpointType write SetcashpointType;
   end;
 
+  TCurrencyDef = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fsymbol: TBaseName;
+    Fiso: TBaseName;
+    Fdescription: TBaseDescription;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: TBaseName);
+    procedure Setiso(const Value: TBaseName);
+    procedure Setsymbol(const Value: TBaseName);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property symbol: TBaseName read Fsymbol write Setsymbol;
+    property iso: TBaseName read Fiso write Setiso;
+    property description: TBaseDescription read Fdescription write Setdescription;
+  end;
+
+  TCurrencyRate = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    FidSourceCurrencyDef: TDataGid;
+    FidTargetCurrencyDef: TDataGid;
+    FidCashpoint: TDataGid;
+    Fquantity: Integer;
+    Frate: Currency;
+    FbindingDate: TDateTime;
+    procedure SetbindingDate(const Value: TDateTime);
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidCashpoint(const Value: TDataGid);
+    procedure SetidSourceCurrencyDef(const Value: TDataGid);
+    procedure SetidTargetCurrencyDef(const Value: TDataGid);
+    procedure Setquantity(const Value: Integer);
+    procedure Setrate(const Value: Currency);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write SetidSourceCurrencyDef;
+    property idTargetCurrencyDef: TDataGid read FidTargetCurrencyDef write SetidTargetCurrencyDef;
+    property idCashpoint: TDataGid read FidCashpoint write SetidCashpoint;
+    property quantity: Integer read Fquantity write Setquantity;
+    property rate: Currency read Frate write Setrate;
+    property bindingDate: TDateTime read FbindingDate write SetbindingDate;
+  end;
+
   TAccount = class(TDataObject)
   private
     Fname: TBaseName;
@@ -390,14 +442,15 @@ var CashPointProxy: TDataProxy;
     ProfileProxy: TDataProxy;
     MovementListProxy: TDataProxy;
     MovementLimitProxy: TDataProxy;
+    CurrencyDefProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
 
-const CDatafileTables: array[0..14] of string =
+const CDatafileTables: array[0..15] of string =
             ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
-             'cmanagerParams', 'movementLimit');
+             'cmanagerParams', 'movementLimit', 'currencyDef');
 
 procedure InitializeProxies;
 
@@ -417,6 +470,7 @@ begin
   MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
   ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
   MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit', Nil);
+  CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -1909,6 +1963,167 @@ begin
     AddField('boundaryCondition', FboundaryCondition, True, 'movementLimit');
     AddField('boundaryDays', IntToStr(FboundaryDays), False, 'movementLimit');
     AddField('sumType', FsumType, True, 'movementLimit');
+  end;
+end;
+
+procedure TCurrencyDef.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+    Fsymbol := FieldByName('symbol').AsString;
+    Fiso := FieldByName('iso').AsString;
+  end;
+end;
+
+function TCurrencyDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 1 then begin
+    Result := Fsymbol;
+  end else if AColumnIndex = 2 then begin
+    Result := Fiso;
+  end else begin
+    Result := Fname;
+  end;
+end;
+
+function TCurrencyDef.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TCurrencyDef.GetElementText: String;
+begin
+  Result := Fname;
+end;
+
+procedure TCurrencyDef.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyDef.Setiso(const Value: TBaseName);
+begin
+  if Fiso <> Value then begin
+    Fiso := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyDef.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyDef.Setsymbol(const Value: TBaseName);
+begin
+  if Fsymbol <> Value then begin
+    Fsymbol := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyDef.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fname, True, 'currencyDef');
+    AddField('symbol', Fsymbol, True, 'currencyDef');
+    AddField('iso', Fiso, True, 'currencyDef');
+    AddField('description', Fdescription, True, 'currencyDef');
+  end;
+end;
+
+{ TCurrencyRate }
+
+procedure TCurrencyRate.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+    FidSourceCurrencyDef := FieldByName('idSourceCurrencyDef').AsString;
+    FidTargetCurrencyDef := FieldByName('idTargetCurrencyDef').AsString;
+    FidCashpoint := FieldByName('idCashpoint').AsString;
+    Fquantity := FieldByName('quantity').AsInteger;
+    Frate := FieldByName('rate').AsCurrency;
+    FbindingDate := FieldByName('bindingDate').AsDateTime;
+  end;
+end;
+
+procedure TCurrencyRate.SetbindingDate(const Value: TDateTime);
+begin
+  if FbindingDate <> Value then begin
+    FbindingDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.SetidCashpoint(const Value: TDataGid);
+begin
+  if FidCashpoint <> Value then begin
+    FidCashpoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.SetidSourceCurrencyDef(const Value: TDataGid);
+begin
+  if FidSourceCurrencyDef <> Value then begin
+    FidSourceCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.SetidTargetCurrencyDef(const Value: TDataGid);
+begin
+  if FidTargetCurrencyDef <> Value then begin
+    FidTargetCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.Setquantity(const Value: Integer);
+begin
+  if Fquantity <> Value then begin
+    Fquantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.Setrate(const Value: Currency);
+begin
+  if Frate <> Value then begin
+    Frate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyRate.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('description', Fdescription, True, 'currencyRate');
+    AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'currencyRate');
+    AddField('idSourceCurrencyDef', DataGidToDatabase(FidSourceCurrencyDef), False, 'currencyRate');
+    AddField('idTargetCurrencyDef', DataGidToDatabase(FidTargetCurrencyDef), False, 'currencyRate');
+    AddField('quantity', IntToStr(Fquantity), False, 'currencyRate');
+    AddField('rate', CurrencyToDatabase(Frate), False, 'currencyRate');
+    AddField('bindingDate', DataGidToDatabase(FidTargetCurrencyDef), False, 'currencyRate');
   end;
 end;
 

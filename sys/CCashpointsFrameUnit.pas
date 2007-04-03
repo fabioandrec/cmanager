@@ -4,7 +4,8 @@ interface
 
 uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
      ImgList, Controls, PngImageList, CComponents, VirtualTrees, StdCtrls,
-     ExtCtrls, CDatabase, SysUtils, CDataobjectFormUnit, CImageListsUnit;
+     ExtCtrls, CDatabase, SysUtils, CDataobjectFormUnit, CImageListsUnit,
+     Dialogs;
 
 type
   TCCashpointsFrame = class(TCDataobjectFrame)

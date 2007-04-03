@@ -564,6 +564,10 @@ object CMainForm: TCMainForm
       Caption = 'Limity'
       ImageIndex = 10
     end
+    object ActionShortcutCurrencydef: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Waluty'
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

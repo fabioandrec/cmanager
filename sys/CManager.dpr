@@ -1,10 +1,12 @@
 program CManager;
 
 {$R 'CMandbpat.res' 'CMandbpat.rc'}
-{%File 'CMandb.sql'}
 {$R 'strings.res' 'strings.rc'}
 {$R 'cmanagericons.res' 'cmanagericons.rc'}
+{%File 'CMandb.sql'}
 {%File 'CMandb_0_1.sql'}
+{%File 'CMandb_1_2.sql'}
+{%File 'CMandb_2_3.sql'}
 {%File 'CMandf.sql'}
 
 uses
@@ -89,7 +91,11 @@ uses
   CLimitFormUnit in 'CLimitFormUnit.pas' {CLimitForm},
   CSurpassedFormUnit in 'CSurpassedFormUnit.pas' {CSurpassedForm},
   CBackups in 'CBackups.pas',
-  CAdox in 'CAdox.pas';
+  CAdox in 'CAdox.pas',
+  CCurrencydefFrameUnit in 'CCurrencydefFrameUnit.pas' {CCurrencydefFrame: TFrame},
+  CCurrencydefFormUnit in 'CCurrencydefFormUnit.pas' {CCurrencydefForm},
+  CCurrencyRateFrameUnit in 'CCurrencyRateFrameUnit.pas' {CCurrencyRateFrame: TFrame},
+  CCurrencyRateFormUnit in 'CCurrencyRateFormUnit.pas' {CCurrencyRateForm};
 
 {$R *.res}
 
@@ -125,7 +131,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
+        if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
         end;
         Application.ProcessMessages;

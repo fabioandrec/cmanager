@@ -2,8 +2,6 @@ unit CDatabase;
 
 interface
 
-{.$DEFINE SAVETOLOG}
-
 uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
      Types, CComponents;
 
@@ -208,9 +206,7 @@ type
 var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
     GDatabaseName: String;
-    {$IFDEF SAVETOLOG}
-    GSqllogfile: String;
-    {$ENDIF}
+    GSqllogfile: String = '';
 
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
@@ -227,10 +223,7 @@ function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
 function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
-{$IFDEF SAVETOLOG}
-procedure StartTickcounting;
 procedure SaveToLog(AText: String);
-{$ENDIF}
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
@@ -238,8 +231,6 @@ implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
      CPreferences, CTools, CAdox;
-
-threadvar GTickCounter: Cardinal;
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 begin
@@ -300,12 +291,10 @@ var xResStream: TResourceStream;
     xError: String;
     xDataVersion: String;
     xFileVersion: String;
+    xLog: String;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
-  {$IFDEF SAVETOLOG}
-  GSqllogfile := ChangeFileExt(ADatabaseName, '.log');
-  {$ENDIF}
   if (not Result) then begin
     if ACanCreate then begin
       Result := CreateDatabase(ADatabaseName, xError);
@@ -363,6 +352,10 @@ begin
         end;
       end;
     end;
+  end;
+  xLog := GetParamValue('-savequery');
+  if xLog <> '' then begin
+    GSqllogfile := GetSystemPathname(xLog); 
   end;
 end;
 
@@ -552,15 +545,10 @@ end;
 
 procedure TDataProvider.BeginTransaction;
 begin
-  {$IFDEF SAVETOLOG}
-  StartTickcounting;
-  {$ENDIF}
   if not FConnection.InTransaction then begin
     FConnection.BeginTrans;
   end;
-  {$IFDEF SAVETOLOG}
   SaveToLog('begin transaction');
-  {$ENDIF}
 end;
 
 procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
@@ -585,13 +573,8 @@ begin
   Result := PostProxies;
   if FConnection.InTransaction then begin
     if Result then begin
-      {$IFDEF SAVETOLOG}
-      StartTickcounting;
-      {$ENDIF}
       FConnection.CommitTrans;
-      {$IFDEF SAVETOLOG}
-      SaveToLog('commit');
-      {$ENDIF}
+      SaveToLog('commit transaction');
     end else begin
       FConnection.RollbackTrans;
     end;
@@ -647,14 +630,12 @@ var xSqls: TStringList;
     xCount: Integer;
 begin
   Result := True;
-  {$IFDEF SAVETOLOG}
-  StartTickCounting;
-  {$ENDIF}
   xSqls := TStringList.Create;
   xSqls.Text := StringReplace(StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]), ';', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
   xCount := 0;
   while Result and (xCount <= xSqls.Count - 1) do begin
     try
+      SaveToLog('Wykonywanie "' + xSqls.Strings[xCount] + '"');
       FConnection.Execute(xSqls.Strings[xCount], cmdText, [eoExecuteNoRecords]);
     except
       on E: Exception do begin
@@ -668,9 +649,9 @@ begin
     Inc(xCount);
   end;
   xSqls.Free;
-  {$IFDEF SAVETOLOG}
-  SaveToLog(ASql);
-  {$ENDIF}
+  if not Result then begin
+    SaveToLog('B³¹d "' + FLastError + '"');
+  end;
 end;
 
 function TDataProvider.GetInTransaction: Boolean;
@@ -711,9 +692,7 @@ end;
 
 function TDataProvider.OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
 begin
-  {$IFDEF SAVETOLOG}
-  StartTickCounting;
-  {$ENDIF}
+  SaveToLog('Otwieranie "' + ASql + '"');
   Result := TADOQuery.Create(Nil);
   try
     Result.Connection := FConnection;
@@ -729,9 +708,9 @@ begin
       FreeAndNil(Result);
     end;
   end;
-  {$IFDEF SAVETOLOG}
-  SaveToLog(ASql);
-  {$ENDIF}
+  if Result = Nil then begin
+    SaveToLog('B³¹d "' + FLastError + '"');
+  end;
 end;
 
 function TDataProvider.PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
@@ -762,13 +741,8 @@ end;
 procedure TDataProvider.RollbackTransaction;
 begin
   if FConnection.InTransaction then begin
-    {$IFDEF SAVETOLOG}
-    StartTickcounting;
-    {$ENDIF}
     FConnection.RollbackTrans;
-    {$IFDEF SAVETOLOG}
-    SaveToLog('rollback');
-    {$ENDIF}
+    SaveToLog('rollback transaction');
   end;
   ClearProxies(False);
 end;
@@ -1220,29 +1194,22 @@ begin
   FreeMem(xRes);
 end;
 
-{$IFDEF SAVETOLOG}
 procedure SaveToLog(AText: String);
 var xStream: TFileStream;
     xText: String;
-    xDiff: Cardinal;
 begin
-  xDiff := GetTickCount - GTickCounter;
-  xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + Format('%10d', [xDiff]) + #9 + AText + sLineBreak;
-  if FileExists(GSqllogfile) then begin
-    xStream := TFileStream.Create(GSqllogfile, fmOpenReadWrite or fmShareDenyWrite);
-  end else begin
-    xStream := TFileStream.Create(GSqllogfile, fmCreate or fmShareDenyWrite);
+  if GSqlLogfile <> '' then begin
+    xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + AText + sLineBreak;
+    if FileExists(GSqllogfile) then begin
+      xStream := TFileStream.Create(GSqllogfile, fmOpenReadWrite or fmShareDenyWrite);
+    end else begin
+      xStream := TFileStream.Create(GSqllogfile, fmCreate or fmShareDenyWrite);
+    end;
+    xStream.Seek(0, soFromEnd);
+    xStream.WriteBuffer(xText[1], Length(xText));
+    xStream.Free;
   end;
-  xStream.Seek(0, soFromEnd);
-  xStream.WriteBuffer(xText[1], Length(xText));
-  xStream.Free;
 end;
-
-procedure StartTickcounting;
-begin
-  GTickCounter := GetTickCount;
-end;
-{$ENDIF}
 
 function GetSystemPathname(AFilename: String): String;
 begin
@@ -1267,7 +1234,10 @@ begin
     Result := ShowInfo(itQuestion, xText, '');
     if Result then begin
       Result := True;
+      GSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
+      SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion);
       while Result and (xCurDbversion <> xToDbversion) do begin
+        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1));
         Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
         Inc(xCurDbversion);
       end;
@@ -1276,6 +1246,7 @@ begin
                  'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
         ShowInfo(itError, xText, xError);
       end;
+      GSqllogfile := '';
     end;
   end;
   if Result then begin
