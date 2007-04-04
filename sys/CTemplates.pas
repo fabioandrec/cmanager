@@ -40,6 +40,7 @@ var GBaseTemlatesList: TDescTemplateList;
     GMovementListTemplatesList: TDescTemplateList;
     GMovementListElementsTemplatesList: TDescTemplateList;
     GPlannedMovementTemplatesList: TDescTemplateList;
+    GCurrencydefTemplatesList: TDescTemplateList;
 
 implementation
 
@@ -99,6 +100,7 @@ initialization
   GMovementListTemplatesList := TDescTemplateList.Create('Mnemoniki list operacji');
   GPlannedMovementTemplatesList := TDescTemplateList.Create('Mnemoniki planowanych operacji');
   GMovementListElementsTemplatesList := TDescTemplateList.Create('Mnemoniki elementów listy operacji');
+  GCurrencydefTemplatesList := TDescTemplateList.Create('Mnemoniki kursów walut');
   with GBaseTemlatesList do begin
     AddTemplate('@godz@', 'aktualna godzina w formacie HH');
     AddTemplate('@min@', 'aktualna minuta w formacie MM');
@@ -142,10 +144,21 @@ initialization
   with GMovementListElementsTemplatesList do begin
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
   end;
+  with GCurrencydefTemplatesList do begin
+    AddTemplate('@datakursu@', 'data kursu w formacie RRRR-MM-DD');
+    AddTemplate('@isobazowej@', 'symbol ISO waluty bazowej');
+    AddTemplate('@isodocelowej@', 'symbol ISO waluty docelowej');
+    AddTemplate('@symbolbazowej@', 'symbol waluty bazowej');
+    AddTemplate('@symboldocelowej@', 'symbol waluty docelowej');
+    AddTemplate('@kontrahent@', 'kontrahent okreœlaj¹cy kurs');
+    AddTemplate('@ilosc@', 'iloœæ waluty bazowej');
+    AddTemplate('@kurs@', 'kurs waluty');
+  end;
 finalization
   GMovementListElementsTemplatesList.Free;
   GBaseTemlatesList.Free;
   GPlannedMovementTemplatesList.Free;
   GBaseMovementTemplatesList.Free;
   GMovementListTemplatesList.Free;
+  GCurrencydefTemplatesList.Free;
 end.

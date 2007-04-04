@@ -113,6 +113,11 @@ const
   CLimitSumtypeInDescription = 'Przychody';
   CLimitSumtypeBalanceDescription = 'Saldo';
 
+  CCurrencyRateFilterToday = 'T';
+  CCurrencyRateFilterYesterday = 'Y';
+  CCurrencyRateFilterWeek = 'W';
+  CCurrencyRateFilterMonth = 'M';
+  CCurrencyRateFilterOther = 'O';
 
 const
   CInMovementDescription = 'Przychód';
@@ -130,16 +135,18 @@ const
   CPlannedScheduledOvertime = 'Zaleg³a';
 
 const
-  CDescPatternsKeys: array[0..3, 0..4] of string =
+  CDescPatternsKeys: array[0..4, 0..4] of string =
     (('BaseMovementOut', 'BaseMovementIn', 'BaseMovementTr', 'BaseMovementPlannedOut', 'BaseMovementPlannedIn'),
      ('MovementListOut', 'MovementListIn', '', '', ''),
      ('PlannedMovementOut', 'PlannedMovementIn', '', '', ''),
-     ('MovementListElement', '', '', '', ''));
+     ('MovementListElement', '', '', '', ''),
+     ('Currencyrate', '', '', '', ''));
 
-  CDescPatternsNames: array[0..3, 0..4] of string =
+  CDescPatternsNames: array[0..4, 0..4] of string =
     (('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód'),
      ('Rozchód', 'Przychód', '', '', ''),
      ('Rozchód', 'Przychód', '', '', ''),
+     ('Wszystkie elementy', '', '', '', ''),
      ('Wszystkie elementy', '', '', '', ''));
 
 

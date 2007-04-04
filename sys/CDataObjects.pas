@@ -48,6 +48,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property name: TBaseName read Fname write Setname;
     property symbol: TBaseName read Fsymbol write Setsymbol;
@@ -58,24 +59,25 @@ type
   TCurrencyRate = class(TDataObject)
   private
     FidSourceCurrencyDef: TDataGid;
-    FsourceIso: TBaseName;
     FidTargetCurrencyDef: TDataGid;
-    FtargetIso: TBaseName;
     FidCashpoint: TDataGid;
     Fquantity: Integer;
     Frate: Currency;
     FbindingDate: TDateTime;
+    Fdescription: TBaseDescription;
     procedure SetbindingDate(const Value: TDateTime);
     procedure SetidCashpoint(const Value: TDataGid);
     procedure SetidSourceCurrencyDef(const Value: TDataGid);
     procedure SetidTargetCurrencyDef(const Value: TDataGid);
     procedure Setquantity(const Value: Integer);
     procedure Setrate(const Value: Currency);
-    procedure SetsourceIso(const Value: TBaseName);
-    procedure SettargetIso(const Value: TBaseName);
+    procedure Setdescription(const Value: TBaseDescription);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write SetidSourceCurrencyDef;
     property idTargetCurrencyDef: TDataGid read FidTargetCurrencyDef write SetidTargetCurrencyDef;
@@ -83,8 +85,7 @@ type
     property quantity: Integer read Fquantity write Setquantity;
     property rate: Currency read Frate write Setrate;
     property bindingDate: TDateTime read FbindingDate write SetbindingDate;
-    property sourceIso: TBaseName read FsourceIso write SetsourceIso;
-    property targetIso: TBaseName read FtargetIso write SettargetIso;
+    property description: TBaseDescription read Fdescription write Setdescription;
   end;
 
   TAccount = class(TDataObject)
@@ -446,6 +447,7 @@ var CashPointProxy: TDataProxy;
     MovementListProxy: TDataProxy;
     MovementLimitProxy: TDataProxy;
     CurrencyDefProxy: TDataProxy;
+    CurrencyRateProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
 
@@ -474,6 +476,7 @@ begin
   ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
   MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit', Nil);
   CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef', Nil);
+  CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -1969,6 +1972,21 @@ begin
   end;
 end;
 
+class function TCurrencyDef.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from currencyRate where ' +
+      '(idSourceCurrencyDef = ' + DataGidToDatabase(AId) + ') or ' +
+      '(idTargetCurrencyDef = ' + DataGidToDatabase(AId) + ')', 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ kursy';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ waluty, gdy¿ ' + xText, '');
+    Result := False;
+  end;
+end;
+
 procedure TCurrencyDef.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -2054,8 +2072,7 @@ begin
     Fquantity := FieldByName('quantity').AsInteger;
     Frate := FieldByName('rate').AsCurrency;
     FbindingDate := FieldByName('bindingDate').AsDateTime;
-    FsourceIso := FieldByName('sourceIso').AsString;
-    FtargetIso := FieldByName('targetIso').AsString;
+    Fdescription := FieldByName('description').AsString;
   end;
 end;
 
@@ -2107,18 +2124,10 @@ begin
   end;
 end;
 
-procedure TCurrencyRate.SetsourceIso(const Value: TBaseName);
+procedure TCurrencyRate.Setdescription(const Value: TBaseDescription);
 begin
-  if FsourceIso <> Value then begin
-    FsourceIso := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TCurrencyRate.SettargetIso(const Value: TBaseName);
-begin
-  if FtargetIso <> Value then begin
-    FtargetIso := Value;
+  if Fdescription <> Value then begin
+    Fdescription := Value;
     SetState(msModified);
   end;
 end;
@@ -2132,10 +2141,30 @@ begin
     AddField('idTargetCurrencyDef', DataGidToDatabase(FidTargetCurrencyDef), False, 'currencyRate');
     AddField('quantity', IntToStr(Fquantity), False, 'currencyRate');
     AddField('rate', CurrencyToDatabase(Frate), False, 'currencyRate');
-    AddField('bindingDate', DataGidToDatabase(FidTargetCurrencyDef), False, 'currencyRate');
-    AddField('sourceIso', FsourceIso, True, 'currencyRate');
-    AddField('targetIso', FtargetIso, True, 'currencyRate');
+    AddField('bindingDate', DatetimeToDatabase(FbindingDate, False), False, 'currencyRate');
+    AddField('description', Fdescription, True, 'currencyRate');
   end;
+end;
+
+function TCurrencyRate.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 0 then begin
+    Result := DateToStr(FbindingDate);
+  end else if AColumnIndex = 1 then begin
+    Result := Fdescription;
+  end else begin
+    Result := CurrencyToString(rate);
+  end;
+end;
+
+function TCurrencyRate.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TCurrencyRate.GetElementText: String;
+begin
+  Result := Fdescription;
 end;
 
 end.

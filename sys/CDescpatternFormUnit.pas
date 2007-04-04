@@ -144,6 +144,8 @@ begin
     xData.Add(GPlannedMovementTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 3 then begin
     xData.Add(GMovementListElementsTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 4 then begin
+    xData.Add(GCurrencydefTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;

@@ -568,6 +568,10 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Waluty'
     end
+    object ActionShortcutCurrencyRate: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Kursy walut'
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

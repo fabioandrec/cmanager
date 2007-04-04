@@ -95,7 +95,10 @@ uses
   CCurrencydefFrameUnit in 'CCurrencydefFrameUnit.pas' {CCurrencydefFrame: TFrame},
   CCurrencydefFormUnit in 'CCurrencydefFormUnit.pas' {CCurrencydefForm},
   CCurrencyRateFrameUnit in 'CCurrencyRateFrameUnit.pas' {CCurrencyRateFrame: TFrame},
-  CCurrencyRateFormUnit in 'CCurrencyRateFormUnit.pas' {CCurrencyRateForm};
+  CCurrencyRateFormUnit in 'CCurrencyRateFormUnit.pas' {CCurrencyRateForm},
+  CPlugins in 'CPlugins.pas',
+  CPluginConsts in 'Plugins\CPluginConsts.pas',
+  CPluginTypes in 'Plugins\CPluginTypes.pas';
 
 {$R *.res}
 
@@ -134,6 +137,7 @@ begin
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
         end;
+        GPlugins.ScanForPlugins;
         Application.ProcessMessages;
         Application.Run;
         CMainForm.FinalizeMainForm;

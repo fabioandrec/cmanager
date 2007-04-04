@@ -4,7 +4,7 @@ interface
 
 uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
      ImgList, Controls, PngImageList, CComponents, VirtualTrees, StdCtrls,
-     ExtCtrls, CDatabase, CDataobjectFormUnit, CImageListsUnit;
+     ExtCtrls, CDatabase, CDataobjectFormUnit, CImageListsUnit, Dialogs;
 
 type
   TCAccountsFrame = class(TCDataobjectFrame)

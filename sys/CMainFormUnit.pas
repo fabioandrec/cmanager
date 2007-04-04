@@ -57,6 +57,7 @@ type
     ActionRandom: TAction;
     ActionShortcutLimits: TAction;
     ActionShortcutCurrencydef: TAction;
+    ActionShortcutCurrencyRate: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -124,7 +125,8 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
   CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
   CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
-  CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit;
+  CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
+  CCurrencyRateFrameUnit;
 
 {$R *.dfm}
 
@@ -208,6 +210,8 @@ begin
       xClass := TCLimitsFrame;
     end else if AAction = ActionShortcutCurrencydef then begin
       xClass := TCCurrencydefFrame;
+    end else if AAction = ActionShortcutCurrencyRate then begin
+      xClass := TCCurrencyRateFrame;
     end else begin
       xClass := TCBaseFrame;
     end;

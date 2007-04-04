@@ -23,8 +23,9 @@ inherited CCashpointsFrame: TCCashpointsFrame
     end
   end
   inherited ActionListButtons: TActionList
+    Images = CImageLists.CashpointImageList24x24
     inherited ActionAdd: TAction
-      Caption = 'Dodaj kontahenta'
+      Caption = 'Dodaj kontrahenta'
     end
     inherited ActionEdit: TAction
       Caption = 'Edytuj kontrahenta'
