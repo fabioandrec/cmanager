@@ -2,10 +2,10 @@ unit CPlugins;
 
 interface
 
-uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, MsXml;
+uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, MsXml, CComponents;
 
 type
-  TCPlugin = class(TObject)
+  TCPlugin = class(TCDataListElementObject)
   private
     FFilename: String;
     FHandle: THandle;
@@ -16,16 +16,21 @@ type
     FPlugin_Initialize: TCPlugin_Initialize;
     FPlugin_Finalize: TCPlugin_Finalize;
     FPlugin_Info: TCPlugin_Info;
-    FInfo: IXMLDOMDocument;
-    FPluginType: Byte;
-    function GetInfo: IXMLDOMDocument;
+    FpluginType: Integer;
+    FpluginDescription: String;
+    FpluginConfiguration: String;
+    function GetisConfigurable: Boolean;
   public
     constructor Create(AFilename: String);
     function LoadAndInitialize: Boolean;
     procedure FinalizeAndUnload;
     destructor Destroy; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
-    property Info: IXMLDOMDocument read GetInfo;
+    property pluginType: Integer read FpluginType;
+    property pluginDescription: String read FpluginDescription;
+    property pluginConfiguration: String read FpluginConfiguration write FpluginConfiguration;
+    property isConfigurable: Boolean read GetisConfigurable;
   end;
 
   TCPluginList = class(TObjectList)
@@ -37,6 +42,7 @@ type
   end;
 
 var GPlugins: TCPluginList;
+    GPluginlogfile: String = '';
 
 implementation
 
@@ -46,7 +52,7 @@ function GetBaseXml: IXMLDOMDocument;
 var xRoot: IXMLDOMNode;
 begin
   Result := CoDOMDocument.Create;
-  xRoot := Result.createElement('cplugin');
+  xRoot := Result.createElement('plugin');
   Result.appendChild(xRoot);
 end;
 
@@ -55,7 +61,7 @@ begin
   inherited Create;
   FFilename := AFilename;
   FHandle := 0;
-  FInfo := Nil;
+  FIcon := 0;
 end;
 
 destructor TCPlugin.Destroy;
@@ -67,19 +73,26 @@ end;
 procedure TCPlugin.FinalizeAndUnload;
 begin
   if FHandle <> 0 then begin
-    FPlugin_Finalize;
+    if @FPlugin_Finalize <> Nil then begin
+      FPlugin_Finalize;
+    end;
     FreeLibrary(FHandle);
     FHandle := 0;
   end;
 end;
 
-function TCPlugin.GetInfo: IXMLDOMDocument;
+function TCPlugin.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
-  if FInfo = Nil then begin
-    FInfo := GetBaseXml;
-    FPlugin_Info(FInfo);
+  if AColumnIndex = 0 then begin
+    Result := ExtractFileName(FFilename);
+  end else begin
+    Result := FpluginDescription;
   end;
-  Result := FInfo;
+end;
+
+function TCPlugin.GetisConfigurable: Boolean;
+begin
+  Result := (@FPlugin_Configure <> Nil);
 end;
 
 function TCPlugin.LoadAndInitialize: Boolean;
@@ -87,6 +100,7 @@ var xInfo: IXMLDOMDocument;
 begin
   FHandle := LoadLibrary(PChar(FFilename));
   Result := FHandle <> 0;
+  SaveToLog('£adowanie i inicjowanie plugin-u ' + FFilename, GPluginlogfile);
   if Result then begin
     @FPlugin_Configure := GetProcAddress(FHandle, 'Plugin_Configure');
     @FPlugin_Icon := GetProcAddress(FHandle, 'Plugin_Icon');
@@ -94,24 +108,38 @@ begin
     @FPlugin_Initialize := GetProcAddress(FHandle, 'Plugin_Initialize');
     @FPlugin_Finalize := GetProcAddress(FHandle, 'Plugin_Finalize');
     @FPlugin_Info := GetProcAddress(FHandle, 'Plugin_Info');
-    Result := (@FPlugin_Configure <> Nil) and (@FPlugin_Icon <> Nil) and (@FPlugin_Execute <> Nil) and
-              (@FPlugin_Initialize <> Nil) and (@FPlugin_Finalize <> Nil) and (@FPlugin_Info <> Nil);
+    Result := (@FPlugin_Execute <> Nil) and (@FPlugin_Info <> Nil);
     if Result then begin
-      Result := FPlugin_Initialize(Application.MainForm.Handle);
+      if @FPlugin_Initialize <> Nil then begin
+        Result := FPlugin_Initialize(Application.MainForm.Handle);
+      end;
       if Result then begin
-        xInfo := Info;
-        FPluginType := GetXmlAttribute('pluginType', xInfo.documentElement, -1);
-        if FPluginType = CPLUGINTYPE_CURRENCYRATE then begin
+        if @FPlugin_Icon <> Nil then begin
           FIcon := FPlugin_Icon;
+        end;
+        xInfo := GetBaseXml;
+        SaveToLog('Wejœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
+        FPlugin_Info(xInfo);
+        SaveToLog('Wyjœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
+        FpluginType := GetXmlAttribute('type', xInfo.documentElement, CPLUGINTYPE_INCORRECT);
+        FpluginDescription := GetXmlAttribute('description', xInfo.documentElement, '');
+        if FpluginType = CPLUGINTYPE_CURRENCYRATE then begin
         end else begin
           Result := False;
+          SaveToLog('Typ pluginu jest niepoprawny ' + IntToStr(FpluginType), GPluginlogfile);
         end;
+      end else begin
+        SaveToLog('Funkcja inicjuj¹ca plugin nie powiod³a siê', GPluginlogfile);
       end;
+    end else begin
+      SaveToLog('Brak implementacji wymaganych metod', GPluginlogfile);
     end;
     if not Result then begin
       FreeLibrary(FHandle);
       FHandle := 0;
     end;
+  end else begin
+    SaveToLog('B³¹d ³adowania ' + SysErrorMessage(GetLastError), GPluginlogfile);
   end;
 end;
 

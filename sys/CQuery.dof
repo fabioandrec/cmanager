@@ -148,8 +148,12 @@ Item0=..\others\PngComponents\Source;..\others\Vtv\Source
 Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item2=$(DELPHI)\Lib\Debug;..\others\PngComponents\Source;..\others\Vtv\Source
 [HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=..\..\Trash
+Count=2
+Item0=..\..\..\..\Trash
+Item1=..\..\Trash
 [HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=..\..\Bin
+Count=4
+Item0=..\..\..\..\Bin\Wtyczki
+Item1=..\..\..\..\Wtyczki\Bin
+Item2=..\..\..\..\Bin
+Item3=..\..\Bin

@@ -130,6 +130,14 @@ begin
         xProceed := CheckPendingInformations;
       end;
       if xProceed then begin
+        xFilename := GetParamValue('-savequery');
+        if xFilename <> '' then begin
+          GSqllogfile := GetSystemPathname(xFilename);
+        end;
+        xFilename := GetParamValue('-saveplugin');
+        if xFilename <> '' then begin
+          GPluginlogfile := GetSystemPathname(xFilename);
+        end;
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;

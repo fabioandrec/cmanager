@@ -67,10 +67,11 @@ function GetSwitch(ASwitch: String): Boolean;
 function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
 function LPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
+procedure SaveToLog(AText: String; ALogFilename: String);
 
 implementation
 
-uses SysUtils;
+uses SysUtils, StrUtils;
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
@@ -388,6 +389,26 @@ begin
   xRedir.Free;
   xErr.Free;
   xOut.Free;
+end;
+
+procedure SaveToLog(AText: String; ALogFilename: String);
+var xStream: TFileStream;
+    xText: String;
+begin
+  if (ALogFilename <> '') then begin
+    xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + AText;
+    if PosEx(sLineBreak, xText, Length(xText) - Length(sLineBreak)) = 0 then begin
+      xText := xText + sLineBreak;
+    end;
+    if FileExists(ALogFilename) then begin
+      xStream := TFileStream.Create(ALogFilename, fmOpenReadWrite or fmShareDenyWrite);
+    end else begin
+      xStream := TFileStream.Create(ALogFilename, fmCreate or fmShareDenyWrite);
+    end;
+    xStream.Seek(0, soFromEnd);
+    xStream.WriteBuffer(xText[1], Length(xText));
+    xStream.Free;
+  end;
 end;
 
 end.

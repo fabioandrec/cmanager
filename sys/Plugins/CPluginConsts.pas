@@ -4,7 +4,8 @@ interface
 
 const
   //Plugin type constants
-  CPLUGINTYPE_CURRENCYRATE = 0;
+  CPLUGINTYPE_INCORRECT = 0;
+  CPLUGINTYPE_CURRENCYRATE = 1;
 
 implementation
 

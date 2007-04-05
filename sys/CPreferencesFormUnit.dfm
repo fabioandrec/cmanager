@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 155
-  Top = 83
+  Left = 313
+  Top = 226
   Caption = 'Preferencje'
   ClientHeight = 485
   ClientWidth = 602
@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 471
           Height = 421
-          ActivePage = TabSheetAutostart
+          ActivePage = TabSheetPlugins
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -516,6 +516,65 @@ inherited CPreferencesForm: TCPreferencesForm
               end
             end
           end
+          object TabSheetPlugins: TTabSheet
+            Caption = 'TabSheetPlugins'
+            ImageIndex = 3
+            TabVisible = False
+            object Panel3: TPanel
+              Left = 8
+              Top = 8
+              Width = 441
+              Height = 241
+              BevelOuter = bvLowered
+              TabOrder = 0
+              object List: TCDataList
+                Left = 1
+                Top = 1
+                Width = 439
+                Height = 239
+                Align = alClient
+                BevelEdges = []
+                BevelInner = bvNone
+                BevelOuter = bvRaised
+                BevelKind = bkFlat
+                BorderStyle = bsNone
+                ButtonStyle = bsTriangle
+                DefaultNodeHeight = 24
+                Header.AutoSizeIndex = -1
+                Header.Font.Charset = DEFAULT_CHARSET
+                Header.Font.Color = clWindowText
+                Header.Font.Height = -11
+                Header.Font.Name = 'MS Sans Serif'
+                Header.Font.Style = []
+                Header.Height = 21
+                Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+                Header.Style = hsFlatButtons
+                HintMode = hmHint
+                ParentShowHint = False
+                ShowHint = True
+                TabOrder = 0
+                TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+                TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+                TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+                TreeOptions.SelectionOptions = [toFullRowSelect]
+                OddColor = 12437200
+                AutoExpand = True
+                OnCDataListReloadTree = ListCDataListReloadTree
+                Columns = <
+                  item
+                    Position = 0
+                    Width = 150
+                    WideText = 'Nazwa'
+                  end
+                  item
+                    Position = 1
+                    Width = 289
+                    WideText = 'Opis'
+                  end>
+                WideDefaultText = ''
+              end
+            end
+          end
         end
       end
       object Panel1: TPanel
@@ -563,6 +622,18 @@ inherited CPreferencesForm: TCPreferencesForm
           Framed = False
           Action = Action3
         end
+        object CButton9: TCButton
+          Left = 16
+          Top = 264
+          Width = 100
+          Height = 57
+          Cursor = crHandPoint
+          PicPosition = ppTop
+          PicOffset = 10
+          TxtOffset = 15
+          Framed = False
+          Action = Action8
+        end
         object Panel2: TPanel
           Left = 1
           Top = 1
@@ -608,6 +679,9 @@ inherited CPreferencesForm: TCPreferencesForm
     object Action3: TAction
       Caption = 'Powiadamianie'
       ImageIndex = 2
+    end
+    object Action8: TAction
+      Caption = 'Wtyczki'
     end
   end
   object CategoryImageList: TPngImageList

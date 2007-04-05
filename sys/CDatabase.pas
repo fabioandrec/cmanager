@@ -223,7 +223,6 @@ function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
 function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
-procedure SaveToLog(AText: String);
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 
@@ -291,7 +290,6 @@ var xResStream: TResourceStream;
     xError: String;
     xDataVersion: String;
     xFileVersion: String;
-    xLog: String;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
@@ -352,10 +350,6 @@ begin
         end;
       end;
     end;
-  end;
-  xLog := GetParamValue('-savequery');
-  if xLog <> '' then begin
-    GSqllogfile := GetSystemPathname(xLog); 
   end;
 end;
 
@@ -548,7 +542,7 @@ begin
   if not FConnection.InTransaction then begin
     FConnection.BeginTrans;
   end;
-  SaveToLog('begin transaction');
+  SaveToLog('begin transaction', GSqllogfile);
 end;
 
 procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
@@ -574,7 +568,7 @@ begin
   if FConnection.InTransaction then begin
     if Result then begin
       FConnection.CommitTrans;
-      SaveToLog('commit transaction');
+      SaveToLog('commit transaction', GSqllogfile);
     end else begin
       FConnection.RollbackTrans;
     end;
@@ -635,7 +629,7 @@ begin
   xCount := 0;
   while Result and (xCount <= xSqls.Count - 1) do begin
     try
-      SaveToLog('Wykonywanie "' + xSqls.Strings[xCount] + '"');
+      SaveToLog('Wykonywanie "' + xSqls.Strings[xCount] + '"', GSqllogfile);
       FConnection.Execute(xSqls.Strings[xCount], cmdText, [eoExecuteNoRecords]);
     except
       on E: Exception do begin
@@ -650,7 +644,7 @@ begin
   end;
   xSqls.Free;
   if not Result then begin
-    SaveToLog('B³¹d "' + FLastError + '"');
+    SaveToLog('B³¹d "' + FLastError + '"', GSqllogfile);
   end;
 end;
 
@@ -692,7 +686,7 @@ end;
 
 function TDataProvider.OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
 begin
-  SaveToLog('Otwieranie "' + ASql + '"');
+  SaveToLog('Otwieranie "' + ASql + '"', GSqllogfile);
   Result := TADOQuery.Create(Nil);
   try
     Result.Connection := FConnection;
@@ -709,7 +703,7 @@ begin
     end;
   end;
   if Result = Nil then begin
-    SaveToLog('B³¹d "' + FLastError + '"');
+    SaveToLog('B³¹d "' + FLastError + '"', GSqllogfile);
   end;
 end;
 
@@ -742,7 +736,7 @@ procedure TDataProvider.RollbackTransaction;
 begin
   if FConnection.InTransaction then begin
     FConnection.RollbackTrans;
-    SaveToLog('rollback transaction');
+    SaveToLog('rollback transaction', GSqllogfile);
   end;
   ClearProxies(False);
 end;
@@ -1194,23 +1188,6 @@ begin
   FreeMem(xRes);
 end;
 
-procedure SaveToLog(AText: String);
-var xStream: TFileStream;
-    xText: String;
-begin
-  if GSqlLogfile <> '' then begin
-    xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + AText + sLineBreak;
-    if FileExists(GSqllogfile) then begin
-      xStream := TFileStream.Create(GSqllogfile, fmOpenReadWrite or fmShareDenyWrite);
-    end else begin
-      xStream := TFileStream.Create(GSqllogfile, fmCreate or fmShareDenyWrite);
-    end;
-    xStream.Seek(0, soFromEnd);
-    xStream.WriteBuffer(xText[1], Length(xText));
-    xStream.Free;
-  end;
-end;
-
 function GetSystemPathname(AFilename: String): String;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + ExtractFileName(AFilename);
@@ -1235,9 +1212,9 @@ begin
     if Result then begin
       Result := True;
       GSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
-      SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion);
+      SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion, GSqllogfile);
       while Result and (xCurDbversion <> xToDbversion) do begin
-        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1));
+        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), GSqllogfile);
         Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
         Inc(xCurDbversion);
       end;

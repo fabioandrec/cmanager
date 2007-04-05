@@ -9,7 +9,7 @@ MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
 DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
-PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe
+PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe NBPCurrencyRates.dll
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -24,6 +24,9 @@ CArchive.exe: ..\sys\CArchive.dpr
   $(DCC)
 
 CQuery.exe: ..\sys\CQuery.dpr
+  $(DCC)
+
+NBPCurrencyRates.dll: ..\sys\Plugins\NBPCurrencyRates\NBPCurrencyRates.dpr
   $(DCC)
 
 

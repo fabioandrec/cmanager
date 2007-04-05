@@ -86,6 +86,11 @@ type
     ActionAdd: TAction;
     CButton8: TCButton;
     CheckBoxCanOverwrite: TCheckBox;
+    TabSheetPlugins: TTabSheet;
+    Action8: TAction;
+    CButton9: TCButton;
+    Panel3: TPanel;
+    List: TCDataList;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -101,6 +106,7 @@ type
     procedure ComboBoxBackupActionChange(Sender: TObject);
     procedure ActionAddExecute(Sender: TObject);
     procedure CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -125,7 +131,7 @@ implementation
 uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CMovementFrameUnit, CBaseFormUnit, CBaseFrameUnit, CDoneFrameUnit,
   CPlannedFrameUnit, CStartupInfoFrameUnit, Registry, CInfoFormUnit,
-  CTemplates, CDescpatternFormUnit;
+  CTemplates, CDescpatternFormUnit, CPlugins;
 
 {$R *.dfm}
 
@@ -134,6 +140,7 @@ begin
   Action1.OnExecute := ActionExecute;
   Action2.OnExecute := ActionExecute;
   Action3.OnExecute := ActionExecute;
+  Action8.OnExecute := ActionExecute;
   ActiveAction := TAction(ActionManager1.Actions[ATab]);
   FViewPrefs.Clone(GViewsPreferences);
   FBasePrefs.Clone(GBasePreferences);
@@ -247,6 +254,7 @@ begin
   CheckBoxAutostartOperationsClick(Nil);
   ComboBoxBackupActionChange(Nil);
   UpdateFilenameState;
+  List.ReloadTree;
 end;
 
 procedure TCPreferencesForm.ReadValues;
@@ -426,6 +434,16 @@ begin
   if AAccepted then begin
     AText := MinimizeName(xDir, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
     ADataGid := xDir;
+  end;
+end;
+
+procedure TCPreferencesForm.ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+var xCount: Integer;
+    xElement: TCListDataElement;
+begin
+  for xCount := 0 to GPlugins.Count - 1 do begin
+    xElement := TCListDataElement.Create(Sender, TCDataListElementObject(GPlugins.Items[xCount]), False);
+    ARootElement.Add(xElement);
   end;
 end;
 
