@@ -91,6 +91,8 @@ type
     CButton9: TCButton;
     Panel3: TPanel;
     List: TCDataList;
+    CButton10: TCButton;
+    Action9: TAction;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -107,6 +109,7 @@ type
     procedure ActionAddExecute(Sender: TObject);
     procedure CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+    procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -255,6 +258,7 @@ begin
   ComboBoxBackupActionChange(Nil);
   UpdateFilenameState;
   List.ReloadTree;
+  ListFocusChanged(List, Nil, 0);
 end;
 
 procedure TCPreferencesForm.ReadValues;
@@ -445,6 +449,16 @@ begin
     xElement := TCListDataElement.Create(Sender, TCDataListElementObject(GPlugins.Items[xCount]), False);
     ARootElement.Add(xElement);
   end;
+end;
+
+procedure TCPreferencesForm.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+var xConfigurable: Boolean;
+begin
+  xConfigurable := False;
+  if Node <> Nil then begin
+    xConfigurable := TCPlugin(List.GetTreeElement(Node).Data).isConfigurable;
+  end;
+  Action9.Enabled := xConfigurable;
 end;
 
 end.
