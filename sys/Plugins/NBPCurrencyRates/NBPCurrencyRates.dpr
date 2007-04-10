@@ -19,7 +19,15 @@ begin
   SetXmlAttribute('description', AXml.documentElement, 'Pobieranie œrednich kursów walut z NBP');
 end;
 
+function Plugin_Configure(AXml: IXMLDOMDocument): Boolean; stdcall; export;
+begin
+  MessageBox(0, 'Ta wtyczka nie ma nic do konfigurowania', 'Informacja', MB_OK + MB_ICONINFORMATION);
+  SetXmlAttribute('configuration', AXml.documentElement, GetXmlAttribute('configuration', AXml.documentElement, '') + '_test');
+  Result := True;
+end;
+
 exports
+  Plugin_Configure,
   Plugin_Execute,
   Plugin_Info;
 end.

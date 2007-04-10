@@ -25,8 +25,10 @@ type
     function LoadAndInitialize: Boolean;
     procedure FinalizeAndUnload;
     destructor Destroy; override;
+    function Configure(AIn: String; var AOut: String): Boolean;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
+    property fileName: String read FFilename;
     property pluginType: Integer read FpluginType;
     property pluginDescription: String read FpluginDescription;
     property pluginConfiguration: String read FpluginConfiguration write FpluginConfiguration;
@@ -54,6 +56,20 @@ begin
   Result := CoDOMDocument.Create;
   xRoot := Result.createElement('plugin');
   Result.appendChild(xRoot);
+end;
+
+function TCPlugin.Configure(AIn: String; var AOut: String): Boolean;
+var xXml: IXMLDOMDocument;
+begin
+  AOut := AIn;
+  xXml := GetBaseXml;
+  SetXmlAttribute('configuration', xXml.documentElement, AIn);
+  SaveToLog('Wejœciowe dane procedury Plugin_Configure ' + xXml.xml, GPluginlogfile);
+  Result := FPlugin_Configure(xXml);
+  if Result then begin
+    AOut := GetXmlAttribute('configuration', xXml.documentElement, AIn);
+    SaveToLog('Wyjœciowe dane procedury Plugin_Configure ' + xXml.xml, GPluginlogfile);
+  end;
 end;
 
 constructor TCPlugin.Create(AFilename: String);

@@ -1269,6 +1269,7 @@ inherited CPreferencesForm: TCPreferencesForm
     object Action9: TAction
       Caption = 'Konfiguruj wtyczk'#281
       ImageIndex = 4
+      OnExecute = Action9Execute
     end
   end
   object ActionManager: TActionManager

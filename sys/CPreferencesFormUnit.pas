@@ -110,6 +110,7 @@ type
     procedure CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure Action9Execute(Sender: TObject);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -459,6 +460,28 @@ begin
     xConfigurable := TCPlugin(List.GetTreeElement(Node).Data).isConfigurable;
   end;
   Action9.Enabled := xConfigurable;
+end;
+
+procedure TCPreferencesForm.Action9Execute(Sender: TObject);
+var xConfiguration: String;
+    xPlugin: TCPlugin;
+    xPluginPref: TPluginPref;
+    xOut: String;
+begin
+  xPlugin := TCPlugin(List.SelectedElement.Data);
+  xPluginPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.fileName]);
+  if xPluginPref = Nil then begin
+    xConfiguration := '';
+  end else begin
+    xConfiguration := xPluginPref.configuration;
+  end;
+  if xPlugin.Configure(xConfiguration, xOut) then begin
+    if xPluginPref = Nil then begin
+      xPluginPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xOut);
+      GPluginsPreferences.Add(xPluginPref);
+    end;
+    xPluginPref.configuration := xOut;
+  end;
 end;
 
 end.

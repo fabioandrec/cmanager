@@ -52,6 +52,18 @@ type
     property lastBackup: TDateTime read FlastBackup write FlastBackup;
   end;
 
+  TPluginPref = class(TPrefItem)
+  private
+    Fconfiguration: String;
+  public
+    function GetNodeName: String; override;
+    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    constructor CreatePluginPref(AFilename: String; AConfiguration: String);
+    property configuration: String read Fconfiguration write Fconfiguration;
+  end;
+
+
   TBackupThread = class(TThread)
   private
     FFilein: String;
@@ -192,6 +204,7 @@ type
 var GViewsPreferences: TPrefList;
     GColumnsPreferences: TPrefList;
     GBackupsPreferences: TPrefList;
+    GPluginsPreferences: TPrefList;
     GBasePreferences: TBasePref;
     GDescPatterns: TDescPatterns;
     GBackupThread: TBackupThread;
@@ -843,11 +856,35 @@ begin
   end;
 end;
 
+constructor TPluginPref.CreatePluginPref(AFilename, AConfiguration: String);
+begin
+  inherited Create(AFilename);
+  Fconfiguration := AConfiguration;
+end;
+
+function TPluginPref.GetNodeName: String;
+begin
+  Result := 'pluginpref';
+end;
+
+procedure TPluginPref.LoadFromXml(ANode: IXMLDOMNode);
+begin
+  inherited LoadFromXml(ANode);
+  Fconfiguration := GetXmlAttribute('configuration', ANode, '');
+end;
+
+procedure TPluginPref.SaveToXml(ANode: IXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('configuration', ANode, Fconfiguration);
+end;
+
 initialization
   GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
   GColumnsPreferences := TPrefList.Create(TViewColumnPref);
   GBackupsPreferences := TPrefList.Create(TBackupPref);
+  GPluginsPreferences := TPrefList.Create(TPluginPref);
   GViewsPreferences.Add(TViewPref.Create('baseMovement'));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
@@ -918,5 +955,6 @@ finalization
   GBasePreferences.Free;
   GColumnsPreferences.Free;
   GBackupsPreferences.Free;
+  GPluginsPreferences.Free;
   GDescPatterns.Free;
 end.
