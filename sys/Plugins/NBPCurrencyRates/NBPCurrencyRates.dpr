@@ -10,7 +10,8 @@ uses
   Forms,
   CPluginConsts in '..\CPluginConsts.pas',
   CXml in '..\..\CXml.pas',
-  NBPCurrencyRatesConfigFormUnit in 'NBPCurrencyRatesConfigFormUnit.pas' {NBPCurrencyRatesConfigForm};
+  NBPCurrencyRatesConfigFormUnit in 'NBPCurrencyRatesConfigFormUnit.pas' {NBPCurrencyRatesConfigForm},
+  NBPCurrencyRatesProgressFormUnit in 'NBPCurrencyRatesProgressFormUnit.pas' {NBPCurrencyRatesProgressForm};
 
 function Plugin_Initialize(AAppHandle: HWND): Boolean; stdcall; export;
 begin
