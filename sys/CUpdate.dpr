@@ -10,7 +10,8 @@ uses
   MemCheck in 'MemCheck.pas',
   CRichtext in 'CRichtext.pas',
   CXml in 'CXml.pas',
-  CTools in 'CTools.pas';
+  CTools in 'CTools.pas',
+  CHttpRequest in 'CHttpRequest.pas';
 
 {$R *.res}
 

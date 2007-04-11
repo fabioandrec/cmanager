@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=/site file://D:\CVS\SOURCEFORGE\cmanager\docs\Homepage\update.xml
+RunParams=
 HostApplication=
 Launcher=
 UseLauncher=0
