@@ -5,8 +5,18 @@ library NBPCurrencyRates;
 uses
   MsXml,
   Windows,
+  Controls,
+  Messages,
+  Forms,
   CPluginConsts in '..\CPluginConsts.pas',
-  CXml in '..\..\CXml.pas';
+  CXml in '..\..\CXml.pas',
+  NBPCurrencyRatesConfigFormUnit in 'NBPCurrencyRatesConfigFormUnit.pas' {NBPCurrencyRatesConfigForm};
+
+function Plugin_Initialize(AAppHandle: HWND): Boolean; stdcall; export;
+begin
+  Application.Handle := AAppHandle;
+  Result := True;
+end;
 
 function Plugin_Execute(AXml: IXMLDOMDocument): Boolean; stdcall; export;
 begin
@@ -20,15 +30,25 @@ begin
 end;
 
 function Plugin_Configure(AXml: IXMLDOMDocument): Boolean; stdcall; export;
+var xForm: TNBPCurrencyRatesConfigForm;
+    xConfiguration: String;
 begin
-  MessageBox(0, 'Ta wtyczka nie ma nic do konfigurowania', 'Informacja', MB_OK + MB_ICONINFORMATION);
-  SetXmlAttribute('configuration', AXml.documentElement, GetXmlAttribute('configuration', AXml.documentElement, '') + '_test');
-  Result := True;
+  Result := False;
+  xForm := TNBPCurrencyRatesConfigForm.Create(Application);
+  xForm.Icon.Handle := SendMessage(Application.Handle, WM_GETICON, ICON_BIG, 0);
+  xConfiguration := GetXmlAttribute('configuration', AXml.documentElement, '');
+  if xConfiguration <> '' then begin
+    xForm.EditName.Text := xConfiguration;
+  end;
+  if xForm.ShowModal = mrOk then begin
+    SetXmlAttribute('configuration', AXml.documentElement,  xForm.EditName.Text);
+    Result := True;
+  end;
 end;
 
 exports
+  Plugin_Initialize,
   Plugin_Configure,
   Plugin_Execute,
   Plugin_Info;
 end.
- 

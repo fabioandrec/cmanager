@@ -134,26 +134,36 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[HistoryLists\hlDebugSourcePath]
+Count=4
+Item0=Klasy sterujace\;..\Wspolne\Komponenty3\;..\Wspolne\Raporty\
+Item1=..\Wspolne;..\Wspolne\Komponenty3;..\Wspolne\Siec\pinpad;..\Wspolne\Siec\Biblioteki;..\Wspolne\Raporty;..\Wspolne\Raporty\Formatki;..\Administracja\Formatki;..\Wspolne\Formatki
+Item2=..\..\Wspolne
+Item3=.\;..\Wspolne;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Do 302002\Admin\Ksieg;..\Bin;..\Wspolne\Komponenty3
 [HistoryLists\hlConditionals]
 Count=3
-Item0=DEBUG
-Item1=DECLARE_GPL
-Item2=GPL
+Item0=BP_ONLINE;SDI_NOWE
+Item1=Rejestracja;BP_ONLINE;SDI_NOWE
+Item2=SDI_NOWE
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source
-Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item2=$(DELPHI)\Lib\Debug;..\others\PngComponents\Source;..\others\Vtv\Source
-[HistoryLists\hlUnitOutputDirectory]
-Count=2
-Item0=..\..\..\..\Trash
-Item1=..\..\Trash
-[HistoryLists\hlOutputDirectorry]
 Count=4
-Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\..\..\Wtyczki\Bin
-Item2=..\..\..\..\Bin
-Item3=..\..\Bin
+Item0=.\;..\Wspolne;.\System;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Bin;..\Wspolne\Komponenty3
+Item1=..\Wspolne\Komponenty3 ;..\temp;..\Wspolne\Komponenty3;..\Wspolne;..\Wspolne\Siec\pinpad;..\Wspolne\Siec\Biblioteki;..\Wspolne\Raporty;..\Wspolne\Raporty\Formatki;..\Administracja\Formatki;..\Wspolne\Formatki
+Item2=..\..\Wspolne;..\..\Wspolne\Formatki;..\..\Wspolne\Klasy biznesowe;..\..\Wspolne\Raporty;..\..\Wspolne\Klasy sterujace;..\..\Wspolne\Komponenty3;..\..\ImportSPG\Wspolne\Formatki
+Item3=.\;..\Wspolne;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Do 302002\Admin\Ksieg;..\Bin;..\Wspolne\Komponenty3
+[HistoryLists\hlUnitOutputDirectory]
+Count=6
+Item0=..\..\..\Trash
+Item1=..\..\..\Temp
+Item2=..\..\Temp
+Item3=..\Temp\
+Item4=..\Temp\R
+Item5=..\Temp
+[HistoryLists\hlOutputDirectorry]
+Count=3
+Item0=..\..\..\Bin
+Item1=..\..\Bin
+Item2=..\Bin

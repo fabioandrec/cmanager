@@ -127,7 +127,7 @@ begin
     Result := (@FPlugin_Execute <> Nil) and (@FPlugin_Info <> Nil);
     if Result then begin
       if @FPlugin_Initialize <> Nil then begin
-        Result := FPlugin_Initialize(Application.MainForm.Handle);
+        Result := FPlugin_Initialize(Application.Handle);
       end;
       if Result then begin
         if @FPlugin_Icon <> Nil then begin

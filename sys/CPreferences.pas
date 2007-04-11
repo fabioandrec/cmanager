@@ -61,6 +61,7 @@ type
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     constructor CreatePluginPref(AFilename: String; AConfiguration: String);
     property configuration: String read Fconfiguration write Fconfiguration;
+    procedure Clone(APrefItem: TPrefItem); override;
   end;
 
 
@@ -854,6 +855,12 @@ begin
   while FIsRunning do begin
     Sleep(10);
   end;
+end;
+
+procedure TPluginPref.Clone(APrefItem: TPrefItem);
+begin
+  inherited Clone(APrefItem);
+  Fconfiguration := TPluginPref(APrefItem).configuration;
 end;
 
 constructor TPluginPref.CreatePluginPref(AFilename, AConfiguration: String);

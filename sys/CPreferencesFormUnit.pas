@@ -116,6 +116,7 @@ type
     FActiveAction: TAction;
     FViewPrefs: TPrefList;
     FBasePrefs: TBasePref;
+    FPluginPrefs: TPrefList;
     procedure SetActiveAction(const Value: TAction);
     procedure ActionExecute(Sender: TObject);
     procedure UpdateFilenameState;
@@ -148,10 +149,12 @@ begin
   ActiveAction := TAction(ActionManager1.Actions[ATab]);
   FViewPrefs.Clone(GViewsPreferences);
   FBasePrefs.Clone(GBasePreferences);
+  FPluginPrefs.Clone(GPluginsPreferences);
   Result := ShowConfig(coEdit);
   if Result then begin
     GViewsPreferences.Clone(FViewPrefs);
     GBasePreferences.Clone(FBasePrefs);
+    GPluginsPreferences.Clone(FPluginPrefs);
     if FPrevWorkDays <> FBasePrefs.workDays then begin
       SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
     end;
@@ -204,10 +207,12 @@ begin
   inherited Create(AOwner);
   FBasePrefs := TBasePref.Create('baseprefs');
   FViewPrefs := TPrefList.Create(TViewPref);
+  FPluginPrefs := TPrefList.Create(TPluginPref);
 end;
 
 destructor TCPreferencesForm.Destroy;
 begin
+  FPluginPrefs.Free;
   FViewPrefs.Free;
   FBasePrefs.Free;
   inherited Destroy;
@@ -469,7 +474,7 @@ var xConfiguration: String;
     xOut: String;
 begin
   xPlugin := TCPlugin(List.SelectedElement.Data);
-  xPluginPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.fileName]);
+  xPluginPref := TPluginPref(FPluginPrefs.ByPrefname[xPlugin.fileName]);
   if xPluginPref = Nil then begin
     xConfiguration := '';
   end else begin
@@ -478,7 +483,7 @@ begin
   if xPlugin.Configure(xConfiguration, xOut) then begin
     if xPluginPref = Nil then begin
       xPluginPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xOut);
-      GPluginsPreferences.Add(xPluginPref);
+      FPluginPrefs.Add(xPluginPref);
     end;
     xPluginPref.configuration := xOut;
   end;
