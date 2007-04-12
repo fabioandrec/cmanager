@@ -2,10 +2,11 @@ unit CXml;
 
 interface
 
-uses MsXml;
+uses ActiveX, MsXml, Classes;
 
 procedure SetXmlAttribute(AName: String; ANode: IXMLDOMNode; AValue: OleVariant);
 function GetXmlAttribute(AName: String; ANode: IXMLDOMNode; ADefault: OleVariant): OleVariant;
+function GetDocumentFromString(AString: String): IXMLDOMDocument;
 
 implementation
 
@@ -26,6 +27,19 @@ begin
   xNode := ANode.ownerDocument.createAttribute(AName);
   ANode.attributes.setNamedItem(xNode);
   xNode.nodeValue := AValue;
+end;
+
+function GetDocumentFromString(AString: String): IXMLDOMDocument;
+var xStream: TStringStream;
+    xHelper: TStreamAdapter;
+begin
+  Result := CoDOMDocument.Create;
+  Result.validateOnParse := True;
+  Result.resolveExternals := True;
+  xStream := TStringStream.Create(AString);
+  xHelper := TStreamAdapter.Create(xStream);
+  Result.load(xHelper as IStream);
+  xStream.Free;
 end;
 
 end.

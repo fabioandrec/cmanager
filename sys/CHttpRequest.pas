@@ -20,16 +20,18 @@ type
     FResponse: String;
     FRequestResult: Cardinal;
     FIsRunning: Boolean;
+    FIsCancelled: Boolean;
     FTextToReport: String;
     FRichEdit: TRichEdit;
     FAgentName: String;
+    FFinished: Boolean;
     function GetErrorDesc(AErrorCode: Cardinal): String;
     function GetHostname: String;
     function GetPathname: String;
     function RemoveProto(AUrl: String): String;
-    function GetResponse(var AResponse: String): Cardinal;
     procedure AddToReportInternal;
   protected
+    function GetResponse(var AResponse: String): Cardinal;
     procedure AddToReport(AText: String);
     procedure Execute; override;
     procedure AfterGetResponse; virtual; abstract;
@@ -38,14 +40,16 @@ type
     procedure CancelRequest;
     property Hostname: String read GetHostname;
     property Pathname: String read GetPathname;
-    property Url: String read FUrl;
+    property Url: String read FUrl write FUrl;
     property Proxy: String read FProxy;
     property ProxyUser: String read FProxyUser;
     property ProxyPass: String read FProxyPass;
     property HttpRequestType: THttpConnectType read FHttpConnectType;
-    property Response: String read FResponse;
-    property RequestResult: Cardinal read FRequestResult;
-    property IsRunning: Boolean read FIsRunning;
+    property Response: String read FResponse write FResponse;
+    property RequestResult: Cardinal read FRequestResult write FRequestResult;
+    property IsRunning: Boolean read FIsRunning write FIsRunning;
+    property IsCancelled: Boolean read FIsCancelled;
+    property Finished: Boolean read FFinished write FFinished;
   end;
 
 implementation
@@ -55,6 +59,7 @@ uses CRichtext;
 constructor THttpRequest.Create(AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AReportRichedit: TRichEdit; AAgentName: String);
 begin
   inherited Create(True);
+  FIsCancelled := False;
   FUrl := AUrl;
   FProxy := AProxy;
   FProxyPass := AProxyPass;
@@ -66,6 +71,7 @@ begin
   FIsRunning := False;
   FRichEdit := AReportRichedit;
   FAgentName := AAgentName;
+  FFinished := False;
 end;
 
 function THttpRequest.GetHostname: String;
@@ -217,6 +223,7 @@ end;
 
 procedure THttpRequest.CancelRequest;
 begin
+  FIsCancelled := True;
   if FRequestHandle <> Nil then begin
     InternetCloseHandle(FRequestHandle);
   end;
@@ -228,6 +235,7 @@ begin
   FRequestResult := GetResponse(FResponse);
   AfterGetResponse;
   FIsRunning := False;
+  FFinished := True;
 end;
 
 end.

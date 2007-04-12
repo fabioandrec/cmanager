@@ -102,7 +102,9 @@ type
     procedure WndProc(var Message: TMessage); override;
   public
     procedure ActionShortcutExecute(ASender: TObject);
+    procedure ActionPluginsExecute(ASender: TObject);
     procedure UpdateStatusbar;
+    procedure UpdatePluginsMenu;
     procedure FinalizeMainForm;
     function OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
   published
@@ -123,12 +125,31 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
-  CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
-  CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
-  CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
-  CCurrencyRateFrameUnit;
+     CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
+     CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
+     CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
+     CCurrencyRateFrameUnit, CPlugins, CPluginConsts;
 
 {$R *.dfm}
+
+function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
+var xCount: Integer;
+    xItem: TActionClientItem;
+    xCaption: String;
+begin
+  Result := Nil;
+  xCount := 0;
+  xCaption := AnsiUpperCase(StringReplace(ACaption, '&', '', [rfReplaceAll, rfIgnoreCase]));
+  while (Result = Nil) and (xCount <= AActionClients.Count - 1) do begin
+    xItem := TActionClientItem(AActionClients.Items[xCount]);
+    if AnsiUpperCase(StringReplace(xItem.Caption, '&', '', [rfReplaceAll, rfIgnoreCase])) = xCaption then begin
+      Result := xItem;
+    end else begin
+      Result := FindActionClientByCaption(xItem.Items, ACaption);
+    end;
+    Inc(xCount);
+  end;
+end;
 
 procedure TCMainForm.FormCreate(Sender: TObject);
 begin
@@ -566,6 +587,50 @@ begin
       xPanel.Text := '';
       ShowReport('Raport z wykonania kopii pliku danych', GBackupThread.Report.Text, 400, 300);
     end;
+  end;
+end;
+
+procedure TCMainForm.UpdatePluginsMenu;
+var xMax, xCount: Integer;
+    xAction: TAction;
+    xPlugin: TCPlugin;
+    xPluginBand: TActionClientItem;
+begin
+  xMax := GPlugins.GetCurrencyRatePluginCount;
+  if xMax > 0 then begin
+    xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
+    if xPluginBand <> Nil then begin
+      for xCount := 0 to GPlugins.Count - 1 do begin
+        xPlugin := TCPlugin(GPlugins.Items[xCount]);
+        if xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+          xAction := TAction.Create(Self);
+          xAction.ActionList := ActionManager;
+          xAction.Caption := xPlugin.pluginMenu;
+          xAction.Tag := xCount;
+          xAction.OnExecute := ActionPluginsExecute;
+          with xPluginBand.Items.Add do begin
+            Action := xAction;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TCMainForm.ActionPluginsExecute(ASender: TObject);
+var xPlugin: TCPlugin;
+    xConfig, xOutput: String;
+    xPluginPref: TPluginPref;
+begin
+  xPlugin := TCPlugin(GPlugins.Items[TAction(ASender).Tag]);
+  xPluginPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.fileName]);
+  if xPluginPref = Nil then begin
+    xConfig := '';
+  end else begin
+    xConfig := xPluginPref.configuration;
+  end;
+  if xPlugin.Execute(xConfig, xOutput) then begin
+    UpdateCurrencyRates(xOutput);
   end;
 end;
 

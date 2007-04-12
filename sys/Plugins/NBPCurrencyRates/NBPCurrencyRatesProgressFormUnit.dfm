@@ -14,14 +14,15 @@ object NBPCurrencyRatesProgressForm: TNBPCurrencyRatesProgressForm
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnActivate = FormActivate
   PixelsPerInch = 96
   TextHeight = 13
   object Label2: TLabel
     Left = 92
     Top = 26
-    Width = 176
+    Width = 166
     Height = 13
-    Caption = 'Trwa sprawdzanie kurs'#243'w walut NBP'
+    Caption = 'Trwa pobieranie kurs'#243'w walut NBP'
   end
   object Image: TImage
     Left = 16
@@ -141,5 +142,6 @@ object NBPCurrencyRatesProgressForm: TNBPCurrencyRatesProgressForm
     Height = 25
     Caption = '&Przerwij'
     TabOrder = 1
+    OnClick = Button1Click
   end
 end

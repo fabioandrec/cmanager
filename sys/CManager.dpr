@@ -146,6 +146,7 @@ begin
           CheckForBackups;
         end;
         GPlugins.ScanForPlugins;
+        CMainForm.UpdatePluginsMenu;
         Application.ProcessMessages;
         Application.Run;
         CMainForm.FinalizeMainForm;

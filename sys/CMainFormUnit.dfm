@@ -376,6 +376,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutLimits
+                Caption = 'Li&mity'
                 ImageIndex = 10
               end>
             Caption = '&Skr'#243'ty'
@@ -401,6 +402,9 @@ object CMainForm: TCMainForm
               item
                 Action = ActionLoanCalc
                 Caption = '&Kalkulator kredytowy'
+              end
+              item
+                Caption = '&Wtyczki'
               end>
             Caption = '&Narz'#281'dzia'
           end

@@ -19,6 +19,7 @@ type
     FpluginType: Integer;
     FpluginDescription: String;
     FpluginConfiguration: String;
+    FpluginMenu: String;
     function GetisConfigurable: Boolean;
   public
     constructor Create(AFilename: String);
@@ -26,11 +27,13 @@ type
     procedure FinalizeAndUnload;
     destructor Destroy; override;
     function Configure(AIn: String; var AOut: String): Boolean;
+    function Execute(AConfiguration: String; AOutput: String): Boolean;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property fileName: String read FFilename;
     property pluginType: Integer read FpluginType;
     property pluginDescription: String read FpluginDescription;
+    property pluginMenu: String read FpluginMenu;
     property pluginConfiguration: String read FpluginConfiguration write FpluginConfiguration;
     property isConfigurable: Boolean read GetisConfigurable;
   end;
@@ -41,6 +44,7 @@ type
   public
     constructor Create(APath: String);
     procedure ScanForPlugins;
+    function GetCurrencyRatePluginCount: Integer;
   end;
 
 var GPlugins: TCPluginList;
@@ -84,6 +88,20 @@ destructor TCPlugin.Destroy;
 begin
   FinalizeAndUnload;
   inherited Destroy;
+end;
+
+function TCPlugin.Execute(AConfiguration, AOutput: String): Boolean;
+var xXml: IXMLDOMDocument;
+begin
+  AOutput := '';
+  xXml := GetBaseXml;
+  SetXmlAttribute('configuration', xXml.documentElement, AConfiguration);
+  SaveToLog('Wejœciowe dane procedury Plugin_Execute ' + xXml.xml, GPluginlogfile);
+  Result := FPlugin_Execute(xXml);
+  if Result then begin
+    AOutput := GetXmlAttribute('output', xXml.documentElement, '');
+    SaveToLog('Wyjœciowe dane procedury Plugin_Execute ' + xXml.xml, GPluginlogfile);
+  end;
 end;
 
 procedure TCPlugin.FinalizeAndUnload;
@@ -139,6 +157,7 @@ begin
         SaveToLog('Wyjœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
         FpluginType := GetXmlAttribute('type', xInfo.documentElement, CPLUGINTYPE_INCORRECT);
         FpluginDescription := GetXmlAttribute('description', xInfo.documentElement, '');
+        FpluginMenu := GetXmlAttribute('menu', xInfo.documentElement, FpluginDescription);
         if FpluginType = CPLUGINTYPE_CURRENCYRATE then begin
         end else begin
           Result := False;
@@ -163,6 +182,17 @@ constructor TCPluginList.Create(APath: String);
 begin
   inherited Create(True);
   FPluginPath := IncludeTrailingPathDelimiter(ExpandFileName(APath));
+end;
+
+function TCPluginList.GetCurrencyRatePluginCount: Integer;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+      Inc(Result);
+    end;
+  end;
 end;
 
 procedure TCPluginList.ScanForPlugins;

@@ -22,14 +22,23 @@ begin
 end;
 
 function Plugin_Execute(AXml: IXMLDOMDocument): Boolean; stdcall; export;
+var xConfiguration, xOutput: String;
 begin
-  Result := True;
+  NBPCurrencyRatesProgressForm := TNBPCurrencyRatesProgressForm.Create(Application);
+  NBPCurrencyRatesProgressForm.Icon.Handle := SendMessage(Application.Handle, WM_GETICON, ICON_BIG, 0);
+  xConfiguration := GetXmlAttribute('configuration', AXml.documentElement, '');
+  Result := NBPCurrencyRatesProgressForm.RetriveCurrencyRates(xConfiguration, xOutput);
+  if Result then begin
+    SetXmlAttribute('output', AXml.documentElement,  xOutput);
+  end;
+  NBPCurrencyRatesProgressForm.Free;
 end;
 
 procedure Plugin_Info(AXml: IXMLDOMDocument); stdcall; export
 begin
   SetXmlAttribute('type', AXml.documentElement, CPLUGINTYPE_CURRENCYRATE);
   SetXmlAttribute('description', AXml.documentElement, 'Pobieranie œrednich kursów walut z NBP');
+  SetXmlAttribute('menu', AXml.documentElement, 'Pobierz œrednie kursy walut NBP');
 end;
 
 function Plugin_Configure(AXml: IXMLDOMDocument): Boolean; stdcall; export;
@@ -47,6 +56,7 @@ begin
     SetXmlAttribute('configuration', AXml.documentElement,  xForm.EditName.Text);
     Result := True;
   end;
+  xForm.Free;
 end;
 
 exports

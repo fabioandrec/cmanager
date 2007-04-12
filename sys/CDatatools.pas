@@ -18,6 +18,7 @@ procedure CheckForBackups;
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
+procedure UpdateCurrencyRates(ARatesText: String);
 
 implementation
 
@@ -249,6 +250,10 @@ begin
   if xMustbackup then begin
     GBackupThread := TBackupThread.Create(GDatabaseName);
   end;
+end;
+
+procedure UpdateCurrencyRates(ARatesText: String);
+begin
 end;
 
 end.

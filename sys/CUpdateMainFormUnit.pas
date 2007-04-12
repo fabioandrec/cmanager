@@ -150,8 +150,6 @@ end;
 
 procedure TUpdateHttpRequest.AfterGetResponse;
 var xDocument: IXMLDOMDocument;
-    xStream: TStringStream;
-    xHelper: TStreamAdapter;
     xCurrentVersion: String;
     xLatestVersion: String;
     xNode: IXMLDOMNode;
@@ -161,13 +159,7 @@ var xDocument: IXMLDOMDocument;
 begin
   if RequestResult = ERROR_SUCCESS then begin
     CoInitialize(Nil);
-    xDocument := CoDOMDocument.Create;
-    xDocument.validateOnParse := True;
-    xDocument.resolveExternals := True;
-    xStream := TStringStream.Create(Response);
-    xHelper := TStreamAdapter.Create(xStream);
-    xDocument.load(xHelper as IStream);
-    xStream.Free;
+    xDocument := GetDocumentFromString(Response);
     xValid := False;
     if xDocument.parseError.errorCode = 0 then begin
       xCurrentVersion := FileVersion(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'cmanager.exe');
