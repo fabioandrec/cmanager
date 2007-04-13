@@ -404,6 +404,9 @@ object CMainForm: TCMainForm
                 Caption = '&Kalkulator kredytowy'
               end
               item
+                Action = ActionImportCurrencyRates
+              end
+              item
                 Caption = '&Wtyczki'
               end>
             Caption = '&Narz'#281'dzia'
@@ -576,6 +579,11 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Kursy walut'
     end
+    object ActionImportCurrencyRates: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Wczytaj kursy walut'
+      OnExecute = ActionImportCurrencyRatesExecute
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'
@@ -593,5 +601,13 @@ object CMainForm: TCMainForm
     Title = 'Plik danych'
     Left = 514
     Top = 192
+  end
+  object OpenDialogXml: TOpenDialog
+    DefaultExt = 'dat'
+    Filter = 'Pliki XML|*.xml|Wszystkie pliki|*.*'
+    FilterIndex = 0
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 474
+    Top = 232
   end
 end

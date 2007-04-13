@@ -58,6 +58,8 @@ type
     ActionShortcutLimits: TAction;
     ActionShortcutCurrencydef: TAction;
     ActionShortcutCurrencyRate: TAction;
+    ActionImportCurrencyRates: TAction;
+    OpenDialogXml: TOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -86,6 +88,7 @@ type
     procedure ActionExportExecute(Sender: TObject);
     procedure ActionRandomExecute(Sender: TObject);
     procedure StatusBarClick(Sender: TObject);
+    procedure ActionImportCurrencyRatesExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -631,6 +634,26 @@ begin
   end;
   if xPlugin.Execute(xConfig, xOutput) then begin
     UpdateCurrencyRates(xOutput);
+  end;
+end;
+
+procedure TCMainForm.ActionImportCurrencyRatesExecute(Sender: TObject);
+var xStr: TStringList;
+begin
+  if OpenDialogXml.Execute then begin
+    xStr := TStringList.Create;
+    try
+      try
+        xStr.LoadFromFile(OpenDialogXml.FileName);
+        UpdateCurrencyRates(xStr.Text);
+      except
+        on E: Exception do begin
+          ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku ' + OpenDialogXml.FileName, E.Message);
+        end;
+      end;
+    finally
+      xStr.Free;
+    end;
   end;
 end;
 

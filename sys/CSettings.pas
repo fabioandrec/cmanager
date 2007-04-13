@@ -183,7 +183,7 @@ end;
 function InitializeSettings(AFileName: String): Boolean;
 begin
   Result := True;
-  GSettings := CoDOMDocument.Create;
+  GSettings := GetXmlDocument;
   if (AFileName <> '') and FileExists(AFileName) then begin
     GSettings.validateOnParse := True;
     GSettings.resolveExternals := True;
@@ -192,6 +192,11 @@ begin
       ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GSettings.parseError.reason);
       Result := False;
     end else begin
+      if GSettings.firstChild <> Nil then begin
+        if GSettings.firstChild.nodeType <> NODE_PROCESSING_INSTRUCTION then begin
+          AppendEncoding(GSettings);
+        end;
+      end;
       GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
       GColumnsPreferences.LoadAllFromParentNode(GetSettingsColumns);
       GBackupsPreferences.LoadAllFromParentNode(GetSettingsBackups);

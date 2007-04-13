@@ -22,15 +22,10 @@ begin
 end;
 
 function Plugin_Execute(AXml: IXMLDOMDocument): Boolean; stdcall; export;
-var xConfiguration, xOutput: String;
 begin
   NBPCurrencyRatesProgressForm := TNBPCurrencyRatesProgressForm.Create(Application);
   NBPCurrencyRatesProgressForm.Icon.Handle := SendMessage(Application.Handle, WM_GETICON, ICON_BIG, 0);
-  xConfiguration := GetXmlAttribute('configuration', AXml.documentElement, '');
-  Result := NBPCurrencyRatesProgressForm.RetriveCurrencyRates(xConfiguration, xOutput);
-  if Result then begin
-    SetXmlAttribute('output', AXml.documentElement,  xOutput);
-  end;
+  Result := NBPCurrencyRatesProgressForm.RetriveCurrencyRates(AXml);
   NBPCurrencyRatesProgressForm.Free;
 end;
 

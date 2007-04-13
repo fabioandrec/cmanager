@@ -11,9 +11,14 @@ uses
 type
   TNBPCurrencyRatesThread = class(THttpRequest)
   private
+    FResponseXml: IXMLDOMDocument;
+    FRootElement: IXMLDOMNode;
     procedure SetFinished;
   protected
     procedure AfterGetResponse; override;
+  public
+    property ResponseXml: IXMLDOMDocument read FResponseXml write FResponseXml;
+    property RootElement: IXMLDOMNode read FRootElement write FRootElement;
   end;
 
   TNBPCurrencyRatesProgressForm = class(TForm)
@@ -26,7 +31,7 @@ type
   private
     FRequestThread: TNBPCurrencyRatesThread;
   public
-    function RetriveCurrencyRates(AFromLink: String; var AOutput: String): Boolean;
+    function RetriveCurrencyRates(AXml: IXMLDOMDocument): Boolean;
   end;
 
 var NBPCurrencyRatesProgressForm: TNBPCurrencyRatesProgressForm;
@@ -41,16 +46,53 @@ const
   CSTARTTAG = '<a href="';
   CENDTAG = '"';
 
-function TNBPCurrencyRatesProgressForm.RetriveCurrencyRates(AFromLink: String; var AOutput: String): Boolean;
+function TNBPCurrencyRatesProgressForm.RetriveCurrencyRates(AXml: IXMLDOMDocument): Boolean;
+var xOutRoot: IXMLDOMNode;
+    xPositions: IXMLDOMNodeList;
+    xPosition, xOut: IXMLDOMNode;
+    xCount: Integer;
+    xCurrencyName, xCurrencyIso: String;
+    xCurrencyQuantity: Integer;
+    xCurrencyRate: Currency;
+    xOldDecimal: Char;
+    xLink: String;
 begin
+  xOldDecimal := DecimalSeparator;
+  DecimalSeparator := '.';
   AssignRichText('Rozpoczêcie wyszukiwania lokalizacji tabeli kursów walut...', RichEdit);
-  FRequestThread := TNBPCurrencyRatesThread.Create(AFromLink, '', '', '', hctPreconfig, RichEdit, 'MSIE');
+  xLink := GetXmlAttribute('configuration', AXml.documentElement, '');
+  if xLink = '' then begin
+    xLink := 'http://www.nbp.org.pl/Kursy/KursyA.html';
+  end;
+  FRequestThread := TNBPCurrencyRatesThread.Create(xLink, '', '', '', hctPreconfig, RichEdit, 'MSIE');
   ShowModal;
   Result := FRequestThread.RequestResult = 0;
   if Result then begin
-    AOutput := FRequestThread.Response;
+    xOutRoot := AXml.createElement('currencyRates');
+    AXml.documentElement.appendChild(xOutRoot);
+    SetXmlAttribute('cashpointName', xOutRoot, 'Narodowy Bank Polski');
+    SetXmlAttribute('bindingDate', xOutRoot, StringReplace(GetXmlNodeValue('data_publikacji', FRequestThread.RootElement, ''), '-', '', [rfReplaceAll, rfIgnoreCase]));
+    xPositions := FRequestThread.RootElement.selectNodes('pozycja');
+    for xCount := 0 to xPositions.length - 1 do begin
+      xPosition := xPositions.item[xCount];
+      xCurrencyName := GetXmlNodeValue('nazwa_waluty', xPosition, '');
+      xCurrencyIso := GetXmlNodeValue('kod_waluty', xPosition, '');
+      xCurrencyQuantity := StrToIntDef(GetXmlNodeValue('przelicznik', xPosition, ''), -1);
+      xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_sredni', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
+      if (xCurrencyName <> '') and (xCurrencyIso <> '') and (xCurrencyQuantity <> -1) and (xCurrencyRate <> -1) then begin
+        xOut := AXml.createElement('currencyRate');
+        xOutRoot.appendChild(xOut);
+        SetXmlAttribute('sourceName', xOut, xCurrencyName);
+        SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
+        SetXmlAttribute('targetName', xOut, 'Polski z³oty');
+        SetXmlAttribute('targetIso', xOut, 'PLN');
+        SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
+        SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+      end;
+    end;
   end;
   FRequestThread.Free;
+  DecimalSeparator := xOldDecimal;
 end;
 
 procedure TNBPCurrencyRatesProgressForm.FormActivate(Sender: TObject);
@@ -66,8 +108,9 @@ var xLocalization: String;
     xHtml: String;
     xStag, xEtag: Integer;
     xPath: String;
-    xXml: IXMLDOMDocument;
 begin
+  FResponseXml := Nil;
+  FRootElement := Nil;
   xHtml := Response;
   xLocalization := '';
   xStag := LastDelimiter('/', Url);
@@ -85,17 +128,23 @@ begin
     Url := xLocalization;
     RequestResult := GetResponse(xResponse);
     if RequestResult = 0 then begin
-      xXml := GetDocumentFromString(xResponse);
-      if xXml.parseError.errorCode = 0 then begin
-        Response := xResponse;
+      FResponseXml := GetDocumentFromString(xResponse);
+      if FResponseXml.parseError.errorCode = 0 then begin
+        FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
+        if FRootElement = Nil then begin
+          FResponseXml := Nil;
+          AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
+          RequestResult := ERROR_BAD_FORMAT;
+        end;
       end else begin
-        RequestResult := ERROR_FILE_NOT_FOUND;
+        FResponseXml := Nil;
         AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
+        RequestResult := ERROR_BAD_FORMAT;
       end;
     end;
   end else begin
-    RequestResult := ERROR_FILE_NOT_FOUND;
     AddToReport('Otrzymane dane nie zawieraj¹ lokalizacji tabeli kursów walut');
+    RequestResult := ERROR_BAD_FORMAT;
   end;
   Synchronize(SetFinished);
 end;

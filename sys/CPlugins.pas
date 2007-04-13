@@ -54,10 +54,10 @@ implementation
 
 uses SysUtils, CTools, CXml;
 
-function GetBaseXml: IXMLDOMDocument;
+function GetBasePluginXml: IXMLDOMDocument;
 var xRoot: IXMLDOMNode;
 begin
-  Result := CoDOMDocument.Create;
+  Result := GetXmlDocument;
   xRoot := Result.createElement('plugin');
   Result.appendChild(xRoot);
 end;
@@ -66,7 +66,7 @@ function TCPlugin.Configure(AIn: String; var AOut: String): Boolean;
 var xXml: IXMLDOMDocument;
 begin
   AOut := AIn;
-  xXml := GetBaseXml;
+  xXml := GetBasePluginXml;
   SetXmlAttribute('configuration', xXml.documentElement, AIn);
   SaveToLog('Wejœciowe dane procedury Plugin_Configure ' + xXml.xml, GPluginlogfile);
   Result := FPlugin_Configure(xXml);
@@ -94,12 +94,12 @@ function TCPlugin.Execute(AConfiguration, AOutput: String): Boolean;
 var xXml: IXMLDOMDocument;
 begin
   AOutput := '';
-  xXml := GetBaseXml;
+  xXml := GetBasePluginXml;
   SetXmlAttribute('configuration', xXml.documentElement, AConfiguration);
   SaveToLog('Wejœciowe dane procedury Plugin_Execute ' + xXml.xml, GPluginlogfile);
   Result := FPlugin_Execute(xXml);
   if Result then begin
-    AOutput := GetXmlAttribute('output', xXml.documentElement, '');
+    AOutput := xXml.xml;
     SaveToLog('Wyjœciowe dane procedury Plugin_Execute ' + xXml.xml, GPluginlogfile);
   end;
 end;
@@ -151,7 +151,7 @@ begin
         if @FPlugin_Icon <> Nil then begin
           FIcon := FPlugin_Icon;
         end;
-        xInfo := GetBaseXml;
+        xInfo := GetBasePluginXml;
         SaveToLog('Wejœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
         FPlugin_Info(xInfo);
         SaveToLog('Wyjœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
