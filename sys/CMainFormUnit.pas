@@ -262,7 +262,9 @@ begin
     FActiveFrame.Show;
     LabelShortcut.Caption := AAction.Caption;
     if AAction.ImageIndex <> -1 then begin
-      PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
+      if AAction.ImageIndex <= CImageLists.MainImageList16x16.PngImages.Count - 1 then begin
+        PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
+      end;
     end;
   end;
 end;

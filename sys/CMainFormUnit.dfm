@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 207
-  Top = 127
+  Left = 133
+  Top = 30
   Width = 863
   Height = 635
   Caption = 'CManager'
@@ -378,6 +378,13 @@ object CMainForm: TCMainForm
                 Action = ActionShortcutLimits
                 Caption = 'Li&mity'
                 ImageIndex = 10
+              end
+              item
+                Action = ActionShortcutCurrencydef
+                ImageIndex = 11
+              end
+              item
+                Action = ActionShortcutCurrencyRate
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -405,6 +412,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionImportCurrencyRates
+                Caption = 'W&czytaj kursy walut'
               end
               item
                 Caption = '&Wtyczki'
@@ -574,6 +582,7 @@ object CMainForm: TCMainForm
     object ActionShortcutCurrencydef: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Waluty'
+      ImageIndex = 11
     end
     object ActionShortcutCurrencyRate: TAction
       Category = 'Skr'#243'ty'

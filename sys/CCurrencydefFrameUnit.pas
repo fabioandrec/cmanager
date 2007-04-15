@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDatabase, CDataobjects,
-  CDataobjectFormUnit;
+  CDataobjectFormUnit, CImageListsUnit;
 
 type
   TCCurrencydefFrame = class(TCDataobjectFrame)

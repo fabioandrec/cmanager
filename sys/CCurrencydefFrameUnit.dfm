@@ -1,13 +1,5 @@
 inherited CCurrencydefFrame: TCCurrencydefFrame
-  Width = 529
-  inherited Bevel: TBevel
-    Width = 529
-  end
-  inherited FilterPanel: TPanel
-    Width = 529
-  end
   inherited List: TCDataList
-    Width = 529
     Header.MainColumn = 0
     Columns = <
       item
@@ -22,12 +14,12 @@ inherited CCurrencydefFrame: TCCurrencydefFrame
       end
       item
         Position = 2
-        Width = 229
+        Width = 143
         WideText = 'Iso'
       end>
     WideDefaultText = ''
   end
-  inherited ButtonPanel: TPanel
-    Width = 529
+  inherited ActionListButtons: TActionList
+    Images = CImageLists.CurrencyDefImageList24x24
   end
 end
