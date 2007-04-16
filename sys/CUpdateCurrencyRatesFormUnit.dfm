@@ -184,19 +184,14 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
             end
             item
               Position = 1
-              Width = 120
-              WideText = 'Waluta bazowa'
+              Width = 240
+              WideText = 'Opis'
             end
             item
               Alignment = taRightJustify
               Position = 2
-              Width = 100
+              Width = 115
               WideText = 'Warto'#347#263
-            end
-            item
-              Position = 3
-              Width = 135
-              WideText = 'Waluta docelowa'
             end>
           WideDefaultText = ''
         end
