@@ -1,16 +1,16 @@
 inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
-  Left = 441
-  Top = 181
+  Left = 253
+  Top = 75
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Tabela kurs'#243'w walut'
-  ClientHeight = 447
+  ClientHeight = 463
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   object PanelButtons: TPanel
     Left = 0
-    Top = 406
+    Top = 422
     Width = 536
     Height = 41
     Align = alBottom
@@ -44,7 +44,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
     Left = 0
     Top = 0
     Width = 536
-    Height = 406
+    Height = 422
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
@@ -110,20 +110,20 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
       Left = 16
       Top = 97
       Width = 505
-      Height = 297
-      Caption = ' Kursy walut  '
+      Height = 320
+      Caption = ' Kursy walut '
       TabOrder = 1
       object Panel1: TPanel
         Left = 24
-        Top = 28
+        Top = 32
         Width = 457
-        Height = 249
+        Height = 265
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
         object Bevel1: TBevel
           Left = 1
-          Top = 205
+          Top = 220
           Width = 455
           Height = 2
           Align = alBottom
@@ -131,19 +131,43 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
         end
         object Panel2: TPanel
           Left = 1
-          Top = 207
+          Top = 222
           Width = 455
-          Height = 41
+          Height = 42
           Align = alBottom
           BevelOuter = bvNone
           Color = clWindow
           TabOrder = 0
+          object CButtonOut: TCButton
+            Left = 173
+            Top = 4
+            Width = 140
+            Height = 33
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = Action1
+          end
+          object CButtonEdit: TCButton
+            Left = 308
+            Top = 4
+            Width = 141
+            Height = 33
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = Action3
+          end
         end
         object RatesList: TCList
           Left = 1
           Top = 1
           Width = 455
-          Height = 204
+          Height = 219
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -196,6 +220,22 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
           WideDefaultText = ''
         end
       end
+    end
+  end
+  object ActionManager1: TActionManager
+    Images = CImageLists.OperationsImageList24x24
+    Left = 248
+    Top = 232
+    StyleName = 'XP Style'
+    object Action1: TAction
+      Caption = 'Zaznacz wszystkie'
+      ImageIndex = 0
+      OnExecute = Action1Execute
+    end
+    object Action3: TAction
+      Caption = 'Odznacz wszystkie'
+      ImageIndex = 2
+      OnExecute = Action3Execute
     end
   end
 end

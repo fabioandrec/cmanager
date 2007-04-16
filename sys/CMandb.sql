@@ -237,6 +237,7 @@ insert into cmanagerParams (paramName, paramValue) values ('MovementListIn', '@k
 insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementOut', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementIn', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('MovementListElement', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('Currencyrate', '@isobazowej@/@isodocelowej@');
 
 create table cmanagerInfo (
   version varchar(20) not null,

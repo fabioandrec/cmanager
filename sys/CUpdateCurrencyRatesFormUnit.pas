@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, MsXml, CComponents, StdCtrls, Buttons, ExtCtrls,
-  VirtualTrees, CTemplates;
+  VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan;
 
 type
   TCUpdateCurrencyRatesForm = class(TCBaseForm)
@@ -23,18 +23,26 @@ type
     Bevel1: TBevel;
     Panel2: TPanel;
     RatesList: TCList;
+    ActionManager1: TActionManager;
+    Action1: TAction;
+    Action3: TAction;
+    CButtonOut: TCButton;
+    CButtonEdit: TCButton;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure RatesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure RatesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure RatesListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure RatesListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure Action1Execute(Sender: TObject);
+    procedure Action3Execute(Sender: TObject);
   private
     FXml: IXMLDOMDocument;
     FRoot: IXMLDOMNode;
     FRates: IXMLDOMNodeList;
     FBindingDate: TDateTime;
     FCashpointName: String;
+    procedure SetChecked(AChecked: Boolean);
   public
     procedure InitializeForm;
     property Xml: IXMLDOMDocument read FXml write FXml;
@@ -157,6 +165,32 @@ begin
   end else if ATemplate = '@kurs@' then begin
     Result := CurrencyToString(FCurRate, False, 4);
   end;
+end;
+
+procedure TCUpdateCurrencyRatesForm.Action1Execute(Sender: TObject);
+begin
+  SetChecked(True);
+end;
+
+procedure TCUpdateCurrencyRatesForm.SetChecked(AChecked: Boolean);
+var xNode: PVirtualNode;
+    xState: TCheckState;
+begin
+  xNode := RatesList.GetFirst;
+  while (xNode <> Nil) do begin
+    if AChecked then begin
+      xState := csCheckedNormal;
+    end else begin
+      xState := csUncheckedNormal;
+    end;
+    RatesList.CheckState[xNode] := xState;
+    xNode := RatesList.GetNext(xNode);
+  end;
+end;
+
+procedure TCUpdateCurrencyRatesForm.Action3Execute(Sender: TObject);
+begin
+  SetChecked(False);
 end;
 
 end.
