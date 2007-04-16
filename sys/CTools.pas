@@ -68,6 +68,8 @@ function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray
 function LPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 procedure SaveToLog(AText: String; ALogFilename: String);
+function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
+function StrToCurrencyDecimalDot(AStr: String): Currency;
 
 implementation
 
@@ -409,6 +411,25 @@ begin
     xStream.WriteBuffer(xText[1], Length(xText));
     xStream.Free;
   end;
+end;
+
+function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
+var xY, xM, xD: Word;
+begin
+  xY := StrToIntDef(Copy(AString, 1, 4), 0);
+  xM := StrToIntDef(Copy(AString, 5, 2), 0);
+  xD := StrToIntDef(Copy(AString, 7, 2), 0);
+  if not TryEncodeDate(xY, xM, xD, Result) then begin
+    Result := ADefault;
+  end;
+end;
+
+function StrToCurrencyDecimalDot(AStr: String): Currency;
+var xStr: String;
+begin
+  xStr := StringReplace(AStr, '.', DecimalSeparator, [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ',', DecimalSeparator, [rfReplaceAll, rfIgnoreCase]);
+  Result := StrToFloatDef(xStr, 0);
 end;
 
 end.

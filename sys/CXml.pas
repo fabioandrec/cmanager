@@ -7,6 +7,7 @@ uses ActiveX, MsXml, Classes;
 procedure SetXmlAttribute(AName: String; ANode: IXMLDOMNode; AValue: OleVariant);
 function GetXmlAttribute(AName: String; ANode: IXMLDOMNode; ADefault: OleVariant): OleVariant;
 function GetDocumentFromString(AString: String): IXMLDOMDocument;
+function GetStringFromDocument(ADocument: IXMLDOMDocument): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: IXMLDOMNode; ADefault: String): String;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument;
 procedure AppendEncoding(var AXml: IXMLDOMDocument; AEncoding: String = 'Windows-1250');
@@ -64,12 +65,23 @@ function GetDocumentFromString(AString: String): IXMLDOMDocument;
 var xStream: TStringStream;
     xHelper: TStreamAdapter;
 begin
-  Result := CoDOMDocument.Create;
+  Result := GetXmlDocument;
   Result.validateOnParse := True;
   Result.resolveExternals := True;
   xStream := TStringStream.Create(AString);
   xHelper := TStreamAdapter.Create(xStream);
   Result.load(xHelper as IStream);
+  xStream.Free;
+end;
+
+function GetStringFromDocument(ADocument: IXMLDOMDocument): String;
+var xStream: TStringStream;
+    xHelper: TStreamAdapter;
+begin
+  xStream := TStringStream.Create('');
+  xHelper := TStreamAdapter.Create(xStream);
+  ADocument.save(xHelper as IStream);
+  Result := xStream.DataString;
   xStream.Free;
 end;
 

@@ -27,7 +27,7 @@ type
     procedure FinalizeAndUnload;
     destructor Destroy; override;
     function Configure(AIn: String; var AOut: String): Boolean;
-    function Execute(AConfiguration: String; AOutput: String): Boolean;
+    function Execute(AConfiguration: String; var AOutput: String): Boolean;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property fileName: String read FFilename;
@@ -68,11 +68,11 @@ begin
   AOut := AIn;
   xXml := GetBasePluginXml;
   SetXmlAttribute('configuration', xXml.documentElement, AIn);
-  SaveToLog('Wejœciowe dane procedury Plugin_Configure ' + xXml.xml, GPluginlogfile);
+  SaveToLog('Wejœciowe dane procedury Plugin_Configure ' + GetStringFromDocument(xXml), GPluginlogfile);
   Result := FPlugin_Configure(xXml);
   if Result then begin
     AOut := GetXmlAttribute('configuration', xXml.documentElement, AIn);
-    SaveToLog('Wyjœciowe dane procedury Plugin_Configure ' + xXml.xml, GPluginlogfile);
+    SaveToLog('Wyjœciowe dane procedury Plugin_Configure ' + GetStringFromDocument(xXml), GPluginlogfile);
   end;
 end;
 
@@ -90,17 +90,17 @@ begin
   inherited Destroy;
 end;
 
-function TCPlugin.Execute(AConfiguration, AOutput: String): Boolean;
+function TCPlugin.Execute(AConfiguration: String; var AOutput: String): Boolean;
 var xXml: IXMLDOMDocument;
 begin
   AOutput := '';
   xXml := GetBasePluginXml;
   SetXmlAttribute('configuration', xXml.documentElement, AConfiguration);
-  SaveToLog('Wejœciowe dane procedury Plugin_Execute ' + xXml.xml, GPluginlogfile);
+  SaveToLog('Wejœciowe dane procedury Plugin_Execute ' + GetStringFromDocument(xXml), GPluginlogfile);
   Result := FPlugin_Execute(xXml);
   if Result then begin
-    AOutput := xXml.xml;
-    SaveToLog('Wyjœciowe dane procedury Plugin_Execute ' + xXml.xml, GPluginlogfile);
+    AOutput := GetStringFromDocument(xXml);
+    SaveToLog('Wyjœciowe dane procedury Plugin_Execute ' + AOutput, GPluginlogfile);
   end;
 end;
 
@@ -152,9 +152,9 @@ begin
           FIcon := FPlugin_Icon;
         end;
         xInfo := GetBasePluginXml;
-        SaveToLog('Wejœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
+        SaveToLog('Wejœciowe dane procedury Plugin_Info ' + GetStringFromDocument(xInfo), GPluginlogfile);
         FPlugin_Info(xInfo);
-        SaveToLog('Wyjœciowe dane procedury Plugin_Info ' + xInfo.xml, GPluginlogfile);
+        SaveToLog('Wyjœciowe dane procedury Plugin_Info ' + GetStringFromDocument(xInfo), GPluginlogfile);
         FpluginType := GetXmlAttribute('type', xInfo.documentElement, CPLUGINTYPE_INCORRECT);
         FpluginDescription := GetXmlAttribute('description', xInfo.documentElement, '');
         FpluginMenu := GetXmlAttribute('menu', xInfo.documentElement, FpluginDescription);

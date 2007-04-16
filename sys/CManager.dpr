@@ -98,7 +98,8 @@ uses
   CCurrencyRateFormUnit in 'CCurrencyRateFormUnit.pas' {CCurrencyRateForm},
   CPlugins in 'CPlugins.pas',
   CPluginConsts in 'Plugins\CPluginConsts.pas',
-  CPluginTypes in 'Plugins\CPluginTypes.pas';
+  CPluginTypes in 'Plugins\CPluginTypes.pas',
+  CUpdateCurrencyRatesFormUnit in 'CUpdateCurrencyRatesFormUnit.pas' {CUpdateCurrencyRatesForm};
 
 {$R *.res}
 
@@ -142,7 +143,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
+  if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
         end;
         GPlugins.ScanForPlugins;

@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils;
+     DateUtils, MsXml;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -24,7 +24,7 @@ implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
-  CTools, StrUtils, CPreferences;
+  CTools, StrUtils, CPreferences, CXml, CUpdateCurrencyRatesFormUnit;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -253,7 +253,54 @@ begin
 end;
 
 procedure UpdateCurrencyRates(ARatesText: String);
+var xDoc: IXMLDOMDocument;
+    xRoot: IXMLDOMNode;
+    xList: IXMLDOMNodeList;
+    xValid: Boolean;
+    xError: String;
+    xBindingDate: TDateTime;
+    xCahpointName: String;
+    xForm: TCUpdateCurrencyRatesForm;
 begin
+  xValid := False;
+  xDoc := GetDocumentFromString(ARatesText);
+  if xDoc.parseError.errorCode = 0 then begin
+    xRoot := xDoc.documentElement.selectSingleNode('currencyRates');
+    if xRoot <> Nil then begin
+      xBindingDate := DmyToDate(GetXmlAttribute('bindingDate', xRoot, ''), 0);
+      if xBindingDate <> 0 then begin
+        xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
+        if xCahpointName <> '' then begin
+          xValid := True;
+          xList := xRoot.selectNodes('currencyRate');
+          if xList.length > 0 then begin
+            xForm := TCUpdateCurrencyRatesForm.Create(Application);
+            xForm.Xml := xDoc;
+            xForm.Root := xRoot;
+            xForm.Rates := xList;
+            xForm.BindingDate := xBindingDate;
+            xForm.CashpointName := xCahpointName;
+            xForm.InitializeForm;
+            xForm.ShowModal;
+            xForm.Free;
+          end else begin
+            ShowInfo(itInfo, 'Tabela nie zawiera ¿adnych kursów walut', xError);
+          end;
+        end else begin
+          xError := 'Brak okreœlenia kontrahenta - dostawcy tabeli kursów';
+        end;
+      end else begin
+        xError := 'Brak okreœlenia daty wa¿noœci tabeli kursów';
+      end;
+    end else begin
+      xError := 'Brak elementu zbiorczego';
+    end;
+  end else begin
+    xError := xDoc.parseError.reason;
+  end;
+  if not xValid then begin
+    ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut', xError);
+  end;
 end;
 
 end.
