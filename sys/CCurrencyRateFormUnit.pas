@@ -39,6 +39,8 @@ type
     procedure CStaticBaseCurrencydefChanged(Sender: TObject);
     procedure CCurrRateChange(Sender: TObject);
     procedure CStaticTargetCurrencydefChanged(Sender: TObject);
+  private
+    FRateToReplaceId: TDataGid;
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -47,6 +49,7 @@ type
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure InitializeForm; override;
     procedure UpdateDescription;
+    procedure AfterCommitData; override;
   public
     function ExpandTemplate(ATemplate: String): String; override;
   end;
@@ -61,6 +64,9 @@ uses CDataObjects, CCurrencyRateFrameUnit, CRichtext, CConsts,
 {$R *.dfm}
 
 function TCCurrencyRateForm.CanAccept: Boolean;
+var xRate: TCurrencyRate;
+    xText: String;
+    xCheck: Boolean;
 begin
   Result := True;
   if CIntQuantity.Value <= 0 then begin
@@ -85,6 +91,32 @@ begin
     ShowInfo(itError, 'Wartoœæ kursu musi byæ wiêksza od zera', '');
     CCurrRate.SetFocus;
     Result := False;
+  end else begin
+    if Operation = coEdit then begin
+      xCheck := (CStaticCashpoint.DataId <> TCurrencyRate(Dataobject).idCashpoint) or
+                (CStaticBaseCurrencydef.DataId <> TCurrencyRate(Dataobject).idSourceCurrencyDef) or
+                (CStaticTargetCurrencydef.DataId <> TCurrencyRate(Dataobject).idTargetCurrencyDef);
+    end else begin
+      xCheck := True;
+    end;
+    if xCheck then begin
+      GDataProvider.BeginTransaction;
+      xRate := TCurrencyRate.FindRate(CStaticBaseCurrencydef.DataId, CStaticTargetCurrencydef.DataId, CStaticCashpoint.DataId, CDateTime.Value);
+      if xRate <> Nil then begin
+        if CStaticCashpoint.DataId <> CEmptyDataGid then begin
+          xText := 'Istnieje ju¿ kurs waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
+                   'Czy chcesz go zast¹piæ ?';
+        end else begin
+          xText := 'Istnieje ju¿ kurs waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
+                   'Czy chcesz go zast¹piæ ?';
+        end;
+        Result := ShowInfo(itQuestion, xText, '');
+        if Result then begin
+          FRateToReplaceId := xRate.id;
+        end;
+      end;
+      GDataProvider.RollbackTransaction;
+    end;
   end;
 end;
 
@@ -122,7 +154,8 @@ begin
   inherited InitializeForm;
   CDateTime.Value := GWorkDate;
   CCurrRate.CurrencyStr := '';
-  UpdateDescription;  
+  FRateToReplaceId := CEmptyDataGid;
+  UpdateDescription;
 end;
 
 procedure TCCurrencyRateForm.ReadValues;
@@ -257,6 +290,18 @@ begin
     if CCurrRate.Value <> 0 then begin
       Result := CCurrRate.Text;
     end;
+  end;
+end;
+
+procedure TCCurrencyRateForm.AfterCommitData;
+var xRate: TCurrencyRate;
+begin
+  if FRateToReplaceId <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    xRate := TCurrencyRate(TCurrencyRate.LoadObject(CurrencyRateProxy, FRateToReplaceId, False));
+    xRate.DeleteObject;
+    GDataProvider.CommitTransaction;
+    SendMessageToFrames(TCCurrencyRateFrame, WM_DATAOBJECTDELETED, Integer(@FRateToReplaceId), 0);
   end;
 end;
 

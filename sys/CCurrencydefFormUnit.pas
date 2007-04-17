@@ -34,7 +34,6 @@ uses CDataObjects, CInfoFormUnit, CRichtext, CCurrencydefFrameUnit;
 
 function TCCurrencydefForm.CanAccept: Boolean;
 begin
-  Result := inherited CanAccept;
   if Trim(EditName.Text) = '' then begin
     Result := False;
     ShowInfo(itError, 'Nazwa waluty nie mo¿e byæ pusta', '');
@@ -43,6 +42,16 @@ begin
     Result := False;
     ShowInfo(itError, 'Symbol waluty nie mo¿e byæ pusty', '');
     EditSymbol.SetFocus;
+  end else if Trim(EditIso.Text) = '' then begin
+    Result := False;
+    ShowInfo(itError, 'Symbol ISO waluty nie mo¿e byæ pusty', '');
+    EditIso.SetFocus;
+  end else begin
+    Result := TCurrencyDef.FindByIso(EditIso.Text) = Nil;
+    if not Result then begin
+      ShowInfo(itError, 'Istnieje ju¿ waluta o symbolu ISO "' + EditIso.Text + '"', '');
+      EditIso.SetFocus;
+    end;
   end;
 end;
 
