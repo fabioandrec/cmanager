@@ -1,6 +1,6 @@
 inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
-  Left = 253
-  Top = 75
+  Left = 328
+  Top = 210
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Tabela kurs'#243'w walut'
@@ -28,6 +28,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
       Caption = 'Zapisz'
       Default = True
       TabOrder = 0
+      OnClick = BitBtnOkClick
     end
     object BitBtnCancel: TBitBtn
       Left = 447

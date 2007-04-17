@@ -76,6 +76,7 @@ begin
   xForm.Height := xHeight + xForm.PanelButtons.Height;
   Result := xForm.ShowConfig(coAdd);
   xForm.Free;
+  Application.ProcessMessages;
 end;
 
 procedure NotImplemented(AFunctionName: String);

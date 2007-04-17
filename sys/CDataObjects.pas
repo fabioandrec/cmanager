@@ -49,6 +49,7 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    class function FindByIso(AIso: TBaseName): TCurrencyDef;
   published
     property name: TBaseName read Fname write Setname;
     property symbol: TBaseName read Fsymbol write Setsymbol;
@@ -78,6 +79,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    class function FindRate(ASourceId, ATargetIs, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
   published
     property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write SetidSourceCurrencyDef;
     property idTargetCurrencyDef: TDataGid read FidTargetCurrencyDef write SetidTargetCurrencyDef;
@@ -1987,6 +1989,11 @@ begin
   end;
 end;
 
+class function TCurrencyDef.FindByIso(AIso: TBaseName): TCurrencyDef;
+begin
+  Result := TCurrencyDef(TCurrencyDef.FindByCondition(CurrencyDefProxy, 'select * from currencyDef where iso = ''' + AIso + '''', False));
+end;
+
 procedure TCurrencyDef.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -2165,6 +2172,15 @@ end;
 function TCurrencyRate.GetElementText: String;
 begin
   Result := Fdescription;
+end;
+
+class function TCurrencyRate.FindRate(ASourceId, ATargetIs, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
+var xSql: String;
+begin
+  xSql := Format('select * from currencyRate where bindingDate = %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s',
+                 [DatetimeToDatabase(ABindingDate, False), DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetIs)]);
+  xSql := xSql + ' and idCashpoint ' + IfThen(ACashpointId = CEmptyDataGid, 'is', '=') + ' ' + DataGidToDatabase(ACashpointId);
+  Result := TCurrencyRate(TCurrencyRate.FindByCondition(CurrencyRateProxy, xSql, False));
 end;
 
 end.

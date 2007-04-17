@@ -162,22 +162,13 @@ inherited CRandomForm: TCRandomForm
       Text = '5'
     end
   end
-  object ProgressBar: TProgressBar
-    Left = 98
-    Top = 398
-    Width = 157
-    Height = 13
-    Smooth = True
-    TabOrder = 2
-    Visible = False
-  end
   object BitBtnOk: TBitBtn
     Left = 16
     Top = 392
     Width = 75
     Height = 25
     Caption = 'Generuj'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = BitBtnOkClick
   end
   object BitBtn1: TBitBtn
@@ -187,7 +178,7 @@ inherited CRandomForm: TCRandomForm
     Height = 25
     Caption = 'Zamknij'
     Default = True
-    TabOrder = 4
+    TabOrder = 3
     OnClick = BitBtn1Click
   end
 end

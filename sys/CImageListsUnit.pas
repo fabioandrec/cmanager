@@ -27,6 +27,7 @@ type
     StatusbarImagesList16x16: TPngImageList;
     ActionImageList: TPngImageList;
     CurrencyDefImageList24x24: TPngImageList;
+    CurrencyRateImageList24x24: TPngImageList;
   private
     { Private declarations }
   public

@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDataobjectFormUnit,
-  CDatabase;
+  CDatabase, CImageListsUnit;
 
 type
   TCCurrencyRateFrame = class(TCDataobjectFrame)
@@ -30,6 +30,7 @@ type
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
+    function GetInitialiFilter: String; override;
   end;
 
 implementation
@@ -98,7 +99,6 @@ end;
 procedure TCCurrencyRateFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
-  CStaticFilter.DataId := CCurrencyRateFilterToday;
   UpdateCustomPeriod;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
@@ -157,6 +157,11 @@ end;
 procedure TCCurrencyRateFrame.CDateTimePerEndChanged(Sender: TObject);
 begin
   RefreshData;
+end;
+
+function TCCurrencyRateFrame.GetInitialiFilter: String;
+begin
+  Result := CCurrencyRateFilterToday;
 end;
 
 end.

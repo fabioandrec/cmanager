@@ -5,7 +5,7 @@ object CWaitForm: TCWaitForm
   BorderStyle = bsSingle
   Caption = 'CWaitForm'
   ClientHeight = 70
-  ClientWidth = 356
+  ClientWidth = 352
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,6 +13,7 @@ object CWaitForm: TCWaitForm
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   object LabelText: TLabel
@@ -25,7 +26,7 @@ object CWaitForm: TCWaitForm
   object ProgressBar: TProgressBar
     Left = 16
     Top = 40
-    Width = 329
+    Width = 321
     Height = 13
     Smooth = True
     TabOrder = 0
@@ -33,7 +34,7 @@ object CWaitForm: TCWaitForm
   object StaticText: TStaticText
     Left = 16
     Top = 40
-    Width = 329
+    Width = 321
     Height = 13
     AutoSize = False
     BorderStyle = sbsSunken

@@ -36,6 +36,7 @@ type
     procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
+    procedure BitBtnOkClick(Sender: TObject);
   private
     FXml: IXMLDOMDocument;
     FRoot: IXMLDOMNode;
@@ -62,12 +63,19 @@ type
   public
     constructor Create(ARate: IXMLDOMNode; ABindingDate: TDateTime; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
     function ExpandTemplate(ATemplate: String): String;
+    property Rate: IXMLDOMNode read FRate;
+    property BindingDate: TDateTime read FBindingDate;
+    property CashpointName: String read FCashpointName;
+    property Quantity: Integer read FQuantity;
+    property CurRate: Currency read FCurRate;
   end;
 
 implementation
 
 uses CDatabase, CXml, CTools, CDataObjects, CConsts, CFrameFormUnit,
-  CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences;
+  CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
+  CBaseFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
+  CWaitFormUnit, CProgressFormUnit;
 
 {$R *.dfm}
 
@@ -191,6 +199,93 @@ end;
 procedure TCUpdateCurrencyRatesForm.Action3Execute(Sender: TObject);
 begin
   SetChecked(False);
+end;
+
+procedure TCUpdateCurrencyRatesForm.BitBtnOkClick(Sender: TObject);
+var xCashpoint: TCashPoint;
+    xProceed: Boolean;
+    xNode: PVirtualNode;
+    xXml: IXMLDOMNode;
+    xRate: TCurrencyRate;
+    xBaseCurrency: TCurrencyDef;
+    xTargetCurrency: TCurrencyDef;
+    xDesc: String;
+    xCashpointId: TDataGid;
+    xHelper: TCurrencyRateDescriptionHelper;
+begin
+  if CStaticCashpoint.DataId = CEmptyDataGid then begin
+    if ShowInfo(itQuestion, 'Nie znaleziono kontrahenta o nazwie "' + FCashpointName + '", czy chcesz go utworzyæ teraz ?', '') then begin
+      GDataProvider.BeginTransaction;
+      xCashpoint := TCashPoint.CreateObject(CashPointProxy, False);
+      xCashpoint.name := Copy(FCashpointName, 1, 40);
+      xCashpoint.description := xCashpoint.name;
+      xCashpoint.cashpointType := CCashpointTypeOther;
+      CStaticCashpoint.DataId := xCashpoint.id;
+      xCashpointId := xCashpoint.id;
+      GDataProvider.CommitTransaction;
+      SendMessageToFrames(TCCashpointsFrame, WM_DATAOBJECTADDED, Integer(@xCashpointId), WMOPT_NONE);
+    end;
+  end;
+  if CStaticCashpoint.DataId <> CEmptyDataGid then begin
+    if GDataProvider.GetSqlInteger(Format('select count(*) from currencyRate where bindingDate = %s and idCashpoint = %s',
+      [DatetimeToDatabase(FBindingDate, False), DataGidToDatabase(CStaticCashpoint.DataId)]), 0) > 0 then begin
+      xProceed := ShowInfo(itQuestion, 'Istniej¹ ju¿ kursy walut w/g "' + FCashpointName + '" z dat¹ obowi¹zywania ' + DateToStr(FBindingDate) + sLineBreak +
+                                       'Czy chcesz je zast¹piæ ?', '');
+    end else begin
+      xProceed := True;
+    end;
+    if xProceed then begin
+      ShowWaitForm(wtProgressbar, 'Trwa zapisywanie tabeli kursów...', 0, RatesList.RootNodeCount);
+      GDataProvider.BeginTransaction;
+      xNode := RatesList.GetFirst;
+      while (xNode <> Nil) do begin
+        if RatesList.CheckState[xNode] = csCheckedNormal then begin
+          xXml := IXMLDOMNode(RatesList.GetNodeData(xNode)^);
+          xBaseCurrency := TCurrencyDef.FindByIso(GetXmlAttribute('sourceIso', xXml, ''));
+          if xBaseCurrency = Nil then begin
+            xBaseCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
+            xBaseCurrency.iso := GetXmlAttribute('sourceIso', xXml, '');
+            xBaseCurrency.symbol := xBaseCurrency.iso;
+            xBaseCurrency.name := GetXmlAttribute('sourceName', xXml, '');
+            xBaseCurrency.description := xBaseCurrency.name;
+          end;
+          xTargetCurrency := TCurrencyDef.FindByIso(GetXmlAttribute('targetIso', xXml, ''));
+          if xTargetCurrency = Nil then begin
+            xTargetCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
+            xTargetCurrency.iso := GetXmlAttribute('targetIso', xXml, '');
+            xTargetCurrency.symbol := xTargetCurrency.iso;
+            xTargetCurrency.name := GetXmlAttribute('targetName', xXml, '');
+            xTargetCurrency.description := xTargetCurrency.name;
+          end;
+          xRate := TCurrencyRate.FindRate(xBaseCurrency.id, xTargetCurrency.id, CStaticCashpoint.DataId, FBindingDate);
+          if xRate = Nil then begin
+            xRate := TCurrencyRate.CreateObject(CurrencyRateProxy, False);
+            xRate.idSourceCurrencyDef := xBaseCurrency.id;
+            xRate.idTargetCurrencyDef := xTargetCurrency.id;
+            xRate.idCashpoint := CStaticCashpoint.DataId;
+            xRate.bindingDate := FBindingDate;
+          end;
+          xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
+          if xDesc <> '' then begin
+            xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+            xHelper := TCurrencyRateDescriptionHelper.Create(xXml, FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xXml, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xXml, '')));
+            xDesc := GCurrencydefTemplatesList.ExpandTemplates(xDesc, xHelper);
+          end;
+          xRate.description := xDesc;
+          xRate.rate := StrToCurrencyDecimalDot(GetXmlAttribute('rate', xXml, ''));
+          xRate.quantity := StrToIntDef(GetXmlAttribute('quantity', xXml, ''), 0);
+        end;
+        GDataProvider.PostProxies;
+        xNode := RatesList.GetNext(xNode);
+        StepWaitForm(1);
+      end;
+      GDataProvider.CommitTransaction;
+      HideWaitForm;
+      SendMessageToFrames(TCCurrencydefFrame, WM_DATAREFRESH, 0, 0);
+      SendMessageToFrames(TCCurrencyRateFrame, WM_DATAREFRESH, 0, 0);
+      CloseForm;
+    end;
+  end;
 end;
 
 end.

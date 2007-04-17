@@ -58,6 +58,7 @@ type
     function GetList: TCList; override;
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
+    function GetInitialiFilter: String; virtual;
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; virtual; abstract;
@@ -109,7 +110,7 @@ var xFilters: TStringList;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   Dataobjects := Nil;
-  CStaticFilter.DataId := CFilterAllElements;
+  CStaticFilter.DataId := GetInitialiFilter;
   xFilters := GetStaticFilter;
   if xFilters <> Nil then begin
     if AAdditionalData <> Nil then begin
@@ -210,6 +211,8 @@ begin
     end else if Msg = WM_DATAOBJECTDELETED then begin
       xDataGid := PDataGid(WParam)^;
       MessageMovementDeleted(xDataGid, LParam);
+    end else if Msg = WM_DATAREFRESH then begin
+      RefreshData;
     end;
   end;
 end;
@@ -348,6 +351,11 @@ begin
       xCurNode := AList.GetNext(xCurNode);
     end;
   end;
+end;
+
+function TCDataobjectFrame.GetInitialiFilter: String;
+begin
+  Result := CFilterAllElements;
 end;
 
 end.

@@ -23,7 +23,6 @@ type
     CIntEdit3: TCIntEdit;
     Label6: TLabel;
     CIntEdit4: TCIntEdit;
-    ProgressBar: TProgressBar;
     BitBtnOk: TBitBtn;
     BitBtn1: TBitBtn;
     Label7: TLabel;
@@ -39,7 +38,8 @@ procedure FillDatabaseExampleData;
 
 implementation
 
-uses CDatabase, CDatatools, CDataObjects, CConsts, Math, DateUtils;
+uses CDatabase, CDatatools, CDataObjects, CConsts, Math, DateUtils,
+  CWaitFormUnit, CProgressFormUnit;
 
 {$R *.dfm}
 
@@ -64,12 +64,9 @@ var xCount: Integer;
 begin
   BitBtnOk.Enabled := False;
   BitBtn1.Enabled := False;
-  ProgressBar.Visible := True;
   Application.ProcessMessages;
   GDataProvider.BeginTransaction;
-  ProgressBar.Min := 0;
-  ProgressBar.Position := 0;
-  ProgressBar.Max := DaysBetween(ADateTo, ADateFrom);
+  ShowWaitForm(wtProgressbar, 'Trwa generowanie danych...', 0, DaysBetween(ADateTo, ADateFrom));
   for xCount := 1 to AAcountCount do begin
     with TAccount.CreateObject(AccountProxy, False) do begin
       accountType := CCashAccount;
@@ -133,17 +130,16 @@ begin
       end;
       GDataProvider.CommitTransaction;
     end;
-    ProgressBar.StepBy(1);
-    Application.ProcessMessages;
+    StepWaitForm(1);
     xDate := IncDay(xDate);
   end;
   xAccounts.Free;
   xCashpoints.Free;
   xInproducts.Free;
   xOutproducts.Free;
+  HideWaitForm;
   BitBtnOk.Enabled := True;
   BitBtn1.Enabled := True;
-  ProgressBar.Visible := False;
 end;
 
 procedure TCRandomForm.FormCreate(Sender: TObject);

@@ -385,6 +385,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutCurrencyRate
+                ImageIndex = 12
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -587,6 +588,7 @@ object CMainForm: TCMainForm
     object ActionShortcutCurrencyRate: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Kursy walut'
+      ImageIndex = 12
     end
     object ActionImportCurrencyRates: TAction
       Category = 'Narz'#281'dzia'

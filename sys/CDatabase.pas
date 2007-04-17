@@ -134,6 +134,7 @@ type
     constructor Create(AStatic: Boolean); virtual;
     constructor CreateObject(ADataProxy: TDataProxy; AIsStatic: Boolean); virtual;
     class function LoadObject(ADataProxy: TDataProxy; AId: TDataGid; AIsStatic: Boolean): TDataObject;
+    class function FindByCondition(ADataProxy: TDataProxy; AACondition: TDataGid; AIsStatic: Boolean): TDataObject;
     procedure ReloadObject;
     class function GetList(AClass: TDataObjectClass; ADataProxy: TDataProxy; ASql: String): TDataObjectList;
     destructor Destroy; override;
@@ -910,6 +911,18 @@ begin
     end;
     Inc(xCount);
   end;
+end;
+
+class function TDataObject.FindByCondition(ADataProxy: TDataProxy; AACondition: TDataGid; AIsStatic: Boolean): TDataObject;
+var xDataset: TADOQuery;
+begin
+  Result := Nil;
+  xDataset := ADataProxy.DataProvider.OpenSql(AACondition);
+  if not xDataset.IsEmpty then begin
+    Result := CreateObject(ADataProxy, AIsStatic);
+    Result.FromDataset(xDataset);
+  end;
+  xDataset.Free;
 end;
 
 procedure TDataObject.ForceUpdate;

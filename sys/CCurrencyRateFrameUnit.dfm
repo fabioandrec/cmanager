@@ -23,6 +23,7 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
     end
     inherited CStaticFilter: TCStatic
       Caption = '<wa'#380'ne dzi'#347'>'
+      DataId = 'T'
     end
     object CDateTimePerStart: TCDateTime
       Left = 306
@@ -85,5 +86,8 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
   inherited ListPopupMenu: TPopupMenu
     Left = 112
     Top = 88
+  end
+  inherited ActionListButtons: TActionList
+    Images = CImageLists.CurrencyRateImageList24x24
   end
 end
