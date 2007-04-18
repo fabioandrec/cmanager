@@ -16,9 +16,9 @@ uses
   CHttpRequest in '..\..\CHttpRequest.pas',
   CRichtext in '..\..\CRichtext.pas';
 
-function Plugin_Initialize(AAppHandle: HWND; AGetObjectDelegate: TCManager_GetObject): Boolean; stdcall; export;
+function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
-  Application.Handle := AAppHandle;
+  Application.Handle := ACManagerInterface.GetAppHandle;
   Result := True;
 end;
 

@@ -5,6 +5,22 @@ interface
 uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, MsXml, CComponents;
 
 type
+  TCPlugin = class;
+
+  TCManagerInterfaceObject = class(TObject, ICManagerInterface)
+  private
+    FParentPlugin: TCPlugin;
+  public
+    constructor Create(AParentPlugin: TCPlugin);
+    function GetConnection: Pointer;
+    function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+    function GetAppHandle: HWND;
+    function GetConfiguration(AConfigurationBuffer: PAnsiChar; ABufferSize: Integer): Integer;
+    procedure SetConfiguration(AConfigurationBuffer: PAnsiChar);
+  end;
+
   TCPlugin = class(TCDataListElementObject)
   private
     FFilename: String;
@@ -18,6 +34,7 @@ type
     FpluginDescription: String;
     FpluginConfiguration: String;
     FpluginMenu: String;
+    FcmanInterface: TCManagerInterfaceObject;
     function GetisConfigurable: Boolean;
   public
     constructor Create(AFilename: String);
@@ -51,15 +68,17 @@ var GPlugins: TCPluginList;
 
 implementation
 
-uses SysUtils, CTools, CXml, CDatabase;
+uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
 begin
   Result := Nil;
-  xName := AnsiLowerCase(AObjectName);
-  if xName = 'connection' then begin
-    Result := Pointer(GDataProvider.Connection.ConnectionObject);
+  if AObjectName <> Nil then begin
+    xName := AnsiLowerCase(AObjectName);
+    if xName = 'connection' then begin
+      Result := Pointer(GDataProvider.Connection.ConnectionObject);
+    end;
   end;
 end;
 
@@ -90,11 +109,13 @@ begin
   inherited Create;
   FFilename := AFilename;
   FHandle := 0;
+  FcmanInterface := TCManagerInterfaceObject.Create(Self);
 end;
 
 destructor TCPlugin.Destroy;
 begin
   FinalizeAndUnload;
+  FcmanInterface.Free;
   inherited Destroy;
 end;
 
@@ -152,7 +173,7 @@ begin
     Result := (@FPlugin_Execute <> Nil) and (@FPlugin_Info <> Nil);
     if Result then begin
       if @FPlugin_Initialize <> Nil then begin
-        Result := FPlugin_Initialize(Application.Handle, GetObjectDelegate);
+        Result := FPlugin_Initialize(FcmanInterface);
       end;
       if Result then begin
         xInfo := GetBasePluginXml;
@@ -229,6 +250,58 @@ begin
     until not xRes;
   end;
   Windows.FindClose(xHandle);
+end;
+
+function TCManagerInterfaceObject.GetConnection: Pointer;
+begin
+  Result := Pointer(GDataProvider.Connection.ConnectionObject);
+end;
+
+function TCManagerInterfaceObject._AddRef: Integer;
+begin
+  Result := 0;
+end;
+
+function TCManagerInterfaceObject._Release: Integer;
+begin
+  Result := 0;
+end;
+
+function TCManagerInterfaceObject.QueryInterface(const IID: TGUID; out Obj): HRESULT;
+begin
+  if GetInterface(IID, Obj) then begin
+    Result := 0
+  end else begin
+    Result := E_NOINTERFACE;
+  end;
+end;
+
+function TCManagerInterfaceObject.GetAppHandle: HWND;
+begin
+  Result := Application.Handle;
+end;
+
+constructor TCManagerInterfaceObject.Create(AParentPlugin: TCPlugin);
+begin
+  inherited Create;
+  FParentPlugin := AParentPlugin;
+end;
+
+function TCManagerInterfaceObject.GetConfiguration(AConfigurationBuffer: PAnsiChar; ABufferSize: Integer): Integer;
+begin
+  if AConfigurationBuffer = Nil then begin
+    Result := Length(FParentPlugin.pluginConfiguration);
+  end else if ABufferSize >= Length(FParentPlugin.pluginConfiguration) + 1 then begin
+    Result := Length(FParentPlugin.pluginConfiguration);
+    CopyMemory(AConfigurationBuffer, @FParentPlugin.pluginConfiguration[1], Result);
+  end else begin
+    Result := -1;
+  end;
+end;
+
+procedure TCManagerInterfaceObject.SetConfiguration(AConfigurationBuffer: PAnsiChar);
+begin
+  FParentPlugin.pluginConfiguration := String(AConfigurationBuffer);
 end;
 
 initialization

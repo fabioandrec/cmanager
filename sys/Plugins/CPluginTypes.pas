@@ -5,10 +5,16 @@ interface
 uses MsXml, Windows;
 
 type
-  TCManager_GetObject = function (AObjectName: PChar): Pointer; stdcall;
+  ICManagerInterface = interface
+    function GetConnection: Pointer;
+    function GetAppHandle: HWND;
+    function GetConfiguration(AConfigurationBuffer: PAnsiChar; ABufferSize: Integer): Integer;
+    procedure SetConfiguration(AConfigurationBuffer: PAnsiChar);
+  end;
+
   TCPlugin_Configure = function (AXml: IXMLDOMDocument): Boolean; stdcall;
   TCPlugin_Execute = function (AXml: IXMLDOMDocument): Boolean; stdcall;
-  TCPlugin_Initialize = function (AAppHandle: HWND; AGetObjectDelegate: TCManager_GetObject): Boolean; stdcall;
+  TCPlugin_Initialize = function (ACManagerInterface: ICManagerInterface): Boolean; stdcall;
   TCPlugin_Finalize = procedure; stdcall;
   TCPlugin_Info = procedure (AXml: IXMLDOMDocument); stdcall;
 

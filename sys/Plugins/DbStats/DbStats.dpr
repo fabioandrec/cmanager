@@ -13,12 +13,12 @@ uses
   CPluginConsts in '..\CPluginConsts.pas',
   CXml in '..\..\CXml.pas';
 
-var GGetObject: TCManager_GetObject;
+var CManInterface: ICManagerInterface;
 
-function Plugin_Initialize(AAppHandle: HWND; AGetObjectDelegate: TCManager_GetObject): Boolean; stdcall; export;
+function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
-  Application.Handle := AAppHandle;
-  GGetObject := AGetObjectDelegate;
+  Application.Handle := ACManagerInterface.GetAppHandle;
+  CManInterface := ACManagerInterface;
   Result := True;
 end;
 
@@ -26,7 +26,7 @@ function Plugin_Execute(AXml: IXMLDOMDocument): Boolean; stdcall; export;
 var xObject: Connection;
 begin
   Result := True;
-  xObject := Connection(GGetObject('Connection'));
+  xObject := Connection(CManInterface.GetConnection);
   ShowMessage(xObject.ConnectionString);
 end;
 
