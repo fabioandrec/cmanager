@@ -39,6 +39,7 @@ type
     function ExecuteSql(ASql: String; AShowError: Boolean = True): Boolean;
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
+    function GetSqlBoolean(ASql: String; ADefault: Boolean): Boolean;
     function GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
     function GetSqlString(ASql: String; ADefault: String): String;
     function GetSqlStringList(ASql: String): TStringList;
@@ -1290,6 +1291,19 @@ begin
     while not xQ.Eof do begin
       Result.Add(xQ.Fields[0].AsString);
       xQ.Next;
+    end;
+    xQ.Free;
+  end;
+end;
+
+function TDataProvider.GetSqlBoolean(ASql: String; ADefault: Boolean): Boolean;
+var xQ: TADOQuery;
+begin
+  Result := ADefault;
+  xQ := OpenSql(ASql);
+  if xQ <> Nil then begin
+    if not xQ.IsEmpty then begin
+      Result := xQ.Fields[0].AsBoolean;
     end;
     xQ.Free;
   end;

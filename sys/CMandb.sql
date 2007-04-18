@@ -207,6 +207,7 @@ create table currencyDef (
   symbol varchar(40) not null,
   iso varchar(40),
   description varchar(200),
+  isBase bit not null,
   primary key (idcurrencyDef)
 );
 
@@ -238,6 +239,8 @@ insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementOut',
 insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementIn', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('MovementListElement', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('Currencyrate', '@isobazowej@/@isodocelowej@');
+
+insert into currencyDef (idcurrencyDef, created, modified, name, symbol, iso, description, isBase) values ('{BC646D67-6074-49B1-B895-1579EE984182}', #2007-04-18 10:33:02#, #2007-04-18 10:33:02#, 'z³oty polski', 'z³', 'PLN', 'z³oty polski', 1);
 
 create table cmanagerInfo (
   version varchar(20) not null,

@@ -38,10 +38,12 @@ type
     Fsymbol: TBaseName;
     Fiso: TBaseName;
     Fdescription: TBaseDescription;
+    FisBase: Boolean;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure Setiso(const Value: TBaseName);
     procedure Setsymbol(const Value: TBaseName);
+    procedure SetisBase(const Value: Boolean);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -55,6 +57,7 @@ type
     property symbol: TBaseName read Fsymbol write Setsymbol;
     property iso: TBaseName read Fiso write Setiso;
     property description: TBaseDescription read Fdescription write Setdescription;
+    property isBase: Boolean read FisBase write SetisBase;
   end;
 
   TCurrencyRate = class(TDataObject)
@@ -1978,7 +1981,9 @@ class function TCurrencyDef.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
-  if GDataProvider.GetSqlInteger('select count(*) from currencyRate where ' +
+  if GDataProvider.GetSqlBoolean('select isBase from currencyDef where idCurrencyDef = ' + DataGidToDatabase(AId), False) then begin
+    xText := 'jest ona walut¹ podstawow¹';
+  end else if GDataProvider.GetSqlInteger('select count(*) from currencyRate where ' +
       '(idSourceCurrencyDef = ' + DataGidToDatabase(AId) + ') or ' +
       '(idTargetCurrencyDef = ' + DataGidToDatabase(AId) + ')', 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ kursy';
@@ -2002,6 +2007,7 @@ begin
     Fdescription := FieldByName('description').AsString;
     Fsymbol := FieldByName('symbol').AsString;
     Fiso := FieldByName('iso').AsString;
+    FisBase := FieldByName('isBase').AsBoolean;
   end;
 end;
 
@@ -2030,6 +2036,14 @@ procedure TCurrencyDef.Setdescription(const Value: TBaseDescription);
 begin
   if Fdescription <> Value then begin
     Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TCurrencyDef.SetisBase(const Value: Boolean);
+begin
+  if FisBase <> Value then begin
+    FisBase := Value;
     SetState(msModified);
   end;
 end;
@@ -2066,6 +2080,7 @@ begin
     AddField('symbol', Fsymbol, True, 'currencyDef');
     AddField('iso', Fiso, True, 'currencyDef');
     AddField('description', Fdescription, True, 'currencyDef');
+    AddField('isBase', IntToStr(Integer(FIsBase)), False, 'currencyDef');
   end;
 end;
 

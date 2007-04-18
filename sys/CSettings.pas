@@ -24,7 +24,7 @@ function GetSettingsPlugins: IXMLDOMNode;
 implementation
 
 uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts,
-  CPreferences, CXml;
+  CPreferences, CXml, CTools;
 
 var GSettings: IXMLDOMDocument = Nil;
 

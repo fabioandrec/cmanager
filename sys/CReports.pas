@@ -1520,6 +1520,8 @@ begin
     Result := Result + 'przychodów ';
   end else if TCSelectedMovementTypeParams(FParams).movementType = COutMovement then begin
     Result := Result + 'rozchodów ';
+  end else begin
+    Result := Result + 'przychodów i rozchodów';
   end;
   Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;

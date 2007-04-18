@@ -88,6 +88,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     OnDblClick = ListDblClick
     OnFocusChanged = ListFocusChanged
     OddColor = 12437200
+    AutoExpand = True
     OnCDataListReloadTree = ListCDataListReloadTree
     Columns = <>
     WideDefaultText = ''
@@ -102,8 +103,8 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Color = clWindow
     TabOrder = 1
     object CButtonAdd: TCButton
-      Left = 8
-      Top = 8
+      Left = 13
+      Top = 4
       Width = 100
       Height = 30
       Cursor = crHandPoint
@@ -114,8 +115,8 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Action = ActionAdd
     end
     object CButtonEdit: TCButton
-      Left = 128
-      Top = 8
+      Left = 133
+      Top = 4
       Width = 100
       Height = 30
       Cursor = crHandPoint
@@ -126,8 +127,8 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Action = ActionEdit
     end
     object CButtonDelete: TCButton
-      Left = 256
-      Top = 8
+      Left = 261
+      Top = 4
       Width = 100
       Height = 30
       Cursor = crHandPoint

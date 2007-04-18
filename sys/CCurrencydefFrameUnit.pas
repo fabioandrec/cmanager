@@ -46,6 +46,7 @@ end;
 
 procedure TCCurrencydefFrame.ReloadDataobjects;
 begin
+  inherited ReloadDataobjects;
   Dataobjects := TDataObject.GetList(TCurrencyDef, CurrencyDefProxy, 'select * from currencyDef');
 end;
 

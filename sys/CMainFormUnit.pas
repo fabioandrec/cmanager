@@ -607,7 +607,8 @@ begin
     if xPluginBand <> Nil then begin
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
-        if xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+        if (xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE) or
+           (xPlugin.pluginType = CPLUGINTYPE_JUSTEXECUTE) then begin
           xAction := TAction.Create(Self);
           xAction.ActionList := ActionManager;
           xAction.Caption := xPlugin.pluginMenu;
@@ -626,6 +627,7 @@ procedure TCMainForm.ActionPluginsExecute(ASender: TObject);
 var xPlugin: TCPlugin;
     xConfig, xOutput: String;
     xPluginPref: TPluginPref;
+    xRes: Boolean;
 begin
   xPlugin := TCPlugin(GPlugins.Items[TAction(ASender).Tag]);
   xPluginPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.fileName]);
@@ -634,8 +636,11 @@ begin
   end else begin
     xConfig := xPluginPref.configuration;
   end;
-  if xPlugin.Execute(xConfig, xOutput) then begin
-    UpdateCurrencyRates(xOutput);
+  xRes := xPlugin.Execute(xConfig, xOutput);
+  if xRes then begin
+    if xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+      UpdateCurrencyRates(xOutput);
+    end;
   end;
 end;
 

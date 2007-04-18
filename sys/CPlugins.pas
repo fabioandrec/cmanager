@@ -9,9 +9,7 @@ type
   private
     FFilename: String;
     FHandle: THandle;
-    FIcon: HICON;
     FPlugin_Configure: TCPlugin_Configure;
-    FPlugin_Icon: TCPlugin_Icon;
     FPlugin_Execute: TCPlugin_Execute;
     FPlugin_Initialize: TCPlugin_Initialize;
     FPlugin_Finalize: TCPlugin_Finalize;
@@ -45,6 +43,7 @@ type
     constructor Create(APath: String);
     procedure ScanForPlugins;
     function GetCurrencyRatePluginCount: Integer;
+    function GetJustExecutePluginCount: Integer;
   end;
 
 var GPlugins: TCPluginList;
@@ -81,7 +80,6 @@ begin
   inherited Create;
   FFilename := AFilename;
   FHandle := 0;
-  FIcon := 0;
 end;
 
 destructor TCPlugin.Destroy;
@@ -137,7 +135,6 @@ begin
   SaveToLog('£adowanie i inicjowanie plugin-u ' + FFilename, GPluginlogfile);
   if Result then begin
     @FPlugin_Configure := GetProcAddress(FHandle, 'Plugin_Configure');
-    @FPlugin_Icon := GetProcAddress(FHandle, 'Plugin_Icon');
     @FPlugin_Execute := GetProcAddress(FHandle, 'Plugin_Execute');
     @FPlugin_Initialize := GetProcAddress(FHandle, 'Plugin_Initialize');
     @FPlugin_Finalize := GetProcAddress(FHandle, 'Plugin_Finalize');
@@ -148,9 +145,6 @@ begin
         Result := FPlugin_Initialize(Application.Handle);
       end;
       if Result then begin
-        if @FPlugin_Icon <> Nil then begin
-          FIcon := FPlugin_Icon;
-        end;
         xInfo := GetBasePluginXml;
         SaveToLog('Wejœciowe dane procedury Plugin_Info ' + GetStringFromDocument(xInfo), GPluginlogfile);
         FPlugin_Info(xInfo);
@@ -158,9 +152,9 @@ begin
         FpluginType := GetXmlAttribute('type', xInfo.documentElement, CPLUGINTYPE_INCORRECT);
         FpluginDescription := GetXmlAttribute('description', xInfo.documentElement, '');
         FpluginMenu := GetXmlAttribute('menu', xInfo.documentElement, FpluginDescription);
-        if FpluginType = CPLUGINTYPE_CURRENCYRATE then begin
-        end else begin
-          Result := False;
+        Result := (FpluginType = CPLUGINTYPE_CURRENCYRATE) or
+                  (FpluginType = CPLUGINTYPE_JUSTEXECUTE);
+        if not Result then begin
           SaveToLog('Typ pluginu jest niepoprawny ' + IntToStr(FpluginType), GPluginlogfile);
         end;
       end else begin
@@ -190,6 +184,17 @@ begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
     if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+      Inc(Result);
+    end;
+  end;
+end;
+
+function TCPluginList.GetJustExecutePluginCount: Integer;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_JUSTEXECUTE then begin
       Inc(Result);
     end;
   end;
