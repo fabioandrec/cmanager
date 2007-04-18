@@ -51,7 +51,17 @@ var GPlugins: TCPluginList;
 
 implementation
 
-uses SysUtils, CTools, CXml;
+uses SysUtils, CTools, CXml, CDatabase;
+
+function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
+var xName: String;
+begin
+  Result := Nil;
+  xName := AnsiLowerCase(AObjectName);
+  if xName = 'connection' then begin
+    Result := Pointer(GDataProvider.Connection.ConnectionObject);
+  end;
+end;
 
 function GetBasePluginXml: IXMLDOMDocument;
 var xRoot: IXMLDOMNode;
@@ -142,7 +152,7 @@ begin
     Result := (@FPlugin_Execute <> Nil) and (@FPlugin_Info <> Nil);
     if Result then begin
       if @FPlugin_Initialize <> Nil then begin
-        Result := FPlugin_Initialize(Application.Handle);
+        Result := FPlugin_Initialize(Application.Handle, GetObjectDelegate);
       end;
       if Result then begin
         xInfo := GetBasePluginXml;

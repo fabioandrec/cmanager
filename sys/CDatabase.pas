@@ -50,6 +50,7 @@ type
     property InTransaction: Boolean read GetInTransaction;
     property IsConnected: Boolean read GetIsConnected;
     property LastError: String read FLastError;
+    property Connection: TADOConnection read FConnection;
   end;
 
   TDataObjectList = class(TObjectList)

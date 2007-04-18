@@ -10,7 +10,7 @@ DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
 PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe \
-  NBPCurrencyRates.dll RunCalc.dll
+  NBPCurrencyRates.dll RunCalc.dll DbStats.dll
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -31,6 +31,9 @@ NBPCurrencyRates.dll: ..\sys\Plugins\NBPCurrencyRates\NBPCurrencyRates.dpr
   $(DCC)
 
 RunCalc.dll: ..\sys\Plugins\RunCalc\RunCalc.dpr
+  $(DCC)
+
+DbStats.dll: ..\sys\Plugins\DbStats\DbStats.dpr
   $(DCC)
 
 

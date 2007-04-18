@@ -9,13 +9,14 @@ uses
   Messages,
   Forms,
   CPluginConsts in '..\CPluginConsts.pas',
+  CPluginTypes in '..\CPluginTypes.pas',
   CXml in '..\..\CXml.pas',
   NBPCurrencyRatesConfigFormUnit in 'NBPCurrencyRatesConfigFormUnit.pas' {NBPCurrencyRatesConfigForm},
   NBPCurrencyRatesProgressFormUnit in 'NBPCurrencyRatesProgressFormUnit.pas' {NBPCurrencyRatesProgressForm},
   CHttpRequest in '..\..\CHttpRequest.pas',
   CRichtext in '..\..\CRichtext.pas';
 
-function Plugin_Initialize(AAppHandle: HWND): Boolean; stdcall; export;
+function Plugin_Initialize(AAppHandle: HWND; AGetObjectDelegate: TCManager_GetObject): Boolean; stdcall; export;
 begin
   Application.Handle := AAppHandle;
   Result := True;
