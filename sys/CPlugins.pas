@@ -12,24 +12,27 @@ type
     FParentPlugin: TCPlugin;
   public
     constructor Create(AParentPlugin: TCPlugin);
-    function GetConnection: Pointer;
+    function GetConnection: OleVariant;
     function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
     function GetAppHandle: HWND;
-    function GetConfiguration(AConfigurationBuffer: PAnsiChar; ABufferSize: Integer): Integer;
-    procedure SetConfiguration(AConfigurationBuffer: PAnsiChar);
+    function GetConfiguration: OleVariant;
+    procedure SetConfiguration(AConfigurationBuffer: OleVariant);
+    procedure SetCaption(ACaption: OleVariant);
+    procedure SetType(AType: Integer);
+    procedure SetDescription(ADescription: OleVariant);
   end;
 
   TCPlugin = class(TCDataListElementObject)
   private
     FFilename: String;
+    FShortName: String;
     FHandle: THandle;
     FPlugin_Configure: TCPlugin_Configure;
     FPlugin_Execute: TCPlugin_Execute;
     FPlugin_Initialize: TCPlugin_Initialize;
     FPlugin_Finalize: TCPlugin_Finalize;
-    FPlugin_Info: TCPlugin_Info;
     FpluginType: Integer;
     FpluginDescription: String;
     FpluginConfiguration: String;
@@ -41,14 +44,14 @@ type
     function LoadAndInitialize: Boolean;
     procedure FinalizeAndUnload;
     destructor Destroy; override;
-    function Configure(AIn: String; var AOut: String): Boolean;
-    function Execute(AConfiguration: String; var AOutput: String): Boolean;
+    function Configure: Boolean;
+    function Execute: OleVariant;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property fileName: String read FFilename;
-    property pluginType: Integer read FpluginType;
-    property pluginDescription: String read FpluginDescription;
-    property pluginMenu: String read FpluginMenu;
+    property pluginType: Integer read FpluginType write FpluginType;
+    property pluginDescription: String read FpluginDescription write FpluginDescription;
+    property pluginMenu: String read FpluginMenu write FpluginMenu;
     property pluginConfiguration: String read FpluginConfiguration write FpluginConfiguration;
     property isConfigurable: Boolean read GetisConfigurable;
   end;
@@ -68,7 +71,8 @@ var GPlugins: TCPluginList;
 
 implementation
 
-uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB;
+uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
+  Variants;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -90,17 +94,17 @@ begin
   Result.appendChild(xRoot);
 end;
 
-function TCPlugin.Configure(AIn: String; var AOut: String): Boolean;
-var xXml: IXMLDOMDocument;
+function TCPlugin.Configure: Boolean;
 begin
-  AOut := AIn;
-  xXml := GetBasePluginXml;
-  SetXmlAttribute('configuration', xXml.documentElement, AIn);
-  SaveToLog('Wejœciowe dane procedury Plugin_Configure ' + GetStringFromDocument(xXml), GPluginlogfile);
-  Result := FPlugin_Configure(xXml);
-  if Result then begin
-    AOut := GetXmlAttribute('configuration', xXml.documentElement, AIn);
-    SaveToLog('Wyjœciowe dane procedury Plugin_Configure ' + GetStringFromDocument(xXml), GPluginlogfile);
+  if @FPlugin_Configure <> Nil then begin
+    SaveToLog('Konfigurowanie pluginu ' + FShortName, GPluginlogfile);
+    try
+      Result := FPlugin_Configure;
+    except
+      Result := False;
+    end;
+  end else begin
+    Result := True;
   end;
 end;
 
@@ -108,7 +112,9 @@ constructor TCPlugin.Create(AFilename: String);
 begin
   inherited Create;
   FFilename := AFilename;
+  FShortName := ExtractFileName(AFilename);
   FHandle := 0;
+  FpluginType := CPLUGINTYPE_INCORRECT;
   FcmanInterface := TCManagerInterfaceObject.Create(Self);
 end;
 
@@ -119,17 +125,18 @@ begin
   inherited Destroy;
 end;
 
-function TCPlugin.Execute(AConfiguration: String; var AOutput: String): Boolean;
-var xXml: IXMLDOMDocument;
+function TCPlugin.Execute: OleVariant;
 begin
-  AOutput := '';
-  xXml := GetBasePluginXml;
-  SetXmlAttribute('configuration', xXml.documentElement, AConfiguration);
-  SaveToLog('Wejœciowe dane procedury Plugin_Execute ' + GetStringFromDocument(xXml), GPluginlogfile);
-  Result := FPlugin_Execute(xXml);
-  if Result then begin
-    AOutput := GetStringFromDocument(xXml);
-    SaveToLog('Wyjœciowe dane procedury Plugin_Execute ' + AOutput, GPluginlogfile);
+  SaveToLog('Wykonywanie pluginu ' + FShortName, GPluginlogfile);
+  try
+    Result := FPlugin_Execute;
+  except
+    Result := False;
+  end;
+  if not VarIsEmpty(Result) then begin
+    SaveToLog('Otrzymano na wyjœciu ' + FShortName + ' ' + Result, GPluginlogfile);
+  end else begin
+    SaveToLog('Brak danych na wyjœciu ' + FShortName, GPluginlogfile);
   end;
 end;
 
@@ -137,7 +144,11 @@ procedure TCPlugin.FinalizeAndUnload;
 begin
   if FHandle <> 0 then begin
     if @FPlugin_Finalize <> Nil then begin
-      FPlugin_Finalize;
+      SaveToLog('Finalizowanie pluginu ' + FShortName, GPluginlogfile);
+      try
+        FPlugin_Finalize;
+      except
+      end;
     end;
     FreeLibrary(FHandle);
     FHandle := 0;
@@ -159,47 +170,40 @@ begin
 end;
 
 function TCPlugin.LoadAndInitialize: Boolean;
-var xInfo: IXMLDOMDocument;
 begin
   FHandle := LoadLibrary(PChar(FFilename));
   Result := FHandle <> 0;
-  SaveToLog('£adowanie i inicjowanie plugin-u ' + FFilename, GPluginlogfile);
+  SaveToLog('£adowanie i inicjowanie plugin-u ' + FShortName, GPluginlogfile);
   if Result then begin
     @FPlugin_Configure := GetProcAddress(FHandle, 'Plugin_Configure');
     @FPlugin_Execute := GetProcAddress(FHandle, 'Plugin_Execute');
     @FPlugin_Initialize := GetProcAddress(FHandle, 'Plugin_Initialize');
     @FPlugin_Finalize := GetProcAddress(FHandle, 'Plugin_Finalize');
-    @FPlugin_Info := GetProcAddress(FHandle, 'Plugin_Info');
-    Result := (@FPlugin_Execute <> Nil) and (@FPlugin_Info <> Nil);
+    Result := (@FPlugin_Execute <> Nil) and (@FPlugin_Initialize <> Nil);
     if Result then begin
-      if @FPlugin_Initialize <> Nil then begin
+      try
         Result := FPlugin_Initialize(FcmanInterface);
+      except
+        Result := False;
       end;
       if Result then begin
-        xInfo := GetBasePluginXml;
-        SaveToLog('Wejœciowe dane procedury Plugin_Info ' + GetStringFromDocument(xInfo), GPluginlogfile);
-        FPlugin_Info(xInfo);
-        SaveToLog('Wyjœciowe dane procedury Plugin_Info ' + GetStringFromDocument(xInfo), GPluginlogfile);
-        FpluginType := GetXmlAttribute('type', xInfo.documentElement, CPLUGINTYPE_INCORRECT);
-        FpluginDescription := GetXmlAttribute('description', xInfo.documentElement, '');
-        FpluginMenu := GetXmlAttribute('menu', xInfo.documentElement, FpluginDescription);
         Result := (FpluginType = CPLUGINTYPE_CURRENCYRATE) or
                   (FpluginType = CPLUGINTYPE_JUSTEXECUTE);
         if not Result then begin
-          SaveToLog('Typ pluginu jest niepoprawny ' + IntToStr(FpluginType), GPluginlogfile);
+          SaveToLog('Typ pluginu jest niepoprawny lub nie zosta³ ustawiony ' + FShortName, GPluginlogfile);
         end;
       end else begin
-        SaveToLog('Funkcja inicjuj¹ca plugin nie powiod³a siê', GPluginlogfile);
+        SaveToLog('Funkcja inicjuj¹ca plugin nie powiod³a siê ' + FShortName, GPluginlogfile);
       end;
     end else begin
-      SaveToLog('Brak implementacji wymaganych metod', GPluginlogfile);
+      SaveToLog('Brak implementacji wymaganych metod ' + FShortName, GPluginlogfile);
     end;
     if not Result then begin
       FreeLibrary(FHandle);
       FHandle := 0;
     end;
   end else begin
-    SaveToLog('B³¹d ³adowania ' + SysErrorMessage(GetLastError), GPluginlogfile);
+    SaveToLog('B³¹d ³adowania ' + FShortName + ' ' + SysErrorMessage(GetLastError), GPluginlogfile);
   end;
 end;
 
@@ -236,12 +240,17 @@ var xS: WIN32_FIND_DATA;
     xHandle: THandle;
     xRes: Boolean;
     xPlugin: TCPlugin;
+    xPref: TPluginPref;
 begin
   xHandle := FindFirstFile(PChar(FPluginPath + '*.dll'), xS);
   if xHandle <> INVALID_HANDLE_VALUE then begin
     repeat
       xPlugin := TCPlugin.Create(FPluginPath + xS.cFileName);
       if xPlugin.LoadAndInitialize then begin
+        xPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.FFilename]);
+        if xPref <> Nil then begin
+          xPlugin.pluginConfiguration := xPref.configuration;
+        end;
         Add(xPlugin);
       end else begin
         xPlugin.Free;
@@ -252,9 +261,35 @@ begin
   Windows.FindClose(xHandle);
 end;
 
-function TCManagerInterfaceObject.GetConnection: Pointer;
+function TCManagerInterfaceObject.GetConnection: OleVariant;
+var xPref: TPluginPref;
+    xAsk: Boolean;
+    xPermit: Boolean;
+    xAlways: Boolean;
 begin
-  Result := Pointer(GDataProvider.Connection.ConnectionObject);
+  xPref := TPluginPref(GPluginsPreferences.ByPrefname[FParentPlugin.fileName]);
+  if xPref <> Nil then begin
+    xAsk := False;
+    xPermit := xPref.permitGetConnection;
+  end else begin
+    xAsk := True;
+    xPermit := False;
+  end;
+  if xAsk then begin
+    xPermit := ShowInfo(itQuestion, 'Wtyczka "' + FParentPlugin.FpluginDescription + '" ¿¹da dostêpu do pliku danych. Czy chcesz na to zezwoliæ ?', '', @xAlways);
+    if xPermit then begin
+      if xPref = Nil then begin
+        xPref := TPluginPref.CreatePluginPref(FParentPlugin.fileName, FParentPlugin.pluginConfiguration);
+        GPluginsPreferences.Add(xPref);
+      end;
+      xPref.permitGetConnection := xAlways;
+    end;
+  end;
+  if xPermit then begin
+    Result := GDataProvider.Connection.ConnectionObject;
+  end else begin
+    VarClear(Result);
+  end;
 end;
 
 function TCManagerInterfaceObject._AddRef: Integer;
@@ -287,21 +322,29 @@ begin
   FParentPlugin := AParentPlugin;
 end;
 
-function TCManagerInterfaceObject.GetConfiguration(AConfigurationBuffer: PAnsiChar; ABufferSize: Integer): Integer;
+function TCManagerInterfaceObject.GetConfiguration: OleVariant;
 begin
-  if AConfigurationBuffer = Nil then begin
-    Result := Length(FParentPlugin.pluginConfiguration);
-  end else if ABufferSize >= Length(FParentPlugin.pluginConfiguration) + 1 then begin
-    Result := Length(FParentPlugin.pluginConfiguration);
-    CopyMemory(AConfigurationBuffer, @FParentPlugin.pluginConfiguration[1], Result);
-  end else begin
-    Result := -1;
-  end;
+  Result := FParentPlugin.pluginConfiguration;
 end;
 
-procedure TCManagerInterfaceObject.SetConfiguration(AConfigurationBuffer: PAnsiChar);
+procedure TCManagerInterfaceObject.SetConfiguration(AConfigurationBuffer: OleVariant);
 begin
-  FParentPlugin.pluginConfiguration := String(AConfigurationBuffer);
+  FParentPlugin.pluginConfiguration := AConfigurationBuffer;
+end;
+
+procedure TCManagerInterfaceObject.SetCaption(ACaption: OleVariant);
+begin
+  FParentPlugin.pluginMenu := ACaption;
+end;
+
+procedure TCManagerInterfaceObject.SetDescription(ADescription: OleVariant);
+begin
+  FParentPlugin.pluginDescription := ADescription;
+end;
+
+procedure TCManagerInterfaceObject.SetType(AType: Integer);
+begin
+  FParentPlugin.pluginType := AType;
 end;
 
 initialization

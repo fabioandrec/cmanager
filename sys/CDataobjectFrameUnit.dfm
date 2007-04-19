@@ -138,6 +138,32 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Framed = False
       Action = ActionDelete
     end
+    object CButtonHistory: TCButton
+      Left = 341
+      Top = 4
+      Width = 100
+      Height = 30
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Action = ActionHistory
+    end
+  end
+  inherited ListPopupMenu: TPopupMenu
+    object Dodaj1: TMenuItem [0]
+      Action = ActionAdd
+    end
+    object Edytuj1: TMenuItem [1]
+      Action = ActionEdit
+    end
+    object Usu1: TMenuItem [2]
+      Action = ActionDelete
+    end
+    object Historia1: TMenuItem [3]
+      Action = ActionHistory
+    end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 168
@@ -160,6 +186,16 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Caption = 'Usu'#324
       ImageIndex = 2
       OnExecute = ActionDeleteExecute
+    end
+  end
+  object ActionListHistory: TActionList
+    Images = CImageLists.PngImageListHistory24x24
+    Left = 176
+    Top = 144
+    object ActionHistory: TAction
+      Caption = 'Historia'
+      ImageIndex = 0
+      OnExecute = ActionHistoryExecute
     end
   end
 end

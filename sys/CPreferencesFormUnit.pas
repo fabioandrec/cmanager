@@ -471,7 +471,6 @@ procedure TCPreferencesForm.Action9Execute(Sender: TObject);
 var xConfiguration: String;
     xPlugin: TCPlugin;
     xPluginPref: TPluginPref;
-    xOut: String;
 begin
   xPlugin := TCPlugin(List.SelectedElement.Data);
   xPluginPref := TPluginPref(FPluginPrefs.ByPrefname[xPlugin.fileName]);
@@ -480,12 +479,12 @@ begin
   end else begin
     xConfiguration := xPluginPref.configuration;
   end;
-  if xPlugin.Configure(xConfiguration, xOut) then begin
+  if xPlugin.Configure then begin
     if xPluginPref = Nil then begin
-      xPluginPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xOut);
+      xPluginPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xPlugin.pluginConfiguration);
       FPluginPrefs.Add(xPluginPref);
     end;
-    xPluginPref.configuration := xOut;
+    xPluginPref.configuration := xPlugin.pluginConfiguration;
   end;
 end;
 

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls;
+  Dialogs, StdCtrls, Buttons, ExtCtrls, CPluginTypes;
 
 type
   TNBPCurrencyRatesConfigForm = class(TForm)
@@ -22,6 +22,8 @@ type
   public
     { Public declarations }
   end;
+
+var GCManagerInterface: ICManagerInterface;
 
 implementation
 

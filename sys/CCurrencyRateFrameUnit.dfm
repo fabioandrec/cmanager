@@ -89,5 +89,14 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
   end
   inherited ActionListButtons: TActionList
     Images = CImageLists.CurrencyRateImageList24x24
+    inherited ActionAdd: TAction
+      Caption = 'Dodaj kurs'
+    end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj kurs'
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' kurs'
+    end
   end
 end

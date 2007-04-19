@@ -16,6 +16,7 @@ type
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    function GetHistoryText: String; override;
   end;
 
 implementation
@@ -37,6 +38,11 @@ end;
 function TCCurrencydefFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := CurrencyDefProxy;
+end;
+
+function TCCurrencydefFrame.GetHistoryText: String;
+begin
+  Result := 'Historia waluty';
 end;
 
 class function TCCurrencydefFrame.GetTitle: String;

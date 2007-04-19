@@ -1,6 +1,6 @@
 inherited CInfoForm: TCInfoForm
-  Left = 22
-  Top = 22
+  Left = 273
+  Top = 242
   Caption = 'InfoForm'
   ClientHeight = 471
   ClientWidth = 774
@@ -31,6 +31,14 @@ inherited CInfoForm: TCInfoForm
     end
     inherited BitBtnCancel: TBitBtn
       Left = 685
+    end
+    object CheckBoxAlways: TCheckBox
+      Left = 8
+      Top = 13
+      Width = 153
+      Height = 17
+      Caption = 'Zastosuj ten wyb'#243'r zawsze'
+      TabOrder = 2
     end
   end
 end

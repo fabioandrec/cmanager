@@ -28,6 +28,7 @@ type
     procedure SetEnabled(Value: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
+    property Canvas;
   published
     property PicPosition: TPicturePosition read FPicPosition write SetPicturePosition;
     property PicOffset: Integer read FPicOffset write SetPicOffset;

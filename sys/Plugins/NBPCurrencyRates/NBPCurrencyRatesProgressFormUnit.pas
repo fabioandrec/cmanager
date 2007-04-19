@@ -31,14 +31,14 @@ type
   private
     FRequestThread: TNBPCurrencyRatesThread;
   public
-    function RetriveCurrencyRates(AXml: IXMLDOMDocument): Boolean;
+    function RetriveCurrencyRates: String;
   end;
 
 var NBPCurrencyRatesProgressForm: TNBPCurrencyRatesProgressForm;
 
 implementation
 
-uses CRichtext, StrUtils, CXml;
+uses CRichtext, StrUtils, CXml, NBPCurrencyRatesConfigFormUnit;
 
 {$R *.dfm}
 
@@ -46,7 +46,7 @@ const
   CSTARTTAG = '<a href="';
   CENDTAG = '"';
 
-function TNBPCurrencyRatesProgressForm.RetriveCurrencyRates(AXml: IXMLDOMDocument): Boolean;
+function TNBPCurrencyRatesProgressForm.RetriveCurrencyRates: String;
 var xOutRoot: IXMLDOMNode;
     xPositions: IXMLDOMNodeList;
     xPosition, xOut: IXMLDOMNode;
@@ -56,20 +56,22 @@ var xOutRoot: IXMLDOMNode;
     xCurrencyRate: Currency;
     xOldDecimal: Char;
     xLink: String;
+    xXml: IXMLDOMDocument;
 begin
+  Result := '';
   xOldDecimal := DecimalSeparator;
   DecimalSeparator := '.';
   AssignRichText('Rozpoczêcie wyszukiwania lokalizacji tabeli kursów walut...', RichEdit);
-  xLink := GetXmlAttribute('configuration', AXml.documentElement, '');
+  xLink := GCManagerInterface.GetConfiguration;
   if xLink = '' then begin
     xLink := 'http://www.nbp.org.pl/Kursy/KursyA.html';
   end;
   FRequestThread := TNBPCurrencyRatesThread.Create(xLink, '', '', '', hctPreconfig, RichEdit, 'MSIE');
   ShowModal;
-  Result := FRequestThread.RequestResult = 0;
-  if Result then begin
-    xOutRoot := AXml.createElement('currencyRates');
-    AXml.documentElement.appendChild(xOutRoot);
+  if FRequestThread.RequestResult = 0 then begin
+    xXml := GetXmlDocument;
+    xOutRoot := xXml.createElement('currencyRates');
+    xXml.appendChild(xOutRoot);
     SetXmlAttribute('cashpointName', xOutRoot, 'Narodowy Bank Polski');
     SetXmlAttribute('bindingDate', xOutRoot, StringReplace(GetXmlNodeValue('data_publikacji', FRequestThread.RootElement, ''), '-', '', [rfReplaceAll, rfIgnoreCase]));
     xPositions := FRequestThread.RootElement.selectNodes('pozycja');
@@ -80,7 +82,7 @@ begin
       xCurrencyQuantity := StrToIntDef(GetXmlNodeValue('przelicznik', xPosition, ''), -1);
       xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_sredni', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
       if (xCurrencyName <> '') and (xCurrencyIso <> '') and (xCurrencyQuantity <> -1) and (xCurrencyRate <> -1) then begin
-        xOut := AXml.createElement('currencyRate');
+        xOut := xXml.createElement('currencyRate');
         xOutRoot.appendChild(xOut);
         SetXmlAttribute('sourceName', xOut, xCurrencyName);
         SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
@@ -90,6 +92,7 @@ begin
         SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
       end;
     end;
+    Result := GetStringFromDocument(xXml);
   end;
   FRequestThread.Free;
   DecimalSeparator := xOldDecimal;

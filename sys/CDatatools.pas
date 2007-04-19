@@ -265,7 +265,7 @@ begin
   xValid := False;
   xDoc := GetDocumentFromString(ARatesText);
   if xDoc.parseError.errorCode = 0 then begin
-    xRoot := xDoc.documentElement.selectSingleNode('currencyRates');
+    xRoot := xDoc.selectSingleNode('currencyRates');
     if xRoot <> Nil then begin
       xBindingDate := DmyToDate(GetXmlAttribute('bindingDate', xRoot, ''), 0);
       if xBindingDate <> 0 then begin

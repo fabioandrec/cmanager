@@ -55,12 +55,14 @@ type
   TPluginPref = class(TPrefItem)
   private
     Fconfiguration: String;
+    FpermitGetConnection: Boolean;
   public
     function GetNodeName: String; override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     constructor CreatePluginPref(AFilename: String; AConfiguration: String);
     property configuration: String read Fconfiguration write Fconfiguration;
+    property permitGetConnection: Boolean read FpermitGetConnection write FpermitGetConnection;
     procedure Clone(APrefItem: TPrefItem); override;
   end;
 
@@ -861,12 +863,14 @@ procedure TPluginPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
   Fconfiguration := TPluginPref(APrefItem).configuration;
+  FpermitGetConnection := TPluginPref(APrefItem).permitGetConnection;
 end;
 
 constructor TPluginPref.CreatePluginPref(AFilename, AConfiguration: String);
 begin
   inherited Create(AFilename);
   Fconfiguration := AConfiguration;
+  FpermitGetConnection := False;
 end;
 
 function TPluginPref.GetNodeName: String;
@@ -878,12 +882,14 @@ procedure TPluginPref.LoadFromXml(ANode: IXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   Fconfiguration := GetXmlAttribute('configuration', ANode, '');
+  FpermitGetConnection := GetXmlAttribute('permitGetConnection', ANode, False);
 end;
 
 procedure TPluginPref.SaveToXml(ANode: IXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('configuration', ANode, Fconfiguration);
+  SetXmlAttribute('permitGetConnection', ANode, FpermitGetConnection);
 end;
 
 initialization

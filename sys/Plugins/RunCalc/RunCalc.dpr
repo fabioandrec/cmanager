@@ -4,24 +4,27 @@ library RunCalc;
 
 uses
   Windows,
-  MsXml,
   ShellApi,
-  CPluginConsts in '..\CPluginConsts.pas',
-  CXml in '..\..\CXml.pas';
+  CPluginTypes in '..\CPluginTypes.pas',
+  CPluginConsts in '..\CPluginConsts.pas';
 
-function Plugin_Execute(AXml: IXMLDOMDocument): Boolean; stdcall; export;
+function Plugin_Execute: OleVariant; stdcall; export;
 begin
-  Result := ShellExecute(0, 'open', 'calc.exe', Nil, Nil, SW_NORMAL) > 32;
+  ShellExecute(0, 'open', 'calc.exe', Nil, Nil, SW_NORMAL);
+  VarClear(Result);
 end;
 
-procedure Plugin_Info(AXml: IXMLDOMDocument); stdcall; export
+function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
-  SetXmlAttribute('type', AXml.documentElement, CPLUGINTYPE_JUSTEXECUTE);
-  SetXmlAttribute('description', AXml.documentElement, 'Uruchamia kalkulator');
-  SetXmlAttribute('menu', AXml.documentElement, 'Uruchom kalkulator');
+  with ACManagerInterface do begin
+    SetType(CPLUGINTYPE_JUSTEXECUTE);
+    SetCaption('Uruchom kalkulator');
+    SetDescription('Uruchamianie kalkulatora');
+  end;
+  Result := True;
 end;
 
 exports
-  Plugin_Execute,
-  Plugin_Info;
+  Plugin_Initialize,
+  Plugin_Execute;
 end.

@@ -4,41 +4,35 @@ library DBStats;
 
 uses
   Windows,
-  MsXml,
-  ShellApi,
   Dialogs,
   AdoInt,
   Forms,
   CPluginTypes in '..\CPluginTypes.pas',
-  CPluginConsts in '..\CPluginConsts.pas',
-  CXml in '..\..\CXml.pas';
+  CPluginConsts in '..\CPluginConsts.pas';
 
 var CManInterface: ICManagerInterface;
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
-  Application.Handle := ACManagerInterface.GetAppHandle;
   CManInterface := ACManagerInterface;
+  with CManInterface do begin
+    Application.Handle := GetAppHandle;
+    SetType(CPLUGINTYPE_JUSTEXECUTE);
+    SetCaption('Poka¿ informacje o pliku danych');
+    SetDescription('Informacje o pliku danych');
+  end;
   Result := True;
 end;
 
-function Plugin_Execute(AXml: IXMLDOMDocument): Boolean; stdcall; export;
-var xObject: Connection;
+function Plugin_Execute: OleVariant; stdcall; export;
+var xObject: OleVariant;
 begin
-  Result := True;
-  xObject := Connection(CManInterface.GetConnection);
+  VarClear(Result);
+  xObject := CManInterface.GetConnection;
   ShowMessage(xObject.ConnectionString);
-end;
-
-procedure Plugin_Info(AXml: IXMLDOMDocument); stdcall; export
-begin
-  SetXmlAttribute('type', AXml.documentElement, CPLUGINTYPE_JUSTEXECUTE);
-  SetXmlAttribute('description', AXml.documentElement, 'Pokazuje informacje o pliku danych');
-  SetXmlAttribute('menu', AXml.documentElement, 'Poka¿ informacje o pliku danych');
 end;
 
 exports
   Plugin_Initialize,
-  Plugin_Execute,
-  Plugin_Info;
+  Plugin_Execute;
 end.

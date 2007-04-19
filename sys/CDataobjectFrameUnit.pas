@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees,
   CComponents, ExtCtrls, VTHeaderPopup, CDatabase, ActnList, CDataobjectFormUnit,
-  StdCtrls;
+  StdCtrls, CImageListsUnit;
 
 type
   TCDataobjectFrameData = class(TObject)
@@ -32,6 +32,13 @@ type
     CButtonDelete: TCButton;
     Label2: TLabel;
     CStaticFilter: TCStatic;
+    Dodaj1: TMenuItem;
+    Edytuj1: TMenuItem;
+    Usu1: TMenuItem;
+    CButtonHistory: TCButton;
+    ActionListHistory: TActionList;
+    ActionHistory: TAction;
+    Historia1: TMenuItem;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ActionAddExecute(Sender: TObject);
@@ -41,6 +48,7 @@ type
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ListDblClick(Sender: TObject);
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+    procedure ActionHistoryExecute(Sender: TObject);
   protected
     procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
     procedure WndProc(var Message: TMessage); override;
@@ -58,6 +66,8 @@ type
     function GetList: TCList; override;
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
+    function GetHistoryText: String; virtual;
+    procedure ShowHistory(AGid: TDataGid); virtual;
     function GetInitialiFilter: String; virtual;
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
@@ -68,6 +78,8 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     function FindNodeId(ANode: PVirtualNode): ShortString; override;
     function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; override;
+    procedure ShowFrame; override;
+    procedure HideFrame; override;
   end;
 
 implementation
@@ -107,9 +119,18 @@ end;
 
 procedure TCDataobjectFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 var xFilters: TStringList;
+    xHistory: String;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
   Dataobjects := Nil;
+  xHistory := GetHistoryText;
+  if xHistory <> '' then begin
+    ActionHistory.Caption := xHistory;
+    CButtonHistory.Width := CButtonHistory.Canvas.TextWidth(ActionHistory.Caption) + CButtonHistory.PicOffset + ActionListHistory.Images.Width + 10;
+    CButtonHistory.Left := ButtonPanel.Width - CButtonHistory.Width - 15;
+    CButtonHistory.Anchors := [akTop, akRight];
+  end;
+  ActionHistory.Visible := xHistory <> '';
   CStaticFilter.DataId := GetInitialiFilter;
   xFilters := GetStaticFilter;
   if xFilters <> Nil then begin
@@ -356,6 +377,36 @@ end;
 function TCDataobjectFrame.GetInitialiFilter: String;
 begin
   Result := CFilterAllElements;
+end;
+
+function TCDataobjectFrame.GetHistoryText: String;
+begin
+  Result := '';
+end;
+
+procedure TCDataobjectFrame.ActionHistoryExecute(Sender: TObject);
+begin
+  ShowHistory(GetSelectedId);
+end;
+
+procedure TCDataobjectFrame.ShowHistory(AGid: TDataGid);
+begin
+end;
+
+procedure TCDataobjectFrame.HideFrame;
+begin
+  inherited HideFrame;
+  ActionAdd.ShortCut := 0;
+  ActionEdit.ShortCut := 0;
+  ActionDelete.ShortCut := 0;
+end;
+
+procedure TCDataobjectFrame.ShowFrame;
+begin
+  inherited ShowFrame;
+  ActionAdd.ShortCut := ShortCut(Word('D'), [ssCtrl]);
+  ActionEdit.ShortCut := ShortCut(Word('E'), [ssCtrl]);
+  ActionDelete.ShortCut := ShortCut(Word('U'), [ssCtrl]);
 end;
 
 end.

@@ -38,6 +38,8 @@ type
     procedure WndProc(var Message: TMessage); override;
     function GetBaseForm: TCBaseForm;
   public
+    procedure HideFrame; virtual;
+    procedure ShowFrame; virtual;
     procedure SaveColumns;
     procedure LoadColumns;
     function GetList: TCList; virtual;
@@ -394,6 +396,16 @@ end;
 procedure TCBaseFrame.JakoplikHTML1Click(Sender: TObject);
 begin
   ExportTree(0);
+end;
+
+procedure TCBaseFrame.HideFrame;
+begin
+  Hide;
+end;
+
+procedure TCBaseFrame.ShowFrame;
+begin
+  Show;
 end;
 
 initialization

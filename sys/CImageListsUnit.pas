@@ -28,6 +28,7 @@ type
     ActionImageList: TPngImageList;
     CurrencyDefImageList24x24: TPngImageList;
     CurrencyRateImageList24x24: TPngImageList;
+    PngImageListHistory24x24: TPngImageList;
   private
     { Private declarations }
   public

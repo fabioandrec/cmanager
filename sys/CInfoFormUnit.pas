@@ -12,16 +12,17 @@ type
   TCInfoForm = class(TCConfigForm)
     Image: TImage;
     LabelInfo: TLabel;
+    CheckBoxAlways: TCheckBox;
   end;
 
-function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String): Boolean;
+function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil): Boolean;
 procedure NotImplemented(AFunctionName: String);
 
 implementation
 
 {$R *.dfm}
 
-function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String): Boolean;
+function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil): Boolean;
 var xForm: TCInfoForm;
     xCaption: String;
     xIconRes: PChar;
@@ -74,7 +75,11 @@ begin
   xHeight := xHeight + 2 * xForm.Image.Top + 24;
   if xHeight <= xForm.Image.Height + 2 * xForm.Image.Top then xHeight := xForm.Image.Height + 2 * xForm.Image.Top;
   xForm.Height := xHeight + xForm.PanelButtons.Height;
+  xForm.CheckBoxAlways.Visible := AAlways <> Nil;
   Result := xForm.ShowConfig(coAdd);
+  if Result and (AAlways <> Nil) then begin
+    Boolean(AAlways^) := xForm.CheckBoxAlways.Checked;
+  end;
   xForm.Free;
   Application.ProcessMessages;
 end;

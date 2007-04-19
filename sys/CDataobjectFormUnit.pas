@@ -43,6 +43,11 @@ end;
 
 procedure TCDataobjectForm.InitializeForm;
 begin
+  if Operation = coAdd then begin
+    Caption := Caption + ' - dodawanie';
+  end else if Operation = coEdit then begin
+    Caption := Caption + ' - edycja';
+  end;
 end;
 
 function TCDataobjectForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean;

@@ -36,9 +36,10 @@ type
     procedure ActionStartupInfoExecute(Sender: TObject);
     procedure ActionAddNewListExecute(Sender: TObject);
   private
-    { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
+    procedure ShowFrame; override;
+    procedure HideFrame; override;
   end;
 
 implementation
@@ -114,6 +115,20 @@ begin
   xForm := TCMovementListForm.Create(Nil);
   xForm.ShowDataobject(coAdd, MovementListProxy, Nil, True);
   xForm.Free;
+end;
+
+procedure TCHomeFrame.HideFrame;
+begin
+  inherited HideFrame;
+  ActionNewOperation.ShortCut := 0;
+  ActionAddNewList.ShortCut := 0;
+end;
+
+procedure TCHomeFrame.ShowFrame;
+begin
+  inherited ShowFrame;
+  ActionNewOperation.ShortCut := ShortCut(Word('N'), [ssCtrl]);
+  ActionAddNewList.ShortCut := ShortCut(Word('L'), [ssCtrl]);
 end;
 
 end.

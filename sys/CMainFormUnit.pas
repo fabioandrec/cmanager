@@ -131,7 +131,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
      CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
      CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
-     CCurrencyRateFrameUnit, CPlugins, CPluginConsts;
+     CCurrencyRateFrameUnit, CPlugins, CPluginConsts, CDataobjectFrameUnit;
 
 {$R *.dfm}
 
@@ -255,11 +255,11 @@ begin
   end;
   if FActiveFrame <> xFrame then begin
     if FActiveFrame <> Nil then begin
-      FActiveFrame.Hide;
+      TCBaseFrame(FActiveFrame).HideFrame;
     end;
     FActiveFrame := xFrame;
     FActiveFrame.Parent := PanelFrames;
-    FActiveFrame.Show;
+    TCBaseFrame(FActiveFrame).ShowFrame;
     LabelShortcut.Caption := AAction.Caption;
     if AAction.ImageIndex <> -1 then begin
       if AAction.ImageIndex <= CImageLists.MainImageList16x16.PngImages.Count - 1 then begin
@@ -625,19 +625,11 @@ end;
 
 procedure TCMainForm.ActionPluginsExecute(ASender: TObject);
 var xPlugin: TCPlugin;
-    xConfig, xOutput: String;
-    xPluginPref: TPluginPref;
-    xRes: Boolean;
+    xOutput: OleVariant;
 begin
   xPlugin := TCPlugin(GPlugins.Items[TAction(ASender).Tag]);
-  xPluginPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.fileName]);
-  if xPluginPref = Nil then begin
-    xConfig := '';
-  end else begin
-    xConfig := xPluginPref.configuration;
-  end;
-  xRes := xPlugin.Execute(xConfig, xOutput);
-  if xRes then begin
+  xOutput := xPlugin.Execute;
+  if not VarIsEmpty(xOutput) then begin
     if xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE then begin
       UpdateCurrencyRates(xOutput);
     end;
