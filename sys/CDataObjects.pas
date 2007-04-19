@@ -462,11 +462,19 @@ const CDatafileTables: array[0..15] of string =
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef');
 
+const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
+
 procedure InitializeProxies;
+function IsKnownCurrency(ADataGid: TDataGid): Boolean;
 
 implementation
 
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences;
+
+function IsKnownCurrency(ADataGid: TDataGid): Boolean;
+begin
+  Result := CCurrencyDefGid_PLN = ADataGid;
+end;
 
 procedure InitializeProxies;
 begin

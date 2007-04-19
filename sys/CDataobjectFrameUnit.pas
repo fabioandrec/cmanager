@@ -209,6 +209,7 @@ begin
   ActionAdd.Enabled := True;
   ActionEdit.Enabled := List.FocusedNode <> Nil;
   ActionDelete.Enabled := List.FocusedNode <> Nil;
+  ActionHistory.Enabled := List.FocusedNode <> Nil;
   if Owner.InheritsFrom(TCFrameForm) then begin
     if TCFrameForm(Owner).IsChoice then begin
       TCFrameForm(Owner).BitBtnOk.Enabled := AIsSelectedSomething or (MultipleChecks <> Nil);
