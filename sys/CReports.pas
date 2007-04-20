@@ -64,13 +64,13 @@ type
     property movementType: String read FmovementType;
   end;
 
-  TCCurrencyParamsParams = class(TCReportParams)
+  TCWithGidParams = class(TCReportParams)
   private
-    FIdCurrency: TDataGid;
+    FId: TDataGid;
   public
-    constructor Create(AIdCurrency: TDataGid);
+    constructor Create(AId: TDataGid);
   published
-    property idCurrency: TDataGid read FIdCurrency;
+    property id: TDataGid read FId;
   end;
 
 
@@ -1051,8 +1051,16 @@ begin
 end;
 
 function TAccountBalanceChartReport.GetReportTitle: String;
+var xAccount: String;
 begin
-  Result := 'Wykres stanu kont (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+  if Params = Nil then begin
+    Result := 'Wykres stanu kont (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+  end else begin
+    GDataProvider.BeginTransaction;
+    xAccount := TAccount(TAccount.LoadObject(AccountProxy, FIds.Strings[0], False)).name;
+    GDataProvider.RollbackTransaction;
+    Result := 'Wykres stanu konta ' + xAccount + ' (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+  end;
 end;
 
 procedure TAccountBalanceChartReport.PrepareReportChart;
@@ -1132,6 +1140,7 @@ begin
     Title.Angle := 90;
   end;
   xChart.View3D := False;
+  xChart.Legend.Visible := Params = Nil;
   xChart.Legend.Alignment := laRight;
   xChart.Legend.ResizeChart := True;
   xAccounts.Free;
@@ -1139,7 +1148,12 @@ end;
 
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
+  if Params = Nil then begin
+    Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds);
+  end else begin
+    Result := ChoosePeriodByForm(FStartDate, FEndDate);
+    FIds.Add(TCWithGidParams(Params).id);
+  end;
 end;
 
 function TOperationsListReport.GetReportBody: String;
@@ -2810,23 +2824,21 @@ begin
     Title.Angle := 90;
   end;
   xChart.View3D := False;
-  xChart.Legend.Alignment := laRight;
-  xChart.Legend.ResizeChart := True;
   xRates.Free;
 end;
 
 function TCurrencyRatesHistoryReport.PrepareReportConditions: Boolean;
 begin
   if Params <> Nil then begin
-    FSourceId := TCCurrencyParamsParams(Params).idCurrency;
+    FSourceId := TCWithGidParams(Params).id;
   end;
   Result := ChoosePeriodRatesHistory(FStartDate, FEndDate, FSourceId, FTargetId, FCashpointId);
 end;
 
-constructor TCCurrencyParamsParams.Create(AIdCurrency: TDataGid);
+constructor TCWithGidParams.Create(AId: TDataGid);
 begin
   inherited Create;
-  FIdCurrency := AIdCurrency;
+  FId := AId;
 end;
 
 end.

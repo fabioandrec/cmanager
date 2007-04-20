@@ -16,11 +16,13 @@ type
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
   end;
 
 implementation
 
-uses CDataObjects, CAccountFormUnit, CConsts;
+uses CDataObjects, CAccountFormUnit, CConsts, CReports;
 
 {$R *.dfm}
 
@@ -37,6 +39,11 @@ end;
 function TCAccountsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := AccountProxy;
+end;
+
+function TCAccountsFrame.GetHistoryText: String;
+begin
+  Result := 'Historia konta';
 end;
 
 function TCAccountsFrame.GetStaticFilter: TStringList;
@@ -73,6 +80,17 @@ begin
     xCondition := ' where accountType = ''' + CBankAccount + '''';
   end;
   Dataobjects := TAccount.GetList(TAccount, AccountProxy, 'select * from account' + xCondition);
+end;
+
+procedure TCAccountsFrame.ShowHistory(AGid: ShortString);
+var xReport: TAccountBalanceChartReport;
+    xParams: TCReportParams;
+begin
+  xParams := TCWithGidParams.Create(AGid);
+  xReport := TAccountBalanceChartReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

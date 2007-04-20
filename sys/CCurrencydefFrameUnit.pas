@@ -61,7 +61,7 @@ procedure TCCurrencydefFrame.ShowHistory(AGid: ShortString);
 var xReport: TCurrencyRatesHistoryReport;
     xParams: TCReportParams;
 begin
-  xParams := TCCurrencyParamsParams.Create(AGid);
+  xParams := TCWithGidParams.Create(AGid);
   xReport := TCurrencyRatesHistoryReport.CreateReport(xParams);
   xReport.ShowReport;
   xReport.Free;
