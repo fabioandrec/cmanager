@@ -1,6 +1,6 @@
 object NBPCurrencyRatesProgressForm: TNBPCurrencyRatesProgressForm
-  Left = 202
-  Top = 230
+  Left = 456
+  Top = 330
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Pobieranie kurs'#243'w walut'
@@ -143,5 +143,13 @@ object NBPCurrencyRatesProgressForm: TNBPCurrencyRatesProgressForm
     Caption = '&Przerwij'
     TabOrder = 1
     OnClick = Button1Click
+  end
+  object OpenDialogXml: TOpenDialog
+    DefaultExt = 'dat'
+    Filter = 'Pliki XML|*.xml|Wszystkie pliki|*.*'
+    FilterIndex = 0
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 298
+    Top = 21
   end
 end

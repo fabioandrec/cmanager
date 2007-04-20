@@ -64,6 +64,16 @@ type
     property movementType: String read FmovementType;
   end;
 
+  TCCurrencyParamsParams = class(TCReportParams)
+  private
+    FIdCurrency: TDataGid;
+  public
+    constructor Create(AIdCurrency: TDataGid);
+  published
+    property idCurrency: TDataGid read FIdCurrency;
+  end;
+
+
   TCVirtualStringTreeParams = class(TCReportParams)
   private
     Flist: TVirtualStringTree;
@@ -90,6 +100,7 @@ type
     constructor CreateReport(AParams: TCReportParams); virtual;
     procedure ShowReport;
     destructor Destroy; override;
+    property Params: TCReportParams read FParams;
   end;
 
   TCHtmlReport = class(TCBaseReport)
@@ -344,6 +355,20 @@ type
     function GetReportBody: String; override;
   end;
 
+  TCurrencyRatesHistoryReport = class(TCChartReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FSourceId: TDataGid;
+    FTargetId: TDataGid;
+    FCashpointId: TDataGid;
+    FAxisName: String;
+  protected
+    procedure PrepareReportChart; override;
+    function GetReportTitle: String; override;
+    function PrepareReportConditions: Boolean; override;
+  end;
+
 
 implementation
 
@@ -354,7 +379,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
      CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
-  CTools;
+     CTools, CChoosePeriodRatesHistoryFormUnit, StrUtils;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
 begin
@@ -2684,6 +2709,124 @@ end;
 function TLoanReport.GetReportTitle: String;
 begin
   Result := 'Informacje o kredycie';
+end;
+
+function TCurrencyRatesHistoryReport.GetReportTitle: String;
+var xSource, xTarget: String;
+    xCashpoint: String;
+begin
+  GDataProvider.BeginTransaction;
+  xSource := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FSourceId, False)).iso;
+  xTarget := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FTargetId, False)).iso;
+  if FCashpointId <> CEmptyDataGid then begin
+    xCashpoint := 'w/g ' + TCashPoint(TCashPoint.LoadObject(CashPointProxy, FCashpointId, False)).name;
+  end else begin
+    xCashpoint := '';
+  end;
+  Result := Format('Kurs waluty %s wzglêdem %s %s (%s - %s)', [xSource, xTarget, xCashpoint, GetFormattedDate(FStartDate, CLongDateFormat), GetFormattedDate(FEndDate, CLongDateFormat)]);
+  FAxisName := xSource + '/' + xTarget;
+end;
+
+procedure TCurrencyRatesHistoryReport.PrepareReportChart;
+
+  function FindCurrencyRate(AInlist: TDataObjectList; ABindingDate: TDateTime): TCurrencyRate;
+  var xCount: Integer;
+  begin
+    Result := Nil;
+    xCount := 0;
+    while (Result = Nil) and (xCount <= AInlist.Count - 1) do begin
+      if TCurrencyRate(AInlist.Items[xCount]).bindingDate = ABindingDate then begin
+        Result := TCurrencyRate(AInlist.Items[xCount]);
+      end;
+      Inc(xCount);
+    end;
+  end;
+
+var xChart: TChart;
+    xRates: TDataObjectList;
+    xMaxDate: TDateTime;
+    xCurDate: TDateTime;
+    xCurValue: Currency;
+    xRate: TCurrencyRate;
+    xSql: String;
+    xMaxQuantity: Integer;
+    xCount: Integer;
+    xSerie: TChartSeries;
+begin
+  xChart := GetChart;
+  xSql := Format('select * from currencyRate where bindingDate between %s and %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s order by bindingDate',
+                 [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                  DataGidToDatabase(FSourceId), DataGidToDatabase(FTargetId), DataGidToDatabase(FCashpointId)]);
+  xRates := TDataObject.GetList(TCurrencyRate, CurrencyRateProxy, xSql);
+  xMaxQuantity := 1;
+  xMaxDate := FStartDate;
+  for xCount := 0 to xRates.Count - 1 do begin
+    if xMaxQuantity < TCurrencyRate(xRates.Items[xCount]).quantity then begin
+      xMaxQuantity := TCurrencyRate(xRates.Items[xCount]).quantity;
+    end;
+    if xMaxDate < TCurrencyRate(xRates.Items[xCount]).bindingDate then begin
+      xMaxDate := TCurrencyRate(xRates.Items[xCount]).bindingDate;
+    end;
+  end;
+  xCurDate := FStartDate;
+  xCurValue := -1;
+  xSerie := TLineSeries.Create(xChart);
+  TLineSeries(xSerie).Pointer.Visible := True;
+  TLineSeries(xSerie).Pointer.InflateMargins := True;
+  with xSerie do begin
+    Title := 'Seria';
+    HorizAxis := aBottomAxis;
+    XValues.DateTime := True;
+  end;
+  while xCurDate <= FEndDate do begin
+    xRate := FindCurrencyRate(xRates, xCurDate);
+    if xRate <> Nil then begin
+      xCurValue := xMaxQuantity * xRate.rate / xRate.quantity;
+    end;
+    if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
+      xSerie.AddXY(xCurDate, xCurValue);
+    end else begin
+      xSerie.AddNullXY(xCurDate, 0, '');
+    end;
+    xCurDate := IncDay(xCurDate);
+  end;
+  xChart.AddSeries(xSerie);
+  with xChart.BottomAxis do begin
+    DateTimeFormat := 'yyyy-mm-dd';
+    ExactDateTime := True;
+    Automatic := False;
+    AutomaticMaximum := False;
+    AutomaticMinimum := False;
+    Increment := DateTimeStep[dtOneDay];
+    Maximum := FEndDate;
+    Minimum := FStartDate;
+    LabelsAngle := 90;
+    MinorTickCount := 0;
+    Title.Caption := '[Data wa¿noœci]';
+  end;
+  with xChart.LeftAxis do begin
+    MinorTickCount := 0;
+    Title.Caption := '[' + IfThen(xMaxQuantity = 1, '', IntToStr(xMaxQuantity) + ' ') + FAxisName + ']';
+    Title.Angle := 90;
+  end;
+  xChart.View3D := False;
+  xChart.Legend.Alignment := laRight;
+  xChart.Legend.ResizeChart := True;
+  xRates.Free;
+end;
+
+function TCurrencyRatesHistoryReport.PrepareReportConditions: Boolean;
+begin
+  if Params <> Nil then begin
+    FSourceId := TCCurrencyParamsParams(Params).idCurrency;
+  end;
+  Result := ChoosePeriodRatesHistory(FStartDate, FEndDate, FSourceId, FTargetId, FCashpointId);
+end;
+
+constructor TCCurrencyParamsParams.Create(AIdCurrency: TDataGid);
+begin
+  inherited Create;
+  FIdCurrency := AIdCurrency;
 end;
 
 end.

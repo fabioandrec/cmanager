@@ -405,7 +405,7 @@ begin
   for xCount := 0 to Count - 1 do begin
     if (Items[xCount].TableName = xTableName) then begin
       if Items[xCount].IsQuoted then begin
-        Result := Result + '''' + Items[xCount].Value + ''', ';
+        Result := Result + QuotedStr(Items[xCount].Value) + ',';
       end else begin
         Result := Result + Items[xCount].Value + ', ';
       end;
@@ -429,7 +429,7 @@ begin
     if (Items[xCount].TableName = xTableName) then begin
      Result := Result + Items[xCount].Name + ' = ';
       if Items[xCount].IsQuoted then begin
-        Result := Result + '''' + Items[xCount].Value + '''';
+        Result := Result + QuotedStr(Items[xCount].Value);
       end else begin
         Result := Result + Items[xCount].Value;
       end;

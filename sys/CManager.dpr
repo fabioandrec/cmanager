@@ -99,7 +99,8 @@ uses
   CPlugins in 'CPlugins.pas',
   CPluginConsts in 'Plugins\CPluginConsts.pas',
   CPluginTypes in 'Plugins\CPluginTypes.pas',
-  CUpdateCurrencyRatesFormUnit in 'CUpdateCurrencyRatesFormUnit.pas' {CUpdateCurrencyRatesForm};
+  CUpdateCurrencyRatesFormUnit in 'CUpdateCurrencyRatesFormUnit.pas' {CUpdateCurrencyRatesForm},
+  CChoosePeriodRatesHistoryFormUnit in 'CChoosePeriodRatesHistoryFormUnit.pas' {CChoosePeriodRatesHistoryForm};
 
 {$R *.res}
 

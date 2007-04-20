@@ -14,9 +14,12 @@ type
     BitBtnCancel: TBitBtn;
     GroupBox1: TGroupBox;
     EditName: TEdit;
+    GroupBox2: TGroupBox;
+    ComboBoxSource: TComboBox;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ComboBoxSourceChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -44,6 +47,11 @@ begin
   if Key = VK_ESCAPE then begin
     Close;
   end;
+end;
+
+procedure TNBPCurrencyRatesConfigForm.ComboBoxSourceChange(Sender: TObject);
+begin
+  EditName.Enabled := ComboBoxSource.ItemIndex = 0;
 end;
 
 end.

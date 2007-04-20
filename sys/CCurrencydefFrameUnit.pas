@@ -17,11 +17,12 @@ type
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
   end;
 
 implementation
 
-uses CCurrencydefFormUnit;
+uses CCurrencydefFormUnit, CReports;
 
 {$R *.dfm}
 
@@ -54,6 +55,17 @@ procedure TCCurrencydefFrame.ReloadDataobjects;
 begin
   inherited ReloadDataobjects;
   Dataobjects := TDataObject.GetList(TCurrencyDef, CurrencyDefProxy, 'select * from currencyDef');
+end;
+
+procedure TCCurrencydefFrame.ShowHistory(AGid: ShortString);
+var xReport: TCurrencyRatesHistoryReport;
+    xParams: TCReportParams;
+begin
+  xParams := TCCurrencyParamsParams.Create(AGid);
+  xReport := TCurrencyRatesHistoryReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

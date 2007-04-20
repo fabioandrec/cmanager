@@ -166,6 +166,7 @@ end;
 procedure TCReportsFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
 var xBase: TCListDataElement;
     xStats: TCListDataElement;
+    xOthers: TCListDataElement;
     xBs, xTm: TCListDataElement;
 begin
   xBase := TCListDataElement.Create(List, TReportListElement.CreateGroup('Podstawowe', '', CNoImage), True);
@@ -212,6 +213,9 @@ begin
   xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CHtmlReportImage), True));
   xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Prognozy' , TFuturesReport, Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CHtmlReportImage), True));
   xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CHtmlReportImage), True));
+  xOthers := TCListDataElement.Create(List, TReportListElement.CreateGroup('Ró¿ne', '', CNoImage), True);
+  ARootElement.Add(xOthers);
+  xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia wybranej waluty' , TCurrencyRatesHistoryReport, Nil, 'Pokazuje historiê waluty w/g wybranego kontrahenta w zadanym okresis', CChartReportImage), True));
 end;
 
 procedure TReportListElement.GetElementReload;

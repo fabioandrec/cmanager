@@ -16,7 +16,7 @@ create table currencyRate (
   modified datetime,
   idSourceCurrencyDef uniqueidentifier not null,
   idTargetCurrencyDef uniqueidentifier not null,
-  idCashpoint uniqueidentifier,
+  idCashpoint uniqueidentifier not null,
   quantity int not null,
   rate money not null,
   bindingDate datetime not null,

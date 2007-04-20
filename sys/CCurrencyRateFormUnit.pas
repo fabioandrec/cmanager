@@ -69,7 +69,12 @@ var xRate: TCurrencyRate;
     xCheck: Boolean;
 begin
   Result := True;
-  if CIntQuantity.Value <= 0 then begin
+  if CStaticCashpoint.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano dostawcy kursu waluty. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCashpoint.DoGetDataId;
+    end;
+  end else if CIntQuantity.Value <= 0 then begin
     ShowInfo(itError, 'Iloœæ waluty bazowej musi byæ wiêksza od zera', '');
     CIntQuantity.SetFocus;
     Result := False;

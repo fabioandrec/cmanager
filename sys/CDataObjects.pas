@@ -463,6 +463,7 @@ const CDatafileTables: array[0..15] of string =
              'cmanagerParams', 'movementLimit', 'currencyDef');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
+      CCurrencyDefIso_PL = 'PLN';
 
 procedure InitializeProxies;
 function IsKnownCurrency(ADataGid: TDataGid): Boolean;
@@ -2200,9 +2201,8 @@ end;
 class function TCurrencyRate.FindRate(ASourceId, ATargetIs, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
 var xSql: String;
 begin
-  xSql := Format('select * from currencyRate where bindingDate = %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s',
-                 [DatetimeToDatabase(ABindingDate, False), DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetIs)]);
-  xSql := xSql + ' and idCashpoint ' + IfThen(ACashpointId = CEmptyDataGid, 'is', '=') + ' ' + DataGidToDatabase(ACashpointId);
+  xSql := Format('select * from currencyRate where bindingDate = %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s',
+                 [DatetimeToDatabase(ABindingDate, False), DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetIs), DataGidToDatabase(ACashpointId)]);
   Result := TCurrencyRate(TCurrencyRate.FindByCondition(CurrencyRateProxy, xSql, False));
 end;
 

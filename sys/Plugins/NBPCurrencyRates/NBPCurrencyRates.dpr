@@ -8,6 +8,7 @@ uses
   Controls,
   Messages,
   Forms,
+  SysUtils,
   CPluginConsts in '..\CPluginConsts.pas',
   CPluginTypes in '..\CPluginTypes.pas',
   CXml in '..\..\CXml.pas',
@@ -45,10 +46,21 @@ begin
   xForm.Icon.Handle := SendMessage(Application.Handle, WM_GETICON, ICON_BIG, 0);
   xConfiguration := GCManagerInterface.GetConfiguration;
   if xConfiguration <> '' then begin
-    xForm.EditName.Text := xConfiguration;
+    if AnsiUpperCase(Copy(xConfiguration, 1, 2)) = 'F;' then begin
+      xForm.ComboBoxSource.ItemIndex := 1;
+    end else begin
+      xForm.ComboBoxSource.ItemIndex := 0;
+    end;
+    xForm.EditName.Text := Copy(xConfiguration, 3, Length(xConfiguration) - 2);
+    xForm.ComboBoxSourceChange(xForm.ComboBoxSource);
   end;
   if xForm.ShowModal = mrOk then begin
-    GCManagerInterface.SetConfiguration(xForm.EditName.Text);
+    if xForm.ComboBoxSource.ItemIndex = 0 then begin
+      xConfiguration := 'N;';
+    end else begin
+      xConfiguration := 'F;';
+    end;
+    GCManagerInterface.SetConfiguration(xConfiguration + xForm.EditName.Text);
     Result := True;
   end;
   xForm.Free;
