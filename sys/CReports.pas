@@ -381,9 +381,8 @@ type
   private
     FBody: OleVariant;
   protected
-    function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
-    function GetReportTitle: String; override;
+    procedure PrepareReportData; override;
   end;
 
   TPluginChartReport = class(TCChartReport)
@@ -2867,20 +2866,18 @@ begin
   Fplugin := APlugin;
 end;
 
-function TPluginHtmlReport.GetReportBody: String;
-begin
-  Result := FBody;
-end;
-
-function TPluginHtmlReport.GetReportTitle: String;
-begin
-  Result := TCPluginReportParams(Params).plugin.pluginMenu;
-end;
-
 function TPluginHtmlReport.PrepareReportConditions: Boolean;
 begin
   FBody := TCPluginReportParams(Params).plugin.Execute;
   Result := not VarIsEmpty(FBody);
+  if Result then begin
+    FreportText.Text := FBody;
+  end;
+end;
+
+procedure TPluginHtmlReport.PrepareReportData;
+begin
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
 end;
 
 end.

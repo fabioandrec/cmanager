@@ -27,6 +27,8 @@ type
     function GetWorkdate: OleVariant;
     function GetReportCss: OleVariant;
     function GetReportText: OleVariant;
+    function GetName: OleVariant;
+    function GetVersion: OleVariant;
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -392,6 +394,16 @@ begin
   xStr.LoadFromFile(GetSystemPathname('report.htm'));
   Result := xStr.Text;
   xStr.Free;
+end;
+
+function TCManagerInterfaceObject.GetName: OleVariant;
+begin
+  Result := 'CManager';
+end;
+
+function TCManagerInterfaceObject.GetVersion: OleVariant;
+begin
+  Result := FileVersion(ParamStr(0));
 end;
 
 initialization

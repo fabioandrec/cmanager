@@ -6,6 +6,8 @@ uses Windows;
 
 type
   ICManagerInterface = interface
+    function GetName: OleVariant;
+    function GetVersion: OleVariant;
     function GetConnection: OleVariant;
     function GetDatafilename: OleVariant;
     function GetWorkdate: OleVariant;

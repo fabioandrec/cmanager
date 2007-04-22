@@ -5,8 +5,9 @@ library AccountList;
 uses
   Windows,
   Dialogs,
-  AdoInt,
   Forms,
+  Variants,
+  SysUtils,
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas';
 
@@ -26,10 +27,17 @@ end;
 
 function Plugin_Execute: OleVariant; stdcall; export;
 var xObject: OleVariant;
+    xCss: String;
 begin
   VarClear(Result);
   xObject := CManInterface.GetConnection;
-  ShowMessage(xObject.ConnectionString);
+  if not VarIsEmpty(xObject) then begin
+    Result := CManInterface.GetReportText;
+    xCss := CManInterface.GetReportCss;
+    Result := StringReplace(Result, '[repstyle]', xCss, [rfReplaceAll, rfIgnoreCase]);
+    Result := StringReplace(Result, '[repfooter]', CManInterface.GetName + ' wer. ' + CManInterface.GetVersion + ', ' + DateTimeToStr(Now), [rfReplaceAll, rfIgnoreCase]);
+    Result := StringReplace(Result, '[reptitle]', 'Zestawienie kont', [rfReplaceAll, rfIgnoreCase]);
+  end;
 end;
 
 exports
