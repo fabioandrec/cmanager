@@ -601,7 +601,7 @@ var xMax, xCount: Integer;
     xPlugin: TCPlugin;
     xPluginBand: TActionClientItem;
 begin
-  xMax := GPlugins.GetCurrencyRatePluginCount;
+  xMax := GPlugins.GetCurrencyRatePluginCount + GPlugins.GetJustExecutePluginCount;
   if xMax > 0 then begin
     xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
     if xPluginBand <> Nil then begin

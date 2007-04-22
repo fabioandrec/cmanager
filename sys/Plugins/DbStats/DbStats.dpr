@@ -5,12 +5,15 @@ library DBStats;
 uses
   Windows,
   Dialogs,
-  AdoInt,
+  Variants,
   Forms,
+  AdoInt,
+  Messages,
   CPluginTypes in '..\CPluginTypes.pas',
-  CPluginConsts in '..\CPluginConsts.pas';
-
-var CManInterface: ICManagerInterface;
+  CPluginConsts in '..\CPluginConsts.pas',
+  DBStatsFormUnit in 'DBStatsFormUnit.pas' {DBStatsForm},
+  CRichtext in '..\..\CRichtext.pas',
+  CTools in '..\..\CTools.pas';
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
@@ -26,10 +29,18 @@ end;
 
 function Plugin_Execute: OleVariant; stdcall; export;
 var xObject: OleVariant;
+    xForm: TDBStatsForm;
 begin
   VarClear(Result);
   xObject := CManInterface.GetConnection;
-  ShowMessage(xObject.ConnectionString);
+  if not VarIsEmpty(xObject) then begin
+    xForm := TDBStatsForm.Create(Application);
+    xForm.Icon.Handle := SendMessage(CManInterface.GetAppHandle, WM_GETICON, ICON_BIG, 0);
+    xForm.Intf := xObject;
+    xForm.PrepareInfo;
+    xForm.ShowModal;
+    xForm.Free;
+  end;
 end;
 
 exports

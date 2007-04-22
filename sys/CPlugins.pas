@@ -2,7 +2,8 @@ unit CPlugins;
 
 interface
 
-uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, MsXml, CComponents;
+uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, MsXml, CComponents,
+     Classes;
 
 type
   TCPlugin = class;
@@ -22,6 +23,10 @@ type
     procedure SetCaption(ACaption: OleVariant);
     procedure SetType(AType: Integer);
     procedure SetDescription(ADescription: OleVariant);
+    function GetDatafilename: OleVariant;
+    function GetWorkdate: OleVariant;
+    function GetReportCss: OleVariant;
+    function GetReportText: OleVariant;
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -188,7 +193,9 @@ begin
       end;
       if Result then begin
         Result := (FpluginType = CPLUGINTYPE_CURRENCYRATE) or
-                  (FpluginType = CPLUGINTYPE_JUSTEXECUTE);
+                  (FpluginType = CPLUGINTYPE_JUSTEXECUTE) or
+                  (FpluginType = CPLUGINTYPE_HTMLREPORT) or
+                  (FpluginType = CPLUGINTYPE_CHARTREPORT);
         if not Result then begin
           SaveToLog('Typ pluginu jest niepoprawny lub nie zosta³ ustawiony ' + FShortName, GPluginlogfile);
         end;
@@ -277,12 +284,12 @@ begin
   end;
   if xAsk then begin
     xPermit := ShowInfo(itQuestion, 'Wtyczka "' + FParentPlugin.FpluginDescription + '" ¿¹da dostêpu do pliku danych. Czy chcesz na to zezwoliæ ?', '', @xAlways);
-    if xPermit then begin
+    if xAlways then begin
       if xPref = Nil then begin
         xPref := TPluginPref.CreatePluginPref(FParentPlugin.fileName, FParentPlugin.pluginConfiguration);
         GPluginsPreferences.Add(xPref);
       end;
-      xPref.permitGetConnection := xAlways;
+      xPref.permitGetConnection := xPermit;
     end;
   end;
   if xPermit then begin
@@ -345,6 +352,46 @@ end;
 procedure TCManagerInterfaceObject.SetType(AType: Integer);
 begin
   FParentPlugin.pluginType := AType;
+end;
+
+function TCManagerInterfaceObject.GetDatafilename: OleVariant;
+begin
+  Result := GDatabaseName;
+end;
+
+function TCManagerInterfaceObject.GetWorkdate: OleVariant;
+begin
+  Result := FormatDateTime('yyyymmdd', GWorkDate);
+end;
+
+function TCManagerInterfaceObject.GetReportCss: OleVariant;
+var xRes: TResourceStream;
+    xStr: TStringList;
+begin
+  if not FileExists(GetSystemPathname('report.css')) then begin
+    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
+    xRes.SaveToFile(GetSystemPathname('report.css'));
+    xRes.Free;
+  end;
+  xStr := TStringList.Create;
+  xStr.LoadFromFile(GetSystemPathname('report.css'));
+  Result := xStr.Text;
+  xStr.Free;
+end;
+
+function TCManagerInterfaceObject.GetReportText: OleVariant;
+var xRes: TResourceStream;
+    xStr: TStringList;
+begin
+  if not FileExists(GetSystemPathname('report.htm')) then begin
+    xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
+    xRes.SaveToFile(GetSystemPathname('report.htm'));
+    xRes.Free;
+  end;
+  xStr := TStringList.Create;
+  xStr.LoadFromFile(GetSystemPathname('report.htm'));
+  Result := xStr.Text;
+  xStr.Free;
 end;
 
 initialization

@@ -3,7 +3,7 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans;
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins;
 
 type
   TSumForDayItem = class(TObject)
@@ -64,6 +64,15 @@ type
     property movementType: String read FmovementType;
   end;
 
+  TCPluginReportParams = class(TCReportParams)
+  private
+    Fplugin: TCPlugin;
+  public
+    constructor Create(APlugin: TCPlugin);
+  published
+    property plugin: TCPlugin read Fplugin;
+  end;
+
   TCWithGidParams = class(TCReportParams)
   private
     FId: TDataGid;
@@ -72,7 +81,6 @@ type
   published
     property id: TDataGid read FId;
   end;
-
 
   TCVirtualStringTreeParams = class(TCReportParams)
   private
@@ -369,6 +377,18 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
+  TPluginHtmlReport = class(TCHtmlReport)
+  private
+    FBody: OleVariant;
+  protected
+    function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
+    function GetReportTitle: String; override;
+  end;
+
+  TPluginChartReport = class(TCChartReport)
+  end;
+
 
 implementation
 
@@ -379,7 +399,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
      CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
-     CTools, CChoosePeriodRatesHistoryFormUnit, StrUtils;
+     CTools, CChoosePeriodRatesHistoryFormUnit, StrUtils, Variants;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
 begin
@@ -2839,6 +2859,28 @@ constructor TCWithGidParams.Create(AId: TDataGid);
 begin
   inherited Create;
   FId := AId;
+end;
+
+constructor TCPluginReportParams.Create(APlugin: TCPlugin);
+begin
+  inherited Create;
+  Fplugin := APlugin;
+end;
+
+function TPluginHtmlReport.GetReportBody: String;
+begin
+  Result := FBody;
+end;
+
+function TPluginHtmlReport.GetReportTitle: String;
+begin
+  Result := TCPluginReportParams(Params).plugin.pluginMenu;
+end;
+
+function TPluginHtmlReport.PrepareReportConditions: Boolean;
+begin
+  FBody := TCPluginReportParams(Params).plugin.Execute;
+  Result := not VarIsEmpty(FBody);
 end;
 
 end.

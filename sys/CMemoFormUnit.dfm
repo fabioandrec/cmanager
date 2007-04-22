@@ -1,6 +1,6 @@
 inherited CMemoForm: TCMemoForm
-  Left = 343
-  Top = 221
+  Left = 272
+  Top = 128
   BorderStyle = bsSizeable
   Caption = 'ReportForm'
   PixelsPerInch = 96

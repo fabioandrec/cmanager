@@ -55,7 +55,8 @@ type
 
 implementation
 
-uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts;
+uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts,
+  CPlugins, CPluginConsts;
 
 {$R *.dfm}
 
@@ -168,6 +169,8 @@ var xBase: TCListDataElement;
     xStats: TCListDataElement;
     xOthers: TCListDataElement;
     xBs, xTm: TCListDataElement;
+    xCount: Integer;
+    xPlugin: TCPlugin;
 begin
   xBase := TCListDataElement.Create(List, TReportListElement.CreateGroup('Podstawowe', '', CNoImage), True);
   ARootElement.Add(xBase);
@@ -216,6 +219,12 @@ begin
   xOthers := TCListDataElement.Create(List, TReportListElement.CreateGroup('Ró¿ne', '', CNoImage), True);
   ARootElement.Add(xOthers);
   xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia wybranej waluty' , TCurrencyRatesHistoryReport, Nil, 'Pokazuje historiê waluty w/g wybranego kontrahenta w zadanym okresis', CChartReportImage), True));
+  for xCount := 0 to GPlugins.Count - 1 do begin
+    xPlugin := TCPlugin(GPlugins.Items[xCount]);
+    if (xPlugin.pluginType = CPLUGINTYPE_HTMLREPORT) then begin
+      xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport(xPlugin.pluginMenu, TPluginHtmlReport, TCPluginReportParams.Create(xPlugin), xPlugin.pluginDescription, CHtmlReportImage), True));
+    end;
+  end;
 end;
 
 procedure TReportListElement.GetElementReload;
