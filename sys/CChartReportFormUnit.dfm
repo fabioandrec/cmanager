@@ -1,4 +1,6 @@
 inherited CChartReportForm: TCChartReportForm
+  Left = 121
+  Top = 43
   Caption = 'CChartReportForm'
   PixelsPerInch = 96
   TextHeight = 13
@@ -10,6 +12,7 @@ inherited CChartReportForm: TCChartReportForm
       Height = 568
       AnimatedZoom = True
       BackWall.Brush.Color = clWhite
+      BottomWall.Dark3D = False
       Foot.Alignment = taRightJustify
       Foot.Brush.Color = clWhite
       Foot.Color = clWhite
@@ -73,12 +76,12 @@ inherited CChartReportForm: TCChartReportForm
       LeftAxis.Title.Font.Height = -11
       LeftAxis.Title.Font.Name = 'Verdana'
       LeftAxis.Title.Font.Style = []
+      Legend.Alignment = laLeft
       Legend.Font.Charset = DEFAULT_CHARSET
       Legend.Font.Color = clBlack
       Legend.Font.Height = -11
       Legend.Font.Name = 'Verdana'
       Legend.Font.Style = []
-      Legend.Visible = False
       RightAxis.LabelsFont.Charset = EASTEUROPE_CHARSET
       RightAxis.LabelsFont.Color = clBlack
       RightAxis.LabelsFont.Height = -11
@@ -115,10 +118,28 @@ inherited CChartReportForm: TCChartReportForm
     inherited CButton3: TCButton
       Left = 76
     end
+    object CButton4: TCButton [3]
+      Left = 148
+      Top = 8
+      Width = 77
+      Height = 25
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Action = ActionGraph
+      Color = clBtnFace
+    end
   end
   inherited ActionList: TActionList
     inherited Action2: TAction
       Visible = False
+    end
+    object ActionGraph: TAction
+      Caption = 'Wygl'#261'd'
+      ImageIndex = 3
+      OnExecute = ActionGraphExecute
     end
   end
   object PrintDialog: TPrintDialog

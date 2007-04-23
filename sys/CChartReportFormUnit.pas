@@ -11,6 +11,9 @@ type
   TCChartReportForm = class(TCReportForm)
     PrintDialog: TPrintDialog;
     CChart: TChart;
+    CButton4: TCButton;
+    ActionGraph: TAction;
+    procedure ActionGraphExecute(Sender: TObject);
   protected
     procedure DoPrint; override;
     procedure DoSave; override;
@@ -18,6 +21,8 @@ type
   end;
 
 implementation
+
+uses CChartPropsFormUnit;
 
 {$R *.dfm}
 
@@ -35,6 +40,11 @@ begin
   if SaveDialog.Execute then begin
     CChart.SaveToBitmapFile(SaveDialog.FileName);
   end;
+end;
+
+procedure TCChartReportForm.ActionGraphExecute(Sender: TObject);
+begin
+  ShowChartProps(CChart);
 end;
 
 end.
