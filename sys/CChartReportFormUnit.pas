@@ -22,7 +22,7 @@ type
 
 implementation
 
-uses CChartPropsFormUnit;
+uses CChartPropsFormUnit, CReports;
 
 {$R *.dfm}
 
