@@ -12,6 +12,10 @@ inherited CChartReportForm: TCChartReportForm
       Height = 568
       AnimatedZoom = True
       BackWall.Brush.Color = clWhite
+      BackWall.Brush.Style = bsClear
+      BackWall.Color = clSilver
+      BottomWall.Brush.Color = clWhite
+      BottomWall.Brush.Style = bsClear
       BottomWall.Dark3D = False
       Foot.Alignment = taRightJustify
       Foot.Brush.Color = clWhite
@@ -25,6 +29,7 @@ inherited CChartReportForm: TCChartReportForm
       Foot.Text.Strings = (
         'Report footer')
       LeftWall.Brush.Color = clWhite
+      LeftWall.Brush.Style = bsClear
       MarginBottom = 1
       MarginLeft = 1
       MarginRight = 1
@@ -39,6 +44,7 @@ inherited CChartReportForm: TCChartReportForm
       Title.Frame.Color = 8453888
       Title.Text.Strings = (
         'Report title')
+      BackColor = clSilver
       BottomAxis.DateTimeFormat = 'yyyy-MM-dd'
       BottomAxis.Grid.SmallDots = True
       BottomAxis.LabelsAngle = 90
@@ -76,7 +82,7 @@ inherited CChartReportForm: TCChartReportForm
       LeftAxis.Title.Font.Height = -11
       LeftAxis.Title.Font.Name = 'Verdana'
       LeftAxis.Title.Font.Style = []
-      Legend.Alignment = laLeft
+      Legend.Alignment = laBottom
       Legend.Font.Charset = DEFAULT_CHARSET
       Legend.Font.Color = clBlack
       Legend.Font.Height = -11
@@ -102,11 +108,11 @@ inherited CChartReportForm: TCChartReportForm
       TopAxis.Title.Font.Height = -11
       TopAxis.Title.Font.Name = 'Verdana'
       TopAxis.Title.Font.Style = []
-      View3D = False
-      View3DOptions.Elevation = 315
-      View3DOptions.Orthogonal = False
+      View3DOptions.Elevation = 341
       View3DOptions.Perspective = 0
-      View3DOptions.Rotation = 360
+      View3DOptions.Rotation = 338
+      View3DOptions.Zoom = 80
+      View3DOptions.ZoomText = False
       Align = alClient
       BevelOuter = bvNone
       BevelWidth = 0

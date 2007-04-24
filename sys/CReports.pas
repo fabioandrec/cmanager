@@ -1051,8 +1051,6 @@ begin
       Width := 1;
     end;
     Legend.LegendStyle := lsSeries;
-    Legend.Alignment := laRight;;
-    Legend.ShadowSize := 0;
   end;
   PrepareReportChart;
 end;
@@ -1160,8 +1158,6 @@ begin
   end;
   xChart.View3D := False;
   xChart.Legend.Visible := Params = Nil;
-  xChart.Legend.Alignment := laRight;
-  xChart.Legend.ResizeChart := True;
   xAccounts.Free;
 end;
 

@@ -14,10 +14,14 @@ type
     CButton4: TCButton;
     ActionGraph: TAction;
     procedure ActionGraphExecute(Sender: TObject);
+  private
+    FProps: TForm;
   protected
     procedure DoPrint; override;
     procedure DoSave; override;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -44,7 +48,26 @@ end;
 
 procedure TCChartReportForm.ActionGraphExecute(Sender: TObject);
 begin
-  ShowChartProps(CChart);
+  if FProps = Nil then begin
+    FProps := ShowChartProps(CChart);
+  end else begin
+    FProps.Show;
+    FProps.BringToFront;
+  end;
+end;
+
+constructor TCChartReportForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FProps := Nil;
+end;
+
+destructor TCChartReportForm.Destroy;
+begin
+  if Assigned(FProps) then begin
+    FreeAndNil(FProps);
+  end;
+  inherited Destroy;
 end;
 
 end.

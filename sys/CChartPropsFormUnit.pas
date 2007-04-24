@@ -4,39 +4,98 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, Chart;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, Chart,
+  CBaseFormUnit, ComCtrls;
 
 type
-  TCChartPropsForm = class(TCConfigForm)
-    CheckBox3d: TCheckBox;
-    CheckBoxLeg: TCheckBox;
+  TCChartPropsForm = class(TCBaseForm)
+    GroupBox1: TGroupBox;
+    ComboBox: TComboBox;
+    TrackBarRotate: TTrackBar;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    TrackBarElevation: TTrackBar;
+    Label4: TLabel;
+    Label5: TLabel;
+    TrackBarPerspective: TTrackBar;
+    Label6: TLabel;
+    Label7: TLabel;
+    TrackBarTilt: TTrackBar;
+    Label8: TLabel;
+    Label9: TLabel;
+    TrackBarDepth: TTrackBar;
+    Label10: TLabel;
+    GroupBox2: TGroupBox;
+    ComboBoxLegendPos: TComboBox;
+    Label11: TLabel;
+    TrackBarZoom: TTrackBar;
+    Label12: TLabel;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure ComboBoxLegendPosChange(Sender: TObject);
+    procedure TrackBarRotateChange(Sender: TObject);
+    procedure TrackBarElevationChange(Sender: TObject);
+    procedure TrackBarPerspectiveChange(Sender: TObject);
+    procedure ComboBoxChange(Sender: TObject);
+    procedure TrackBarTiltChange(Sender: TObject);
+    procedure TrackBarDepthChange(Sender: TObject);
+    procedure TrackBarZoomChange(Sender: TObject);
   private
     Fchart: TChart;
     FisPie: Boolean;
   protected
     procedure CheckIsPie;
-    procedure FillForm; override;
-    procedure ReadValues; override;
+    procedure UpdateTrackbars;
+    procedure UpdateLabelPos(ALabel: TLabel; ATrackbar: TTrackBar);
   public
     property chart: TChart read Fchart write Fchart;
   end;
 
-function ShowChartProps(AChart: TChart): Boolean;
+function ShowChartProps(AChart: TChart): TForm;
 
 implementation
 
 {$R *.dfm}
 
-uses Series;
+uses Series, TeCanvas;
 
-function ShowChartProps(AChart: TChart): Boolean;
-var xForm: TCChartPropsForm;
+const CLegendPosition: array[0..4] of String = ('z lewej', 'z prawej', 'z góry', 'z do³u', 'ukryta');
+
+function ShowChartProps(AChart: TChart): TForm;
 begin
-  xForm := TCChartPropsForm.Create(Nil);
-  xForm.chart := AChart;
-  xForm.CheckIsPie;
-  Result := xForm.ShowConfig(coEdit);
-  xForm.Free;
+  Result := TCChartPropsForm.Create(Application);
+  with TCChartPropsForm(Result) do begin
+    chart := AChart;
+    CheckIsPie;
+    if chart.View3D then begin
+      if chart.View3DOptions.Orthogonal then begin
+        ComboBox.ItemIndex := 1;
+      end else begin
+        ComboBox.ItemIndex := 2;
+      end;
+    end else begin
+      ComboBox.ItemIndex := 0;
+    end;
+    TrackBarRotate.Position := chart.View3DOptions.Rotation;
+    TrackBarElevation.Position := chart.View3DOptions.Elevation;
+    TrackBarPerspective.Position := chart.View3DOptions.Perspective;
+    TrackBarTilt.Position := chart.View3DOptions.Tilt;
+    TrackBarDepth.Position := chart.Chart3DPercent;
+    TrackBarZoom.Position := chart.View3DOptions.Zoom;
+    UpdateLabelPos(Label2, TrackBarRotate);
+    UpdateLabelPos(Label4, TrackBarElevation);
+    UpdateLabelPos(Label6, TrackBarPerspective);
+    UpdateLabelPos(Label8, TrackBarTilt);
+    UpdateLabelPos(Label10, TrackBarDepth);
+    UpdateLabelPos(Label12, TrackBarZoom);
+    UpdateTrackbars;    
+    if chart.Legend.Visible then begin
+      ComboBoxLegendPos.ItemIndex := Ord(chart.Legend.Alignment);
+    end else begin
+      ComboBoxLegendPos.ItemIndex := 4;
+    end;
+  end;
 end;
 
 procedure TCChartPropsForm.CheckIsPie;
@@ -53,18 +112,98 @@ begin
   xTemp.Free;
 end;
 
-procedure TCChartPropsForm.FillForm;
+procedure TCChartPropsForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  CheckBox3d.Checked := Fchart.View3D;
-  CheckBoxLeg.Checked := Fchart.Legend.Visible;
+  Action := caHide;
 end;
 
-procedure TCChartPropsForm.ReadValues;
+procedure TCChartPropsForm.FormCreate(Sender: TObject);
+var xCount: Integer;
 begin
-  Fchart.View3D := CheckBox3d.Checked;
-  Fchart.View3DWalls := Fchart.View3D and (not FisPie);
-  Fchart.View3DOptions.Orthogonal := Fchart.View3DWalls;
-  Fchart.Legend.Visible := CheckBoxLeg.Checked;
+  with ComboBoxLegendPos do begin
+    Clear;
+    for xCount := Low(CLegendPosition) to High(CLegendPosition) do begin
+      Items.Add(CLegendPosition[xCount])
+    end;
+  end;
+end;
+
+procedure TCChartPropsForm.ComboBoxLegendPosChange(Sender: TObject);
+begin
+  chart.Legend.Visible := ComboBoxLegendPos.ItemIndex <> 4;
+  if chart.Legend.Visible then begin
+    chart.Legend.Alignment := TLegendAlignment(ComboBoxLegendPos.ItemIndex);
+  end;
+end;
+
+procedure TCChartPropsForm.TrackBarRotateChange(Sender: TObject);
+begin
+  UpdateLabelPos(Label2, TrackBarRotate);
+  Fchart.View3DOptions.Rotation := TrackBarRotate.Position;
+end;
+
+procedure TCChartPropsForm.TrackBarElevationChange(Sender: TObject);
+begin
+  UpdateLabelPos(Label4, TrackBarElevation);
+  Fchart.View3DOptions.Elevation := TrackBarElevation.Position;
+end;
+
+procedure TCChartPropsForm.TrackBarPerspectiveChange(Sender: TObject);
+begin
+  UpdateLabelPos(Label6, TrackBarPerspective);
+  Fchart.View3DOptions.Perspective := TrackBarPerspective.Position;
+end;
+
+procedure TCChartPropsForm.UpdateLabelPos(ALabel: TLabel; ATrackbar: TTrackBar);
+begin
+  ALabel.Caption := IntToStr(ATrackbar.Position);
+end;
+
+procedure TCChartPropsForm.ComboBoxChange(Sender: TObject);
+begin
+  Fchart.View3D := (ComboBox.ItemIndex <> 0);
+  Fchart.View3DOptions.Orthogonal := (ComboBox.ItemIndex = 1);
+  UpdateTrackbars;
+end;
+
+procedure TCChartPropsForm.UpdateTrackbars;
+begin
+  Label1.Enabled := ComboBox.ItemIndex = 2;
+  TrackBarRotate.Enabled := ComboBox.ItemIndex = 2;
+  Label2.Enabled := ComboBox.ItemIndex = 2;
+  Label4.Enabled := ComboBox.ItemIndex = 2;
+  TrackBarElevation.Enabled := ComboBox.ItemIndex = 2;
+  Label3.Enabled := ComboBox.ItemIndex = 2;
+  Label5.Enabled := ComboBox.ItemIndex = 2;
+  TrackBarPerspective.Enabled := ComboBox.ItemIndex = 2;
+  Label6.Enabled := ComboBox.ItemIndex = 2;
+  Label8.Enabled := ComboBox.ItemIndex = 2;
+  TrackBarTilt.Enabled := ComboBox.ItemIndex = 2;
+  Label7.Enabled := ComboBox.ItemIndex = 2;
+  Label9.Enabled := ComboBox.ItemIndex <> 0;
+  TrackBarDepth.Enabled := ComboBox.ItemIndex <> 0;
+  Label10.Enabled := ComboBox.ItemIndex <> 0;
+  Label11.Enabled := ComboBox.ItemIndex <> 0;
+  TrackBarZoom.Enabled := ComboBox.ItemIndex <> 0;
+  Label12.Enabled := ComboBox.ItemIndex <> 0;
+end;
+
+procedure TCChartPropsForm.TrackBarTiltChange(Sender: TObject);
+begin
+  UpdateLabelPos(Label8, TrackBarTilt);
+  Fchart.View3DOptions.Tilt := TrackBarTilt.Position;
+end;
+
+procedure TCChartPropsForm.TrackBarDepthChange(Sender: TObject);
+begin
+  UpdateLabelPos(Label10, TrackBarDepth);
+  Fchart.Chart3DPercent := TrackBarDepth.Position;
+end;
+
+procedure TCChartPropsForm.TrackBarZoomChange(Sender: TObject);
+begin
+  UpdateLabelPos(Label12, TrackBarZoom);
+  Fchart.View3DOptions.Zoom := TrackBarZoom.Position;
 end;
 
 end.
