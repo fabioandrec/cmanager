@@ -1,10 +1,10 @@
 inherited CChartPropsForm: TCChartPropsForm
-  Left = 253
-  Top = 103
+  Left = 268
+  Top = 15
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Wygl'#261'd wykresu'
-  ClientHeight = 339
+  ClientHeight = 426
   ClientWidth = 340
   OnClose = FormClose
   OnCreate = FormCreate
@@ -190,7 +190,7 @@ inherited CChartPropsForm: TCChartPropsForm
       Top = 88
       Width = 137
       Height = 17
-      Max = 100
+      Max = 500
       Min = 1
       PageSize = 1
       Position = 1
@@ -223,6 +223,30 @@ inherited CChartPropsForm: TCChartPropsForm
         'z prawej'
         'z g'#243'ry'
         'z do'#322'u')
+    end
+  end
+  object GroupBoxMarks: TGroupBox
+    Left = 16
+    Top = 336
+    Width = 305
+    Height = 73
+    Caption = ' Warto'#347'ci '
+    TabOrder = 2
+    object ComboBoxMarks: TComboBox
+      Left = 27
+      Top = 28
+      Width = 249
+      Height = 21
+      BevelInner = bvNone
+      BevelKind = bkTile
+      Style = csDropDownList
+      ItemHeight = 13
+      TabOrder = 0
+      OnChange = ComboBoxMarksChange
+      Items.Strings = (
+        'Ukryte'
+        'Warto'#347'ci'
+        'Nazwy')
     end
   end
 end

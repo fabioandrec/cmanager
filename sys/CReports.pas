@@ -130,12 +130,17 @@ type
   end;
 
   TCChartReport = class(TCBaseReport)
+  private
+    FisPie: Boolean;
   protected
     function GetFormClass: TCReportFormClass; override;
     function GetReportFooter: String; override;
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
+    procedure SetChartProps; virtual;
     function GetChart: TChart;
+  public
+    property isPie: Boolean read FisPie;
   end;
 
   TAccountBalanceOnDayReport = class(TCHtmlReport)
@@ -1032,8 +1037,12 @@ begin
 end;
 
 procedure TCChartReport.PrepareReportData;
+var xCount: Integer;
+    xTemp: TPieSeries;
+    xChart: TChart;
 begin
-  with GetChart do begin
+  xChart := GetChart;
+  with xChart do begin
     Foot.Text.Text := GetReportFooter;
     Foot.Font.Height := -10;
     Title.Text.Text := GetReportTitle;
@@ -1050,9 +1059,17 @@ begin
     with BottomAxis.Axis do begin
       Width := 1;
     end;
-    Legend.LegendStyle := lsSeries;
+    PrepareReportChart;
+    FisPie := False;
+    xCount := 0;
+    xTemp := TPieSeries.Create(Nil);
+    while (xCount <= SeriesCount - 1) and (not FisPie) do begin
+      FisPie := Series[xCount].SameClass(xTemp);
+      Inc(xCount);
+    end;
+    xTemp.Free;
   end;
-  PrepareReportChart;
+  SetChartProps;
 end;
 
 constructor TAccountBalanceChartReport.CreateReport(AParams: TCReportParams);
@@ -1156,8 +1173,6 @@ begin
     Title.Caption := '[' + GetCurrencySymbol + ']';
     Title.Angle := 90;
   end;
-  xChart.View3D := False;
-  xChart.Legend.Visible := Params = Nil;
   xAccounts.Free;
 end;
 
@@ -1265,8 +1280,6 @@ begin
   xSerie.Marks.Style := smsLabel;
   with xChart do begin
     AddSeries(xSerie);
-    View3D := True;
-    Legend.Visible := False;
   end;
   xSums.Free;
 end;
@@ -1720,7 +1733,6 @@ begin
     if xInMovements and xOutMovements then begin
       xInSerie.Title := 'Przychody';
       xOutSerie.Title := 'Rozchody';
-      Legend.Visible := True;
     end;
   end;
 end;
@@ -2838,7 +2850,6 @@ begin
     Title.Caption := '[' + IfThen(xMaxQuantity = 1, '', IntToStr(xMaxQuantity) + ' ') + FAxisName + ']';
     Title.Angle := 90;
   end;
-  xChart.View3D := False;
   xRates.Free;
 end;
 
@@ -2874,6 +2885,18 @@ end;
 procedure TPluginHtmlReport.PrepareReportData;
 begin
   TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
+end;
+
+procedure TCChartReport.SetChartProps;
+begin
+  with GetChart do begin
+    Legend.LegendStyle := lsSeries;
+    Legend.Visible := False;
+    Legend.Alignment := laBottom;
+    Legend.ShadowSize := 0;
+    View3DOptions.Orthogonal := not FisPie;
+    View3D := FisPie;
+  end;
 end;
 
 end.

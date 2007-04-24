@@ -5,9 +5,11 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, Chart,
-  CBaseFormUnit, ComCtrls;
+  CBaseFormUnit, ComCtrls, TeEngine;
 
 type
+  TMarksStyle = (msHidden, msValues, msLabels);
+
   TCChartPropsForm = class(TCBaseForm)
     GroupBox1: TGroupBox;
     ComboBox: TComboBox;
@@ -31,6 +33,8 @@ type
     Label11: TLabel;
     TrackBarZoom: TTrackBar;
     Label12: TLabel;
+    GroupBoxMarks: TGroupBox;
+    ComboBoxMarks: TComboBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxLegendPosChange(Sender: TObject);
@@ -41,15 +45,19 @@ type
     procedure TrackBarTiltChange(Sender: TObject);
     procedure TrackBarDepthChange(Sender: TObject);
     procedure TrackBarZoomChange(Sender: TObject);
+    procedure ComboBoxMarksChange(Sender: TObject);
   private
     Fchart: TChart;
     FisPie: Boolean;
+    function GetmarksStyle: TMarksStyle;
+    procedure SetmarksStyle(const Value: TMarksStyle);
   protected
     procedure CheckIsPie;
     procedure UpdateTrackbars;
     procedure UpdateLabelPos(ALabel: TLabel; ATrackbar: TTrackBar);
   public
     property chart: TChart read Fchart write Fchart;
+    property marksStyle: TMarksStyle read GetmarksStyle write SetmarksStyle;
   end;
 
 function ShowChartProps(AChart: TChart): TForm;
@@ -77,6 +85,7 @@ begin
     end else begin
       ComboBox.ItemIndex := 0;
     end;
+    ComboBoxMarks.ItemIndex := Ord(marksStyle);
     TrackBarRotate.Position := chart.View3DOptions.Rotation;
     TrackBarElevation.Position := chart.View3DOptions.Elevation;
     TrackBarPerspective.Position := chart.View3DOptions.Perspective;
@@ -204,6 +213,41 @@ procedure TCChartPropsForm.TrackBarZoomChange(Sender: TObject);
 begin
   UpdateLabelPos(Label12, TrackBarZoom);
   Fchart.View3DOptions.Zoom := TrackBarZoom.Position;
+end;
+
+function TCChartPropsForm.GetmarksStyle: TMarksStyle;
+var xCount: Integer;
+begin
+  Result := msHidden;
+  xCount := 0;
+  while (xCount <= Fchart.SeriesCount - 1) and (Result = msHidden) do begin
+    if Fchart.Series[xCount].Marks.Visible then begin
+      if Fchart.Series[xCount].Marks.Style = smsValue then begin
+        Result := msValues;
+      end else begin
+        Result := msLabels;
+      end;
+    end;
+    Inc(xCount);
+  end;
+end;
+
+procedure TCChartPropsForm.SetmarksStyle(const Value: TMarksStyle);
+var xCount: Integer;
+begin
+  for xCount := 0 to Fchart.SeriesCount - 1 do begin
+    Fchart.Series[xCount].Marks.Visible := Value <> msHidden;
+    if Value = msValues then begin
+      Fchart.Series[xCount].Marks.Style := smsValue;
+    end else begin
+      Fchart.Series[xCount].Marks.Style := smsLabel;
+    end;
+  end;
+end;
+
+procedure TCChartPropsForm.ComboBoxMarksChange(Sender: TObject);
+begin
+  marksStyle := TMarksStyle(ComboBoxMarks.ItemIndex);
 end;
 
 end.
