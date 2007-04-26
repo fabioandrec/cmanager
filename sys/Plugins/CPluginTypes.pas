@@ -8,7 +8,7 @@ type
   ICManagerInterface = interface
     function GetName: OleVariant;
     function GetVersion: OleVariant;
-    function GetConnection: OleVariant;
+    function GetConnection: IInterface;
     function GetDatafilename: OleVariant;
     function GetWorkdate: OleVariant;
     function GetAppHandle: HWND;

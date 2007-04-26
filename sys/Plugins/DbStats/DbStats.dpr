@@ -28,7 +28,7 @@ begin
 end;
 
 function Plugin_Execute: OleVariant; stdcall; export;
-var xObject: OleVariant;
+var xObject: IInterface;
     xForm: TDBStatsForm;
 begin
   VarClear(Result);
@@ -36,7 +36,7 @@ begin
   if not VarIsEmpty(xObject) then begin
     xForm := TDBStatsForm.Create(Application);
     xForm.Icon.Handle := SendMessage(CManInterface.GetAppHandle, WM_GETICON, ICON_BIG, 0);
-    xForm.Intf := xObject;
+    xForm.Intf := xObject as _Connection;
     xForm.PrepareInfo;
     xForm.ShowModal;
     xForm.Free;

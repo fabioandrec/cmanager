@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, Buttons, ExtCtrls, CPluginTypes;
+  Dialogs, StdCtrls, ComCtrls, Buttons, ExtCtrls, CPluginTypes, AdoInt;
 
 type
   TDBStatsForm = class(TForm)
@@ -14,10 +14,10 @@ type
     RichEdit: TRichEdit;
     procedure BitBtnCancelClick(Sender: TObject);
   private
-    FIntf: OleVariant;
+    FIntf: _Connection;
   public
     procedure PrepareInfo;
-    property Intf: OleVariant read FIntf write FIntf;
+    property Intf: _Connection read FIntf write FIntf;
   end;
 
 var CManInterface: ICManagerInterface;

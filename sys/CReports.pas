@@ -3,7 +3,7 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins;
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml;
 
 type
   TSumForDayItem = class(TObject)
@@ -132,6 +132,7 @@ type
   TCChartReport = class(TCBaseReport)
   private
     FisPie: Boolean;
+    procedure Setmarks(const Value: Integer);
   protected
     function GetFormClass: TCReportFormClass; override;
     function GetReportFooter: String; override;
@@ -140,7 +141,9 @@ type
     procedure SetChartProps; virtual;
     function GetChart: TChart;
   public
+    function GetPrefname: String; virtual;
     property isPie: Boolean read FisPie;
+    property marks: Integer write Setmarks;
   end;
 
   TAccountBalanceOnDayReport = class(TCHtmlReport)
@@ -374,6 +377,8 @@ type
     FEndDate: TDateTime;
     FSourceId: TDataGid;
     FTargetId: TDataGid;
+    FSourceIso: TDataGid;
+    FTargetIso: TDataGid;
     FCashpointId: TDataGid;
     FAxisName: String;
   protected
@@ -391,6 +396,15 @@ type
   end;
 
   TPluginChartReport = class(TCChartReport)
+  private
+    FXml: IXMLDOMDocument;
+  protected
+    function PrepareReportConditions: Boolean; override;
+    function GetReportTitle: String; override;
+    function GetReportFooter: String; override;
+    procedure PrepareReportChart; override;
+  public
+    function GetPrefname: String; override;
   end;
 
 
@@ -403,7 +417,8 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChoosePeriodAccountListFormUnit, CComponents,
      CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
      CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
-     CTools, CChoosePeriodRatesHistoryFormUnit, StrUtils, Variants;
+     CTools, CChoosePeriodRatesHistoryFormUnit, StrUtils, Variants,
+     CPreferences, CXml, CInfoFormUnit, CPluginConsts;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
 begin
@@ -1031,6 +1046,11 @@ begin
   Result := TCChartReportForm;
 end;
 
+function TCChartReport.GetPrefname: String;
+begin
+  Result := ClassName;
+end;
+
 function TCChartReport.GetReportFooter: String;
 begin
   Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
@@ -1129,13 +1149,13 @@ begin
         if (xSums.RecNo = 1) and (xSums.FieldByName('regDate').AsDateTime < FEndDate) then begin
           xDate := FEndDate;
           while (xDate > xSums.FieldByName('regDate').AsDateTime) do begin
-            xSerie.AddXY(xDate, xBalance);
+            xSerie.AddXY(xDate, xBalance, '');
             xDate := IncDay(xDate, -1);
           end;
         end;
         xDate := xSums.FieldByName('regDate').AsDateTime;
         if (FStartDate <= xDate) and (xDate <= FEndDate) then begin
-          xSerie.AddXY(xDate, xBalance);
+          xSerie.AddXY(xDate, xBalance, '');
         end;
         xBalance := xBalance - xSums.FieldByName('cash').AsCurrency;
         xSums.Next;
@@ -1147,7 +1167,7 @@ begin
             xEnd := xDate < FStartDate;
           end;
           if not xEnd then begin
-            xSerie.AddXY(xDate, xBalance);
+            xSerie.AddXY(xDate, xBalance, '');
           end;
         until xEnd;
       end;
@@ -1264,6 +1284,7 @@ begin
   xChart := GetChart;
   xSums := GDataProvider.OpenSql(GetSql);
   xSerie := TPieSeries.Create(xChart);
+  xSerie.Title := 'Wszystkie dane';
   xSum := 0;
   while not xSums.Eof do begin
     xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
@@ -2753,19 +2774,18 @@ begin
 end;
 
 function TCurrencyRatesHistoryReport.GetReportTitle: String;
-var xSource, xTarget: String;
-    xCashpoint: String;
+var xCashpoint: String;
 begin
   GDataProvider.BeginTransaction;
-  xSource := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FSourceId, False)).iso;
-  xTarget := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FTargetId, False)).iso;
+  FSourceIso := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FSourceId, False)).iso;
+  FTargetIso := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FTargetId, False)).iso;
   if FCashpointId <> CEmptyDataGid then begin
     xCashpoint := 'w/g ' + TCashPoint(TCashPoint.LoadObject(CashPointProxy, FCashpointId, False)).name;
   end else begin
     xCashpoint := '';
   end;
-  Result := Format('Kurs waluty %s wzglêdem %s %s (%s - %s)', [xSource, xTarget, xCashpoint, GetFormattedDate(FStartDate, CLongDateFormat), GetFormattedDate(FEndDate, CLongDateFormat)]);
-  FAxisName := xSource + '/' + xTarget;
+  Result := Format('Kurs waluty %s wzglêdem %s %s (%s - %s)', [FSourceIso, FTargetIso, xCashpoint, GetFormattedDate(FStartDate, CLongDateFormat), GetFormattedDate(FEndDate, CLongDateFormat)]);
+  FAxisName := FSourceIso + '/' + FTargetIso;
 end;
 
 procedure TCurrencyRatesHistoryReport.PrepareReportChart;
@@ -2815,7 +2835,7 @@ begin
   TLineSeries(xSerie).Pointer.Visible := True;
   TLineSeries(xSerie).Pointer.InflateMargins := True;
   with xSerie do begin
-    Title := 'Seria';
+    Title := FAxisName;
     HorizAxis := aBottomAxis;
     XValues.DateTime := True;
   end;
@@ -2825,7 +2845,7 @@ begin
       xCurValue := xMaxQuantity * xRate.rate / xRate.quantity;
     end;
     if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
-      xSerie.AddXY(xCurDate, xCurValue);
+      xSerie.AddXY(xCurDate, xCurValue, '');
     end else begin
       xSerie.AddNullXY(xCurDate, 0, '');
     end;
@@ -2888,14 +2908,133 @@ begin
 end;
 
 procedure TCChartReport.SetChartProps;
+var xPref: TChartPref;
+    xChart: TChart;
 begin
+  xChart := GetChart;
+  with xChart do begin
+    xPref := TChartPref(GChartPreferences.ByPrefname[GetPrefname]);
+    if xPref <> Nil then begin
+      Chart3DPercent := xPref.depth;
+      View3DOptions.Zoom := xPref.zoom;
+      View3DOptions.Tilt := xPref.tilt;
+      View3DOptions.Rotation := xPref.rotate;
+      View3DOptions.Elevation := xPref.elevation;
+      View3DOptions.Perspective := xPref.perspective;
+      Legend.Visible := (xPref.legend <> 4);
+      if Legend.Visible then begin
+        Legend.Alignment := TLegendAlignment(xPref.legend);
+      end;
+      View3D := (xPref.view <> 0);
+      View3DOptions.Orthogonal := (xPref.view = 1);
+      marks := xPref.values;
+      Legend.LegendStyle := lsSeries;
+      Legend.ShadowSize := 0;
+    end else begin
+      Legend.LegendStyle := lsSeries;
+      Legend.Visible := False;
+      Legend.Alignment := laBottom;
+      Legend.ShadowSize := 0;
+      View3DOptions.Orthogonal := not FisPie;
+      View3D := FisPie;
+    end;
+  end;
+end;
+
+function TPluginChartReport.GetPrefname: String;
+begin
+  Result := TCPluginReportParams(Params).plugin.fileName;
+end;
+
+procedure TCChartReport.Setmarks(const Value: Integer);
+var xCount: Integer;
+begin
+  for xCount := 0 to GetChart.SeriesCount - 1 do begin
+    GetChart.Series[xCount].Marks.Visible := Value <> 0;
+    if Value = 1 then begin
+      GetChart.Series[xCount].Marks.Style := smsValue;
+    end else if Value = 2 then begin
+      GetChart.Series[xCount].Marks.Style := smsLabel;
+    end;
+  end;
+end;
+
+function TPluginChartReport.GetReportFooter: String;
+begin
+  Result := GetXmlAttribute('footer', FXml.documentElement, '');
+end;
+
+function TPluginChartReport.GetReportTitle: String;
+begin
+  Result := GetXmlAttribute('title', FXml.documentElement, '');
+end;
+
+procedure TPluginChartReport.PrepareReportChart;
+var xSeries, xItems: IXMLDOMNodeList;
+    xCountS, xCountI: Integer;
+    xSerieNode, xItemNode: IXMLDOMNode;
+    xSerieObject: TChartSeries;
+    xSerieType: Integer;
+    xX, xY: Double;
+    xLabel: String;
+begin
+  xSeries := FXml.documentElement.selectNodes('serie');
+  for xCountS := 0 to xSeries.length - 1 do begin
+    xSerieNode := xSeries.item[xCountS];
+    xSerieType := StrToIntDef(GetXmlAttribute('type', xSerieNode, ''), 0);
+    if xSerieType = CSERIESTYPE_PIE then begin
+      xSerieObject := TPieSeries.Create(GetChart);
+    end else if xSerieType = CSERIESTYPE_LINE then begin
+      xSerieObject := TLineSeries.Create(GetChart);
+    end else if xSerieType = CSERIESTYPE_BAR then begin
+      xSerieObject := TBarSeries.Create(GetChart);
+    end else begin
+      xSerieObject := Nil;
+    end;
+    if xSerieObject <> Nil then begin
+      xSerieObject.Title := GetXmlAttribute('title', xSerieNode, '');
+      xSerieObject.HorizAxis := aBottomAxis;
+      xSerieObject.XValues.DateTime := GetXmlAttribute('domain', xSerieNode, CSERIESDOMAIN_DATETIME);
+      xItems := xSerieNode.selectNodes('item');
+      for xCountI := 0 to xItems.length - 1 do begin
+        xItemNode := xItems.item[xCountI];
+        xLabel := GetXmlAttribute('label', xItemNode, '');
+        if xSerieObject.XValues.DateTime then begin
+          xX := DmyToDate(GetXmlAttribute('domain', xItemNode, ''), 0);
+        end else begin
+          xX := StrToCurrencyDecimalDot(GetXmlAttribute('domain', xItemNode, ''));
+        end;
+        xY := StrToCurrencyDecimalDot(GetXmlAttribute('value', xItemNode, ''));
+        xSerieObject.AddXY(xX, xY, xLabel);
+      end;
+      if xSerieObject.ValuesLists.Count > 0 then begin
+        GetChart.AddSeries(xSerieObject);
+      end;
+    end;
+  end;
   with GetChart do begin
-    Legend.LegendStyle := lsSeries;
-    Legend.Visible := False;
-    Legend.Alignment := laBottom;
-    Legend.ShadowSize := 0;
-    View3DOptions.Orthogonal := not FisPie;
-    View3D := FisPie;
+    LeftAxis.Title.Caption := GetXmlAttribute('axisy', FXml.documentElement, '');
+    if GetXmlAttribute('angley', FXml.documentElement, '') <> '' then begin
+      LeftAxis.Title.Angle := StrToIntDef(GetXmlAttribute('angley', FXml.documentElement, ''), 0);
+    end;
+    BottomAxis.Title.Caption := GetXmlAttribute('axisx', FXml.documentElement, '');
+    if GetXmlAttribute('anglex', FXml.documentElement, '') <> '' then begin
+      BottomAxis.Title.Angle := StrToIntDef(GetXmlAttribute('anglex', FXml.documentElement, ''), 0);
+    end;
+  end;
+end;
+
+function TPluginChartReport.PrepareReportConditions: Boolean;
+var xOut: OleVariant;
+begin
+  xOut := TCPluginReportParams(Params).plugin.Execute;
+  Result := False;
+  if not VarIsEmpty(xOut) then begin
+    FXml := GetDocumentFromString(xOut);
+    Result := FXml.parseError.errorCode = 0;
+    if not Result then begin
+      ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', FXml.parseError.reason);
+    end;
   end;
 end;
 

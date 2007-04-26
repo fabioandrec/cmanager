@@ -244,9 +244,9 @@ inherited CChartPropsForm: TCChartPropsForm
       TabOrder = 0
       OnChange = ComboBoxMarksChange
       Items.Strings = (
-        'Ukryte'
-        'Warto'#347'ci'
-        'Nazwy')
+        'ukryte'
+        'warto'#347'ci'
+        'nazwy')
     end
   end
 end

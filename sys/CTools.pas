@@ -58,7 +58,6 @@ type
     property Parameters: String read FParameters;
   end;
 
-
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 function FileSize(AName: String): Int64;

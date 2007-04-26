@@ -49,11 +49,10 @@ end;
 procedure TCChartReportForm.ActionGraphExecute(Sender: TObject);
 begin
   if FProps = Nil then begin
-    FProps := ShowChartProps(CChart);
-  end else begin
-    FProps.Show;
-    FProps.BringToFront;
+    FProps := ShowChartProps(CChart, TCChartReport(Report).GetPrefname);
   end;
+  FProps.Show;
+  FProps.BringToFront;
 end;
 
 constructor TCChartReportForm.Create(AOwner: TComponent);

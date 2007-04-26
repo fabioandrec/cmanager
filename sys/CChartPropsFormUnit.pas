@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, Chart,
-  CBaseFormUnit, ComCtrls, TeEngine;
+  CBaseFormUnit, ComCtrls, TeEngine, CPreferences;
 
 type
   TMarksStyle = (msHidden, msValues, msLabels);
@@ -49,8 +49,11 @@ type
   private
     Fchart: TChart;
     FisPie: Boolean;
+    Fprefs: TChartPref;
+    FprefName: String;
     function GetmarksStyle: TMarksStyle;
     procedure SetmarksStyle(const Value: TMarksStyle);
+    procedure UpdatePrefs;
   protected
     procedure CheckIsPie;
     procedure UpdateTrackbars;
@@ -58,9 +61,10 @@ type
   public
     property chart: TChart read Fchart write Fchart;
     property marksStyle: TMarksStyle read GetmarksStyle write SetmarksStyle;
+    constructor Create(AOwner: TComponent); override;
   end;
 
-function ShowChartProps(AChart: TChart): TForm;
+function ShowChartProps(AChart: TChart; APrefName: String): TForm;
 
 implementation
 
@@ -70,11 +74,12 @@ uses Series, TeCanvas;
 
 const CLegendPosition: array[0..4] of String = ('z lewej', 'z prawej', 'z góry', 'z do³u', 'ukryta');
 
-function ShowChartProps(AChart: TChart): TForm;
+function ShowChartProps(AChart: TChart; APrefName: String): TForm;
 begin
   Result := TCChartPropsForm.Create(Application);
   with TCChartPropsForm(Result) do begin
     chart := AChart;
+    FprefName := APrefName;
     CheckIsPie;
     if chart.View3D then begin
       if chart.View3DOptions.Orthogonal then begin
@@ -104,6 +109,7 @@ begin
     end else begin
       ComboBoxLegendPos.ItemIndex := 4;
     end;
+    UpdatePrefs;
   end;
 end;
 
@@ -143,24 +149,28 @@ begin
   if chart.Legend.Visible then begin
     chart.Legend.Alignment := TLegendAlignment(ComboBoxLegendPos.ItemIndex);
   end;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.TrackBarRotateChange(Sender: TObject);
 begin
   UpdateLabelPos(Label2, TrackBarRotate);
   Fchart.View3DOptions.Rotation := TrackBarRotate.Position;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.TrackBarElevationChange(Sender: TObject);
 begin
   UpdateLabelPos(Label4, TrackBarElevation);
   Fchart.View3DOptions.Elevation := TrackBarElevation.Position;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.TrackBarPerspectiveChange(Sender: TObject);
 begin
   UpdateLabelPos(Label6, TrackBarPerspective);
   Fchart.View3DOptions.Perspective := TrackBarPerspective.Position;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.UpdateLabelPos(ALabel: TLabel; ATrackbar: TTrackBar);
@@ -173,6 +183,7 @@ begin
   Fchart.View3D := (ComboBox.ItemIndex <> 0);
   Fchart.View3DOptions.Orthogonal := (ComboBox.ItemIndex = 1);
   UpdateTrackbars;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.UpdateTrackbars;
@@ -201,18 +212,21 @@ procedure TCChartPropsForm.TrackBarTiltChange(Sender: TObject);
 begin
   UpdateLabelPos(Label8, TrackBarTilt);
   Fchart.View3DOptions.Tilt := TrackBarTilt.Position;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.TrackBarDepthChange(Sender: TObject);
 begin
   UpdateLabelPos(Label10, TrackBarDepth);
   Fchart.Chart3DPercent := TrackBarDepth.Position;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.TrackBarZoomChange(Sender: TObject);
 begin
   UpdateLabelPos(Label12, TrackBarZoom);
   Fchart.View3DOptions.Zoom := TrackBarZoom.Position;
+  UpdatePrefs;
 end;
 
 function TCChartPropsForm.GetmarksStyle: TMarksStyle;
@@ -243,11 +257,38 @@ begin
       Fchart.Series[xCount].Marks.Style := smsLabel;
     end;
   end;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.ComboBoxMarksChange(Sender: TObject);
 begin
   marksStyle := TMarksStyle(ComboBoxMarks.ItemIndex);
+  UpdatePrefs;
+end;
+
+constructor TCChartPropsForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Fprefs := Nil;
+end;
+
+procedure TCChartPropsForm.UpdatePrefs;
+begin
+  if Fprefs = Nil then begin
+    Fprefs := TChartPref.Create(FprefName);
+    GChartPreferences.Add(Fprefs);
+  end;
+  with Fprefs do begin
+    view := ComboBox.ItemIndex;
+    legend := ComboBoxLegendPos.ItemIndex;
+    values := ComboBoxMarks.ItemIndex;
+    depth := TrackBarDepth.Position;
+    zoom := TrackBarZoom.Position;
+    rotate := TrackBarRotate.Position;
+    elevation := TrackBarElevation.Position;
+    perspective := TrackBarPerspective.Position;
+    tilt := TrackBarTilt.Position;
+  end;
 end;
 
 end.

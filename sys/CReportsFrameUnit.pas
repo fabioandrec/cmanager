@@ -223,6 +223,8 @@ begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
     if (xPlugin.pluginType = CPLUGINTYPE_HTMLREPORT) then begin
       xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport(xPlugin.pluginMenu, TPluginHtmlReport, TCPluginReportParams.Create(xPlugin), xPlugin.pluginDescription, CHtmlReportImage), True));
+    end else if (xPlugin.pluginType = CPLUGINTYPE_CHARTREPORT) then begin
+      xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport(xPlugin.pluginMenu, TPluginChartReport, TCPluginReportParams.Create(xPlugin), xPlugin.pluginDescription, CChartReportImage), True));
     end;
   end;
 end;

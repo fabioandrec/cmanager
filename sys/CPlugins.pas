@@ -13,7 +13,7 @@ type
     FParentPlugin: TCPlugin;
   public
     constructor Create(AParentPlugin: TCPlugin);
-    function GetConnection: OleVariant;
+    function GetConnection: IInterface;
     function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
@@ -270,7 +270,7 @@ begin
   Windows.FindClose(xHandle);
 end;
 
-function TCManagerInterfaceObject.GetConnection: OleVariant;
+function TCManagerInterfaceObject.GetConnection: IInterface;
 var xPref: TPluginPref;
     xAsk: Boolean;
     xPermit: Boolean;
@@ -297,7 +297,7 @@ begin
   if xPermit then begin
     Result := GDataProvider.Connection.ConnectionObject;
   end else begin
-    VarClear(Result);
+    Result := Nil;
   end;
 end;
 

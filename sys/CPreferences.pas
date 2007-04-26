@@ -133,6 +133,34 @@ type
     property Fontprefs: TPrefList read FFontprefs;
   end;
 
+  TChartPref = class(TPrefItem)
+  private
+    Fview: Integer;
+    Flegend: Integer;
+    Fvalues: Integer;
+    Fdepth: Integer;
+    Fzoom: Integer;
+    Frotate: Integer;
+    Felevation: Integer;
+    Fperspective: Integer;
+    Ftilt: Integer;
+  public
+    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure Clone(APrefItem: TPrefItem); override;
+    function GetNodeName: String; override;
+  published
+    property view: Integer read Fview write Fview;
+    property legend: Integer read Flegend write Flegend;
+    property values: Integer read Fvalues write Fvalues;
+    property depth: Integer read Fdepth write Fdepth;
+    property zoom: Integer read Fzoom write Fzoom;
+    property rotate: Integer read Frotate write Frotate;
+    property elevation: Integer read Felevation write Felevation;
+    property perspective: Integer read Fperspective write Fperspective;
+    property tilt: Integer read Ftilt write Ftilt;
+  end;
+
   TBasePref = class(TPrefItem, IDescTemplateExpander)
   private
     FstartupDatafileMode: Integer;
@@ -205,6 +233,7 @@ type
   end;
 
 var GViewsPreferences: TPrefList;
+    GChartPreferences: TPrefList;
     GColumnsPreferences: TPrefList;
     GBackupsPreferences: TPrefList;
     GPluginsPreferences: TPrefList;
@@ -892,12 +921,62 @@ begin
   SetXmlAttribute('permitGetConnection', ANode, FpermitGetConnection);
 end;
 
+{ TChartPref }
+
+procedure TChartPref.Clone(APrefItem: TPrefItem);
+begin
+  inherited Clone(APrefItem);
+  Fview := TChartPref(APrefItem).view;
+  Flegend := TChartPref(APrefItem).legend;
+  Fvalues := TChartPref(APrefItem).values;
+  Fdepth := TChartPref(APrefItem).depth;
+  Fzoom := TChartPref(APrefItem).zoom;
+  Frotate := TChartPref(APrefItem).rotate;
+  Felevation := TChartPref(APrefItem).elevation;
+  Fperspective := TChartPref(APrefItem).perspective;
+  Ftilt := TChartPref(APrefItem).tilt;
+end;
+
+function TChartPref.GetNodeName: String;
+begin
+  Result := 'chartpref';
+end;
+
+procedure TChartPref.LoadFromXml(ANode: IXMLDOMNode);
+begin
+  inherited LoadFromXml(ANode);
+  Fview := GetXmlAttribute('view', ANode, 0);
+  Flegend := GetXmlAttribute('legend', ANode, 0);
+  Fvalues := GetXmlAttribute('values', ANode, 0);
+  Fdepth := GetXmlAttribute('depth', ANode, 0);
+  Fzoom := GetXmlAttribute('zoom', ANode, 0);
+  Frotate := GetXmlAttribute('rotate', ANode, 0);
+  Felevation := GetXmlAttribute('elevation', ANode, 0);
+  Fperspective := GetXmlAttribute('perspective', ANode, 0);
+  Ftilt := GetXmlAttribute('tilt', ANode, 0);
+end;
+
+procedure TChartPref.SaveToXml(ANode: IXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('view', ANode, Fview);
+  SetXmlAttribute('legend', ANode, Flegend);
+  SetXmlAttribute('values', ANode, Fvalues);
+  SetXmlAttribute('depth', ANode, Fdepth);
+  SetXmlAttribute('zoom', ANode, Fzoom);
+  SetXmlAttribute('rotate', ANode, Frotate);
+  SetXmlAttribute('elevation', ANode, Felevation);
+  SetXmlAttribute('perspective', ANode, Fperspective);
+  SetXmlAttribute('tilt', ANode, Ftilt);
+end;
+
 initialization
   GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
   GColumnsPreferences := TPrefList.Create(TViewColumnPref);
   GBackupsPreferences := TPrefList.Create(TBackupPref);
   GPluginsPreferences := TPrefList.Create(TPluginPref);
+  GChartPreferences := TPrefList.Create(TChartPref);
   GViewsPreferences.Add(TViewPref.Create('baseMovement'));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
@@ -968,6 +1047,7 @@ finalization
   GBasePreferences.Free;
   GColumnsPreferences.Free;
   GBackupsPreferences.Free;
+  GChartPreferences.Free;
   GPluginsPreferences.Free;
   GDescPatterns.Free;
 end.
