@@ -12,8 +12,8 @@ uses
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
   DBStatsFormUnit in 'DBStatsFormUnit.pas' {DBStatsForm},
-  CRichtext in '..\..\CRichtext.pas',
-  CTools in '..\..\CTools.pas';
+  CRichtext in '..\..\Shared\CRichtext.pas',
+  CTools in '..\..\Shared\CTools.pas';
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin

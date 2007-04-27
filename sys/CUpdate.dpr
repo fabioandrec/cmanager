@@ -8,10 +8,10 @@ uses
   CUpdateMainFormUnit in 'CUpdateMainFormUnit.pas' {CUpdateMainForm},
   CComponents in 'CComponents.pas',
   MemCheck in 'MemCheck.pas',
-  CRichtext in 'CRichtext.pas',
-  CXml in 'CXml.pas',
-  CTools in 'CTools.pas',
-  CHttpRequest in 'CHttpRequest.pas';
+  CRichtext in '.\Shared\CRichtext.pas',
+  CXml in '.\Shared\CXml.pas',
+  CTools in '.\Shared\CTools.pas',
+  CHttpRequest in '.\Shared\CHttpRequest.pas';
 
 {$R *.res}
 

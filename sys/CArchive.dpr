@@ -9,7 +9,7 @@ uses
   ActiveX,
   SysUtils,
   MemCheck in 'MemCheck.pas',
-  CTools in 'CTools.pas',
+  CTools in '.\Shared\CTools.pas',
   CBackups in 'CBackups.pas',
   CAdox in 'CAdox.pas';
 

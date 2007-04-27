@@ -13,7 +13,7 @@ uses
   Variants,
   Classes,
   MemCheck in 'MemCheck.pas',
-  CTools in 'CTools.pas';
+  CTools in '.\Shared\CTools.pas';
 
 {$R *.res}
 

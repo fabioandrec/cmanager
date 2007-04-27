@@ -11,11 +11,11 @@ uses
   SysUtils,
   CPluginConsts in '..\CPluginConsts.pas',
   CPluginTypes in '..\CPluginTypes.pas',
-  CXml in '..\..\CXml.pas',
+  CXml in '..\..\Shared\CXml.pas',
   NBPCurrencyRatesConfigFormUnit in 'NBPCurrencyRatesConfigFormUnit.pas' {NBPCurrencyRatesConfigForm},
   NBPCurrencyRatesProgressFormUnit in 'NBPCurrencyRatesProgressFormUnit.pas' {NBPCurrencyRatesProgressForm},
-  CHttpRequest in '..\..\CHttpRequest.pas',
-  CRichtext in '..\..\CRichtext.pas';
+  CHttpRequest in '..\..\Shared\CHttpRequest.pas',
+  CRichtext in '..\..\Shared\CRichtext.pas';
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
