@@ -10,7 +10,9 @@ program CManager;
 {%File 'CMandf.sql'}
 
 uses
+  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
+  {$ENDIF}
   Forms,
   Windows,
   CDatabase in 'CDatabase.pas',

@@ -7,7 +7,9 @@ uses
   Windows,
   CUpdateMainFormUnit in 'CUpdateMainFormUnit.pas' {CUpdateMainForm},
   CComponents in 'CComponents.pas',
+  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
+  {$ENDIF}
   CRichtext in '.\Shared\CRichtext.pas',
   CXml in '.\Shared\CXml.pas',
   CTools in '.\Shared\CTools.pas',

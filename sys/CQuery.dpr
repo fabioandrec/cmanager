@@ -12,7 +12,9 @@ uses
   SysUtils,
   Variants,
   Classes,
+  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
+  {$ENDIF}
   CTools in '.\Shared\CTools.pas';
 
 {$R *.res}
