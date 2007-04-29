@@ -15,7 +15,7 @@ uses
   Graphics,
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
-  CXml in '..\..\CXml.pas';
+  CXml in '..\..\Shared\CXml.pas';
 
 var CManInterface: ICManagerInterface;
     CConnection: _Connection;
