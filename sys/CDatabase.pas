@@ -1218,31 +1218,36 @@ begin
   Result := True;
   xCurDynArray := StringToStringArray(AFromVersion, '.');
   xToDynArray := StringToStringArray(AToVersion, '.');
-  xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
-  xToDbversion := StrToIntDef(xToDynArray[1], -1);
-  if xCurDbversion < xToDbversion then begin
-    xText := 'Otwierany plik danych ma strukturê ' + AFromVersion + ' i musi byæ uaktualniony do wersji ' + AToVersion + sLineBreak +
-             'Czy rozpocz¹æ uaktualnianie pliku danych ?';
-    Result := ShowInfo(itQuestion, xText, '');
-    if Result then begin
-      Result := True;
-      GSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
-      SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion, GSqllogfile);
-      while Result and (xCurDbversion <> xToDbversion) do begin
-        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), GSqllogfile);
-        Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
-        Inc(xCurDbversion);
+  if Length(xCurDynArray) <> 4 then begin
+    ShowInfo(itError, 'Plik ' + GDatabaseName + ' nie jest poprawnym plikiem danych', '');
+    Result := False;
+  end else begin
+    xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
+    xToDbversion := StrToIntDef(xToDynArray[1], -1);
+    if xCurDbversion < xToDbversion then begin
+      xText := 'Otwierany plik danych ma strukturê ' + AFromVersion + ' i musi byæ uaktualniony do wersji ' + AToVersion + sLineBreak +
+               'Czy rozpocz¹æ uaktualnianie pliku danych ?';
+      Result := ShowInfo(itQuestion, xText, '');
+      if Result then begin
+        Result := True;
+        GSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
+        SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion, GSqllogfile);
+        while Result and (xCurDbversion <> xToDbversion) do begin
+          SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), GSqllogfile);
+          Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
+          Inc(xCurDbversion);
+        end;
+        if not Result then begin
+          xText := 'Podczas uaktualniania pliku danych z wersji ' + AFromVersion + ' do ' + AToVersion + ' wyst¹pi³ b³¹d' + sLineBreak +
+                   'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
+          ShowInfo(itError, xText, xError);
+        end;
+        GSqllogfile := '';
       end;
-      if not Result then begin
-        xText := 'Podczas uaktualniania pliku danych z wersji ' + AFromVersion + ' do ' + AToVersion + ' wyst¹pi³ b³¹d' + sLineBreak +
-                 'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
-        ShowInfo(itError, xText, xError);
-      end;
-      GSqllogfile := '';
     end;
-  end;
-  if Result then begin
-    GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
+    if Result then begin
+      GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
+    end;
   end;
 end;
 

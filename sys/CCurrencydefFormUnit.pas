@@ -28,11 +28,13 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CRichtext, CCurrencydefFrameUnit;
+uses CDataObjects, CInfoFormUnit, CRichtext, CCurrencydefFrameUnit,
+  CConfigFormUnit;
 
 {$R *.dfm}
 
 function TCCurrencydefForm.CanAccept: Boolean;
+var xCur: TCurrencyDef;
 begin
   if Trim(EditName.Text) = '' then begin
     Result := False;
@@ -47,7 +49,11 @@ begin
     ShowInfo(itError, 'Symbol ISO waluty nie mo¿e byæ pusty', '');
     EditIso.SetFocus;
   end else begin
-    Result := TCurrencyDef.FindByIso(EditIso.Text) = Nil;
+    xCur := TCurrencyDef.FindByIso(EditIso.Text);
+    Result := xCur = Nil;
+    if (not Result) and (Operation = coEdit) then begin
+      Result := xCur.id = Dataobject.id;
+    end;
     if not Result then begin
       ShowInfo(itError, 'Istnieje ju¿ waluta o symbolu ISO "' + EditIso.Text + '"', '');
       EditIso.SetFocus;
