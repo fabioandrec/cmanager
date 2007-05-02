@@ -119,6 +119,14 @@ const
   CCurrencyRateFilterMonth = 'M';
   CCurrencyRateFilterOther = 'O';
 
+  CCurrencyRateTypeAverage = 'A';
+  CCurrencyRateTypeSell = 'S';
+  CCurrencyRateTypeBuy = 'B';
+
+  CCurrencyRateTypeAverageDesc = 'kurs œredni';
+  CCurrencyRateTypeSellDesc = 'kurs sprzeda¿y';
+  CCurrencyRateTypeBuyDesc = 'kurs kupna';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

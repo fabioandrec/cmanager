@@ -151,6 +151,7 @@ initialization
     AddTemplate('@symbolbazowej@', 'symbol waluty bazowej');
     AddTemplate('@symboldocelowej@', 'symbol waluty docelowej');
     AddTemplate('@kontrahent@', 'kontrahent okreœlaj¹cy kurs');
+    AddTemplate('@typ@', 'typ kursu');
     AddTemplate('@ilosc@', 'iloœæ waluty bazowej');
     AddTemplate('@kurs@', 'kurs waluty');
   end;

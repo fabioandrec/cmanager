@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ActnList, XPStyleActnCtrls, ActnMan, ComCtrls, CDatabase, CBaseFrameUnit;
+  ActnList, XPStyleActnCtrls, ActnMan, ComCtrls, CDatabase, CBaseFrameUnit,
+  CDataobjects;
 
 type
   TCCurrencyRateForm = class(TCDataobjectForm)
@@ -28,6 +29,8 @@ type
     CButton2: TCButton;
     RichEditDesc: TRichEdit;
     ComboBoxTemplate: TComboBox;
+    Label3: TLabel;
+    ComboBoxType: TComboBox;
     procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticBaseCurrencydefGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticTargetCurrencydefGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -39,8 +42,11 @@ type
     procedure CStaticBaseCurrencydefChanged(Sender: TObject);
     procedure CCurrRateChange(Sender: TObject);
     procedure CStaticTargetCurrencydefChanged(Sender: TObject);
+    procedure ComboBoxTypeChange(Sender: TObject);
   private
     FRateToReplaceId: TDataGid;
+    function GetrateType: TBaseEnumeration;
+    procedure SetRateType(const Value: TBaseEnumeration);
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -52,11 +58,12 @@ type
     procedure AfterCommitData; override;
   public
     function ExpandTemplate(ATemplate: String): String; override;
+    property formRateType: TBaseEnumeration read GetrateType write SetRateType;
   end;
 
 implementation
 
-uses CDataObjects, CCurrencyRateFrameUnit, CRichtext, CConsts,
+uses CCurrencyRateFrameUnit, CRichtext, CConsts,
   CFrameFormUnit, CCashpointsFrameUnit, CDataobjectFrameUnit,
   CCurrencydefFrameUnit, CInfoFormUnit, CTemplates, CPreferences, Math,
   CConfigFormUnit, Contnrs, CDescpatternFormUnit;
@@ -100,19 +107,20 @@ begin
     if Operation = coEdit then begin
       xCheck := (CStaticCashpoint.DataId <> TCurrencyRate(Dataobject).idCashpoint) or
                 (CStaticBaseCurrencydef.DataId <> TCurrencyRate(Dataobject).idSourceCurrencyDef) or
-                (CStaticTargetCurrencydef.DataId <> TCurrencyRate(Dataobject).idTargetCurrencyDef);
+                (CStaticTargetCurrencydef.DataId <> TCurrencyRate(Dataobject).idTargetCurrencyDef) or
+                (formRateType <> TCurrencyRate(Dataobject).rateType); 
     end else begin
       xCheck := True;
     end;
     if xCheck then begin
       GDataProvider.BeginTransaction;
-      xRate := TCurrencyRate.FindRate(CStaticBaseCurrencydef.DataId, CStaticTargetCurrencydef.DataId, CStaticCashpoint.DataId, CDateTime.Value);
+      xRate := TCurrencyRate.FindRate(formRateType, CStaticBaseCurrencydef.DataId, CStaticTargetCurrencydef.DataId, CStaticCashpoint.DataId, CDateTime.Value);
       if xRate <> Nil then begin
         if CStaticCashpoint.DataId <> CEmptyDataGid then begin
-          xText := 'Istnieje ju¿ kurs waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
+          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
                    'Czy chcesz go zast¹piæ ?';
         end else begin
-          xText := 'Istnieje ju¿ kurs waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
+          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
                    'Czy chcesz go zast¹piæ ?';
         end;
         Result := ShowInfo(itQuestion, xText, '');
@@ -132,6 +140,7 @@ begin
     CDateTime.Value := bindingDate;
     CIntQuantity.Text := IntToStr(quantity);
     CCurrRate.Value := rate;
+    formRateType := rateType;
     SimpleRichText(description, RichEditDesc);
     CStaticBaseCurrencydef.DataId := idSourceCurrencyDef;
     CStaticBaseCurrencydef.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idSourceCurrencyDef, False)).iso;
@@ -174,6 +183,7 @@ begin
     rate := CCurrRate.Value;
     description := RichEditDesc.Text;
     bindingDate := CDateTime.Value;
+    rateType := formRateType;
   end;
 end;
 
@@ -280,6 +290,8 @@ begin
     if CStaticTargetCurrencydef.DataId <> CEmptyDataGid then begin
       Result := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CStaticTargetCurrencydef.DataId, False)).symbol;
     end;
+  end else if ATemplate = '@typ@' then begin
+    Result := TCurrencyRate.GetTypeDesc(formRateType);
   end else if ATemplate = '@kontrahent@' then begin
     Result := '<kontrahent>';
     if CStaticCashpoint.DataId <> CEmptyDataGid then begin
@@ -308,6 +320,34 @@ begin
     GDataProvider.CommitTransaction;
     SendMessageToFrames(TCCurrencyRateFrame, WM_DATAOBJECTDELETED, Integer(@FRateToReplaceId), 0);
   end;
+end;
+
+function TCCurrencyRateForm.GetrateType: TBaseEnumeration;
+begin
+  if ComboBoxType.ItemIndex = 1 then begin
+    Result := CCurrencyRateTypeBuy;
+  end else if ComboBoxType.ItemIndex = 2 then begin
+    Result := CCurrencyRateTypeSell;
+  end else begin
+    Result := CCurrencyRateTypeAverage;
+  end;
+end;
+
+procedure TCCurrencyRateForm.SetRateType(const Value: TBaseEnumeration);
+begin
+  if Value = CCurrencyRateTypeBuy then begin
+    ComboBoxType.ItemIndex := 1
+  end else if Value = CCurrencyRateTypeSell then begin
+    ComboBoxType.ItemIndex := 2;
+  end else begin
+    ComboBoxType.ItemIndex := 0;
+  end;
+  UpdateDescription;
+end;
+
+procedure TCCurrencyRateForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  UpdateDescription;
 end;
 
 end.

@@ -222,10 +222,12 @@ create table currencyRate (
   rate money not null,
   bindingDate datetime not null,
   description varchar(200),
+  rateType varchar(1) not null,
   primary key (idcurrencyRate),
   constraint fk_rateSourceCurrencyDef foreign key (idSourceCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_rateTargetCurrencyDef foreign key (idTargetCurrencyDef) references currencyDef (idCurrencyDef),
-  constraint fk_rateCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint)
+  constraint fk_rateCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint),
+  constraint ck_rateType check (rateType in ('B', 'S', 'A'))
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');

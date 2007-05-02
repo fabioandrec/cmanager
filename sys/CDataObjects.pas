@@ -69,6 +69,7 @@ type
     Frate: Currency;
     FbindingDate: TDateTime;
     Fdescription: TBaseDescription;
+    FrateType: TBaseEnumeration;
     procedure SetbindingDate(const Value: TDateTime);
     procedure SetidCashpoint(const Value: TDataGid);
     procedure SetidSourceCurrencyDef(const Value: TDataGid);
@@ -76,13 +77,15 @@ type
     procedure Setquantity(const Value: Integer);
     procedure Setrate(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
+    procedure SetrateType(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
-    class function FindRate(ASourceId, ATargetIs, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
+    class function FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
+    class function GetTypeDesc(AType: TBaseEnumeration): String;
   published
     property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write SetidSourceCurrencyDef;
     property idTargetCurrencyDef: TDataGid read FidTargetCurrencyDef write SetidTargetCurrencyDef;
@@ -91,6 +94,7 @@ type
     property rate: Currency read Frate write Setrate;
     property bindingDate: TDateTime read FbindingDate write SetbindingDate;
     property description: TBaseDescription read Fdescription write Setdescription;
+    property rateType: TBaseEnumeration read FrateType write SetrateType;
   end;
 
   TAccount = class(TDataObject)
@@ -2104,6 +2108,7 @@ begin
     Frate := FieldByName('rate').AsCurrency;
     FbindingDate := FieldByName('bindingDate').AsDateTime;
     Fdescription := FieldByName('description').AsString;
+    FrateType := FieldByName('rateType').AsString;
   end;
 end;
 
@@ -2174,6 +2179,7 @@ begin
     AddField('rate', CurrencyToDatabase(Frate), False, 'currencyRate');
     AddField('bindingDate', DatetimeToDatabase(FbindingDate, False), False, 'currencyRate');
     AddField('description', Fdescription, True, 'currencyRate');
+    AddField('rateType', FrateType, True, 'currencyRate');
   end;
 end;
 
@@ -2183,6 +2189,8 @@ begin
     Result := DateToStr(FbindingDate);
   end else if AColumnIndex = 1 then begin
     Result := Fdescription;
+  end else if AColumnIndex = 3 then begin
+    Result := GetTypeDesc(FrateType);
   end else begin
     Result := CurrencyToString(rate);
   end;
@@ -2198,12 +2206,31 @@ begin
   Result := Fdescription;
 end;
 
-class function TCurrencyRate.FindRate(ASourceId, ATargetIs, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
+class function TCurrencyRate.FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
 var xSql: String;
 begin
-  xSql := Format('select * from currencyRate where bindingDate = %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s',
-                 [DatetimeToDatabase(ABindingDate, False), DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetIs), DataGidToDatabase(ACashpointId)]);
+  xSql := Format('select * from currencyRate where rateType = ''%s'' and bindingDate = %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s',
+                 [ARateType, DatetimeToDatabase(ABindingDate, False), DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetId), DataGidToDatabase(ACashpointId)]);
   Result := TCurrencyRate(TCurrencyRate.FindByCondition(CurrencyRateProxy, xSql, False));
+end;
+
+procedure TCurrencyRate.SetrateType(const Value: TBaseEnumeration);
+begin
+  if FrateType <> Value then begin
+    FrateType := Value;
+    SetState(msModified);
+  end;
+end;
+
+class function TCurrencyRate.GetTypeDesc(AType: TBaseEnumeration): String;
+begin
+  if AType = CCurrencyRateTypeSell then begin
+    Result := CCurrencyRateTypeSell;
+  end else if AType = CCurrencyRateTypeSell then begin
+    Result := CCurrencyRateTypeBuy;
+  end else begin
+    Result := CCurrencyRateTypeAverageDesc;
+  end;
 end;
 
 end.
