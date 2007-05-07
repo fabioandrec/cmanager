@@ -380,6 +380,7 @@ type
     FSourceIso: TDataGid;
     FTargetIso: TDataGid;
     FCashpointId: TDataGid;
+    FrateTypes: String;
     FAxisName: String;
   protected
     procedure PrepareReportChart; override;
@@ -2790,13 +2791,13 @@ end;
 
 procedure TCurrencyRatesHistoryReport.PrepareReportChart;
 
-  function FindCurrencyRate(AInlist: TDataObjectList; ABindingDate: TDateTime): TCurrencyRate;
+  function FindCurrencyRate(AInlist: TDataObjectList; ABindingDate: TDateTime; ArateType: TBaseEnumeration): TCurrencyRate;
   var xCount: Integer;
   begin
     Result := Nil;
     xCount := 0;
     while (Result = Nil) and (xCount <= AInlist.Count - 1) do begin
-      if TCurrencyRate(AInlist.Items[xCount]).bindingDate = ABindingDate then begin
+      if (TCurrencyRate(AInlist.Items[xCount]).bindingDate = ABindingDate) and ((TCurrencyRate(AInlist.Items[xCount]).rateType = ArateType)) then begin
         Result := TCurrencyRate(AInlist.Items[xCount]);
       end;
       Inc(xCount);
@@ -2813,11 +2814,20 @@ var xChart: TChart;
     xMaxQuantity: Integer;
     xCount: Integer;
     xSerie: TChartSeries;
+    xTypeCondition: String;
 begin
   xChart := GetChart;
-  xSql := Format('select * from currencyRate where bindingDate between %s and %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s order by bindingDate',
+  if Length(FrateTypes) = 1 then begin
+    xTypeCondition := 'rateType = ''' + FrateTypes + '''';
+  end else if Length(FrateTypes) = 2 then begin
+    xTypeCondition := 'rateType in (' + '''' + FrateTypes[1] + ''', ''' + FrateTypes[2] + ''')';
+  end else begin
+    xTypeCondition := 'rateType in (' + '''' + FrateTypes[1] + ''', ''' + FrateTypes[2]  + ''', ''' +  FrateTypes[3] + ''')';
+  end;
+  xSql := Format('select * from currencyRate where bindingDate between %s and %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s and %s order by bindingDate',
                  [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
-                  DataGidToDatabase(FSourceId), DataGidToDatabase(FTargetId), DataGidToDatabase(FCashpointId)]);
+                  DataGidToDatabase(FSourceId), DataGidToDatabase(FTargetId), DataGidToDatabase(FCashpointId),
+                  xTypeCondition]);
   xRates := TDataObject.GetList(TCurrencyRate, CurrencyRateProxy, xSql);
   xMaxQuantity := 1;
   xMaxDate := FStartDate;
@@ -2829,29 +2839,37 @@ begin
       xMaxDate := TCurrencyRate(xRates.Items[xCount]).bindingDate;
     end;
   end;
-  xCurDate := FStartDate;
-  xCurValue := -1;
-  xSerie := TLineSeries.Create(xChart);
-  TLineSeries(xSerie).Pointer.Visible := True;
-  TLineSeries(xSerie).Pointer.InflateMargins := True;
-  with xSerie do begin
-    Title := FAxisName;
-    HorizAxis := aBottomAxis;
-    XValues.DateTime := True;
-  end;
-  while xCurDate <= FEndDate do begin
-    xRate := FindCurrencyRate(xRates, xCurDate);
-    if xRate <> Nil then begin
-      xCurValue := xMaxQuantity * xRate.rate / xRate.quantity;
+  for xCount := 1 to Length(FrateTypes) do begin
+    xCurDate := FStartDate;
+    xCurValue := -1;
+    xSerie := TLineSeries.Create(xChart);
+    TLineSeries(xSerie).Pointer.Visible := True;
+    TLineSeries(xSerie).Pointer.InflateMargins := True;
+    with xSerie do begin
+      if FrateTypes[xCount] = CCurrencyRateTypeAverage then begin
+        Title := CCurrencyRateTypeAverageDesc;
+      end else if FrateTypes[xCount] = CCurrencyRateTypeSell then begin
+        Title := CCurrencyRateTypeSellDesc;
+      end else if FrateTypes[xCount] = CCurrencyRateTypeBuy then begin
+        Title := CCurrencyRateTypeBuyDesc;
+      end;
+      HorizAxis := aBottomAxis;
+      XValues.DateTime := True;
     end;
-    if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
-      xSerie.AddXY(xCurDate, xCurValue, '');
-    end else begin
-      xSerie.AddNullXY(xCurDate, 0, '');
+    while xCurDate <= FEndDate do begin
+      xRate := FindCurrencyRate(xRates, xCurDate, FrateTypes[xCount]);
+      if xRate <> Nil then begin
+        xCurValue := xMaxQuantity * xRate.rate / xRate.quantity;
+      end;
+      if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
+        xSerie.AddXY(xCurDate, xCurValue, '');
+      end else begin
+        xSerie.AddNullXY(xCurDate, 0, '');
+      end;
+      xCurDate := IncDay(xCurDate);
     end;
-    xCurDate := IncDay(xCurDate);
+    xChart.AddSeries(xSerie);
   end;
-  xChart.AddSeries(xSerie);
   with xChart.BottomAxis do begin
     DateTimeFormat := 'yyyy-mm-dd';
     ExactDateTime := True;
@@ -2878,7 +2896,7 @@ begin
   if Params <> Nil then begin
     FSourceId := TCWithGidParams(Params).id;
   end;
-  Result := ChoosePeriodRatesHistory(FStartDate, FEndDate, FSourceId, FTargetId, FCashpointId);
+  Result := ChoosePeriodRatesHistory(FStartDate, FEndDate, FSourceId, FTargetId, FCashpointId, FrateTypes);
 end;
 
 constructor TCWithGidParams.Create(AId: TDataGid);

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CChoosePeriodFormUnit, StdCtrls, Buttons, CComponents, ExtCtrls,
-  CDatabase;
+  CDatabase, CheckLst;
 
 type
   TCChoosePeriodRatesHistoryForm = class(TCChoosePeriodForm)
@@ -16,6 +16,10 @@ type
     CStaticTarget: TCStatic;
     Label4: TLabel;
     CStaticCashpoint: TCStatic;
+    CheckBoxAvg: TCheckBox;
+    Label6: TLabel;
+    CheckBoxBuy: TCheckBox;
+    CheckBoxSell: TCheckBox;
     procedure CStaticSourceGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticTargetGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -23,7 +27,7 @@ type
     function CanAccept: Boolean; override;
   end;
 
-function ChoosePeriodRatesHistory(var AStartDate, AEndDate: TDateTime; var ASourceId, ATargetId, ACashpointId: TDataGid): Boolean;
+function ChoosePeriodRatesHistory(var AStartDate, AEndDate: TDateTime; var ASourceId, ATargetId, ACashpointId: TDataGid; var ARateTypes: String): Boolean;
 
 implementation
 
@@ -32,7 +36,7 @@ uses CConfigFormUnit, CFrameFormUnit, CCurrencydefFrameUnit,
 
 {$R *.dfm}
 
-function ChoosePeriodRatesHistory(var AStartDate, AEndDate: TDateTime; var ASourceId, ATargetId, ACashpointId: TDataGid): Boolean;
+function ChoosePeriodRatesHistory(var AStartDate, AEndDate: TDateTime; var ASourceId, ATargetId, ACashpointId: TDataGid; var ARateTypes: String): Boolean;
 var xForm: TCChoosePeriodRatesHistoryForm;
 begin
   xForm := TCChoosePeriodRatesHistoryForm.Create(Nil);
@@ -60,6 +64,16 @@ begin
     ASourceId := xForm.CStaticSource.DataId;
     ATargetId := xForm.CStaticTarget.DataId;
     ACashpointId := xForm.CStaticCashpoint.DataId;
+    ARateTypes := '';
+    if xForm.CheckBoxAvg.Checked then begin
+      ARateTypes := ARateTypes + CCurrencyRateTypeAverage;
+    end;
+    if xForm.CheckBoxBuy.Checked then begin
+      ARateTypes := ARateTypes + CCurrencyRateTypeBuy;
+    end;
+    if xForm.CheckBoxSell.Checked then begin
+      ARateTypes := ARateTypes + CCurrencyRateTypeSell;
+    end;
   end;
   xForm.Free;
 end;
@@ -97,8 +111,11 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano waluty docelowej. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticTarget.DoGetDataId;
     end;
+  end else if not (CheckBoxAvg.Checked or CheckBoxBuy.Checked or CheckBoxSell.Checked) then begin
+    Result := False;
+    ShowInfo(itQuestion, 'Musisz zaznaczyæ przynajmniej jeden rodzaj kursu', '');
+    CheckBoxAvg.SetFocus;
   end;
 end;
 
 end.
- 

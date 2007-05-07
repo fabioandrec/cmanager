@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Forms, Classes, ComCtrls, Graphics, SysUtils, Messages, CTemplates,
-  Controls;
+  Controls, VirtualTrees;
 
 type
   TCBaseForm = class(TForm, IDescTemplateExpander)
@@ -22,7 +22,7 @@ type
 implementation
 
 uses CSettings, CBaseFrameUnit, CConsts, CComponents, CTools, DateUtils,
-  CDatabase, CPreferences;
+  CDatabase, CPreferences, Math;
 
 {$R *.dfm}
 

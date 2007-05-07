@@ -1,16 +1,16 @@
 inherited CChoosePeriodRatesHistoryForm: TCChoosePeriodRatesHistoryForm
-  Left = 432
-  Top = 205
-  ClientHeight = 354
+  Left = 373
+  Top = 37
+  ClientHeight = 376
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 313
+    Height = 335
     object GroupBox2: TGroupBox
       Left = 16
       Top = 152
       Width = 337
-      Height = 153
+      Height = 177
       Caption = ' Zakres danych '
       TabOrder = 1
       object Label14: TLabel
@@ -36,6 +36,14 @@ inherited CChoosePeriodRatesHistoryForm: TCChoosePeriodRatesHistoryForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kurs w/g'
+      end
+      object Label6: TLabel
+        Left = 28
+        Top = 141
+        Width = 76
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Rodzaje kurs'#243'w'
       end
       object CStaticSource: TCStatic
         Left = 112
@@ -91,9 +99,39 @@ inherited CChoosePeriodRatesHistoryForm: TCChoosePeriodRatesHistoryForm
         OnGetDataId = CStaticCashpointGetDataId
         HotTrack = True
       end
+      object CheckBoxAvg: TCheckBox
+        Left = 112
+        Top = 140
+        Width = 57
+        Height = 17
+        Caption = #346'rednie'
+        Checked = True
+        State = cbChecked
+        TabOrder = 3
+      end
+      object CheckBoxBuy: TCheckBox
+        Left = 178
+        Top = 140
+        Width = 57
+        Height = 17
+        Caption = 'Kupna'
+        Checked = True
+        State = cbChecked
+        TabOrder = 4
+      end
+      object CheckBoxSell: TCheckBox
+        Left = 240
+        Top = 140
+        Width = 65
+        Height = 17
+        Caption = 'Sprzeda'#380
+        Checked = True
+        State = cbChecked
+        TabOrder = 5
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 313
+    Top = 335
   end
 end

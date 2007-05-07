@@ -2225,9 +2225,9 @@ end;
 class function TCurrencyRate.GetTypeDesc(AType: TBaseEnumeration): String;
 begin
   if AType = CCurrencyRateTypeSell then begin
-    Result := CCurrencyRateTypeSell;
-  end else if AType = CCurrencyRateTypeSell then begin
-    Result := CCurrencyRateTypeBuy;
+    Result := CCurrencyRateTypeSellDesc;
+  end else if AType = CCurrencyRateTypeBuy then begin
+    Result := CCurrencyRateTypeBuyDesc;
   end else begin
     Result := CCurrencyRateTypeAverageDesc;
   end;

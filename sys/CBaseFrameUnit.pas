@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus,
-  CConfigFormUnit, CBaseFormUnit, CComponents;
+  CConfigFormUnit, CBaseFormUnit, CComponents, ComCtrls;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
@@ -33,10 +33,12 @@ type
     FOwner: TComponent;
     function ExportTree(AType: Integer): String;
   protected
+    procedure IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
     function GetBaseForm: TCBaseForm;
+    procedure Loaded; override;
   public
     procedure HideFrame; virtual;
     procedure ShowFrame; virtual;
@@ -406,6 +408,37 @@ end;
 procedure TCBaseFrame.ShowFrame;
 begin
   Show;
+end;
+
+procedure TCBaseFrame.Loaded;
+var xCount: Integer;
+begin
+  inherited Loaded;
+  for xCount := 0 to ComponentCount - 1 do begin
+    if Components[xCount].InheritsFrom(TCStatic) then begin
+      TCStatic(Components[xCount]).TabStop := True;
+      TCStatic(Components[xCount]).Transparent := False;
+    end else if Components[xCount].InheritsFrom(TRichEdit) then begin
+      TRichEdit(Components[xCount]).Font.Name := 'Microsoft Sans Serif';
+    end else if Components[xCount].InheritsFrom(TVirtualStringTree) then begin
+      TVirtualStringTree(Components[xCount]).IncrementalSearch := isAll;
+      TVirtualStringTree(Components[xCount]).OnIncrementalSearch := IncrementalSearch;
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
+var xTree: TVirtualStringTree;
+    xColumn: TColumnIndex;
+    xText: String;
+begin
+  xTree := TVirtualStringTree(Sender);
+  xColumn := xTree.Header.SortColumn;
+  if xColumn = NoColumn then begin
+    xColumn := xTree.Header.MainColumn;
+  end;
+  xText := xTree.Text[Node, xColumn];
+  Result := IfThen(Pos(AnsiUpperCase(SearchText), AnsiUpperCase(xText)) = 1, 0, 1);
 end;
 
 initialization
