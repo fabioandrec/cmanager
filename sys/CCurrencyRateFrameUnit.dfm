@@ -82,7 +82,6 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
         WideText = 'Kurs'
       end
       item
-        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
         Position = 3
         Width = 100
         WideText = 'Rodzaj'

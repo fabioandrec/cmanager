@@ -42,7 +42,6 @@ type
     FRoot: IXMLDOMNode;
     FRates: IXMLDOMNodeList;
     FBindingDate: TDateTime;
-    FRateType: TBaseEnumeration;
     FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
   public
@@ -52,7 +51,6 @@ type
     property Rates: IXMLDOMNodeList read FRates write FRates;
     property BindingDate: TDateTime read FBindingDate write FBindingDate;
     property CashpointName: String read FCashpointName write FCashpointName;
-    property RateType: TBaseEnumeration read FRateType write FRateType;
   end;
 
   TCurrencyRateDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
@@ -113,11 +111,13 @@ begin
     xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
     if xDesc <> '' then begin
       xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-      xExpander := TCurrencyRateDescriptionHelper.Create(xNode, FRateType, FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')));
+      xExpander := TCurrencyRateDescriptionHelper.Create(xNode, GetXmlAttribute('type', xNode, CCurrencyRateTypeAverage), FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')));
       CellText := GCurrencydefTemplatesList.ExpandTemplates(xDesc, xExpander);
     end;
-  end else begin
+  end else if Column = 0 then begin
     CellText := IntToStr(StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0));;
+  end else begin
+    CellText := TCurrencyRate.GetTypeDesc(GetXmlAttribute('type', xNode, CCurrencyRateTypeAverage));
   end;
 end;
 
@@ -234,10 +234,10 @@ begin
     end;
   end;
   if CStaticCashpoint.DataId <> CEmptyDataGid then begin
-    if GDataProvider.GetSqlInteger(Format('select count(*) from currencyRate where rateType = ''%s'' and bindingDate = %s and idCashpoint = %s',
-      [FRateType, DatetimeToDatabase(FBindingDate, False), DataGidToDatabase(CStaticCashpoint.DataId)]), 0) > 0 then begin
+    if GDataProvider.GetSqlInteger(Format('select count(*) from currencyRate where bindingDate = %s and idCashpoint = %s',
+      [DatetimeToDatabase(FBindingDate, False), DataGidToDatabase(CStaticCashpoint.DataId)]), 0) > 0 then begin
       xProceed := ShowInfo(itQuestion, 'Istniej¹ ju¿ kursy walut w/g "' + FCashpointName + '" z dat¹ obowi¹zywania ' + DateToStr(FBindingDate) + sLineBreak +
-                                       'Czy chcesz je zast¹piæ ?', '');
+                                       'Czy chcesz je uzupe³niæ ?', '');
     end else begin
       xProceed := True;
     end;
@@ -264,19 +264,19 @@ begin
             xTargetCurrency.name := GetXmlAttribute('targetName', xXml, '');
             xTargetCurrency.description := xTargetCurrency.name;
           end;
-          xRate := TCurrencyRate.FindRate(FRateType, xBaseCurrency.id, xTargetCurrency.id, CStaticCashpoint.DataId, FBindingDate);
+          xRate := TCurrencyRate.FindRate(GetXmlAttribute('type', xXml, CCurrencyRateTypeAverage), xBaseCurrency.id, xTargetCurrency.id, CStaticCashpoint.DataId, FBindingDate);
           if xRate = Nil then begin
             xRate := TCurrencyRate.CreateObject(CurrencyRateProxy, False);
             xRate.idSourceCurrencyDef := xBaseCurrency.id;
             xRate.idTargetCurrencyDef := xTargetCurrency.id;
             xRate.idCashpoint := CStaticCashpoint.DataId;
             xRate.bindingDate := FBindingDate;
-            xRate.rateType := FRateType;
+            xRate.rateType := GetXmlAttribute('type', xXml, CCurrencyRateTypeAverage);
           end;
           xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
           if xDesc <> '' then begin
             xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-            xHelper := TCurrencyRateDescriptionHelper.Create(xXml, FRateType, FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xXml, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xXml, '')));
+            xHelper := TCurrencyRateDescriptionHelper.Create(xXml, GetXmlAttribute('type', xXml, CCurrencyRateTypeAverage), FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xXml, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xXml, '')));
             xDesc := GCurrencydefTemplatesList.ExpandTemplates(xDesc, xHelper);
           end;
           xRate.description := xDesc;

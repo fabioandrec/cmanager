@@ -261,7 +261,6 @@ var xDoc: IXMLDOMDocument;
     xBindingDate: TDateTime;
     xCahpointName: String;
     xForm: TCUpdateCurrencyRatesForm;
-    xRateType: TBaseEnumeration;
 begin
   xValid := False;
   xDoc := GetDocumentFromString(ARatesText);
@@ -271,7 +270,6 @@ begin
       xBindingDate := DmyToDate(GetXmlAttribute('bindingDate', xRoot, ''), 0);
       if xBindingDate <> 0 then begin
         xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
-        xRateType := GetXmlAttribute('type', xRoot, CCurrencyRateTypeAverage);
         if xCahpointName <> '' then begin
           xValid := True;
           xList := xRoot.selectNodes('currencyRate');
@@ -281,7 +279,6 @@ begin
             xForm.Root := xRoot;
             xForm.Rates := xList;
             xForm.BindingDate := xBindingDate;
-            xForm.RateType := xRateType;
             xForm.CashpointName := xCahpointName;
             xForm.InitializeForm;
             xForm.ShowModal;

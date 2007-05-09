@@ -204,19 +204,24 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
             item
               Alignment = taRightJustify
               Position = 0
-              Width = 100
+              Width = 70
               WideText = 'Ilo'#347#263
             end
             item
               Position = 1
-              Width = 240
+              Width = 200
               WideText = 'Opis'
             end
             item
               Alignment = taRightJustify
               Position = 2
-              Width = 115
+              Width = 100
               WideText = 'Warto'#347#263
+            end
+            item
+              Position = 3
+              Width = 85
+              WideText = 'Rodzaj'
             end>
           WideDefaultText = ''
         end
