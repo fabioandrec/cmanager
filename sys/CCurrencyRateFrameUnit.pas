@@ -15,9 +15,12 @@ type
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
     Label3: TLabel;
-    procedure CStaticFilterChanged(Sender: TObject);
+    Label1: TLabel;
+    CStaticPeriod: TCStatic;
     procedure CDateTimePerStartChanged(Sender: TObject);
     procedure CDateTimePerEndChanged(Sender: TObject);
+    procedure CStaticPeriodChanged(Sender: TObject);
+    procedure CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
     procedure UpdateCustomPeriod;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
@@ -35,7 +38,8 @@ type
 
 implementation
 
-uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils;
+uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils,
+  CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit;
 
 {$R *.dfm}
 
@@ -59,7 +63,7 @@ var xId: TDataGid;
 begin
   ADateFrom := 0;
   ADateTo := 0;
-  xId := CStaticFilter.DataId;
+  xId := CStaticPeriod.DataId;
   if xId = CCurrencyRateFilterToday then begin
     ADateFrom := GWorkDate;
     ADateTo := GWorkDate;
@@ -83,11 +87,9 @@ begin
   Result := TStringList.Create;
   with Result do begin
     Add(CFilterAllElements + '=<wszystkie elementy>');
-    Add(CCurrencyRateFilterToday + '=<wa¿ne dziœ>');
-    Add(CCurrencyRateFilterYesterday + '=<wa¿ne wczoraj>');
-    Add(CCurrencyRateFilterWeek + '=<wa¿ne w tym tygodniu>');
-    Add(CCurrencyRateFilterMonth + '=<wa¿ne w tym miesi¹cu>');
-    Add(CCurrencyRateFilterOther + '=<dowolny okres>');
+    Add(CCurrencyRateTypeAverage + '=<kursy œrednie>');
+    Add(CCurrencyRateTypeSell + '=<kursy kupna>');
+    Add(CCurrencyRateTypeBuy + '=<kursy sprzeda¿y>');
   end;
 end;
 
@@ -114,7 +116,8 @@ var xDf, xDt: TDateTime;
 begin
   GetFilterDates(xDf, xDt);
   Result := (inherited IsValidFilteredObject(AObject)) or
-            (xDf <= TCurrencyRate(AObject).bindingDate) and (TCurrencyRate(AObject).bindingDate <= xDt);
+            ((xDf <= TCurrencyRate(AObject).bindingDate) and (TCurrencyRate(AObject).bindingDate <= xDt)
+            and (CStaticFilter.DataId = TCurrencyRate(AObject).rateType));
 end;
 
 procedure TCCurrencyRateFrame.ReloadDataobjects;
@@ -122,11 +125,14 @@ var xCondition: String;
     xDf, xDt: TDateTime;
 begin
   inherited ReloadDataobjects;
-  if CStaticFilter.DataId = CFilterAllElements then begin
+  if CStaticPeriod.DataId = CFilterAllElements then begin
     xCondition := '';
   end else begin
     GetFilterDates(xDf, xDt);
     xCondition := Format(' where bindingDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+  end;
+  if CStaticFilter.DataId <> CFilterAllElements then begin
+    xCondition := xCondition + ' and rateType = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TCurrencyRate.GetList(TCurrencyRate, CurrencyRateProxy, 'select * from currencyRate' + xCondition);
 end;
@@ -134,19 +140,13 @@ end;
 procedure TCCurrencyRateFrame.UpdateCustomPeriod;
 var xF, xE: TDateTime;
 begin
-  CDateTimePerStart.HotTrack := CStaticFilter.DataId = CCurrencyRateFilterOther;
-  CDateTimePerEnd.HotTrack := CStaticFilter.DataId = CCurrencyRateFilterOther;
-  if CStaticFilter.DataId <> CCurrencyRateFilterOther then begin
+  CDateTimePerStart.HotTrack := CStaticPeriod.DataId = CCurrencyRateFilterOther;
+  CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = CCurrencyRateFilterOther;
+  if CStaticPeriod.DataId <> CCurrencyRateFilterOther then begin
     GetFilterDates(xF, xE);
     CDateTimePerStart.Value := xF;
     CDateTimePerEnd.Value := xE;
   end;
-end;
-
-procedure TCCurrencyRateFrame.CStaticFilterChanged(Sender: TObject);
-begin
-  UpdateCustomPeriod;
-  inherited;
 end;
 
 procedure TCCurrencyRateFrame.CDateTimePerStartChanged(Sender: TObject);
@@ -161,7 +161,35 @@ end;
 
 function TCCurrencyRateFrame.GetInitialiFilter: String;
 begin
-  Result := CCurrencyRateFilterToday;
+  Result := CFilterAllElements;
+end;
+
+procedure TCCurrencyRateFrame.CStaticPeriodChanged(Sender: TObject);
+begin
+  UpdateCustomPeriod;
+  RefreshData;
+end;
+
+procedure TCCurrencyRateFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xList: TStringList;
+    xGid, xText: String;
+    xRect: TRect;
+begin
+  xList := TStringList.Create;
+  xList.Add(CFilterAllElements + '=<wszystkie elementy>');
+  xList.Add(CCurrencyRateFilterToday + '=<wa¿ne dziœ>');
+  xList.Add(CCurrencyRateFilterYesterday + '=<wa¿ne wczoraj>');
+  xList.Add(CCurrencyRateFilterWeek + '=<wa¿ne w tym tygodniu>');
+  xList.Add(CCurrencyRateFilterMonth + '=<wa¿ne w tym miesi¹cu>');
+  xList.Add(CCurrencyRateFilterOther + '=<dowolny okres>');
+  xGid := CFilterAllElements;
+  xText := '';
+  xRect := Rect(10, 10, 200, 300);
+  AAccepted := TCFrameForm.ShowFrame(TCListFrame, xGid, xText, xList, @xRect);
+  if AAccepted then begin
+    ADataGid := xGid;
+    AText := xText;
+  end;
 end;
 
 end.

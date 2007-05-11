@@ -21,8 +21,15 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       Height = 13
       Caption = '(od'
     end
+    object Label1: TLabel [4]
+      Left = 162
+      Top = 4
+      Width = 73
+      Height = 13
+      Caption = 'Data wa'#380'no'#347'ci:'
+    end
     inherited CStaticFilter: TCStatic
-      Caption = '<wa'#380'ne dzi'#347'>'
+      Width = 104
       DataId = 'T'
     end
     object CDateTimePerStart: TCDateTime
@@ -59,6 +66,34 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       TabStop = True
       Transparent = False
       OnChanged = CDateTimePerEndChanged
+      HotTrack = True
+    end
+    object CStaticPeriod: TCStatic
+      Left = 243
+      Top = 4
+      Width = 134
+      Height = 15
+      Cursor = crHandPoint
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '<tylko dzi'#347'>'
+      Color = clBtnFace
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentColor = False
+      ParentFont = False
+      TabOrder = 3
+      TabStop = True
+      Transparent = False
+      DataId = 'T'
+      TextOnEmpty = '<tylko dzi'#347'>'
+      OnGetDataId = CStaticPeriodGetDataId
+      OnChanged = CStaticPeriodChanged
       HotTrack = True
     end
   end

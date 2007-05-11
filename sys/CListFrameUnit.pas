@@ -28,6 +28,7 @@ type
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
+    function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
   end;
 
 implementation
@@ -135,6 +136,25 @@ procedure TCListFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualN
 begin
   if Owner.InheritsFrom(TCFrameForm) then begin
     TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
+  end;
+end;
+
+function TCListFrame.FindNode(ADataId: ShortString; AList: TCList): PVirtualNode;
+var xIndex: Integer;
+    xCount: Integer;
+    xNode: PVirtualNode;
+begin
+  Result := Nil;
+  xIndex := FGids.IndexOf(ADataId);
+  if xIndex <> -1 then begin
+    xCount := 0;
+    xNode := AList.GetFirst;
+    while (xNode <> Nil) and (Result = Nil) do begin
+      if xCount = xIndex then begin
+        Result := xNode;
+      end;
+      xNode := xNode.NextSibling;
+    end;
   end;
 end;
 

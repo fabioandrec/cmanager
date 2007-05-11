@@ -34,6 +34,8 @@ inherited CListFrame: TCListFrame
     OnGetText = ListGetText
     OnGetNodeDataSize = ListGetNodeDataSize
     OnInitNode = ListInitNode
+    OddColor = 12437200
+    AutoExpand = True
     Columns = <
       item
         Position = 0
@@ -41,5 +43,6 @@ inherited CListFrame: TCListFrame
         WideText = 'Nazwa'
         WideHint = 'Nazwa kontrahenta'
       end>
+    WideDefaultText = ''
   end
 end
