@@ -39,7 +39,8 @@ var NBPBSCurrencyRatesProgressForm: TNBPBSCurrencyRatesProgressForm;
 
 implementation
 
-uses CRichtext, StrUtils, CXml, NBPBSCurrencyRatesConfigFormUnit;
+uses CRichtext, StrUtils, CXml, NBPBSCurrencyRatesConfigFormUnit,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -94,16 +95,31 @@ begin
         xCurrencyName := GetXmlNodeValue('nazwa_waluty', xPosition, '');
         xCurrencyIso := GetXmlNodeValue('kod_waluty', xPosition, '');
         xCurrencyQuantity := StrToIntDef(GetXmlNodeValue('przelicznik', xPosition, ''), -1);
-        xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_sredni', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
-        if (xCurrencyName <> '') and (xCurrencyIso <> '') and (xCurrencyQuantity <> -1) and (xCurrencyRate <> -1) then begin
-          xOut := xXml.createElement('currencyRate');
-          xOutRoot.appendChild(xOut);
-          SetXmlAttribute('sourceName', xOut, xCurrencyName);
-          SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
-          SetXmlAttribute('targetName', xOut, 'Polski z³oty');
-          SetXmlAttribute('targetIso', xOut, 'PLN');
-          SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
-          SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+        if (xCurrencyName <> '') and (xCurrencyIso <> '') and (xCurrencyQuantity <> -1) then begin
+          xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_kupna', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
+          if (xCurrencyRate <> -1) then begin
+            xOut := xXml.createElement('currencyRate');
+            xOutRoot.appendChild(xOut);
+            SetXmlAttribute('sourceName', xOut, xCurrencyName);
+            SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
+            SetXmlAttribute('targetName', xOut, 'Polski z³oty');
+            SetXmlAttribute('targetIso', xOut, 'PLN');
+            SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
+            SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+            SetXmlAttribute('type', xOut, CCURRENCYRATE_BUY);
+          end;
+          xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_sprzedazy', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
+          if (xCurrencyRate <> -1) then begin
+            xOut := xXml.createElement('currencyRate');
+            xOutRoot.appendChild(xOut);
+            SetXmlAttribute('sourceName', xOut, xCurrencyName);
+            SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
+            SetXmlAttribute('targetName', xOut, 'Polski z³oty');
+            SetXmlAttribute('targetIso', xOut, 'PLN');
+            SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
+            SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+            SetXmlAttribute('type', xOut, CCURRENCYRATE_SELL);
+          end;
         end;
       end;
       Result := GetStringFromDocument(xXml);

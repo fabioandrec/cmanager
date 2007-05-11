@@ -39,7 +39,8 @@ var NBPACurrencyRatesProgressForm: TNBPACurrencyRatesProgressForm;
 
 implementation
 
-uses CRichtext, StrUtils, CXml, NBPACurrencyRatesConfigFormUnit;
+uses CRichtext, StrUtils, CXml, NBPACurrencyRatesConfigFormUnit,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -104,6 +105,7 @@ begin
           SetXmlAttribute('targetIso', xOut, 'PLN');
           SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
           SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+          SetXmlAttribute('type', xOut, CCURRENCYRATE_AVG);
         end;
       end;
       Result := GetStringFromDocument(xXml);
