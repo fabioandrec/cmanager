@@ -8,11 +8,16 @@ uses
 
 type
   TCCalculatorForm = class(TForm)
-    RichEditDesc: TRichEdit;
+    RichEdit: TRichEdit;
     CValue: TCCurrEdit;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure CButtonClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+  private
+    FPrecision: SmallInt;
+    FValue: Double;
+    FOperation: Char;
+    procedure FinishOperation;
+    procedure StartOperation(AKey: Char);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure WndProc(var Message: TMessage); override;
@@ -22,7 +27,7 @@ function ShowCalculator(AParent: TWinControl; APrecision: Integer; var AResult: 
 
 implementation
 
-uses DateUtils, Types;
+uses DateUtils, Types, CRichtext;
 
 {$R *.dfm}
 
@@ -30,6 +35,11 @@ function ShowCalculator(AParent: TWinControl; APrecision: Integer; var AResult: 
 begin
   Result := False;
   with TCCalculatorForm.Create(Nil) do begin
+    FPrecision := APrecision;
+    FValue := 0;
+    FOperation := ' ';
+    CValue.CurrencyStr := '';
+    CValue.Decimals := FPrecision;
     Top := AParent.ClientOrigin.Y + AParent.Height + 2;
     Left := AParent.ClientOrigin.X + 4;
     if Left + Width > Screen.Width then begin
@@ -76,14 +86,44 @@ begin
   end;
 end;
 
-procedure TCCalculatorForm.CButtonClick(Sender: TObject);
+procedure TCCalculatorForm.FormKeyPress(Sender: TObject; var Key: Char);
 begin
-  ModalResult := mrOk;
+  if (Key in ['+', '-', '*', '/']) then begin
+    FinishOperation;
+    StartOperation(Key);
+    Key := #0;
+  end else begin
+    FinishOperation;
+    Key := #0;
+  end;
 end;
 
-procedure TCCalculatorForm.FormCreate(Sender: TObject);
+procedure TCCalculatorForm.FinishOperation;
 begin
-  CValue.CurrencyStr := '';
+  if FOperation = '+' then begin
+    FValue := FValue + CValue.Value;
+  end else if FOperation = '-' then begin
+    FValue := FValue - CValue.Value;
+  end else if FOperation = '*' then begin
+    FValue := FValue * CValue.Value;
+  end else if FOperation = '/' then begin
+    FValue := FValue / CValue.Value;
+  end;
+  if FOperation <> ' ' then begin
+    AddRichText(FloatToStr(CValue.Value), RichEdit);
+    AddRichText('=', RichEdit);
+    AddRichText(CRtfSB + FloatToStr(FValue) + CRtfEB, RichEdit);
+    FOperation := ' ';
+  end else begin
+    AddRichText(FloatToStr(CValue.Value), RichEdit);
+  end;
+end;
+
+procedure TCCalculatorForm.StartOperation(AKey: Char);
+begin
+  FOperation := AKey;
+  AddRichText(AKey, RichEdit);
+  CValue.Value := 0;
 end;
 
 end.

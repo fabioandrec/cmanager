@@ -10,7 +10,9 @@ program CManager;
 {%File 'CMandf.sql'}
 
 uses
+  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
+  {$ENDIF}
   Forms,
   Windows,
   CDatabase in 'CDatabase.pas',
@@ -108,6 +110,7 @@ uses
 
 var xError, xDesc, xFilename: String;
     xProceed: Boolean;
+    xCash: Double;
 
 begin
   {$IFDEF DEBUG}
@@ -146,7 +149,9 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
+  ShowCalculator(CMainForm, 4, xCash);
+  Application.Terminate;
+        if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
         end;
         GPlugins.ScanForPlugins;

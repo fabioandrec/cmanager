@@ -14,11 +14,11 @@ object CCalculatorForm: TCCalculatorForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
   PixelsPerInch = 96
   TextHeight = 13
-  object RichEditDesc: TRichEdit
+  object RichEdit: TRichEdit
     Left = 13
     Top = 12
     Width = 172
