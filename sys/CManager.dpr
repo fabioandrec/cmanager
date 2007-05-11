@@ -10,9 +10,7 @@ program CManager;
 {%File 'CMandf.sql'}
 
 uses
-  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
-  {$ENDIF}
   Forms,
   Windows,
   CDatabase in 'CDatabase.pas',
@@ -77,9 +75,9 @@ uses
   CLoanCalculatorFormUnit in 'CLoanCalculatorFormUnit.pas' {CLoanCalculatorForm},
   CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm},
   CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame},
-  CRichtext in '.\Shared\CRichtext.pas',
-  CXml in '.\Shared\CXml.pas',
-  CTools in '.\Shared\CTools.pas',
+  CRichtext in 'Shared\CRichtext.pas',
+  CXml in 'Shared\CXml.pas',
+  CTools in 'Shared\CTools.pas',
   CHelp in 'CHelp.pas',
   CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm},
   CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm},
@@ -103,7 +101,8 @@ uses
   CPluginTypes in 'Plugins\CPluginTypes.pas',
   CUpdateCurrencyRatesFormUnit in 'CUpdateCurrencyRatesFormUnit.pas' {CUpdateCurrencyRatesForm},
   CChoosePeriodRatesHistoryFormUnit in 'CChoosePeriodRatesHistoryFormUnit.pas' {CChoosePeriodRatesHistoryForm},
-  CChartPropsFormUnit in 'CChartPropsFormUnit.pas' {CChartPropsForm};
+  CChartPropsFormUnit in 'CChartPropsFormUnit.pas' {CChartPropsForm},
+  CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm};
 
 {$R *.res}
 

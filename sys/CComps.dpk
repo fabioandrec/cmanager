@@ -35,6 +35,7 @@ requires
 contains
   CComponents in 'CComponents.pas',
   CCalendarFormUnit in 'CCalendarFormUnit.pas' {CCalendarForm},
-  IntfUIHandlers in 'IntfUIHandlers.pas';
+  IntfUIHandlers in 'IntfUIHandlers.pas',
+  CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm};
 
 end.

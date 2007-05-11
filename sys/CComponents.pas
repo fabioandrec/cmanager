@@ -138,6 +138,7 @@ type
     FOldText: string;
     FShowKSeps: boolean;
     FEditMode: boolean;
+    FWithCalculator: Boolean;
     procedure SetTextFromValue;
     function FormatIt(Value: Currency; ShowMode: boolean): string;
     function LeftStr(OrgStr: string; CharCount: smallint): string;
@@ -207,6 +208,7 @@ type
     property BevelOuter;
     property BevelInner;
     property BevelWidth;
+    property WithCalculator: Boolean read FWithCalculator write FWithCalculator;
   end;
 
   TCBrowser = class(TWebBrowser, IDocHostUIHandler)
@@ -364,7 +366,7 @@ procedure Register;
 
 implementation
 
-uses Forms, CCalendarFormUnit, DateUtils, ComObj;
+uses Forms, CCalendarFormUnit, DateUtils, ComObj, CCalculatorFormUnit;
 
 procedure Register;
 begin
@@ -730,6 +732,7 @@ begin
   FAlign := taRightJustify;
   FShowKSeps := True;
   FEditMode := False;
+  FWithCalculator := True;
   SetTextFromValue;
 end;
 
@@ -764,11 +767,11 @@ begin
 end;
 
 procedure TCCurrEdit.KeyDown(var Key: Word; Shift: TShiftState);
-var
-  txt: string;
-  tlen, cPos: integer;
-  InputParsed: Boolean;
-  DoBeep: Boolean;
+var txt: string;
+    tlen, cPos: integer;
+    InputParsed: Boolean;
+    DoBeep: Boolean;
+    xFromCalc: Double;
 begin
   if ReadOnly then Exit;
   DoBeep := False;
@@ -816,6 +819,10 @@ begin
       SelStart := cPos;
       Modified := True;
     end;
+    Key := 0;
+  end else if (Key = Ord('C')) or (Key = Ord('c')) and FWithCalculator then begin
+    ShowCalculator(Self, FDecimals, xFromCalc);
+    Value := xFromCalc;
     Key := 0;
   end;
   if DoBeep then Beep;
