@@ -52,7 +52,8 @@ begin
   with Result do begin
     Add(CFilterAllElements + '=<wszystkie elementy>');
     Add(CCashAccount + '=<konta gotówkowe>');
-    Add(CBankAccount + '=<konta bankowe>');
+    Add(CBankAccount + '=<rachunki bankowe>');
+    Add(CInvestmentAccount + '=<rachunki inwestycyjne>');
   end;
 end;
 
@@ -74,10 +75,8 @@ begin
   inherited ReloadDataobjects;
   if CStaticFilter.DataId = CFilterAllElements then begin
     xCondition := '';
-  end else if CStaticFilter.DataId = CCashAccount then begin
-    xCondition := ' where accountType = ''' + CCashAccount + '''';
-  end else if CStaticFilter.DataId = CBankAccount then begin
-    xCondition := ' where accountType = ''' + CBankAccount + '''';
+  end else begin
+    xCondition := ' where accountType = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TAccount.GetList(TAccount, AccountProxy, 'select * from account' + xCondition);
 end;

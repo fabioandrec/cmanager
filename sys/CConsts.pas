@@ -41,6 +41,7 @@ const
 
   CBankAccount = 'B';
   CCashAccount = 'C';
+  CInvestmentAccount = 'I';
 
   CScheduleTypeOnce = 'O';
   CScheduleTypeCyclic = 'C';

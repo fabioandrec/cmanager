@@ -16,11 +16,14 @@ type
     FPrecision: SmallInt;
     FValue: Double;
     FOperation: Char;
-    procedure FinishOperation;
-    procedure StartOperation(AKey: Char);
+    FWasDigit: Boolean;
+    FWasOperation: Boolean;
+    FWasError: Boolean;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure WndProc(var Message: TMessage); override;
+  public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 function ShowCalculator(AParent: TWinControl; APrecision: Integer; var AResult: Double): Boolean;
@@ -32,9 +35,11 @@ uses DateUtils, Types, CRichtext;
 {$R *.dfm}
 
 function ShowCalculator(AParent: TWinControl; APrecision: Integer; var AResult: Double): Boolean;
+var xForm: TCCalculatorForm;
 begin
   Result := False;
-  with TCCalculatorForm.Create(Nil) do begin
+  xForm := TCCalculatorForm.Create(Nil);
+  with xForm do begin
     FPrecision := APrecision;
     FValue := 0;
     FOperation := ' ';
@@ -51,9 +56,10 @@ begin
     until (ModalResult = mrOk) or (ModalResult = mrCancel);
     if ModalResult = mrOk then begin
       Result := True;
+      AResult := FValue;
     end;
-    Free;
   end;
+  xForm.Free;
 end;
 
 procedure TCCalculatorForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -87,43 +93,95 @@ begin
 end;
 
 procedure TCCalculatorForm.FormKeyPress(Sender: TObject; var Key: Char);
+var xPrevValue, xOperand: Double;
 begin
-  if (Key in ['+', '-', '*', '/']) then begin
-    FinishOperation;
-    StartOperation(Key);
-    Key := #0;
-  end else begin
-    FinishOperation;
-    Key := #0;
+  if Key in ['-', '+', '*', '/', '%'] then begin
+    FWasOperation := True;
+    if (not FWasDigit) then begin
+      FOperation := Key;
+    end else begin
+      if (FOperation = ' ') then begin
+        FOperation := Key;
+        FWasOperation := True;
+        FValue := CValue.Value;
+      end else begin
+        xPrevValue := FValue;
+        xOperand := CValue.Value;
+        try
+          if FOperation = '+' then begin
+            FValue := xPrevValue + xOperand;
+          end else if FOperation = '-' then begin
+            FValue := xPrevValue - xOperand;
+          end else if FOperation = '*' then begin
+            FValue := xPrevValue * xOperand;
+          end else if FOperation = '/' then begin
+            FValue := xPrevValue / xOperand;
+          end else if FOperation = '%' then begin
+            FValue := xPrevValue * xOperand / 100;
+          end;
+        except
+          FWasError := True;
+        end;
+        if not FWasError then begin
+          try
+            AddRichText(CRtFRA + CValue.FormatIt(xPrevValue, False) + ' ' + FOperation + ' ' + CValue.FormatIt(xOperand, False), RichEdit);
+            AddRichText(CRtFRA + '=', RichEdit);
+            AddRichText(CRtFRA + CRtfSB + CValue.FormatIt(FValue, False) + CRtfEB, RichEdit);
+            FOperation := Key;
+          except
+          end;
+        end;
+      end;
+    end;
+  end else if Key in ['='] then begin
+    FWasOperation := True;
+    if FOperation <> ' ' then begin
+      xPrevValue := FValue;
+      xOperand := CValue.Value;
+      try
+        if FOperation = '+' then begin
+          FValue := xPrevValue + xOperand;
+        end else if FOperation = '-' then begin
+          FValue := xPrevValue - xOperand;
+        end else if FOperation = '*' then begin
+          FValue := xPrevValue * xOperand;
+        end else if FOperation = '/' then begin
+          FValue := xPrevValue / xOperand;
+        end else if FOperation = '%' then begin
+          FValue := xPrevValue * xOperand / 100;
+        end;
+      except
+        FWasError := True;
+      end;
+      if not FWasError then begin
+        try
+          AddRichText(CRtFRA + CValue.FormatIt(xPrevValue, False) + ' ' + FOperation + ' ' + CValue.FormatIt(xOperand, False), RichEdit);
+          AddRichText(CRtFRA + '=', RichEdit);
+          AddRichText(CRtFRA + CRtfSB + CValue.FormatIt(FValue, False) + CRtfEB, RichEdit);
+          FOperation := ' ';
+        except
+        end;
+      end;
+    end;
+  end else if Key in ['0'..'9'] then begin
+    FWasDigit := True;
+    if FWasOperation then begin
+      FWasOperation := False;
+      CValue.Value := 0;
+    end;
   end;
+  RichEdit.SelStart := MaxInt;
+  SendMessage(RichEdit.Handle, EM_SCROLLCARET, 0, 0);
+  FWasError := False;
+  inherited;
 end;
 
-procedure TCCalculatorForm.FinishOperation;
+constructor TCCalculatorForm.Create(AOwner: TComponent);
 begin
-  if FOperation = '+' then begin
-    FValue := FValue + CValue.Value;
-  end else if FOperation = '-' then begin
-    FValue := FValue - CValue.Value;
-  end else if FOperation = '*' then begin
-    FValue := FValue * CValue.Value;
-  end else if FOperation = '/' then begin
-    FValue := FValue / CValue.Value;
-  end;
-  if FOperation <> ' ' then begin
-    AddRichText(FloatToStr(CValue.Value), RichEdit);
-    AddRichText('=', RichEdit);
-    AddRichText(CRtfSB + FloatToStr(FValue) + CRtfEB, RichEdit);
-    FOperation := ' ';
-  end else begin
-    AddRichText(FloatToStr(CValue.Value), RichEdit);
-  end;
-end;
-
-procedure TCCalculatorForm.StartOperation(AKey: Char);
-begin
-  FOperation := AKey;
-  AddRichText(AKey, RichEdit);
-  CValue.Value := 0;
+  inherited Create(AOwner);
+  FWasDigit := False;
+  FWasOperation := False;
+  FWasError := False;
 end;
 
 end.

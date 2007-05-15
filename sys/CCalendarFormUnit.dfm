@@ -5,9 +5,9 @@ object CCalendarForm: TCCalendarForm
   AutoSize = True
   BorderStyle = bsNone
   Caption = 'CCalendarForm'
-  ClientHeight = 168
+  ClientHeight = 164
   ClientWidth = 171
-  Color = clWindow
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -18,18 +18,9 @@ object CCalendarForm: TCCalendarForm
   OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
-  object Bevel: TBevel
-    Left = 0
-    Top = 0
-    Width = 171
-    Height = 3
-    Align = alTop
-    Shape = bsTopLine
-    Style = bsRaised
-  end
   object CButton: TCButton
     Left = 55
-    Top = 144
+    Top = 140
     Width = 58
     Height = 24
     Cursor = crHandPoint
@@ -39,18 +30,33 @@ object CCalendarForm: TCCalendarForm
     Framed = False
     Caption = 'Dzisiaj'
     OnClick = CButtonClick
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+  end
+  object Bevel: TBevel
+    Left = 0
+    Top = 0
+    Width = 171
+    Height = 7
+    Align = alTop
+    Shape = bsSpacer
+    Style = bsRaised
   end
   object MonthCalendar: TMonthCalendar
     Left = 0
-    Top = 3
+    Top = 7
     Width = 171
     Height = 136
     Align = alTop
     AutoSize = True
-    CalColors.TitleBackColor = clBtnShadow
-    CalColors.MonthBackColor = clWindow
+    CalColors.BackColor = clBtnFace
+    CalColors.MonthBackColor = clBtnFace
     CalColors.TrailingTextColor = clBtnFace
-    Date = 38974.592934097220000000
+    Date = 38974.342490798610000000
     ShowToday = False
     ShowTodayCircle = False
     TabOrder = 0

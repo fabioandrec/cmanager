@@ -23,9 +23,9 @@ type
     EditNumber: TEdit;
     CStaticBank: TCStatic;
     Label4: TLabel;
-    procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ComboBoxTypeChange(Sender: TObject);
   private
     FmovementCount: Integer;
   protected
@@ -58,17 +58,6 @@ begin
   end;
 end;
 
-procedure TCAccountForm.ComboBoxTypeChange(Sender: TObject);
-begin
-  if ComboBoxType.ItemIndex = 0 then begin
-    Height := 390;
-    GroupBoxBank.Visible := False;
-  end else begin
-    Height := 516;
-    GroupBoxBank.Visible := True;
-  end;
-end;
-
 procedure TCAccountForm.FillForm;
 var xCashPoint: TCashPoint;
 begin
@@ -77,18 +66,21 @@ begin
     SimpleRichText(description, RichEditDesc);
     if accountType = CBankAccount then begin
       ComboBoxType.ItemIndex := 1;
+    end else if accountType = CInvestmentAccount then begin
+      ComboBoxType.ItemIndex := 2;
     end else begin
       ComboBoxType.ItemIndex := 0;
     end;
-    ComboBoxTypeChange(ComboBoxType);
     FmovementCount := GetMovementCount(id);
     if (Operation = coAdd) or (FmovementCount = 0) then begin
       LabelCash.Caption := 'Œrodki pocz¹tkowe';
       CCurrEditCash.Value := initialBalance;
+      ComboBoxType.Enabled := True;
     end else begin
       LabelCash.Caption := 'Dostêpne œrodki';
       CCurrEditCash.Enabled := False;
       CCurrEditCash.Value := cash;
+      ComboBoxType.Enabled := False;
     end;
     if idCashPoint <> CEmptyDataGid then begin
       CStaticBank.DataId := idCashPoint;
@@ -97,6 +89,7 @@ begin
       xCashPoint.Free;
     end;
     EditNumber.Text := accountNumber;
+    ComboBoxTypeChange(Nil);
   end;
 end;
 
@@ -104,7 +97,7 @@ procedure TCAccountForm.FormCreate(Sender: TObject);
 begin
   inherited;
   ComboBoxType.ItemIndex := 0;
-  ComboBoxTypeChange(ComboBoxType);
+  ComboBoxTypeChange(Nil);
 end;
 
 function TCAccountForm.GetDataobjectClass: TDataObjectClass;
@@ -120,14 +113,17 @@ begin
     description := RichEditDesc.Text;
     if ComboBoxType.ItemIndex = 0 then begin
       accountType := CCashAccount;
-    end else begin
+    end else if ComboBoxType.ItemIndex = 1 then begin
       accountType := CBankAccount;
+    end else begin
+      accountType := CInvestmentAccount;
     end;
     if (Operation = coAdd) or (FmovementCount = 0) then begin
       cash := CCurrEditCash.Value;
       initialBalance := CCurrEditCash.Value;
     end;
     idCashPoint := CStaticBank.DataId;
+    idCurrencyDef := CCurrencyDefGid_PLN;
     accountNumber := EditNumber.Text;
   end;
 end;
@@ -140,6 +136,14 @@ end;
 function TCAccountForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCAccountsFrame;
+end;
+
+procedure TCAccountForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  Label3.Enabled := ComboBoxType.ItemIndex <> 0;
+  EditNumber.Enabled := ComboBoxType.ItemIndex <> 0;
+  Label4.Enabled := ComboBoxType.ItemIndex <> 0;
+  CStaticBank.Enabled := ComboBoxType.ItemIndex <> 0;
 end;
 
 end.

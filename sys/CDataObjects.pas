@@ -106,6 +106,7 @@ type
     FinitialBalance: Currency;
     FaccountNumber: TAccountNumber;
     FidCashPoint: TDataGid;
+    FidCurrencyDef: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure Setcash(const Value: Currency);
@@ -113,6 +114,7 @@ type
     procedure SetaccountNumber(const Value: TAccountNumber);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetinitialBalance(const Value: Currency);
+    procedure SetidCurrencyDef(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -131,6 +133,7 @@ type
     property initialBalance: Currency read FinitialBalance write SetinitialBalance;
     property accountNumber: TAccountNumber read FaccountNumber write SetaccountNumber;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
   end;
 
   TProduct = class(TDataObject)
@@ -460,26 +463,19 @@ var CashPointProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
 
-const CDatafileTables: array[0..15] of string =
+const CDatafileTables: array[0..16] of string =
             ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
-             'cmanagerParams', 'movementLimit', 'currencyDef');
+             'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
-      CCurrencyDefIso_PL = 'PLN';
 
 procedure InitializeProxies;
-function IsKnownCurrency(ADataGid: TDataGid): Boolean;
 
 implementation
 
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences;
-
-function IsKnownCurrency(ADataGid: TDataGid): Boolean;
-begin
-  Result := CCurrencyDefGid_PLN = ADataGid;
-end;
 
 procedure InitializeProxies;
 begin
@@ -588,6 +584,7 @@ begin
     FinitialBalance := FieldByName('initialBalance').AsCurrency;
     FaccountNumber := FieldByName('accountNumber').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
   end;
 end;
 
@@ -634,6 +631,7 @@ begin
     AddField('initialBalance', CurrencyToDatabase(FinitialBalance), False, 'account');
     AddField('accountNumber', FaccountNumber, True, 'account');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'account');
+    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'account');
   end;
 end;
 
@@ -2000,6 +1998,8 @@ begin
       '(idSourceCurrencyDef = ' + DataGidToDatabase(AId) + ') or ' +
       '(idTargetCurrencyDef = ' + DataGidToDatabase(AId) + ')', 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ kursy';
+  end else if GDataProvider.GetSqlInteger('select count(*) from account where idCurrencyDef = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ konta';
   end;
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ waluty, gdy¿ ' + xText, '');
@@ -2230,6 +2230,14 @@ begin
     Result := CCurrencyRateTypeBuyDesc;
   end else begin
     Result := CCurrencyRateTypeAverageDesc;
+  end;
+end;
+
+procedure TAccount.SetidCurrencyDef(const Value: TDataGid);
+begin
+  if FidCurrencyDef <> Value then begin
+    FidCurrencyDef := Value;
+    SetState(msModified);
   end;
 end;
 

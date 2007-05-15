@@ -6,7 +6,7 @@ object CCalculatorForm: TCCalculatorForm
   Caption = 'CCalendarForm'
   ClientHeight = 125
   ClientWidth = 194
-  Color = clWindow
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -16,6 +16,9 @@ object CCalculatorForm: TCCalculatorForm
   OldCreateOrder = False
   OnKeyDown = FormKeyDown
   OnKeyPress = FormKeyPress
+  DesignSize = (
+    194
+    125)
   PixelsPerInch = 96
   TextHeight = 13
   object RichEdit: TRichEdit
@@ -24,9 +27,11 @@ object CCalculatorForm: TCCalculatorForm
     Width = 172
     Height = 69
     TabStop = False
+    Anchors = [akLeft, akTop, akBottom]
     BevelKind = bkTile
     BorderStyle = bsNone
     ReadOnly = True
+    ScrollBars = ssVertical
     TabOrder = 0
   end
   object CValue: TCCurrEdit
@@ -34,6 +39,7 @@ object CCalculatorForm: TCCalculatorForm
     Top = 91
     Width = 173
     Height = 21
+    Anchors = [akLeft, akTop, akRight, akBottom]
     BorderStyle = bsNone
     TabOrder = 1
     Decimals = 2

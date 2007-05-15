@@ -9,6 +9,18 @@ create table cashPoint (
   constraint ck_cashpointType check (cashpointType in ('I', 'O', 'W', 'X'))
 );
 
+create table currencyDef (
+  idcurrencyDef uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  name varchar(40) not null,
+  symbol varchar(40) not null,
+  iso varchar(40),
+  description varchar(200),
+  isBase bit not null,
+  primary key (idcurrencyDef)
+);
+
 create table account (
   idAccount uniqueidentifier not null,
   created datetime not null,
@@ -20,9 +32,11 @@ create table account (
   initialBalance money not null,
   accountNumber varchar(50),
   idCashPoint uniqueidentifier,
+  idCurrencyDef uniqueidentifier not null,
   primary key (idAccount),
-  constraint ck_accountType check (accountType in ('C', 'B')),
-  constraint fk_accountCashPoint foreign key (idCashPoint) references cashPoint (idCashPoint)
+  constraint ck_accountType check (accountType in ('C', 'B', 'I')),
+  constraint fk_accountCashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
+  constraint fk_accountCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
 create table product (
@@ -197,18 +211,6 @@ create table movementLimit (
   constraint ck_boundaryConditionlimit check (boundarycondition in ('=', '<', '>', '<=', '>=')),  
   constraint ck_sumTypelimit check (sumType in ('I', 'O', 'B')),  
   constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter)
-);
-
-create table currencyDef (
-  idcurrencyDef uniqueidentifier not null,
-  created datetime not null,
-  modified datetime,
-  name varchar(40) not null,
-  symbol varchar(40) not null,
-  iso varchar(40),
-  description varchar(200),
-  isBase bit not null,
-  primary key (idcurrencyDef)
 );
 
 create table currencyRate (

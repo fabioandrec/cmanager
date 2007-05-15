@@ -110,7 +110,6 @@ uses
 
 var xError, xDesc, xFilename: String;
     xProceed: Boolean;
-    xCash: Double;
 
 begin
   {$IFDEF DEBUG}
@@ -149,8 +148,6 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  ShowCalculator(CMainForm, 4, xCash);
-  Application.Terminate;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
         end;

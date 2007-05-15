@@ -40,6 +40,7 @@ type
     property Enabled;
     property OnClick;
     property Color;
+    property Font;
   end;
 
   TCImage = class(TGraphicControl)
@@ -140,7 +141,6 @@ type
     FEditMode: boolean;
     FWithCalculator: Boolean;
     procedure SetTextFromValue;
-    function FormatIt(Value: Currency; ShowMode: boolean): string;
     function LeftStr(OrgStr: string; CharCount: smallint): string;
     function RightStr(OrgStr: string; CharCount: smallint): string;
     function InsertChars(OrgStr, InsChars: string; CharPos: smallint): string;
@@ -158,6 +158,7 @@ type
     procedure DoEnter; override;
     procedure DoExit; override;
   public
+    function FormatIt(AValue: Double; ShowMode: boolean): string;
     constructor Create(AOwner: TComponent); override;
     procedure CreateParams(var Params: TCreateParams); override;
     procedure Update; override;
@@ -167,6 +168,7 @@ type
   published
     property AutoSelect;
     property AutoSize;
+    property Anchors;
     property BorderStyle;
     property Color;
     property Ctl3D;
@@ -820,7 +822,7 @@ begin
       Modified := True;
     end;
     Key := 0;
-  end else if (Key = Ord('C')) or (Key = Ord('c')) and FWithCalculator then begin
+  end else if ((Key = Ord('C')) or (Key = Ord('c'))) and FWithCalculator then begin
     ShowCalculator(Self, FDecimals, xFromCalc);
     Value := xFromCalc;
     Key := 0;
@@ -1055,7 +1057,7 @@ begin
   result := CurrToStr(FValue);
 end;
 
-function TCCurrEdit.FormatIt(Value: Currency; ShowMode: boolean): string;
+function TCCurrEdit.FormatIt(AValue: Double; ShowMode: boolean): string;
 var
   decimals, mask: string;
   x: smallint;
@@ -1067,7 +1069,7 @@ begin
     decimals := decimals + '0';
   mask := mask + decimals;
   try
-    result := FormatCurr(mask, Value);
+    result := FormatCurr(mask, AValue);
     if not ShowMode then FValue := StrToCurr(result);
   except
     result := '0' + DecimalSeparator + decimals;
@@ -1075,7 +1077,7 @@ begin
       FValue := 0;
       SetTextFromValue;
     end;
-    raise TCEditError.Create('"' + FloatToStr(Value) + '" is not a valid value');
+    raise TCEditError.Create('"' + FloatToStr(AValue) + '" is not a valid value');
   end;
 end;
 

@@ -73,6 +73,7 @@ begin
       name := 'konto ' + IntToStr(xCount);
       description := name;
       initialBalance := 0;
+      idCurrencyDef := CCurrencyDefGid_PLN;
       cash := 0;
     end;
   end;

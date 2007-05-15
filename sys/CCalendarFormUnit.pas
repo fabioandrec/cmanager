@@ -8,9 +8,9 @@ uses
 
 type
   TCCalendarForm = class(TForm)
-    Bevel: TBevel;
     CButton: TCButton;
     MonthCalendar: TMonthCalendar;
+    Bevel: TBevel;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SpeedButton1Click(Sender: TObject);
     procedure MonthCalendarDblClick(Sender: TObject);

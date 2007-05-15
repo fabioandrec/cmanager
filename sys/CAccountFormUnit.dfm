@@ -1,15 +1,15 @@
 inherited CAccountForm: TCAccountForm
-  Left = 269
-  Top = 192
+  Left = 405
+  Top = 223
   Caption = 'Konto'
-  ClientHeight = 489
+  ClientHeight = 479
   ClientWidth = 370
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 370
-    Height = 448
+    Height = 438
     object GroupBoxAccountType: TGroupBox
       Left = 16
       Top = 16
@@ -30,7 +30,8 @@ inherited CAccountForm: TCAccountForm
         OnChange = ComboBoxTypeChange
         Items.Strings = (
           'Got'#243'wkowe'
-          'Bankowe')
+          'Rachunek bankowy'
+          'Rachunek inwestycyjny')
       end
     end
     object GroupBox2: TGroupBox
@@ -94,6 +95,7 @@ inherited CAccountForm: TCAccountForm
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
+        WithCalculator = True
       end
     end
     object GroupBoxBank: TGroupBox
@@ -104,25 +106,25 @@ inherited CAccountForm: TCAccountForm
       Caption = ' Dane dodatkowe '
       TabOrder = 2
       object Label3: TLabel
-        Left = 19
+        Left = 20
         Top = 32
-        Width = 61
+        Width = 79
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Numer konta'
+        Caption = 'Numer rachunku'
       end
       object Label4: TLabel
-        Left = 21
+        Left = 40
         Top = 67
-        Width = 115
+        Width = 58
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Bank prowadz'#261'cy konto'
+        Caption = 'Prowadz'#261'cy'
       end
       object EditNumber: TEdit
-        Left = 88
+        Left = 108
         Top = 28
-        Width = 225
+        Width = 205
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -130,27 +132,27 @@ inherited CAccountForm: TCAccountForm
         TabOrder = 0
       end
       object CStaticBank: TCStatic
-        Left = 144
+        Left = 108
         Top = 64
-        Width = 169
+        Width = 205
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz bank z listy>'
+        Caption = '<wybierz prowadz'#261'cego z listy>'
         Color = clWindow
         ParentColor = False
         TabOrder = 1
         TabStop = True
         Transparent = False
-        TextOnEmpty = '<wybierz bank z listy>'
+        TextOnEmpty = '<wybierz prowadz'#261'cego z listy>'
         OnGetDataId = CStaticBankGetDataId
         HotTrack = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 448
+    Top = 438
     Width = 370
     inherited BitBtnOk: TBitBtn
       Left = 193
