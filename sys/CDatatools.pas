@@ -19,6 +19,7 @@ function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolea
 procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
 procedure UpdateCurrencyRates(ARatesText: String);
+procedure ReloadCurrencyCache;
 
 implementation
 
@@ -301,6 +302,19 @@ begin
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut', xError);
   end;
+end;
+
+procedure ReloadCurrencyCache;
+var xC: TDataObjectList;
+    xCount: Integer;
+    xCur: TCurrencyDef;
+begin
+  xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
+  for xCount := 0 to xC.Count - 1 do begin
+    xCur := TCurrencyDef(xC.Items[xCount]);
+    GCurrencyCache.Change(xCur.id, xCur.symbol);
+  end;
+  xC.Free;
 end;
 
 end.

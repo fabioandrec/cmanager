@@ -242,6 +242,7 @@ end;
 procedure TCMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  CStaticPeriod.DataId := '1';
   FTreeHelper := TTreeObjectList.Create(True);
   UpdateCustomPeriod;
   CDateTimePerStart.Value := GWorkDate;

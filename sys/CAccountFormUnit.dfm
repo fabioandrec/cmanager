@@ -1,15 +1,15 @@
 inherited CAccountForm: TCAccountForm
-  Left = 405
-  Top = 223
+  Left = 418
+  Top = 150
   Caption = 'Konto'
-  ClientHeight = 479
+  ClientHeight = 530
   ClientWidth = 370
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 370
-    Height = 438
+    Height = 489
     object GroupBoxAccountType: TGroupBox
       Left = 16
       Top = 16
@@ -38,7 +38,7 @@ inherited CAccountForm: TCAccountForm
       Left = 16
       Top = 104
       Width = 337
-      Height = 209
+      Height = 241
       Caption = ' Dane konta '
       TabOrder = 1
       object Label1: TLabel
@@ -59,11 +59,19 @@ inherited CAccountForm: TCAccountForm
       end
       object LabelCash: TLabel
         Left = 45
-        Top = 172
+        Top = 208
         Width = 91
         Height = 13
         Alignment = taRightJustify
         Caption = #346'rodki pocz'#261'tkowe'
+      end
+      object Label5: TLabel
+        Left = 59
+        Top = 171
+        Width = 77
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta '#347'rodk'#243'w'
       end
       object EditName: TEdit
         Left = 56
@@ -86,21 +94,40 @@ inherited CAccountForm: TCAccountForm
       end
       object CCurrEditCash: TCCurrEdit
         Left = 144
-        Top = 168
+        Top = 204
         Width = 169
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 2
+        TabOrder = 3
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
+      object CStaticCurrency: TCStatic
+        Left = 144
+        Top = 168
+        Width = 169
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz walut'#281' z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 2
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz walut'#281' z listy>'
+        OnGetDataId = CStaticCurrencyGetDataId
+        OnChanged = CStaticCurrencyChanged
+        HotTrack = True
+      end
     end
     object GroupBoxBank: TGroupBox
       Left = 16
-      Top = 328
+      Top = 360
       Width = 337
       Height = 105
       Caption = ' Dane dodatkowe '
@@ -152,7 +179,7 @@ inherited CAccountForm: TCAccountForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 438
+    Top = 489
     Width = 370
     inherited BitBtnOk: TBitBtn
       Left = 193

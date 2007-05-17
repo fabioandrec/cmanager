@@ -105,7 +105,7 @@ var xNode: IXMLDOMNode;
 begin
   xNode := IXMLDOMNode(RatesList.GetNodeData(Node)^);
   if Column = 2 then begin
-    CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), False, 4);
+    CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), '', False, 4);
   end else if Column = 1 then begin
     CellText := '';
     xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
@@ -138,7 +138,7 @@ begin
   xNode := IXMLDOMNode(RatesList.GetNodeData(Node)^);
   HintText := IntToStr(StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0)) + ' ' +
               GetXmlAttribute('sourceName', xNode, '') + ' kosztuje ' +
-              CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), False, 4) + ' ' +
+              CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), '', False, 4) + ' ' +
               GetXmlAttribute('targetName', xNode, '');
   LineBreakStyle := hlbForceMultiLine;
 end;
@@ -178,7 +178,7 @@ begin
   end else if ATemplate = '@ilosc@' then begin
     Result := IntToStr(FQuantity);
   end else if ATemplate = '@kurs@' then begin
-    Result := CurrencyToString(FCurRate, False, 4);
+    Result := CurrencyToString(FCurRate, '', False, 4);
   end;
 end;
 

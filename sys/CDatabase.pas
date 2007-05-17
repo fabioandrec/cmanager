@@ -139,6 +139,7 @@ type
     class function FindByCondition(ADataProxy: TDataProxy; AACondition: String; AIsStatic: Boolean): TDataObject;
     procedure ReloadObject;
     class function GetList(AClass: TDataObjectClass; ADataProxy: TDataProxy; ASql: String): TDataObjectList;
+    class function GetAllObjects(ADataProxy: TDataProxy): TDataObjectList;
     destructor Destroy; override;
     procedure UpdateFieldList; virtual;
     procedure FromDataset(ADataset: TADOQuery); virtual;
@@ -214,7 +215,7 @@ var GDataProvider: TDataProvider;
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
-function CurrencyToString(ACurrency: Currency; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
+function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
@@ -232,7 +233,7 @@ function DataGidToDatabase(ADataGid: TDataGid): String;
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
-     CPreferences, CTools, CAdox;
+     CPreferences, CTools, CAdox, CDataObjects;
 
 function DataGidToDatabase(ADataGid: TDataGid): String;
 begin
@@ -247,10 +248,16 @@ begin
   Result := CurrToStr(ACurrency, xFormat);
 end;
 
-function CurrencyToString(ACurrency: Currency; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
+function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
+var xCurSymbol: String;
 begin
   if AWithSymbol then begin
-    Result := CurrToStrF(ACurrency, ffCurrency, ADecimal);
+    if ACurrencyId = '' then begin
+      xCurSymbol := GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN);
+    end else begin
+      xCurSymbol := GCurrencyCache.GetSymbol(ACurrencyId);
+    end;
+    Result := CurrToStrF(ACurrency, ffNumber, ADecimal) + ' ' + xCurSymbol;
   end else begin
     Result := CurrToStrF(ACurrency, ffNumber, ADecimal);
   end;
@@ -941,6 +948,11 @@ begin
     Fcreated := FieldByName('created').AsDateTime;
     Fmodified := FieldByName('modified').AsDateTime;
   end;
+end;
+
+class function TDataObject.GetAllObjects(ADataProxy: TDataProxy): TDataObjectList;
+begin
+  Result := GetList(Self, ADataProxy, 'select * from ' + ADataProxy.TableName)
 end;
 
 function TDataObject.GetColumnImage(AColumnIndex: Integer): Integer;

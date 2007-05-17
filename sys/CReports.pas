@@ -2710,12 +2710,12 @@ begin
     Add('<table class="base" colspan="6">');
     Add('<tr class="base">');
     Add('<td class="center" width="20%">' + CurrencyToString(xL.totalCash) + '</td>');
-    Add('<td class="center" width="10%">' + CurrencyToString(xL.taxAmount, False, 4) + '%</td>');
+    Add('<td class="center" width="10%">' + CurrencyToString(xL.taxAmount, '', False, 4) + '%</td>');
     Add('<td class="center" width="15%">' + CurrencyToString(xL.otherTaxes) + '</td>');
     Add('<td class="center" width="15%">' + IntToStr(xL.periods) + '</td>');
     Add('<td class="center" width="15%">' + xPaymentType + '</td>');
     Add('<td class="center" width="15%">' + xPaymentPeriod + '</td>');
-    Add('<td class="center" width="10%">' + CurrencyToString(xL.yearRate, False, 4) + '%</td>');
+    Add('<td class="center" width="10%">' + CurrencyToString(xL.yearRate, '', False, 4) + '%</td>');
     Add('</tr>');
     Add('</table>');
     Add('<hr>');

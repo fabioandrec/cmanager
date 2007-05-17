@@ -299,7 +299,7 @@ inherited CMovementFrame: TCMovementFrame
       TabOrder = 1
       TabStop = True
       Transparent = False
-      DataId = 'T'
+      DataId = '1'
       TextOnEmpty = '<tylko dzi'#347'>'
       OnGetDataId = CStaticPeriodGetDataId
       OnChanged = CStaticFilterChanged

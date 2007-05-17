@@ -132,6 +132,7 @@ begin
       xProceed := True;
     end;
     if xProceed then begin
+      ReloadCurrencyCache;
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;
       end;

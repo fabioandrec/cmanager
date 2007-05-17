@@ -23,9 +23,14 @@ type
     EditNumber: TEdit;
     CStaticBank: TCStatic;
     Label4: TLabel;
+    Label5: TLabel;
+    CStaticCurrency: TCStatic;
     procedure FormCreate(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ComboBoxTypeChange(Sender: TObject);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String;
+      var AAccepted: Boolean);
+    procedure CStaticCurrencyChanged(Sender: TObject);
   private
     FmovementCount: Integer;
   protected
@@ -34,12 +39,14 @@ type
     procedure FillForm; override;
     function CanAccept: Boolean; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
+    procedure InitializeForm; override;
   end;
 
 implementation
 
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
-  CCashpointsFrameUnit, CConsts, CAccountsFrameUnit, CRichtext;
+  CCashpointsFrameUnit, CConsts, CAccountsFrameUnit, CRichtext,
+  CCurrencydefFormUnit, CCurrencydefFrameUnit;
 
 {$R *.dfm}
 
@@ -71,16 +78,21 @@ begin
     end else begin
       ComboBoxType.ItemIndex := 0;
     end;
+    CStaticCurrency.DataId := idCurrencyDef;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
+    CCurrEditCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     FmovementCount := GetMovementCount(id);
     if (Operation = coAdd) or (FmovementCount = 0) then begin
       LabelCash.Caption := 'Œrodki pocz¹tkowe';
       CCurrEditCash.Value := initialBalance;
       ComboBoxType.Enabled := True;
+      CStaticCurrency.Enabled := True;
     end else begin
       LabelCash.Caption := 'Dostêpne œrodki';
       CCurrEditCash.Enabled := False;
       CCurrEditCash.Value := cash;
       ComboBoxType.Enabled := False;
+      CStaticCurrency.Enabled := False;
     end;
     if idCashPoint <> CEmptyDataGid then begin
       CStaticBank.DataId := idCashPoint;
@@ -123,7 +135,7 @@ begin
       initialBalance := CCurrEditCash.Value;
     end;
     idCashPoint := CStaticBank.DataId;
-    idCurrencyDef := CCurrencyDefGid_PLN;
+    idCurrencyDef := CStaticCurrency.DataId;
     accountNumber := EditNumber.Text;
   end;
 end;
@@ -144,6 +156,26 @@ begin
   EditNumber.Enabled := ComboBoxType.ItemIndex <> 0;
   Label4.Enabled := ComboBoxType.ItemIndex <> 0;
   CStaticBank.Enabled := ComboBoxType.ItemIndex <> 0;
+end;
+
+procedure TCAccountForm.InitializeForm;
+begin
+  inherited InitializeForm;
+  if Operation = coAdd then begin
+    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CStaticCurrency.DataId, False)).GetElementText;
+    CCurrEditCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+  end;
+end;
+
+procedure TCAccountForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
+end;
+
+procedure TCAccountForm.CStaticCurrencyChanged(Sender: TObject);
+begin
+  CCurrEditCash.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
 end;
 
 end.

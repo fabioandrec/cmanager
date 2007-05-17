@@ -80,9 +80,14 @@ uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math;
 
 procedure SendMessageToFrames(AFrameClass: TCBaseFrameClass; AMsg: Cardinal; AWParam: Cardinal; ALParam: Cardinal);
 var xCount: Integer;
+    xSend: Boolean;
 begin
   for xCount := 0 to GFrames.Count - 1 do begin
-    if GFrames.Items[xCount].InheritsFrom(AFrameClass) then begin
+    xSend := AFrameClass = Nil;
+    if not xSend then begin
+      xSend := GFrames.Items[xCount].InheritsFrom(AFrameClass);
+    end;
+    if xSend then begin
        TCBaseFrame(GFrames.Items[xCount]).Perform(AMsg, AWParam, ALParam);
     end;
   end;

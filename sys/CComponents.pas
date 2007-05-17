@@ -140,6 +140,7 @@ type
     FShowKSeps: boolean;
     FEditMode: boolean;
     FWithCalculator: Boolean;
+    FCurrencyId: String;
     procedure SetTextFromValue;
     function LeftStr(OrgStr: string; CharCount: smallint): string;
     function RightStr(OrgStr: string; CharCount: smallint): string;
@@ -165,6 +166,8 @@ type
     function AsCurrency: Currency;
     function AsFloat: double;
     function AsString: string;
+    destructor Destroy; override;
+    procedure SetCurrencyDef(AId, ASymbol: String);
   published
     property AutoSelect;
     property AutoSize;
@@ -211,6 +214,7 @@ type
     property BevelInner;
     property BevelWidth;
     property WithCalculator: Boolean read FWithCalculator write FWithCalculator;
+    property CurrencyId: String read FCurrencyId write FCurrencyId;
   end;
 
   TCBrowser = class(TWebBrowser, IDocHostUIHandler)
@@ -363,6 +367,9 @@ type
   end;
 
 function GetCurrencySymbol: string;
+procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String);
+
+var CurrencyComponents: TObjectList;
 
 procedure Register;
 
@@ -735,7 +742,13 @@ begin
   FShowKSeps := True;
   FEditMode := False;
   FWithCalculator := True;
+  FCurrencyId := '';
   SetTextFromValue;
+  if not (csDesigning in ComponentState) then begin
+    if CurrencyComponents <> Nil then begin
+      CurrencyComponents.Add(Self);
+    end;
+  end;
 end;
 
 procedure TCCurrEdit.CreateParams(var Params: TCreateParams);
@@ -1802,5 +1815,37 @@ begin
   end;
 end;
 
+destructor TCCurrEdit.Destroy;
+begin
+  if not (csDesigning in ComponentState) then begin
+    if CurrencyComponents <> Nil then begin
+      CurrencyComponents.Remove(Self);
+    end;
+  end;
+  inherited Destroy;
+end;
+
+procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String);
+var xCount: Integer;
+    xCur: TCCurrEdit;
+begin
+  for xCount := 0 to CurrencyComponents.Count - 1 do begin
+    xCur := TCCurrEdit(CurrencyComponents.Items[xCount]);
+    if xCur.CurrencyId = ACurrencyId then begin
+      xCur.CurrencyStr := ACurrencySymbol;
+    end;
+  end;
+end;
+
+procedure TCCurrEdit.SetCurrencyDef(AId, ASymbol: String);
+begin
+  FCurrencyId := AId;
+  CurrencyStr := ASymbol;
+end;
+
+initialization
+  CurrencyComponents := TObjectList.Create(False);
+finalization
+  FreeAndNil(CurrencyComponents);
 end.
 

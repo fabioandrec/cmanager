@@ -22,7 +22,7 @@ type
 implementation
 
 uses CSettings, CBaseFrameUnit, CConsts, CComponents, CTools, DateUtils,
-  CDatabase, CPreferences, Math;
+  CDatabase, CPreferences, Math, CDataObjects;
 
 {$R *.dfm}
 
@@ -68,6 +68,8 @@ begin
       TCStatic(Components[xCount]).Transparent := False;
     end else if Components[xCount].InheritsFrom(TRichEdit) then begin
       TRichEdit(Components[xCount]).Font.Name := 'Microsoft Sans Serif';
+    end else if Components[xCount].InheritsFrom(TCCurrEdit) then begin
+      TCCurrEdit(Components[xCount]).CurrencyId := CCurrencyDefGid_PLN;
     end;
   end;
 end;

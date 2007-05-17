@@ -2,7 +2,7 @@ unit CDataObjects;
 
 interface
 
-uses CDatabase, SysUtils, AdoDb, Classes, CConsts, CComponents, Math;
+uses CDatabase, SysUtils, AdoDb, Classes, CConsts, CComponents, Math, Contnrs;
 
 type
   TBaseName = string[40];
@@ -34,6 +34,7 @@ type
 
   TCurrencyDef = class(TDataObject)
   private
+    FpreviousSymbol: TBaseName;
     Fname: TBaseName;
     Fsymbol: TBaseName;
     Fiso: TBaseName;
@@ -52,6 +53,8 @@ type
     function GetElementHint(AColumnIndex: Integer): String; override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class function FindByIso(AIso: TBaseName): TCurrencyDef;
+    constructor Create(AStatic: Boolean); override;
+    procedure AfterPost; override;
   published
     property name: TBaseName read Fname write Setname;
     property symbol: TBaseName read Fsymbol write Setsymbol;
@@ -448,6 +451,29 @@ type
     property sumType: TBaseEnumeration read FsumType write SetsumType;
   end;
 
+  TCurrCacheItem = class(TObject)
+  private
+    FCurrI: String;
+    FCurrS: String;
+    procedure SetCurrS(const Value: String);
+  public
+    constructor Create(AId, ASymbol: String);
+  published
+    property CurrS: String read FCurrS write SetCurrS;
+  end;
+
+  TCurrCache = class(TObjectList)
+  private
+    function GetItems(AIndex: Integer): TCurrCacheItem;
+    procedure SetItems(AIndex: Integer; const Value: TCurrCacheItem);
+    function GetById(AId: String): TCurrCacheItem;
+  public
+    procedure Change(AId, ASymbol: String);
+    function GetSymbol(AId: String): String;
+    property Items[AIndex: Integer]: TCurrCacheItem read GetItems write SetItems;
+    property ById[AId: String]: TCurrCacheItem read GetById;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -462,6 +488,7 @@ var CashPointProxy: TDataProxy;
     CurrencyRateProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
+    GCurrencyCache: TCurrCache;
 
 const CDatafileTables: array[0..16] of string =
             ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
@@ -475,7 +502,7 @@ procedure InitializeProxies;
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences;
+uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
 
 procedure InitializeProxies;
 begin
@@ -1988,6 +2015,14 @@ begin
   end;
 end;
 
+procedure TCurrencyDef.AfterPost;
+begin
+  if Fsymbol <> FpreviousSymbol then begin
+    GCurrencyCache.Change(id, symbol);
+  end;
+  inherited AfterPost;
+end;
+
 class function TCurrencyDef.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
@@ -2007,6 +2042,12 @@ begin
   end;
 end;
 
+constructor TCurrencyDef.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FpreviousSymbol := '';
+end;
+
 class function TCurrencyDef.FindByIso(AIso: TBaseName): TCurrencyDef;
 begin
   Result := TCurrencyDef(TCurrencyDef.FindByCondition(CurrencyDefProxy, 'select * from currencyDef where iso = ''' + AIso + '''', False));
@@ -2019,6 +2060,7 @@ begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
     Fsymbol := FieldByName('symbol').AsString;
+    FpreviousSymbol := Fsymbol;
     Fiso := FieldByName('iso').AsString;
     FisBase := FieldByName('isBase').AsBoolean;
   end;
@@ -2241,4 +2283,70 @@ begin
   end;
 end;
 
+constructor TCurrCacheItem.Create(AId, ASymbol: String);
+begin
+  inherited Create;
+  FCurrI := AId;
+  FCurrS := ASymbol;
+end;
+
+procedure TCurrCacheItem.SetCurrS(const Value: String);
+begin
+  if FCurrS <> Value then begin
+    FCurrS := Value;
+    SetCurrencySymbol(FCurrI, FCurrS);
+    SendMessageToFrames(Nil, WM_MUSTREPAINT, 0, 0);
+  end;
+end;
+
+procedure TCurrCache.Change(AId, ASymbol: String);
+var xCur: TCurrCacheItem;
+begin
+  xCur := ById[AId];
+  if xCur = Nil then begin
+    xCur := TCurrCacheItem.Create(AId, ASymbol);
+    Add(xCur);
+  end else begin
+    xCur.CurrS := ASymbol;
+  end;
+end;
+
+function TCurrCache.GetById(AId: String): TCurrCacheItem;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (Result = Nil) and (xCount <= GCurrencyCache.Count - 1) do begin
+    if AId = GCurrencyCache.Items[xCount].FCurrI then begin
+      Result := GCurrencyCache.Items[xCount];
+    end;
+    Inc(xCount);
+  end;
+end;
+
+function TCurrCache.GetItems(AIndex: Integer): TCurrCacheItem;
+begin
+  Result := TCurrCacheItem(inherited Items[AIndex]);
+end;
+
+function TCurrCache.GetSymbol(AId: String): String;
+var xCur: TCurrCacheItem;
+begin
+  xCur := ById[AId];
+  if xCur <> Nil then begin
+    Result := xCur.CurrS;
+  end else begin
+    Result := '';
+  end;
+end;
+
+procedure TCurrCache.SetItems(AIndex: Integer; const Value: TCurrCacheItem);
+begin
+  inherited Items[AIndex] := Value;
+end;
+
+initialization
+  GCurrencyCache := TCurrCache.Create(True);
+finalization
+  GCurrencyCache.Free;
 end.
