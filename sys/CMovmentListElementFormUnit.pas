@@ -15,6 +15,7 @@ type
     FmovementType: TBaseEnumeration;
     Fdescription: TBaseDescription;
     Fcash: Currency;
+    FidCurrencyDef: TDataGid;
   public
     constructor Create;
   published
@@ -23,6 +24,7 @@ type
     property movementType: TBaseEnumeration read FmovementType write FmovementType;
     property description: TBaseDescription read Fdescription write Fdescription;
     property cash: Currency read Fcash write Fcash;
+    property idCurrencyDef: TDataGid read FidCurrencyDef write FidCurrencyDef;
   end;
 
   TCMovmentListElementForm = class(TCConfigForm)
@@ -111,6 +113,7 @@ var xProduct: TProduct;
 begin
   inherited FillForm;
   ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
+  CCurrEdit.SetCurrencyDef(Felement.idCurrencyDef, GCurrencyCache.GetSymbol(Felement.idCurrencyDef));
   if Operation = coEdit then begin
     AssignRichText(Felement.description, RichEditDesc);
     CCurrEdit.Value := Felement.cash;

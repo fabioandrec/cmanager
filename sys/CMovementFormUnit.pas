@@ -91,8 +91,7 @@ type
     procedure CStaticCurrencyCyclicChanged(Sender: TObject);
     procedure CStaticCurrencyTransChanged(Sender: TObject);
     procedure CStaticCurrencyOnceChanged(Sender: TObject);
-    procedure CStaticCurrencyOnceGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticCurrencyOnceGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyCyclicGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyTransGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
@@ -396,6 +395,7 @@ begin
       CDateTime.Enabled := False;
       CStaticInoutOnceAccount.Enabled := False;
       CStaticInoutOnceCashpoint.Enabled := False;
+      CStaticCurrencyOnce.Enabled := False;
       Caption := Caption + ' - Lista - ' + TMovementList(TMovementList.LoadObject(MovementListProxy, idMovementList, False)).description;
     end;
     if (movementType = COutMovement) or (movementType = CInMovement) then begin

@@ -33,15 +33,17 @@ type
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
     MovementList: TCList;
-    Panel3: TPanel;
-    Label6: TLabel;
-    CCurrEditCash: TCCurrEdit;
     ActionManager: TActionManager;
     ActionAdd: TAction;
     ActionTemplate: TAction;
     CButton1: TCButton;
     CButton2: TCButton;
     ComboBoxTemplate: TComboBox;
+    Label19: TLabel;
+    CStaticCurrency: TCStatic;
+    Panel3: TPanel;
+    Label6: TLabel;
+    CCurrEditCash: TCCurrEdit;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -61,6 +63,8 @@ type
     procedure CStaticInoutOnceAccountChanged(Sender: TObject);
     procedure CStaticInoutOnceCashpointChanged(Sender: TObject);
     procedure ComboBoxTemplateChange(Sender: TObject);
+    procedure CStaticCurrencyChanged(Sender: TObject);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -97,7 +101,8 @@ implementation
 uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
-  CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit;
+  CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit,
+  CCurrencydefFrameUnit;
 
 {$R *.dfm}
 
@@ -141,9 +146,11 @@ var xForm: TCMovmentListElementForm;
 begin
   xElement := TMovementListElement.Create;
   xElement.movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
+  xElement.idCurrencyDef := CStaticCurrency.DataId;
   xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
   if xForm.ShowConfig(coAdd) then begin
     Perform(WM_DATAOBJECTADDED, Integer(xElement), 0);
+    CStaticCurrency.Enabled := Fmovements.Count = 0;
   end else begin
     xElement.Free;
   end;
@@ -219,6 +226,11 @@ begin
   inherited InitializeForm;
   CCurrEditCash.Value := GetCash;
   CDateTime1.Value := GWorkDate;
+  if Operation = coAdd then begin
+    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
+    CCurrEditCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+  end;
   MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
   FbaseAccount := CEmptyDataGid;
   FbaseCashpoint := CEmptyDataGid;
@@ -261,7 +273,7 @@ begin
   end else if Column = 1 then begin
     CellText := xData.description;
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xData.cash);
+    CellText := CurrencyToString(xData.cash, xData.idCurrencyDef, False);
   end;
 end;
 
@@ -314,6 +326,7 @@ begin
     xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
     if xForm.ShowConfig(coEdit) then begin
       Perform(WM_DATAOBJECTEDITED, Integer(xElement), 0);
+      CStaticCurrency.Enabled := Fmovements.Count = 0;
     end;
     xForm.Free;
   end;
@@ -339,6 +352,7 @@ begin
   if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
     xElement := TMovementListElement(MovementList.GetNodeData(MovementList.FocusedNode)^);
     Perform(WM_DATAOBJECTDELETED, Integer(xElement), 0);
+    CStaticCurrency.Enabled := Fmovements.Count = 0;
   end;
 end;
 
@@ -400,6 +414,9 @@ begin
     SimpleRichText(description, RichEditDesc);
     ComboBox1.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
     ComboBox1.Enabled := False;
+    CStaticCurrency.DataId := idCurrencyDef;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
+    CCurrEditCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     xList := GetMovements;
     Fmovements.Clear;
     for xCount := 0 to xList.Count - 1 do begin
@@ -410,11 +427,13 @@ begin
       xElement.productId := xMovement.idProduct;
       xElement.movementType := xMovement.movementType;
       xElement.cash := xMovement.cash;
+      xElement.idCurrencyDef := idCurrencyDef;
       Fmovements.Add(xElement);
     end;
     xList.Free;
     GDataProvider.RollbackTransaction;
     MovementList.RootNodeCount := Fmovements.Count;
+    CStaticCurrency.Enabled := Fmovements.Count = 0;
   end;
 end;
 
@@ -425,6 +444,7 @@ begin
     description := RichEditDesc.Text;
     idAccount := CStaticInoutOnceAccount.DataId;
     idCashPoint := CStaticInoutOnceCashpoint.DataId;
+    idCurrencyDef := CStaticCurrency.DataId;
     regDate := CDateTime1.Value;
     movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
   end;
@@ -449,6 +469,7 @@ begin
       xMovement.idCashPoint := CStaticInoutOnceCashpoint.DataId;
       xMovement.idProduct := productId;
       xMovement.idMovementList := Dataobject.id;
+      xMovement.idCurrencyDef := CStaticCurrency.DataId;
     end;
   end;
   for xCount := 0 to Fmodified.Count - 1 do begin
@@ -462,6 +483,7 @@ begin
       xMovement.idCashPoint := CStaticInoutOnceCashpoint.DataId;
       xMovement.idProduct := productId;
       xMovement.idMovementList := Dataobject.id;
+      xMovement.idCurrencyDef := CStaticCurrency.DataId;
     end;
   end;
   for xCount := 0 to Fdeleted.Count - 1 do begin
@@ -607,6 +629,16 @@ end;
 procedure TCMovementListForm.ComboBoxTemplateChange(Sender: TObject);
 begin
   UpdateDescription;
+end;
+
+procedure TCMovementListForm.CStaticCurrencyChanged(Sender: TObject);
+begin
+  CCurrEditCash.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
+end;
+
+procedure TCMovementListForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
 end;
 
 end.

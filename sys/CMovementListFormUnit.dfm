@@ -188,17 +188,25 @@ inherited CMovementListForm: TCMovementListForm
       Height = 297
       Caption = ' Lista operacji '
       TabOrder = 2
+      object Label19: TLabel
+        Left = 25
+        Top = 32
+        Width = 34
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta'
+      end
       object Panel1: TPanel
         Left = 24
-        Top = 28
+        Top = 64
         Width = 457
-        Height = 213
+        Height = 209
         BevelOuter = bvLowered
         Caption = 'Panel1'
-        TabOrder = 0
+        TabOrder = 1
         object Bevel1: TBevel
           Left = 1
-          Top = 169
+          Top = 165
           Width = 455
           Height = 2
           Align = alBottom
@@ -206,7 +214,7 @@ inherited CMovementListForm: TCMovementListForm
         end
         object Panel2: TPanel
           Left = 1
-          Top = 171
+          Top = 167
           Width = 455
           Height = 41
           Align = alBottom
@@ -254,7 +262,7 @@ inherited CMovementListForm: TCMovementListForm
           Left = 1
           Top = 1
           Width = 455
-          Height = 168
+          Height = 164
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -288,6 +296,7 @@ inherited CMovementListForm: TCMovementListForm
           OnGetNodeDataSize = MovementListGetNodeDataSize
           OnInitNode = MovementListInitNode
           OddColor = 12437200
+          AutoExpand = True
           Columns = <
             item
               Alignment = taRightJustify
@@ -310,16 +319,35 @@ inherited CMovementListForm: TCMovementListForm
           WideDefaultText = ''
         end
       end
+      object CStaticCurrency: TCStatic
+        Left = 67
+        Top = 29
+        Width = 123
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz walut'#281' z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 0
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz walut'#281' z listy>'
+        OnGetDataId = CStaticCurrencyGetDataId
+        OnChanged = CStaticCurrencyChanged
+        HotTrack = True
+      end
       object Panel3: TPanel
-        Left = 184
-        Top = 248
-        Width = 305
-        Height = 41
+        Left = 200
+        Top = 20
+        Width = 289
+        Height = 34
         BevelOuter = bvNone
         Enabled = False
-        TabOrder = 1
+        TabOrder = 2
         object Label6: TLabel
-          Left = 21
+          Left = 5
           Top = 12
           Width = 147
           Height = 13
@@ -327,7 +355,7 @@ inherited CMovementListForm: TCMovementListForm
           Caption = 'Suma kwot wszystkich operacji'
         end
         object CCurrEditCash: TCCurrEdit
-          Left = 175
+          Left = 159
           Top = 8
           Width = 123
           Height = 21
@@ -337,6 +365,7 @@ inherited CMovementListForm: TCMovementListForm
           ThousandSep = True
           CurrencyStr = 'z'#322
           BevelKind = bkTile
+          WithCalculator = True
         end
       end
     end
