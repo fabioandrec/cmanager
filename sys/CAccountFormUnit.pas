@@ -28,8 +28,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ComboBoxTypeChange(Sender: TObject);
-    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyChanged(Sender: TObject);
   private
     FmovementCount: Integer;

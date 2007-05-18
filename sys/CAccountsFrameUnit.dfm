@@ -17,6 +17,11 @@ inherited CAccountsFrame: TCAccountsFrame
         Position = 2
         Width = 143
         WideText = 'Dost'#281'pne '#347'rodki'
+      end
+      item
+        Position = 3
+        Width = 100
+        WideText = 'Waluta'
       end>
     WideDefaultText = ''
   end

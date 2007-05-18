@@ -296,7 +296,7 @@ begin
   if xList <> Nil then begin
     if xList.Header.Columns.Count > 1 then begin
       for xCount := 0 to xList.Header.Columns.Count - 1 do begin
-        xPrefname := FOwner.Name + '|' + xList.Name + '|' + IntToStr(xCount);
+        xPrefname := FOwner.Name + '|' + Self.ClassName + '|' + xList.Name + '|' + IntToStr(xCount);
         xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
         if xColumnPref <> Nil then begin
           xColumn := xList.Header.Columns.Items[xCount];
@@ -324,7 +324,7 @@ begin
   if xList <> Nil then begin
     if xList.Header.Columns.Count > 1 then begin
       for xCount := 0 to xList.Header.Columns.Count - 1 do begin
-        xPrefname := FOwner.Name + '|' + xList.Name + '|' + IntToStr(xCount);
+        xPrefname := FOwner.Name + '|' + Self.ClassName + '|' + xList.Name + '|' + IntToStr(xCount);
         xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
         if xColumnPref = Nil then begin
           xColumnPref := TViewColumnPref.Create(xPrefname);

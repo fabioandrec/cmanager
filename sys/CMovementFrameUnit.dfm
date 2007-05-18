@@ -211,7 +211,7 @@ inherited CMovementFrame: TCMovementFrame
       end
       item
         Position = 1
-        Width = 193
+        Width = 143
         WideText = 'Opis'
         WideHint = 'Nazwa kontrahenta'
       end
@@ -227,8 +227,12 @@ inherited CMovementFrame: TCMovementFrame
         WideText = 'Kwota'
       end
       item
-        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
         Position = 4
+        WideText = 'Waluta'
+      end
+      item
+        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 5
         Width = 150
         WideText = 'Rodzaj'
       end>

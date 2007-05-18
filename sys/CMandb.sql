@@ -111,10 +111,12 @@ create table movementList (
   yearDate datetime not null,
   movementType varchar(1) not null,  
   cash money not null,
+  idCurrencyDef uniqueidentifier not null,
   primary key (idmovementList),
   constraint ck_movementTypemovementList check (movementType in ('I', 'O')),  
   constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),  
-  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
+  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount),
+  constraint fk_movementListCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)  
 );
 
 create table baseMovement (
@@ -134,13 +136,15 @@ create table baseMovement (
   idProduct uniqueidentifier null,
   idPlannedDone uniqueidentifier null,
   idMovementList uniqueidentifier null,
+  idCurrencyDef uniqueidentifier not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
   constraint fk_sourceAccount foreign key (idSourceAccount) references account (idAccount),
   constraint fk_cashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_product foreign key (idProduct) references product (idProduct),
-  constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList)
+  constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList),
+  constraint fk_baseMovementCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
 create table movementFilter (

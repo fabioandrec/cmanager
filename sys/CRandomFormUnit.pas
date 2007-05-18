@@ -103,6 +103,7 @@ begin
       GDataProvider.BeginTransaction;
       with TBaseMovement.CreateObject(BaseMovementProxy, False) do begin
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
+        idCurrencyDef := xAccount.idCurrencyDef;
         xProduct := TProduct(xOutproducts.Items[Random(xOutproducts.Count)]);
         xCashpoint := TCashPoint(xCashpoints.Items[Random(xCashpoints.Count)]);
         description := xProduct.name;
@@ -119,6 +120,7 @@ begin
       GDataProvider.BeginTransaction;
       with TBaseMovement.CreateObject(BaseMovementProxy, False) do begin
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
+        idCurrencyDef := xAccount.idCurrencyDef;
         xProduct := TProduct(xInproducts.Items[Random(xInproducts.Count)]);
         xCashpoint := TCashPoint(xCashpoints.Items[Random(xCashpoints.Count)]);
         description := xProduct.name;

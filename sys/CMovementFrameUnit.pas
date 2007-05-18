@@ -18,11 +18,13 @@ type
     function Getcash: Currency;
     function Getregdate: TDateTime;
     function GetmovementType: TBaseEnumeration;
+    function GetidCurrencyDef: TDataGid;
   public
     property elementType: TMovementTreeElementType read FelementType write FelementType;
     property description: String read GetDescription;
     property cash: Currency read Getcash;
     property regDate: TDateTime read Getregdate;
+    property idCurrencyDef: TDataGid read GetidCurrencyDef;
     property movementType: TBaseEnumeration read GetmovementType;
   end;
 
@@ -304,8 +306,10 @@ begin
   end else if Column = 2 then begin
     CellText := DateToStr(xData.regDate);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(xData.cash);
+    CellText := CurrencyToString(xData.cash, xData.idCurrencyDef, False);
   end else if Column = 4 then begin
+    CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
+  end else if Column = 5 then begin
     if (xData.movementType = CInMovement) then begin
       CellText := CInMovementDescription;
     end else if (xData.movementType = COutMovement) then begin
@@ -349,6 +353,8 @@ begin
       Result := 0;
     end;
   end else if Column = 4 then begin
+    Result := AnsiCompareText(xData1.idCurrencyDef, xData2.idCurrencyDef);
+  end else if Column = 5 then begin
     Result := AnsiCompareText(xData1.movementType, xData2.movementType);
   end;
 end;
@@ -786,7 +792,7 @@ end;
 procedure TCMovementFrame.TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
 var xBase: TMovementTreeElement;
 begin
-  if Column = 4 then begin
+  if Column = 5 then begin
     xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
     if xBase.movementType = CInMovement then begin
       ImageIndex := 0;
@@ -855,12 +861,21 @@ begin
   end;
 end;
 
+function TMovementTreeElement.GetidCurrencyDef: TDataGid;
+begin
+  if FelementType = mtObject then begin
+    Result := TBaseMovement(Dataobject).idCurrencyDef;
+  end else begin
+    Result := TMovementList(Dataobject).idCurrencyDef;
+  end;
+end;
+
 function TMovementTreeElement.GetmovementType: TBaseEnumeration;
 begin
   if FelementType = mtObject then begin
     Result := TBaseMovement(Dataobject).movementType;
   end else begin
-    Result := TmovementList(Dataobject).movementType;
+    Result := TMovementList(Dataobject).movementType;
   end;
 end;
 
@@ -869,7 +884,7 @@ begin
   if FelementType = mtObject then begin
     Result := TBaseMovement(Dataobject).regDate;
   end else begin
-    Result := TmovementList(Dataobject).regDate;
+    Result := TMovementList(Dataobject).regDate;
   end;
 end;
 

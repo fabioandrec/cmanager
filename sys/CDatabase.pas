@@ -214,6 +214,7 @@ var GDataProvider: TDataProvider;
 
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
+function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
@@ -355,6 +356,9 @@ begin
           xFileVersion := FileVersion(ParamStr(0));
           if xFileVersion <> xDataVersion then begin
             Result := UpdateDatabase(xDataVersion, xFileVersion);
+            if Result then begin
+              Result := UpdateConfiguration(xDataVersion, xFileVersion);
+            end;
           end;
           xDataset.Free;
         end;
@@ -1259,6 +1263,29 @@ begin
     end;
     if Result then begin
       GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
+    end;
+  end;
+end;
+
+function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
+var xCurDbversion: Integer;
+    xToDbversion: Integer;
+    xCurDynArray, xToDynArray: TStringDynArray;
+begin
+  Result := True;
+  xCurDynArray := StringToStringArray(AFromVersion, '.');
+  xToDynArray := StringToStringArray(AToVersion, '.');
+  if Length(xCurDynArray) <> 4 then begin
+    ShowInfo(itError, 'Plik ' + GDatabaseName + ' nie jest poprawnym plikiem danych', '');
+    Result := False;
+  end else begin
+    xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
+    xToDbversion := StrToIntDef(xToDynArray[1], -1);
+    if (xCurDbversion < 4) and (xToDbversion = 4) then begin
+      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹ ' + sLineBreak +
+                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list' + sLineBreak +
+                       'wyœwietlaj¹cych dane w programie. Zastosowane zostan¹ domyœlne ustawienia.', '');
+      GColumnsPreferences.Clear;
     end;
   end;
 end;
