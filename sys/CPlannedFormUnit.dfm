@@ -101,12 +101,20 @@ inherited CPlannedForm: TCPlannedForm
         Caption = 'Kontrahent'
       end
       object Label9: TLabel
-        Left = 226
+        Left = 290
         Top = 139
         Width = 30
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kwota'
+      end
+      object Label17: TLabel
+        Left = 70
+        Top = 138
+        Width = 34
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta'
       end
       object CStaticAccount: TCStatic
         Left = 112
@@ -166,16 +174,36 @@ inherited CPlannedForm: TCPlannedForm
         HotTrack = True
       end
       object CCurrEdit: TCCurrEdit
-        Left = 264
+        Left = 328
         Top = 135
-        Width = 209
+        Width = 145
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 3
+        TabOrder = 4
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
+        WithCalculator = True
+      end
+      object CStaticCurrency: TCStatic
+        Left = 112
+        Top = 135
+        Width = 145
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz walut'#281' z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 3
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz walut'#281' z listy>'
+        OnGetDataId = CStaticCurrencyGetDataId
+        OnChanged = CStaticCurrencyChanged
+        HotTrack = True
       end
     end
     object GroupBox1: TGroupBox

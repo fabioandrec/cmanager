@@ -86,6 +86,8 @@ inherited CPlannedFrame: TCPlannedFrame
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
     OnInitNode = PlannedListInitNode
+    OddColor = 12437200
+    AutoExpand = True
     Columns = <
       item
         Alignment = taRightJustify
@@ -95,7 +97,7 @@ inherited CPlannedFrame: TCPlannedFrame
       end
       item
         Position = 1
-        Width = 243
+        Width = 193
         WideText = 'Opis'
         WideHint = 'Nazwa kontrahenta'
       end
@@ -110,7 +112,12 @@ inherited CPlannedFrame: TCPlannedFrame
         Position = 3
         Width = 150
         WideText = 'Kwota'
+      end
+      item
+        Position = 4
+        WideText = 'Waluta'
       end>
+    WideDefaultText = ''
   end
   inherited ImageList: TPngImageList
     Top = 144

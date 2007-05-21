@@ -34,6 +34,8 @@ type
     CButton1: TCButton;
     CButton2: TCButton;
     ComboBoxTemplate: TComboBox;
+    Label17: TLabel;
+    CStaticCurrency: TCStatic;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -49,6 +51,8 @@ type
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
     procedure ComboBoxTemplateChange(Sender: TObject);
+    procedure CStaticCurrencyChanged(Sender: TObject);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FSchedule: TSchedule;
   protected
@@ -72,7 +76,8 @@ implementation
 uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit, CTemplates,
-  CDescpatternFormUnit, CPreferences, CRichtext, CDataobjectFrameUnit;
+  CDescpatternFormUnit, CPreferences, CRichtext, CDataobjectFrameUnit,
+  CCurrencydefFrameUnit;
 
 {$R *.dfm}
 
@@ -89,6 +94,11 @@ end;
 procedure TCPlannedForm.InitializeForm;
 begin
   FSchedule := TSchedule.Create;
+  if Operation = coAdd then begin
+    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
+    CCurrEdit.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+  end;
   ComboBoxTypeChange(ComboBoxType);
   CStaticSchedule.Caption := FSchedule.AsString;
   UpdateDescription;
@@ -212,6 +222,9 @@ begin
     FSchedule.triggerType := triggerType;
     FSchedule.triggerDay := triggerDay;
     FSchedule.freeDays := freeDays;
+    CStaticCurrency.DataId := idCurrencyDef;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
+    CCurrEdit.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     ComboBoxTypeChange(ComboBoxType);
     CStaticSchedule.Caption := FSchedule.AsString;
   end;
@@ -240,6 +253,7 @@ begin
     triggerType := FSchedule.triggerType;
     triggerDay := FSchedule.triggerDay;
     freeDays := FSchedule.freeDays;
+    idCurrencyDef := CStaticCurrency.DataId;
   end;
 end;
 
@@ -321,6 +335,16 @@ end;
 procedure TCPlannedForm.ComboBoxTemplateChange(Sender: TObject);
 begin
   UpdateDescription
+end;
+
+procedure TCPlannedForm.CStaticCurrencyChanged(Sender: TObject);
+begin
+  CCurrEdit.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
+end;
+
+procedure TCPlannedForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
 end;
 
 end.

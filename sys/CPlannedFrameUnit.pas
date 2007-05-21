@@ -127,8 +127,10 @@ begin
     end else if (xData.movementType = COutMovement) then begin
       CellText := COutMovementDescription;
     end;
+  end else if Column = 3 then begin
+    CellText := CurrencyToString(xData.cash, '', False);
   end else begin
-    CellText := CurrencyToString(xData.cash);
+    CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
   end;
 end;
 
