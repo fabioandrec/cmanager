@@ -103,6 +103,8 @@ inherited CDoneFrame: TCDoneFrame
       OnGetHint = DoneListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitNode = SumListInitNode
+      OddColor = 12437200
+      AutoExpand = True
       Columns = <
         item
           Position = 0
@@ -128,6 +130,7 @@ inherited CDoneFrame: TCDoneFrame
           Width = 150
           WideText = 'Saldo'
         end>
+      WideDefaultText = ''
     end
   end
   object DoneList: TCList [2]
@@ -171,6 +174,8 @@ inherited CDoneFrame: TCDoneFrame
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
     OnInitNode = DoneListInitNode
+    OddColor = 12437200
+    AutoExpand = True
     Columns = <
       item
         Alignment = taRightJustify
@@ -207,6 +212,7 @@ inherited CDoneFrame: TCDoneFrame
         Width = 100
         WideText = 'Status'
       end>
+    WideDefaultText = ''
   end
   object Panel: TPanel [3]
     Left = 0

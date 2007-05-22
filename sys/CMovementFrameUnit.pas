@@ -79,6 +79,7 @@ type
     procedure TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ActionAddListExecute(Sender: TObject);
     procedure TodayListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+    procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
   private
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
@@ -570,11 +571,11 @@ procedure TCMovementFrame.ReloadSums;
 var xDs: TADOQuery;
     xSql: String;
     xObj: TSumElement;
-    xOvr: TSumElement;
+    xPar: TSumElement;
     xDf, xDt: TDateTime;
 begin
   GetFilterDates(xDf, xDt);
-  xSql := Format('select v.*, a.name from ' +
+  xSql := Format('select v.*, a.name, a.idCurrencyDef from ' +
                  ' (select idAccount, sum(income) as incomes, sum(expense) as expenses from balances where ' +
                  '   movementType <> ''%s'' and ' +
                  '   regDate between %s and %s group by idAccount) as v ' +
@@ -584,22 +585,36 @@ begin
   SumList.BeginUpdate;
   SumList.Clear;
   FSumObjects.Clear;
-  xOvr := TSumElement.Create;
-  xOvr.name := 'Razem dla wszystkich kont';
-  xOvr.cashIn := 0;
-  xOvr.cashOut := 0;
-  xOvr.id := '*';
   while not xDs.Eof do begin
-    xObj := FSumObjects.FindSumObject(xDs.FieldByName('idAccount').AsString, True);
-    xObj.id := xDs.FieldByName('idAccount').AsString;
-    xObj.name := xDs.FieldByName('name').AsString;
-    xObj.cashIn := xObj.cashIn + xDs.FieldByName('incomes').AsCurrency;
-    xOvr.cashIn := xOvr.cashIn + xObj.cashIn;
-    xObj.cashOut := xObj.cashOut + xDs.FieldByName('expenses').AsCurrency;
-    xOvr.cashOut := xOvr.cashOut + xObj.cashOut;
+    xObj := FSumObjects.FindSumObjectByCur(xDs.FieldByName('idCurrencyDef').AsString, False);
+    if xObj = Nil then begin
+      xObj := TSumElement.Create;
+      xObj.id := '*';
+      xObj.idCurrencyDef := xDs.FieldByName('idCurrencyDef').AsString;
+      xObj.cashIn := 0;
+      xObj.cashOut := 0;
+      xObj.name := 'Razem w ' + GCurrencyCache.GetSymbol(xObj.idCurrencyDef);
+      FSumObjects.Add(xObj);
+    end;
     xDs.Next;
   end;
-  FSumObjects.Add(xOvr);
+  xDs.First;
+  while not xDs.Eof do begin
+    xPar := FSumObjects.FindSumObjectByCur(xDs.FieldByName('idCurrencyDef').AsString, False);
+    if xPar <> Nil then begin
+      xObj := xPar.childs.FindSumObjectById(xDs.FieldByName('idAccount').AsString, False);
+      if xObj = Nil then begin
+        xObj := TSumElement.Create;
+      end;
+      xObj.id := xDs.FieldByName('idAccount').AsString;
+      xObj.name := xDs.FieldByName('name').AsString;
+      xObj.cashIn := xObj.cashIn + xDs.FieldByName('incomes').AsCurrency;
+      xObj.idCurrencyDef := xDs.FieldByName('idCurrencyDef').AsString;
+      xObj.cashOut := xObj.cashOut + xDs.FieldByName('expenses').AsCurrency;
+      xPar.AddChild(xObj);
+    end;
+    xDs.Next;
+  end;
   SumList.RootNodeCount := FSumObjects.Count;
   SumList.EndUpdate;
   xDs.Free;
@@ -611,13 +626,13 @@ var xData1: TSumElement;
 begin
   xData1 := TSumElement(SumList.GetNodeData(Node1)^);
   xData2 := TSumElement(SumList.GetNodeData(Node2)^);
-  if (xData1.id = '*') then begin
+  if (Copy(xData1.id, 1, 1) = '*') then begin
     if TCList(Sender).Header.SortDirection = sdAscending then begin
-      Result := -11;
+      Result := -1;
     end else begin
       Result := 1;
     end;
-  end else if (xData2.id = '*') then begin
+  end else if (Copy(xData2.id, 1, 1) = '*') then begin
     if TCList(Sender).Header.SortDirection = sdAscending then begin
       Result := 1;
     end else begin
@@ -666,17 +681,28 @@ begin
   if Column = 0 then begin
     CellText := xData.name;
   end else if Column = 1 then begin
-    CellText := CurrencyToString(xData.cashOut);
+    CellText := CurrencyToString(xData.cashOut, '', False);
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xData.cashIn);
+    CellText := CurrencyToString(xData.cashIn, '', False);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(xData.cashIn - xData.cashOut);
+    CellText := CurrencyToString(xData.cashIn - xData.cashOut, '', False);
+  end else if Column = 4 then begin
+    CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
   end;
 end;
 
 procedure TCMovementFrame.SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+var xDate: TSumElement;
 begin
-  TSumElement(SumList.GetNodeData(Node)^) := TSumElement(FSumObjects.Items[Node.Index]);
+  if ParentNode = Nil then begin
+    TSumElement(SumList.GetNodeData(Node)^) := TSumElement(FSumObjects.Items[Node.Index]);
+  end else begin
+    xDate := TSumElement(SumList.GetNodeData(ParentNode)^);
+    TSumElement(SumList.GetNodeData(Node)^) := TSumElement(xDate.childs.Items[Node.Index]);
+  end;
+  if TSumElement(SumList.GetNodeData(Node)^).childs.Count > 0 then begin
+    InitialStates := InitialStates + [ivsHasChildren];
+  end;
 end;
 
 procedure TCMovementFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -928,6 +954,13 @@ begin
       FTodayObjects.Remove(FTodayObjects.Items[xCount]);
     end;
   end;
+end;
+
+procedure TCMovementFrame.SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+var xDate: TSumElement;
+begin
+  xDate := TSumElement(SumList.GetNodeData(Node)^);
+  ChildCount := xDate.childs.Count;
 end;
 
 end.

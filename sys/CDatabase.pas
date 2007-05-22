@@ -187,24 +187,33 @@ type
     property Items[AIndex: Integer]: TTreeObject read GetItems write SetItems;
   end;
 
+  TSumList = class;
+
   TSumElement = class(TObject)
   private
-    Fid: TDataGid;
+    Fid: String;
+    FidCurrencyDef: String;
     Fname: String;
     FcashIn: Currency;
     FcashOut: Currency;
+    Fchilds: TSumList;
   public
     constructor Create;
+    destructor Destroy; override;
+    procedure AddChild(ASumElement: TSumElement);
   published
-    property id: TDataGid read Fid write Fid;
+    property id: String read Fid write Fid;
+    property idCurrencyDef: String read FidCurrencyDef write FidCurrencyDef;
     property name: String read Fname write Fname;
     property cashIn: Currency read FcashIn write FcashIn;
     property cashOut: Currency read FcashOut write FcashOut;
+    property childs: TSumList read Fchilds write Fchilds;
   end;
 
   TSumList = class(TObjectList)
   public
-    function FindSumObject(AId: TDataGid; ACreate: Boolean): TSumElement;
+    function FindSumObjectById(AId: String; ACreate: Boolean): TSumElement;
+    function FindSumObjectByCur(AId: String; ACreate: Boolean): TSumElement;
   end;
 
 var GDataProvider: TDataProvider;
@@ -1127,6 +1136,13 @@ begin
   inherited Items[AIndex] := Value;
 end;
 
+procedure TSumElement.AddChild(ASumElement: TSumElement);
+begin
+  Fchilds.Add(ASumElement);
+  FcashIn := FcashIn + ASumElement.cashIn;
+  FcashOut := FcashOut + ASumElement.cashOut;
+end;
+
 constructor TSumElement.Create;
 begin
   inherited Create;
@@ -1134,9 +1150,10 @@ begin
   Fname := '';
   FcashIn := 0;
   FcashOut := 0;
+  Fchilds := TSumList.Create(True);
 end;
 
-function TSumList.FindSumObject(AId: TDataGid; ACreate: Boolean): TSumElement;
+function TSumList.FindSumObjectById(AId: String; ACreate: Boolean): TSumElement;
 var xCount: Integer;
 begin
   Result := Nil;
@@ -1152,6 +1169,24 @@ begin
     Add(Result);
   end;
 end;
+
+function TSumList.FindSumObjectByCur(AId: String; ACreate: Boolean): TSumElement;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= Count - 1) and (Result = Nil) do begin
+    if TSumElement(Items[xCount]).idCurrencyDef = AId then begin
+      Result := TSumElement(Items[xCount]);
+    end;
+    Inc(xCount);
+  end;
+  if (Result = Nil) and ACreate then begin
+    Result := TSumElement.Create;
+    Add(Result);
+  end;
+end;
+
 
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
 var xQuarter: Integer;
@@ -1352,6 +1387,12 @@ begin
     end;
     xQ.Free;
   end;
+end;
+
+destructor TSumElement.Destroy;
+begin
+  Fchilds.Free;
+  inherited Destroy;
 end;
 
 initialization

@@ -668,10 +668,10 @@ begin
     for xCount := 0 to FTreeObjects.Count - 1 do begin
       xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
       if xElement.done = Nil then begin
-        xSum := FSumObjects.FindSumObject('*', True);
+        xSum := FSumObjects.FindSumObjectById('*', True);
         xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
         xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
-        xSum := FSumObjects.FindSumObject(xElement.planned.idAccount, False);
+        xSum := FSumObjects.FindSumObjectById(xElement.planned.idAccount, False);
         if xSum = Nil then begin
           xSum := TSumElement.Create;
           xSum.id := xElement.planned.idAccount;
