@@ -312,7 +312,7 @@ begin
   xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
   for xCount := 0 to xC.Count - 1 do begin
     xCur := TCurrencyDef(xC.Items[xCount]);
-    GCurrencyCache.Change(xCur.id, xCur.symbol);
+    GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
   end;
   xC.Free;
 end;

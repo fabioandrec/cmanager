@@ -124,6 +124,7 @@ type
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class function AccountBalanceOnDay(AIdAccount: TDataGid; ADateTime: TDateTime): Currency;
     class function GetMovementCount(AIdAccount: TDataGid): Integer;
+    class function GetCurrencyDefinition(AIdAccount: TDataGid): TDataGid;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
@@ -463,12 +464,15 @@ type
   TCurrCacheItem = class(TObject)
   private
     FCurrI: String;
-    FCurrS: String;
-    procedure SetCurrS(const Value: String);
+    FCurrSymbol: String;
+    FCurrIso: String;
+    procedure SetCurrSymbol(const Value: String);
+    procedure SetCurrIso(const Value: String);
   public
-    constructor Create(AId, ASymbol: String);
+    constructor Create(AId, ASymbol, AIso: String);
   published
-    property CurrS: String read FCurrS write SetCurrS;
+    property CurrSymbol: String read FCurrSymbol write SetCurrSymbol;
+    property CurrIso: String read FCurrIso write SetCurrIso;
   end;
 
   TCurrCache = class(TObjectList)
@@ -477,8 +481,9 @@ type
     procedure SetItems(AIndex: Integer; const Value: TCurrCacheItem);
     function GetById(AId: String): TCurrCacheItem;
   public
-    procedure Change(AId, ASymbol: String);
+    procedure Change(AId, ASymbol, AIso: String);
     function GetSymbol(AId: String): String;
+    function GetIso(AId: String): String;
     property Items[AIndex: Integer]: TCurrCacheItem read GetItems write SetItems;
     property ById[AId: String]: TCurrCacheItem read GetById;
   end;
@@ -2052,7 +2057,7 @@ end;
 procedure TCurrencyDef.AfterPost;
 begin
   if Fsymbol <> FpreviousSymbol then begin
-    GCurrencyCache.Change(id, symbol);
+    GCurrencyCache.Change(id, symbol, iso);
   end;
   inherited AfterPost;
 end;
@@ -2317,31 +2322,40 @@ begin
   end;
 end;
 
-constructor TCurrCacheItem.Create(AId, ASymbol: String);
+constructor TCurrCacheItem.Create(AId, ASymbol, AIso: String);
 begin
   inherited Create;
   FCurrI := AId;
-  FCurrS := ASymbol;
+  FCurrSymbol := ASymbol;
+  FCurrIso := AIso;
 end;
 
-procedure TCurrCacheItem.SetCurrS(const Value: String);
+procedure TCurrCacheItem.SetCurrIso(const Value: String);
 begin
-  if FCurrS <> Value then begin
-    FCurrS := Value;
-    SetCurrencySymbol(FCurrI, FCurrS);
+  if FCurrIso <> Value then begin
+    FCurrIso := Value;
+  end;
+end;
+
+procedure TCurrCacheItem.SetCurrSymbol(const Value: String);
+begin
+  if FCurrSymbol <> Value then begin
+    FCurrSymbol := Value;
+    SetCurrencySymbol(FCurrI, FCurrSymbol);
     SendMessageToFrames(Nil, WM_MUSTREPAINT, 0, 0);
   end;
 end;
 
-procedure TCurrCache.Change(AId, ASymbol: String);
+procedure TCurrCache.Change(AId, ASymbol, AIso: String);
 var xCur: TCurrCacheItem;
 begin
   xCur := ById[AId];
   if xCur = Nil then begin
-    xCur := TCurrCacheItem.Create(AId, ASymbol);
+    xCur := TCurrCacheItem.Create(AId, ASymbol, AIso);
     Add(xCur);
   end else begin
-    xCur.CurrS := ASymbol;
+    xCur.CurrSymbol := ASymbol;
+    xCur.CurrIso := AIso;
   end;
 end;
 
@@ -2358,6 +2372,17 @@ begin
   end;
 end;
 
+function TCurrCache.GetIso(AId: String): String;
+var xCur: TCurrCacheItem;
+begin
+  xCur := ById[AId];
+  if xCur <> Nil then begin
+    Result := xCur.CurrIso;
+  end else begin
+    Result := '';
+  end;
+end;
+
 function TCurrCache.GetItems(AIndex: Integer): TCurrCacheItem;
 begin
   Result := TCurrCacheItem(inherited Items[AIndex]);
@@ -2368,7 +2393,7 @@ var xCur: TCurrCacheItem;
 begin
   xCur := ById[AId];
   if xCur <> Nil then begin
-    Result := xCur.CurrS;
+    Result := xCur.CurrSymbol;
   end else begin
     Result := '';
   end;
@@ -2385,6 +2410,11 @@ begin
     FidCurrencyDef := Value;
     SetState(msModified);
   end;
+end;
+
+class function TAccount.GetCurrencyDefinition(AIdAccount: TDataGid): TDataGid;
+begin
+  Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from account where idAccount = %s', [DataGidToDatabase(AIdAccount)]), '');
 end;
 
 initialization
