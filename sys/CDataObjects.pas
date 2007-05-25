@@ -100,6 +100,21 @@ type
     property rateType: TBaseEnumeration read FrateType write SetrateType;
   end;
 
+  TCurrencyRateHelper = class(TObject)
+  private
+    Fquantity: Integer;
+    Frate: Currency;
+    Fdesc: string;
+  public
+    constructor Create(Aquantity: Integer; Arate: Currency; ADesc: String);
+    function ExchangeCurrency(ACash: Currency): Currency;
+    procedure Assign(Aquantity: Integer; Arate: Currency; ADesc: String);
+  published
+    property quantity: Integer read Fquantity write Fquantity;
+    property rate: Currency read Frate write Frate;
+    property desc: String read Fdesc write Fdesc;
+  end;
+
   TAccount = class(TDataObject)
   private
     Fname: TBaseName;
@@ -2415,6 +2430,28 @@ end;
 class function TAccount.GetCurrencyDefinition(AIdAccount: TDataGid): TDataGid;
 begin
   Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from account where idAccount = %s', [DataGidToDatabase(AIdAccount)]), '');
+end;
+
+{ TCurrencyRateHelper }
+
+procedure TCurrencyRateHelper.Assign(Aquantity: Integer; Arate: Currency; ADesc: String);
+begin
+  Fquantity := Aquantity;
+  Frate := Arate;
+  Fdesc := ADesc;
+end;
+
+constructor TCurrencyRateHelper.Create(Aquantity: Integer; Arate: Currency; ADesc: String);
+begin
+  inherited Create;
+  Fquantity := Aquantity;
+  Frate := Arate;
+  Fdesc := ADesc;
+end;
+
+function TCurrencyRateHelper.ExchangeCurrency(ACash: Currency): Currency;
+begin
+  Result := SimpleRoundTo(Fquantity * ACash / Frate, -4);
 end;
 
 initialization

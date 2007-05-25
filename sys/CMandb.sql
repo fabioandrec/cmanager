@@ -21,6 +21,25 @@ create table currencyDef (
   primary key (idcurrencyDef)
 );
 
+create table currencyRate (
+  idcurrencyRate uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  idSourceCurrencyDef uniqueidentifier not null,
+  idTargetCurrencyDef uniqueidentifier not null,
+  idCashpoint uniqueidentifier not null,
+  quantity int not null,
+  rate money not null,
+  bindingDate datetime not null,
+  description varchar(200),
+  rateType varchar(1) not null,
+  primary key (idcurrencyRate),
+  constraint fk_rateSourceCurrencyDef foreign key (idSourceCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_rateTargetCurrencyDef foreign key (idTargetCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_rateCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint),
+  constraint ck_rateType check (rateType in ('B', 'S', 'A'))
+);
+
 create table account (
   idAccount uniqueidentifier not null,
   created datetime not null,
@@ -71,7 +90,6 @@ create table plannedMovement (
   triggerType varchar(1) not null,
   triggerDay int not null,
   freeDays varchar(1) not null,
-  idCurrencyDef uniqueidentifier not null,
   primary key (idPlannedMovement),
   constraint ck_plannedType check (movementType in ('I', 'O')),
   constraint ck_freeDays check (freeDays in ('E', 'D', 'I')),
@@ -81,8 +99,7 @@ create table plannedMovement (
   constraint ck_scheduleType check (scheduleType in ('O', 'C')),
   constraint ck_endCondition check (endCondition in ('T', 'D', 'N')),
   constraint ck_endConditionCountDate check ((endCount is not null) or (endDate is not null)),
-  constraint ck_triggerType check (triggerType in ('W', 'M')),
-  constraint fk_plannedMovementCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)  
+  constraint ck_triggerType check (triggerType in ('W', 'M'))
 );
 
 create table plannedDone (
@@ -113,12 +130,10 @@ create table movementList (
   yearDate datetime not null,
   movementType varchar(1) not null,  
   cash money not null,
-  idCurrencyDef uniqueidentifier not null,
   primary key (idmovementList),
   constraint ck_movementTypemovementList check (movementType in ('I', 'O')),  
   constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),  
-  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount),
-  constraint fk_movementListCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)  
+  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
 );
 
 create table baseMovement (
@@ -138,7 +153,13 @@ create table baseMovement (
   idProduct uniqueidentifier null,
   idPlannedDone uniqueidentifier null,
   idMovementList uniqueidentifier null,
-  idCurrencyDef uniqueidentifier not null,
+  idAccountCurrencyDef uniqueidentifier not null,
+  idMovementCurrencyDef uniqueidentifier not null,
+  idCurrencyRate uniqueidentifier,
+  currencyQuantity int,
+  currencyRate money null,
+  rateDescription varchar(200),
+  currencyCash money not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -146,7 +167,9 @@ create table baseMovement (
   constraint fk_cashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_product foreign key (idProduct) references product (idProduct),
   constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList),
-  constraint fk_baseMovementCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
+  constraint fk_movementAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_movementMovementCurrencyDef foreign key (idMovementCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_movementCurrencyRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate)
 );
 
 create table movementFilter (
@@ -219,25 +242,6 @@ create table movementLimit (
   constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter)
 );
 
-create table currencyRate (
-  idcurrencyRate uniqueidentifier not null,
-  created datetime not null,
-  modified datetime,
-  idSourceCurrencyDef uniqueidentifier not null,
-  idTargetCurrencyDef uniqueidentifier not null,
-  idCashpoint uniqueidentifier not null,
-  quantity int not null,
-  rate money not null,
-  bindingDate datetime not null,
-  description varchar(200),
-  rateType varchar(1) not null,
-  primary key (idcurrencyRate),
-  constraint fk_rateSourceCurrencyDef foreign key (idSourceCurrencyDef) references currencyDef (idCurrencyDef),
-  constraint fk_rateTargetCurrencyDef foreign key (idTargetCurrencyDef) references currencyDef (idCurrencyDef),
-  constraint fk_rateCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint),
-  constraint ck_rateType check (rateType in ('B', 'S', 'A'))
-);
-
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementIn', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');
@@ -258,22 +262,22 @@ create table cmanagerInfo (
 );
 
 create view transactions as select * from (
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, cash as cash from baseMovement where movementType = 'I'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash from baseMovement where movementType = 'I'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash from baseMovement where movementType = 'O'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash from baseMovement where movementType = 'O'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash from baseMovement where movementType = 'T'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash from baseMovement where movementType = 'T'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, cash as cash from baseMovement where movementType = 'T') as v;
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash from baseMovement where movementType = 'T') as v;
 
 create view balances as select * from (
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense from baseMovement where movementType = 'I'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense from baseMovement where movementType = 'I'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense from baseMovement where movementType = 'O'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense from baseMovement where movementType = 'O'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense from baseMovement where movementType = 'T'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense from baseMovement where movementType = 'T'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, idCurrencyDef, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense from baseMovement where movementType = 'T') as v;
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense from baseMovement where movementType = 'T') as v;
  
 create view filters as
   select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m

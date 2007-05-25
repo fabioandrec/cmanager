@@ -142,7 +142,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 232
-        ActivePage = TabSheetInOutOnce
+        ActivePage = TabSheetTrans
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -191,12 +191,12 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Waluta operacji'
           end
           object Label18: TLabel
-            Left = 224
+            Left = 274
             Top = 117
-            Width = 120
+            Width = 70
             Height = 13
             Alignment = taRightJustify
-            Caption = 'Kwota w walucie operacji'
+            Caption = 'Kwota operacji'
           end
           object Label23: TLabel
             Left = 54
@@ -314,6 +314,7 @@ inherited CMovementForm: TCMovementForm
             Transparent = False
             TextOnEmpty = '<wybierz walut'#281'>'
             OnGetDataId = CStaticInOutOnceCurrencyAccountGetDataId
+            OnChanged = CStaticInOutCyclicMovementCurrencyChanged
             HotTrack = True
           end
           object CCurrEditInoutCyclicMovement: TCCurrEdit
@@ -323,6 +324,7 @@ inherited CMovementForm: TCMovementForm
             Height = 21
             BorderStyle = bsNone
             TabOrder = 5
+            OnChange = CCurrEditInoutCyclicMovementChange
             Decimals = 2
             ThousandSep = True
             CurrencyStr = 'z'#322
@@ -344,8 +346,8 @@ inherited CMovementForm: TCMovementForm
             TabStop = True
             Transparent = False
             TextOnEmpty = '<wybierz przelicznik kursu z listy>'
-            OnGetDataId = CStaticInoutOnceCashpointGetDataId
-            OnChanged = CStaticInoutOnceAccountChanged
+            OnGetDataId = CStaticInOutCyclicRateGetDataId
+            OnChanged = CStaticInOutCyclicRateChanged
             HotTrack = True
           end
           object CStaticInOutCyclicCurrencyAccount: TCStatic
@@ -403,20 +405,20 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Konto docelowe'
           end
           object Label8: TLabel
-            Left = 23
+            Left = 30
             Top = 116
-            Width = 81
+            Width = 74
             Height = 13
             Alignment = taRightJustify
-            Caption = 'Waluta '#378'r'#243'd'#322'owa'
+            Caption = 'Waluta operacji'
           end
           object Label19: TLabel
-            Left = 215
+            Left = 274
             Top = 117
-            Width = 129
+            Width = 70
             Height = 13
             Alignment = taRightJustify
-            Caption = 'Kwota w walucie '#378'r'#243'd'#322'owej'
+            Caption = 'Kwota operacji'
           end
           object Label26: TLabel
             Left = 54
@@ -435,12 +437,12 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Waluta docelowa'
           end
           object Label28: TLabel
-            Left = 213
+            Left = 234
             Top = 189
-            Width = 131
+            Width = 110
             Height = 13
             Alignment = taRightJustify
-            Caption = 'Kwota w walucie docelowej'
+            Caption = 'Kwota w walucie konta'
           end
           object CStaticTransSourceAccount: TCStatic
             Left = 112
@@ -490,14 +492,14 @@ inherited CMovementForm: TCMovementForm
             BevelKind = bkTile
             Caption = '<brak konta>'
             Color = clWindow
+            Enabled = False
             ParentColor = False
             TabOrder = 2
             TabStop = True
             Transparent = False
             TextOnEmpty = '<brak konta>'
             OnGetDataId = CStaticInOutOnceCurrencyAccountGetDataId
-            OnChanged = CStaticTransCurrencySourceChanged
-            HotTrack = True
+            HotTrack = False
           end
           object CCurrEditTransMovement: TCCurrEdit
             Left = 352
@@ -506,6 +508,7 @@ inherited CMovementForm: TCMovementForm
             Height = 21
             BorderStyle = bsNone
             TabOrder = 3
+            OnChange = CCurrEditTransMovementChange
             Decimals = 2
             ThousandSep = True
             CurrencyStr = 'z'#322
@@ -527,8 +530,8 @@ inherited CMovementForm: TCMovementForm
             TabStop = True
             Transparent = False
             TextOnEmpty = '<wybierz przelicznik kursu z listy>'
-            OnGetDataId = CStaticInoutOnceCashpointGetDataId
-            OnChanged = CStaticInoutOnceAccountChanged
+            OnGetDataId = CStaticTransRateGetDataId
+            OnChanged = CStaticTransRateChanged
             HotTrack = True
           end
           object CStaticTransCurrencyDest: TCStatic
@@ -594,12 +597,12 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Kontrahent'
           end
           object Label9: TLabel
-            Left = 224
+            Left = 274
             Top = 117
-            Width = 120
+            Width = 70
             Height = 13
             Alignment = taRightJustify
-            Caption = 'Kwota w walucie operacji'
+            Caption = 'Kwota operacji'
           end
           object Label17: TLabel
             Left = 40
@@ -697,6 +700,7 @@ inherited CMovementForm: TCMovementForm
             Height = 21
             BorderStyle = bsNone
             TabOrder = 4
+            OnChange = CCurrEditInoutOnceMovementChange
             Decimals = 2
             ThousandSep = True
             CurrencyStr = 'z'#322
@@ -770,7 +774,8 @@ inherited CMovementForm: TCMovementForm
             TabStop = True
             Transparent = False
             TextOnEmpty = '<wybierz przelicznik kursu z listy>'
-            OnGetDataId = CStaticInoutOnceCashpointGetDataId
+            OnGetDataId = CStaticInOutOnceRateGetDataId
+            OnChanged = CStaticInOutOnceRateChanged
             HotTrack = True
           end
         end
