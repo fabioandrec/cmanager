@@ -373,6 +373,9 @@ begin
         end;
       end;
     end;
+    if Result then begin
+      GBasePreferences.lastOpenedDatafilename := GDatabaseName;
+    end;
   end;
 end;
 

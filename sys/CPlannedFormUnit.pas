@@ -193,6 +193,11 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCategory.DoGetDataId;
     end;
+  end else if CStaticCurrency.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano waluty operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCurrency.DoGetDataId;
+    end;
   end;
 end;
 
@@ -224,6 +229,12 @@ begin
     FSchedule.freeDays := freeDays;
     ComboBoxTypeChange(ComboBoxType);
     CStaticSchedule.Caption := FSchedule.AsString;
+    CStaticCashpoint.DataId := idCashPoint;
+    CStaticCurrency.DataId := idMovementCurrencyDef;
+    if idMovementCurrencyDef <> CEmptyDataGid then begin
+      CStaticCurrency.Caption := GCurrencyCache.GetIso(idMovementCurrencyDef);
+    end;
+    CCurrEdit.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
   end;
 end;
 
@@ -250,6 +261,7 @@ begin
     triggerType := FSchedule.triggerType;
     triggerDay := FSchedule.triggerDay;
     freeDays := FSchedule.freeDays;
+    idMovementCurrencyDef := CStaticCurrency.DataId;
   end;
 end;
 

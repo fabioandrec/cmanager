@@ -230,9 +230,6 @@ begin
   GBackupsPreferences.SavetToParentNode(GetSettingsBackups);
   GPluginsPreferences.SavetToParentNode(GetSettingsPlugins);
   GChartPreferences.SavetToParentNode(GetSettingsCharts);
-  if GDataProvider.IsConnected then begin
-    GBasePreferences.lastOpenedDatafilename := GDatabaseName;
-  end;
   if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
     GBasePreferences.startupDatafileMode := CStartupFilemodeLastOpened;
   end;

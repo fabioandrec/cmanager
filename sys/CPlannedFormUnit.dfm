@@ -101,20 +101,20 @@ inherited CPlannedForm: TCPlannedForm
         Caption = 'Kontrahent'
       end
       object Label9: TLabel
-        Left = 290
+        Left = 250
         Top = 139
-        Width = 30
+        Width = 70
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Kwota'
+        Caption = 'Kwota operacji'
       end
       object Label17: TLabel
-        Left = 70
+        Left = 30
         Top = 138
-        Width = 34
+        Width = 74
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Waluta'
+        Caption = 'Waluta operacji'
       end
       object CStaticAccount: TCStatic
         Left = 112
@@ -189,7 +189,7 @@ inherited CPlannedForm: TCPlannedForm
       object CStaticCurrency: TCStatic
         Left = 112
         Top = 135
-        Width = 145
+        Width = 129
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -303,8 +303,8 @@ inherited CPlannedForm: TCPlannedForm
   end
   object ActionManager: TActionManager
     Images = CImageLists.TemplateImageList16x16
-    Left = 32
-    Top = 266
+    Left = 24
+    Top = 202
     StyleName = 'XP Style'
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'

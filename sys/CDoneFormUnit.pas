@@ -45,6 +45,7 @@ begin
   CCurrCash.Value := FData.planned.cash;
   if FData.done = Nil then begin
     ComboBoxStatus.ItemIndex := 0;
+    CCurrCash.SetCurrencyDef(FData.planned.idMovementCurrencyDef, GCurrencyCache.GetSymbol(FData.planned.idMovementCurrencyDef));
   end else begin
     if FData.done.doneState = CDoneAccepted then begin
       ComboBoxStatus.ItemIndex := 1;
@@ -53,6 +54,7 @@ begin
     end;
     AssignRichText(FData.done.description, RichEditDesc);
     CCurrCash.Value := FData.done.cash;
+    CCurrCash.SetCurrencyDef(FData.done.idAccountCurrencyDef, GCurrencyCache.GetSymbol(FData.done.idAccountCurrencyDef));
   end;
   GDataProvider.RollbackTransaction;
   ComboBoxStatusSelect(Nil);

@@ -90,6 +90,7 @@ create table plannedMovement (
   triggerType varchar(1) not null,
   triggerDay int not null,
   freeDays varchar(1) not null,
+  idMovementCurrencyDef uniqueidentifier not null,
   primary key (idPlannedMovement),
   constraint ck_plannedType check (movementType in ('I', 'O')),
   constraint ck_freeDays check (freeDays in ('E', 'D', 'I')),
@@ -99,7 +100,8 @@ create table plannedMovement (
   constraint ck_scheduleType check (scheduleType in ('O', 'C')),
   constraint ck_endCondition check (endCondition in ('T', 'D', 'N')),
   constraint ck_endConditionCountDate check ((endCount is not null) or (endDate is not null)),
-  constraint ck_triggerType check (triggerType in ('W', 'M'))
+  constraint ck_triggerType check (triggerType in ('W', 'M')),
+  constraint fk_planndedMovementCurrencyDef foreign key (idMovementCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
 create table plannedDone (
@@ -112,9 +114,11 @@ create table plannedDone (
   idPlannedMovement uniqueidentifier not null,
   description varchar(200),
   cash money not null,
+  idAccountCurrencyDef uniqueidentifier not null,
   primary key (idPlannedDone),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
-  constraint ck_doneState check (doneState in ('O', 'D', 'A'))
+  constraint ck_doneState check (doneState in ('O', 'D', 'A')),
+  constraint fk_plannedAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
 );
 
 create table movementList (
@@ -131,8 +135,8 @@ create table movementList (
   movementType varchar(1) not null,  
   cash money not null,
   primary key (idmovementList),
-  constraint ck_movementTypemovementList check (movementType in ('I', 'O')),  
-  constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),  
+  constraint ck_movementTypemovementList check (movementType in ('I', 'O')),
+  constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),
   constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
 );
 

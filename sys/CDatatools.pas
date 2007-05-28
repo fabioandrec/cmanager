@@ -120,12 +120,16 @@ end;
 function CheckPendingInformations: Boolean;
 var xInfo: TCStartupInfoForm;
 begin
-  xInfo := TCStartupInfoForm.Create(Nil);
-  Result := xInfo.PrepareInfoFrame;
-  if Result then begin
-    Result := xInfo.ShowModal = mrOk;
+  if GDataProvider.IsConnected then begin
+    xInfo := TCStartupInfoForm.Create(Nil);
+    Result := xInfo.PrepareInfoFrame;
+    if Result then begin
+      Result := xInfo.ShowModal = mrOk;
+    end;
+    xInfo.Free;
+  end else begin
+    Result := False;
   end;
-  xInfo.Free;
 end;
 
 procedure CheckForUpdates(AQuiet: Boolean);
@@ -309,12 +313,14 @@ var xC: TDataObjectList;
     xCount: Integer;
     xCur: TCurrencyDef;
 begin
-  xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
-  for xCount := 0 to xC.Count - 1 do begin
-    xCur := TCurrencyDef(xC.Items[xCount]);
-    GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
+  if GDataProvider.IsConnected then begin
+    xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
+    for xCount := 0 to xC.Count - 1 do begin
+      xCur := TCurrencyDef(xC.Items[xCount]);
+      GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
+    end;
+    xC.Free;
   end;
-  xC.Free;
 end;
 
 end.

@@ -216,20 +216,6 @@ begin
   FCyclicRateHelper := Nil;
   FTransferRateHelper := Nil;
   CDateTime.Value := GWorkDate;
-  if AdditionalData <> Nil then begin
-    xAdd := TMovementAdditionalData(AdditionalData);
-    xPlan := TPlannedMovement(xAdd.planned);
-    if xPlan.movementType = CInMovement then begin
-      ComboBoxType.ItemIndex := 4;
-      xText := xPlan.description + ' (wp³yw do ' + DateToStr(xAdd.triggerDate) + ')'
-    end else if xPlan.movementType = COutMovement then begin
-      ComboBoxType.ItemIndex := 3;
-      xText := xPlan.description + ' (p³atne do ' + DateToStr(xAdd.triggerDate) + ')'
-    end;
-    CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
-    CStaticInoutCyclic.Caption := xText;
-    CStaticInoutCyclicChanged(CStaticInoutCyclic);
-  end;
   FbaseAccount := CEmptyDataGid;
   FbaseList := CEmptyDataGid;
   FsourceAccount := CEmptyDataGid;
@@ -244,6 +230,20 @@ begin
     CCurrEditInoutCyclicMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
     CCurrEditTransMovement.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditTransAccount.SetCurrencyDef(CEmptyDataGid, '');
+  end;
+  if AdditionalData <> Nil then begin
+    xAdd := TMovementAdditionalData(AdditionalData);
+    xPlan := TPlannedMovement(xAdd.planned);
+    if xPlan.movementType = CInMovement then begin
+      ComboBoxType.ItemIndex := 4;
+      xText := xPlan.description + ' (wp³yw do ' + DateToStr(xAdd.triggerDate) + ')'
+    end else if xPlan.movementType = COutMovement then begin
+      ComboBoxType.ItemIndex := 3;
+      xText := xPlan.description + ' (p³atne do ' + DateToStr(xAdd.triggerDate) + ')'
+    end;
+    CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+    CStaticInoutCyclic.Caption := xText;
+    CStaticInoutCyclicChanged(CStaticInoutCyclic);
   end;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
@@ -648,11 +648,13 @@ begin
         xDone.description := description;
         xDone.cash := cash;
         idPlannedDone := xDone.id;
+        xDone.idAccountCurrencyDef := idAccountCurrencyDef;
       end else begin
         xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
         xDone.cash := cash;
         xDone.description := description;
         xDone.doneDate := regDate;
+        xDone.idAccountCurrencyDef := idAccountCurrencyDef;
       end;
     end;
   end;
@@ -686,6 +688,9 @@ begin
   CStaticInoutCyclicAccount.DataId := xPlan.idAccount;
   if xPlan.idAccount <> CEmptyDataGid then begin
     CStaticInoutCyclicAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xPlan.idAccount, False)).name;
+    CStaticInOutCyclicCurrencyAccount.DataId := TAccount.GetCurrencyDefinition(xPlan.idAccount);
+    CStaticInOutCyclicCurrencyAccount.Caption := GCurrencyCache.GetIso(CStaticInOutCyclicCurrencyAccount.DataId);
+    CCurrEditInOutCyclicAccount.SetCurrencyDef(CStaticInOutCyclicCurrencyAccount.DataId, GCurrencyCache.GetSymbol(CStaticInOutCyclicCurrencyAccount.DataId));
   end;
   CStaticInoutCyclicCategory.DataId := xPlan.idProduct;
   if xPlan.idProduct <> CEmptyDataGid then begin
@@ -696,6 +701,9 @@ begin
     CStaticInoutCyclicCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xPlan.idCashPoint, False)).name;
   end;
   CCurrEditInoutCyclicMovement.Value := xPlan.cash;
+  CStaticInOutCyclicMovementCurrency.DataId := xPlan.idMovementCurrencyDef;
+  CStaticInOutCyclicMovementCurrency.Caption := GCurrencyCache.GetIso(xPlan.idMovementCurrencyDef);
+  CCurrEditInoutCyclicMovement.SetCurrencyDef(xPlan.idMovementCurrencyDef, GCurrencyCache.GetSymbol(xPlan.idMovementCurrencyDef));
   GDataProvider.RollbackTransaction;
   UpdateDescription;
 end;

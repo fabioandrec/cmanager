@@ -185,7 +185,7 @@ inherited CDoneFrame: TCDoneFrame
       end
       item
         Position = 1
-        Width = 193
+        Width = 143
         WideText = 'Opis'
         WideHint = 'Nazwa kontrahenta'
       end
@@ -211,6 +211,10 @@ inherited CDoneFrame: TCDoneFrame
         Position = 5
         Width = 100
         WideText = 'Status'
+      end
+      item
+        Position = 6
+        WideText = 'Waluta'
       end>
     WideDefaultText = ''
   end

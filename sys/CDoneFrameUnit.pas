@@ -211,9 +211,9 @@ begin
     CellText := DateToStr(xData.triggerDate);
   end else if Column = 3 then begin
     if xData.done = Nil then begin
-      CellText := CurrencyToString(xData.planned.cash);
+      CellText := CurrencyToString(xData.planned.cash, '', False);
     end else begin
-      CellText := CurrencyToString(xData.done.cash);
+      CellText := CurrencyToString(xData.done.cash, '', False);
     end;
   end else if Column = 4 then begin
     if (xData.planned.movementType = CInMovement) then begin
@@ -239,6 +239,7 @@ begin
         CellText := CPlannedScheduledOvertime;
       end;
     end;
+  end else if Column = 6 then begin
   end;
 end;
 
@@ -635,6 +636,7 @@ begin
         xData.done.doneDate := xForm.CDateTime.Value;
         xData.done.description := xForm.RichEditDesc.Text;
         xData.done.cash := xForm.CCurrCash.Value;
+        xData.done.idAccountCurrencyDef := xData.planned.idMovementCurrencyDef;
         if xForm.ComboBoxStatus.ItemIndex = 1 then begin
           xData.done.doneState := CDoneAccepted;
         end else begin

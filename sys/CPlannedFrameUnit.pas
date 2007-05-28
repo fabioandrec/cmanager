@@ -130,7 +130,7 @@ begin
   end else if Column = 3 then begin
     CellText := CurrencyToString(xData.cash, '', False);
   end else begin
-    CellText := GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN);
+    CellText := GCurrencyCache.GetSymbol(xData.idMovementCurrencyDef);
   end;
 end;
 
