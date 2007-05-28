@@ -9,6 +9,28 @@ uses
   CDatabase, CImageListsUnit;
 
 type
+  TRateFrameAdditionalData = class(TCDataobjectFrameData)
+  private
+    FIdSource: String;
+    FIdDest: String;
+  public
+    constructor CreateRateData(AIdSource, AIdDest: String);
+  published
+    property idSource: String read FIdSource;
+    property idDesc: String read FIdDest;
+  end;
+
+  TRateFormAdditionalData = class(TAdditionalData)
+  private
+    FIdSource: String;
+    FIdDest: String;
+  public
+    constructor CreateRateData(AIdSource, AIdDest: String);
+  published
+    property idSource: String read FIdSource;
+    property idDesc: String read FIdDest;
+  end;
+
   TCCurrencyRateFrame = class(TCDataobjectFrame)
     CDateTimePerStart: TCDateTime;
     Label4: TLabel;
@@ -24,6 +46,7 @@ type
   protected
     procedure UpdateCustomPeriod;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+    function GetAdditionalDataForObject: TAdditionalData; override;
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
@@ -39,7 +62,7 @@ type
 implementation
 
 uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils,
-  CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit;
+  CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit, CBaseFrameUnit;
 
 {$R *.dfm}
 
@@ -118,6 +141,11 @@ begin
   Result := (inherited IsValidFilteredObject(AObject)) or
             ((xDf <= TCurrencyRate(AObject).bindingDate) and (TCurrencyRate(AObject).bindingDate <= xDt)
             and (CStaticFilter.DataId = TCurrencyRate(AObject).rateType));
+  if Result and (AdditionalData <> Nil) then begin
+    with TRateFrameAdditionalData(AdditionalData) do begin
+      Result := (FIdSource = TCurrencyRate(AObject).idSourceCurrencyDef) and (FIdDest = TCurrencyRate(AObject).idTargetCurrencyDef);
+    end;
+  end;
 end;
 
 procedure TCCurrencyRateFrame.ReloadDataobjects;
@@ -133,6 +161,11 @@ begin
   end;
   if CStaticFilter.DataId <> CFilterAllElements then begin
     xCondition := xCondition + ' and rateType = ''' + CStaticFilter.DataId + '''';
+  end;
+  if AdditionalData <> Nil then begin
+    with TRateFrameAdditionalData(AdditionalData) do begin
+      xCondition := xCondition + Format(' and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s', [FIdSource, FIdDest]);
+    end;
   end;
   Dataobjects := TCurrencyRate.GetList(TCurrencyRate, CurrencyRateProxy, 'select * from currencyRate' + xCondition);
 end;
@@ -190,6 +223,29 @@ begin
     ADataGid := xGid;
     AText := xText;
   end;
+end;
+
+constructor TRateFrameAdditionalData.CreateRateData(AIdSource, AIdDest: String);
+begin
+  inherited CreateNew;
+  FIdSource := AIdSource;
+  FIdDest := AIdDest;
+end;
+
+function TCCurrencyRateFrame.GetAdditionalDataForObject: TAdditionalData;
+begin
+  if AdditionalData = Nil then begin
+    Result := inherited GetAdditionalDataForObject;
+  end else begin
+    Result := TRateFormAdditionalData.CreateRateData(TRateFrameAdditionalData(AdditionalData).idSource, TRateFrameAdditionalData(AdditionalData).idDesc);
+  end;
+end;
+
+constructor TRateFormAdditionalData.CreateRateData(AIdSource, AIdDest: String);
+begin
+  inherited Create;
+  FIdSource := AIdSource;
+  FIdDest := AIdDest;
 end;
 
 end.

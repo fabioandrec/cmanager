@@ -169,6 +169,14 @@ begin
   CDateTime.Value := GWorkDate;
   CCurrRate.CurrencyStr := '';
   FRateToReplaceId := CEmptyDataGid;
+  if (Operation = coAdd) and (AdditionalData <> Nil) then begin
+    with TRateFormAdditionalData(AdditionalData) do begin
+      CStaticBaseCurrencydef.DataId := idSource;
+      CStaticBaseCurrencydef.Caption := GCurrencyCache.GetIso(idSource);
+      CStaticTargetCurrencydef.DataId := idDesc;
+      CStaticTargetCurrencydef.Caption := GCurrencyCache.GetIso(idDesc);
+    end;
+  end;
   UpdateDescription;
 end;
 

@@ -159,7 +159,7 @@ create table baseMovement (
   currencyQuantity int,
   currencyRate money null,
   rateDescription varchar(200),
-  currencyCash money not null,
+  movementCash money not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),

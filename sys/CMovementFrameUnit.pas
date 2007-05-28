@@ -890,7 +890,7 @@ end;
 function TMovementTreeElement.GetidCurrencyDef: TDataGid;
 begin
   if FelementType = mtObject then begin
-    Result := TBaseMovement(Dataobject).idCurrencyDef;
+    Result := TBaseMovement(Dataobject).idAccountCurrencyDef;
   end else begin
     Result := TMovementList(Dataobject).idCurrencyDef;
   end;

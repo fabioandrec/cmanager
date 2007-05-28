@@ -240,7 +240,13 @@ type
     FidProduct: TDataGid;
     FidPlannedDone: TDataGid;
     FidMovementList: TDataGid;
-    FidCurrencyDef: TDataGid;
+    FidAccountCurrencyDef: TDataGid;
+    FidMovementCurrencyDef: TDataGid;
+    FidCurrencyRate: TDataGid;
+    FcurrencyQuantity: Integer;
+    FcurrencyRate: Currency;
+    FrateDescription: TBaseDescription;
+    FmovementCash: Currency;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -251,7 +257,13 @@ type
     procedure SetidProduct(const Value: TDataGid);
     procedure SetidPlannedDone(const Value: TDataGid);
     procedure SetidMovementList(const Value: TDataGid);
-    procedure SetidCurrencyDef(const Value: TDataGid);
+    procedure SetcurrencyQuantity(const Value: Integer);
+    procedure SetcurrencyRate(const Value: Currency);
+    procedure SetidAccountCurrencyDef(const Value: TDataGid);
+    procedure SetidCurrencyRate(const Value: TDataGid);
+    procedure SetidMovementCurrencyDef(const Value: TDataGid);
+    procedure SetmovementCash(const Value: Currency);
+    procedure SetrateDescription(const Value: TBaseDescription);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -274,7 +286,13 @@ type
     property weekDate: TDateTime read FweekDate;
     property monthDate: TDateTime read FmonthDate;
     property yearDate: TDateTime read FyearDate;
-    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
+    property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write SetidAccountCurrencyDef;
+    property idMovementCurrencyDef: TDataGid read FidMovementCurrencyDef write SetidMovementCurrencyDef;
+    property idCurrencyRate: TDataGid read FidCurrencyRate write SetidCurrencyRate;
+    property currencyQuantity: Integer read FcurrencyQuantity write SetcurrencyQuantity;
+    property currencyRate: Currency read FcurrencyRate write SetcurrencyRate;
+    property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
+    property movementCash: Currency read FmovementCash write SetmovementCash;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -295,7 +313,6 @@ type
     FtriggerDay: Integer;
     FdoneCount: Integer;
     FfreeDays: TBaseEnumeration;
-    FidCurrencyDef: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -311,7 +328,6 @@ type
     procedure SettriggerType(const Value: TBaseEnumeration);
     procedure SetisActive(const Value: Boolean);
     procedure SetfreeDays(const Value: TBaseEnumeration);
-    procedure SetidCurrencyDef(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -335,7 +351,6 @@ type
     property triggerDay: Integer read FtriggerDay write SettriggerDay;
     property doneCount: Integer read FdoneCount;
     property freeDays: TBaseEnumeration read FfreeDays write SetfreeDays;
-    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
   end;
 
   TPlannedDone = class(TDataObject)
@@ -831,7 +846,13 @@ begin
     FidProduct := FieldByName('idProduct').AsString;
     FidPlannedDone := FieldByName('idPlannedDone').AsString;
     FidMovementList := FieldByName('idMovementList').AsString;
-    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
+    FidMovementCurrencyDef := FieldByName('idMovementCurrencyDef').AsString;
+    FidCurrencyRate := FieldByName('idCurrencyRate').AsString;
+    FcurrencyQuantity := FieldByName('currencyQuantity').AsInteger;
+    FcurrencyRate := FieldByName('currencyRate').AsCurrency;
+    FrateDescription := FieldByName('rateDescription').AsString;
+    FmovementCash := FieldByName('movementCash').AsCurrency;
   end;
 end;
 
@@ -903,7 +924,13 @@ begin
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'baseMovement');
     AddField('idPlannedDone', DataGidToDatabase(FidPlannedDone), False, 'baseMovement');
     AddField('idMovementList', DataGidToDatabase(FidMovementList), False, 'baseMovement');
-    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'baseMovement');
+    AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'baseMovement');
+    AddField('idMovementCurrencyDef', DataGidToDatabase(FidMovementCurrencyDef), False, 'baseMovement');
+    AddField('idCurrencyRate', DataGidToDatabase(FidCurrencyRate), False, 'baseMovement');
+    AddField('currencyQuantity', IntToStr(FcurrencyQuantity), False, 'baseMovement');
+    AddField('currencyRate', CurrencyToDatabase(FcurrencyRate), False, 'baseMovement');
+    AddField('rateDescription', FrateDescription, True, 'baseMovement');
+    AddField('movementCash', CurrencyToDatabase(FmovementCash), False, 'baseMovement');
   end;
 end;
 
@@ -992,7 +1019,6 @@ begin
     if xField <> Nil then begin
       FdoneCount := xField.AsInteger;
     end;
-    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
   end;
 end;
 
@@ -1072,14 +1098,6 @@ begin
   end;
 end;
 
-procedure TPlannedMovement.SetidCurrencyDef(const Value: TDataGid);
-begin
-  if FidCurrencyDef <> Value then begin
-    FidCurrencyDef := Value;
-    SetState(msModified);
-  end;
-end;
-
 procedure TPlannedMovement.SetidProduct(const Value: TDataGid);
 begin
   if FidProduct <> Value then begin
@@ -1155,7 +1173,6 @@ begin
     AddField('triggerType', FtriggerType, True, 'plannedMovement');
     AddField('triggerDay', IntToStr(FtriggerDay), False, 'plannedMovement');
     AddField('freeDays', FfreeDays, True, 'plannedMovement');
-    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'plannedMovement');
   end;
 end;
 
@@ -1719,7 +1736,9 @@ begin
   FidCashPoint := CEmptyDataGid;
   FidPlannedDone := CEmptyDataGid;
   FidProduct := CEmptyDataGid;
-  FidCurrencyDef := CEmptyDataGid;
+  FidAccountCurrencyDef := CEmptyDataGid;
+  FidMovementCurrencyDef := CEmptyDataGid;
+  FidCurrencyRate := CEmptyDataGid;
 end;
 
 function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -2419,20 +2438,10 @@ begin
   inherited Items[AIndex] := Value;
 end;
 
-procedure TBaseMovement.SetidCurrencyDef(const Value: TDataGid);
-begin
-  if FidCurrencyDef <> Value then begin
-    FidCurrencyDef := Value;
-    SetState(msModified);
-  end;
-end;
-
 class function TAccount.GetCurrencyDefinition(AIdAccount: TDataGid): TDataGid;
 begin
   Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from account where idAccount = %s', [DataGidToDatabase(AIdAccount)]), '');
 end;
-
-{ TCurrencyRateHelper }
 
 procedure TCurrencyRateHelper.Assign(Aquantity: Integer; Arate: Currency; ADesc: String);
 begin
@@ -2452,6 +2461,62 @@ end;
 function TCurrencyRateHelper.ExchangeCurrency(ACash: Currency): Currency;
 begin
   Result := SimpleRoundTo(Fquantity * ACash / Frate, -4);
+end;
+
+procedure TBaseMovement.SetcurrencyQuantity(const Value: Integer);
+begin
+  if FcurrencyQuantity <> Value then begin
+    FcurrencyQuantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetcurrencyRate(const Value: Currency);
+begin
+  if FcurrencyRate <> Value then begin
+    FcurrencyRate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetidAccountCurrencyDef(const Value: TDataGid);
+begin
+  if FidAccountCurrencyDef <> Value then begin
+    FidAccountCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetidCurrencyRate(const Value: TDataGid);
+begin
+  if FidCurrencyRate <> Value then begin
+    FidCurrencyRate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetidMovementCurrencyDef(const Value: TDataGid);
+begin
+  if FidMovementCurrencyDef <> Value then begin
+    FidMovementCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetmovementCash(const Value: Currency);
+begin
+  if FmovementCash <> Value then begin
+    FmovementCash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetrateDescription(const Value: TBaseDescription);
+begin
+  if FrateDescription <> Value then begin
+    FrateDescription := Value;
+    SetState(msModified);
+  end;
 end;
 
 initialization

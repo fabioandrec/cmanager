@@ -170,6 +170,7 @@ inherited CCurrencyRateForm: TCCurrencyRateForm
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
+        WithCalculator = True
       end
     end
     object GroupBox2: TGroupBox

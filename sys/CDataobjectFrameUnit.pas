@@ -14,6 +14,7 @@ type
     FFilterId: String;
   public
     constructor CreateWithFilter(AFilterId: String);
+    constructor CreateNew;
     property FilterId: String read FFilterId;
   end;
 
@@ -56,6 +57,7 @@ type
     procedure MessageMovementEdited(AId: TDataGid; AOptions: Integer); virtual;
     procedure MessageMovementDeleted(AId: TDataGid; AOptions: Integer); virtual;
     procedure RefreshData; virtual;
+    function GetAdditionalDataForObject: TAdditionalData; virtual;
   public
     Dataobjects: TDataObjectList;
     procedure RecreateTreeHelper; virtual;
@@ -243,7 +245,7 @@ procedure TCDataobjectFrame.ActionAddExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
 begin
   xForm := GetDataobjectForm(WMOPT_NONE).Create(Nil);
-  xForm.ShowDataobject(coAdd, GetDataobjectProxy(WMOPT_NONE), Nil, True);
+  xForm.ShowDataobject(coAdd, GetDataobjectProxy(WMOPT_NONE), Nil, True, GetAdditionalDataForObject);
   xForm.Free;
 end;
 
@@ -251,7 +253,7 @@ procedure TCDataobjectFrame.ActionEditExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
 begin
   xForm := GetDataobjectForm(WMOPT_NONE).Create(Nil);
-  xForm.ShowDataobject(coEdit, GetDataobjectProxy(WMOPT_NONE), TDataObject(List.SelectedElement.Data), True);
+  xForm.ShowDataobject(coEdit, GetDataobjectProxy(WMOPT_NONE), TDataObject(List.SelectedElement.Data), True, GetAdditionalDataForObject);
   xForm.Free;
 end;
 
@@ -303,9 +305,15 @@ begin
   Result := Nil;
 end;
 
-constructor TCDataobjectFrameData.CreateWithFilter(AFilterId: String);
+constructor TCDataobjectFrameData.CreateNew;
 begin
   inherited Create;
+  FFilterId := CFilterAllElements;
+end;
+
+constructor TCDataobjectFrameData.CreateWithFilter(AFilterId: String);
+begin
+  CreateNew;
   FFilterId := AFilterId;
 end;
 
@@ -408,6 +416,11 @@ begin
   ActionAdd.ShortCut := ShortCut(Word('D'), [ssCtrl]);
   ActionEdit.ShortCut := ShortCut(Word('E'), [ssCtrl]);
   ActionDelete.ShortCut := ShortCut(Word('U'), [ssCtrl]);
+end;
+
+function TCDataobjectFrame.GetAdditionalDataForObject: TAdditionalData;
+begin
+  Result := Nil;
 end;
 
 end.

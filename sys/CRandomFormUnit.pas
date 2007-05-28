@@ -103,11 +103,17 @@ begin
       GDataProvider.BeginTransaction;
       with TBaseMovement.CreateObject(BaseMovementProxy, False) do begin
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
-        idCurrencyDef := xAccount.idCurrencyDef;
+        idAccountCurrencyDef := xAccount.idCurrencyDef;
+        idMovementCurrencyDef := idAccountCurrencyDef;
+        currencyQuantity := 1;
+        currencyRate := 1;
+        rateDescription := '';
+        idCurrencyRate := CEmptyDataGid;
         xProduct := TProduct(xOutproducts.Items[Random(xOutproducts.Count)]);
         xCashpoint := TCashPoint(xCashpoints.Items[Random(xCashpoints.Count)]);
         description := xProduct.name;
         cash := Random(50) + Random;
+        movementCash := cash;
         movementType := COutMovement;
         idAccount := xAccount.id;
         regDate := xDate;
@@ -120,11 +126,17 @@ begin
       GDataProvider.BeginTransaction;
       with TBaseMovement.CreateObject(BaseMovementProxy, False) do begin
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
-        idCurrencyDef := xAccount.idCurrencyDef;
+        idAccountCurrencyDef := xAccount.idCurrencyDef;
+        idMovementCurrencyDef := idAccountCurrencyDef;
+        currencyQuantity := 1;
+        currencyRate := 1;
+        rateDescription := '';
+        idCurrencyRate := CEmptyDataGid;
         xProduct := TProduct(xInproducts.Items[Random(xInproducts.Count)]);
         xCashpoint := TCashPoint(xCashpoints.Items[Random(xCashpoints.Count)]);
         description := xProduct.name;
         cash := Random(500) + Random;
+        movementCash := cash;
         movementType := CInMovement;
         idAccount := xAccount.id;
         regDate := xDate;

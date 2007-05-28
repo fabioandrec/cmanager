@@ -469,7 +469,6 @@ begin
       xMovement.idCashPoint := CStaticInoutOnceCashpoint.DataId;
       xMovement.idProduct := productId;
       xMovement.idMovementList := Dataobject.id;
-      xMovement.idCurrencyDef := CStaticCurrency.DataId;
     end;
   end;
   for xCount := 0 to Fmodified.Count - 1 do begin
@@ -483,7 +482,6 @@ begin
       xMovement.idCashPoint := CStaticInoutOnceCashpoint.DataId;
       xMovement.idProduct := productId;
       xMovement.idMovementList := Dataobject.id;
-      xMovement.idCurrencyDef := CStaticCurrency.DataId;
     end;
   end;
   for xCount := 0 to Fdeleted.Count - 1 do begin

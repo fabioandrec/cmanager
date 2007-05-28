@@ -222,9 +222,6 @@ begin
     FSchedule.triggerType := triggerType;
     FSchedule.triggerDay := triggerDay;
     FSchedule.freeDays := freeDays;
-    CStaticCurrency.DataId := idCurrencyDef;
-    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
-    CCurrEdit.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     ComboBoxTypeChange(ComboBoxType);
     CStaticSchedule.Caption := FSchedule.AsString;
   end;
@@ -253,7 +250,6 @@ begin
     triggerType := FSchedule.triggerType;
     triggerDay := FSchedule.triggerDay;
     freeDays := FSchedule.freeDays;
-    idCurrencyDef := CStaticCurrency.DataId;
   end;
 end;
 
