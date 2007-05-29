@@ -197,13 +197,13 @@ type
     FmovementType: TBaseEnumeration;
     Fcash: Currency;
     FprevCash: Currency;
-    FidCurrencyDef: TDataGid;
+    FidAccountCurrencyDef: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetregDate(const Value: TDateTime);
     procedure SetmovementType(const Value: TBaseEnumeration);
-    procedure SetidCurrencyDef(const Value: TDataGid);
+    procedure SetidAccountCurrencyDef(const Value: TDataGid);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
@@ -221,7 +221,7 @@ type
     property yearDate: TDateTime read FyearDate;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property cash: Currency read Fcash;
-    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
+    property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write SetidAccountCurrencyDef;
   end;
 
   TBaseMovement = class(TDataObject)
@@ -1686,7 +1686,7 @@ begin
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FmovementType := FieldByName('movementType').AsString;
     Fcash := FieldByName('cash').AsCurrency;
-    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
     FprevCash := Fcash;
   end;
 end;
@@ -1731,10 +1731,10 @@ begin
   end;
 end;
 
-procedure TMovementList.SetidCurrencyDef(const Value: TDataGid);
+procedure TMovementList.SetidAccountCurrencyDef(const Value: TDataGid);
 begin
-  if FidCurrencyDef <> Value then begin
-    FidCurrencyDef := Value;
+  if FidAccountCurrencyDef <> Value then begin
+    FidAccountCurrencyDef := Value;
     SetState(msModified);
   end;
 end;
@@ -1771,7 +1771,7 @@ begin
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'movementList');
     AddField('movementType', FmovementType, True, 'movementList');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'movementList');
-    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'movementList');
+    AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'movementList');
   end;
 end;
 
@@ -1863,7 +1863,9 @@ end;
 class function TAccount.GetMovementCount(AIdAccount: TDataGid): Integer;
 begin
   Result := GDataProvider.GetSqlInteger(Format('select count(*) from baseMovement where idAccount = %s or idSourceAccount = %s',
-      [DataGidToDatabase(AIdAccount), DataGidToDatabase(AIdAccount)]), 0);
+                 [DataGidToDatabase(AIdAccount), DataGidToDatabase(AIdAccount)]), 0) +
+            GDataProvider.GetSqlInteger(Format('select count(*) from movementList where idAccount = %s',
+                 [DataGidToDatabase(AIdAccount), DataGidToDatabase(AIdAccount)]), 0);
 end;
 
 procedure TAccount.SetinitialBalance(const Value: Currency);

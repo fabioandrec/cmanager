@@ -28,3 +28,6 @@ alter table plannedMovement add constraint fk_planndedMovementCurrencyDef foreig
 alter table plannedDone add idDoneCurrencyDef uniqueidentifier not null;
 update plannedDone set idDoneCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
 alter table plannedDone add constraint fk_plannedDoneCurrencyDef foreign key (idDoneCurrencyDef) references currencyDef (idCurrencyDef);
+alter table movementList add idAccountCurrencyDef uniqueidentifier not null;
+update movementList set idAccountCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
+alter table movementList add constraint fk_movementListAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef);

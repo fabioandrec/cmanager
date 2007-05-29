@@ -188,13 +188,21 @@ inherited CMovementListForm: TCMovementListForm
       Height = 297
       Caption = ' Lista operacji '
       TabOrder = 2
-      object Label19: TLabel
-        Left = 25
-        Top = 32
-        Width = 34
+      object Label17: TLabel
+        Left = 24
+        Top = 28
+        Width = 64
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Waluta'
+        Caption = 'Waluta konta'
+      end
+      object Label21: TLabel
+        Left = 239
+        Top = 29
+        Width = 113
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Razem w walucie konta'
       end
       object Panel1: TPanel
         Left = 24
@@ -203,7 +211,7 @@ inherited CMovementListForm: TCMovementListForm
         Height = 209
         BevelOuter = bvLowered
         Caption = 'Panel1'
-        TabOrder = 1
+        TabOrder = 0
         object Bevel1: TBevel
           Left = 1
           Top = 165
@@ -320,53 +328,36 @@ inherited CMovementListForm: TCMovementListForm
         end
       end
       object CStaticCurrency: TCStatic
-        Left = 67
-        Top = 29
-        Width = 123
+        Left = 96
+        Top = 25
+        Width = 97
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz walut'#281' z listy>'
+        Caption = '<brak konta>'
         Color = clWindow
+        Enabled = False
         ParentColor = False
-        TabOrder = 0
+        TabOrder = 1
         TabStop = True
         Transparent = False
-        TextOnEmpty = '<wybierz walut'#281' z listy>'
-        OnGetDataId = CStaticCurrencyGetDataId
-        OnChanged = CStaticCurrencyChanged
-        HotTrack = True
+        TextOnEmpty = '<brak konta>'
+        HotTrack = False
       end
-      object Panel3: TPanel
-        Left = 200
-        Top = 20
-        Width = 289
-        Height = 34
-        BevelOuter = bvNone
+      object CCurrEditCash: TCCurrEdit
+        Left = 360
+        Top = 25
+        Width = 121
+        Height = 21
+        BorderStyle = bsNone
         Enabled = False
         TabOrder = 2
-        object Label6: TLabel
-          Left = 5
-          Top = 12
-          Width = 147
-          Height = 13
-          Alignment = taRightJustify
-          Caption = 'Suma kwot wszystkich operacji'
-        end
-        object CCurrEditCash: TCCurrEdit
-          Left = 159
-          Top = 8
-          Width = 123
-          Height = 21
-          BorderStyle = bsNone
-          TabOrder = 0
-          Decimals = 2
-          ThousandSep = True
-          CurrencyStr = 'z'#322
-          BevelKind = bkTile
-          WithCalculator = True
-        end
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
   end

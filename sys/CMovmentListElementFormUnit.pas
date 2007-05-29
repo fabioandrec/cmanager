@@ -15,7 +15,13 @@ type
     FmovementType: TBaseEnumeration;
     Fdescription: TBaseDescription;
     Fcash: Currency;
-    FidCurrencyDef: TDataGid;
+    FmovementCash: Currency;
+    FidAccountCurrencyDef: TDataGid;
+    FidMovementCurrencyDef: TDataGid;
+    FidCurrencyRate: TDataGid;
+    FcurrencyQuantity: Integer;
+    FcurrencyRate: Currency;
+    FrateDescription: TBaseDescription;
   public
     constructor Create;
   published
@@ -24,7 +30,13 @@ type
     property movementType: TBaseEnumeration read FmovementType write FmovementType;
     property description: TBaseDescription read Fdescription write Fdescription;
     property cash: Currency read Fcash write Fcash;
-    property idCurrencyDef: TDataGid read FidCurrencyDef write FidCurrencyDef;
+    property movementCash: Currency read FmovementCash write FmovementCash;
+    property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write FidAccountCurrencyDef;
+    property idMovementCurrencyDef: TDataGid read FidMovementCurrencyDef write FidMovementCurrencyDef;
+    property idCurrencyRate: TDataGid read FidCurrencyRate write FidCurrencyRate;
+    property currencyQuantity: Integer read FcurrencyQuantity write FcurrencyQuantity;
+    property currencyRate: Currency read FcurrencyRate write FcurrencyRate;
+    property rateDescription: TBaseDescription read FrateDescription write FrateDescription;
   end;
 
   TCMovmentListElementForm = class(TCConfigForm)

@@ -911,7 +911,7 @@ begin
   if FelementType = mtObject then begin
     Result := TBaseMovement(Dataobject).idAccountCurrencyDef;
   end else begin
-    Result := TMovementList(Dataobject).idCurrencyDef;
+    Result := TMovementList(Dataobject).idAccountCurrencyDef;
   end;
 end;
 

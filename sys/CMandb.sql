@@ -134,10 +134,12 @@ create table movementList (
   yearDate datetime not null,
   movementType varchar(1) not null,  
   cash money not null,
+  idAccountCurrencyDef uniqueidentifier not null,  
   primary key (idmovementList),
   constraint ck_movementTypemovementList check (movementType in ('I', 'O')),
   constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),
-  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount)
+  constraint fk_accountmovementList foreign key (idAccount) references account (idAccount),
+  constraint fk_movementListAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
 create table baseMovement (
