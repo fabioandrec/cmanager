@@ -102,6 +102,7 @@ inherited CDoneFrame: TCDoneFrame
       OnGetText = SumListGetText
       OnGetHint = DoneListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
+      OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
       OddColor = 12437200
       AutoExpand = True
@@ -129,6 +130,10 @@ inherited CDoneFrame: TCDoneFrame
           Position = 3
           Width = 150
           WideText = 'Saldo'
+        end
+        item
+          Position = 4
+          WideText = 'Waluta'
         end>
       WideDefaultText = ''
     end

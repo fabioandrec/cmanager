@@ -62,10 +62,12 @@ type
     procedure DoneListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure ActionDooperationExecute(Sender: TObject);
     procedure DoneListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure SumListInitChildren(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; var ChildCount: Cardinal);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
-    FSumObjects: TSumList;
+    FSumRoot: TSumElement;
     FTreeObjects: TObjectList;
     procedure UpdateCustomPeriod;
     procedure FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
@@ -101,7 +103,7 @@ begin
   inherited Create(AOwner);
   FPlannedObjects := Nil;
   FDoneObjects := Nil;
-  FSumObjects := TSumList.Create(True);
+  FSumRoot := TSumElement.Create;
   FTreeObjects := TObjectList.Create(True);
 end;
 
@@ -176,7 +178,7 @@ destructor TCDoneFrame.Destroy;
 begin
   FPlannedObjects.Free;
   FDoneObjects.Free;
-  FSumObjects.Free;
+  FSumRoot.Free;
   FTreeObjects.Free;
   inherited Destroy;
 end;
@@ -240,6 +242,11 @@ begin
       end;
     end;
   end else if Column = 6 then begin
+    if xData.done = Nil then begin
+      CellText := GCurrencyCache.GetSymbol(xData.planned.idMovementCurrencyDef);
+    end else begin
+      CellText := GCurrencyCache.GetSymbol(xData.done.idDoneCurrencyDef);
+    end;
   end;
 end;
 
@@ -426,17 +433,28 @@ begin
   if Column = 0 then begin
     CellText := xData.name;
   end else if Column = 1 then begin
-    CellText := CurrencyToString(xData.cashOut);
+    CellText := CurrencyToString(xData.cashOut, '', False);
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xData.cashIn);
+    CellText := CurrencyToString(xData.cashIn, '', False);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(xData.cashIn - xData.cashOut);
+    CellText := CurrencyToString(xData.cashIn - xData.cashOut, '', False);
+  end else if Column = 4 then begin
+    CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
   end;
 end;
 
 procedure TCDoneFrame.SumListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+var xDate: TSumElement;
 begin
-  TSumElement(SumList.GetNodeData(Node)^) := TSumElement(FSumObjects.Items[Node.Index]);
+  if ParentNode = Nil then begin
+    TSumElement(SumList.GetNodeData(Node)^) := TSumElement(FSumRoot.childs.Items[Node.Index]);
+  end else begin
+    xDate := TSumElement(SumList.GetNodeData(ParentNode)^);
+    TSumElement(SumList.GetNodeData(Node)^) := TSumElement(xDate.childs.Items[Node.Index]);
+  end;
+  if TSumElement(SumList.GetNodeData(Node)^).childs.Count > 0 then begin
+    InitialStates := InitialStates + [ivsHasChildren];
+  end;
 end;
 
 procedure TCDoneFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -636,7 +654,7 @@ begin
         xData.done.doneDate := xForm.CDateTime.Value;
         xData.done.description := xForm.RichEditDesc.Text;
         xData.done.cash := xForm.CCurrCash.Value;
-        xData.done.idAccountCurrencyDef := xData.planned.idMovementCurrencyDef;
+        xData.done.idDoneCurrencyDef := xData.planned.idMovementCurrencyDef;
         if xForm.ComboBoxStatus.ItemIndex = 1 then begin
           xData.done.doneState := CDoneAccepted;
         end else begin
@@ -656,39 +674,82 @@ procedure TCDoneFrame.ReloadSums;
 var xCount: Integer;
     xElement: TPlannedTreeItem;
     xSum: TSumElement;
+    xMultiCurrency: Boolean;
+    xOneCurrency: TDataGid;
+    xPar: TSumElement;
 begin
   if AdditionalData = Nil then begin
     SumList.BeginUpdate;
     SumList.Clear;
-    FSumObjects.Clear;
-    xSum := TSumElement.Create;
-    xSum.id := '*';
-    xSum.name := 'Ogó³em dla wszystkich kont';
-    xSum.cashIn := 0;
-    xSum.cashOut := 0;
-    FSumObjects.Add(xSum);
+    xMultiCurrency := False;
+    xOneCurrency := CEmptyDataGid;
+    xCount := 0;
+    while (not xMultiCurrency) and (xCount <= FTreeObjects.Count - 1) do begin
+      xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
+      if xElement.done = Nil then begin
+        if xOneCurrency = CEmptyDataGid then begin
+          xOneCurrency := xElement.planned.idMovementCurrencyDef;
+        end else begin
+          xMultiCurrency := xOneCurrency <> xElement.planned.idMovementCurrencyDef;
+        end;
+      end;
+      Inc(xCount);
+    end;
+    FSumRoot.childs.Clear;
+    if xMultiCurrency then begin
+      for xCount := 0 to FTreeObjects.Count - 1 do begin
+        xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
+        if xElement.done = Nil then begin
+          xSum := FSumRoot.childs.FindSumObjectByCur(xElement.planned.idMovementCurrencyDef, False);
+          if xSum = Nil then begin
+            xSum := TSumElement.Create;
+            xSum.id := '*';
+            xSum.idCurrencyDef := xElement.planned.idMovementCurrencyDef;
+            xSum.cashIn := 0;
+            xSum.cashOut := 0;
+            xSum.name := 'Razem w ' + GCurrencyCache.GetSymbol(xElement.planned.idMovementCurrencyDef);
+            FSumRoot.AddChild(xSum);
+          end;
+        end;
+      end;
+    end else begin
+      xSum := TSumElement.Create;
+      xSum.id := '*';
+      xSum.idCurrencyDef := xOneCurrency;
+      xSum.cashIn := 0;
+      xSum.cashOut := 0;
+      xSum.name := 'Razem wszystkie operacje';
+      FSumRoot.AddChild(xSum);
+    end;
     for xCount := 0 to FTreeObjects.Count - 1 do begin
       xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
       if xElement.done = Nil then begin
-        xSum := FSumObjects.FindSumObjectById('*', True);
-        xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
-        xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
-        xSum := FSumObjects.FindSumObjectById(xElement.planned.idAccount, False);
-        if xSum = Nil then begin
-          xSum := TSumElement.Create;
-          xSum.id := xElement.planned.idAccount;
-          if xSum.id = CEmptyDataGid then begin
-            xSum.name := 'Bez zdefiniowanego konta';
-          end else begin
-            xSum.name := TAccount(TAccount.LoadObject(AccountProxy, xElement.planned.idAccount, False)).name;
-          end;
-          FSumObjects.Add(xSum);
+        if xMultiCurrency then begin
+          xPar := FSumRoot.childs.FindSumObjectByCur(xElement.planned.idMovementCurrencyDef, False);
+        end else begin
+          xPar := FSumRoot;
         end;
-        xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
-        xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
+        if xPar <> Nil then begin
+          xSum := xPar.childs.FindSumObjectById(xElement.planned.idAccount, False);
+          if xSum = Nil then begin
+            xSum := TSumElement.Create;
+            xSum.id := xElement.planned.idAccount;
+            xSum.idCurrencyDef := xElement.planned.idMovementCurrencyDef;
+            if xSum.id = CEmptyDataGid then begin
+              xSum.name := 'Bez zdefiniowanego konta';
+            end else begin
+              xSum.name := TAccount(TAccount.LoadObject(AccountProxy, xElement.planned.idAccount, False)).name;
+            end;
+            xPar.AddChild(xSum);
+          end;
+          xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
+          xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
+          xPar.cashIn := xPar.cashIn + xSum.cashIn;
+          xPar.cashOut := xPar.cashOut + xSum.cashOut;
+        end;
       end;
     end;
-    SumList.RootNodeCount := FSumObjects.Count;
+    SumList.RootNodeCount := FSumRoot.childs.Count;
     SumList.EndUpdate;
   end;
 end;
@@ -780,6 +841,13 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TCDoneFrame.SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+var xDate: TSumElement;
+begin
+  xDate := TSumElement(SumList.GetNodeData(Node)^);
+  ChildCount := xDate.childs.Count;
 end;
 
 end.

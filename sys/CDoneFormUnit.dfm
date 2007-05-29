@@ -75,6 +75,8 @@ inherited CDoneForm: TCDoneForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+        TabStop = True
+        Transparent = False
         HotTrack = True
       end
       object CCurrCash: TCCurrEdit
@@ -86,7 +88,9 @@ inherited CDoneForm: TCDoneForm
         TabOrder = 2
         Decimals = 2
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
+        WithCalculator = True
       end
     end
     object GroupBox3: TGroupBox
@@ -117,6 +121,8 @@ inherited CDoneForm: TCDoneForm
         Enabled = False
         ParentColor = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         HotTrack = True
       end
       object RichEditOperation: TRichEdit

@@ -366,14 +366,14 @@ type
     FdoneState: TBaseEnumeration;
     Fdescription: TBaseDescription;
     Fcash: Currency;
-    FidAccountCurrencyDef: TDataGid;
+    FidDoneCurrencyDef: TDataGid;
     procedure SetidPlannedMovement(const Value: TDataGid);
     procedure SettriggerDate(const Value: TDateTime);
     procedure SetdoneState(const Value: TBaseEnumeration);
     procedure SetdoneDate(const Value: TDateTime);
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setcash(const Value: Currency);
-    procedure SetidAccountCurrencyDef(const Value: TDataGid);
+    procedure SetidDoneCurrencyDef(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -385,7 +385,7 @@ type
     property doneDate: TDateTime read FdoneDate write SetdoneDate;
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
-    property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write SetidAccountCurrencyDef;
+    property idDoneCurrencyDef: TDataGid read FidDoneCurrencyDef write SetidDoneCurrencyDef;
   end;
 
   TMovementFilter = class(TDataObject)
@@ -551,10 +551,29 @@ const CDatafileTables: array[0..16] of string =
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
 procedure InitializeProxies;
+function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
 
 implementation
 
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
+
+function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
+begin
+  ADataset.First;
+  Result := False;
+  AOneCurrDef := '';
+  if not ADataset.IsEmpty then begin
+    AOneCurrDef := ADataset.FieldByName(ACurDefFieldname).AsString;
+    while (not Result) and (not ADataset.Eof) do begin
+      Result := (AOneCurrDef <> ADataset.FieldByName(ACurDefFieldname).AsString);
+      ADataset.Next;
+    end;
+  end;
+  ADataset.First;
+  if Result then begin
+    AOneCurrDef := '';
+  end;
+end;
 
 procedure InitializeProxies;
 begin
@@ -1211,7 +1230,7 @@ begin
     FdoneState := FieldByName('doneState').AsString;
     Fdescription := FieldByName('description').AsString;
     Fcash := FieldByName('cash').AsCurrency;
-    FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
+    FidDoneCurrencyDef := FieldByName('idDoneCurrencyDef').AsString;
   end;
 end;
 
@@ -1247,10 +1266,10 @@ begin
   end;
 end;
 
-procedure TPlannedDone.SetidAccountCurrencyDef(const Value: TDataGid);
+procedure TPlannedDone.SetidDoneCurrencyDef(const Value: TDataGid);
 begin
-  if FidAccountCurrencyDef <> Value then begin
-    FidAccountCurrencyDef := Value;
+  if FidDoneCurrencyDef <> Value then begin
+    FidDoneCurrencyDef := Value;
     SetState(msModified);
   end;
 end;
@@ -1281,7 +1300,7 @@ begin
     AddField('doneState', FdoneState, True, 'plannedDone');
     AddField('description', Fdescription, True, 'plannedDone');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'plannedDone');
-    AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'plannedDone');
+    AddField('idDoneCurrencyDef', DataGidToDatabase(FidDoneCurrencyDef), False, 'plannedDone');
   end;
 end;
 

@@ -114,11 +114,11 @@ create table plannedDone (
   idPlannedMovement uniqueidentifier not null,
   description varchar(200),
   cash money not null,
-  idAccountCurrencyDef uniqueidentifier not null,
+  idDoneCurrencyDef uniqueidentifier not null,
   primary key (idPlannedDone),
   constraint fk_plannedMovement foreign key (idPlannedMovement) references plannedMovement (idPlannedMovement),
   constraint ck_doneState check (doneState in ('O', 'D', 'A')),
-  constraint fk_plannedAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_plannedDoneCurrencyDef foreign key (idDoneCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
 create table movementList (

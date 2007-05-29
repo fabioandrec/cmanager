@@ -648,13 +648,13 @@ begin
         xDone.description := description;
         xDone.cash := cash;
         idPlannedDone := xDone.id;
-        xDone.idAccountCurrencyDef := idAccountCurrencyDef;
+        xDone.idDoneCurrencyDef := idAccountCurrencyDef;
       end else begin
         xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
         xDone.cash := cash;
         xDone.description := description;
         xDone.doneDate := regDate;
-        xDone.idAccountCurrencyDef := idAccountCurrencyDef;
+        xDone.idDoneCurrencyDef := idAccountCurrencyDef;
       end;
     end;
   end;

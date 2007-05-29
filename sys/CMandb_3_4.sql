@@ -25,6 +25,6 @@ alter table baseMovement add constraint fk_movementCurrencyRate foreign key (idC
 alter table plannedMovement add idMovementCurrencyDef uniqueidentifier not null;
 update plannedMovement set idMovementCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
 alter table plannedMovement add constraint fk_planndedMovementCurrencyDef foreign key (idMovementCurrencyDef) references currencyDef (idCurrencyDef);
-alter table plannedDone add idAccountCurrencyDef uniqueidentifier not null;
-update plannedDone set idAccountCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
-alter table plannedDone add constraint fk_plannedAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef);
+alter table plannedDone add idDoneCurrencyDef uniqueidentifier not null;
+update plannedDone set idDoneCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
+alter table plannedDone add constraint fk_plannedDoneCurrencyDef foreign key (idDoneCurrencyDef) references currencyDef (idCurrencyDef);
