@@ -69,8 +69,8 @@ type
     procedure ComboBoxTemplateChange(Sender: TObject);
     procedure CStaticMovementCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticMovementCurrencyChanged(Sender: TObject);
-    procedure CStaticRateGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CCurrEditMovementChange(Sender: TObject);
   private
     Felement: TMovementListElement;
     FRateHelper: TCurrencyRateHelper;
@@ -145,11 +145,16 @@ begin
   inherited FillForm;
   ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
   CCurrEditAccount.SetCurrencyDef(Felement.idAccountCurrencyDef, GCurrencyCache.GetSymbol(Felement.idAccountCurrencyDef));
+  CStaticAccountCurrency.DataId := Felement.idAccountCurrencyDef;
+  CStaticAccountCurrency.Caption := GCurrencyCache.GetIso(Felement.idAccountCurrencyDef);
+  CCurrEditMovement.SetCurrencyDef(Felement.idMovementCurrencyDef, GCurrencyCache.GetSymbol(Felement.idMovementCurrencyDef));
+  CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
+  CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
   if Operation = coEdit then begin
     FRateHelper := TCurrencyRateHelper.Create(Felement.currencyQuantity, Felement.currencyRate, Felement.rateDescription);
-    AssignRichText(Felement.description, RichEditDesc);
-    CCurrEditAccount.Value := Felement.cash;
     CCurrEditMovement.Value := Felement.movementCash;
+    CCurrEditAccount.Value := Felement.cash;
+    AssignRichText(Felement.description, RichEditDesc);
     CStaticCategory.DataId := Felement.productId;
     GDataProvider.BeginTransaction;
     xProduct := TProduct(TProduct.LoadObject(ProductProxy, Felement.productId, False));
@@ -158,7 +163,6 @@ begin
     CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
     CStaticRate.DataId := Felement.idCurrencyRate;
     CStaticRate.Caption := Felement.rateDescription;
-    CCurrEditMovement.SetCurrencyDef(Felement.idMovementCurrencyDef, GCurrencyCache.GetSymbol(Felement.idMovementCurrencyDef));
     GDataProvider.RollbackTransaction;
   end;
 end;
@@ -321,6 +325,11 @@ begin
       FRateHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
     end;
   end;
+end;
+
+procedure TCMovmentListElementForm.CCurrEditMovementChange(Sender: TObject);
+begin
+  UpdateAccountCurEdit(CStaticRate, CCurrEditMovement, CCurrEditAccount, FRateHelper);
 end;
 
 end.

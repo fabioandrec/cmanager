@@ -167,6 +167,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Height = 21
         BorderStyle = bsNone
         TabOrder = 2
+        OnChange = CCurrEditMovementChange
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322

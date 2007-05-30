@@ -314,7 +314,7 @@ inherited CMovementListForm: TCMovementListForm
             end
             item
               Position = 1
-              Width = 305
+              Width = 255
               WideText = 'Opis'
               WideHint = 'Nazwa kontrahenta'
             end
@@ -323,6 +323,10 @@ inherited CMovementListForm: TCMovementListForm
               Position = 2
               Width = 100
               WideText = 'Kwota'
+            end
+            item
+              Position = 3
+              WideText = 'Waluta'
             end>
           WideDefaultText = ''
         end

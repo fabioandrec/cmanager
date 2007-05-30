@@ -116,7 +116,11 @@ end;
 
 procedure TCMovementListForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
+  if Fmovements.Count = 0 then begin
+    AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
+  end else begin
+    ShowInfo(itInfo, 'Nie mo¿na zmieniæ konta, je¿eli na liœcie s¹ wprowadzone operacje', '')
+  end;
 end;
 
 procedure TCMovementListForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -143,17 +147,24 @@ procedure TCMovementListForm.Action1Execute(Sender: TObject);
 var xForm: TCMovmentListElementForm;
     xElement: TMovementListElement;
 begin
-  xElement := TMovementListElement.Create;
-  xElement.movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
-  xElement.idAccountCurrencyDef := CStaticCurrency.DataId;
-  xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
-  if xForm.ShowConfig(coAdd) then begin
-    Perform(WM_DATAOBJECTADDED, Integer(xElement), 0);
-    CStaticCurrency.Enabled := Fmovements.Count = 0;
+  if CStaticInoutOnceAccount.DataId <> CEmptyDataGid then begin
+    xElement := TMovementListElement.Create;
+    xElement.movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
+    xElement.idAccountCurrencyDef := CStaticCurrency.DataId;
+    xElement.idMovementCurrencyDef := CCurrencyDefGid_PLN;
+    xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
+    if xForm.ShowConfig(coAdd) then begin
+      Perform(WM_DATAOBJECTADDED, Integer(xElement), 0);
+      CStaticCurrency.Enabled := Fmovements.Count = 0;
+    end else begin
+      xElement.Free;
+    end;
+    xForm.Free;
   end else begin
-    xElement.Free;
+    if ShowInfo(itQuestion, 'Nie wybrano konta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticInoutOnceAccount.DoGetDataId;
+    end;
   end;
-  xForm.Free;
 end;
 
 procedure TCMovementListForm.WndProc(var Message: TMessage);
@@ -270,7 +281,9 @@ begin
   end else if Column = 1 then begin
     CellText := xData.description;
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xData.cash, xData.idAccountCurrencyDef, False);
+    CellText := CurrencyToString(xData.movementCash, '', False);
+  end else if Column = 3 then begin
+    CellText := GCurrencyCache.GetSymbol(xData.idMovementCurrencyDef);
   end;
 end;
 
