@@ -59,11 +59,13 @@ type
   end;
 
   TOnGetDataId = procedure (var ADataGid: String; var AText: String; var AAccepted: Boolean) of Object;
+  TOnClearDataId = procedure (ACurrentDataGid: String; var ACanClear: Boolean) of Object;
 
   TCStatic = class(TStaticText)
   private
     FDataId: string;
     FOnGetDataId: TOnGetDataId;
+    FOnClearDataId: TOnClearDataId;
     FOnChanged: TNotifyEvent;
     FTextOnEmpty: string;
     FHotTrack: Boolean;
@@ -84,6 +86,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure DoGetDataId;
+    procedure DoClearDataId(var ACanAccept: Boolean);
     property Canvas: TCanvas read FCanvas;
     destructor Destroy; override;
     function CanFocus: Boolean; override;
@@ -95,6 +98,7 @@ type
     property OnKeyPress;
     property Enabled;
     property OnGetDataId: TOnGetDataId read FOnGetDataId write FOnGetDataId;
+    property OnClearDataId: TOnClearDataId read FOnClearDataId write FOnClearDataId;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property HotTrack: Boolean read FHotTrack write FHotTrack;
   end;
@@ -633,6 +637,9 @@ end;
 constructor TCStatic.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FOnGetDataId := Nil;
+  FOnClearDataId := Nil;
+  FOnChanged := Nil;
   AutoSize := False;
   Height := 21;
   Width := 150;
@@ -657,6 +664,14 @@ begin
   inherited Destroy;
 end;
 
+procedure TCStatic.DoClearDataId(var ACanAccept: Boolean);
+begin
+  ACanAccept := True;
+  if Assigned(FOnClearDataId) then begin
+    FOnClearDataId(FDataId, ACanAccept);
+  end;
+end;
+
 procedure TCStatic.DoEnter;
 begin
   inherited;
@@ -677,14 +692,18 @@ begin
 end;
 
 procedure TCStatic.KeyDown(var Key: Word; Shift: TShiftState);
+var xCanClear: Boolean;
 begin
   inherited;
   if Key = VK_SPACE then begin
     Click;
   end else if Key = VK_DELETE then begin
-    DataId := '';
-    if Assigned(FOnChanged) then begin
-       FOnChanged(Self);
+    DoClearDataId(xCanClear);
+    if xCanClear then begin
+      DataId := '';
+      if Assigned(FOnChanged) then begin
+         FOnChanged(Self);
+      end;
     end;
   end;
 end;

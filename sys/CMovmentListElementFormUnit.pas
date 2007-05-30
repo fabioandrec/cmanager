@@ -44,39 +44,57 @@ type
     RichEditDesc: TRichEdit;
     GroupBox3: TGroupBox;
     Label2: TLabel;
-    Label9: TLabel;
     CStaticCategory: TCStatic;
-    CCurrEdit: TCCurrEdit;
     ActionManager: TActionManager;
     ActionAdd: TAction;
     ActionTemplate: TAction;
     CButton1: TCButton;
     CButton2: TCButton;
     ComboBoxTemplate: TComboBox;
+    Label20: TLabel;
+    CStaticMovementCurrency: TCStatic;
+    Label1: TLabel;
+    CCurrEditMovement: TCCurrEdit;
+    Label22: TLabel;
+    CStaticRate: TCStatic;
+    Label17: TLabel;
+    CStaticAccountCurrency: TCStatic;
+    Label21: TLabel;
+    CCurrEditAccount: TCCurrEdit;
     procedure CStaticCategoryChanged(Sender: TObject);
     procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ComboBoxTemplateChange(Sender: TObject);
+    procedure CStaticMovementCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticMovementCurrencyChanged(Sender: TObject);
+    procedure CStaticRateGetDataId(var ADataGid, AText: String;
+      var AAccepted: Boolean);
   private
     Felement: TMovementListElement;
+    FRateHelper: TCurrencyRateHelper;
     function ChooseProduct(var AId, AText: String): Boolean;
+    procedure UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
   protected
     procedure FillForm; override;
     procedure ReadValues; override;
     function CanAccept: Boolean; override;
+    procedure UpdateAccountCurDef(AAccountId: TDataGid; AStatic: TCStatic; ACurEdit: TCCurrEdit);
+    procedure UpdateCurrencyRates(AUpdateCurEdit: Boolean = True);
   public
     procedure UpdateDescription;
     constructor CreateFormElement(AOwner: TComponent; AElement: TMovementListElement);
     function ExpandTemplate(ATemplate: String): String; override;
+    destructor Destroy; override;
   end;
 
 implementation
 
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
      CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
-     CPreferences, CRichtext, CDataobjectFrameUnit;
+     CPreferences, CRichtext, CDataobjectFrameUnit, CCurrencydefFrameUnit,
+  CCurrencyRateFrameUnit;
 
 {$R *.dfm}
 
@@ -118,6 +136,7 @@ constructor TCMovmentListElementForm.CreateFormElement(AOwner: TComponent; AElem
 begin
   inherited Create(AOwner);
   Felement := AElement;
+  FRateHelper := Nil;
 end;
 
 procedure TCMovmentListElementForm.FillForm;
@@ -125,14 +144,21 @@ var xProduct: TProduct;
 begin
   inherited FillForm;
   ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
-  CCurrEdit.SetCurrencyDef(Felement.idCurrencyDef, GCurrencyCache.GetSymbol(Felement.idCurrencyDef));
+  CCurrEditAccount.SetCurrencyDef(Felement.idAccountCurrencyDef, GCurrencyCache.GetSymbol(Felement.idAccountCurrencyDef));
   if Operation = coEdit then begin
+    FRateHelper := TCurrencyRateHelper.Create(Felement.currencyQuantity, Felement.currencyRate, Felement.rateDescription);
     AssignRichText(Felement.description, RichEditDesc);
-    CCurrEdit.Value := Felement.cash;
+    CCurrEditAccount.Value := Felement.cash;
+    CCurrEditMovement.Value := Felement.movementCash;
     CStaticCategory.DataId := Felement.productId;
     GDataProvider.BeginTransaction;
     xProduct := TProduct(TProduct.LoadObject(ProductProxy, Felement.productId, False));
     CStaticCategory.Caption := xProduct.name;
+    CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
+    CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
+    CStaticRate.DataId := Felement.idCurrencyRate;
+    CStaticRate.Caption := Felement.rateDescription;
+    CCurrEditMovement.SetCurrencyDef(Felement.idMovementCurrencyDef, GCurrencyCache.GetSymbol(Felement.idMovementCurrencyDef));
     GDataProvider.RollbackTransaction;
   end;
 end;
@@ -142,7 +168,11 @@ begin
   inherited ReadValues;
   Felement.description := RichEditDesc.Text;
   Felement.productId := CStaticCategory.DataId;
-  Felement.cash := CCurrEdit.Value;
+  Felement.cash := CCurrEditAccount.Value;
+  Felement.movementCash := CCurrEditMovement.Value;
+  Felement.idMovementCurrencyDef := CStaticMovementCurrency.DataId;
+  Felement.rateDescription := CStaticRate.Caption;
+  Felement.idCurrencyRate := CStaticRate.DataId;
 end;
 
 function TCMovmentListElementForm.CanAccept: Boolean;
@@ -153,10 +183,10 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCategory.DoGetDataId;
     end;
-  end else if CCurrEdit.Value = 0 then begin
+  end else if CCurrEditAccount.Value = 0 then begin
     Result := False;
     ShowInfo(itError, 'Kwota operacji nie mo¿e byæ zerowa', '');
-    CCurrEdit.SetFocus;
+    CCurrEditAccount.SetFocus;
   end;
 end;
 
@@ -211,6 +241,86 @@ end;
 procedure TCMovmentListElementForm.ComboBoxTemplateChange(Sender: TObject);
 begin
   UpdateDescription;
+end;
+
+procedure TCMovmentListElementForm.UpdateAccountCurDef(AAccountId: TDataGid; AStatic: TCStatic; ACurEdit: TCCurrEdit);
+var xCurrencyId: TDataGid;
+begin
+  if AAccountId <> CEmptyDataGid then begin
+    xCurrencyId := TAccount.GetCurrencyDefinition(AAccountId);
+    AStatic.DataId := xCurrencyId;
+    AStatic.Caption := GCurrencyCache.GetIso(xCurrencyId);
+    ACurEdit.SetCurrencyDef(xCurrencyId, GCurrencyCache.GetSymbol(xCurrencyId));
+  end else begin
+    AStatic.DataId := CEmptyDataGid;
+    ACurEdit.SetCurrencyDef(CEmptyDataGid, '');
+  end;
+end;
+
+procedure TCMovmentListElementForm.CStaticMovementCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
+end;
+
+procedure TCMovmentListElementForm.CStaticMovementCurrencyChanged(Sender: TObject);
+begin
+  CStaticRate.DataId := CEmptyDataGid;
+  UpdateCurrencyRates;
+  CCurrEditMovement.SetCurrencyDef(CStaticMovementCurrency.DataId, GCurrencyCache.GetSymbol(CStaticMovementCurrency.DataId));
+end;
+
+procedure TCMovmentListElementForm.UpdateCurrencyRates(AUpdateCurEdit: Boolean = True);
+begin
+  CStaticRate.Enabled :=
+    (CStaticAccountCurrency.DataId <> CStaticMovementCurrency.DataId) and
+    (CStaticMovementCurrency.DataId <> CEmptyDataGid) and
+    (CStaticAccountCurrency.DataId <> CEmptyDataGid);
+  CStaticRate.HotTrack := CStaticRate.Enabled;
+  Label22.Enabled := CStaticRate.Enabled;
+  Label17.Enabled := CStaticRate.Enabled;
+  Label21.Enabled := CStaticRate.Enabled;
+  if AUpdateCurEdit then begin
+    UpdateAccountCurEdit(CStaticRate, CCurrEditMovement, CCurrEditAccount, FRateHelper);
+  end;
+end;
+
+procedure TCMovmentListElementForm.UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
+begin
+  if ASourceEdit.CurrencyId <> ATargetEdit.CurrencyId then begin
+    if ARate.DataId <> CEmptyDataGid then begin
+      if AHelper <> Nil then begin
+        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value);
+      end else begin
+        ATargetEdit.Value := 0;
+      end;
+    end else begin
+      ATargetEdit.Value := 0;
+    end;
+  end else begin
+    ATargetEdit.Value := ASourceEdit.Value;
+  end;
+end;
+
+destructor TCMovmentListElementForm.Destroy;
+begin
+  if FRateHelper <> Nil then begin
+    FRateHelper.Free;
+  end;
+  inherited Destroy;
+end;
+
+procedure TCMovmentListElementForm.CStaticRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xCurrencyRate: TCurrencyRate;
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencyRateFrame, ADataGid, AText, TRateFrameAdditionalData.CreateRateData(CStaticAccountCurrency.DataId, CStaticMovementCurrency.DataId));
+  if AAccepted then begin
+    xCurrencyRate := TCurrencyRate(TCurrencyRate.LoadObject(CurrencyRateProxy, ADataGid, False));
+    if FRateHelper = Nil then begin
+      FRateHelper := TCurrencyRateHelper.Create(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
+    end else begin
+      FRateHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
+    end;
+  end;
 end;
 
 end.

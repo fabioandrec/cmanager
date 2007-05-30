@@ -1017,9 +1017,15 @@ end;
 
 destructor TCMovementForm.Destroy;
 begin
-  FOnceRateHelper.Free;
-  FCyclicRateHelper.Free;
-  FTransferRateHelper.Free;
+  if FOnceRateHelper <> Nil then begin
+    FOnceRateHelper.Free;
+  end;
+  if FCyclicRateHelper <> Nil then begin
+    FCyclicRateHelper.Free;
+  end;
+  if FTransferRateHelper <> Nil then begin
+    FTransferRateHelper.Free;
+  end;
   inherited Destroy;
 end;
 

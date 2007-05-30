@@ -145,7 +145,7 @@ var xForm: TCMovmentListElementForm;
 begin
   xElement := TMovementListElement.Create;
   xElement.movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
-  xElement.idCurrencyDef := CStaticCurrency.DataId;
+  xElement.idAccountCurrencyDef := CStaticCurrency.DataId;
   xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
   if xForm.ShowConfig(coAdd) then begin
     Perform(WM_DATAOBJECTADDED, Integer(xElement), 0);
@@ -270,7 +270,7 @@ begin
   end else if Column = 1 then begin
     CellText := xData.description;
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xData.cash, xData.idCurrencyDef, False);
+    CellText := CurrencyToString(xData.cash, xData.idAccountCurrencyDef, False);
   end;
 end;
 
@@ -424,7 +424,7 @@ begin
       xElement.productId := xMovement.idProduct;
       xElement.movementType := xMovement.movementType;
       xElement.cash := xMovement.cash;
-      xElement.idCurrencyDef := idAccountCurrencyDef;
+      xElement.idAccountCurrencyDef := idAccountCurrencyDef;
       Fmovements.Add(xElement);
     end;
     xList.Free;
