@@ -190,6 +190,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Transparent = False
         TextOnEmpty = '<wybierz przelicznik kursu z listy>'
         OnGetDataId = CStaticRateGetDataId
+        OnChanged = CStaticRateChanged
         HotTrack = True
       end
       object CStaticAccountCurrency: TCStatic

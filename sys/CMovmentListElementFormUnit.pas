@@ -71,6 +71,7 @@ type
     procedure CStaticMovementCurrencyChanged(Sender: TObject);
     procedure CStaticRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CCurrEditMovementChange(Sender: TObject);
+    procedure CStaticRateChanged(Sender: TObject);
   private
     Felement: TMovementListElement;
     FRateHelper: TCurrencyRateHelper;
@@ -176,6 +177,8 @@ begin
   Felement.movementCash := CCurrEditMovement.Value;
   Felement.idMovementCurrencyDef := CStaticMovementCurrency.DataId;
   Felement.rateDescription := CStaticRate.Caption;
+  Felement.currencyQuantity := FRateHelper.quantity;
+  Felement.currencyRate := FRateHelper.rate;
   Felement.idCurrencyRate := CStaticRate.DataId;
 end;
 
@@ -330,6 +333,11 @@ end;
 procedure TCMovmentListElementForm.CCurrEditMovementChange(Sender: TObject);
 begin
   UpdateAccountCurEdit(CStaticRate, CCurrEditMovement, CCurrEditAccount, FRateHelper);
+end;
+
+procedure TCMovmentListElementForm.CStaticRateChanged(Sender: TObject);
+begin
+  UpdateCurrencyRates;
 end;
 
 end.

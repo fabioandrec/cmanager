@@ -438,6 +438,12 @@ begin
       xElement.movementType := xMovement.movementType;
       xElement.cash := xMovement.cash;
       xElement.idAccountCurrencyDef := idAccountCurrencyDef;
+      xElement.idMovementCurrencyDef := xMovement.idMovementCurrencyDef;
+      xElement.movementCash := xMovement.movementCash;
+      xElement.idCurrencyRate := xMovement.idCurrencyRate;
+      xElement.currencyQuantity := xMovement.currencyQuantity;
+      xElement.currencyRate := xMovement.currencyRate;
+      xElement.rateDescription := xMovement.rateDescription;
       Fmovements.Add(xElement);
     end;
     xList.Free;
@@ -474,6 +480,7 @@ begin
       xMovement.id := id;
       xMovement.description := description;
       xMovement.cash := cash;
+      xMovement.movementCash := movementCash;
       xMovement.movementType := movementType;
       xMovement.idAccount := CStaticInoutOnceAccount.DataId;
       xMovement.regDate := CDateTime1.Value;
@@ -481,6 +488,11 @@ begin
       xMovement.idProduct := productId;
       xMovement.idMovementList := Dataobject.id;
       xMovement.idAccountCurrencyDef := CStaticCurrency.DataId;
+      xMovement.idMovementCurrencyDef := idMovementCurrencyDef;
+      xMovement.currencyQuantity := currencyQuantity;
+      xMovement.currencyRate := currencyRate;
+      xMovement.idCurrencyRate := idCurrencyRate;
+      xMovement.rateDescription := rateDescription;
     end;
   end;
   for xCount := 0 to Fmodified.Count - 1 do begin
@@ -488,6 +500,7 @@ begin
       xMovement := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, id, False));
       xMovement.description := description;
       xMovement.cash := cash;
+      xMovement.movementCash := movementCash;
       xMovement.movementType := movementType;
       xMovement.idAccount := CStaticInoutOnceAccount.DataId;
       xMovement.regDate := CDateTime1.Value;
@@ -495,6 +508,11 @@ begin
       xMovement.idProduct := productId;
       xMovement.idMovementList := Dataobject.id;
       xMovement.idAccountCurrencyDef := CStaticCurrency.DataId;
+      xMovement.idMovementCurrencyDef := idMovementCurrencyDef;
+      xMovement.currencyQuantity := currencyQuantity;
+      xMovement.currencyRate := currencyRate;
+      xMovement.idCurrencyRate := idCurrencyRate;
+      xMovement.rateDescription := rateDescription;
     end;
   end;
   for xCount := 0 to Fdeleted.Count - 1 do begin

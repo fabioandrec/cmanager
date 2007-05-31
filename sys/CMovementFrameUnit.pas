@@ -577,24 +577,24 @@ var xDs: TADOQuery;
     xOneCurrency: TDataGid;
 begin
   GetFilterDates(xDf, xDt);
-  xSql := Format('select v.*, a.name, a.idCurrencyDef from ' +
-                 ' (select idAccount, sum(income) as incomes, sum(expense) as expenses from balances where ' +
+  xSql := Format('select v.*, a.name from ' +
+                 ' (select idAccount, idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses from balances where ' +
                  '   movementType <> ''%s'' and ' +
-                 '   regDate between %s and %s group by idAccount) as v ' +
+                 '   regDate between %s and %s group by idAccount, idMovementCurrencyDef) as v ' +
                  '   left outer join account a on a.idAccount = v.idAccount',
        [CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   xDs := GDataProvider.OpenSql(xSql);
-  xMultiCurrency := IsMultiCurrencyDataset(xDs, 'idCurrencyDef', xOneCurrency);
+  xMultiCurrency := IsMultiCurrencyDataset(xDs, 'idMovementCurrencyDef', xOneCurrency);
   SumList.BeginUpdate;
   SumList.Clear;
   FSumRoot.childs.Clear;
   if xMultiCurrency then begin
     while not xDs.Eof do begin
-      xObj := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idCurrencyDef').AsString, False);
+      xObj := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idMovementCurrencyDef').AsString, False);
       if xObj = Nil then begin
         xObj := TSumElement.Create;
         xObj.id := '*';
-        xObj.idCurrencyDef := xDs.FieldByName('idCurrencyDef').AsString;
+        xObj.idCurrencyDef := xDs.FieldByName('idMovementCurrencyDef').AsString;
         xObj.cashIn := 0;
         xObj.cashOut := 0;
         xObj.name := 'Razem w ' + GCurrencyCache.GetSymbol(xObj.idCurrencyDef);
@@ -614,7 +614,7 @@ begin
   xDs.First;
   while not xDs.Eof do begin
     if xMultiCurrency then begin
-      xPar := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idCurrencyDef').AsString, False);
+      xPar := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idMovementCurrencyDef').AsString, False);
     end else begin
       xPar := FSumRoot;
     end;
@@ -627,7 +627,7 @@ begin
       xObj.id := xDs.FieldByName('idAccount').AsString;
       xObj.name := xDs.FieldByName('name').AsString;
       xObj.cashIn := xObj.cashIn + xDs.FieldByName('incomes').AsCurrency;
-      xObj.idCurrencyDef := xDs.FieldByName('idCurrencyDef').AsString;
+      xObj.idCurrencyDef := xDs.FieldByName('idMovementCurrencyDef').AsString;
       xObj.cashOut := xObj.cashOut + xDs.FieldByName('expenses').AsCurrency;
       xPar.cashIn := xPar.cashIn + xObj.cashIn;
       xPar.cashOut := xPar.cashOut + xObj.cashOut;
@@ -891,7 +891,7 @@ end;
 function TMovementTreeElement.Getcash: Currency;
 begin
   if FelementType = mtObject then begin
-    Result := TBaseMovement(Dataobject).cash;
+    Result := TBaseMovement(Dataobject).movementCash;
   end else begin
     Result := TmovementList(Dataobject).cash;
   end;
@@ -909,7 +909,7 @@ end;
 function TMovementTreeElement.GetidCurrencyDef: TDataGid;
 begin
   if FelementType = mtObject then begin
-    Result := TBaseMovement(Dataobject).idAccountCurrencyDef;
+    Result := TBaseMovement(Dataobject).idMovementCurrencyDef;
   end else begin
     Result := TMovementList(Dataobject).idAccountCurrencyDef;
   end;
