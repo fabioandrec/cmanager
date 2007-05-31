@@ -30,8 +30,13 @@ type
     CCurrEditBound: TCCurrEdit;
     Label9: TLabel;
     ComboBoxSum: TComboBox;
+    Label20: TLabel;
+    CStaticCurrency: TCStatic;
     procedure ComboBoxDaysChange(Sender: TObject);
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String;
+      var AAccepted: Boolean);
+    procedure CStaticCurrencyChanged(Sender: TObject);
   protected
     procedure InitializeForm; override;
     function CanAccept: Boolean; override;
@@ -44,7 +49,8 @@ type
 implementation
 
 uses CFrameFormUnit, CFilterFrameUnit, CInfoFormUnit, CDataObjects,
-  CConsts, Math, CRichtext, CLimitsFrameUnit;
+  CConsts, Math, CRichtext, CLimitsFrameUnit, CCurrencydefFrameUnit,
+  CConfigFormUnit;
 
 {$R *.dfm}
 
@@ -56,6 +62,11 @@ end;
 procedure TCLimitForm.InitializeForm;
 begin
   inherited InitializeForm;
+  if Operation = coAdd then begin
+    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
+    CCurrEditBound.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+  end;
   ComboBoxDaysChange(ComboBoxDays);
 end;
 
@@ -71,6 +82,11 @@ begin
     Result := False;
     ShowInfo(itError, 'Nazwa limitu nie mo¿e byæ pusta', '');
     EditName.SetFocus;
+  end else if CStaticCurrency.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano waluty operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCurrency.DoGetDataId;
+    end;
   end;
 end;
 
@@ -83,6 +99,7 @@ begin
     name := EditName.Text;
     description := RichEditDesc.Text;
     idFilter := CStaticFilter.DataId;
+    idCurrencyDef := CStaticCurrency.DataId;
     boundaryAmount := CCurrEditBound.Value;
     boundaryDays := CIntEditDays.Value;
     xI := ComboBoxSum.ItemIndex;
@@ -133,6 +150,9 @@ begin
     SimpleRichText(description, RichEditDesc);
     CCurrEditBound.Value := boundaryAmount;
     CIntEditDays.Text := IntToStr(boundaryDays);
+    CStaticCurrency.DataId := idCurrencyDef;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
+    CCurrEditBound.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     if idFilter <> CEmptyDataGid then begin
       GDataProvider.BeginTransaction;
       CStaticFilter.DataId := idFilter;
@@ -187,6 +207,16 @@ end;
 function TCLimitForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCLimitsFrame;
+end;
+
+procedure TCLimitForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
+end;
+
+procedure TCLimitForm.CStaticCurrencyChanged(Sender: TObject);
+begin
+  CCurrEditBound.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
 end;
 
 end.

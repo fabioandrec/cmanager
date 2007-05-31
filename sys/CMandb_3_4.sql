@@ -31,6 +31,9 @@ alter table plannedDone add constraint fk_plannedDoneCurrencyDef foreign key (id
 alter table movementList add idAccountCurrencyDef uniqueidentifier not null;
 update movementList set idAccountCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
 alter table movementList add constraint fk_movementListAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef);
+alter table movementLimit add idCurrencyDef uniqueidentifier not null;
+update movementLimit set idCurrencyDef = '{00000000-0000-0000-0000-000000000001}';
+alter table movementLimit add constraint fk_limitCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef);
 drop  view transactions;
 create view transactions as select * from (
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'I'

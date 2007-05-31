@@ -467,6 +467,7 @@ type
     FsumType: TBaseEnumeration;
     FcurrentAmount: Currency;
     FisCalculated: Boolean;
+    FidCurrencyDef: TDataGid;
     procedure SetboundaryAmount(const Value: Currency);
     procedure SetboundaryDays(const Value: Integer);
     procedure SetboundaryType(const Value: TBaseEnumeration);
@@ -477,6 +478,7 @@ type
     procedure SetboundaryCondition(const Value: TBaseName);
     procedure GetFilterDates(ADateTime: TDateTime; var ADateFrom, ADateTo: TDateTime);
     procedure SetsumType(const Value: TBaseEnumeration);
+    procedure SetidCurrencyDef(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -497,6 +499,7 @@ type
     property boundaryCondition: TBaseName read FboundaryCondition write SetboundaryCondition;
     property boundaryDays: Integer read FboundaryDays write SetboundaryDays;
     property sumType: TBaseEnumeration read FsumType write SetsumType;
+    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
   end;
 
   TCurrCacheItem = class(TObject)
@@ -1912,6 +1915,8 @@ constructor TMovementLimit.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
   FisCalculated := False;
+  FidCurrencyDef := CEmptyDataGid;
+  FidFilter := CEmptyDataGid;
 end;
 
 procedure TMovementLimit.FromDataset(ADataset: TADOQuery);
@@ -1927,6 +1932,7 @@ begin
     FboundaryDays := FieldByName('boundaryDays').AsInteger;
     FisActive := FieldByName('isActive').AsBoolean;
     FsumType := FieldByName('sumType').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
   end;
 end;
 
@@ -2090,6 +2096,14 @@ begin
   end;
 end;
 
+procedure TMovementLimit.SetidCurrencyDef(const Value: TDataGid);
+begin
+  if FidCurrencyDef <> Value then begin
+    FidCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TMovementLimit.SetidFilter(const Value: TDataGid);
 begin
   if FidFilter <> Value then begin
@@ -2135,6 +2149,7 @@ begin
     AddField('boundaryCondition', FboundaryCondition, True, 'movementLimit');
     AddField('boundaryDays', IntToStr(FboundaryDays), False, 'movementLimit');
     AddField('sumType', FsumType, True, 'movementLimit');
+    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'movementLimit');
   end;
 end;
 

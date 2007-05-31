@@ -241,11 +241,13 @@ create table movementLimit (
   boundarycondition varchar(2) not null,
   boundaryDays int,  
   sumType varchar(1) not null,
+  idCurrencyDef uniqueidentifier not null,
   primary key (idMovementLimit),
   constraint ck_boundaryTypelimit check (boundaryType in ('T', 'W', 'M', 'Q', 'H', 'Y', 'D')),  
   constraint ck_boundaryConditionlimit check (boundarycondition in ('=', '<', '>', '<=', '>=')),  
   constraint ck_sumTypelimit check (sumType in ('I', 'O', 'B')),  
-  constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter)
+  constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter),
+  constraint fk_limitCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');

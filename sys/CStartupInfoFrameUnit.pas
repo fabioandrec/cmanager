@@ -334,11 +334,17 @@ begin
       end;
     end else if Column = 1 then begin
       if xData.helperType = shtPlannedItem then begin
-        CellText := CurrencyToString(TPlannedTreeItem(xData.item).planned.cash);
+        CellText := CurrencyToString(TPlannedTreeItem(xData.item).planned.cash, '', False);
       end else if xData.helperType = shtLimit then begin
-        CellText := CurrencyToString(TStartupHelper(xData).sum);
+        CellText := CurrencyToString(TStartupHelper(xData).sum, '', False);
       end;
     end else if Column = 2 then begin
+      if xData.helperType = shtPlannedItem then begin
+        CellText := GCurrencyCache.GetSymbol(TPlannedTreeItem(xData.item).planned.idMovementCurrencyDef);
+      end else if xData.helperType = shtLimit then begin
+        CellText := GCurrencyCache.GetSymbol(TMovementLimit(xData.item).idCurrencyDef);
+      end;
+    end else if Column = 3 then begin
       if xData.helperType = shtPlannedItem then begin
         if (TPlannedTreeItem(xData.item).planned.movementType = CInMovement) then begin
           CellText := CInMovementDescription;
@@ -354,7 +360,7 @@ begin
           CellText := CLimitSumtypeBalanceDescription;
         end;
       end;
-    end else if Column = 3 then begin
+    end else if Column = 4 then begin
       if xData.helperType = shtPlannedItem then begin
         if (TPlannedTreeItem(xData.item).done <> Nil) then begin
           if (TPlannedTreeItem(xData.item).done.doneState = CDoneOperation) then begin
@@ -468,7 +474,7 @@ var xData: TStartupHelper;
     xBase: TPlannedTreeItem;
 begin
   xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
-  if Column = 2 then begin
+  if Column = 3 then begin
     if xData.helperType = shtPlannedItem then begin
       if TPlannedTreeItem(xData.item).planned.movementType = CInMovement then begin
         ImageIndex := 0;
@@ -484,7 +490,7 @@ begin
         ImageIndex := 7;
       end;
     end;
-  end else if Column = 3 then begin
+  end else if Column = 4 then begin
     if xData.helperType = shtPlannedItem then begin
       xBase := TPlannedTreeItem(xData.item);
       if (xBase.done <> Nil) then begin

@@ -56,14 +56,19 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
         WideText = 'Kwota'
       end
       item
-        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 2
+        WideText = 'Waluta'
+      end
+      item
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 3
         Width = 70
         WideText = 'Rodzaj'
       end
       item
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
-        Position = 3
+        Position = 4
         Width = 70
         WideText = 'Status'
       end>
