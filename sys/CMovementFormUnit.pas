@@ -911,6 +911,7 @@ begin
       (CStaticTransCurrencySource.DataId <> CEmptyDataGid) and
       (CStaticTransCurrencyDest.DataId <> CEmptyDataGid);
     CStaticTransRate.HotTrack := CStaticTransRate.Enabled;
+    Label8.Enabled := CStaticTransRate.Enabled;
     Label26.Enabled := CStaticTransRate.Enabled;
     Label27.Enabled := CStaticTransRate.Enabled;
     Label28.Enabled := CStaticTransRate.Enabled;

@@ -1,44 +1,20 @@
 inherited CAccountForm: TCAccountForm
-  Left = 418
-  Top = 150
+  Left = 413
+  Top = 169
   Caption = 'Konto'
-  ClientHeight = 530
-  ClientWidth = 370
+  ClientHeight = 518
+  ClientWidth = 379
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 370
-    Height = 489
-    object GroupBoxAccountType: TGroupBox
-      Left = 16
-      Top = 16
-      Width = 337
-      Height = 73
-      Caption = ' Rodzaj konta '
-      TabOrder = 0
-      object ComboBoxType: TComboBox
-        Left = 24
-        Top = 31
-        Width = 289
-        Height = 21
-        BevelInner = bvNone
-        BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        TabOrder = 0
-        OnChange = ComboBoxTypeChange
-        Items.Strings = (
-          'Got'#243'wkowe'
-          'Rachunek bankowy'
-          'Rachunek inwestycyjny')
-      end
-    end
+    Width = 379
+    Height = 477
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 104
-      Width = 337
-      Height = 241
+      Top = 144
+      Width = 345
+      Height = 209
       Caption = ' Dane konta '
       TabOrder = 1
       object Label1: TLabel
@@ -58,25 +34,17 @@ inherited CAccountForm: TCAccountForm
         Caption = 'Opis'
       end
       object LabelCash: TLabel
-        Left = 45
-        Top = 208
+        Left = 53
+        Top = 172
         Width = 91
         Height = 13
         Alignment = taRightJustify
         Caption = #346'rodki pocz'#261'tkowe'
       end
-      object Label5: TLabel
-        Left = 59
-        Top = 171
-        Width = 77
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Waluta '#347'rodk'#243'w'
-      end
       object EditName: TEdit
         Left = 56
         Top = 28
-        Width = 257
+        Width = 265
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -86,29 +54,82 @@ inherited CAccountForm: TCAccountForm
       object RichEditDesc: TRichEdit
         Left = 56
         Top = 64
-        Width = 257
+        Width = 265
         Height = 89
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 1
       end
       object CCurrEditCash: TCCurrEdit
-        Left = 144
-        Top = 204
+        Left = 152
+        Top = 168
         Width = 169
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 3
+        TabOrder = 2
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
+    end
+    object GroupBoxAccountType: TGroupBox
+      Left = 16
+      Top = 16
+      Width = 345
+      Height = 113
+      Caption = ' Dane podstawowe  '
+      TabOrder = 0
+      object Label5: TLabel
+        Left = 14
+        Top = 76
+        Width = 34
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta'
+      end
+      object Label6: TLabel
+        Left = 15
+        Top = 36
+        Width = 33
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Rodzaj'
+      end
+      object CButton1: TCButton
+        Left = 175
+        Top = 70
+        Width = 154
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = Action1
+        Color = clBtnFace
+      end
+      object ComboBoxType: TComboBox
+        Left = 56
+        Top = 32
+        Width = 265
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        TabOrder = 0
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          'Got'#243'wkowe'
+          'Rachunek bankowy'
+          'Rachunek inwestycyjny')
+      end
       object CStaticCurrency: TCStatic
-        Left = 144
-        Top = 168
-        Width = 169
+        Left = 56
+        Top = 72
+        Width = 114
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -116,7 +137,7 @@ inherited CAccountForm: TCAccountForm
         Caption = '<wybierz walut'#281' z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 2
+        TabOrder = 1
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281' z listy>'
@@ -127,10 +148,16 @@ inherited CAccountForm: TCAccountForm
     end
     object GroupBoxBank: TGroupBox
       Left = 16
-      Top = 360
-      Width = 337
+      Top = 368
+      Width = 345
       Height = 105
       Caption = ' Dane dodatkowe '
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 2
       object Label3: TLabel
         Left = 20
@@ -151,7 +178,7 @@ inherited CAccountForm: TCAccountForm
       object EditNumber: TEdit
         Left = 108
         Top = 28
-        Width = 205
+        Width = 213
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -161,7 +188,7 @@ inherited CAccountForm: TCAccountForm
       object CStaticBank: TCStatic
         Left = 108
         Top = 64
-        Width = 205
+        Width = 213
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -179,13 +206,24 @@ inherited CAccountForm: TCAccountForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 489
-    Width = 370
+    Top = 477
+    Width = 379
     inherited BitBtnOk: TBitBtn
-      Left = 193
+      Left = 202
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 281
+      Left = 290
+    end
+  end
+  object ActionManager: TActionManager
+    Images = CImageLists.TemplateImageList16x16
+    Left = 40
+    Top = 268
+    StyleName = 'XP Style'
+    object Action1: TAction
+      Caption = 'Regu'#322'y przelicze'#324' walut'
+      ImageIndex = 2
+      OnExecute = Action1Execute
     end
   end
 end

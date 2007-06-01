@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ImgList,
-  ComCtrls, CComponents, CDatabase, CBaseFrameUnit;
+  ComCtrls, CComponents, CDatabase, CBaseFrameUnit, ActnList,
+  XPStyleActnCtrls, ActnMan, CImageListsUnit;
 
 type
   TCAccountForm = class(TCDataobjectForm)
@@ -25,11 +26,17 @@ type
     Label4: TLabel;
     Label5: TLabel;
     CStaticCurrency: TCStatic;
+    Label6: TLabel;
+    ActionManager: TActionManager;
+    Action1: TAction;
+    CButton1: TCButton;
     procedure FormCreate(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyChanged(Sender: TObject);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure Action1Execute(Sender: TObject);
   private
     FmovementCount: Integer;
   protected
@@ -175,6 +182,16 @@ end;
 procedure TCAccountForm.CStaticCurrencyChanged(Sender: TObject);
 begin
   CCurrEditCash.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
+end;
+
+procedure TCAccountForm.ActionAddExecute(Sender: TObject);
+begin
+  //
+end;
+
+procedure TCAccountForm.Action1Execute(Sender: TObject);
+begin
+  //
 end;
 
 end.
