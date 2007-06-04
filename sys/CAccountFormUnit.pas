@@ -35,10 +35,10 @@ type
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyChanged(Sender: TObject);
-    procedure ActionAddExecute(Sender: TObject);
     procedure Action1Execute(Sender: TObject);
   private
     FmovementCount: Integer;
+    Frules: TStringList;
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -46,13 +46,16 @@ type
     function CanAccept: Boolean; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure InitializeForm; override;
+    procedure AfterCommitData; override;
+  public
+    destructor Destroy; override;
   end;
 
 implementation
 
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
   CCashpointsFrameUnit, CConsts, CAccountsFrameUnit, CRichtext,
-  CCurrencydefFormUnit, CCurrencydefFrameUnit;
+  CCurrencydefFormUnit, CCurrencydefFrameUnit, CAccountCurrencyFormUnit;
 
 {$R *.dfm}
 
@@ -73,6 +76,9 @@ end;
 
 procedure TCAccountForm.FillForm;
 var xCashPoint: TCashPoint;
+    xRules: TDataObjectList;
+    xCount: Integer;
+    xRule: TAccountCurrencyRule;
 begin
   with TAccount(Dataobject) do begin
     EditName.Text := name;
@@ -107,6 +113,12 @@ begin
       xCashPoint.Free;
     end;
     EditNumber.Text := accountNumber;
+    xRules := TAccountCurrencyRule.FindRules(id);
+    for xCount := 0 to xRules.Count - 1 do begin
+      xRule := TAccountCurrencyRule(xRules.Items[xCount]);
+      Frules.Values[xRule.movementType] := xRule.rateType + xRule.idCashPoint;
+    end;
+    xRules.Free;
     ComboBoxTypeChange(Nil);
   end;
 end;
@@ -167,6 +179,7 @@ end;
 procedure TCAccountForm.InitializeForm;
 begin
   inherited InitializeForm;
+  Frules := TStringList.Create;
   if Operation = coAdd then begin
     CStaticCurrency.DataId := CCurrencyDefGid_PLN;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CStaticCurrency.DataId, False)).GetElementText;
@@ -184,14 +197,32 @@ begin
   CCurrEditCash.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
 end;
 
-procedure TCAccountForm.ActionAddExecute(Sender: TObject);
-begin
-  //
-end;
-
 procedure TCAccountForm.Action1Execute(Sender: TObject);
 begin
-  //
+  ShowRules(Frules);
+end;
+
+procedure TCAccountForm.AfterCommitData;
+var xCount: Integer;
+    xRule: TAccountCurrencyRule;
+begin
+  GDataProvider.BeginTransaction;
+  TAccountCurrencyRule.DeleteRules(Dataobject.id);
+  for xCount := 0 to Frules.Count - 1 do begin
+    xRule := TAccountCurrencyRule.CreateObject(AccountCurrencyRule, False);
+    xRule.idAccount := Dataobject.id;
+    xRule.movementType := Frules.Names[xCount];
+    xRule.rateType := Copy(Frules.ValueFromIndex[xCount], 1, 1);
+    xRule.idCashPoint := Copy(Frules.ValueFromIndex[xCount], 2, MaxInt);
+  end;
+  GDataProvider.CommitTransaction;
+  inherited AfterCommitData;
+end;
+
+destructor TCAccountForm.Destroy;
+begin
+  Frules.Free;
+  inherited Destroy;
 end;
 
 end.

@@ -41,24 +41,13 @@ function EditAddTemplate(ATemplates: TObjectList; AExpander: IDescTemplateExpand
 
 implementation
 
-uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit, CRichtext;
+uses CConsts, CFrameFormUnit, CDescTemplatesFrameUnit, CRichtext, CTools;
 
 {$R *.dfm}
 
 procedure TCDescpatternForm.ComboBoxOperationChange(Sender: TObject);
-var xCount: Integer;
 begin
-  ComboBoxType.Items.BeginUpdate;
-  ComboBoxType.Items.Clear;
-  for xCount := Low(CDescPatternsNames[ComboBoxOperation.ItemIndex]) to High(CDescPatternsNames[ComboBoxOperation.ItemIndex]) do begin
-    if CDescPatternsNames[ComboBoxOperation.ItemIndex][xCount] <> '' then begin
-      ComboBoxType.Items.Add(CDescPatternsNames[ComboBoxOperation.ItemIndex][xCount]);
-    end;
-  end;
-  ComboBoxType.Items.EndUpdate;
-  if ComboBoxType.Items.Count > 0 then begin
-    ComboBoxType.ItemIndex := 0;
-  end;
+  FillCombo(ComboBoxType, CDescPatternsNames[ComboBoxOperation.ItemIndex]);
   ComboBoxType.Enabled := ComboBoxType.Items.Count > 1;
   ComboBoxTypeChange(Nil);
 end;

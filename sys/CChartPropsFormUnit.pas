@@ -70,7 +70,7 @@ implementation
 
 {$R *.dfm}
 
-uses Series, TeCanvas;
+uses Series, TeCanvas, CTools;
 
 const CLegendPosition: array[0..4] of String = ('z lewej', 'z prawej', 'z góry', 'z do³u', 'ukryta');
 
@@ -133,14 +133,8 @@ begin
 end;
 
 procedure TCChartPropsForm.FormCreate(Sender: TObject);
-var xCount: Integer;
 begin
-  with ComboBoxLegendPos do begin
-    Clear;
-    for xCount := Low(CLegendPosition) to High(CLegendPosition) do begin
-      Items.Add(CLegendPosition[xCount])
-    end;
-  end;
+  FillCombo(ComboBoxLegendPos, CLegendPosition);
 end;
 
 procedure TCChartPropsForm.ComboBoxLegendPosChange(Sender: TObject);

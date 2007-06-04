@@ -250,6 +250,21 @@ create table movementLimit (
   constraint fk_limitCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
+create table accountCurrencyRule (
+  idaccountCurrencyRule uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  movementType varchar(1) not null,
+  rateType varchar(1) not null,
+  idAccount uniqueidentifier not null,
+  idCashPoint uniqueidentifier,
+  primary key (idaccountCurrencyRule),
+  constraint ck_accountCurrencymovementType check (movementType in ('I', 'O', 'T')),
+  constraint ck_accountCurrencyrateType check (rateType in ('B', 'S', 'A')),
+  constraint fk_accountCurrencyaccount foreign key (idAccount) references account (idAccount),
+  constraint fk_accountCurrencycashPoint foreign key (idCashPoint) references cashPoint (idCashPoint)
+);
+
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementIn', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');

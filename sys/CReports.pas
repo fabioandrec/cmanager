@@ -504,21 +504,24 @@ end;
 function TAccountBalanceOnDayReport.GetReportBody: String;
 var xAccounts: TADOQuery;
     xOperations: TADOQuery;
-    xSum, xDelta: Currency;
+    xDelta: Currency;
     xBody: TStringList;
     xRec: Integer;
+    xSums: TSumList;
+    xCount: Integer;
 begin
   xAccounts := GDataProvider.OpenSql('select * from account order by name');
   xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, idAccount from transactions where regDate > %s group by idAccount', [DatetimeToDatabase(FDate, False)]));
-  xSum := 0;
+  xSums := TSumList.Create(True);
   xBody := TStringList.Create;
   with xAccounts, xBody do begin
-    Add('<table class="base" colspan=2>');
+    Add('<table class="base" colspan=3>');
     Add('<tr class="base">');
-    Add('<td class="headtext" width="75%">Nazwa konta</td>');
+    Add('<td class="headtext" width="65%">Nazwa konta</td>');
     Add('<td class="headcash" width="25%">Saldo</td>');
+    Add('<td class="headtext" width="10%">Waluta</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=2>');
+    Add('</table><hr><table class="base" colspan=3>');
     xRec := 1;
     while not Eof do begin
       if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
@@ -527,7 +530,7 @@ begin
         end else begin
           Add('<tr class="base">');
         end;
-        Add('<td class="text" width="75%">' + FieldByName('name').AsString + '</td>');
+        Add('<td class="text" width="65%">' + FieldByName('name').AsString + '</td>');
         xOperations.Filter := 'idAccount = ' + DataGidToDatabase(FieldByName('idAccount').AsString);
         xOperations.Filtered := True;
         if xOperations.IsEmpty then begin
@@ -535,23 +538,28 @@ begin
         end else begin
           xDelta := xOperations.FieldByName('cash').AsCurrency;
         end;
-        Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency - xDelta) + '</td>');
+        Add('<td class="cash" width="25%">' + CurrencyToString(FieldByName('cash').AsCurrency - xDelta, '', False) + '</td>');
+        Add('<td class="text" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
         Add('</tr>');
-        xSum := xSum + FieldByName('cash').AsCurrency - xDelta;
+        xSums.AddSum(FieldByName('idCurrencyDef').AsString, FieldByName('cash').AsCurrency - xDelta);
         Inc(xRec);
       end;
       Next;
     end;
-    Add('</table><hr><table class="base" colspan=2>');
-    Add('<tr class="base">');
-    Add('<td class="sumtext" width="75%">Razem</td>');
-    Add('<td class="sumcash" width="25%">' + CurrencyToString(xSum) + '</td>');
-    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=3>');
+    for xCount := 0 to xSums.Count - 1 do begin
+      Add('<tr class="base">');
+      Add('<td class="sumtext" width="65%">Razem w ' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
+      Add('<td class="sumcash" width="25%">' + CurrencyToString(xSums.Items[xCount].value, '', False) + '</td>');
+      Add('<td class="sumtext" width="10%">' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
+      Add('</tr>');
+    end;
     Add('</table>');
   end;
   xAccounts.Free;
   xOperations.Free;
   Result := xBody.Text;
+  xSums.Free;
   xBody.Free;
 end;
 

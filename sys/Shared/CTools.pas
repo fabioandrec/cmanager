@@ -6,7 +6,7 @@ interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows, Types, Contnrs, Classes;
+uses Windows, Types, Contnrs, Classes, StdCtrls;
 
 type
   TSum = class(TObject)
@@ -23,6 +23,7 @@ type
     function GetItems(AIndex: Integer): TSum;
     procedure SetItems(AIndex: Integer; const Value: TSum);
     function GetByName(AName: String): TSum;
+    procedure SetByName(AName: String; const Value: TSum);
   public
     constructor CreateWithSum(AName: String; AValue: Currency);
     procedure AddSum(AName: String; AValue: Currency);
@@ -69,6 +70,7 @@ function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boo
 procedure SaveToLog(AText: String; ALogFilename: String);
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
+procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 
 implementation
 
@@ -230,6 +232,11 @@ begin
   for xCount := 0 to Count - 1 do begin
     Result := Result + Items[xCount].value;
   end;
+end;
+
+procedure TSumList.SetByName(AName: String; const Value: TSum);
+begin
+
 end;
 
 procedure TSumList.SetItems(AIndex: Integer; const Value: TSum);
@@ -429,6 +436,22 @@ begin
   xStr := StringReplace(AStr, '.', DecimalSeparator, [rfReplaceAll, rfIgnoreCase]);
   xStr := StringReplace(xStr, ',', DecimalSeparator, [rfReplaceAll, rfIgnoreCase]);
   Result := StrToFloatDef(xStr, 0);
+end;
+
+procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
+var xCount: Integer;
+begin
+  ACombo.Items.BeginUpdate;
+  ACombo.Clear;
+  for xCount := Low(AList) to High(AList) do begin
+    if AList[xCount] <> '' then begin
+      ACombo.Items.Add(AList[xCount]);
+    end;
+  end;
+  if ACombo.Items.Count >= AItemIndex then begin
+   ACombo.ItemIndex := AItemIndex;
+  end;
+  ACombo.Items.EndUpdate;
 end;
 
 end.

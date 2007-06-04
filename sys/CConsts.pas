@@ -144,6 +144,11 @@ const
   CPlannedScheduledOvertime = 'Zaleg³a';
 
 const
+  CBaseMovementTypes: array[0..4] of String = ('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód');
+
+  CSimpleMovementTypes: array[0..2] of String = ('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer');
+  CSimpleMovementSymbols: array[0..2] of String = ('O', 'I', 'T');
+
   CDescPatternsKeys: array[0..4, 0..4] of string =
     (('BaseMovementOut', 'BaseMovementIn', 'BaseMovementTr', 'BaseMovementPlannedOut', 'BaseMovementPlannedIn'),
      ('MovementListOut', 'MovementListIn', '', '', ''),

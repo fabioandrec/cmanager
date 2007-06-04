@@ -529,6 +529,30 @@ type
     property ById[AId: String]: TCurrCacheItem read GetById;
   end;
 
+  TAccountCurrencyRule = class(TDataObject)
+  private
+    FmovementType: TBaseEnumeration;
+    FrateType: TBaseEnumeration;
+    FidAccount: TDataGid;
+    FidCashPoint: TDataGid;
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetidCashPoint(const Value: TDataGid);
+    procedure SetmovementType(const Value: TBaseEnumeration);
+    procedure SetrateType(const Value: TBaseEnumeration);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    class procedure DeleteRules(AIdAccount: TDataGid);
+    class function FindRule(AmovementType: TBaseEnumeration; AIdAccount: TDataGid): TAccountCurrencyRule;
+    class function FindRules(AIdAccount: TDataGid): TDataObjectList;
+  published
+    property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property rateType: TBaseEnumeration read FrateType write SetrateType;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+  end;
+
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -541,6 +565,7 @@ var CashPointProxy: TDataProxy;
     MovementLimitProxy: TDataProxy;
     CurrencyDefProxy: TDataProxy;
     CurrencyRateProxy: TDataProxy;
+    AccountCurrencyRule: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
@@ -592,6 +617,7 @@ begin
   MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit', Nil);
   CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef', Nil);
   CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate', Nil);
+  AccountCurrencyRule := TDataProxy.Create(GDataProvider, 'accountCurrencyRule', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -2588,6 +2614,86 @@ function TCurrencyRate.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
   Result := inherited OnDeleteObject(AProxy);
   AProxy.DataProvider.ExecuteSql('update baseMovement set idCurrencyRate = null where idCurrencyRate = ' + DataGidToDatabase(id));
+end;
+
+class procedure TAccountCurrencyRule.DeleteRules(AIdAccount: TDataGid);
+begin
+  AccountCurrencyRule.DataProvider.ExecuteSql('delete from accountCurrencyRule where idAccount = ' + DataGidToDatabase(AIdAccount));
+end;
+
+class function TAccountCurrencyRule.FindRule(AmovementType: TBaseEnumeration; AIdAccount: TDataGid): TAccountCurrencyRule;
+var xD: TDataObjectList;
+begin
+  xD := TDataObject.GetList(TAccountCurrencyRule, AccountCurrencyRule,
+           Format('select * from accountCurrencyRule where movementType = ''%s'' and idAccount = %s',
+                  [AmovementType, DataGidToDatabase(AIdAccount)]));
+  if xD.Count > 0 then begin
+    Result := TAccountCurrencyRule(xD.Items[0]);
+  end else begin
+    Result := Nil;
+  end;
+  xD.Free;
+end;
+
+class function TAccountCurrencyRule.FindRules(AIdAccount: TDataGid): TDataObjectList;
+begin
+  Result := TDataObject.GetList(TAccountCurrencyRule, AccountCurrencyRule,
+            Format('select * from accountCurrencyRule where idAccount = %s',
+                  [DataGidToDatabase(AIdAccount)]));
+end;
+
+procedure TAccountCurrencyRule.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidCashPoint := FieldByName('idCashPoint').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FrateType := FieldByName('rateType').AsString;
+    FmovementType := FieldByName('movementType').AsString;
+  end;
+end;
+
+procedure TAccountCurrencyRule.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountCurrencyRule.SetidCashPoint(const Value: TDataGid);
+begin
+  if FidCashPoint <> Value then begin
+    FidCashPoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountCurrencyRule.SetmovementType(const Value: TBaseEnumeration);
+begin
+  if movementType <> Value then begin
+    FmovementType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountCurrencyRule.SetrateType(const Value: TBaseEnumeration);
+begin
+  if FrateType <> Value then begin
+    FrateType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountCurrencyRule.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'accountCurrencyRule');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'accountCurrencyRule');
+    AddField('rateType', FrateType, True, 'accountCurrencyRule');
+    AddField('movementType', FmovementType, True, 'accountCurrencyRule');
+  end;
 end;
 
 initialization

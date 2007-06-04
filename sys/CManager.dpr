@@ -11,9 +11,7 @@ program CManager;
 {%File 'CMandf.sql'}
 
 uses
-  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
-  {$ENDIF}
   Forms,
   Windows,
   CDatabase in 'CDatabase.pas',
@@ -105,7 +103,8 @@ uses
   CUpdateCurrencyRatesFormUnit in 'CUpdateCurrencyRatesFormUnit.pas' {CUpdateCurrencyRatesForm},
   CChoosePeriodRatesHistoryFormUnit in 'CChoosePeriodRatesHistoryFormUnit.pas' {CChoosePeriodRatesHistoryForm},
   CChartPropsFormUnit in 'CChartPropsFormUnit.pas' {CChartPropsForm},
-  CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm};
+  CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
+  CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm};
 
 {$R *.res}
 

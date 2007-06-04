@@ -212,6 +212,7 @@ var xAdd: TMovementAdditionalData;
     xPlan: TPlannedMovement;
     xText: String;
 begin
+  FillCombo(ComboBoxType, CBaseMovementTypes);
   FOnceRateHelper := Nil;
   FCyclicRateHelper := Nil;
   FTransferRateHelper := Nil;
