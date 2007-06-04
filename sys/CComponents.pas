@@ -306,6 +306,7 @@ type
     procedure DoHeaderClick(Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer); override;
   public
     constructor Create(AOwner: TComponent); override;
+    function GetVisibleIndex(ANode: PVirtualNode): Integer;
   published
     property OddColor: TColor read FOddColor write SetOddColor;
     property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
@@ -1459,9 +1460,11 @@ begin
 end;
 
 procedure TCList.DoBeforeItemErase(Canvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var Color: TColor; var EraseAction: TItemEraseAction);
+var xIndex: Cardinal;
 begin
   with Canvas do begin
-    if not Odd(AbsoluteIndex(Node)) then begin
+    xIndex := GetVisibleIndex(Node);
+    if not Odd(xIndex) then begin
       Color := clWindow;
     end else begin
       Color := FOddColor;
@@ -1485,6 +1488,15 @@ begin
     end;
   end;
   inherited;
+end;
+
+function TCList.GetVisibleIndex(ANode: PVirtualNode): Integer;
+begin
+  Result := -1;
+  while Assigned(ANode) do begin
+    Inc(Result);
+    ANode := GetPreviousVisible(ANode);
+  end;
 end;
 
 procedure TCList.SetOddColor(const Value: TColor);
@@ -1693,8 +1705,6 @@ begin
     LineBreakStyle := hlbDefault;
   end;
 end;
-
-{ TCDataListElementObject }
 
 function TCDataListElementObject.GetColumnImage(AColumnIndex: Integer): Integer;
 begin

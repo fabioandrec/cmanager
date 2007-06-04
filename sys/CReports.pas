@@ -3,7 +3,8 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml;
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
+     CComponents;
 
 type
   TSumForDayItem = class(TObject)
@@ -84,12 +85,12 @@ type
 
   TCVirtualStringTreeParams = class(TCReportParams)
   private
-    Flist: TVirtualStringTree;
+    Flist: TCList;
     Ftitle: String;
   public
-    constructor Create(AList: TVirtualStringTree; ATitle: String);
+    constructor Create(AList: TCList; ATitle: String);
   published
-    property list: TVirtualStringTree read Flist;
+    property list: TCList read Flist;
     property title: String read Ftitle;
   end;
 
@@ -146,7 +147,7 @@ type
     property marks: Integer write Setmarks;
   end;
 
-  TAccountBalanceOnDayReport = class(TCHtmlReport)
+  {+}TAccountBalanceOnDayReport = class(TCHtmlReport)
   private
     FDate: TDateTime;
     FIds: TStringList;
@@ -345,7 +346,7 @@ type
     function GetReportBody: String; override;
   end;
 
-  TVirtualStringReport = class(TCHtmlReport)
+  {+}TVirtualStringReport = class(TCHtmlReport)
   private
     FWidth: Integer;
     function GetColumnPercentage(AColumn: TVirtualTreeColumn): Integer;
@@ -415,11 +416,10 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts, CDataObjects,
      DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
      CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
-     CChoosePeriodAccountListFormUnit, CComponents,
-     CChoosePeriodAccountListGroupFormUnit, CChooseDateAccountListFormUnit,
-     CChoosePeriodFilterFormUnit, CDatatools, CChooseFutureFilterFormUnit,
-     CTools, CChoosePeriodRatesHistoryFormUnit, StrUtils, Variants,
-     CPreferences, CXml, CInfoFormUnit, CPluginConsts;
+     CChoosePeriodAccountListFormUnit, CChoosePeriodAccountListGroupFormUnit,
+     CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
+     CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
+     StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
 begin
@@ -2569,7 +2569,7 @@ begin
   Result := sum / WeekCount(FendDate, FstartDate);
 end;
 
-constructor TCVirtualStringTreeParams.Create(AList: TVirtualStringTree; ATitle: String);
+constructor TCVirtualStringTreeParams.Create(AList: TCList; ATitle: String);
 begin
   inherited Create;
   Flist := AList;
@@ -2604,20 +2604,21 @@ end;
 
 function TVirtualStringReport.GetReportBody: String;
 var xBody: TStringList;
-    xList: TVirtualStringTree;
+    xList: TCList;
     xColumns: TColumnsArray;
     xCount: Integer;
     xNode: PVirtualNode;
     xAl: String;
     xLevelPrefix: String;
     xLevel: Integer;
+    xExpand: String;
 begin
   xList := TCVirtualStringTreeParams(FParams).list;
   xBody := TStringList.Create;
   xColumns := xList.Header.Columns.GetVisibleColumns;
   with xBody do begin
     Add('<table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     for xCount := Low(xColumns) to High(xColumns) do begin
       if (xColumns[xCount].Alignment = taRightJustify) and (AnsiUpperCase(xColumns[xCount].Text) <> 'LP') then begin
         xAl := 'headcash';
@@ -2628,13 +2629,9 @@ begin
     end;
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
-    xNode := xList.GetFirst;
+    xNode := xList.GetFirstVisible;
     while xNode <> Nil do begin
-      if not Odd(xList.AbsoluteIndex(xNode)) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
-      end;
+      Add('<tr class="' + IsEvenToStr(xList.GetVisibleIndex(xNode) + 1) + 'base">');
       for xCount := Low(xColumns) to High(xColumns) do begin
         if (xColumns[xCount].Alignment = taRightJustify) and (AnsiUpperCase(xColumns[xCount].Text) <> 'LP') then begin
           xAl := 'cash';
@@ -2646,10 +2643,19 @@ begin
         while Length(xLevelPrefix) < xLevel do begin
           xLevelPrefix := xLevelPrefix + '&nbsp';
         end;
-        Add(Format('<td class="%s" width="%s">' + xLevelPrefix + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
+        if xNode.ChildCount > 0 then begin
+          if vsExpanded in xNode.States then begin
+            xExpand := '&nbsp-&nbsp';
+          end else begin
+            xExpand := '&nbsp+&nbsp';
+          end;
+        end else begin
+          xExpand := '&nbsp';
+        end;
+        Add(Format('<td class="%s" width="%s">' + xLevelPrefix + xExpand + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
       end;
       Add('</tr>');
-      xNode := xList.GetNext(xNode);
+      xNode := xList.GetNextVisible(xNode);
     end;
     Add('</table>');
   end;
