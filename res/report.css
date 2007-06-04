@@ -15,10 +15,30 @@ tr.base
 {
 height: 25px
 }
-tr.baseodd
+tr.evenbase
+{
+height: 25px;
+background-color: #EFEFEF;
+}
+tr.head
 {
 height: 25px;
 background-color: #CCFFCC;
+}
+tr.evenhead
+{
+height: 25px;
+background-color: #CCFACC;
+}
+tr.sum
+{
+height: 25px;
+background-color: #CCCCFF;
+}
+tr.evensum
+{
+height: 25px;
+background-color: #BCBCEF;
 }
 td.cash
 {
@@ -50,7 +70,6 @@ td.headtext
 padding-left: 8px;
 padding-right: 8px;
 font-weight: bold;
-background-color: #CCFFCC;
 text-align: left;
 }
 td.headcenter
@@ -58,7 +77,6 @@ td.headcenter
 padding-left: 8px;
 padding-right: 8px;
 font-weight: bold;
-background-color: #CCFFCC;
 text-align: center;
 }
 td.headcash
@@ -67,14 +85,12 @@ padding-left: 8px;
 padding-right: 8px;
 font-weight: bold;
 text-align: right;
-background-color: #CCFFCC;
 }
 td.sumtext
 {
 padding-left: 8px;
 padding-right: 8px;
 font-weight: bold;
-background-color: #CCCCFF;
 text-align: left;
 }
 td.sumcash
@@ -83,7 +99,6 @@ padding-left: 8px;
 padding-right: 8px;
 font-weight: bold;
 text-align: right;
-background-color: #CCCCFF;
 }
 hr
 {

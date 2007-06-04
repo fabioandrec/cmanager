@@ -516,7 +516,7 @@ begin
   xBody := TStringList.Create;
   with xAccounts, xBody do begin
     Add('<table class="base" colspan=3>');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     Add('<td class="headtext" width="65%">Nazwa konta</td>');
     Add('<td class="headcash" width="25%">Saldo</td>');
     Add('<td class="headtext" width="10%">Waluta</td>');
@@ -525,7 +525,7 @@ begin
     xRec := 1;
     while not Eof do begin
       if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
-        Add('<tr class="base' + IsOdd(xRec) + '">');
+        Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
         Add('<td class="text" width="65%">' + FieldByName('name').AsString + '</td>');
         xOperations.Filter := 'idAccount = ' + DataGidToDatabase(FieldByName('idAccount').AsString);
         xOperations.Filtered := True;
@@ -544,8 +544,8 @@ begin
     end;
     Add('</table><hr><table class="base" colspan=3>');
     for xCount := 0 to xSums.Count - 1 do begin
-      Add('<tr class="base">');
-      Add('<td class="sumtext" width="65%">Razem w ' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
+      Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
+      Add('<td class="sumtext" width="65%">Razem [' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + ']</td>');
       Add('<td class="sumcash" width="25%">' + CurrencyToString(xSums.Items[xCount].value, '', False) + '</td>');
       Add('<td class="sumtext" width="10%">' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
       Add('</tr>');

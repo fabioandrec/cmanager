@@ -70,7 +70,9 @@ procedure SaveToLog(AText: String; ALogFilename: String);
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
-function IsOdd(AInt: Integer): String;
+
+function IsEvenToStr(AInt: Integer): String; overload;
+function IsEven(AInt: Integer): Boolean; overload;
 
 implementation
 
@@ -449,9 +451,15 @@ begin
   ACombo.Items.EndUpdate;
 end;
 
-function IsOdd(AInt: Integer): String;
+function IsEvenToStr(AInt: Integer): String;
 begin
-  Result := IfThen(Odd(AInt), 'odd', '');
+  Result := IfThen(IsEven(AInt), 'even', '');
 end;
+
+function IsEven(AInt: Integer): Boolean;
+begin
+  Result := not Odd(AInt);
+end;
+
 
 end.
