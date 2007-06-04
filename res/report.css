@@ -15,6 +15,11 @@ tr.base
 {
 height: 25px
 }
+tr.baseodd
+{
+height: 25px;
+background-color: #CCFFCC;
+}
 td.cash
 {
 padding-left: 8px;

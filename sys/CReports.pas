@@ -525,11 +525,7 @@ begin
     xRec := 1;
     while not Eof do begin
       if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
+        Add('<tr class="base' + IsOdd(xRec) + '">');
         Add('<td class="text" width="65%">' + FieldByName('name').AsString + '</td>');
         xOperations.Filter := 'idAccount = ' + DataGidToDatabase(FieldByName('idAccount').AsString);
         xOperations.Filtered := True;

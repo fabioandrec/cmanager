@@ -23,7 +23,6 @@ type
     function GetItems(AIndex: Integer): TSum;
     procedure SetItems(AIndex: Integer; const Value: TSum);
     function GetByName(AName: String): TSum;
-    procedure SetByName(AName: String; const Value: TSum);
   public
     constructor CreateWithSum(AName: String; AValue: Currency);
     procedure AddSum(AName: String; AValue: Currency);
@@ -71,6 +70,7 @@ procedure SaveToLog(AText: String; ALogFilename: String);
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
+function IsOdd(AInt: Integer): String;
 
 implementation
 
@@ -232,11 +232,6 @@ begin
   for xCount := 0 to Count - 1 do begin
     Result := Result + Items[xCount].value;
   end;
-end;
-
-procedure TSumList.SetByName(AName: String; const Value: TSum);
-begin
-
 end;
 
 procedure TSumList.SetItems(AIndex: Integer; const Value: TSum);
@@ -452,6 +447,11 @@ begin
    ACombo.ItemIndex := AItemIndex;
   end;
   ACombo.Items.EndUpdate;
+end;
+
+function IsOdd(AInt: Integer): String;
+begin
+  Result := IfThen(Odd(AInt), 'odd', '');
 end;
 
 end.
