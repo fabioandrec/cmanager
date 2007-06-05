@@ -249,6 +249,7 @@ type
     FcurrencyRate: Currency;
     FrateDescription: TBaseDescription;
     FmovementCash: Currency;
+    FprevmovementCash: Currency;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -910,6 +911,7 @@ begin
     FcurrencyRate := FieldByName('currencyRate').AsCurrency;
     FrateDescription := FieldByName('rateDescription').AsString;
     FmovementCash := FieldByName('movementCash').AsCurrency;
+    FprevmovementCash := FmovementCash;
   end;
 end;
 
@@ -1830,7 +1832,7 @@ begin
   end;
   if movementType = CTransferMovement then begin
     AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
-    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idSourceAccount));
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(movementCash) + ' where idAccount = ' + DataGidToDatabase(idSourceAccount));
   end else if movementType = CInMovement then begin
     AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
   end else if movementType = COutMovement then begin
@@ -1846,7 +1848,7 @@ begin
   end;
   if movementType = CTransferMovement then begin
     AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
-    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idSourceAccount));
+    AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(movementCash) + ' where idAccount = ' + DataGidToDatabase(idSourceAccount));
   end else if movementType = CInMovement then begin
     AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
   end else if movementType = COutMovement then begin
@@ -1868,10 +1870,10 @@ begin
       AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(FidAccount));
     end;
     if FidSourceAccount <> FprevIdSourceAccount then begin
-      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(FprevCash) + ' where idAccount = ' + DataGidToDatabase(FprevIdSourceAccount));
-      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(FidSourceAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(FprevmovementCash) + ' where idAccount = ' + DataGidToDatabase(FprevIdSourceAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(movementCash) + ' where idAccount = ' + DataGidToDatabase(FidSourceAccount));
     end else begin
-      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(FidSourceAccount));
+      AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(movementCash - FprevmovementCash) + ' where idAccount = ' + DataGidToDatabase(FidSourceAccount));
     end;
   end else if movementType = CInMovement then begin
     if FidAccount <> FprevIdAccount then begin
