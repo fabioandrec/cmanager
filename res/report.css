@@ -18,7 +18,7 @@ height: 25px
 tr.evenbase
 {
 height: 25px;
-background-color: #EFEFEF;
+background-color: #F5F5F5;
 }
 tr.head
 {
@@ -38,7 +38,7 @@ background-color: #CCCCFF;
 tr.evensum
 {
 height: 25px;
-background-color: #BCBCEF;
+background-color: #C2C2F5;
 }
 td.cash
 {
