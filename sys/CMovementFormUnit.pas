@@ -892,6 +892,7 @@ end;
 
 procedure TCMovementForm.UpdateCurrencyRates(AUpdateCurEdit: Boolean = True);
 var xI: Integer;
+    xRate: TCurrencyRate;
 begin
   xI := ComboBoxType.ItemIndex;
   if (xI = 0) or (xI = 1) then begin
@@ -903,6 +904,19 @@ begin
     Label22.Enabled := CStaticInOutOnceRate.Enabled;
     Label17.Enabled := CStaticInOutOnceRate.Enabled;
     Label21.Enabled := CStaticInOutOnceRate.Enabled;
+    if CStaticInOutOnceRate.Enabled then begin
+      GDataProvider.BeginTransaction;
+      xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, IfThen(xI = 0, COutMovement, CInMovement), CStaticInoutOnceAccount.DataId, CStaticInOutOnceMovementCurrency.DataId);
+      if xRate <> Nil then begin
+        if FOnceRateHelper = Nil then begin
+          FOnceRateHelper := TCurrencyRateHelper.Create(0, 0, '');
+        end;
+        FOnceRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description);
+        CStaticInOutOnceRate.DataId := xRate.id;
+        CStaticInOutOnceRate.Caption := xRate.description;
+      end;
+      GDataProvider.RollbackTransaction;
+    end;
     if AUpdateCurEdit then begin
       UpdateAccountCurEdit(CStaticInOutOnceRate, CCurrEditInoutOnceMovement, CCurrEditInoutOnceAccount, FOnceRateHelper);
     end;
@@ -916,6 +930,21 @@ begin
     Label26.Enabled := CStaticTransRate.Enabled;
     Label27.Enabled := CStaticTransRate.Enabled;
     Label28.Enabled := CStaticTransRate.Enabled;
+    if CStaticTransRate.Enabled then begin
+      GDataProvider.BeginTransaction;
+      xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, CTransferMovement, CStaticTransSourceAccount.DataId, CStaticTransCurrencyDest.DataId);
+      if xRate <> Nil then begin
+        if FTransferRateHelper = Nil then begin
+          FTransferRateHelper := TCurrencyRateHelper.Create(0, 0, '');
+        end;
+        FTransferRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description);
+        CStaticTransRate.DataId := xRate.id;
+        CStaticTransRate.Caption := xRate.description;
+      end;
+      GDataProvider.RollbackTransaction;
+    end;
+
+
     if AUpdateCurEdit then begin
       UpdateAccountCurEdit(CStaticTransRate, CCurrEditTransMovement, CCurrEditTransAccount, FTransferRateHelper);
     end;

@@ -544,6 +544,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     class procedure DeleteRules(AIdAccount: TDataGid);
     class function FindRule(AmovementType: TBaseEnumeration; AIdAccount: TDataGid): TAccountCurrencyRule;
+    class function FindRateByRule(ADate: TDateTime; AmovementType: TBaseEnumeration; AIdAccount: TDataGid; ASourceCurrency: TDataGid): TCurrencyRate;
     class function FindRules(AIdAccount: TDataGid): TDataObjectList;
   published
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
@@ -2619,6 +2620,24 @@ end;
 class procedure TAccountCurrencyRule.DeleteRules(AIdAccount: TDataGid);
 begin
   AccountCurrencyRule.DataProvider.ExecuteSql('delete from accountCurrencyRule where idAccount = ' + DataGidToDatabase(AIdAccount));
+end;
+
+class function TAccountCurrencyRule.FindRateByRule(ADate: TDateTime; AmovementType: TBaseEnumeration; AIdAccount, ASourceCurrency: TDataGid): TCurrencyRate;
+var xTr: Boolean;
+    xRule: TAccountCurrencyRule;
+begin
+  Result := Nil;
+  xTr := GDataProvider.InTransaction;
+  if not xTr then begin
+    GDataProvider.BeginTransaction;
+  end;
+  xRule := FindRule(AmovementType, AIdAccount);
+  if xRule <> Nil then begin
+    Result := TCurrencyRate.FindRate(xRule.rateType, TAccount.GetCurrencyDefinition(AIdAccount), ASourceCurrency, xRule.idCashPoint, ADate);
+  end;
+  if not xTr then begin
+    GDataProvider.RollbackTransaction;
+  end;
 end;
 
 class function TAccountCurrencyRule.FindRule(AmovementType: TBaseEnumeration; AIdAccount: TDataGid): TAccountCurrencyRule;
