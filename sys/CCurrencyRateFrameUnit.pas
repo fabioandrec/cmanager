@@ -164,7 +164,7 @@ begin
   end;
   if AdditionalData <> Nil then begin
     with TRateFrameAdditionalData(AdditionalData) do begin
-      xCondition := xCondition + Format(' and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s', [FIdSource, FIdDest]);
+      xCondition := xCondition + Format(' and ((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))', [FIdSource, FIdDest, FIdDest, FIdSource]);
     end;
   end;
   Dataobjects := TCurrencyRate.GetList(TCurrencyRate, CurrencyRateProxy, 'select * from currencyRate' + xCondition);

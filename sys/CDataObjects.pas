@@ -107,14 +107,18 @@ type
     Fquantity: Integer;
     Frate: Currency;
     Fdesc: string;
+    FidSourceCurrencyDef: TDataGid;
+    FidTargetCurrencyDef: TDataGid;
   public
-    constructor Create(Aquantity: Integer; Arate: Currency; ADesc: String);
-    function ExchangeCurrency(ACash: Currency): Currency;
-    procedure Assign(Aquantity: Integer; Arate: Currency; ADesc: String);
+    constructor Create(Aquantity: Integer; Arate: Currency; ADesc: String; ASourceId, ATargerId: TDataGid);
+    function ExchangeCurrency(ACash: Currency; ASourceId, ATargerId: TDataGid): Currency;
+    procedure Assign(Aquantity: Integer; Arate: Currency; ADesc: String; ASourceId, ATargerId: TDataGid);
   published
     property quantity: Integer read Fquantity write Fquantity;
     property rate: Currency read Frate write Frate;
     property desc: String read Fdesc write Fdesc;
+    property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write FidSourceCurrencyDef;
+    property idTargetCurrencyDef: TDataGid read FidTargetCurrencyDef write FidTargetCurrencyDef;
   end;
 
   TAccount = class(TDataObject)
@@ -582,10 +586,28 @@ const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
 procedure InitializeProxies;
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
+function GetCurrencyDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 
 implementation
 
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
+
+function GetCurrencyDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
+var xGid: String;
+begin
+  ADataset.First;
+  Result := TDataGids.Create;
+  if not ADataset.IsEmpty then begin
+    while (not ADataset.Eof) do begin
+      xGid := ADataset.FieldByName(ACurDefFieldname).AsString;
+      if Result.IndexOf(xGid) = -1 then begin
+        Result.Add(xGid);
+      end;
+      ADataset.Next;
+    end;
+  end;
+  ADataset.First;
+end;
 
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
 begin
@@ -2418,8 +2440,14 @@ end;
 class function TCurrencyRate.FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
 var xSql: String;
 begin
-  xSql := Format('select * from currencyRate where rateType = ''%s'' and bindingDate = %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s',
-                 [ARateType, DatetimeToDatabase(ABindingDate, False), DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetId), DataGidToDatabase(ACashpointId)]);
+  xSql := Format('select * from currencyRate where rateType = ''%s'' and bindingDate = %s and ' +
+    '((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))' +
+    ' and idCashpoint = %s',
+                 [ARateType,
+                  DatetimeToDatabase(ABindingDate, False),
+                  DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetId),
+                  DataGidToDatabase(ATargetId), DataGidToDatabase(ASourceId),
+                  DataGidToDatabase(ACashpointId)]);
   Result := TCurrencyRate(TCurrencyRate.FindByCondition(CurrencyRateProxy, xSql, False));
 end;
 
@@ -2537,24 +2565,34 @@ begin
   Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from account where idAccount = %s', [DataGidToDatabase(AIdAccount)]), '');
 end;
 
-procedure TCurrencyRateHelper.Assign(Aquantity: Integer; Arate: Currency; ADesc: String);
+procedure TCurrencyRateHelper.Assign(Aquantity: Integer; Arate: Currency; ADesc: String; ASourceId, ATargerId: TDataGid);
 begin
   Fquantity := Aquantity;
   Frate := Arate;
   Fdesc := ADesc;
+  FidSourceCurrencyDef := ASourceId;
+  FidTargetCurrencyDef := ATargerId;
 end;
 
-constructor TCurrencyRateHelper.Create(Aquantity: Integer; Arate: Currency; ADesc: String);
+constructor TCurrencyRateHelper.Create(Aquantity: Integer; Arate: Currency; ADesc: String; ASourceId, ATargerId: TDataGid);
 begin
   inherited Create;
   Fquantity := Aquantity;
   Frate := Arate;
   Fdesc := ADesc;
+  FidSourceCurrencyDef := ASourceId;
+  FidTargetCurrencyDef := ATargerId;
 end;
 
-function TCurrencyRateHelper.ExchangeCurrency(ACash: Currency): Currency;
+function TCurrencyRateHelper.ExchangeCurrency(ACash: Currency; ASourceId, ATargerId: TDataGid): Currency;
 begin
-  Result := SimpleRoundTo(Fquantity * ACash / Frate, -4);
+  if (ASourceId = FidSourceCurrencyDef) and (ATargerId = FidTargetCurrencyDef) then begin
+    Result := SimpleRoundTo(ACash * Frate / Fquantity, -4);
+  end else if (ASourceId = FidTargetCurrencyDef) and (ATargerId = FidSourceCurrencyDef) then begin
+    Result := SimpleRoundTo(Fquantity * ACash / Frate, -4);
+  end else begin
+    Result := 0;
+  end;
 end;
 
 procedure TBaseMovement.SetcurrencyQuantity(const Value: Integer);

@@ -51,8 +51,8 @@ create table accountCurrencyRule (
   primary key (idaccountCurrencyRule),
   constraint ck_accountCurrencymovementType check (movementType in ('I', 'O', 'T')),
   constraint ck_accountCurrencyrateType check (rateType in ('B', 'S', 'A')),
-  constraint fk_accountCurrencyaccount foreign key (idAccount) references account (idAccount),
-  constraint fk_accountCurrencycashPoint foreign key (idCashPoint) references cashPoint (idCashPoint)
+  constraint fk_accountCurrencyaccount foreign key (idAccount) references account (idAccount) on delete cascade,
+  constraint fk_accountCurrencycashPoint foreign key (idCashPoint) references cashPoint (idCashPoint) on delete cascade
 );
 
 drop  view transactions;

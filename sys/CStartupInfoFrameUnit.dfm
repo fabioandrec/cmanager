@@ -75,7 +75,7 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     WideDefaultText = ''
   end
   object PanelError: TPanel [1]
-    Left = 56
+    Left = 42
     Top = 56
     Width = 370
     Height = 89

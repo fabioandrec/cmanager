@@ -492,7 +492,7 @@ begin
           CStaticInOutOnceRate.DataId := idCurrencyRate;
           CStaticInOutOnceRate.Caption := rateDescription;
         end;
-        FOnceRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription);
+        FOnceRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idAccountCurrencyDef, idMovementCurrencyDef);
         CCurrEditInoutOnceMovement.Value := movementCash;
         CCurrEditInoutOnceMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
         CCurrEditInOutOnceAccount.Value := cash;
@@ -520,7 +520,7 @@ begin
           CStaticInOutCyclicRate.DataId := idCurrencyRate;
           CStaticInOutCyclicRate.Caption := rateDescription;
         end;
-        FCyclicRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription);
+        FCyclicRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idAccountCurrencyDef, idMovementCurrencyDef);
         CCurrEditInoutCyclicMovement.Value := movementCash;
         CCurrEditInoutCyclicMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
         CCurrEditInOutCyclicAccount.Value := cash;
@@ -540,7 +540,7 @@ begin
         CStaticTransRate.DataId := idCurrencyRate;
         CStaticTransRate.Caption := rateDescription;
       end;
-      FTransferRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription);
+      FTransferRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idAccountCurrencyDef, idMovementCurrencyDef);
       CCurrEditTransMovement.Value := movementCash;
       CCurrEditTransMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
       CCurrEditTransAccount.Value := cash;
@@ -909,9 +909,9 @@ begin
       xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, IfThen(xI = 0, COutMovement, CInMovement), CStaticInoutOnceAccount.DataId, CStaticInOutOnceMovementCurrency.DataId);
       if xRate <> Nil then begin
         if FOnceRateHelper = Nil then begin
-          FOnceRateHelper := TCurrencyRateHelper.Create(0, 0, '');
+          FOnceRateHelper := TCurrencyRateHelper.Create(0, 0, '', '', '');
         end;
-        FOnceRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description);
+        FOnceRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description, xRate.idSourceCurrencyDef, xRate.idTargetCurrencyDef);
         CStaticInOutOnceRate.DataId := xRate.id;
         CStaticInOutOnceRate.Caption := xRate.description;
       end;
@@ -935,9 +935,9 @@ begin
       xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, CTransferMovement, CStaticTransSourceAccount.DataId, CStaticTransCurrencyDest.DataId);
       if xRate <> Nil then begin
         if FTransferRateHelper = Nil then begin
-          FTransferRateHelper := TCurrencyRateHelper.Create(0, 0, '');
+          FTransferRateHelper := TCurrencyRateHelper.Create(0, 0, '', '', '');
         end;
-        FTransferRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description);
+        FTransferRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description, xRate.idSourceCurrencyDef, xRate.idTargetCurrencyDef);
         CStaticTransRate.DataId := xRate.id;
         CStaticTransRate.Caption := xRate.description;
       end;
@@ -1024,7 +1024,7 @@ begin
   if ASourceEdit.CurrencyId <> ATargetEdit.CurrencyId then begin
     if ARate.DataId <> CEmptyDataGid then begin
       if AHelper <> Nil then begin
-        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value);
+        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value, ASourceEdit.CurrencyId, ATargetEdit.CurrencyId);
       end else begin
         ATargetEdit.Value := 0;
       end;
@@ -1067,9 +1067,9 @@ begin
   if Result then begin
     xCurrencyRate := TCurrencyRate(TCurrencyRate.LoadObject(CurrencyRateProxy, AId, False));
     if AHelper = Nil then begin
-      AHelper := TCurrencyRateHelper.Create(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
+      AHelper := TCurrencyRateHelper.Create(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description, xCurrencyRate.idSourceCurrencyDef, xCurrencyRate.idTargetCurrencyDef);
     end else begin
-      AHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
+      AHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description, xCurrencyRate.idSourceCurrencyDef, xCurrencyRate.idTargetCurrencyDef);
     end;
   end;
 end;

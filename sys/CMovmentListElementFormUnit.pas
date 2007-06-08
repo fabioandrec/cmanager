@@ -152,19 +152,19 @@ begin
   CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
   CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
   if Operation = coEdit then begin
-    FRateHelper := TCurrencyRateHelper.Create(Felement.currencyQuantity, Felement.currencyRate, Felement.rateDescription);
+    FRateHelper := TCurrencyRateHelper.Create(Felement.currencyQuantity, Felement.currencyRate, Felement.rateDescription, Felement.idAccountCurrencyDef, Felement.idMovementCurrencyDef);
     CCurrEditMovement.Value := Felement.movementCash;
     CCurrEditAccount.Value := Felement.cash;
-    AssignRichText(Felement.description, RichEditDesc);
+    SimpleRichText(Felement.description, RichEditDesc);
     CStaticCategory.DataId := Felement.productId;
+    CStaticRate.DataId := Felement.idCurrencyRate;
+    CStaticRate.Caption := Felement.rateDescription;
     GDataProvider.BeginTransaction;
     xProduct := TProduct(TProduct.LoadObject(ProductProxy, Felement.productId, False));
     CStaticCategory.Caption := xProduct.name;
+    GDataProvider.RollbackTransaction;
     CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
     CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
-    CStaticRate.DataId := Felement.idCurrencyRate;
-    CStaticRate.Caption := Felement.rateDescription;
-    GDataProvider.RollbackTransaction;
   end;
 end;
 
@@ -296,7 +296,7 @@ begin
   if ASourceEdit.CurrencyId <> ATargetEdit.CurrencyId then begin
     if ARate.DataId <> CEmptyDataGid then begin
       if AHelper <> Nil then begin
-        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value);
+        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value, ASourceEdit.CurrencyId, ATargetEdit.CurrencyId);
       end else begin
         ATargetEdit.Value := 0;
       end;
@@ -323,9 +323,9 @@ begin
   if AAccepted then begin
     xCurrencyRate := TCurrencyRate(TCurrencyRate.LoadObject(CurrencyRateProxy, ADataGid, False));
     if FRateHelper = Nil then begin
-      FRateHelper := TCurrencyRateHelper.Create(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
+      FRateHelper := TCurrencyRateHelper.Create(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description, xCurrencyRate.idSourceCurrencyDef, xCurrencyRate.idTargetCurrencyDef);
     end else begin
-      FRateHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description);
+      FRateHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description, xCurrencyRate.idSourceCurrencyDef, xCurrencyRate.idTargetCurrencyDef);
     end;
   end;
 end;

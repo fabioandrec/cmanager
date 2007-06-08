@@ -177,7 +177,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  TOperationsListReport = class(TCHtmlReport)
+  {+}TOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -197,7 +197,7 @@ type
     procedure PrepareReportChart; override;
   end;
 
-  TOperationsBySomethingList = class(TCHtmlReport)
+  {+}TOperationsBySomethingList = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -219,13 +219,13 @@ type
     function GetReportTitle: String; override;
   end;
 
-  TOperationsByCategoryList = class(TOperationsBySomethingList)
+  {+}TOperationsByCategoryList = class(TOperationsBySomethingList)
   protected
     function GetSql: String; override;
     function GetReportTitle: String; override;
   end;
 
-  TOperationsByCashpointList = class(TOperationsBySomethingList)
+  {+}TOperationsByCashpointList = class(TOperationsBySomethingList)
   protected
     function GetSql: String; override;
     function GetReportTitle: String; override;
@@ -542,15 +542,18 @@ begin
       end;
       Next;
     end;
-    Add('</table><hr><table class="base" colspan=3>');
-    for xCount := 0 to xSums.Count - 1 do begin
-      Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
-      Add('<td class="sumtext" width="75%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
-      Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
-      Add('<td class="sumcash" width="15%">' + CurrencyToString(xSums.Items[xCount].value, '', False) + '</td>');
-      Add('</tr>');
+    Add('</table><hr>');
+    if xSums.Count > 0 then begin
+      Add('<table class="base" colspan=3>');
+      for xCount := 0 to xSums.Count - 1 do begin
+        Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
+        Add('<td class="sumtext" width="75%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
+        Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
+        Add('<td class="sumcash" width="15%">' + CurrencyToString(xSums.Items[xCount].value, '', False) + '</td>');
+        Add('</tr>');
+      end;
+      Add('</table>');
     end;
-    Add('</table>');
   end;
   xAccounts.Free;
   xOperations.Free;
@@ -637,32 +640,35 @@ begin
       end;
       Next;
     end;
-    Add('</table><hr><table class="base" colspan=4>');
-    for xCount := 0 to Max(xInSum.Count, xOutSum.Count) do begin
-      xIdCur := '';
-      if xCount <= xInSum.Count - 1 then begin
-        xIdCur := xInSum.Items[xCount].name;
-      end else if xCount < xOutSum.Count - 1 then begin
-        xIdCur := xOutSum.Items[xCount].name;
-      end;
-      if xIdCur <> '' then begin
-        xIC := xInSum.GetSum(xIdCur);
-        xOC := xOutSum.GetSum(xIdCur);
-        if xIC > 0 then begin
-          xIS := CurrencyToString(xIC, '', False);
+    Add('</table><hr>');
+    if xInSum.Count + xOutSum.Count > 0 then begin
+      Add('<table class="base" colspan=4>');
+      for xCount := 0 to Max(xInSum.Count, xOutSum.Count) do begin
+        xIdCur := '';
+        if xCount <= xInSum.Count - 1 then begin
+          xIdCur := xInSum.Items[xCount].name;
+        end else if xCount < xOutSum.Count - 1 then begin
+          xIdCur := xOutSum.Items[xCount].name;
         end;
-        if xOC > 0 then begin
-          xOS := CurrencyToString(xOC, '', False);
+        if xIdCur <> '' then begin
+          xIC := xInSum.GetSum(xIdCur);
+          xOC := xOutSum.GetSum(xIdCur);
+          if xIC > 0 then begin
+            xIS := CurrencyToString(xIC, '', False);
+          end;
+          if xOC > 0 then begin
+            xOS := CurrencyToString(xOC, '', False);
+          end;
+          Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
+          Add('<td class="sumtext" width="70%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
+          Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xIdCur) + '</td>');
+          Add('<td class="sumcash" width="10%">' + xIS + '</td>');
+          Add('<td class="sumcash" width="10%">' + xOS + '</td>');
+          Add('</tr>');
         end;
-        Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
-        Add('<td class="sumtext" width="70%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
-        Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xIdCur) + '</td>');
-        Add('<td class="sumcash" width="10%">' + xIS + '</td>');
-        Add('<td class="sumcash" width="10%">' + xOS + '</td>');
-        Add('</tr>');
       end;
+      Add('</table>');
     end;
-    Add('</table>');
   end;
   xOperations.Free;
   Result := xBody.Text;
@@ -1236,27 +1242,29 @@ end;
 
 function TOperationsListReport.GetReportBody: String;
 var xOperations: TADOQuery;
-    xSum: Currency;
+    xSums: TSumList;
     xBody: TStringList;
     xCash: Currency;
+    xCount: Integer;
 begin
   xOperations := GDataProvider.OpenSql(
             Format('select b.*, a.name from transactions b' +
                    ' left outer join account a on a.idAccount = b.idAccount ' +
                    '  where movementType = ''%s'' and b.regDate between %s and %s order by b.regDate, b.created',
                    [TCSelectedMovementTypeParams(FParams).movementType , DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]));
-  xSum := 0;
+  xSums := TSumList.Create(True);
   xBody := TStringList.Create;
   with xOperations, xBody do begin
-    Add('<table class="base" colspan=5>');
-    Add('<tr class="base">');
+    Add('<table class="base" colspan=6>');
+    Add('<tr class="head">');
     Add('<td class="headtext" width="5%">Lp</td>');
     Add('<td class="headtext" width="15%">Data</td>');
-    Add('<td class="headtext" width="50%">Opis</td>');
+    Add('<td class="headtext" width="40%">Opis</td>');
     Add('<td class="headtext" width="20%">Konto</td>');
+    Add('<td class="headcash" width="10%">Waluta</td>');
     Add('<td class="headcash" width="10%">Kwota</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=5>');
+    Add('</table><hr><table class="base" colspan=6>');
     while not Eof do begin
       if not Odd(RecNo) then begin
         Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
@@ -1264,24 +1272,32 @@ begin
         Add('<tr class="base">');
       end;
       xCash := Abs(FieldByName('cash').AsCurrency);
-      xSum := xSum + xCash;
+      xSums.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash);
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="50%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
       Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
+      Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idMovementCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + CurrencyToString(xCash) + '</td>');
       Add('</tr>');
       Next;
     end;
-    Add('</table><hr><table class="base" colspan=2>');
-    Add('<tr class="base">');
-    Add('<td class="sumtext" width="90%">Razem</td>');
-    Add('<td class="sumcash" width="10%">' + CurrencyToString(xSum) + '</td>');
-    Add('</tr>');
-    Add('</table>');
+    Add('</table><hr>');
+    if xSums.Count > 0 then begin
+      Add('<table class="base" colspan=3>');
+      for xCount := 0 to xSums.Count - 1 do begin
+        Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
+        Add('<td class="sumtext" width="80%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
+        Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
+        Add('<td class="sumcash" width="10%">' + CurrencyToString(xSums.Items[xCount].value, '', False) + '</td>');
+        Add('</tr>');
+      end;
+      Add('</table>');
+    end;
   end;
   xOperations.Free;
   Result := xBody.Text;
+  xSums.Free;
   xBody.Free;
 end;
 
@@ -1380,50 +1396,75 @@ var xSums: TADOQuery;
     xSum: Currency;
     xPercent: Double;
     xBody: TStringList;
+    xCurrs: TDataGids;
+    xCount: Integer;
 begin
   xSums := GDataProvider.OpenSql(GetSql);
-  xSum := 0;
-  while not xSums.Eof do begin
-    xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
-    xSums.Next;
-  end;
+  xCurrs := GetCurrencyDefsFromDataset(xSums, 'idMovementCurrencyDef');
   xBody := TStringList.Create;
-  with xSums, xBody do begin
-    First;
+  with xBody do begin
     Add('<table class="base" colspan=4>');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     Add('<td class="headtext" width="5%">Lp</td>');
-    Add('<td class="headtext" width="55%">Nazwa</td>');
+    Add('<td class="headtext" width="45%">Nazwa</td>');
+    Add('<td class="headcash" width="10%">Waluta</td>');
     Add('<td class="headcash" width="20%">Kwota</td>');
     Add('<td class="headcash" width="20%">Procent ca³oœci</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=4>');
-    while not Eof do begin
-      if not Odd(RecNo) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
-      end;
-      xCash := Abs(FieldByName('cash').AsCurrency);
-      xPercent := (xCash * 100) / xSum;
-      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="55%">' + FieldByName('name').AsString + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xCash) + '</td>');
-      Add('<td class="cash" width="20%">' + Format('%3.2f', [xPercent]) + '%</td>');
-      Add('</tr>');
-      Next;
+    Add('</table><hr>');
+  end;
+  for xCount := 0 to xCurrs.Count - 1 do begin
+    xSum := 0;
+    xSums.Filter := 'idMovementCurrencyDef = ' + DataGidToDatabase(xCurrs.Strings[xCount]);
+    xSums.Filtered := True;
+    xSums.First;
+    while not xSums.Eof do begin
+      xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
+      xSums.Next;
     end;
-    Add('</table><hr><table class="base" colspan=3>');
-    Add('<tr class="base">');
-    Add('<td class="sumtext" width="60%">Razem</td>');
-    Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum) + '</td>');
-    Add('<td class="sumcash" width="20%"></td>');
-    Add('</tr>');
-    Add('</table>');
+    with xSums, xBody do begin
+      First;
+      if xCount > 0 then begin
+        Add('<hr>');
+      end;
+      with xBody do begin
+        Add('<table class="base" colspan=1>');
+        Add('<tr class="subhead">');
+        Add('<td class="subheadtext" width="100%">[' + GCurrencyCache.GetIso(xCurrs.Strings[xCount]) + ']' + '</td>');
+        Add('</tr>');
+        Add('</table><hr>');
+      end;
+      Add('<table class="base" colspan=5>');
+      while not Eof do begin
+        if not Odd(RecNo) then begin
+          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
+        end else begin
+          Add('<tr class="base">');
+        end;
+        xCash := Abs(FieldByName('cash').AsCurrency);
+        xPercent := (xCash * 100) / xSum;
+        Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+        Add('<td class="text" width="45%">' + FieldByName('name').AsString + '</td>');
+        Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(xCurrs.Strings[xCount]) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xCash, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + Format('%3.2f', [xPercent]) + '%</td>');
+        Add('</tr>');
+        Next;
+      end;
+      Add('</table><hr><table class="base" colspan=3>');
+      Add('<tr class="sum">');
+      Add('<td class="sumtext" width="50%">Razem</td>');
+      Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xCurrs.Strings[xCount]) + '</td>');
+      Add('<td class="sumcash" width="20%">' + CurrencyToString(xSum, '', False) + '</td>');
+      Add('<td class="sumcash" width="20%"></td>');
+      Add('</tr>');
+      Add('</table>');
+    end;
   end;
   Result := xBody.Text;
   xBody.Free;
   xSums.Free;
+  xCurrs.Free;
 end;
 
 function TOperationsBySomethingList.PrepareReportConditions: Boolean;
@@ -1442,9 +1483,9 @@ end;
 
 function TOperationsByCategoryList.GetSql: String;
 begin
-  Result := Format('select v.cash, p.name from ( ' +
-                '  select sum(cash) as cash, idProduct from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by idProduct) as v ' +
+  Result := Format('select v.cash, p.name, v.idMovementCurrencyDef from ( ' +
+                '  select sum(cash) as cash, idProduct, idMovementCurrencyDef from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idProduct, idMovementCurrencyDef) as v ' +
                 '  left outer join product p on p.idProduct = v.idProduct',
                 [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
 end;
@@ -1460,9 +1501,9 @@ end;
 
 function TOperationsByCashpointList.GetSql: String;
 begin
-  Result := Format('select v.cash, p.name from ( ' +
-                '  select sum(cash) as cash, idCashpoint from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by idCashpoint) as v ' +
+  Result := Format('select v.cash, p.name, v.idMovementCurrencyDef from ( ' +
+                '  select sum(cash) as cash, idCashpoint, idMovementCurrencyDef from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idCashpoint, idMovementCurrencyDef) as v ' +
                 '  left outer join cashpoint p on p.idCashpoint = v.idCashpoint',
                 [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
 end;
