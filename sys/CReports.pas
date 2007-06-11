@@ -553,6 +553,8 @@ begin
         Add('</tr>');
       end;
       Add('</table>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Razem</td></tr></table>');
     end;
   end;
   xAccounts.Free;
@@ -668,6 +670,8 @@ begin
         end;
       end;
       Add('</table>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Razem</td></tr></table>');
     end;
   end;
   xOperations.Free;
@@ -828,6 +832,8 @@ begin
         end;
       end;
       Add('</table><hr>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Suma zrealizowanych operacji</td></tr></table><hr>');
     end;
     if xNotrealInSum.Count + xNotrealOutSum.Count > 0 then begin
       Add('<table class="base" colspan=4>');
@@ -856,8 +862,9 @@ begin
         end;
       end;
       Add('</table><hr>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Suma niezrealizowanych operacji</td></tr></table><hr>');
     end;
-
     if xOverallInSum.Count + xOverallOutSum.Count > 0 then begin
       Add('<table class="base" colspan=4>');
       for xCount := 0 to Max(xOverallInSum.Count, xOverallOutSum.Count) do begin
@@ -885,6 +892,8 @@ begin
         end;
       end;
       Add('</table><hr>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Suma wszystkich zaplanowanych operacji</td></tr></table><hr>');
     end;
   end;
   xPlannedObjects.Free;
@@ -977,6 +986,8 @@ begin
         Add('</tr>');
       end;
       Add('</table>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Razem</td></tr></table>');
     end;
   end;
   xOperations.Free;
@@ -1382,6 +1393,8 @@ begin
         Add('</tr>');
       end;
       Add('</table>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Razem</td></tr></table>');
     end;
   end;
   xOperations.Free;
@@ -1689,8 +1702,8 @@ begin
       end else begin
         Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
         Add('<td class="text" width="70%">' + GetDescription(xCurDate) + '</td>');
-        Add('<td class="cash" width="10%">' + '-' + '</td>');
-        Add('<td class="cash" width="20%">' + '-' + '</td>');
+        Add('<td class="cash" width="10%">-</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(0, '', False) + '</td>');
         Add('</tr>');
         Inc(xRec);
       end;
@@ -1714,6 +1727,8 @@ begin
         Add('</tr>');
       end;
       Add('</table>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Razem</td></tr></table>');
     end;
   end;
   xOperations.Free;

@@ -60,6 +60,8 @@ type
     ActionShortcutCurrencyRate: TAction;
     ActionImportCurrencyRates: TAction;
     OpenDialogXml: TOpenDialog;
+    ActionBug: TAction;
+    ActionFutureRequest: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -89,6 +91,8 @@ type
     procedure ActionRandomExecute(Sender: TObject);
     procedure StatusBarClick(Sender: TObject);
     procedure ActionImportCurrencyRatesExecute(Sender: TObject);
+    procedure ActionBugExecute(Sender: TObject);
+    procedure ActionFutureRequestExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -654,6 +658,16 @@ begin
       xStr.Free;
     end;
   end;
+end;
+
+procedure TCMainForm.ActionBugExecute(Sender: TObject);
+begin
+  ShellExecute(0, nil, 'http://sourceforge.net/tracker/?func=add&group_id=178670&atid=886066', nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TCMainForm.ActionFutureRequestExecute(Sender: TObject);
+begin
+  ShellExecute(0, nil, 'http://sourceforge.net/tracker/?func=add&group_id=178670&atid=886069', nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 133
-  Top = 30
+  Left = 138
+  Top = 161
   Width = 863
   Height = 635
   Caption = 'CManager'
@@ -381,10 +381,12 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutCurrencydef
+                Caption = '&Waluty'
                 ImageIndex = 11
               end
               item
                 Action = ActionShortcutCurrencyRate
+                Caption = '&Kursy walut'
                 ImageIndex = 12
               end>
             Caption = '&Skr'#243'ty'
@@ -425,6 +427,16 @@ object CMainForm: TCMainForm
               item
                 Action = ActionHelp
                 Caption = '&Spis tre'#347'ci'
+              end
+              item
+                Caption = '-'
+              end
+              item
+                Action = ActionBug
+                Caption = '&Zg'#322'o'#347' b'#322#261'd'
+              end
+              item
+                Action = ActionFutureRequest
               end
               item
                 Caption = '-'
@@ -594,6 +606,16 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Wczytaj kursy walut'
       OnExecute = ActionImportCurrencyRatesExecute
+    end
+    object ActionBug: TAction
+      Category = 'Pomoc'
+      Caption = 'Zg'#322'o'#347' b'#322#261'd'
+      OnExecute = ActionBugExecute
+    end
+    object ActionFutureRequest: TAction
+      Category = 'Pomoc'
+      Caption = 'Zaproponuj zmian'#281
+      OnExecute = ActionFutureRequestExecute
     end
   end
   object OpenDialog: TOpenDialog
