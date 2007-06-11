@@ -647,15 +647,15 @@ begin
         xDone.doneState := CDoneOperation;
         xDone.doneDate := regDate;
         xDone.description := description;
-        xDone.cash := cash;
+        xDone.cash := movementCash;
         idPlannedDone := xDone.id;
-        xDone.idDoneCurrencyDef := idAccountCurrencyDef;
+        xDone.idDoneCurrencyDef := idMovementCurrencyDef;
       end else begin
         xDone := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
-        xDone.cash := cash;
+        xDone.cash := movementCash;
         xDone.description := description;
         xDone.doneDate := regDate;
-        xDone.idDoneCurrencyDef := idAccountCurrencyDef;
+        xDone.idDoneCurrencyDef := idMovementCurrencyDef;
       end;
     end;
   end;
