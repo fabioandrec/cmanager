@@ -21,11 +21,13 @@ type
     JakoplikTXT1: TMenuItem;
     JakoplikRTF1: TMenuItem;
     JakoplikHTML1: TMenuItem;
+    plikExcel1: TMenuItem;
     procedure Ustawienialisty1Click(Sender: TObject);
     procedure Wywietljakoraport1Click(Sender: TObject);
     procedure JakoplikTXT1Click(Sender: TObject);
     procedure JakoplikRTF1Click(Sender: TObject);
     procedure JakoplikHTML1Click(Sender: TObject);
+    procedure plikExcel1Click(Sender: TObject);
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;
@@ -74,7 +76,8 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 
 implementation
 
-uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math;
+uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
+  CDatatools, CInfoFormUnit;
 
 {$R *.dfm}
 
@@ -354,6 +357,7 @@ var xFilter: String;
     xDef: String;
     xReport: TVirtualStringReport;
     xParams: TCVirtualStringTreeParams;
+    xValid: Boolean;
 begin
   case AType of
     0: begin
@@ -368,25 +372,43 @@ begin
       xFilter := 'pliki TXT|*.txt';
       xDef := '.txt';
     end;
+    3: begin
+      xFilter := 'pliki xls|*.xls';
+      xDef := '.xls';
+    end;
   end;
   ExportSaveDialog.Filter := xFilter;
   ExportSaveDialog.DefaultExt := xDef;
   if ExportSaveDialog.Execute then begin
-    xStr := TStringList.Create;
-    case AType of
-      0: begin
-        xParams := TCVirtualStringTreeParams.Create(GetList, GetTitle);
-        xReport := TVirtualStringReport.CreateReport(xParams);
-        xStr.Text := xReport.PrepareContent;
-        xReport.Free;
-        xParams.Free;
+    if FileExists(ExportSaveDialog.FileName) then begin
+      xValid := DeleteFile(ExportSaveDialog.FileName);
+      if not xValid then begin
+        ShowInfo(itError, 'Nie powiod³o siê usuniêcie pliku ' + ExtractFileName(ExportSaveDialog.FileName), SysErrorMessage(GetLastError));
       end;
-      1: xStr.Text := GetList.ContentToRTF(tstAll);
-      2: xStr.Text := GetList.ContentToText(tstAll, #9);
+    end else begin
+      xValid := True;
     end;
-    Result := xStr.Text;
-    xStr.SaveToFile(ExportSaveDialog.FileName);
-    xStr.Free;
+    if xValid then begin
+      if AType <> 3 then begin
+        xStr := TStringList.Create;
+        case AType of
+          0: begin
+            xParams := TCVirtualStringTreeParams.Create(GetList, GetTitle);
+            xReport := TVirtualStringReport.CreateReport(xParams);
+            xStr.Text := xReport.PrepareContent;
+            xReport.Free;
+            xParams.Free;
+          end;
+          1: xStr.Text := GetList.ContentToRTF(tstAll);
+          2: xStr.Text := GetList.ContentToText(tstAll, #9);
+        end;
+        Result := xStr.Text;
+        xStr.SaveToFile(ExportSaveDialog.FileName);
+        xStr.Free;
+      end else begin
+        ExportListToExcel(GetList, ExportSaveDialog.FileName);
+      end;
+    end;
   end;
 end;
 
@@ -444,6 +466,11 @@ begin
   end;
   xText := xTree.Text[Node, xColumn];
   Result := IfThen(Pos(AnsiUpperCase(SearchText), AnsiUpperCase(xText)) = 1, 0, 1);
+end;
+
+procedure TCBaseFrame.plikExcel1Click(Sender: TObject);
+begin
+  ExportTree(3);
 end;
 
 initialization

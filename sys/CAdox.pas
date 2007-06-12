@@ -5,6 +5,7 @@ interface
 uses ShellApi, SysUtils, Classes, ComObj, Variants;
 
 function CreateDatabase(AFilename: String; var AError: String): Boolean;
+function CreateExcelFile(AFilename: String; var AError: String): OleVariant;
 function CompactDatabase(AFilename: String; var AError: String): Boolean;
 
 implementation
@@ -12,6 +13,7 @@ implementation
 const
   CCreateDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
   CCompactDatabaseString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
+  CCreateExcelFile = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Extended Properties="Excel 8.0"';
 
 function CreateDatabase(AFilename: String; var AError: String): Boolean;
 var xCatalog : OLEVariant;
@@ -29,6 +31,23 @@ begin
     end
   finally
     xCatalog := Unassigned;
+  end;
+end;
+
+function CreateExcelFile(AFilename: String; var AError: String): OleVariant;
+begin
+  VarClear(Result);
+  try
+    try
+      Result := CreateOleObject('ADOX.Catalog');
+      Result.ActiveConnection := Format(CCreateExcelFile, [AFilename]);
+    except
+      on E: Exception do begin
+        AError := E.Message;
+        Result := Unassigned;
+      end;
+    end
+  finally
   end;
 end;
 

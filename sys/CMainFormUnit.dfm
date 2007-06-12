@@ -235,7 +235,7 @@ object CMainForm: TCMainForm
         BorderStyle = bsNone
         ButtonStyle = bsTriangle
         Colors.HotColor = clNavy
-        DefaultNodeHeight = 60
+        DefaultNodeHeight = 80
         Header.AutoSizeIndex = -1
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText

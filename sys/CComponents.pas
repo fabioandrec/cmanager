@@ -307,6 +307,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function GetVisibleIndex(ANode: PVirtualNode): Integer;
+    function SumColumn(AColumnIndex: TColumnIndex; var ASum: Extended): Boolean;
   published
     property OddColor: TColor read FOddColor write SetOddColor;
     property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
@@ -380,7 +381,8 @@ procedure Register;
 
 implementation
 
-uses Forms, CCalendarFormUnit, DateUtils, ComObj, CCalculatorFormUnit;
+uses Forms, CCalendarFormUnit, DateUtils, ComObj, CCalculatorFormUnit,
+  Math;
 
 procedure Register;
 begin
@@ -1496,6 +1498,30 @@ begin
   while Assigned(ANode) do begin
     Inc(Result);
     ANode := GetPreviousVisible(ANode);
+  end;
+end;
+
+function TCList.SumColumn(AColumnIndex: TColumnIndex; var ASum: Extended): Boolean;
+var xNode: PVirtualNode;
+    xStr: String;
+    xCode: Integer;
+    xValue: Extended;
+begin
+  Result := True;
+  ASum := 0;
+  xNode := GetFirst;
+  while (xNode <> Nil) and Result do begin
+    xStr := Text[xNode, AColumnIndex];
+
+    Val(StringReplace(xStr, ',', '.', [rfReplaceAll, rfIgnoreCase]), xValue, xCode);
+    Result := Result and (xCode = 0);
+    if Result then begin
+      ASum := ASum + xValue;
+    end;
+    xNode := GetNext(xNode);
+  end;
+  if not Result then begin
+    ASum := 0;
   end;
 end;
 

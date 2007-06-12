@@ -41,9 +41,14 @@ object CBaseFrame: TCBaseFrame
         Caption = 'strona web'
         OnClick = JakoplikHTML1Click
       end
+      object plikExcel1: TMenuItem
+        Caption = 'plik Excel'
+        OnClick = plikExcel1Click
+      end
     end
   end
   object ExportSaveDialog: TSaveDialog
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 72
     Top = 120
   end

@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils, MsXml;
+     DateUtils, MsXml, AdoDb, VirtualTrees;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -20,12 +20,14 @@ procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure ReloadCurrencyCache;
+procedure ExportListToExcel(AList: TCList; AFilename: String);
 
 implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
-  CTools, StrUtils, CPreferences, CXml, CUpdateCurrencyRatesFormUnit;
+  CTools, StrUtils, CPreferences, CXml, CUpdateCurrencyRatesFormUnit,
+  CAdox;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -320,6 +322,77 @@ begin
       GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
     end;
     xC.Free;
+  end;
+end;
+
+procedure ExportListToExcel(AList: TCList; AFilename: String);
+var xConnection: TADOConnection;
+    xQuery: TADOQuery;
+    xCatalog, xSheet, xColumn: OleVariant;
+    xError: String;
+    xCount: Integer;
+    xNode: PVirtualNode;
+    xSum: Extended;
+begin
+  xError := '';
+  xCatalog := CreateExcelFile(AFilename, xError);
+  if not VarIsEmpty(xCatalog) then begin
+    try
+      try
+        xSheet := CreateOleObject('Adox.Table');
+        xSheet.Name := 'Lista';
+        for xCount := 0 to AList.Header.Columns.Count - 1 do begin
+          xColumn := CreateOleObject('Adox.Column');
+          xColumn.Name := AList.Header.Columns.Items[xCount].Text;
+          if AList.SumColumn(xCount, xSum) then begin
+            xColumn.Type := $00000005;
+          end;
+          xSheet.Columns.Append(xColumn);
+        end;
+        xCatalog.Tables.Append(xSheet);
+      except
+        on E: Exception do begin
+          xError := E.Message;
+        end;
+      end;
+    finally
+      xColumn := Unassigned;
+      xSheet := Unassigned;
+      xCatalog := Unassigned;
+    end;
+    if xError = '' then begin
+      xConnection := TADOConnection.Create(nil);
+      xConnection.LoginPrompt := False;
+      xConnection.ConnectionString := Format('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Extended Properties="Excel 8.0;HDR=Yes"', [AFilename]);
+      xQuery := TADOQuery.Create(Nil);
+      xQuery.Connection := xConnection;
+      try
+        try
+          xQuery.SQL.Text := 'select * from [lista$]';
+          xQuery.Open;
+          xNode := AList.GetFirst;
+          while (xNode <> Nil) do begin
+            xQuery.Append;
+            xQuery.Edit;
+            for xCount := 0 to AList.Header.Columns.Count - 1 do begin
+              xQuery.Fields.Fields[xCount].Value := AList.Text[xNode, xCount];
+            end;
+            xQuery.Post;
+            xNode := AList.GetNext(xNode);
+          end;
+        except
+          on E: Exception do begin
+            xError := E.Message;
+          end;
+        end;
+      finally
+        xQuery.Free;
+        xConnection.Free;
+      end;
+    end;
+  end;
+  if xError <> '' then begin
+    ShowInfo(itError, 'Nie uda³o siê wykonaæ eksportu do pliku w formacie Excel', xError);
   end;
 end;
 

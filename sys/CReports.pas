@@ -1969,7 +1969,7 @@ begin
   xMonthsBetween := MonthCount(FEndDate, FStartDate);
   with xBody do begin
     Add('<table class="base" colspan=4>');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     Add('<td class="headtext" width="40%">Œrednie ogó³em (wszystkie konta)</td>');
     Add('<td class="headcash" width="20%">Przychody</td>');
     Add('<td class="headcash" width="20%">Rozchody</td>');
