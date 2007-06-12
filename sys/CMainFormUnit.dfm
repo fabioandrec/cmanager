@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 138
-  Top = 161
+  Left = 129
+  Top = 66
   Width = 863
   Height = 635
   Caption = 'CManager'
@@ -434,6 +434,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionBug
                 Caption = '&Zg'#322'o'#347' b'#322#261'd'
+                ImageIndex = 13
               end
               item
                 Action = ActionFutureRequest
@@ -444,6 +445,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCheckUpdates
                 Caption = 'S&prawd'#378' aktualizacje'
+                ImageIndex = 14
               end
               item
                 Action = ActionAbout
@@ -515,6 +517,7 @@ object CMainForm: TCMainForm
     object ActionCheckUpdates: TAction
       Category = 'Pomoc'
       Caption = 'Sprawd'#378' aktualizacje'
+      ImageIndex = 14
       OnExecute = ActionCheckUpdatesExecute
     end
     object ActionAbout: TAction
@@ -610,6 +613,7 @@ object CMainForm: TCMainForm
     object ActionBug: TAction
       Category = 'Pomoc'
       Caption = 'Zg'#322'o'#347' b'#322#261'd'
+      ImageIndex = 13
       OnExecute = ActionBugExecute
     end
     object ActionFutureRequest: TAction
