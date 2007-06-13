@@ -24,7 +24,8 @@ type
   end;
 
 procedure ShowWaitForm(AType: TWaitType; AText: String; AMin: Integer = 0; AMax: Integer = 100);
-procedure StepWaitForm(AStep: Integer);
+procedure InitWaitForm(AText: String; AMin: Integer = 0; AMax: Integer = 100);
+procedure StepWaitForm(AStep: Integer; AText: String = '');
 procedure HideWaitForm;
 
 implementation
@@ -60,11 +61,30 @@ begin
   GWaitForm.Update;
 end;
 
-procedure StepWaitForm(AStep: Integer);
+procedure InitWaitForm(AText: String; AMin: Integer = 0; AMax: Integer = 100);
+begin
+  if GWaitForm <> Nil then begin
+    if GWaitForm.FWaitType = wtProgressbar then begin
+      GWaitForm.ProgressBar.Min := AMin;
+      GWaitForm.ProgressBar.Max := AMax;
+      GWaitForm.ProgressBar.Position := AMin;
+    end;
+    if AText <> '' then begin
+      GWaitForm.LabelText.Caption := AText;
+      GWaitForm.LabelText.Update;
+    end;
+  end;
+end;
+
+procedure StepWaitForm(AStep: Integer; AText: String = '');
 begin
   if GWaitForm <> Nil then begin
     if GWaitForm.FWaitType = wtProgressbar then begin
       GWaitForm.ProgressBar.StepBy(AStep);
+    end;
+    if AText <> '' then begin
+      GWaitForm.LabelText.Caption := AText;
+      GWaitForm.LabelText.Update;
     end;
   end;
 end;
