@@ -311,7 +311,7 @@ type
     destructor Destroy; override;
   end;
 
-  TAveragesReport = class(TCHtmlReport)
+  {+}TAveragesReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -1954,6 +1954,46 @@ begin
 end;
 
 function TAveragesReport.GetReportBody: String;
+
+  procedure AppendGroup(APeriodsCount: Integer; AQuery: TADOQuery; ATitle: String; AIdGroupName: String; var ARecNo: Integer; var ABody: TStringList);
+  var xIdCurDef, xIdGroupBy: TDataGid;
+  begin
+    with ABody do begin
+      if APeriodsCount > 0 then begin
+        Add('<hr><p><hr>');
+        Add('<table class="base" colspan=1>');
+        Add('<tr class="head">');
+        Add('<td class="headtext" width="100%">' + ATitle + '</td>');
+        Add('</tr></table>');
+        xIdCurDef := CEmptyDataGid;
+        xIdGroupBy := CEmptyDataGid;
+        AQuery.First;
+        while not AQuery.Eof do begin
+          if xIdGroupBy <> AQuery.FieldByName(AIdGroupName).AsString then begin
+            xIdGroupBy := AQuery.FieldByName(AIdGroupName).AsString;
+            Add('<hr><table class="base" colspan=1>');
+            Add('<tr class="subhead">');
+            Add('<td class="subheadtext" width="100%">' + AQuery.FieldByName('name').AsString + '</td>');
+            Add('</tr></table><hr>');
+          end;
+          if xIdCurDef <> AQuery.FieldByName('idMovementCurrencyDef').AsString then begin
+            xIdCurDef := AQuery.FieldByName('idMovementCurrencyDef').AsString;
+            Add('<table class="base" colspan=4>');
+            Add('<tr class="' + IsEvenToStr(ARecNo) + 'base">');
+            Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xIdCurDef) + ']</td>');
+            Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('incomes').AsCurrency / APeriodsCount, '', False) + '</td>');
+            Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('expenses').AsCurrency / APeriodsCount, '', False) + '</td>');
+            Add('<td class="cash" width="20%">' + CurrencyToString((AQuery.FieldByName('incomes').AsCurrency - AQuery.FieldByName('expenses').AsCurrency) / APeriodsCount, '', False) + '</td>');
+            Add('</tr></table>');
+            Inc(ARecNo);
+          end;
+          AQuery.Next;
+        end;
+        Add('</table>');
+      end;
+    end;
+  end;
+
 var xBody: TStringList;
     xRec: Integer;
     xSql: String;
@@ -1962,331 +2002,115 @@ var xBody: TStringList;
     xMonthsBetween: Integer;
     xQuery: TADOQuery;
     xFilter: String;
+    xCurDefs: TDataGids;
+    xCount: Integer;
 begin
   xBody := TStringList.Create;
   xDaysBetween := DayCount(FEndDate, FStartDate);
   xWeeksBetween := WeekCount(FEndDate, FStartDate);
   xMonthsBetween := MonthCount(FEndDate, FStartDate);
   with xBody do begin
-    Add('<table class="base" colspan=4>');
+    Add('<table class="base" colspan=5>');
     Add('<tr class="head">');
     Add('<td class="headtext" width="40%">Œrednie ogó³em (wszystkie konta)</td>');
     Add('<td class="headcash" width="20%">Przychody</td>');
     Add('<td class="headcash" width="20%">Rozchody</td>');
     Add('<td class="headcash" width="20%">Saldo</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=4>');
+    Add('</table><hr>');
     xRec := 1;
     xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True);
-    xSql := Format('select sum(income) as incomes, sum(expense) as expenses from balances where movementType <> ''%s'' and regDate between %s and %s',
+    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses from balances where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xQuery := GDataProvider.OpenSql(xSql);
-    if xDaysBetween > 0 then begin
-      if not Odd(xRec) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
-      end;
-      Add('<td class="text" width="40%">Dzienne</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xDaysBetween) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xDaysBetween) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xDaysBetween) + '</td>');
+    xQuery := GDataProvider.OpenSql(xSql + ' group by idMovementCurrencyDef');
+    xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idMovementCurrencyDef');
+    for xCount := 0 to xCurDefs.Count - 1 do begin
+      xQuery.Filter := 'idMovementCurrencyDef = ' + DataGidToDatabase(xCurDefs.Strings[xCount]);
+      xQuery.Filtered := True;
+      Add('<table class="base" colspan=1>');
+      Add('<tr class="subhead">');
+      Add('<td class="subheadtext" width="100%">[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCount]) + ']' + '</td>');
       Add('</tr>');
-      Inc(xRec);
-    end;
-    if xWeeksBetween > 0 then begin
-      if not Odd(xRec) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
+      Add('</table><hr>');
+      Add('<table class="base" colspan=5>');
+      if xDaysBetween > 0 then begin
+        Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
+        Add('<td class="text" width="40%">Dzienne</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xDaysBetween, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xDaysBetween, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xDaysBetween, '', False) + '</td>');
+        Add('</tr>');
+        Inc(xRec);
       end;
-      Add('<td class="text" width="40%">Tygodniowe</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xWeeksBetween) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xWeeksBetween) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xWeeksBetween) + '</td>');
-      Add('</tr>');
-      Inc(xRec);
-    end;
-    if xMonthsBetween > 0 then begin
-      if not Odd(xRec) then begin
-        Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-      end else begin
-        Add('<tr class="base">');
+      if xWeeksBetween > 0 then begin
+        Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
+        Add('<td class="text" width="40%">Tygodniowe</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xWeeksBetween, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xWeeksBetween, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xWeeksBetween, '', False) + '</td>');
+        Add('</tr>');
+        Inc(xRec);
       end;
-      Add('<td class="text" width="40%">Miesiêcznie</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xMonthsBetween) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xMonthsBetween) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xMonthsBetween) + '</td>');
-      Add('</tr>');
+      if xMonthsBetween > 0 then begin
+        Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
+        Add('<td class="text" width="40%">Miesiêcznie</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xMonthsBetween, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xMonthsBetween, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xMonthsBetween, '', False) + '</td>');
+        Add('</tr>');
+        Inc(xRec);
+      end;
+      Add('</table>');
+      if xCount <> xCurDefs.Count - 1 then begin
+        Add('<hr>');
+      end;
     end;
-    Add('</table>');
     xQuery.Free;
+    xCurDefs.Free;
     //konta
-    Add('<hr>');
-    Add('<p>');
-    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idAccount, account.name from balances ' +
+    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idAccount, account.name from balances ' +
                    ' left outer join account on account.idAccount = balances.idAccount ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by balances.idAccount, account.name';
+    xSql := xSql + ' group by idMovementCurrencyDef, balances.idAccount, account.name order by account.name, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
-    if xDaysBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie dzienne (dla konta)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xDaysBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xDaysBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xDaysBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
-    if xWeeksBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie tygodniowe (dla konta)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xWeeksBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xWeeksBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xWeeksBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
-    if xMonthsBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie miesiêczne (dla konta)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xMonthsBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xMonthsBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xMonthsBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
+    AppendGroup(xDaysBetween, xQuery, 'Œrednie dzienne (dla konta)', 'idAccount', xRec, xBody);
+    AppendGroup(xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla konta)', 'idAccount', xRec, xBody);
+    AppendGroup(xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla konta)', 'idAccount', xRec, xBody);
     xQuery.Free;
-    //kontrahenci
-    Add('<hr>');
-    Add('<p>');
-    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idCashpoint, cashpoint.name from balances ' +
+    //kontahenci
+    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idCashpoint, cashpoint.name from balances ' +
                    ' left outer join cashpoint on cashpoint.idCashpoint = balances.idCashpoint ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by balances.idCashpoint, cashpoint.name';
+    xSql := xSql + ' group by idMovementCurrencyDef, balances.idCashpoint, cashpoint.name order by cashpoint.name, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
-    if xDaysBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie dzienne (dla kontrahenta)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xDaysBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xDaysBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xDaysBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
-    if xWeeksBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie tygodniowe (dla kontrahenta)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xWeeksBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xWeeksBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xWeeksBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
-    if xMonthsBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie miesiêczne (dla kontrahenta)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xMonthsBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xMonthsBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xMonthsBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
+    AppendGroup(xDaysBetween, xQuery, 'Œrednie dzienne (dla kontrahenta)', 'idCashpoint', xRec, xBody);
+    AppendGroup(xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla kontrahenta)', 'idCashpoint', xRec, xBody);
+    AppendGroup(xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla konta)', 'idCashpoint', xRec, xBody);
     xQuery.Free;
     //kategorie
-    Add('<hr>');
-    Add('<p>');
-    xSql := Format('select sum(income) as incomes, sum(expense) as expenses, balances.idProduct, product.name from balances ' +
+    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idProduct, product.name from balances ' +
                    ' left outer join product on product.idProduct = balances.idProduct ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by balances.idProduct, product.name';
+    xSql := xSql + ' group by idMovementCurrencyDef, balances.idProduct, product.name order by product.name, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
-    if xDaysBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie dzienne (dla kategorii)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xDaysBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xDaysBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xDaysBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
-    if xWeeksBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie tygodniowe (dla kategorii)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xWeeksBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xWeeksBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xWeeksBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
-    if xMonthsBetween > 0 then begin
-      Add('<hr>');
-      Add('<table class="base" colspan=1>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="100%">Œrednie miesiêczne (dla kategorii)</td>');
-      Add('</tr>');
-      Add('</table><hr><table class="base" colspan=4>');
-      xQuery.First;
-      xRec := 1;
-      while not xQuery.Eof do begin
-        if not Odd(xRec) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="40%">' + xQuery.FieldByName('name').AsString + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('incomes').AsCurrency / xMonthsBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xQuery.FieldByName('expenses').AsCurrency / xMonthsBetween) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString((xQuery.FieldByName('incomes').AsCurrency - xQuery.FieldByName('expenses').AsCurrency) / xMonthsBetween) + '</td>');
-        Add('</tr>');
-        Inc(xRec);
-        xQuery.Next;
-      end;
-      Add('</table>');
-    end;
+    AppendGroup(xDaysBetween, xQuery, 'Œrednie dzienne (dla kategorii)', 'idProduct', xRec, xBody);
+    AppendGroup(xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla kategorii)', 'idProduct', xRec, xBody);
+    AppendGroup(xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla kategorii)', 'idProduct', xRec, xBody);
     xQuery.Free;
   end;
   Result := xBody.Text;
