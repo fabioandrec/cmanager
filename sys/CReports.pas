@@ -1955,7 +1955,7 @@ end;
 
 function TAveragesReport.GetReportBody: String;
 
-  procedure AppendGroup(APeriodsCount: Integer; AQuery: TADOQuery; ATitle: String; AIdGroupName: String; var ARecNo: Integer; var ABody: TStringList);
+  procedure AppendGroup(AIsMultiCurrency: Boolean; APeriodsCount: Integer; AQuery: TADOQuery; ATitle: String; AIdGroupName: String; var ARecNo: Integer; var ABody: TStringList);
   var xIdCurDef, xIdGroupBy: TDataGid;
   begin
     with ABody do begin
@@ -1965,27 +1965,44 @@ function TAveragesReport.GetReportBody: String;
         Add('<tr class="head">');
         Add('<td class="headtext" width="100%">' + ATitle + '</td>');
         Add('</tr></table>');
+        if not AIsMultiCurrency then begin
+          Add('<hr>');
+        end;
         xIdCurDef := CEmptyDataGid;
         xIdGroupBy := CEmptyDataGid;
         AQuery.First;
         while not AQuery.Eof do begin
           if xIdGroupBy <> AQuery.FieldByName(AIdGroupName).AsString then begin
             xIdGroupBy := AQuery.FieldByName(AIdGroupName).AsString;
-            Add('<hr><table class="base" colspan=1>');
-            Add('<tr class="subhead">');
-            Add('<td class="subheadtext" width="100%">' + AQuery.FieldByName('name').AsString + '</td>');
-            Add('</tr></table><hr>');
+            xIdCurDef := CEmptyDataGid;
+            if AIsMultiCurrency then begin
+              Add('<hr><table class="base" colspan=1>');
+              Add('<tr class="subhead">');
+              Add('<td class="subheadtext" width="100%">' + AQuery.FieldByName('name').AsString + '</td>');
+              Add('</tr></table><hr>');
+            end else begin
+              Add('<table class="base" colspan=4>');
+              Add('<tr class="' + IsEvenToStr(ARecNo) + 'base">');
+              Add('<td class="text" width="40%">' + AQuery.FieldByName('name').AsString + '</td>');
+              Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('incomes').AsCurrency / APeriodsCount, '', False) + '</td>');
+              Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('expenses').AsCurrency / APeriodsCount, '', False) + '</td>');
+              Add('<td class="cash" width="20%">' + CurrencyToString((AQuery.FieldByName('incomes').AsCurrency - AQuery.FieldByName('expenses').AsCurrency) / APeriodsCount, '', False) + '</td>');
+              Add('</tr></table>');
+              Inc(ARecNo);
+            end;
           end;
-          if xIdCurDef <> AQuery.FieldByName('idMovementCurrencyDef').AsString then begin
-            xIdCurDef := AQuery.FieldByName('idMovementCurrencyDef').AsString;
-            Add('<table class="base" colspan=4>');
-            Add('<tr class="' + IsEvenToStr(ARecNo) + 'base">');
-            Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xIdCurDef) + ']</td>');
-            Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('incomes').AsCurrency / APeriodsCount, '', False) + '</td>');
-            Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('expenses').AsCurrency / APeriodsCount, '', False) + '</td>');
-            Add('<td class="cash" width="20%">' + CurrencyToString((AQuery.FieldByName('incomes').AsCurrency - AQuery.FieldByName('expenses').AsCurrency) / APeriodsCount, '', False) + '</td>');
-            Add('</tr></table>');
-            Inc(ARecNo);
+          if AIsMultiCurrency then begin
+            if xIdCurDef <> AQuery.FieldByName('idMovementCurrencyDef').AsString then begin
+              xIdCurDef := AQuery.FieldByName('idMovementCurrencyDef').AsString;
+              Add('<table class="base" colspan=4>');
+              Add('<tr class="' + IsEvenToStr(ARecNo) + 'base">');
+              Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xIdCurDef) + ']</td>');
+              Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('incomes').AsCurrency / APeriodsCount, '', False) + '</td>');
+              Add('<td class="cash" width="20%">' + CurrencyToString(AQuery.FieldByName('expenses').AsCurrency / APeriodsCount, '', False) + '</td>');
+              Add('<td class="cash" width="20%">' + CurrencyToString((AQuery.FieldByName('incomes').AsCurrency - AQuery.FieldByName('expenses').AsCurrency) / APeriodsCount, '', False) + '</td>');
+              Add('</tr></table>');
+              Inc(ARecNo);
+            end;
           end;
           AQuery.Next;
         end;
@@ -2004,6 +2021,7 @@ var xBody: TStringList;
     xFilter: String;
     xCurDefs: TDataGids;
     xCount: Integer;
+    xIsMultiCurrency: Boolean;
 begin
   xBody := TStringList.Create;
   xDaysBetween := DayCount(FEndDate, FStartDate);
@@ -2027,6 +2045,7 @@ begin
     end;
     xQuery := GDataProvider.OpenSql(xSql + ' group by idMovementCurrencyDef');
     xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idMovementCurrencyDef');
+    xIsMultiCurrency := xCurDefs.Count > 1;
     for xCount := 0 to xCurDefs.Count - 1 do begin
       xQuery.Filter := 'idMovementCurrencyDef = ' + DataGidToDatabase(xCurDefs.Strings[xCount]);
       xQuery.Filtered := True;
@@ -2072,7 +2091,7 @@ begin
     xCurDefs.Free;
     //konta
     xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idAccount, account.name from balances ' +
-                   ' left outer join account on account.idAccount = balances.idAccount ' +
+                   ' left join account on account.idAccount = balances.idAccount ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
@@ -2080,13 +2099,13 @@ begin
     end;
     xSql := xSql + ' group by idMovementCurrencyDef, balances.idAccount, account.name order by account.name, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
-    AppendGroup(xDaysBetween, xQuery, 'Œrednie dzienne (dla konta)', 'idAccount', xRec, xBody);
-    AppendGroup(xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla konta)', 'idAccount', xRec, xBody);
-    AppendGroup(xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla konta)', 'idAccount', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xDaysBetween, xQuery, 'Œrednie dzienne (dla konta)', 'idAccount', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla konta)', 'idAccount', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla konta)', 'idAccount', xRec, xBody);
     xQuery.Free;
     //kontahenci
     xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idCashpoint, cashpoint.name from balances ' +
-                   ' left outer join cashpoint on cashpoint.idCashpoint = balances.idCashpoint ' +
+                   ' left join cashpoint on cashpoint.idCashpoint = balances.idCashpoint ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
@@ -2094,13 +2113,13 @@ begin
     end;
     xSql := xSql + ' group by idMovementCurrencyDef, balances.idCashpoint, cashpoint.name order by cashpoint.name, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
-    AppendGroup(xDaysBetween, xQuery, 'Œrednie dzienne (dla kontrahenta)', 'idCashpoint', xRec, xBody);
-    AppendGroup(xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla kontrahenta)', 'idCashpoint', xRec, xBody);
-    AppendGroup(xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla konta)', 'idCashpoint', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xDaysBetween, xQuery, 'Œrednie dzienne (dla kontrahenta)', 'idCashpoint', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla kontrahenta)', 'idCashpoint', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla konta)', 'idCashpoint', xRec, xBody);
     xQuery.Free;
     //kategorie
     xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idProduct, product.name from balances ' +
-                   ' left outer join product on product.idProduct = balances.idProduct ' +
+                   ' left join product on product.idProduct = balances.idProduct ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
@@ -2108,9 +2127,9 @@ begin
     end;
     xSql := xSql + ' group by idMovementCurrencyDef, balances.idProduct, product.name order by product.name, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
-    AppendGroup(xDaysBetween, xQuery, 'Œrednie dzienne (dla kategorii)', 'idProduct', xRec, xBody);
-    AppendGroup(xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla kategorii)', 'idProduct', xRec, xBody);
-    AppendGroup(xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla kategorii)', 'idProduct', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xDaysBetween, xQuery, 'Œrednie dzienne (dla kategorii)', 'idProduct', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xWeeksBetween, xQuery, 'Œrednie tygodniowe (dla kategorii)', 'idProduct', xRec, xBody);
+    AppendGroup(xIsMultiCurrency, xMonthsBetween, xQuery, 'Œrednie miesiêczne (dla kategorii)', 'idProduct', xRec, xBody);
     xQuery.Free;
   end;
   Result := xBody.Text;
