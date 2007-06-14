@@ -1,9 +1,10 @@
 inherited CLoanCalculatorForm: TCLoanCalculatorForm
-  Left = 338
-  Top = 30
+  Left = 336
+  Top = 182
   Caption = 'Kalkulator kredytowy'
   ClientHeight = 523
   ClientWidth = 578
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
@@ -147,6 +148,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         ThousandSep = True
         CurrencyStr = '%'
         BevelKind = bkTile
+        WithCalculator = True
       end
       object CCurrEditCash: TCCurrEdit
         Left = 110
@@ -158,8 +160,8 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         OnChange = CCurrEditCashChange
         Decimals = 2
         ThousandSep = True
-        CurrencyStr = 'z'#322
         BevelKind = bkTile
+        WithCalculator = True
       end
       object CCurrEditOthers: TCCurrEdit
         Left = 409
@@ -171,8 +173,8 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         OnChange = CCurrEditCashChange
         Decimals = 2
         ThousandSep = True
-        CurrencyStr = 'z'#322
         BevelKind = bkTile
+        WithCalculator = True
       end
     end
     object GroupBox2: TGroupBox
@@ -322,6 +324,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           ThousandSep = True
           CurrencyStr = '%'
           BevelKind = bkTile
+          WithCalculator = True
         end
       end
     end

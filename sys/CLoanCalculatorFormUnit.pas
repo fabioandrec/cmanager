@@ -40,6 +40,7 @@ type
     procedure CDateTimeChanged(Sender: TObject);
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure BitBtnOkClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     Floan: TLoan;
     procedure UpdateLoanData;
@@ -169,14 +170,14 @@ begin
       CellText := '';
     end;
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xObj.payment);
+    CellText := CurrencyToString(xObj.payment, '', False);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(xObj.principal);
+    CellText := CurrencyToString(xObj.principal, '', False);
   end else if Column = 4 then begin
-    CellText := CurrencyToString(xObj.tax);
+    CellText := CurrencyToString(xObj.tax, '', False);
   end else if Column = 5 then begin
     if Floan.IsSumObject(Floan.IndexOf(xObj)) then begin
-      CellText := CurrencyToString(xObj.left);
+      CellText := CurrencyToString(xObj.left, '', False);
     end else begin
       CellText := '';
     end;
@@ -192,6 +193,13 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+procedure TCLoanCalculatorForm.FormCreate(Sender: TObject);
+begin
+  inherited;
+  CCurrEditCash.CurrencyStr := '';
+  CCurrEditOthers.CurrencyStr := '';
 end;
 
 end.

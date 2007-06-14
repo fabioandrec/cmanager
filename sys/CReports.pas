@@ -357,7 +357,7 @@ type
     constructor CreateReport(AParams: TCReportParams); override;
   end;
 
-  TLoanReportParams = class(TCReportParams)
+  {+}TLoanReportParams = class(TCReportParams)
   private
     Floan: TLoan;
   public
@@ -366,7 +366,7 @@ type
     property loan: TLoan read Floan write Floan;
   end;
 
-  TLoanReport = class(TCHtmlReport)
+  {+}TLoanReport = class(TCHtmlReport)
   protected
     function GetReportTitle: String; override;
     function GetReportBody: String; override;
@@ -389,7 +389,7 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
-  TPluginHtmlReport = class(TCHtmlReport)
+  {+}TPluginHtmlReport = class(TCHtmlReport)
   private
     FBody: OleVariant;
   protected
@@ -2717,7 +2717,7 @@ begin
   xBody := TStringList.Create;
   with xBody do begin
     Add('<table class="base" colspan="6">');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     Add('<td class="headcenter" width="20%">Kwota</td>');
     Add('<td class="headcenter" width="10%">Oprocentowanie</td>');
     Add('<td class="headcenter" width="15%">Prowizje i op³aty</td>');
@@ -2728,9 +2728,9 @@ begin
     Add('</tr></table><hr>');
     Add('<table class="base" colspan="6">');
     Add('<tr class="base">');
-    Add('<td class="center" width="20%">' + CurrencyToString(xL.totalCash) + '</td>');
+    Add('<td class="center" width="20%">' + CurrencyToString(xL.totalCash, '', False) + '</td>');
     Add('<td class="center" width="10%">' + CurrencyToString(xL.taxAmount, '', False, 4) + '%</td>');
-    Add('<td class="center" width="15%">' + CurrencyToString(xL.otherTaxes) + '</td>');
+    Add('<td class="center" width="15%">' + CurrencyToString(xL.otherTaxes, '', False) + '</td>');
     Add('<td class="center" width="15%">' + IntToStr(xL.periods) + '</td>');
     Add('<td class="center" width="15%">' + xPaymentType + '</td>');
     Add('<td class="center" width="15%">' + xPaymentPeriod + '</td>');
@@ -2740,7 +2740,7 @@ begin
     Add('<hr>');
     Add('<p class="reptitle">Harmonogram sp³at<hr>');
     Add('<table class="base" colspan="' + IntToStr(IfThen(xL.firstDay <> 0, 6, 5)) + '">');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     Add('<td class="headtext" width="5%">Lp</td>');
     if xL.firstDay <> 0 then begin
       Add('<td class="headtext" width="20%">Data</td>');
@@ -2755,31 +2755,27 @@ begin
     Add('<table class="base" colspan="' + IntToStr(IfThen(xL.firstDay <> 0, 6, 5)) + '">');
     for xCount := 0 to xL.Count - 1 do begin
       if xL.IsSumObject(xCount) then begin
-        if not Odd(xCount) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
+        Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
         Add('<td class="text" width="5%">' + IntToStr(xCount + 1) + '</td>');
         if xL.firstDay <> 0 then begin
           Add('<td class="text" width="20%">' + DateToStr(xL.Items[xCount].date) + '</td>');
         end;
-        Add('<td class="cash" width="25%">' + CurrencyToString(xL.Items[xCount].payment) + '</td>');
-        Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].principal) + '</td>');
-        Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].tax) + '</td>');
-        Add('<td class="cash" width="20%">' + CurrencyToString(xL.Items[xCount].left) + '</td>');
+        Add('<td class="cash" width="25%">' + CurrencyToString(xL.Items[xCount].payment, '', False) + '</td>');
+        Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].principal, '', False) + '</td>');
+        Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].tax, '', False) + '</td>');
+        Add('<td class="cash" width="20%">' + CurrencyToString(xL.Items[xCount].left, '', False) + '</td>');
         Add('</tr>');
       end;
     end;
     Add('</table><hr><table class="base" colspan="' + IntToStr(IfThen(xL.firstDay <> 0, 6, 5)) + '">');
-    Add('<tr class="base">');
+    Add('<tr class="sum">');
     Add('<td class="sumtext" width="5%">Razem</td>');
     if xL.firstDay <> 0 then begin
       Add('<td class="sumtext" width="20%"></td>');
     end;
-    Add('<td class="sumcash" width="25%">' + CurrencyToString(xL.sumPayments) + '</td>');
-    Add('<td class="sumcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.sumPrincipal) + '</td>');
-    Add('<td class="sumcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.sumTax) + '</td>');
+    Add('<td class="sumcash" width="25%">' + CurrencyToString(xL.sumPayments, '', False) + '</td>');
+    Add('<td class="sumcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.sumPrincipal, '', False) + '</td>');
+    Add('<td class="sumcash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.sumTax, '', False) + '</td>');
     Add('<td class="sumcash" width="20%"></td>');
     Add('</tr>');
     Add('</table>');
