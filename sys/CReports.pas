@@ -133,8 +133,8 @@ type
 
   TCChartReport = class(TCBaseReport)
   private
-    FisPie: Boolean;
     procedure Setmarks(const Value: Integer);
+    procedure UpdateChartsThumbnails;
   protected
     function GetFormClass: TCReportFormClass; override;
     function GetReportFooter: String; override;
@@ -144,7 +144,6 @@ type
     function GetChart(ASymbol: String = ''): TCChart;
   public
     function GetPrefname: String; virtual;
-    property isPie: Boolean read FisPie;
     property marks: Integer write Setmarks;
   end;
 
@@ -1192,9 +1191,7 @@ begin
 end;
 
 procedure TCChartReport.PrepareReportData;
-var xCount: Integer;
-    xTemp: TPieSeries;
-    xChart: TChart;
+var xChart: TChart;
 begin
   xChart := GetChart;
   with xChart do begin
@@ -1215,17 +1212,10 @@ begin
       Width := 1;
     end;
     PrepareReportChart;
-    FisPie := False;
-    xCount := 0;
-    xTemp := TPieSeries.Create(Nil);
-    while (xCount <= SeriesCount - 1) and (not FisPie) do begin
-      FisPie := Series[xCount].SameClass(xTemp);
-      Inc(xCount);
-    end;
-    xTemp.Free;
   end;
   TCChartReportForm(FForm).ActiveChartIndex := 0;
   SetChartProps;
+  UpdateChartsThumbnails;
 end;
 
 constructor TAccountBalanceChartReport.CreateReport(AParams: TCReportParams);
@@ -2995,8 +2985,8 @@ begin
       Legend.Visible := False;
       Legend.Alignment := laBottom;
       Legend.ShadowSize := 0;
-      View3DOptions.Orthogonal := not FisPie;
-      View3D := FisPie;
+      View3DOptions.Orthogonal := not xChart.isPie;
+      View3D := xChart.isPie;
     end;
   end;
 end;
@@ -3096,6 +3086,11 @@ begin
       ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', FXml.parseError.reason);
     end;
   end;
+end;
+
+procedure TCChartReport.UpdateChartsThumbnails;
+begin
+  TCChartReportForm(FForm).UpdateThumbnails;
 end;
 
 end.

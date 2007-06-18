@@ -11,12 +11,16 @@ type
   TCChart = class(TChart)
   private
     Fsymbol: String;
+    Ftitle: String;
     Fprops: TForm;
+    function GetIsPie: Boolean;
   public
     constructor CreateNew(AOwner: TComponent; ASymbol: String);
     destructor Destroy; override;
     property symbol: String read Fsymbol write Fsymbol;
+    property thumbTitle: String read Ftitle write Ftitle;
     property props: TForm read Fprops write Fprops;
+    property isPie: Boolean read GetIsPie;
   end;
 
   TChartList = class(TObjectList)
@@ -33,7 +37,13 @@ type
     PrintDialog: TPrintDialog;
     CButton4: TCButton;
     ActionGraph: TAction;
+    PanelThumbs: TPanel;
+    PanelParent: TPanel;
+    ThumbsList: TVirtualStringTree;
     procedure ActionGraphExecute(Sender: TObject);
+    procedure ThumbsListGetText(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+      var CellText: WideString);
   private
     Fcharts: TChartList;
     FActiveChartIndex: Integer;
@@ -44,11 +54,13 @@ type
     procedure DoPrint; override;
     procedure DoSave; override;
   public
+    constructor CreateForm(AReport: TObject); override;
+    procedure UpdateThumbnails;
     destructor Destroy; override;
     function GetChart(ASymbol: String; ACanCreate: Boolean = True): TCChart;
     property ActiveChartIndex: Integer read FActiveChartIndex write SetActiveChartIndex;
     property ActiveChart: TCChart read GetActiveChart;
-    constructor CreateForm(AReport: TObject); override;
+    property charts: TChartList read Fcharts;
   end;
 
 implementation
@@ -100,6 +112,7 @@ constructor TCChart.CreateNew(AOwner: TComponent; ASymbol: String);
 begin
   inherited Create(AOwner);
   Fsymbol := ASymbol;
+  Ftitle := '';
   Fprops := Nil;
 end;
 
@@ -161,8 +174,8 @@ begin
     LeftWall.Brush.Color := clWhite;
     LeftWall.Brush.Style := bsClear;
     MarginBottom := 1;
-    MarginLeft := 1;
-    MarginRight := 1;
+    MarginLeft := 3;
+    MarginRight := 3;
     MarginTop := 1;
     Title.Alignment := taLeftJustify;
     Title.Color := clWhite;
@@ -248,7 +261,7 @@ begin
     BevelOuter := bvNone;
     Color := clWhite;
     Visible := False;
-    Parent := PanelConfig;
+    Parent := PanelParent;
   end;
   Fcharts.Add(Result);
 end;
@@ -287,6 +300,33 @@ begin
   inherited CreateForm(AReport);
   Fcharts := TChartList.Create(True);
   FActiveChartIndex := -1;
+end;
+
+procedure TCChartReportForm.UpdateThumbnails;
+begin
+  PanelThumbs.Visible := Fcharts.Count > 1;
+  if PanelThumbs.Visible then begin
+    ThumbsList.RootNodeCount := Fcharts.Count;
+  end;
+end;
+
+procedure TCChartReportForm.ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+begin
+  CellText := Fcharts.Items[Node.Index].thumbTitle;
+end;
+
+function TCChart.GetIsPie: Boolean;
+var xCount: Integer;
+    xTemp: TPieSeries;
+begin
+  xCount := 0;
+  xTemp := TPieSeries.Create(Nil);
+  Result := False;
+  while (xCount <= SeriesCount - 1) and (not Result) do begin
+    Result := Series[xCount].SameClass(xTemp);
+    Inc(xCount);
+  end;
+  xTemp.Free;
 end;
 
 end.
