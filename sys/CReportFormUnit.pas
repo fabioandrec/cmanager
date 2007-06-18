@@ -27,7 +27,7 @@ type
     procedure DoPreview; virtual;
     procedure DoSave; virtual;
   public
-    constructor CreateForm(AReport: TObject);
+    constructor CreateForm(AReport: TObject); virtual;
     property Report: TObject read FReport write FReport;
   end;
 

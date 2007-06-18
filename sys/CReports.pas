@@ -4,7 +4,7 @@ interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
-     CComponents;
+     CComponents, CChartReportFormUnit;
 
 type
   TSumForDayItem = class(TObject)
@@ -141,7 +141,7 @@ type
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
     procedure SetChartProps; virtual;
-    function GetChart: TChart;
+    function GetChart(ASymbol: String = ''): TCChart;
   public
     function GetPrefname: String; virtual;
     property isPie: Boolean read FisPie;
@@ -416,7 +416,7 @@ implementation
 uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts, CDataObjects,
      DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
-     CChartReportFormUnit, TeeProcs, TeCanvas, TeEngine,
+     TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAccountListFormUnit, CChoosePeriodAccountListGroupFormUnit,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
@@ -1171,9 +1171,9 @@ begin
   FreportStyle.LoadFromFile(GetSystemPathname('report.css'));
 end;
 
-function TCChartReport.GetChart: TChart;
+function TCChartReport.GetChart(ASymbol: String = ''): TCChart;
 begin
-  Result := TCChartReportForm(FForm).CChart;
+  Result := TCChartReportForm(FForm).GetChart(ASymbol, True);
 end;
 
 function TCChartReport.GetFormClass: TCReportFormClass;
@@ -1224,6 +1224,7 @@ begin
     end;
     xTemp.Free;
   end;
+  TCChartReportForm(FForm).ActiveChartIndex := 0;
   SetChartProps;
 end;
 
@@ -2968,11 +2969,11 @@ end;
 
 procedure TCChartReport.SetChartProps;
 var xPref: TChartPref;
-    xChart: TChart;
+    xChart: TCChart;
 begin
   xChart := GetChart;
   with xChart do begin
-    xPref := TChartPref(GChartPreferences.ByPrefname[GetPrefname]);
+    xPref := TChartPref(GChartPreferences.ByPrefname[GetPrefname + xChart.symbol]);
     if xPref <> Nil then begin
       Chart3DPercent := xPref.depth;
       View3DOptions.Zoom := xPref.zoom;
