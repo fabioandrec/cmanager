@@ -264,7 +264,7 @@ type
     function PrepareReportConditions: Boolean; override;
   end;
 
-  TAccountBalanceChartReport = class(TCChartReport)
+  {+}TAccountBalanceChartReport = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -334,7 +334,7 @@ type
     function GetReportBody: String; override;
   end;
 
-  TFuturesReport = class(TCHtmlReport)
+  {+}TFuturesReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -1273,7 +1273,7 @@ begin
       TLineSeries(xSerie).Pointer.Visible := True;
       TLineSeries(xSerie).Pointer.InflateMargins := True;
       with xSerie do begin
-        Title := xAccount.name;
+        Title := xAccount.name + ' [' + GCurrencyCache.GetIso(xAccount.idCurrencyDef) + ']';
         HorizAxis := aBottomAxis;
         XValues.DateTime := True;
       end;
@@ -1325,7 +1325,7 @@ begin
   end;
   with xChart.LeftAxis do begin
     MinorTickCount := 0;
-    Title.Caption := '[' + GetCurrencySymbol + ']';
+    Title.Caption := '[dostêpne œrodki]';
     Title.Angle := 90;
   end;
   xAccounts.Free;
@@ -2246,7 +2246,7 @@ begin
   with xBody do begin
     Add('<table class="base" colspan=5>');
     Add('<tr class="head">');
-    Add('<td class="headtext" width="40%">Sumy ogó³em (wszystkie konta)</td>');
+    Add('<td class="headtext" width="40%">Sumy ogó³em dla wszystkich kont</td>');
     Add('<td class="headcash" width="20%">Przychody</td>');
     Add('<td class="headcash" width="20%">Rozchody</td>');
     Add('<td class="headcash" width="20%">Saldo</td>');
@@ -2329,20 +2329,53 @@ begin
 end;
 
 function TFuturesReport.GetReportBody: String;
+
+  procedure AppendPeriod(ACurDefs: TDataGids; APeriodsCount, AType: Integer; var ABody: TStringList; ATitle: String; AIn, AOut: TObjectList);
+  var xCount: Integer;
+      xIn, xOut: Currency;
+  begin
+    if APeriodsCount > 0 then begin
+      with ABody do begin
+        Add('<hr><table class="base">');
+        Add('<tr class="subhead"><td class="subheadtext" width="100%">' + ATitle + '</td></tr>');
+        Add('</table><hr><table class="base" colspan=4>');
+        for xCount := 0 to ACurDefs.Count - 1 do begin
+          Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
+          Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(ACurDefs.Strings[xCount]) + ']</td>');
+          if AType = 0 then begin
+            xIn := TPeriodSums(AIn.Items[xCount]).dayAvg;
+            xOut := TPeriodSums(AOut.Items[xCount]).dayAvg;
+          end else if AType = 1 then begin
+            xIn := TPeriodSums(AIn.Items[xCount]).weekAvg;
+            xOut := TPeriodSums(AOut.Items[xCount]).weekAvg;
+          end else if AType = 2 then begin
+            xIn := TPeriodSums(AIn.Items[xCount]).monthAvg;
+            xOut := TPeriodSums(AOut.Items[xCount]).monthAvg;
+          end else begin
+            xIn := 0;
+            xOut := 0;
+          end;
+          Add('<td class="cash" width="20%">' + CurrencyToString(xIn, '', False) + '</td>');
+          Add('<td class="cash" width="20%">' + CurrencyToString(xOut, '', False) + '</td>');
+          Add('<td class="cash" width="20%">' + CurrencyToString((xIn - xOut), '', False) + '</td>');
+          Add('</tr>');
+        end;
+        Add('</table>');
+      end;
+    end;
+  end;
+
 var xBody: TStringList;
     xSql: String;
-    xRec, xCount: Integer;
+    xCount: Integer;
     xQuery: TADOQuery;
     xCurDefs: TDataGids;
     xFilter: String;
-    xIsMultiCurrency: Boolean;
     xBasePeriodsIn, xBasePeriodsOut: TObjectList;
-    xBasePeriodIn, xBasePeriodOut: TPeriodSums;
-    xFuturePeriodIn, xFuturePeriodOut: TPeriodSums;
+    xFuturePeriodsIn, xFuturePeriodsOut: TObjectList;
 begin
   xBody := TStringList.Create;
   with xBody do begin
-    xRec := 1;
     Add('<table class="base" colspan=4>');
     Add('<tr class="head">');
     Add('<td class="headtext" width="40%">Podsumowanie okresu bazowego</td>');
@@ -2350,7 +2383,7 @@ begin
     Add('<td class="headcash" width="20%">Rozchody</td>');
     Add('<td class="headcash" width="20%">Saldo</td>');
     Add('</tr>');
-    Add('</table><hr><table class="base" colspan=4>');
+    Add('</table><hr>');
     xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True);
     xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, regdate from balances where movementType <> ''%s'' and regDate between %s and %s',
                    [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
@@ -2360,7 +2393,6 @@ begin
     xSql := xSql + ' group by regDate, idMovementCurrencyDef';
     xQuery := GDataProvider.OpenSql(xSql);
     xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idMovementCurrencyDef');
-    xIsMultiCurrency := xCurDefs.Count > 1;
     xBasePeriodsIn := TObjectList.Create(True);
     xBasePeriodsOut := TObjectList.Create(True);
     for xCount := 0 to xCurDefs.Count - 1 do begin
@@ -2369,93 +2401,58 @@ begin
       TPeriodSums(xBasePeriodsIn.Last).FromDataset(xQuery, 'incomes', 'regDate', 'idMovementCurrencyDef');
       TPeriodSums(xBasePeriodsOut.Last).FromDataset(xQuery, 'expenses', 'regDate', 'idMovementCurrencyDef');
     end;
-
-    Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-    Add('<td class="text" width="40%">Razem</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.sum) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.sum) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.sum - xBasePeriodOut.sum)) + '</td>');
-    Add('</tr>');
-    Inc(xRec);
-    Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-    Add('<td class="text" width="40%">Dziennie</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.dayAvg) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.dayAvg) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.dayAvg - xBasePeriodOut.dayAvg)) + '</td>');
-    Add('</tr>');
-    Inc(xRec);
-    if WeekCount(FEndDate, FStartDate) > 0 then begin
-      Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-      Add('<td class="text" width="40%">Tygodniowo</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.weekAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.weekAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.weekAvg - xBasePeriodOut.weekAvg)) + '</td>');
-      Add('</tr>');
-      Inc(xRec);
-    end;
-    if MonthCount(FEndDate, FStartDate) > 0 then begin
-      Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-      Add('<td class="text" width="40%">Miesiêcznie</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodIn.monthAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xBasePeriodOut.monthAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xBasePeriodIn.monthAvg - xBasePeriodOut.monthAvg)) + '</td>');
+    Add('<table class="base">');
+    Add('<tr class="subhead"><td class="subheadtext" width="100%">Razem</td></tr>');
+    Add('</table><hr><table class="base" colspan=4>');
+    for xCount := 0 to xCurDefs.Count - 1 do begin
+      Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
+      Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCount]) + ']</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(TPeriodSums(xBasePeriodsIn.Items[xCount]).sum, '', False) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(TPeriodSums(xBasePeriodsOut.Items[xCount]).sum, '', False) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((TPeriodSums(xBasePeriodsIn.Items[xCount]).sum - TPeriodSums(xBasePeriodsOut.Items[xCount]).sum), '', False) + '</td>');
       Add('</tr>');
     end;
     Add('</table>');
+    AppendPeriod(xCurDefs, DayCount(FEndDate, FStartDate), 0, xBody, 'Dziennie', xBasePeriodsIn, xBasePeriodsOut);
+    AppendPeriod(xCurDefs, WeekCount(FEndDate, FStartDate), 1, xBody, 'Tygodniowo', xBasePeriodsIn, xBasePeriodsOut);
+    AppendPeriod(xCurDefs, MonthCount(FEndDate, FStartDate), 2, xBody, 'Miesiêcznie', xBasePeriodsIn, xBasePeriodsOut);
+    xFuturePeriodsIn := TObjectList.Create(True);
+    xFuturePeriodsOut := TObjectList.Create(True);
+    for xCount := 0 to xCurDefs.Count - 1 do begin
+      xFuturePeriodsIn.Add(TPeriodSums(xBasePeriodsIn.Items[xCount]).GetRegLin(FStartDate, FEndDate));
+      xFuturePeriodsOut.Add(TPeriodSums(xBasePeriodsOut.Items[xCount]).GetRegLin(FStartDate, FEndDate));
+    end;
     Add('<hr>');
     Add('<p>');
     Add('<hr>');
     Add('<table class="base" colspan=4>');
-    Add('<tr class="base">');
+    Add('<tr class="head">');
     Add('<td class="headtext" width="40%">Prognoza dla wybranego okresu</td>');
     Add('<td class="headcash" width="20%">Przychody</td>');
     Add('<td class="headcash" width="20%">Rozchody</td>');
     Add('<td class="headcash" width="20%">Saldo</td>');
     Add('</tr>');
+    Add('</table><hr>');
+    Add('<table class="base">');
+    Add('<tr class="subhead"><td class="subheadtext" width="100%">Razem</td></tr>');
     Add('</table><hr><table class="base" colspan=4>');
-    xRec := 1;
-    xFuturePeriodIn := xBasePeriodIn.GetRegLin(FStartFuture, FEndFuture);
-    xFuturePeriodOut := xBasePeriodOut.GetRegLin(FStartFuture, FEndFuture);
-    Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-    Add('<td class="text" width="40%">Razem</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.sum) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.sum) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.sum - xFuturePeriodOut.sum)) + '</td>');
-    Add('</tr>');
-    Inc(xRec);
-    Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-    Add('<td class="text" width="40%">Dziennie</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.dayAvg) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.dayAvg) + '</td>');
-    Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.dayAvg - xFuturePeriodOut.dayAvg)) + '</td>');
-    Add('</tr>');
-    Inc(xRec);
-    if WeekCount(FEndFuture, FStartFuture) > 0 then begin
-      Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-      Add('<td class="text" width="40%">Tygodniowo</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.weekAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.weekAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.weekAvg - xFuturePeriodOut.weekAvg)) + '</td>');
-      Add('</tr>');
-      Inc(xRec);
-    end;
-    if MonthCount(FEndFuture, FStartFuture) > 0 then begin
-      Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
-      Add('<td class="text" width="40%">Miesiêcznie</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodIn.monthAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString(xFuturePeriodOut.monthAvg) + '</td>');
-      Add('<td class="cash" width="20%">' + CurrencyToString((xFuturePeriodIn.monthAvg - xFuturePeriodOut.monthAvg)) + '</td>');
+    for xCount := 0 to xCurDefs.Count - 1 do begin
+      Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
+      Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCount]) + ']</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(TPeriodSums(xFuturePeriodsIn.Items[xCount]).sum, '', False) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString(TPeriodSums(xFuturePeriodsOut.Items[xCount]).sum, '', False) + '</td>');
+      Add('<td class="cash" width="20%">' + CurrencyToString((TPeriodSums(xFuturePeriodsIn.Items[xCount]).sum - TPeriodSums(xFuturePeriodsOut.Items[xCount]).sum), '', False) + '</td>');
       Add('</tr>');
     end;
     Add('</table>');
-    xQuery.Free;
-    Add('</table>');
-    xFuturePeriodIn.Free;
-    xFuturePeriodOut.Free;
-    xBasePeriodIn.Free;
-    xBasePeriodOut.Free;
+    AppendPeriod(xCurDefs, DayCount(FEndDate, FStartDate), 0, xBody, 'Dziennie', xFuturePeriodsIn, xFuturePeriodsOut);
+    AppendPeriod(xCurDefs, WeekCount(FEndDate, FStartDate), 1, xBody, 'Tygodniowo', xFuturePeriodsIn, xFuturePeriodsOut);
+    AppendPeriod(xCurDefs, MonthCount(FEndDate, FStartDate), 2, xBody, 'Miesiêcznie', xFuturePeriodsIn, xFuturePeriodsOut);
   end;
   Result := xBody.Text;
+  xQuery.Free;
+  xFuturePeriodsIn.Free;
+  xFuturePeriodsOut.Free;
   xBasePeriodsIn.Free;
   xBasePeriodsOut.Free;
   xCurDefs.Free;
