@@ -374,6 +374,7 @@ type
 
 function GetCurrencySymbol: string;
 procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String);
+function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
 
 var CurrencyComponents: TObjectList;
 
@@ -1896,6 +1897,19 @@ procedure TCCurrEdit.SetCurrencyDef(AId, ASymbol: String);
 begin
   FCurrencyId := AId;
   CurrencyStr := ASymbol;
+end;
+
+function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
+var xCur: PVirtualNode;
+begin
+  Result := Nil;
+  xCur := AList.GetFirst;
+  while (xCur <> Nil) and (Result = Nil) do begin
+    if AList.AbsoluteIndex(xCur) = AIndex then begin
+      Result := xCur;
+    end;
+    xCur := AList.GetNext(xCur);
+  end;
 end;
 
 initialization

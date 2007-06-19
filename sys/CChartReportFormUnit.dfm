@@ -24,7 +24,6 @@ inherited CChartReportForm: TCChartReportForm
         Top = 1
         Width = 183
         Height = 419
-        Cursor = crHandPoint
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -34,6 +33,8 @@ inherited CChartReportForm: TCChartReportForm
         ButtonStyle = bsTriangle
         Color = clWhite
         Colors.HotColor = clNavy
+        Colors.UnfocusedSelectionColor = clHighlight
+        Colors.UnfocusedSelectionBorderColor = clHighlight
         DefaultNodeHeight = 80
         Header.AutoSizeIndex = -1
         Header.Font.Charset = DEFAULT_CHARSET
@@ -46,18 +47,22 @@ inherited CChartReportForm: TCChartReportForm
         Header.SortColumn = 0
         Header.Style = hsFlatButtons
         HintMode = hmHint
+        Images = CImageLists.ChartImageList32x32
         Indent = 20
+        Margin = 15
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
         TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-        TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
+        TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect]
+        OnFocusChanged = ThumbsListFocusChanged
         OnGetText = ThumbsListGetText
+        OnGetImageIndex = ThumbsListGetImageIndex
+        OnHotChange = ThumbsListHotChange
         Columns = <
           item
-            Alignment = taCenter
             Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
             Width = 183

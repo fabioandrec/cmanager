@@ -29,6 +29,7 @@ type
     CurrencyDefImageList24x24: TPngImageList;
     CurrencyRateImageList24x24: TPngImageList;
     PngImageListHistory24x24: TPngImageList;
+    ChartImageList32x32: TPngImageList;
   private
     { Private declarations }
   public

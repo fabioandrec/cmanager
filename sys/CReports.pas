@@ -101,12 +101,12 @@ type
     FParams: TCReportParams;
   protected
     function PrepareReportConditions: Boolean; virtual;
-    function GetReportTitle: String; virtual; abstract;
-    function GetReportFooter: String; virtual; abstract;
     function GetFormClass: TCReportFormClass; virtual; abstract;
     procedure PrepareReportData; virtual; abstract;
     procedure SaveContentToFile(AFilename: String); virtual; abstract;
   public
+    function GetReportTitle: String; virtual; abstract;
+    function GetReportFooter: String; virtual; abstract;
     constructor CreateReport(AParams: TCReportParams); virtual;
     procedure ShowReport;
     destructor Destroy; override;
@@ -122,9 +122,9 @@ type
   protected
     procedure PrepareReportData; override;
     function GetReportBody: String; virtual; abstract;
+  public
     function GetReportFooter: String; override;
     function GetFormClass: TCReportFormClass; override;
-  public
     constructor CreateReport(AParams: TCReportParams); override;
     function PrepareContent: String;
     destructor Destroy; override;
@@ -137,12 +137,12 @@ type
     procedure UpdateChartsThumbnails;
   protected
     function GetFormClass: TCReportFormClass; override;
-    function GetReportFooter: String; override;
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
     procedure SetChartProps; virtual;
     function GetChart(ASymbol: String = ''): TCChart;
   public
+    function GetReportFooter: String; override;
     function GetPrefname: String; virtual;
     property marks: Integer write Setmarks;
   end;
@@ -152,10 +152,10 @@ type
     FDate: TDateTime;
     FIds: TStringList;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
   public
+    function GetReportTitle: String; override;
     destructor Destroy; override;
     constructor CreateReport(AParams: TCReportParams); override;
   end;
@@ -166,14 +166,16 @@ type
     FEndDate: TDateTime;
     FFilterId: TDataGid;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TTodayOperationsListReport = class(TDoneOperationsListReport)
   protected
     function PrepareReportConditions: Boolean; override;
+  public
     function GetReportTitle: String; override;
   end;
 
@@ -184,10 +186,11 @@ type
   protected
     function PrepareReportConditions: Boolean; override;
     function GetReportBody: String; override;
+  public
     function GetReportTitle: String; override;
   end;
 
-  TOperationsBySomethingChart = class(TCChartReport)
+  {+}TOperationsBySomethingChart = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -207,27 +210,31 @@ type
     function GetReportBody: String; override;
   end;
 
-  TOperationsByCategoryChart = class(TOperationsBySomethingChart)
+  {+}TOperationsByCategoryChart = class(TOperationsBySomethingChart)
   protected
     function GetSql: String; override;
+  public
     function GetReportTitle: String; override;
   end;
 
-  TOperationsByCashpointChart = class(TOperationsBySomethingChart)
+  {+}TOperationsByCashpointChart = class(TOperationsBySomethingChart)
   protected
     function GetSql: String; override;
+  public
     function GetReportTitle: String; override;
   end;
 
   {+}TOperationsByCategoryList = class(TOperationsBySomethingList)
   protected
     function GetSql: String; override;
+  public
     function GetReportTitle: String; override;
   end;
 
   {+}TOperationsByCashpointList = class(TOperationsBySomethingList)
   protected
     function GetSql: String; override;
+  public
     function GetReportTitle: String; override;
   end;
 
@@ -237,9 +244,10 @@ type
     FEndDate: TDateTime;
     FFilterId: TDataGid;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TCashFlowListReport = class(TCHtmlReport)
@@ -247,9 +255,10 @@ type
     FStartDate: TDateTime;
     FEndDate: TDateTime;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TAccountHistoryReport = class(TCHtmlReport)
@@ -258,9 +267,10 @@ type
     FEndDate: TDateTime;
     FIdAccount: TDataGid;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TAccountBalanceChartReport = class(TCChartReport)
@@ -270,9 +280,9 @@ type
     FIds: TStringList;
   protected
     procedure PrepareReportChart; override;
-    function GetReportTitle: String; override;
     function PrepareReportConditions: Boolean; override;
   public
+    function GetReportTitle: String; override;
     constructor CreateReport(AParams: TCReportParams); override;
     destructor Destroy; override;
   end;
@@ -286,10 +296,10 @@ type
   private
     function GetDescription(ADate: TDateTime): String;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
   public
+    function GetReportTitle: String; override;
     constructor CreateReport(AParams: TCReportParams); override;
     destructor Destroy; override;
   end;
@@ -303,10 +313,10 @@ type
   private
     function GetDescription(ADate: TDateTime): String;
   protected
-    function GetReportTitle: String; override;
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
   public
+    function GetReportTitle: String; override;
     constructor CreateReport(AParams: TCReportParams); override;
     destructor Destroy; override;
   end;
@@ -318,8 +328,9 @@ type
     FIdFilter: TDataGid;
   protected
     function PrepareReportConditions: Boolean; override;
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TPeriodSumsReport = class(TCHtmlReport)
@@ -329,8 +340,9 @@ type
     FIdFilter: TDataGid;
   protected
     function PrepareReportConditions: Boolean; override;
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TFuturesReport = class(TCHtmlReport)
@@ -342,8 +354,9 @@ type
     FIdFilter: TDataGid;
   protected
     function PrepareReportConditions: Boolean; override;
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TVirtualStringReport = class(TCHtmlReport)
@@ -351,9 +364,9 @@ type
     FWidth: Integer;
     function GetColumnPercentage(AColumn: TVirtualTreeColumn): Integer;
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
   public
+    function GetReportTitle: String; override;
     constructor CreateReport(AParams: TCReportParams); override;
   end;
 
@@ -368,8 +381,9 @@ type
 
   {+}TLoanReport = class(TCHtmlReport)
   protected
-    function GetReportTitle: String; override;
     function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   TCurrencyRatesHistoryReport = class(TCChartReport)
@@ -385,8 +399,9 @@ type
     FAxisName: String;
   protected
     procedure PrepareReportChart; override;
-    function GetReportTitle: String; override;
     function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
   end;
 
   {+}TPluginHtmlReport = class(TCHtmlReport)
@@ -402,10 +417,10 @@ type
     FXml: IXMLDOMDocument;
   protected
     function PrepareReportConditions: Boolean; override;
-    function GetReportTitle: String; override;
-    function GetReportFooter: String; override;
     procedure PrepareReportChart; override;
   public
+    function GetReportFooter: String; override;
+    function GetReportTitle: String; override;
     function GetPrefname: String; override;
   end;
 
@@ -1191,31 +1206,11 @@ begin
 end;
 
 procedure TCChartReport.PrepareReportData;
-var xChart: TChart;
 begin
-  xChart := GetChart;
-  with xChart do begin
-    Foot.Text.Text := GetReportFooter;
-    Foot.Font.Height := -10;
-    Title.Text.Text := GetReportTitle;
-    Title.Font.Height := -14;
-    with LeftAxis.Axis do begin
-      Width := 1;
-    end;
-    with RightAxis.Axis do begin
-      Width := 1;
-    end;
-    with TopAxis.Axis do begin
-      Width := 1;
-    end;
-    with BottomAxis.Axis do begin
-      Width := 1;
-    end;
-    PrepareReportChart;
-  end;
+  PrepareReportChart;
+  UpdateChartsThumbnails;
   TCChartReportForm(FForm).ActiveChartIndex := 0;
   SetChartProps;
-  UpdateChartsThumbnails;
 end;
 
 constructor TAccountBalanceChartReport.CreateReport(AParams: TCReportParams);
@@ -1413,33 +1408,43 @@ end;
 procedure TOperationsBySomethingChart.PrepareReportChart;
 var xSums: TADOQuery;
     xSerie: TPieSeries;
-    xChart: TChart;
+    xChart: TCChart;
     xCash: Currency;
     xLabel: String;
     xSum: Currency;
     xPercent: Double;
+    xCurDefs: TDataGids;
+    xCount: Integer;
 begin
-  xChart := GetChart;
   xSums := GDataProvider.OpenSql(GetSql);
-  xSerie := TPieSeries.Create(xChart);
-  xSerie.Title := 'Wszystkie dane';
-  xSum := 0;
-  while not xSums.Eof do begin
-    xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
-    xSums.Next;
+  xCurDefs := GetCurrencyDefsFromDataset(xSums, 'idMovementCurrencyDef');
+  for xCount := 0 to xCurDefs.Count - 1 do begin
+    xChart := GetChart(xCurDefs.Strings[xCount]);
+    xChart.thumbTitle := '[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCount]) + ']';
+    xSerie := TPieSeries.Create(xChart);
+    xSerie.Title := 'Wszystkie dane';
+    xSum := 0;
+    xSums.Filter := 'idMovementCurrencyDef = ' + DataGidToDatabase(xCurDefs.Strings[xCount]);
+    xSums.Filtered := True;
+    xSums.First;
+    while not xSums.Eof do begin
+      xSum := xSum + Abs(xSums.FieldByName('cash').AsCurrency);
+      xSums.Next;
+    end;
+    xSums.First;
+    while not xSums.Eof do begin
+      xCash := Abs(xSums.FieldByName('cash').AsCurrency);
+      xPercent := (xCash * 100) / xSum;
+      xLabel := Format('%3.2f', [xPercent]) + '% - ' + xSums.FieldByName('name').AsString + ' (' + CurrencyToString(xCash, xCurDefs.Strings[xCount], True) + ')';
+      xSerie.Add(xCash, xLabel);
+      xSums.Next;
+    end;
+    xSerie.Marks.Style := smsLabel;
+    with xChart do begin
+      AddSeries(xSerie);
+    end;
   end;
-  xSums.First;
-  while not xSums.Eof do begin
-    xCash := Abs(xSums.FieldByName('cash').AsCurrency);
-    xPercent := (xCash * 100) / xSum;
-    xLabel := Format('%3.2f', [xPercent]) + '% - ' + xSums.FieldByName('name').AsString + ' (' + CurrencyToString(xCash) + ')';
-    xSerie.Add(xCash, xLabel);
-    xSums.Next;
-  end;
-  xSerie.Marks.Style := smsLabel;
-  with xChart do begin
-    AddSeries(xSerie);
-  end;
+  xCurDefs.Free;
   xSums.Free;
 end;
 
@@ -1459,9 +1464,9 @@ end;
 
 function TOperationsByCategoryChart.GetSql: String;
 begin
-  Result := Format('select v.cash, p.name from ( ' +
-                '  select sum(cash) as cash, idProduct from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by idProduct) as v ' +
+  Result := Format('select v.idMovementCurrencyDef, v.cash, p.name from ( ' +
+                '  select sum(movementCash) as cash, idProduct, idMovementCurrencyDef from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idMovementCurrencyDef, idProduct) as v ' +
                 '  left outer join product p on p.idProduct = v.idProduct',
                 [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
 end;
@@ -1477,9 +1482,9 @@ end;
 
 function TOperationsByCashpointChart.GetSql: String;
 begin
-  Result := Format('select v.cash, p.name from ( ' +
-                '  select sum(cash) as cash, idCashpoint from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by idCashpoint) as v ' +
+  Result := Format('select v.idMovementCurrencyDef, v.cash, p.name from ( ' +
+                '  select sum(movementCash) as cash, idCashpoint, idMovementCurrencyDef from transactions ' +
+                '  where movementType = ''%s'' and regDate between %s and %s group by idMovementCurrencyDef, idCashpoint) as v ' +
                 '  left outer join cashpoint p on p.idCashpoint = v.idCashpoint',
                 [TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
 end;

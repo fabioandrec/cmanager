@@ -199,7 +199,7 @@ begin
           rateDescription := '';
           idCurrencyRate := CEmptyDataGid;
         end;
-        movementCash := Random(50) + Random;
+        movementCash := Random(50) + RandomRange(1, 99) / 100;
         if idMovementCurrencyDef <> idAccountCurrencyDef then begin
           xHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idMovementCurrencyDef, idAccountCurrencyDef);
           cash := xHelper.ExchangeCurrency(movementCash, idAccountCurrencyDef, idMovementCurrencyDef);
@@ -237,7 +237,7 @@ begin
           rateDescription := '';
           idCurrencyRate := CEmptyDataGid;
         end;
-        movementCash := Random(50) + Random;
+        movementCash := Random(50) + RandomRange(1, 99) / 100;
         if idMovementCurrencyDef <> idAccountCurrencyDef then begin
           xHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idMovementCurrencyDef, idAccountCurrencyDef);
           cash := xHelper.ExchangeCurrency(movementCash, idAccountCurrencyDef, idMovementCurrencyDef);
@@ -280,7 +280,7 @@ begin
             idCurrencyRate := CEmptyDataGid;
           end;
           description := 'Transfer z ' + xSourceAccount.name + ' do ' + xAccount.name;
-          movementCash := Random(500) + Random;
+          movementCash := Random(500) + RandomRange(1, 99) / 100;
           if idMovementCurrencyDef <> idAccountCurrencyDef then begin
             xHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idMovementCurrencyDef, idAccountCurrencyDef);
             cash := xHelper.ExchangeCurrency(movementCash, idAccountCurrencyDef, idMovementCurrencyDef);

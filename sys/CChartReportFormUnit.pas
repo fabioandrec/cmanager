@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CReportFormUnit, StdCtrls, Buttons, ExtCtrls, TeeProcs,
-  TeEngine, Chart, Series, ActnList, CComponents, Contnrs, VirtualTrees;
+  TeEngine, Chart, Series, ActnList, CComponents, Contnrs, VirtualTrees,
+  CImageListsUnit;
 
 type
   TCChart = class(TChart)
@@ -13,6 +14,7 @@ type
     Fsymbol: String;
     Ftitle: String;
     Fprops: TForm;
+    Fimage: Integer;
     function GetIsPie: Boolean;
   public
     constructor CreateNew(AOwner: TComponent; ASymbol: String);
@@ -21,6 +23,7 @@ type
     property thumbTitle: String read Ftitle write Ftitle;
     property props: TForm read Fprops write Fprops;
     property isPie: Boolean read GetIsPie;
+    property image: Integer read Fimage write Fimage;
   end;
 
   TChartList = class(TObjectList)
@@ -41,9 +44,11 @@ type
     PanelParent: TPanel;
     ThumbsList: TVirtualStringTree;
     procedure ActionGraphExecute(Sender: TObject);
-    procedure ThumbsListGetText(Sender: TBaseVirtualTree;
-      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-      var CellText: WideString);
+    procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure ThumbsListHotChange(Sender: TBaseVirtualTree; OldNode,
+      NewNode: PVirtualNode);
+    procedure ThumbsListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
     Fcharts: TChartList;
     FActiveChartIndex: Integer;
@@ -65,7 +70,7 @@ type
 
 implementation
 
-uses CChartPropsFormUnit, CReports, CConfigFormUnit;
+uses CChartPropsFormUnit, CReports, CConfigFormUnit, Math;
 
 {$R *.dfm}
 
@@ -114,6 +119,7 @@ begin
   Fsymbol := ASymbol;
   Ftitle := '';
   Fprops := Nil;
+  Fimage := -1;
 end;
 
 function TChartList.GetBySymbol(ASymbol: String): TCChart;
@@ -165,7 +171,7 @@ begin
     Foot.Color := clWhite;
     Foot.Font.Charset := DEFAULT_CHARSET;
     Foot.Font.Color := clNavy;
-    Foot.Font.Height := -11;
+    Foot.Font.Height := -10;
     Foot.Font.Name := 'Verdana';
     Foot.Font.Style := [];
     Foot.Frame.Color := clWhite;
@@ -185,8 +191,6 @@ begin
     Title.Font.Name := 'Verdana';
     Title.Font.Style := [fsBold];
     Title.Frame.Color := 8453888;
-    Title.Text.Clear;
-    Title.Text.Add('Report title');
     BackColor := clSilver;
     BottomAxis.DateTimeFormat := 'yyyy-MM-dd';
     BottomAxis.Grid.SmallDots := True;
@@ -262,6 +266,12 @@ begin
     Color := clWhite;
     Visible := False;
     Parent := PanelParent;
+    Foot.Text.Text := TCBaseReport(Report).GetReportFooter;
+    Title.Text.Text := TCBaseReport(Report).GetReportTitle;
+    LeftAxis.Axis.Width := 1;
+    RightAxis.Axis.Width := 1;
+    TopAxis.Axis.Width := 1;
+    BottomAxis.Axis.Width := 1;
   end;
   Fcharts.Add(Result);
 end;
@@ -275,6 +285,7 @@ begin
 end;
 
 procedure TCChartReportForm.SetActiveChartIndex(const Value: Integer);
+var xNode: PVirtualNode;
 begin
   if FActiveChartIndex <> Value then begin
     if FActiveChartIndex <> -1 then begin
@@ -283,6 +294,13 @@ begin
     FActiveChartIndex := Value;
     if FActiveChartIndex <> -1 then begin
       Fcharts.Items[FActiveChartIndex].Visible := True;
+      xNode := FindNodeWithIndex(FActiveChartIndex, ThumbsList);
+      if xNode <> Nil then begin
+        ThumbsList.FocusedNode := xNode;
+        ThumbsList.Selected[xNode] := True;
+      end;
+    end else begin
+      ThumbsList.FocusedNode := Nil;
     end;
   end;
 end;
@@ -313,6 +331,9 @@ end;
 procedure TCChartReportForm.ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 begin
   CellText := Fcharts.Items[Node.Index].thumbTitle;
+  if CellText = '' then begin
+    CellText := 'Podstawowy';
+  end;
 end;
 
 function TCChart.GetIsPie: Boolean;
@@ -327,6 +348,38 @@ begin
     Inc(xCount);
   end;
   xTemp.Free;
+end;
+
+procedure TCChartReportForm.ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xImage: Integer;
+begin
+  xImage := Fcharts.Items[Node.Index].image;
+  if xImage = -1 then begin
+    xImage := IfThen(Fcharts.Items[Node.Index].isPie, 1, 0);
+  end;
+  ImageIndex := xImage;
+end;
+
+procedure TCChartReportForm.ThumbsListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+begin
+  if NewNode <> Nil then begin
+    ThumbsList.Cursor := crHandPoint;
+  end else begin
+    ThumbsList.Cursor := crDefault;
+  end;
+end;
+
+procedure TCChartReportForm.ThumbsListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+var xIndex: Integer;
+begin
+  if (Node <> Nil) then begin
+    xIndex := Node.Index;
+    if (xIndex >= 0) and (xIndex <= Fcharts.Count - 1) then begin
+      ActiveChartIndex := xIndex;
+    end;
+  end else begin
+    ActiveChartIndex := -1;
+  end;
 end;
 
 end.

@@ -2593,6 +2593,7 @@ begin
   end else begin
     Result := 0;
   end;
+  Result := SimpleRoundTo(Result, -2);
 end;
 
 procedure TBaseMovement.SetcurrencyQuantity(const Value: Integer);
