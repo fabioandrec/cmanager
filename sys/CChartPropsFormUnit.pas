@@ -48,23 +48,20 @@ type
     procedure ComboBoxMarksChange(Sender: TObject);
   private
     Fchart: TChart;
-    FisPie: Boolean;
     Fprefs: TChartPref;
     FprefName: String;
     function GetmarksStyle: TMarksStyle;
     procedure SetmarksStyle(const Value: TMarksStyle);
     procedure UpdatePrefs;
   protected
-    procedure CheckIsPie;
     procedure UpdateTrackbars;
     procedure UpdateLabelPos(ALabel: TLabel; ATrackbar: TTrackBar);
   public
+    constructor Create(AOwner: TComponent); override;
+    procedure SetChart(AChart: TChart; APrefName: String);
     property chart: TChart read Fchart write Fchart;
     property marksStyle: TMarksStyle read GetmarksStyle write SetmarksStyle;
-    constructor Create(AOwner: TComponent); override;
   end;
-
-function ShowChartProps(AChart: TChart; APrefName: String): TForm;
 
 implementation
 
@@ -73,59 +70,6 @@ implementation
 uses Series, TeCanvas, CTools;
 
 const CLegendPosition: array[0..4] of String = ('z lewej', 'z prawej', 'z góry', 'z do³u', 'ukryta');
-
-function ShowChartProps(AChart: TChart; APrefName: String): TForm;
-begin
-  Result := TCChartPropsForm.Create(Application);
-  with TCChartPropsForm(Result) do begin
-    chart := AChart;
-    FprefName := APrefName;
-    CheckIsPie;
-    if chart.View3D then begin
-      if chart.View3DOptions.Orthogonal then begin
-        ComboBox.ItemIndex := 1;
-      end else begin
-        ComboBox.ItemIndex := 2;
-      end;
-    end else begin
-      ComboBox.ItemIndex := 0;
-    end;
-    ComboBoxMarks.ItemIndex := Ord(marksStyle);
-    TrackBarRotate.Position := chart.View3DOptions.Rotation;
-    TrackBarElevation.Position := chart.View3DOptions.Elevation;
-    TrackBarPerspective.Position := chart.View3DOptions.Perspective;
-    TrackBarTilt.Position := chart.View3DOptions.Tilt;
-    TrackBarDepth.Position := chart.Chart3DPercent;
-    TrackBarZoom.Position := chart.View3DOptions.Zoom;
-    UpdateLabelPos(Label2, TrackBarRotate);
-    UpdateLabelPos(Label4, TrackBarElevation);
-    UpdateLabelPos(Label6, TrackBarPerspective);
-    UpdateLabelPos(Label8, TrackBarTilt);
-    UpdateLabelPos(Label10, TrackBarDepth);
-    UpdateLabelPos(Label12, TrackBarZoom);
-    UpdateTrackbars;    
-    if chart.Legend.Visible then begin
-      ComboBoxLegendPos.ItemIndex := Ord(chart.Legend.Alignment);
-    end else begin
-      ComboBoxLegendPos.ItemIndex := 4;
-    end;
-    UpdatePrefs;
-  end;
-end;
-
-procedure TCChartPropsForm.CheckIsPie;
-var xCount: Integer;
-    xTemp: TPieSeries;
-begin
-  FisPie := False;
-  xCount := 0;
-  xTemp := TPieSeries.Create(Nil);
-  while (xCount <= Fchart.SeriesCount - 1) and (not FisPie) do begin
-    FisPie := Fchart.Series[xCount].SameClass(xTemp);
-    Inc(xCount);
-  end;
-  xTemp.Free;
-end;
 
 procedure TCChartPropsForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -182,24 +126,51 @@ end;
 
 procedure TCChartPropsForm.UpdateTrackbars;
 begin
-  Label1.Enabled := ComboBox.ItemIndex = 2;
-  TrackBarRotate.Enabled := ComboBox.ItemIndex = 2;
-  Label2.Enabled := ComboBox.ItemIndex = 2;
-  Label4.Enabled := ComboBox.ItemIndex = 2;
-  TrackBarElevation.Enabled := ComboBox.ItemIndex = 2;
-  Label3.Enabled := ComboBox.ItemIndex = 2;
-  Label5.Enabled := ComboBox.ItemIndex = 2;
-  TrackBarPerspective.Enabled := ComboBox.ItemIndex = 2;
-  Label6.Enabled := ComboBox.ItemIndex = 2;
-  Label8.Enabled := ComboBox.ItemIndex = 2;
-  TrackBarTilt.Enabled := ComboBox.ItemIndex = 2;
-  Label7.Enabled := ComboBox.ItemIndex = 2;
-  Label9.Enabled := ComboBox.ItemIndex <> 0;
-  TrackBarDepth.Enabled := ComboBox.ItemIndex <> 0;
-  Label10.Enabled := ComboBox.ItemIndex <> 0;
-  Label11.Enabled := ComboBox.ItemIndex <> 0;
-  TrackBarZoom.Enabled := ComboBox.ItemIndex <> 0;
-  Label12.Enabled := ComboBox.ItemIndex <> 0;
+  if Fchart <> Nil then begin
+    ComboBoxMarks.Enabled := True;
+    ComboBoxLegendPos.Enabled := True;
+    ComboBox.Enabled := True;
+    Label1.Enabled := ComboBox.ItemIndex = 2;
+    TrackBarRotate.Enabled := ComboBox.ItemIndex = 2;
+    Label2.Enabled := ComboBox.ItemIndex = 2;
+    Label4.Enabled := ComboBox.ItemIndex = 2;
+    TrackBarElevation.Enabled := ComboBox.ItemIndex = 2;
+    Label3.Enabled := ComboBox.ItemIndex = 2;
+    Label5.Enabled := ComboBox.ItemIndex = 2;
+    TrackBarPerspective.Enabled := ComboBox.ItemIndex = 2;
+    Label6.Enabled := ComboBox.ItemIndex = 2;
+    Label8.Enabled := ComboBox.ItemIndex = 2;
+    TrackBarTilt.Enabled := ComboBox.ItemIndex = 2;
+    Label7.Enabled := ComboBox.ItemIndex = 2;
+    Label9.Enabled := ComboBox.ItemIndex <> 0;
+    TrackBarDepth.Enabled := ComboBox.ItemIndex <> 0;
+    Label10.Enabled := ComboBox.ItemIndex <> 0;
+    Label11.Enabled := ComboBox.ItemIndex <> 0;
+    TrackBarZoom.Enabled := ComboBox.ItemIndex <> 0;
+    Label12.Enabled := ComboBox.ItemIndex <> 0;
+  end else begin
+    Label1.Enabled := False;
+    TrackBarRotate.Enabled := False;
+    Label2.Enabled := False;
+    Label4.Enabled := False;
+    TrackBarElevation.Enabled := False;
+    Label3.Enabled := False;
+    Label5.Enabled := False;
+    TrackBarPerspective.Enabled := False;
+    Label6.Enabled := False;
+    Label8.Enabled := False;
+    TrackBarTilt.Enabled := False;
+    Label7.Enabled := False;
+    Label9.Enabled := False;
+    TrackBarDepth.Enabled := False;
+    Label10.Enabled := False;
+    Label11.Enabled := False;
+    TrackBarZoom.Enabled := False;
+    Label12.Enabled := False;
+    ComboBoxMarks.Enabled := False;
+    ComboBoxLegendPos.Enabled := False;
+    ComboBox.Enabled := False;
+  end;
 end;
 
 procedure TCChartPropsForm.TrackBarTiltChange(Sender: TObject);
@@ -268,6 +239,7 @@ end;
 
 procedure TCChartPropsForm.UpdatePrefs;
 begin
+  Fprefs := TChartPref(GChartPreferences.ByPrefname[FprefName]);
   if Fprefs = Nil then begin
     Fprefs := TChartPref.Create(FprefName);
     GChartPreferences.Add(Fprefs);
@@ -282,6 +254,46 @@ begin
     elevation := TrackBarElevation.Position;
     perspective := TrackBarPerspective.Position;
     tilt := TrackBarTilt.Position;
+  end;
+end;
+
+procedure TCChartPropsForm.SetChart(AChart: TChart; APrefName: String);
+begin
+  FprefName := APrefName;
+  if AChart <> Nil then begin
+    Fchart := AChart;
+    FprefName := APrefName;
+    if chart.View3D then begin
+      if chart.View3DOptions.Orthogonal then begin
+        ComboBox.ItemIndex := 1;
+      end else begin
+        ComboBox.ItemIndex := 2;
+      end;
+    end else begin
+      ComboBox.ItemIndex := 0;
+    end;
+    ComboBoxMarks.ItemIndex := Ord(marksStyle);
+    TrackBarRotate.Position := chart.View3DOptions.Rotation;
+    TrackBarElevation.Position := chart.View3DOptions.Elevation;
+    TrackBarPerspective.Position := chart.View3DOptions.Perspective;
+    TrackBarTilt.Position := chart.View3DOptions.Tilt;
+    TrackBarDepth.Position := chart.Chart3DPercent;
+    TrackBarZoom.Position := chart.View3DOptions.Zoom;
+    UpdateLabelPos(Label2, TrackBarRotate);
+    UpdateLabelPos(Label4, TrackBarElevation);
+    UpdateLabelPos(Label6, TrackBarPerspective);
+    UpdateLabelPos(Label8, TrackBarTilt);
+    UpdateLabelPos(Label10, TrackBarDepth);
+    UpdateLabelPos(Label12, TrackBarZoom);
+    UpdateTrackbars;
+    if chart.Legend.Visible then begin
+      ComboBoxLegendPos.ItemIndex := Ord(chart.Legend.Alignment);
+    end else begin
+      ComboBoxLegendPos.ItemIndex := 4;
+    end;
+    UpdatePrefs;
+  end else begin
+    UpdateTrackbars;
   end;
 end;
 

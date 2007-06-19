@@ -15,7 +15,9 @@ type
 
   TDataGids = class(TStringList)
   public
-    constructor CreateFromGid(ADataGid: TDataGid); 
+    constructor Create; 
+    constructor CreateFromGid(ADataGid: TDataGid);
+    procedure MergeWithDataGids(AGids: TDataGids);
   end;
 
   TDataProvider = class(TObject)
@@ -1359,6 +1361,12 @@ begin
   ExecuteSql(xSql);
 end;
 
+constructor TDataGids.Create;
+begin
+  inherited Create;
+  Sorted := True;
+end;
+
 constructor TDataGids.CreateFromGid(ADataGid: TDataGid);
 begin
   inherited Create;
@@ -1396,6 +1404,12 @@ destructor TSumElement.Destroy;
 begin
   Fchilds.Free;
   inherited Destroy;
+end;
+
+procedure TDataGids.MergeWithDataGids(AGids: TDataGids);
+begin
+  Duplicates := dupIgnore;
+  AddStrings(AGids);
 end;
 
 initialization

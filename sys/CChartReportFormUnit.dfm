@@ -10,10 +10,16 @@ inherited CChartReportForm: TCChartReportForm
     Width = 670
     Height = 421
     BevelOuter = bvNone
+    object Splitter: TSplitter
+      Left = 131
+      Top = 0
+      Width = 2
+      Height = 421
+    end
     object PanelThumbs: TPanel
       Left = 0
       Top = 0
-      Width = 185
+      Width = 131
       Height = 421
       Align = alLeft
       BevelOuter = bvLowered
@@ -22,7 +28,7 @@ inherited CChartReportForm: TCChartReportForm
       object ThumbsList: TVirtualStringTree
         Left = 1
         Top = 1
-        Width = 183
+        Width = 129
         Height = 419
         Align = alClient
         BevelEdges = []
@@ -65,14 +71,14 @@ inherited CChartReportForm: TCChartReportForm
           item
             Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
-            Width = 183
+            Width = 129
           end>
       end
     end
     object PanelParent: TPanel
-      Left = 185
+      Left = 133
       Top = 0
-      Width = 485
+      Width = 537
       Height = 421
       Align = alClient
       BevelOuter = bvLowered

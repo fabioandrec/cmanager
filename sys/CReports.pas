@@ -139,9 +139,9 @@ type
     function GetFormClass: TCReportFormClass; override;
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
-    procedure SetChartProps; virtual;
     function GetChart(ASymbol: String = ''): TCChart;
   public
+    procedure SetChartProps; virtual;
     function GetReportFooter: String; override;
     function GetPrefname: String; virtual;
     property marks: Integer write Setmarks;
@@ -304,7 +304,7 @@ type
     destructor Destroy; override;
   end;
 
-  TSumReportChart = class(TCChartReport)
+  {+}TSumReportChart = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -386,7 +386,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  TCurrencyRatesHistoryReport = class(TCChartReport)
+  {+}TCurrencyRatesHistoryReport = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -423,7 +423,6 @@ type
     function GetReportTitle: String; override;
     function GetPrefname: String; override;
   end;
-
 
 implementation
 
@@ -1802,7 +1801,7 @@ begin
 end;
 
 procedure TSumReportChart.PrepareReportChart;
-var xOperations: TADOQuery;
+var xInOperations, xOutOperations: TADOQuery;
     xGb: String;
     xGbSum: Currency;
     xName: String;
@@ -1810,6 +1809,9 @@ var xOperations: TADOQuery;
     xInSerie, xOutSerie: TBarSeries;
     xInMovements: Boolean;
     xOutMovements: Boolean;
+    xInCurDefs, xOutCurDefs, xOverallCurDefs: TDataGids;
+    xCount: Integer;
+    xChart: TCChart;
 begin
   xGb := 'regDate';
   xName := 'Dzieñ';
@@ -1824,10 +1826,29 @@ begin
   xOutSerie := Nil;
   xInMovements := Pos(CInMovement, TCSelectedMovementTypeParams(FParams).movementType) > 0;
   xOutMovements := Pos(COutMovement, TCSelectedMovementTypeParams(FParams).movementType) > 0;
+  xOverallCurDefs := TDataGids.Create;
   if xInMovements then begin
-    xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
+    xInOperations := GDataProvider.OpenSql(Format('select idMovementCurrencyDef, sum(movementCash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount, idMovementCurrencyDef order by %s',
                                [xGb, CInMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
-    with xOperations do begin
+    xInCurDefs := GetCurrencyDefsFromDataset(xInOperations, 'idMovementCurrencyDef');
+    xOverallCurDefs.MergeWithDataGids(xInCurDefs);
+    xInCurDefs.Free;
+  end else begin
+    xInOperations := Nil;
+  end;
+  if xOutMovements then begin
+    xOutOperations := GDataProvider.OpenSql(Format('select idMovementCurrencyDef, sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount, idMovementCurrencyDef order by %s',
+                               [xGb, COutMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
+    xOutCurDefs := GetCurrencyDefsFromDataset(xOutOperations, 'idMovementCurrencyDef');
+    xOverallCurDefs.MergeWithDataGids(xOutCurDefs);
+    xOutCurDefs.Free;
+  end else begin
+    xOutOperations := Nil;
+  end;
+  for xCount := 0 to xOverallCurDefs.Count - 1 do begin
+    xChart := GetChart(xOverallCurDefs.Strings[xCount]);
+    xChart.thumbTitle := '[' + GCurrencyCache.GetIso(xOverallCurDefs.Strings[xCount]) + ']';
+    if xInMovements then begin
       if FGroupBy = CGroupByWeek then begin
         xCurDate := StartOfTheWeek(FStartDate);
       end else if FGroupBy = CGroupByMonth then begin
@@ -1835,7 +1856,7 @@ begin
       end else begin
         xCurDate := FStartDate;
       end;
-      xInSerie := TBarSeries.Create(GetChart);
+      xInSerie := TBarSeries.Create(xChart);
       with TBarSeries(xInSerie) do begin
         Title := xName;
         Marks.ArrowLength := 0;
@@ -1844,15 +1865,16 @@ begin
         XValues.DateTime := True;
       end;
       while (xCurDate <= FEndDate) do begin
-        Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
-        Filtered := True;
-        First;
+        xInOperations.Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False) +
+                                      ' and idMovementCurrencyDef = ' + DataGidToDatabase(xOverallCurDefs.Strings[xCount]);
+        xInOperations.Filtered := True;
+        xInOperations.First;
         xGbSum := 0;
-        while not Eof do begin
-          if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
-            xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
+        while not xInOperations.Eof do begin
+          if IsValidAccount(xInOperations.FieldByName('idAccount').AsString, FIds) then begin
+            xGbSum := xGbSum + Abs(xInOperations.FieldByName('cash').AsCurrency);
           end;
-          Next;
+          xInOperations.Next;
         end;
         xInSerie.AddXY(xCurDate, xGbSum, GetDescription(xCurDate));
         if FGroupBy = CGroupByWeek then begin
@@ -1864,12 +1886,7 @@ begin
         end;
       end;
     end;
-    xOperations.Free;
-  end;
-  if xOutMovements then begin
-    xOperations := GDataProvider.OpenSql(Format('select sum(cash) as cash, %s, idAccount from transactions where movementType = ''%s'' and regDate between %s and %s group by %s, idAccount order by %s',
-                               [xGb, COutMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xGb, xGb]));
-    with xOperations do begin
+    if xOutMovements then begin
       if FGroupBy = CGroupByWeek then begin
         xCurDate := StartOfTheWeek(FStartDate);
       end else if FGroupBy = CGroupByMonth then begin
@@ -1877,7 +1894,7 @@ begin
       end else begin
         xCurDate := FStartDate;
       end;
-      xOutSerie := TBarSeries.Create(GetChart);
+      xOutSerie := TBarSeries.Create(xChart);
       with TBarSeries(xOutSerie) do begin
         Title := xName;
         Marks.ArrowLength := 0;
@@ -1886,15 +1903,16 @@ begin
         XValues.DateTime := True;
       end;
       while (xCurDate <= FEndDate) do begin
-        Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
-        Filtered := True;
-        First;
+        xOutOperations.Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False) +
+                                       ' and idMovementCurrencyDef = ' + DataGidToDatabase(xOverallCurDefs.Strings[xCount]);
+        xOutOperations.Filtered := True;
+        xOutOperations.First;
         xGbSum := 0;
-        while not Eof do begin
-          if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
-            xGbSum := xGbSum + Abs(FieldByName('cash').AsCurrency);
+        while not xOutOperations.Eof do begin
+          if IsValidAccount(xOutOperations.FieldByName('idAccount').AsString, FIds) then begin
+            xGbSum := xGbSum + Abs(xOutOperations.FieldByName('cash').AsCurrency);
           end;
-          Next;
+          xOutOperations.Next;
         end;
         xOutSerie.AddXY(xCurDate, xGbSum, GetDescription(xCurDate));
         if FGroupBy = CGroupByWeek then begin
@@ -1906,43 +1924,49 @@ begin
         end;
       end;
     end;
-    xOperations.Free;
-  end;
-  with GetChart do begin
-    with BottomAxis do begin
-      Automatic := False;
-      AutomaticMaximum := False;
-      AutomaticMinimum := False;
-      if FGroupBy = CGroupByWeek then begin
-        Maximum := EndOfTheWeek(FEndDate);
-        Minimum := StartOfTheWeek(FStartDate);
-      end else if FGroupBy = CGroupByMonth then begin
-        Maximum := EndOfTheMonth(FEndDate);
-        Minimum := StartOfTheMonth(FStartDate);
-      end else begin
-        Maximum := FEndDate;
-        Minimum := FStartDate;
+    with xChart do begin
+      with BottomAxis do begin
+        Automatic := False;
+        AutomaticMaximum := False;
+        AutomaticMinimum := False;
+        if FGroupBy = CGroupByWeek then begin
+          Maximum := EndOfTheWeek(FEndDate);
+          Minimum := StartOfTheWeek(FStartDate);
+        end else if FGroupBy = CGroupByMonth then begin
+          Maximum := EndOfTheMonth(FEndDate);
+          Minimum := StartOfTheMonth(FStartDate);
+        end else begin
+          Maximum := FEndDate;
+          Minimum := FStartDate;
+        end;
+        LabelsAngle := 90;
+        MinorTickCount := 0;
+        Title.Caption := xName
       end;
-      LabelsAngle := 90;
-      MinorTickCount := 0;
-      Title.Caption := xName
-    end;
-    with LeftAxis do begin
-      MinorTickCount := 0;
-      Title.Caption := '[' + GetCurrencySymbol + ']';
-      Title.Angle := 90;
-    end;
-    if xInMovements then begin
-      AddSeries(xInSerie);
-    end;
-    if xOutMovements then begin
-      AddSeries(xOutSerie);
-    end;
-    if xInMovements and xOutMovements then begin
-      xInSerie.Title := 'Przychody';
-      xOutSerie.Title := 'Rozchody';
+      with LeftAxis do begin
+        MinorTickCount := 0;
+        Title.Caption := '[' + GCurrencyCache.GetIso(xOverallCurDefs.Strings[xCount]) + ']';
+        Title.Angle := 90;
+      end;
+      if xInMovements then begin
+        AddSeries(xInSerie);
+      end;
+      if xOutMovements then begin
+        AddSeries(xOutSerie);
+      end;
+      if xInMovements and xOutMovements then begin
+        xInSerie.Title := 'Przychody';
+        xOutSerie.Title := 'Rozchody';
+      end;
     end;
   end;
+  if xInMovements then begin
+    xInOperations.Free;
+  end;
+  if xOutMovements then begin
+    xOutOperations.Free;
+  end;
+  xOverallCurDefs.Free;
 end;
 
 function TSumReportChart.PrepareReportConditions: Boolean;
@@ -2966,32 +2990,34 @@ procedure TCChartReport.SetChartProps;
 var xPref: TChartPref;
     xChart: TCChart;
 begin
-  xChart := GetChart;
-  with xChart do begin
-    xPref := TChartPref(GChartPreferences.ByPrefname[GetPrefname + xChart.symbol]);
-    if xPref <> Nil then begin
-      Chart3DPercent := xPref.depth;
-      View3DOptions.Zoom := xPref.zoom;
-      View3DOptions.Tilt := xPref.tilt;
-      View3DOptions.Rotation := xPref.rotate;
-      View3DOptions.Elevation := xPref.elevation;
-      View3DOptions.Perspective := xPref.perspective;
-      Legend.Visible := (xPref.legend <> 4);
-      if Legend.Visible then begin
-        Legend.Alignment := TLegendAlignment(xPref.legend);
+  xChart := TCChartReportForm(FForm).ActiveChart;
+  if xChart <> Nil then begin
+    with xChart do begin
+      xPref := TChartPref(GChartPreferences.ByPrefname[GetPrefname + xChart.symbol]);
+      if xPref <> Nil then begin
+        Chart3DPercent := xPref.depth;
+        View3DOptions.Zoom := xPref.zoom;
+        View3DOptions.Tilt := xPref.tilt;
+        View3DOptions.Rotation := xPref.rotate;
+        View3DOptions.Elevation := xPref.elevation;
+        View3DOptions.Perspective := xPref.perspective;
+        Legend.Visible := (xPref.legend <> 4);
+        if Legend.Visible then begin
+          Legend.Alignment := TLegendAlignment(xPref.legend);
+        end;
+        View3D := (xPref.view <> 0);
+        View3DOptions.Orthogonal := (xPref.view = 1);
+        marks := xPref.values;
+        Legend.LegendStyle := lsSeries;
+        Legend.ShadowSize := 0;
+      end else begin
+        Legend.LegendStyle := lsSeries;
+        Legend.Visible := False;
+        Legend.Alignment := laBottom;
+        Legend.ShadowSize := 0;
+        View3DOptions.Orthogonal := not xChart.isPie;
+        View3D := xChart.isPie;
       end;
-      View3D := (xPref.view <> 0);
-      View3DOptions.Orthogonal := (xPref.view = 1);
-      marks := xPref.values;
-      Legend.LegendStyle := lsSeries;
-      Legend.ShadowSize := 0;
-    end else begin
-      Legend.LegendStyle := lsSeries;
-      Legend.Visible := False;
-      Legend.Alignment := laBottom;
-      Legend.ShadowSize := 0;
-      View3DOptions.Orthogonal := not xChart.isPie;
-      View3D := xChart.isPie;
     end;
   end;
 end;
@@ -3003,78 +3029,91 @@ end;
 
 procedure TCChartReport.Setmarks(const Value: Integer);
 var xCount: Integer;
+    xChart: TChart;
 begin
-  for xCount := 0 to GetChart.SeriesCount - 1 do begin
-    GetChart.Series[xCount].Marks.Visible := Value <> 0;
-    if Value = 1 then begin
-      GetChart.Series[xCount].Marks.Style := smsValue;
-    end else if Value = 2 then begin
-      GetChart.Series[xCount].Marks.Style := smsLabel;
+  xChart := TCChartReportForm(FForm).ActiveChart;
+  if xChart <> Nil then begin
+    for xCount := 0 to xChart.SeriesCount - 1 do begin
+      xChart.Series[xCount].Marks.Visible := Value <> 0;
+      if Value = 1 then begin
+        xChart.Series[xCount].Marks.Style := smsValue;
+      end else if Value = 2 then begin
+        xChart.Series[xCount].Marks.Style := smsLabel;
+      end;
     end;
   end;
 end;
 
 function TPluginChartReport.GetReportFooter: String;
 begin
-  Result := GetXmlAttribute('footer', FXml.documentElement, '');
+  Result := '';
 end;
 
 function TPluginChartReport.GetReportTitle: String;
 begin
-  Result := GetXmlAttribute('title', FXml.documentElement, '');
+  Result := '';
 end;
 
 procedure TPluginChartReport.PrepareReportChart;
-var xSeries, xItems: IXMLDOMNodeList;
-    xCountS, xCountI: Integer;
-    xSerieNode, xItemNode: IXMLDOMNode;
+var xSeries, xItems, xCharts: IXMLDOMNodeList;
+    xCountS, xCountC, xCountI: Integer;
+    xChartNode, xSerieNode, xItemNode: IXMLDOMNode;
     xSerieObject: TChartSeries;
     xSerieType: Integer;
     xX, xY: Double;
     xLabel: String;
+    xChart: TCChart;
 begin
-  xSeries := FXml.documentElement.selectNodes('serie');
-  for xCountS := 0 to xSeries.length - 1 do begin
-    xSerieNode := xSeries.item[xCountS];
-    xSerieType := StrToIntDef(GetXmlAttribute('type', xSerieNode, ''), 0);
-    if xSerieType = CSERIESTYPE_PIE then begin
-      xSerieObject := TPieSeries.Create(GetChart);
-    end else if xSerieType = CSERIESTYPE_LINE then begin
-      xSerieObject := TLineSeries.Create(GetChart);
-    end else if xSerieType = CSERIESTYPE_BAR then begin
-      xSerieObject := TBarSeries.Create(GetChart);
-    end else begin
-      xSerieObject := Nil;
-    end;
-    if xSerieObject <> Nil then begin
-      xSerieObject.Title := GetXmlAttribute('title', xSerieNode, '');
-      xSerieObject.HorizAxis := aBottomAxis;
-      xSerieObject.XValues.DateTime := GetXmlAttribute('domain', xSerieNode, CSERIESDOMAIN_DATETIME);
-      xItems := xSerieNode.selectNodes('item');
-      for xCountI := 0 to xItems.length - 1 do begin
-        xItemNode := xItems.item[xCountI];
-        xLabel := GetXmlAttribute('label', xItemNode, '');
-        if xSerieObject.XValues.DateTime then begin
-          xX := DmyToDate(GetXmlAttribute('domain', xItemNode, ''), 0);
-        end else begin
-          xX := StrToCurrencyDecimalDot(GetXmlAttribute('domain', xItemNode, ''));
+  xCharts := FXml.documentElement.selectNodes('chart');
+  for xCountC := 0 to xCharts.length - 1 do begin
+    xChartNode := xCharts.item[xCountC];
+    xChart := GetChart(GetXmlAttribute('symbol', xChartNode, ''));
+    xChart.thumbTitle := GetXmlAttribute('thumbTitle', xChartNode, '');
+    xChart.Title.Text.Text := GetXmlAttribute('chartTitle', xChartNode, '');
+    xChart.Foot.Text.Text := GetXmlAttribute('chartFooter', xChartNode, '');
+    xSeries := xCharts.item[xCountC].selectNodes('serie');
+    for xCountS := 0 to xSeries.length - 1 do begin
+      xSerieNode := xSeries.item[xCountS];
+      xSerieType := StrToIntDef(GetXmlAttribute('type', xSerieNode, ''), 0);
+      if xSerieType = CSERIESTYPE_PIE then begin
+        xSerieObject := TPieSeries.Create(xChart);
+      end else if xSerieType = CSERIESTYPE_LINE then begin
+        xSerieObject := TLineSeries.Create(xChart);
+      end else if xSerieType = CSERIESTYPE_BAR then begin
+        xSerieObject := TBarSeries.Create(xChart);
+      end else begin
+        xSerieObject := Nil;
+      end;
+      if xSerieObject <> Nil then begin
+        xSerieObject.Title := GetXmlAttribute('title', xSerieNode, '');
+        xSerieObject.HorizAxis := aBottomAxis;
+        xSerieObject.XValues.DateTime := GetXmlAttribute('domain', xSerieNode, CSERIESDOMAIN_DATETIME);
+        xItems := xSerieNode.selectNodes('item');
+        for xCountI := 0 to xItems.length - 1 do begin
+          xItemNode := xItems.item[xCountI];
+          xLabel := GetXmlAttribute('label', xItemNode, '');
+          if xSerieObject.XValues.DateTime then begin
+            xX := DmyToDate(GetXmlAttribute('domain', xItemNode, ''), 0);
+          end else begin
+            xX := StrToCurrencyDecimalDot(GetXmlAttribute('domain', xItemNode, ''));
+          end;
+          xY := StrToCurrencyDecimalDot(GetXmlAttribute('value', xItemNode, ''));
+          xSerieObject.AddXY(xX, xY, xLabel);
         end;
-        xY := StrToCurrencyDecimalDot(GetXmlAttribute('value', xItemNode, ''));
-        xSerieObject.AddXY(xX, xY, xLabel);
-      end;
-      if xSerieObject.ValuesLists.Count > 0 then begin
-        GetChart.AddSeries(xSerieObject);
+        if xSerieObject.ValuesLists.Count > 0 then begin
+          xChart.AddSeries(xSerieObject);
+        end;
       end;
     end;
-  end;
-  with GetChart do begin
-    LeftAxis.Title.Caption := GetXmlAttribute('axisy', FXml.documentElement, '');
-    if GetXmlAttribute('angley', FXml.documentElement, '') <> '' then begin
-      LeftAxis.Title.Angle := StrToIntDef(GetXmlAttribute('angley', FXml.documentElement, ''), 0);
-    end;
-    BottomAxis.Title.Caption := GetXmlAttribute('axisx', FXml.documentElement, '');
-    if GetXmlAttribute('anglex', FXml.documentElement, '') <> '' then begin
-      BottomAxis.Title.Angle := StrToIntDef(GetXmlAttribute('anglex', FXml.documentElement, ''), 0);
+    with xChart do begin
+      LeftAxis.Title.Caption := GetXmlAttribute('axisy', FXml.documentElement, '');
+      if GetXmlAttribute('angley', FXml.documentElement, '') <> '' then begin
+        LeftAxis.Title.Angle := StrToIntDef(GetXmlAttribute('angley', FXml.documentElement, ''), 0);
+      end;
+      BottomAxis.Title.Caption := GetXmlAttribute('axisx', FXml.documentElement, '');
+      if GetXmlAttribute('anglex', FXml.documentElement, '') <> '' then begin
+        BottomAxis.Title.Angle := StrToIntDef(GetXmlAttribute('anglex', FXml.documentElement, ''), 0);
+      end;
     end;
   end;
 end;

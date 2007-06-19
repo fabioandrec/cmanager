@@ -13,16 +13,17 @@ type
   private
     Fsymbol: String;
     Ftitle: String;
-    Fprops: TForm;
     Fimage: Integer;
     function GetIsPie: Boolean;
+    function GetIsBar: Boolean;
+    function GetIsLin: Boolean;
   public
     constructor CreateNew(AOwner: TComponent; ASymbol: String);
-    destructor Destroy; override;
     property symbol: String read Fsymbol write Fsymbol;
     property thumbTitle: String read Ftitle write Ftitle;
-    property props: TForm read Fprops write Fprops;
     property isPie: Boolean read GetIsPie;
+    property isBar: Boolean read GetIsBar;
+    property isLin: Boolean read GetIsLin;
     property image: Integer read Fimage write Fimage;
   end;
 
@@ -41,17 +42,18 @@ type
     CButton4: TCButton;
     ActionGraph: TAction;
     PanelThumbs: TPanel;
-    PanelParent: TPanel;
     ThumbsList: TVirtualStringTree;
+    Splitter: TSplitter;
+    PanelParent: TPanel;
     procedure ActionGraphExecute(Sender: TObject);
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure ThumbsListHotChange(Sender: TBaseVirtualTree; OldNode,
-      NewNode: PVirtualNode);
+    procedure ThumbsListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
     procedure ThumbsListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
     Fcharts: TChartList;
     FActiveChartIndex: Integer;
+    Fprops: TForm;
     function CreateNewChart(ASymbol: String): TCChart;
     procedure SetActiveChartIndex(const Value: Integer);
     function GetActiveChart: TCChart;
@@ -99,16 +101,20 @@ var xChart: TCChart;
 begin
   xChart := ActiveChart;
   if xChart <> Nil then begin
-    if xChart.props = Nil then begin
-      xChart.props := ShowChartProps(Fcharts.Items[FActiveChartIndex], TCChartReport(Report).GetPrefname + xChart.symbol);
+    if Fprops = Nil then begin
+      Fprops := TCChartPropsForm.Create(Nil);;
+      TCChartPropsForm(Fprops).SetChart(xChart, TCChartReport(Report).GetPrefname + xChart.symbol);
     end;
-    xChart.props.Show;
-    xChart.props.BringToFront;
+    Fprops.Show;
+    Fprops.BringToFront;
   end;
 end;
 
 destructor TCChartReportForm.Destroy;
 begin
+  if Assigned(Fprops) then begin
+    FreeAndNil(Fprops);
+  end;
   Fcharts.Free;
   inherited Destroy;
 end;
@@ -118,7 +124,6 @@ begin
   inherited Create(AOwner);
   Fsymbol := ASymbol;
   Ftitle := '';
-  Fprops := Nil;
   Fimage := -1;
 end;
 
@@ -145,14 +150,6 @@ end;
 procedure TChartList.SetItems(AIndex: Integer; const Value: TCChart);
 begin
   inherited Items[AIndex] := Value;
-end;
-
-destructor TCChart.Destroy;
-begin
-  if Assigned(Fprops) then begin
-    FreeAndNil(Fprops);
-  end;
-  inherited Destroy;
 end;
 
 function TCChartReportForm.CreateNewChart(ASymbol: String): TCChart;
@@ -299,8 +296,13 @@ begin
         ThumbsList.FocusedNode := xNode;
         ThumbsList.Selected[xNode] := True;
       end;
+      TCChartReport(Report).SetChartProps;
+      if Fprops <> Nil then begin
+        TCChartPropsForm(Fprops).SetChart(ActiveChart, TCChartReport(Report).GetPrefname + ActiveChart.symbol);
+      end;
     end else begin
       ThumbsList.FocusedNode := Nil;
+      TCChartPropsForm(Fprops).SetChart(Nil, '');
     end;
   end;
 end;
@@ -317,12 +319,13 @@ constructor TCChartReportForm.CreateForm(AReport: TObject);
 begin
   inherited CreateForm(AReport);
   Fcharts := TChartList.Create(True);
+  Fprops := Nil;
   FActiveChartIndex := -1;
 end;
 
 procedure TCChartReportForm.UpdateThumbnails;
 begin
-  PanelThumbs.Visible := Fcharts.Count > 1;
+  PanelThumbs.Visible := True{Fcharts.Count > 1};
   if PanelThumbs.Visible then begin
     ThumbsList.RootNodeCount := Fcharts.Count;
   end;
@@ -334,6 +337,34 @@ begin
   if CellText = '' then begin
     CellText := 'Podstawowy';
   end;
+end;
+
+function TCChart.GetIsBar: Boolean;
+var xCount: Integer;
+    xTemp: TBarSeries;
+begin
+  xCount := 0;
+  xTemp := TBarSeries.Create(Nil);
+  Result := False;
+  while (xCount <= SeriesCount - 1) and (not Result) do begin
+    Result := Series[xCount].SameClass(xTemp);
+    Inc(xCount);
+  end;
+  xTemp.Free;
+end;
+
+function TCChart.GetIsLin: Boolean;
+var xCount: Integer;
+    xTemp: TLineSeries;
+begin
+  xCount := 0;
+  xTemp := TLineSeries.Create(Nil);
+  Result := False;
+  while (xCount <= SeriesCount - 1) and (not Result) do begin
+    Result := Series[xCount].SameClass(xTemp);
+    Inc(xCount);
+  end;
+  xTemp.Free;
 end;
 
 function TCChart.GetIsPie: Boolean;
@@ -355,7 +386,13 @@ var xImage: Integer;
 begin
   xImage := Fcharts.Items[Node.Index].image;
   if xImage = -1 then begin
-    xImage := IfThen(Fcharts.Items[Node.Index].isPie, 1, 0);
+    if Fcharts.Items[Node.Index].isPie then begin
+      xImage := 1;
+    end else if Fcharts.Items[Node.Index].isBar then begin
+      xImage := 0;
+    end else if Fcharts.Items[Node.Index].isLin then begin
+      xImage := 2;
+    end;
   end;
   ImageIndex := xImage;
 end;

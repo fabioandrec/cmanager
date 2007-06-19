@@ -167,8 +167,10 @@ Item5=..\Temp\
 Item6=..\Temp\R
 Item7=..\Temp
 [HistoryLists\hlOutputDirectorry]
-Count=4
+Count=6
 Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\Bin
-Item2=..\..\..\Bin
-Item3=..\Bin
+Item1=..\..\..\..\..\Bin\Wtyczki
+Item2=..\..\..\Bin\Wtyczki
+Item3=..\..\Bin
+Item4=..\..\..\Bin
+Item5=..\Bin
