@@ -83,6 +83,23 @@ inherited CChartReportForm: TCChartReportForm
       Align = alClient
       BevelOuter = bvLowered
       TabOrder = 1
+      object PanelNoData: TPanel
+        Left = 1
+        Top = 1
+        Width = 535
+        Height = 419
+        Align = alClient
+        BevelOuter = bvNone
+        Caption = 'Brak danych do utworzenia wykres'#243'w'
+        Color = clWhite
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGrayText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+      end
     end
   end
   inherited PanelButtons: TPanel

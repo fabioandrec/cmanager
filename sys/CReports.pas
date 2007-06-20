@@ -141,6 +141,7 @@ type
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
     function GetChart(ASymbol: String = ''): TCChart;
+    function CanShowReport: Boolean; override;
   public
     procedure SetChartProps; virtual;
     function GetReportFooter: String; override;
@@ -1193,6 +1194,12 @@ begin
   FreportStyle.LoadFromFile(GetSystemPathname('report.css'));
 end;
 
+function TCChartReport.CanShowReport: Boolean;
+begin
+  Result := inherited CanShowReport;
+  TCChartReportForm(FForm).PanelNoData.Visible := TCChartReportForm(FForm).charts.Count = 0;
+end;
+
 function TCChartReport.GetChart(ASymbol: String = ''): TCChart;
 begin
   Result := TCChartReportForm(FForm).GetChart(ASymbol, True);
@@ -1446,7 +1453,7 @@ begin
       xCash := Abs(xSums.FieldByName('cash').AsCurrency);
       xPercent := (xCash * 100) / xSum;
       xLabel := Format('%3.2f', [xPercent]) + '% - ' + xSums.FieldByName('name').AsString + ' (' + CurrencyToString(xCash, xCurDefs.Strings[xCount], True) + ')';
-      xSerie.Add(xCash, xLabel);
+      xSerie.Add(xCash, xLabel, clTeeColor);
       xSums.Next;
     end;
     xSerie.Marks.Style := smsLabel;
@@ -3035,10 +3042,8 @@ end;
 
 function TPluginChartReport.CanShowReport: Boolean;
 begin
-  Result := TCChartReportForm(FForm).charts.Count > 0;
-  if not Result then begin
-    ShowInfo(itInfo, 'Wtyczka nie zwróci³a ¿adnych wykresów do wyœwietlenia', '');
-  end;
+  Result := inherited CanShowReport;
+  TCChartReportForm(FForm).PanelNoData.Caption := 'Wtyczka nie zwróci³a ¿adnego wykresu do wyœwietlenie';
 end;
 
 function TPluginChartReport.GetPrefname: String;

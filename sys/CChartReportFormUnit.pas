@@ -45,6 +45,7 @@ type
     ThumbsList: TVirtualStringTree;
     Splitter: TSplitter;
     PanelParent: TPanel;
+    PanelNoData: TPanel;
     procedure ActionGraphExecute(Sender: TObject);
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -325,7 +326,7 @@ end;
 
 procedure TCChartReportForm.UpdateThumbnails;
 begin
-  PanelThumbs.Visible := True{Fcharts.Count > 1};
+  PanelThumbs.Visible := Fcharts.Count > 1;
   if PanelThumbs.Visible then begin
     ThumbsList.RootNodeCount := Fcharts.Count;
   end;
