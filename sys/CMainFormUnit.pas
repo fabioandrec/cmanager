@@ -62,6 +62,7 @@ type
     OpenDialogXml: TOpenDialog;
     ActionBug: TAction;
     ActionFutureRequest: TAction;
+    ActionHistory: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);

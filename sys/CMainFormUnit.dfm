@@ -429,6 +429,9 @@ object CMainForm: TCMainForm
                 Caption = '&Spis tre'#347'ci'
               end
               item
+                Action = ActionHistory
+              end
+              item
                 Caption = '-'
               end
               item
@@ -438,6 +441,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionFutureRequest
+                Caption = 'Z&aproponuj zmian'#281
               end
               item
                 Caption = '-'
@@ -620,6 +624,10 @@ object CMainForm: TCMainForm
       Category = 'Pomoc'
       Caption = 'Zaproponuj zmian'#281
       OnExecute = ActionFutureRequestExecute
+    end
+    object ActionHistory: TAction
+      Category = 'Pomoc'
+      Caption = 'Historia'
     end
   end
   object OpenDialog: TOpenDialog
