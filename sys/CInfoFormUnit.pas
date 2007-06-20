@@ -31,6 +31,9 @@ var xForm: TCInfoForm;
     xText: String;
 begin
   xForm := TCInfoForm.Create(Nil);
+  if AAlways <> Nil then begin
+    Boolean(AAlways^) := False;
+  end;
   case AIconType of
     itWarning: begin
       xCaption := 'Uwaga';

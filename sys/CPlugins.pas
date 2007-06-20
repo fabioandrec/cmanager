@@ -29,6 +29,8 @@ type
     function GetReportText: OleVariant;
     function GetName: OleVariant;
     function GetVersion: OleVariant;
+    function GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant;
+    function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -79,7 +81,7 @@ var GPlugins: TCPluginList;
 implementation
 
 uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
-  Variants;
+  Variants, CDataObjects;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -404,6 +406,16 @@ end;
 function TCManagerInterfaceObject.GetVersion: OleVariant;
 begin
   Result := FileVersion(ParamStr(0));
+end;
+
+function TCManagerInterfaceObject.GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
+begin
+  Result := GCurrencyCache.GetIso(ACurrencyId);
+end;
+
+function TCManagerInterfaceObject.GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant;
+begin
+  Result := GCurrencyCache.GetSymbol(ACurrencyId);
 end;
 
 initialization

@@ -104,6 +104,7 @@ type
     function GetFormClass: TCReportFormClass; virtual; abstract;
     procedure PrepareReportData; virtual; abstract;
     procedure SaveContentToFile(AFilename: String); virtual; abstract;
+    function CanShowReport: Boolean; virtual;
   public
     function GetReportTitle: String; virtual; abstract;
     function GetReportFooter: String; virtual; abstract;
@@ -418,6 +419,7 @@ type
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
+    function CanShowReport: Boolean; override;
   public
     function GetReportFooter: String; override;
     function GetReportTitle: String; override;
@@ -1087,6 +1089,11 @@ begin
   Result := ChoosePeriodAccountByForm(FStartDate, FEndDate, FIdAccount);
 end;
 
+function TCBaseReport.CanShowReport: Boolean;
+begin
+  Result := True;
+end;
+
 constructor TCBaseReport.CreateReport(AParams: TCReportParams);
 begin
   inherited Create;
@@ -1110,8 +1117,10 @@ begin
     GDataProvider.BeginTransaction;
     PrepareReportData;
     GDataProvider.RollbackTransaction;
-    Fform.Caption := 'Raport';
-    Fform.ShowConfig(coNone);
+    if CanShowReport then begin
+      Fform.Caption := 'Raport';
+      Fform.ShowConfig(coNone);
+    end;
   end;
   Fform.Free;
 end;
@@ -1208,8 +1217,10 @@ procedure TCChartReport.PrepareReportData;
 begin
   PrepareReportChart;
   UpdateChartsThumbnails;
-  TCChartReportForm(FForm).ActiveChartIndex := 0;
-  SetChartProps;
+  if TCChartReportForm(FForm).charts.Count > 0 then begin
+    TCChartReportForm(FForm).ActiveChartIndex := 0;
+    SetChartProps;
+  end;
 end;
 
 constructor TAccountBalanceChartReport.CreateReport(AParams: TCReportParams);
@@ -3019,6 +3030,14 @@ begin
         View3D := xChart.isPie;
       end;
     end;
+  end;
+end;
+
+function TPluginChartReport.CanShowReport: Boolean;
+begin
+  Result := TCChartReportForm(FForm).charts.Count > 0;
+  if not Result then begin
+    ShowInfo(itInfo, 'Wtyczka nie zwróci³a ¿adnych wykresów do wyœwietlenia', '');
   end;
 end;
 

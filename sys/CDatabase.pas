@@ -1324,8 +1324,10 @@ begin
     if (xCurDbversion < 4) and (xToDbversion = 4) then begin
       ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹ ' + sLineBreak +
                        'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list' + sLineBreak +
-                       'wyœwietlaj¹cych dane w programie. Zastosowane zostan¹ domyœlne ustawienia.', '');
+                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane' + sLineBreak +
+                       'zostan¹ domyœlne ustawienia.', '');
       GColumnsPreferences.Clear;
+      GChartPreferences.Clear;
     end;
   end;
 end;

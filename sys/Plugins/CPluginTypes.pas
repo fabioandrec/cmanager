@@ -19,6 +19,8 @@ type
     procedure SetCaption(ACaption: OleVariant);
     function GetReportText: OleVariant;
     function GetReportCss: OleVariant;
+    function GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant;
+    function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
   end;
 
   TCPlugin_Configure = function: Boolean; stdcall;

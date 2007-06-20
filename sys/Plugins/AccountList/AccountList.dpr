@@ -13,7 +13,8 @@ uses
   GraphUtil,
   Graphics,
   CPluginTypes in '..\CPluginTypes.pas',
-  CPluginConsts in '..\CPluginConsts.pas';
+  CPluginConsts in '..\CPluginConsts.pas',
+  CTools in '..\..\Shared\CTools.pas';
 
 var CManInterface: ICManagerInterface;
     CConnection: _Connection;
@@ -43,36 +44,49 @@ function Plugin_Execute: OleVariant; stdcall; export;
   var xBody: TStringList;
       xAccounts: _Recordset;
       xOut: OleVariant;
-      xSum: Currency;
+      xSums: TSumList;
+      xIdCurrency: String;
+      xCash: Currency;
+      xCount: Integer;
   begin
     xBody := TStringList.Create;
-    xAccounts := CConnection.Execute('select * from account', xOut, 0);
+    xAccounts := CConnection.Execute('select a.*, c.iso from account a left outer join currencyDef c on c.idCurrencyDef = a.idCurrencyDef', xOut, 0);
     with xAccounts, xBody do begin
-      Add('<table class="base" colspan=2>');
-      Add('<tr class="base">');
-      Add('<td class="headtext" width="75%">Nazwa konta</td>');
+      Add('<table class="base" colspan=3>');
+      Add('<tr class="head">');
+      Add('<td class="headtext" width="65%">Nazwa konta</td>');
+      Add('<td class="headcash" width="10%">Waluta</td>');
       Add('<td class="headcash" width="25%">Saldo</td>');
       Add('</tr>');
-      Add('</table><hr><table class="base" colspan=2>');
-      xSum := 0;
+      Add('</table><hr><table class="base" colspan=3>');
+      xCount := 0;
+      xSums := TSumList.Create(True);
       while not xAccounts.EOF do begin
-        if not Odd(xAccounts.AbsolutePosition) then begin
-          Add('<tr class="base" bgcolor=' + ColToRgb(GetHighLightColor(clWhite, -10)) + '>');
-        end else begin
-          Add('<tr class="base">');
-        end;
-        Add('<td class="text" width="75%">' + xAccounts.Fields.Item['name'].Value + '</td>');
-        Add('<td class="cash" width="25%">' + CurrToStrF(xAccounts.Fields.Item['cash'].Value, ffCurrency, 2) + '</td>');
+        Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
+        xCash := xAccounts.Fields.Item['cash'].Value;
+        Add('<td class="text" width="65%">' + xAccounts.Fields.Item['name'].Value + '</td>');
+        Add('<td class="cash" width="10%">' + xAccounts.Fields.Item['iso'].Value + '</td>');
+        Add('<td class="cash" width="25%">' + CurrToStrF(xCash, ffNumber, 2) + '</td>');
         Add('</tr>');
-        xSum := xSum + xAccounts.Fields.Item['cash'].Value;
+        xIdCurrency := xAccounts.Fields.Item['idCurrencyDef'].Value;
+        xSums.AddSum(xIdCurrency, xCash);
         xAccounts.MoveNext;
+        Inc(xCount);
       end;
-      Add('</table><hr><table class="base" colspan=2>');
-      Add('<tr class="base">');
-      Add('<td class="sumtext" width="75%">Razem</td>');
-      Add('<td class="sumcash" width="25%">' + CurrToStrF(xSum, ffCurrency, 2) + '</td>');
-      Add('</tr>');
+      Add('</table><hr><table class="base" colspan=3>');
+      for xCount := 0 to xSums.Count - 1 do begin
+        Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
+        if xCount = 0 then begin
+          Add('<td class="sumtext" width="65%">Razem</td>');
+        end else begin
+          Add('<td class="sumtext" width="65%"></td>');
+        end;
+        Add('<td class="sumcash" width="10%">' + CManInterface.GetCurrencyIso(xSums.Items[xCount].name) + '</td>');
+        Add('<td class="sumcash" width="25%">' + CurrToStrF(xSums.Items[xCount].value, ffNumber, 2) + '</td>');
+        Add('</tr>');
+      end;
       Add('</table>');
+      xSums.Free;
     end;
     xAccounts := Nil;
     Result := xBody.Text;
