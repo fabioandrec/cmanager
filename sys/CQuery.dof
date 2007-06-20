@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=0
-Build=17
+Build=19
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CArchive - tworzenie kopii plików danych
-FileVersion=1.0.0.17
+FileVersion=1.0.0.19
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -150,12 +150,13 @@ Item3=SDI_NOWE
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=5
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item1=.\;..\Wspolne;.\System;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Bin;..\Wspolne\Komponenty3
-Item2=..\Wspolne\Komponenty3 ;..\temp;..\Wspolne\Komponenty3;..\Wspolne;..\Wspolne\Siec\pinpad;..\Wspolne\Siec\Biblioteki;..\Wspolne\Raporty;..\Wspolne\Raporty\Formatki;..\Administracja\Formatki;..\Wspolne\Formatki
-Item3=..\..\Wspolne;..\..\Wspolne\Formatki;..\..\Wspolne\Klasy biznesowe;..\..\Wspolne\Raporty;..\..\Wspolne\Klasy sterujace;..\..\Wspolne\Komponenty3;..\..\ImportSPG\Wspolne\Formatki
-Item4=.\;..\Wspolne;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Do 302002\Admin\Ksieg;..\Bin;..\Wspolne\Komponenty3
+Count=6
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
+Item2=.\;..\Wspolne;.\System;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Bin;..\Wspolne\Komponenty3
+Item3=..\Wspolne\Komponenty3 ;..\temp;..\Wspolne\Komponenty3;..\Wspolne;..\Wspolne\Siec\pinpad;..\Wspolne\Siec\Biblioteki;..\Wspolne\Raporty;..\Wspolne\Raporty\Formatki;..\Administracja\Formatki;..\Wspolne\Formatki
+Item4=..\..\Wspolne;..\..\Wspolne\Formatki;..\..\Wspolne\Klasy biznesowe;..\..\Wspolne\Raporty;..\..\Wspolne\Klasy sterujace;..\..\Wspolne\Komponenty3;..\..\ImportSPG\Wspolne\Formatki
+Item5=.\;..\Wspolne;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Do 302002\Admin\Ksieg;..\Bin;..\Wspolne\Komponenty3
 [HistoryLists\hlUnitOutputDirectory]
 Count=8
 Item0=..\..\..\..\Trash
@@ -167,10 +168,8 @@ Item5=..\Temp\
 Item6=..\Temp\R
 Item7=..\Temp
 [HistoryLists\hlOutputDirectorry]
-Count=6
+Count=4
 Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\..\..\..\Bin\Wtyczki
-Item2=..\..\..\Bin\Wtyczki
-Item3=..\..\Bin
-Item4=..\..\..\Bin
-Item5=..\Bin
+Item1=..\..\Bin
+Item2=..\..\..\Bin
+Item3=..\Bin

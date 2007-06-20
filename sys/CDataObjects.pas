@@ -576,11 +576,14 @@ var CashPointProxy: TDataProxy;
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
 
-const CDatafileTables: array[0..16] of string =
+const CDatafileTables: array[0..17] of string =
             ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
-             'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate');
+             'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
+             'accountCurrencyRule');
+
+
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
