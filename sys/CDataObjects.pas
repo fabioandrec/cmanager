@@ -2030,8 +2030,9 @@ begin
   if (not FisCalculated) or AMustRecalculate then begin
     Result := 0;
     GetFilterDates(ADate, xSd, xEd);
-    xSql := Format('select sum(income) as income, sum(expense) as expense from balances where movementType <> ''%s'' and regDate between %s and %s %s',
-            [CTransferMovement,
+    xSql := Format('select sum(movementIncome) as income, sum(movementExpense) as expense from balances where idMovementCurrencyDef = %s and movementType <> ''%s'' and regDate between %s and %s %s',
+            [DataGidToDatabase(idCurrencyDef),
+             CTransferMovement,
              DatetimeToDatabase(xSd, False),
              DatetimeToDatabase(xEd, False),
              TMovementFilter.GetFilterCondition(idFilter, True)]);

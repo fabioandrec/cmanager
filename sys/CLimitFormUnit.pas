@@ -34,8 +34,7 @@ type
     CStaticCurrency: TCStatic;
     procedure ComboBoxDaysChange(Sender: TObject);
     procedure CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyChanged(Sender: TObject);
   protected
     procedure InitializeForm; override;

@@ -139,12 +139,12 @@ inherited CLimitForm: TCLimitForm
         Caption = 'Przekroczono, je'#380'eli'
       end
       object Label20: TLabel
-        Left = 297
+        Left = 270
         Top = 32
-        Width = 47
+        Width = 74
         Height = 13
         Alignment = taRightJustify
-        Caption = 'w walucie'
+        Caption = 'wykonanych w '
       end
       object CStaticFilter: TCStatic
         Left = 120
@@ -167,7 +167,7 @@ inherited CLimitForm: TCLimitForm
       object ComboBoxDays: TComboBox
         Left = 120
         Top = 100
-        Width = 161
+        Width = 137
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -199,7 +199,7 @@ inherited CLimitForm: TCLimitForm
       object ComboBoxCondition: TComboBox
         Left = 120
         Top = 136
-        Width = 161
+        Width = 137
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -232,7 +232,7 @@ inherited CLimitForm: TCLimitForm
       object ComboBoxSum: TComboBox
         Left = 119
         Top = 29
-        Width = 162
+        Width = 138
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -245,7 +245,7 @@ inherited CLimitForm: TCLimitForm
         Items.Strings = (
           'Suma rozchod'#243'w'
           'Suma przychod'#243'w'
-          'Saldo')
+          'Saldo operacji')
       end
       object CStaticCurrency: TCStatic
         Left = 352
