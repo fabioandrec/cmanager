@@ -94,6 +94,7 @@ type
     procedure ActionImportCurrencyRatesExecute(Sender: TObject);
     procedure ActionBugExecute(Sender: TObject);
     procedure ActionFutureRequestExecute(Sender: TObject);
+    procedure ActionHistoryExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -669,6 +670,11 @@ end;
 procedure TCMainForm.ActionFutureRequestExecute(Sender: TObject);
 begin
   ShellExecute(0, nil, 'http://sourceforge.net/tracker/?func=add&group_id=178670&atid=886069', nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TCMainForm.ActionHistoryExecute(Sender: TObject);
+begin
+  ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname('changelog')), Nil, SW_SHOWNORMAL);
 end;
 
 end.

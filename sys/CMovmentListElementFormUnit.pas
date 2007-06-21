@@ -10,12 +10,16 @@ uses
 type
   TMovementListElement = class(TObject)
   private
+    FIsNew: Boolean;
     Fid: TDataGid;
     FproductId: TDataGid;
     FmovementType: TBaseEnumeration;
     Fdescription: TBaseDescription;
     Fcash: Currency;
     FmovementCash: Currency;
+    FidAccount: TDataGid;
+    FidCashpoint: TDataGid;
+    FdateTime: TDateTime;
     FidAccountCurrencyDef: TDataGid;
     FidMovementCurrencyDef: TDataGid;
     FidCurrencyRate: TDataGid;
@@ -37,6 +41,10 @@ type
     property currencyQuantity: Integer read FcurrencyQuantity write FcurrencyQuantity;
     property currencyRate: Currency read FcurrencyRate write FcurrencyRate;
     property rateDescription: TBaseDescription read FrateDescription write FrateDescription;
+    property isNew: Boolean read FIsNew write FIsNew;
+    property idAccount: TDataGid read FidAccount write FidAccount;
+    property idCashpoint: TDataGid read FidCashpoint write FidCashpoint;
+    property dateTime: TDateTime read FdateTime write FdateTime;
   end;
 
   TCMovmentListElementForm = class(TCConfigForm)
@@ -95,7 +103,7 @@ implementation
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
      CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
      CPreferences, CRichtext, CDataobjectFrameUnit, CCurrencydefFrameUnit,
-  CCurrencyRateFrameUnit;
+  CCurrencyRateFrameUnit, CSurpassedFormUnit;
 
 {$R *.dfm}
 
@@ -166,6 +174,7 @@ begin
     CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
     CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
   end;
+  CStaticRate.Enabled := CStaticMovementCurrency.DataId <> CStaticAccountCurrency.DataId;
 end;
 
 procedure TCMovmentListElementForm.ReadValues;
@@ -177,8 +186,13 @@ begin
   Felement.movementCash := CCurrEditMovement.Value;
   Felement.idMovementCurrencyDef := CStaticMovementCurrency.DataId;
   Felement.rateDescription := CStaticRate.Caption;
-  Felement.currencyQuantity := FRateHelper.quantity;
-  Felement.currencyRate := FRateHelper.rate;
+  if FRateHelper <> Nil then begin
+    Felement.currencyQuantity := FRateHelper.quantity;
+    Felement.currencyRate := FRateHelper.rate;
+  end else begin
+    Felement.currencyQuantity := 1;
+    Felement.currencyRate := 1;
+  end;
   Felement.idCurrencyRate := CStaticRate.DataId;
 end;
 
@@ -201,6 +215,7 @@ constructor TMovementListElement.Create;
 var xGuid: TGUID;
 begin
   inherited Create;
+  FIsNew := False;
   CreateGUID(xGuid);
   Fid := GUIDToString(xGuid);
 end;

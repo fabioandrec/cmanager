@@ -77,6 +77,7 @@ type
     procedure MessageMovementDeleted(AData: TMovementListElement);
     function FindNodeByData(AData: TMovementListElement): PVirtualNode;
     function GetCash: Currency;
+    procedure UpdateButtons;
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure InitializeForm; override;
@@ -116,11 +117,7 @@ end;
 
 procedure TCMovementListForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  if Fmovements.Count = 0 then begin
-    AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
-  end else begin
-    ShowInfo(itInfo, 'Nie mo¿na zmieniæ konta, je¿eli na liœcie s¹ wprowadzone operacje', '')
-  end;
+  AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
 end;
 
 procedure TCMovementListForm.CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -147,23 +144,31 @@ procedure TCMovementListForm.Action1Execute(Sender: TObject);
 var xForm: TCMovmentListElementForm;
     xElement: TMovementListElement;
 begin
-  if CStaticInoutOnceAccount.DataId <> CEmptyDataGid then begin
+  if CStaticInoutOnceAccount.DataId = CEmptyDataGid then begin
+    if ShowInfo(itQuestion, 'Nie wybrano konta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticInoutOnceAccount.DoGetDataId;
+    end;
+  end else if CStaticInoutOnceCashpoint.DataId = CEmptyDataGid then begin
+    if ShowInfo(itQuestion, 'Nie wybrano kontrahenta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticInoutOnceCashpoint.DoGetDataId;
+    end;
+  end else begin
     xElement := TMovementListElement.Create;
+    xElement.isNew := True;
     xElement.movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
     xElement.idAccountCurrencyDef := CStaticCurrency.DataId;
     xElement.idMovementCurrencyDef := CCurrencyDefGid_PLN;
+    xElement.dateTime := CDateTime1.Value;
+    xElement.idCashpoint := CStaticInoutOnceCashpoint.DataId;
+    xElement.idAccount := CStaticInoutOnceAccount.DataId;
     xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
     if xForm.ShowConfig(coAdd) then begin
       Perform(WM_DATAOBJECTADDED, Integer(xElement), 0);
-      CStaticCurrency.Enabled := Fmovements.Count = 0;
+      UpdateButtons;
     end else begin
       xElement.Free;
     end;
     xForm.Free;
-  end else begin
-    if ShowInfo(itQuestion, 'Nie wybrano konta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticInoutOnceAccount.DoGetDataId;
-    end;
   end;
 end;
 
@@ -211,7 +216,9 @@ begin
       Fadded.Remove(AData);
     end;
     xData := TMovementListElement(Fmovements.Extract(AData));
-    Fdeleted.Add(xData);
+    if not xData.isNew then begin
+      Fdeleted.Add(xData);
+    end;
     MovementList.DeleteNode(xNode);
     MovementList.EndUpdate;
   end;
@@ -336,7 +343,7 @@ begin
     xForm := TCMovmentListElementForm.CreateFormElement(Application, xElement);
     if xForm.ShowConfig(coEdit) then begin
       Perform(WM_DATAOBJECTEDITED, Integer(xElement), 0);
-      CStaticCurrency.Enabled := Fmovements.Count = 0;
+      UpdateButtons;
     end;
     xForm.Free;
   end;
@@ -362,7 +369,7 @@ begin
   if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
     xElement := TMovementListElement(MovementList.GetNodeData(MovementList.FocusedNode)^);
     Perform(WM_DATAOBJECTDELETED, Integer(xElement), 0);
-    CStaticCurrency.Enabled := Fmovements.Count = 0;
+    UpdateButtons;
   end;
 end;
 
@@ -423,7 +430,6 @@ begin
     CCurrEditCash.Value := cash;
     SimpleRichText(description, RichEditDesc);
     ComboBox1.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
-    ComboBox1.Enabled := False;
     CStaticCurrency.DataId := idAccountCurrencyDef;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idAccountCurrencyDef, False)).GetElementText;
     CCurrEditCash.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
@@ -444,12 +450,15 @@ begin
       xElement.currencyQuantity := xMovement.currencyQuantity;
       xElement.currencyRate := xMovement.currencyRate;
       xElement.rateDescription := xMovement.rateDescription;
+      xElement.dateTime := xMovement.regDate;
+      xElement.idCashpoint := xMovement.idCashPoint;
+      xElement.idAccount := xMovement.idAccount;
       Fmovements.Add(xElement);
     end;
     xList.Free;
     GDataProvider.RollbackTransaction;
     MovementList.RootNodeCount := Fmovements.Count;
-    CStaticCurrency.Enabled := Fmovements.Count = 0;
+    UpdateButtons;
   end;
 end;
 
@@ -678,6 +687,14 @@ end;
 procedure TCMovementListForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
+end;
+
+procedure TCMovementListForm.UpdateButtons;
+begin
+  CDateTime1.Enabled := (Fmovements.Count = 0) and (Operation = coAdd);
+  ComboBox1.Enabled := (Fmovements.Count = 0) and (Operation = coAdd);
+  CStaticInoutOnceAccount.Enabled := Fmovements.Count = 0;
+  CStaticInoutOnceCashpoint.Enabled := Fmovements.Count = 0;
 end;
 
 end.

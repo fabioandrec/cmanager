@@ -17,7 +17,7 @@ type
     procedure Action1Execute(Sender: TObject);
   end;
 
-procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer);
+procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AFontname: String = ''; AFontsize: Integer = -1);
 
 implementation
 
@@ -25,13 +25,19 @@ uses CBaseFormUnit, CRichtext;
 
 {$R *.dfm}
 
-procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer);
+procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AFontname: String = ''; AFontsize: Integer = -1);
 var xForm: TCMemoForm;
 begin
   xForm := TCMemoForm.Create(Application);
   xForm.Caption := AFormTitle;
   xForm.Width := AWidth;
   xForm.Height := AHeight;
+  if AFontname <> '' then begin
+    xForm.RichEdit.Font.Name := AFontname;
+  end;
+  if AFontsize <> -1 then begin
+    xForm.RichEdit.Font.Size := AFontsize;
+  end;
   AssignRichText(AReport, xForm.RichEdit);
   xForm.ShowConfig(coNone);
   xForm.Free;

@@ -434,15 +434,16 @@ begin
   end;
   if Result then begin
     if (xI = 0) or (xI = 1) then begin
-      Result := CheckSurpassedLimits(IfThen(xI = 0, COutMovement, CInMovement), CDateTime.Value,
+      Result := CheckSurpassedLimits(CStaticInOutOnceMovementCurrency.DataId, IfThen(xI = 0, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticInoutOnceAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticInoutOnceCashpoint.DataId),
-                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, CCurrEditInOutOnceAccount.Value));
+                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, CCurrEditInoutOnceMovement.Value));
     end else if (xI = 3) or (xI = 4) then begin
-      Result := CheckSurpassedLimits(IfThen(xI = 3, COutMovement, CInMovement), CDateTime.Value,
+      Result := CheckSurpassedLimits(CStaticInOutCyclicMovementCurrency.DataId,
+                                     IfThen(xI = 3, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticInoutCyclicAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticInoutCyclicCategory.DataId),
-                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, CCurrEditInOutCyclicAccount.Value));
+                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, CCurrEditInoutCyclicMovement.Value));
     end;
   end;
 end;

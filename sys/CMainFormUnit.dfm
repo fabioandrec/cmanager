@@ -628,6 +628,7 @@ object CMainForm: TCMainForm
     object ActionHistory: TAction
       Category = 'Pomoc'
       Caption = 'Historia'
+      OnExecute = ActionHistoryExecute
     end
   end
   object OpenDialog: TOpenDialog

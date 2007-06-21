@@ -27,6 +27,7 @@ type
     procedure SurpassedListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
   private
     FMovementType: TBaseEnumeration;
+    FCurrencyDef: TDataGid;
     FDate: TDateTime;
     FDataobjects: TDataObjectList;
     FAccountIds: TDataGids;
@@ -36,7 +37,7 @@ type
     destructor Destroy; override;
   end;
 
-function CheckSurpassedLimits(AMovementType: TBaseEnumeration; ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
+function CheckSurpassedLimits(ACurrencyDef: TDataGid; AMovementType: TBaseEnumeration; ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
 
 implementation
 
@@ -44,11 +45,12 @@ uses CConsts;
 
 {$R *.dfm}
 
-function CheckSurpassedLimits(AMovementType: TBaseEnumeration; ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
+function CheckSurpassedLimits(ACurrencyDef: TDataGid; AMovementType: TBaseEnumeration; ADate: TDateTime; AAccountIds, ACashpointIds: TDataGids; ACategorySums: TSumList): Boolean;
 var xForm: TCSurpassedForm;
 begin
   xForm := TCSurpassedForm.Create(Application);
   xForm.FDate := ADate;
+  xForm.FCurrencyDef := ACurrencyDef;
   xForm.FAccountIds := AAccountIds;
   xForm.FCategorySums := ACategorySums;
   xForm.FCashpointIds := ACashpointIds;
@@ -131,35 +133,37 @@ begin
   FDataobjects := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, xSql);
   for xCount := 0 to FDataobjects.Count - 1 do begin
     xLimit := TMovementLimit(FDataobjects.Items[xCount]);
-    if xLimit.idFilter = CEmptyDataGid then begin
-      xCash := FCategorySums.GetSum;
-    end else begin
-      xFilterCats := GDataProvider.GetSqlStringList('select idProduct from productFilter where idMovementFilter = ' + DataGidToDatabase(xLimit.idFilter));
-      xCash := FCategorySums.GetSum(xFilterCats);
-      xFilterCats.Free;
-    end;
-    if xLimit.sumType = CLimitSumtypeOut then begin
-      if FMovementType = COutMovement then begin
-        xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+    if xLimit.idCurrencyDef = FCurrencyDef then begin
+      if xLimit.idFilter = CEmptyDataGid then begin
+        xCash := FCategorySums.GetSum;
       end else begin
-        xAmount := 0;
+        xFilterCats := GDataProvider.GetSqlStringList('select idProduct from productFilter where idMovementFilter = ' + DataGidToDatabase(xLimit.idFilter));
+        xCash := FCategorySums.GetSum(xFilterCats);
+        xFilterCats.Free;
       end;
-    end else if xLimit.sumType = CLimitSumtypeIn then begin
-      if FMovementType = CInMovement then begin
-        xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+      if xLimit.sumType = CLimitSumtypeOut then begin
+        if FMovementType = COutMovement then begin
+          xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+        end else begin
+          xAmount := 0;
+        end;
+      end else if xLimit.sumType = CLimitSumtypeIn then begin
+        if FMovementType = CInMovement then begin
+          xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+        end else begin
+          xAmount := 0;
+        end;
       end else begin
-        xAmount := 0;
+        if FMovementType = CInMovement then begin
+          xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
+        end else begin
+          xAmount := xLimit.GetCurrentAmount(FDate, False) - xCash;
+        end;
       end;
-    end else begin
-      if FMovementType = CInMovement then begin
-        xAmount := xLimit.GetCurrentAmount(FDate, False) + xCash;
-      end else begin
-        xAmount := xLimit.GetCurrentAmount(FDate, False) - xCash;
+      if xLimit.IsSurpassed(xAmount) then begin
+        xElement := TCListDataElement.Create(SurpassedList, TSurpassedLimit.Create(xLimit, xAmount), True);
+        ARootElement.Add(xElement);
       end;
-    end;
-    if xLimit.IsSurpassed(xAmount) then begin
-      xElement := TCListDataElement.Create(SurpassedList, TSurpassedLimit.Create(xLimit, xAmount), True);
-      ARootElement.Add(xElement);
     end;
   end;
 end;
