@@ -207,10 +207,10 @@ inherited CLimitForm: TCLimitForm
         ItemHeight = 13
         ItemIndex = 0
         TabOrder = 4
-        Text = 'wieksza'
+        Text = 'wi'#281'ksza'
         OnChange = ComboBoxDaysChange
         Items.Strings = (
-          'wieksza'
+          'wi'#281'ksza'
           'wi'#281'ksza lub r'#243'wna'
           'mniejsza'
           'mniejsza lub r'#243'wna'

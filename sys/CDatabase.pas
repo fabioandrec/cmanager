@@ -189,7 +189,7 @@ type
     property Items[AIndex: Integer]: TTreeObject read GetItems write SetItems;
   end;
 
-  TSumList = class;
+  TSumElementList = class;
 
   TSumElement = class(TObject)
   private
@@ -198,7 +198,7 @@ type
     Fname: String;
     FcashIn: Currency;
     FcashOut: Currency;
-    Fchilds: TSumList;
+    Fchilds: TSumElementList;
   public
     constructor Create;
     destructor Destroy; override;
@@ -209,10 +209,10 @@ type
     property name: String read Fname write Fname;
     property cashIn: Currency read FcashIn write FcashIn;
     property cashOut: Currency read FcashOut write FcashOut;
-    property childs: TSumList read Fchilds write Fchilds;
+    property childs: TSumElementList read Fchilds write Fchilds;
   end;
 
-  TSumList = class(TObjectList)
+  TSumElementList = class(TObjectList)
   public
     function FindSumObjectById(AId: String; ACreate: Boolean): TSumElement;
     function FindSumObjectByCur(AId: String; ACreate: Boolean): TSumElement;
@@ -1155,10 +1155,10 @@ begin
   Fname := '';
   FcashIn := 0;
   FcashOut := 0;
-  Fchilds := TSumList.Create(True);
+  Fchilds := TSumElementList.Create(True);
 end;
 
-function TSumList.FindSumObjectById(AId: String; ACreate: Boolean): TSumElement;
+function TSumElementList.FindSumObjectById(AId: String; ACreate: Boolean): TSumElement;
 var xCount: Integer;
 begin
   Result := Nil;
@@ -1175,7 +1175,7 @@ begin
   end;
 end;
 
-function TSumList.FindSumObjectByCur(AId: String; ACreate: Boolean): TSumElement;
+function TSumElementList.FindSumObjectByCur(AId: String; ACreate: Boolean): TSumElement;
 var xCount: Integer;
 begin
   Result := Nil;

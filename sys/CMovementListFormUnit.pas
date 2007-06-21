@@ -102,7 +102,7 @@ uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
   CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit,
-  CCurrencydefFrameUnit;
+  CCurrencydefFrameUnit, CTools, CSurpassedFormUnit;
 
 {$R *.dfm}
 
@@ -383,6 +383,9 @@ begin
 end;
 
 function TCMovementListForm.CanAccept: Boolean;
+var xSums: TSumList;
+    xCount: Integer;
+    xElement: TMovementListElement;
 begin
   Result := True;
   if CStaticInoutOnceAccount.DataId = CEmptyDataGid then begin
@@ -395,6 +398,17 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano kontrahenta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticInoutOnceCashpoint.DoGetDataId;
     end;
+  end;
+  if Result then begin
+    xSums := TSumList.Create(True);
+    for xCount := 0 to Fmovements.Count - 1 do begin
+      xElement := TMovementListElement(Fmovements.Items[xCount]);
+      xSums.AddSum(xElement.idCashpoint, xElement.movementCash, xElement.idMovementCurrencyDef);
+    end;
+    Result := CheckSurpassedLimits(IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement), CDateTime1.Value,
+                                   TDataGids.CreateFromGid(CStaticInoutOnceAccount.DataId),
+                                   TDataGids.CreateFromGid(CStaticInoutOnceCashpoint.DataId),
+                                   xSums);
   end;
 end;
 

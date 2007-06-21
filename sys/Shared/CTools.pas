@@ -13,24 +13,26 @@ type
   private
     Fvalue: Currency;
     Fname: String;
+    Fcurrency: String;
   public
     property value: Currency read Fvalue write Fvalue;
     property name: String read Fname write Fname;
+    property currency: String read Fcurrency write Fcurrency;
   end;
 
   TSumList = class(TObjectList)
   private
     function GetItems(AIndex: Integer): TSum;
     procedure SetItems(AIndex: Integer; const Value: TSum);
-    function GetByName(AName: String): TSum;
+    function GetByNameCurrency(AName, ACurrency: String): TSum;
   public
-    constructor CreateWithSum(AName: String; AValue: Currency);
-    procedure AddSum(AName: String; AValue: Currency);
-    function GetSum(AName: String): Currency; overload;
-    function GetSum(ANames: TStringList): Currency; overload;
-    function GetSum: Currency; overload;
+    constructor CreateWithSum(AName: String; AValue: Currency; ACurrency: String);
+    procedure AddSum(AName: String; AValue: Currency; ACurrency: String);
+    function GetSum(AName: String; ACurrency: String): Currency; overload;
+    function GetSum(ANames: TStringList; ACurrency: String): Currency; overload;
+    function GetSum(ACurrency: String): Currency; overload;
     property Items[AIndex: Integer]: TSum read GetItems write SetItems;
-    property ByName[AName: String]: TSum read GetByName;
+    property ByNameCurrency[AName, ACurrency: String]: TSum read GetByNameCurrency;
   end;
 
   TConsoleRedirect = class(TObject)
@@ -169,33 +171,34 @@ begin
   end;
 end;
 
-procedure TSumList.AddSum(AName: String; AValue: Currency);
+procedure TSumList.AddSum(AName: String; AValue: Currency; ACurrency: String);
 var xSum: TSum;
 begin
-  xSum := ByName[AName];
+  xSum := ByNameCurrency[AName, ACurrency];
   if xSum = Nil then begin
     xSum := TSum.Create;
     xSum.name := AName;
     xSum.value := AValue;
+    xSum.currency := ACurrency;
     Add(xSum);
   end else begin
     xSum.value := xSum.value + AValue;
   end;
 end;
 
-constructor TSumList.CreateWithSum(AName: String; AValue: Currency);
+constructor TSumList.CreateWithSum(AName: String; AValue: Currency; ACurrency: String);
 begin
   inherited Create(True);
-  AddSum(AName, AValue);
+  AddSum(AName, AValue, ACurrency);
 end;
 
-function TSumList.GetByName(AName: String): TSum;
+function TSumList.GetByNameCurrency(AName, ACurrency: String): TSum;
 var xCount: Integer;
 begin
   Result := Nil;
   xCount := 0;
   while (Result = Nil) and (xCount <= Count - 1) do begin
-    if Items[xCount].name = AName then begin
+    if (Items[xCount].name = AName) and (Items[xCount].currency = ACurrency) then begin
       Result := Items[xCount];
     end;
     Inc(xCount);
@@ -207,10 +210,10 @@ begin
   Result := TSum(inherited Items[AIndex]);
 end;
 
-function TSumList.GetSum(AName: String): Currency;
+function TSumList.GetSum(AName: String; ACurrency: String): Currency;
 var xSum: TSum;
 begin
-  xSum := ByName[AName];
+  xSum := ByNameCurrency[AName, ACurrency];
   if xSum = Nil then begin
     Result := 0;
   end else begin
@@ -218,21 +221,23 @@ begin
   end;
 end;
 
-function TSumList.GetSum(ANames: TStringList): Currency;
+function TSumList.GetSum(ANames: TStringList; ACurrency: String): Currency;
 var xCount: Integer;
 begin
   Result := 0;
   for xCount := 0 to ANames.Count - 1 do begin
-    Result := Result + GetSum(ANames.Strings[xCount]);
+    Result := Result + GetSum(ANames.Strings[xCount], ACurrency);
   end;
 end;
 
-function TSumList.GetSum: Currency;
+function TSumList.GetSum(ACurrency: String): Currency;
 var xCount: Integer;
 begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
-    Result := Result + Items[xCount].value;
+    if Items[xCount].currency = ACurrency then begin
+      Result := Result + Items[xCount].value;
+    end;
   end;
 end;
 

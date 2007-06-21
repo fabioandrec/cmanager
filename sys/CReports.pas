@@ -554,7 +554,7 @@ begin
         end;
         Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('cash').AsCurrency - xDelta, '', False) + '</td>');
         Add('</tr>');
-        xSums.AddSum(FieldByName('idCurrencyDef').AsString, FieldByName('cash').AsCurrency - xDelta);
+        xSums.AddSum(FieldByName('idCurrencyDef').AsString, FieldByName('cash').AsCurrency - xDelta, CEmptyDataGid);
         Inc(xRec);
       end;
       Next;
@@ -636,14 +636,14 @@ begin
         xCash := FieldByName('movementIncome').AsCurrency;
         if xCash > 0 then begin
           xIn := CurrencyToString(xCash, '', False);
-          xInSum.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash);
+          xInSum.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash, CEmptyDataGid);
         end else begin
           xIn := '';
         end;
         xCash := FieldByName('movementExpense').AsCurrency;
         if xCash > 0 then begin
           xOut := CurrencyToString(xCash, '', False);
-          xOutSum.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash);
+          xOutSum.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash, CEmptyDataGid);
         end else begin
           xOut := '';
         end;
@@ -670,8 +670,8 @@ begin
           xIdCur := xOutSum.Items[xCount].name;
         end;
         if xIdCur <> '' then begin
-          xIC := xInSum.GetSum(xIdCur);
-          xOC := xOutSum.GetSum(xIdCur);
+          xIC := xInSum.GetSum(xIdCur, CEmptyDataGid);
+          xOC := xOutSum.GetSum(xIdCur, CEmptyDataGid);
           if xIC > 0 then begin
             xIS := CurrencyToString(xIC, '', False);
           end;
@@ -777,13 +777,13 @@ begin
           if xElement.planned.movementType = CInMovement then begin
             xIn := CurrencyToString(xElement.done.cash, '', False);
             xOut := '';
-            xOverallInSum.AddSum(xIdCurrency, xElement.done.cash);
-            xRelizedInSum.AddSum(xIdCurrency, xElement.done.cash);
+            xOverallInSum.AddSum(xIdCurrency, xElement.done.cash, CEmptyDataGid);
+            xRelizedInSum.AddSum(xIdCurrency, xElement.done.cash, CEmptyDataGid);
           end else begin
             xOut := CurrencyToString(xElement.done.cash, '', False);
             xIn := '';
-            xOverallOutSum.AddSum(xIdCurrency, xElement.done.cash);
-            xRealizedOutSum.AddSum(xIdCurrency, xElement.done.cash);
+            xOverallOutSum.AddSum(xIdCurrency, xElement.done.cash, CEmptyDataGid);
+            xRealizedOutSum.AddSum(xIdCurrency, xElement.done.cash, CEmptyDataGid);
           end;
           if xElement.done.doneState = CDoneOperation then begin
             xStat := CPlannedDoneDescription;
@@ -799,13 +799,13 @@ begin
           if xElement.planned.movementType = CInMovement then begin
             xIn := CurrencyToString(xElement.planned.cash, '', False);
             xOut := '';
-            xOverallInSum.AddSum(xIdCurrency, xElement.planned.cash);
-            xNotrealInSum.AddSum(xIdCurrency, xElement.planned.cash);
+            xOverallInSum.AddSum(xIdCurrency, xElement.planned.cash, CEmptyDataGid);
+            xNotrealInSum.AddSum(xIdCurrency, xElement.planned.cash, CEmptyDataGid);
           end else begin
             xOut := CurrencyToString(xElement.planned.cash, '', False);
             xIn := '';
-            xOverallOutSum.AddSum(xIdCurrency, xElement.planned.cash);
-            xNotrealOutSum.AddSum(xIdCurrency, xElement.planned.cash);
+            xOverallOutSum.AddSum(xIdCurrency, xElement.planned.cash, CEmptyDataGid);
+            xNotrealOutSum.AddSum(xIdCurrency, xElement.planned.cash, CEmptyDataGid);
           end;
           xStat := '';
           xDate := xElement.triggerDate;
@@ -832,8 +832,8 @@ begin
           xIdCurrency := xRealizedOutSum.Items[xCount].name;
         end;
         if xIdCurrency <> '' then begin
-          xIC := xRelizedInSum.GetSum(xIdCurrency);
-          xOC := xRealizedOutSum.GetSum(xIdCurrency);
+          xIC := xRelizedInSum.GetSum(xIdCurrency, CEmptyDataGid);
+          xOC := xRealizedOutSum.GetSum(xIdCurrency, CEmptyDataGid);
           if xIC > 0 then begin
             xIS := CurrencyToString(xIC, '', False);
           end;
@@ -862,8 +862,8 @@ begin
           xIdCurrency := xNotrealOutSum.Items[xCount].name;
         end;
         if xIdCurrency <> '' then begin
-          xIC := xNotrealInSum.GetSum(xIdCurrency);
-          xOC := xNotrealOutSum.GetSum(xIdCurrency);
+          xIC := xNotrealInSum.GetSum(xIdCurrency, CEmptyDataGid);
+          xOC := xNotrealOutSum.GetSum(xIdCurrency, CEmptyDataGid);
           if xIC > 0 then begin
             xIS := CurrencyToString(xIC, '', False);
           end;
@@ -892,8 +892,8 @@ begin
           xIdCurrency := xOverallOutSum.Items[xCount].name;
         end;
         if xIdCurrency <> '' then begin
-          xIC := xOverallInSum.GetSum(xIdCurrency);
-          xOC := xOverallOutSum.GetSum(xIdCurrency);
+          xIC := xOverallInSum.GetSum(xIdCurrency, CEmptyDataGid);
+          xOC := xOverallOutSum.GetSum(xIdCurrency, CEmptyDataGid);
           if xIC > 0 then begin
             xIS := CurrencyToString(xIC, '', False);
           end;
@@ -989,7 +989,7 @@ begin
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idMovementCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="20%">' + CurrencyToString(FieldByName('movementCash').AsCurrency, '', False) + '</td>');
       Add('</tr>');
-      xSums.AddSum(FieldByName('idMovementCurrencyDef').AsString, FieldByName('movementCash').AsCurrency);
+      xSums.AddSum(FieldByName('idMovementCurrencyDef').AsString, FieldByName('movementCash').AsCurrency, CEmptyDataGid);
       Next;
     end;
     Add('</table><hr>');
@@ -1376,7 +1376,7 @@ begin
         Add('<tr class="base">');
       end;
       xCash := Abs(FieldByName('cash').AsCurrency);
-      xSums.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash);
+      xSums.AddSum(FieldByName('idMovementCurrencyDef').AsString, xCash, CEmptyDataGid);
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
@@ -1699,7 +1699,7 @@ begin
       xGbSum := TSumList.Create(True);
       while not Eof do begin
         if IsValidAccount(FieldByName('idAccount').AsString, FIds) then begin
-          xGbSum.AddSum(FieldByName('idMovementCurrencyDef').AsString, Abs(FieldByName('movementCash').AsCurrency));
+          xGbSum.AddSum(FieldByName('idMovementCurrencyDef').AsString, Abs(FieldByName('movementCash').AsCurrency), CEmptyDataGid);
         end;
         Next;
       end;
@@ -1711,7 +1711,7 @@ begin
           Add('<td class="cash" width="20%">' + CurrencyToString(xGbSum.Items[xCount].value, '', False) + '</td>');
           Add('</tr>');
           Inc(xRec);
-          xSums.AddSum(xGbSum.Items[xCount].name, xGbSum.Items[xCount].value);
+          xSums.AddSum(xGbSum.Items[xCount].name, xGbSum.Items[xCount].value, CEmptyDataGid);
         end;
       end else begin
         Add('<tr class="' + IsEvenToStr(xRec) + 'base">');

@@ -72,17 +72,21 @@ inherited CSurpassedForm: TCSurpassedForm
           end
           item
             Position = 1
+            WideText = 'Waluta'
+          end
+          item
+            Position = 2
             Width = 100
             WideText = 'Suma'
           end
           item
-            Position = 2
-            Width = 150
+            Position = 3
+            Width = 125
             WideText = 'Rodzaj'
           end
           item
-            Position = 3
-            Width = 139
+            Position = 4
+            Width = 114
             WideText = 'Status'
           end>
         WideDefaultText = ''
