@@ -336,6 +336,7 @@ end;
 
 function TCMovementForm.CanAccept: Boolean;
 var xI: Integer;
+    xPrevCash: Currency;
 begin
   Result := True;
   xI := ComboBoxType.ItemIndex;
@@ -433,16 +434,21 @@ begin
     end;
   end;
   if Result then begin
+    if Operation = coEdit then begin
+      xPrevCash := TBaseMovement(Dataobject).movementCash;
+    end else begin
+      xPrevCash := 0;
+    end;
     if (xI = 0) or (xI = 1) then begin
       Result := CheckSurpassedLimits(IfThen(xI = 0, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticInoutOnceAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticInoutOnceCashpoint.DataId),
-                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, CCurrEditInoutOnceMovement.Value, CStaticInOutOnceMovementCurrency.DataId));
+                                     TSumList.CreateWithSum(CStaticInoutOnceCategory.DataId, CCurrEditInoutOnceMovement.Value - xPrevCash, CStaticInOutOnceMovementCurrency.DataId));
     end else if (xI = 3) or (xI = 4) then begin
       Result := CheckSurpassedLimits(IfThen(xI = 3, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticInoutCyclicAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticInoutCyclicCategory.DataId),
-                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, CCurrEditInoutCyclicMovement.Value, CStaticInOutCyclicMovementCurrency.DataId));
+                                     TSumList.CreateWithSum(CStaticInoutCyclicCategory.DataId, CCurrEditInoutCyclicMovement.Value - xPrevCash, CStaticInOutCyclicMovementCurrency.DataId));
     end;
   end;
 end;

@@ -98,7 +98,7 @@ begin
     end;
   end;
   if FAccountIds.Count > 0 then begin
-    xCondition := xCondition + 'idAccount in (' + xCondA + ')';
+    xCondition := xCondition + '(idAccount in (' + xCondA + ') or idAccount is null)';
   end;
   for xCount := 0 to FCategorySums.Count - 1 do begin
     xCondP := xCondP + DataGidToDatabase(FCategorySums.Items[xCount].name);
@@ -110,7 +110,7 @@ begin
     if xCondition <> '' then begin
       xCondition := xCondition + ' or ';
     end;
-    xCondition := xCondition + 'idProduct in (' + xCondP + ')';
+    xCondition := xCondition + '(idProduct in (' + xCondP + ') or idProduct is null)';
   end;
   for xCount := 0 to FCashpointIds.Count - 1 do begin
     xCondC := xCondC + DataGidToDatabase(FCashpointIds.Strings[xCount]);
@@ -122,7 +122,7 @@ begin
     if xCondition <> '' then begin
       xCondition := xCondition + ' or ';
     end;
-    xCondition := xCondition + 'idCashpoint in (' + xCondC + ')';
+    xCondition := xCondition + '(idCashpoint in (' + xCondC + ') or idCashpoint is null)';
   end;
   if xCondition <> '' then begin
     xCondition := ' where ' + xCondition;
@@ -135,7 +135,11 @@ begin
       xCash := FCategorySums.GetSum(xLimit.idCurrencyDef);
     end else begin
       xFilterCats := GDataProvider.GetSqlStringList('select idProduct from productFilter where idMovementFilter = ' + DataGidToDatabase(xLimit.idFilter));
-      xCash := FCategorySums.GetSum(xFilterCats, xLimit.idCurrencyDef);
+      if xFilterCats.Count > 0 then begin
+        xCash := FCategorySums.GetSum(xFilterCats, xLimit.idCurrencyDef);
+      end else begin
+        xCash := FCategorySums.GetSum(xLimit.idCurrencyDef);
+      end;
       xFilterCats.Free;
     end;
     if xLimit.sumType = CLimitSumtypeOut then begin

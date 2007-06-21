@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, VirtualTrees, ActnList, XPStyleActnCtrls, ActnMan, Contnrs,
-  CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit;
+  CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit, CTools;
 
 type
   TCMovementListForm = class(TCDataobjectForm)
@@ -72,6 +72,7 @@ type
     FbaseAccount: TDataGid;
     FbaseCashpoint: TDataGid;
     FbaseDate: TDateTime;
+    FprevSums: TSumList;
     procedure MessageMovementAdded(AData: TMovementListElement);
     procedure MessageMovementEdited(AData: TMovementListElement);
     procedure MessageMovementDeleted(AData: TMovementListElement);
@@ -102,7 +103,7 @@ uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
   CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit,
-  CCurrencydefFrameUnit, CTools, CSurpassedFormUnit;
+  CCurrencydefFrameUnit, CSurpassedFormUnit;
 
 {$R *.dfm}
 
@@ -113,6 +114,7 @@ begin
   Fmovements := TObjectList.Create(True);
   Fmodified := TObjectList.Create(False);
   Fdeleted := TObjectList.Create(True);
+  FprevSums := TSumList.Create(True);
 end;
 
 procedure TCMovementListForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -137,6 +139,7 @@ begin
   Fdeleted.Free;
   Fmodified.Free;
   Fmovements.Free;
+  FprevSums.Free;
   inherited Destroy;
 end;
 
@@ -386,6 +389,7 @@ function TCMovementListForm.CanAccept: Boolean;
 var xSums: TSumList;
     xCount: Integer;
     xElement: TMovementListElement;
+    xSum: TSum;
 begin
   Result := True;
   if CStaticInoutOnceAccount.DataId = CEmptyDataGid then begin
@@ -403,7 +407,15 @@ begin
     xSums := TSumList.Create(True);
     for xCount := 0 to Fmovements.Count - 1 do begin
       xElement := TMovementListElement(Fmovements.Items[xCount]);
-      xSums.AddSum(xElement.idCashpoint, xElement.movementCash, xElement.idMovementCurrencyDef);
+      xSums.AddSum(xElement.productId, xElement.movementCash, xElement.idMovementCurrencyDef);
+    end;
+    if Operation = coEdit then begin
+      for xCount := 0 to xSums.Count - 1 do begin
+        xSum := FprevSums.ByNameCurrency[xSums.Items[xCount].name, xSums.Items[xCount].currency];
+        if xSum <> Nil then begin
+          xSums.AddSum(xSums.Items[xCount].name, (-1) * xSum.value, xSums.Items[xCount].currency);
+        end;
+      end;
     end;
     Result := CheckSurpassedLimits(IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement), CDateTime1.Value,
                                    TDataGids.CreateFromGid(CStaticInoutOnceAccount.DataId),
@@ -468,6 +480,7 @@ begin
       xElement.idCashpoint := xMovement.idCashPoint;
       xElement.idAccount := xMovement.idAccount;
       Fmovements.Add(xElement);
+      FprevSums.AddSum(xMovement.idProduct, xMovement.movementCash, xMovement.idMovementCurrencyDef);
     end;
     xList.Free;
     GDataProvider.RollbackTransaction;
