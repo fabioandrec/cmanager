@@ -401,11 +401,8 @@ begin
 end;
 
 procedure TCMainForm.ActionAboutExecute(Sender: TObject);
-var xAbout: TCAboutForm;
 begin
-  xAbout := TCAboutForm.Create(Nil);
-  xAbout.ShowConfig(coNone);
-  xAbout.Free;
+  ShowAbout;
 end;
 
 procedure TCMainForm.FormShow(Sender: TObject);

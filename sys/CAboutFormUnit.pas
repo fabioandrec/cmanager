@@ -7,12 +7,11 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, ShellApi, ComCtrls,
-  CComponents, ClipBrd;
+  CComponents, ClipBrd, CRichtext, RichEdit;
 
 type
   TCAboutForm = class(TCConfigForm)
     Image: TImage;
-    Label1: TLabel;
     Label2: TLabel;
     RichEditContrib: TRichEdit;
     CButtonMail: TCButton;
@@ -24,21 +23,32 @@ type
     procedure CButton2Click(Sender: TObject);
   protected
     procedure FillForm; override;
+    procedure WndProc(var Message: TMessage); override;
   end;
+
+procedure ShowAbout;
 
 implementation
 
-uses CBaseFormUnit, CDatabase, CDatatools, CRichtext, CTools,
-  CInfoFormUnit;
+uses CBaseFormUnit, CDatabase, CDatatools, CTools,
+     CInfoFormUnit;
 
 {$R *.dfm}
+
+var GAboutDialog: TCAboutForm;
+
+procedure ShowAbout;
+begin
+  GAboutDialog := TCAboutForm.Create(Nil);
+  GAboutDialog.ShowConfig(coNone);
+  GAboutDialog.Free;
+end;
 
 procedure TCAboutForm.FillForm;
 var xText: TStringStream;
     xRes: TResourceStream;
 begin
   inherited FillForm;
-  Image.Picture.Icon.Handle := LoadIcon(HInstance, 'LARGEICON');
   xRes := TResourceStream.Create(HInstance, 'CONTRIB', RT_RCDATA);
   xText := TStringStream.Create('');
   xRes.SaveToStream(xText);
@@ -48,8 +58,12 @@ begin
 end;
 
 procedure TCAboutForm.FormCreate(Sender: TObject);
+var xMask: Cardinal;
 begin
-  Label2.Caption := 'wersja ' + FileVersion(ParamStr(0)) + ' Beta';
+  Label2.Caption := 'CManager wersja ' + FileVersion(ParamStr(0)) + ' Beta';
+  xMask := SendMessage(RichEditContrib.Handle, EM_GETEVENTMASK, 0, 0);
+  SendMessage(RichEditContrib.Handle, EM_SETEVENTMASK, 0, xMask or ENM_LINK);
+  SendMessage(RichEditContrib.Handle, EM_AUTOURLDETECT, Integer(True), 0);
 end;
 
 procedure TCAboutForm.CButtonMailClick(Sender: TObject);
@@ -69,6 +83,23 @@ begin
   Clipboard.AsText := '4963605';
   Clipboard.Close;
   ShowInfo(itInfo, 'Numer gadu-gadu zosta³ skopiowany do schowka', '');
+end;
+
+procedure TCAboutForm.WndProc(var Message: TMessage);
+var xP: TENLink;
+    xUrl: string;
+begin
+  if (Message.Msg = WM_NOTIFY) then begin
+    if (PNMHDR(Message.LParam).code = EN_LINK) then begin
+      xP := TENLink(Pointer(TWMNotify(Message).NMHdr)^);
+      if (xP.msg = WM_LBUTTONDOWN) then begin
+        SendMessage(RichEditContrib.Handle, EM_EXSETSEL, 0, LongInt(@(xP.chrg)));
+        xUrl := RichEditContrib.SelText;
+        ShellExecute(Handle, 'open', PChar(xUrl), Nil, Nil, SW_SHOWNORMAL);
+      end
+    end
+  end;
+  inherited;
 end;
 
 end.
