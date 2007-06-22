@@ -61,6 +61,7 @@ function TCCashpointsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 begin
   Result := (inherited IsValidFilteredObject(AObject)) or
             (CStaticFilter.DataId = CCashpointTypeAll) or
+            (TCashPoint(AObject).cashpointType = CCashpointTypeAll) or
             (TCashPoint(AObject).cashpointType = CStaticFilter.DataId);
 end;
 

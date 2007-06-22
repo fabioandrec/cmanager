@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=CManager
-AppVerName=CManager 1.3.1 Beta
+AppVerName=CManager 1.4.1 Beta
 AppPublisherURL=http://cmanager.sourceforge.net
 AppSupportURL=http://cmanager.sourceforge.net
 AppUpdatesURL=http://cmanager.sourceforge.net
@@ -14,7 +14,7 @@ LicenseFile=..\..\docs\license
 OutputDir=..\..\bin
 OutputBaseFilename=..\..\releases\CManagerSetup_1_4_1_Beta
 SetupIconFile=..\res\cmanager32.ico
-Compression=lzma
+Compression=lzma/max
 SolidCompression=true
 ShowLanguageDialog=auto
 LanguageDetectionMethod=locale
