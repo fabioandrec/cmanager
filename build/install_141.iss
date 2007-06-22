@@ -2,6 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 [Setup]
+AppId=CManager
 AppName=CManager
 AppVerName=CManager 1.4.1 Beta
 AppPublisherURL=http://cmanager.sourceforge.net
@@ -18,6 +19,8 @@ Compression=lzma/max
 SolidCompression=true
 ShowLanguageDialog=auto
 LanguageDetectionMethod=locale
+WizardImageFile=..\res\install.bmp
+UsePreviousAppDir=yes
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -39,10 +42,13 @@ Source: ..\..\bin\CArchive.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\CQuery.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\NBPACurrencyRates.dll; DestDir: {app}\Wtyczki\; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\NBPBSCurrencyRates.dll; DestDir: {app}\Wtyczki\; Flags: ignoreversion
+Source: ..\..\sources\res\home.url; DestDir: {app}; Flags: ignoreversion
+
 
 [Icons]
-Name: {group}\CManager; Filename: {app}\CManager.exe
+Name: {group}\CManager; Filename: {app}\CManager.exe; WorkingDir: {app}
 Name: {group}\{cm:UninstallProgram,CManager}; Filename: {uninstallexe}
+Name: {group}\Strona domowa; Filename: {app}\home.url; IconFilename: {app}\CManager.exe
 Name: {userdesktop}\CManager; Filename: {app}\CManager.exe; Tasks: desktopicon; WorkingDir: {app}
 
 [Run]

@@ -69,7 +69,7 @@ function Plugin_Execute: OleVariant; stdcall; export;
         Add('<td class="cash" width="25%">' + CurrToStrF(xCash, ffNumber, 2) + '</td>');
         Add('</tr>');
         xIdCurrency := xAccounts.Fields.Item['idCurrencyDef'].Value;
-        xSums.AddSum(xIdCurrency, xCash);
+        xSums.AddSum(xIdCurrency, xCash, '');
         xAccounts.MoveNext;
         Inc(xCount);
       end;
