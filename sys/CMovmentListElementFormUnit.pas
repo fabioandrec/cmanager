@@ -49,7 +49,7 @@ type
 
   TCMovmentListElementForm = class(TCConfigForm)
     GroupBox2: TGroupBox;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     GroupBox3: TGroupBox;
     Label2: TLabel;
     CStaticCategory: TCStatic;

@@ -9,7 +9,7 @@ inherited CMemoForm: TCMemoForm
     DesignSize = (
       591
       396)
-    object RichEdit: TRichEdit
+    object RichEdit: TCRichEdit
       Left = 4
       Top = 5
       Width = 585

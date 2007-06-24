@@ -27,7 +27,7 @@ type
     GroupBox2: TGroupBox;
     CButton1: TCButton;
     CButton2: TCButton;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     ComboBoxTemplate: TComboBox;
     Label3: TLabel;
     ComboBoxType: TComboBox;

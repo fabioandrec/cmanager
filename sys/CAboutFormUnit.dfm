@@ -1,20 +1,21 @@
 inherited CAboutForm: TCAboutForm
-  Left = 319
-  Top = 227
+  Left = 227
+  Top = 107
   Caption = 'O programie'
-  ClientHeight = 404
+  ClientHeight = 430
   ClientWidth = 514
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 514
-    Height = 363
+    Height = 389
     object Image: TImage
       Left = 16
       Top = 16
       Width = 164
-      Height = 338
+      Height = 364
+      Anchors = [akLeft, akTop, akBottom]
       Picture.Data = {
         07544269746D6170AE5B0200424DAE5B0200000000003600000028000000A400
         00003A0100000100180000000000785B0200130B0000130B0000000000000000
@@ -4851,19 +4852,19 @@ inherited CAboutForm: TCAboutForm
     object Label2: TLabel
       Left = 192
       Top = 18
-      Width = 142
-      Height = 13
+      Width = 169
+      Height = 16
       Caption = 'CManager wersja 2.2.2.2'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -15
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
       ParentFont = False
     end
     object CButtonMail: TCButton
       Left = 178
-      Top = 40
+      Top = 64
       Width = 193
       Height = 17
       Cursor = crHandPoint
@@ -4877,7 +4878,7 @@ inherited CAboutForm: TCAboutForm
     end
     object CButton1: TCButton
       Left = 178
-      Top = 56
+      Top = 48
       Width = 177
       Height = 17
       Cursor = crHandPoint
@@ -4890,8 +4891,8 @@ inherited CAboutForm: TCAboutForm
       Color = clBtnFace
     end
     object CButton2: TCButton
-      Left = 346
-      Top = 40
+      Left = 178
+      Top = 80
       Width = 117
       Height = 17
       Cursor = crHandPoint
@@ -4899,15 +4900,15 @@ inherited CAboutForm: TCAboutForm
       PicOffset = 10
       TxtOffset = 15
       Framed = False
-      Caption = 'gadu-gadu: 4963605'
+      Caption = 'gadu-gadu 4963605'
       OnClick = CButton2Click
       Color = clBtnFace
     end
-    object RichEditContrib: TRichEdit
+    object RichEditContrib: TCRichedit
       Left = 192
-      Top = 88
+      Top = 104
       Width = 307
-      Height = 266
+      Height = 276
       TabStop = False
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelInner = bvNone
@@ -4926,10 +4927,11 @@ inherited CAboutForm: TCAboutForm
       ScrollBars = ssBoth
       TabOrder = 0
       WordWrap = False
+      OnURLClick = RichEditContribURLClick
     end
   end
   inherited PanelButtons: TPanel
-    Top = 363
+    Top = 389
     Width = 514
     inherited BitBtnOk: TBitBtn
       Left = 337

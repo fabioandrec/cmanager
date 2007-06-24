@@ -9,7 +9,7 @@ uses
 
 type
   TCMemoForm = class(TCConfigForm)
-    RichEdit: TRichEdit;
+    RichEdit: TCRichEdit;
     PrinterSetupDialog: TPrinterSetupDialog;
     ActionList: TActionList;
     Action1: TAction;

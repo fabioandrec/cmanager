@@ -21,7 +21,7 @@ object CCalculatorForm: TCCalculatorForm
     125)
   PixelsPerInch = 96
   TextHeight = 13
-  object RichEdit: TRichEdit
+  object RichEdit: TCRichEdit
     Left = 13
     Top = 12
     Width = 172

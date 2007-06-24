@@ -88,7 +88,7 @@ inherited CDescpatternForm: TCDescpatternForm
         Action = ActionAdd
         Color = clBtnFace
       end
-      object RichEditDesc: TRichEdit
+      object RichEditDesc: TCRichEdit
         Left = 24
         Top = 28
         Width = 457

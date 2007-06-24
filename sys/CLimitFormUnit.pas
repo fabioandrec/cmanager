@@ -13,7 +13,7 @@ type
     Label1: TLabel;
     Label2: TLabel;
     EditName: TEdit;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     GroupBox1: TGroupBox;
     CStaticFilter: TCStatic;
     Label3: TLabel;

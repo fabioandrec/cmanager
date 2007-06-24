@@ -54,7 +54,7 @@ inherited CDoneForm: TCDoneForm
         Alignment = taRightJustify
         Caption = 'Kwota'
       end
-      object RichEditDesc: TRichEdit
+      object RichEditDesc: TCRichEdit
         Left = 24
         Top = 28
         Width = 321
@@ -125,7 +125,7 @@ inherited CDoneForm: TCDoneForm
         Transparent = False
         HotTrack = True
       end
-      object RichEditOperation: TRichEdit
+      object RichEditOperation: TCRichEdit
         Left = 24
         Top = 32
         Width = 321

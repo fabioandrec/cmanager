@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls, CDatabase,
-  CBaseFrameUnit;
+  CBaseFrameUnit, CComponents;
 
 type
   TCProductAdditionalData = class(TAdditionalData)
@@ -24,7 +24,7 @@ type
     Label1: TLabel;
     Label2: TLabel;
     EditName: TEdit;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     GroupBoxAccountType: TGroupBox;
     ComboBoxType: TComboBox;
   protected

@@ -24,7 +24,7 @@ type
     GroupBox1: TGroupBox;
     Label3: TLabel;
     GroupBox2: TGroupBox;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     ComboBoxType: TComboBox;
     Label5: TLabel;
     GroupBox3: TGroupBox;

@@ -50,7 +50,7 @@ inherited CCashpointForm: TCCashpointForm
         MaxLength = 40
         TabOrder = 0
       end
-      object RichEditDesc: TRichEdit
+      object RichEditDesc: TCRichEdit
         Left = 56
         Top = 64
         Width = 257

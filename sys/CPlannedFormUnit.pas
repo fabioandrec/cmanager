@@ -11,7 +11,7 @@ uses
 type
   TCPlannedForm = class(TCDataobjectForm)
     GroupBox2: TGroupBox;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     GroupBox3: TGroupBox;
     GroupBox1: TGroupBox;
     Label5: TLabel;

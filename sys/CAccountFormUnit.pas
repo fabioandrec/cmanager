@@ -16,7 +16,7 @@ type
     Label1: TLabel;
     Label2: TLabel;
     EditName: TEdit;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     CCurrEditCash: TCCurrEdit;
     LabelCash: TLabel;
     GroupBoxBank: TGroupBox;

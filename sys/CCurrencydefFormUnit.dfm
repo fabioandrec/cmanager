@@ -56,7 +56,7 @@ inherited CCurrencydefForm: TCCurrencydefForm
         MaxLength = 40
         TabOrder = 0
       end
-      object RichEditDesc: TRichEdit
+      object RichEditDesc: TCRichedit
         Left = 56
         Top = 136
         Width = 257

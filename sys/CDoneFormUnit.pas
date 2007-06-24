@@ -12,11 +12,11 @@ type
     GroupBox1: TGroupBox;
     ComboBoxStatus: TComboBox;
     GroupBox2: TGroupBox;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     GroupBox3: TGroupBox;
     Label1: TLabel;
     CDateTimePlanned: TCDateTime;
-    RichEditOperation: TRichEdit;
+    RichEditOperation: TCRichEdit;
     Label3: TLabel;
     CDateTime: TCDateTime;
     Label10: TLabel;

@@ -4,7 +4,8 @@ interface
 
 uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList,
      Buttons, StdCtrls, ExtCtrls, SysUtils, ComCtrls, IntfUIHandlers, ShDocVw,
-     ActiveX, PngImageList, VirtualTrees, GraphUtil, Contnrs, Types;
+     ActiveX, PngImageList, VirtualTrees, GraphUtil, Contnrs, Types, RichEdit,
+     ShellApi;
 
 type
   TPicturePosition = (ppLeft, ppTop, ppRight);
@@ -372,6 +373,21 @@ type
     property ImageList: TPngImageList read FImageList write SetPngImageList;
   end;
 
+
+  TURLClickEvent = procedure(Sender :TObject; const URL: string) of object;
+
+
+  TCRichedit = class(TRichEdit)
+  private
+    FOnURLClick: TURLClickEvent;
+    procedure DoURLClick(const AURL: string);
+  protected
+    procedure CreateWnd; override;
+    procedure CNNotify(var Message: TMessage); message CN_NOTIFY;
+  published
+    property OnURLClick: TURLClickEvent read FOnURLClick write FOnURLClick;
+  end;
+
 function GetCurrencySymbol: string;
 procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String);
 function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
@@ -387,7 +403,7 @@ uses Forms, CCalendarFormUnit, DateUtils, ComObj, CCalculatorFormUnit,
 
 procedure Register;
 begin
-  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar]);
+  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit]);
 end;
 
 procedure TCButton.ActionChange(Sender: TObject; CheckDefaults: Boolean);
@@ -1910,6 +1926,44 @@ begin
     end;
     xCur := AList.GetNext(xCur);
   end;
+end;
+
+procedure TCRichedit.CNNotify(var Message: TMessage);
+var xP: TENLink;
+    xURL: string;
+    xMsg: TWMNotify;
+begin
+  xMsg := TWMNotify(Message);
+  if (xMsg.NMHdr^.code = EN_LINK) then begin
+    xP := TENLink(Pointer(xMsg.NMHdr)^);
+    if (xP.Msg = WM_LBUTTONDOWN) then begin
+      try
+        SendMessage(Handle, EM_EXSETSEL, 0, Longint(@(xP.chrg)));
+        xURL := SelText;
+        DoURLClick(xURL);
+      except
+      end;
+    end;
+  end;
+  inherited;
+end;
+
+procedure TCRichedit.DoURLClick(const AURL: string);
+begin
+  if Assigned(FOnURLClick) then begin
+    OnURLClick(Self, AURL);
+  end else begin
+    ShellExecute(0, nil, PChar(AURL), nil, nil, SW_SHOWNORMAL);
+  end;
+end;
+
+procedure TCRichedit.CreateWnd;
+var xMask: Integer;
+begin
+  inherited CreateWnd;
+  xMask := SendMessage(Handle, EM_GETEVENTMASK, 0, 0);
+  SendMessage(Handle, EM_SETEVENTMASK, 0, xMask or ENM_LINK);
+  SendMessage(Handle, EM_AUTOURLDETECT, Integer(True), 0);
 end;
 
 initialization

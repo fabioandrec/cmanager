@@ -16,7 +16,7 @@ type
     CDateTime1: TCDateTime;
     ComboBox1: TComboBox;
     GroupBox2: TGroupBox;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     Label4: TLabel;
     CStaticInoutOnceAccount: TCStatic;
     Label2: TLabel;

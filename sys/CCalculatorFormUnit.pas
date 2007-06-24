@@ -8,7 +8,7 @@ uses
 
 type
   TCCalculatorForm = class(TForm)
-    RichEdit: TRichEdit;
+    RichEdit: TCRichEdit;
     CValue: TCCurrEdit;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyPress(Sender: TObject; var Key: Char);

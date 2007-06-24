@@ -16,7 +16,7 @@ type
     ComboBoxOperation: TComboBox;
     ComboBoxType: TComboBox;
     GroupBox2: TGroupBox;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     CButton1: TCButton;
     ActionManager: TActionManager;
     ActionAdd: TAction;

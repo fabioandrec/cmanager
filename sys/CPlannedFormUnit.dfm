@@ -42,7 +42,7 @@ inherited CPlannedForm: TCPlannedForm
         Action = ActionTemplate
         Color = clBtnFace
       end
-      object RichEditDesc: TRichEdit
+      object RichEditDesc: TCRichEdit
         Left = 24
         Top = 28
         Width = 457

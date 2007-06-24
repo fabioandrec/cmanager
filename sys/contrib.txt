@@ -3,7 +3,7 @@
 
   1) <b>VirtualTreeView</b> - wersja 4.4.3
      Mike Lischke, public@soft-gems.net
-     http://www.delphi-gems.com/VirtualTreeview
+     http://www.soft-gems.net/
 
   2) <b>MemCheck</b> - wersja 2.73
      Vincent Mahon, Vincent.Mahon@free.fr

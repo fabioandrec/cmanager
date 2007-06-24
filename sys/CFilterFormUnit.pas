@@ -12,7 +12,7 @@ type
     GroupBox2: TGroupBox;
     EditName: TEdit;
     Label1: TLabel;
-    RichEditDesc: TRichEdit;
+    RichEditDesc: TCRichEdit;
     Label2: TLabel;
     GroupBox1: TGroupBox;
     Label14: TLabel;
