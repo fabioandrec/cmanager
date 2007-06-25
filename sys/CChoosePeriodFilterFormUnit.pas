@@ -21,25 +21,38 @@ type
     property CanBeEmpty: Boolean read FCanBeEmpty write FCanBeEmpty;
   end;
 
-function ChoosePeriodFilterByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; ACanBeEmpty: Boolean = False): Boolean;
+function ChoosePeriodFilterByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 
 implementation
 
 uses CFilterFrameUnit, CFrameFormUnit, CConfigFormUnit, CInfoFormUnit,
-  CConsts;
+  CConsts, CListFrameUnit;
 
 {$R *.dfm}
 
-function ChoosePeriodFilterByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; ACanBeEmpty: Boolean = False): Boolean;
+function ChoosePeriodFilterByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 var xForm: TCChoosePeriodFilterForm;
+    xData: String;
 begin
   xForm := TCChoosePeriodFilterForm.Create(Nil);
   xForm.CanBeEmpty := ACanBeEmpty;
+  if ACurrencyView = Nil then begin
+    xForm.GroupBoxView.Visible := False;
+    xForm.Height := xForm.Height - xForm.GroupBoxView.Height - 23;
+  end;
+  if (AStartDate = GWorkDate) and (AEndDate = GWorkDate) then begin
+    xForm.ComboBoxPredefined.ItemIndex := 1;
+    xForm.ComboBoxPredefinedChange(xForm.ComboBoxPredefined);
+  end;
   Result := xForm.ShowConfig(coEdit);
   if Result then begin
     AStartDate := xForm.CDateTime1.Value;
     AEndDate := xForm.CDateTime2.Value;
     AIdFilter := xForm.CStaticFilter.DataId;
+    if ACurrencyView <> Nil then begin
+      xData := xForm.CStaticCurrencyView.DataId[1];
+      CopyMemory(ACurrencyView, @xData[1], 1);
+    end;
   end;
   xForm.Free;
 end;

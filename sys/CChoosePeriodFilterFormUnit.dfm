@@ -1,11 +1,15 @@
 inherited CChoosePeriodFilterForm: TCChoosePeriodFilterForm
-  Left = 388
-  Top = 268
-  ClientHeight = 287
+  Left = 414
+  Top = 197
+  ClientHeight = 379
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 246
+    Height = 338
+    inherited GroupBoxView: TGroupBox
+      Top = 248
+      TabOrder = 2
+    end
     object GroupBox2: TGroupBox
       Left = 16
       Top = 152
@@ -33,13 +37,14 @@ inherited CChoosePeriodFilterForm: TCChoosePeriodFilterForm
         Color = clWindow
         ParentColor = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<brak aktywnego filtru>'
-        OnGetDataId = CStaticFilterGetDataId
         HotTrack = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 246
+    Top = 338
   end
 end

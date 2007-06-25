@@ -1,16 +1,21 @@
 inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
-  Left = 361
-  Top = 196
-  ClientHeight = 421
+  Left = 379
+  Top = 107
+  ClientHeight = 515
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 380
+    Height = 474
     inherited GroupBox1: TGroupBox
       Caption = ' Zakres dat dla podstawy prognozy  '
     end
     inherited GroupBox2: TGroupBox
       Top = 288
+      TabOrder = 2
+    end
+    inherited GroupBoxView: TGroupBox
+      Top = 384
+      TabOrder = 3
     end
     object GroupBox3: TGroupBox
       Left = 16
@@ -18,7 +23,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
       Width = 337
       Height = 121
       Caption = ' Okres prognozowany   '
-      TabOrder = 2
+      TabOrder = 1
       object Label3: TLabel
         Left = 31
         Top = 36
@@ -100,6 +105,6 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 380
+    Top = 474
   end
 end
