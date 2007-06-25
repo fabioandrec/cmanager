@@ -41,7 +41,6 @@ uses CFrameFormUnit, CConsts;
 
 function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
 var xList: TStringList;
-    xGid, xText: String;
     xRect: TRect;
 begin
   xList := TStringList.Create;

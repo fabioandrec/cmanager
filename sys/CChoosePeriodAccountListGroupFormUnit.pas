@@ -18,18 +18,32 @@ type
     { Public declarations }
   end;
 
-function ChoosePeriodAccountListGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdAccounts: TStringList; var AGroupBy: String): Boolean;
+function ChoosePeriodAccountListGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdAccounts: TStringList; var AGroupBy: String; ACurrencyView: PChar): Boolean;
 
 implementation
 
-uses CConsts, CConfigFormUnit;
+uses CConsts, CConfigFormUnit, CDatabase;
 
 {$R *.dfm}
 
-function ChoosePeriodAccountListGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdAccounts: TStringList; var AGroupBy: String): Boolean;
+function ChoosePeriodAccountListGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdAccounts: TStringList; var AGroupBy: String; ACurrencyView: PChar): Boolean;
 var xForm: TCChoosePeriodAccountListGroupForm;
+    xList: TList;
+    xData: String;
 begin
   xForm := TCChoosePeriodAccountListGroupForm.Create(Nil);
+  if ACurrencyView = Nil then begin
+    xForm.GroupBoxView.Visible := False;
+    xForm.Height := xForm.Height - xForm.GroupBoxView.Height - 15;
+    xList := TList.Create;
+    xForm.GetTabOrderList(xList);
+    xForm.GroupBoxView.TabOrder := xList.Count;
+    xList.Free;
+  end;
+  if (AStartDate = GWorkDate) and (AEndDate = GWorkDate) then begin
+    xForm.ComboBoxPredefined.ItemIndex := 1;
+    xForm.ComboBoxPredefinedChange(xForm.ComboBoxPredefined);
+  end;
   Result := xForm.ShowConfig(coEdit);
   if Result then begin
     AStartDate := xForm.CDateTime1.Value;
@@ -41,6 +55,10 @@ begin
       AGroupBy := CGroupByWeek;
     end else begin
       AGroupBy := CGroupByMonth;
+    end;
+    if ACurrencyView <> Nil then begin
+      xData := xForm.CStaticCurrencyView.DataId[1];
+      CopyMemory(ACurrencyView, @xData[1], 1);
     end;
   end;
   xForm.Free;

@@ -1,11 +1,15 @@
 inherited CChoosePeriodAccountListForm: TCChoosePeriodAccountListForm
-  Left = 583
-  Top = 337
-  ClientHeight = 287
+  Left = 352
+  Top = 152
+  ClientHeight = 376
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 246
+    Height = 335
+    inherited GroupBoxView: TGroupBox
+      Top = 248
+      TabOrder = 2
+    end
     object GroupBox2: TGroupBox
       Left = 16
       Top = 152
@@ -33,6 +37,8 @@ inherited CChoosePeriodAccountListForm: TCChoosePeriodAccountListForm
         Color = clWindow
         ParentColor = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wszystkie konta>'
         OnGetDataId = CStaticAccountGetDataId
         HotTrack = True
@@ -40,6 +46,6 @@ inherited CChoosePeriodAccountListForm: TCChoosePeriodAccountListForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 246
+    Top = 335
   end
 end

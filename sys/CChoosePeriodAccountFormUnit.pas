@@ -21,7 +21,7 @@ type
     property CanBeEmpty: Boolean read FCanBeEmpty write FCanBeEmpty;
   end;
 
-function ChoosePeriodAccountByForm(var AStartDate, AEndDate: TDateTime; var AIdAccount: TDataGid; ACanBeEmpty: Boolean = False): Boolean;
+function ChoosePeriodAccountByForm(var AStartDate, AEndDate: TDateTime; var AIdAccount: TDataGid; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 
 implementation
 
@@ -30,16 +30,34 @@ uses CConfigFormUnit, CFrameFormUnit, CAccountsFrameUnit, CInfoFormUnit,
 
 {$R *.dfm}
 
-function ChoosePeriodAccountByForm(var AStartDate, AEndDate: TDateTime; var AIdAccount: TDataGid; ACanBeEmpty: Boolean = False): Boolean;
+function ChoosePeriodAccountByForm(var AStartDate, AEndDate: TDateTime; var AIdAccount: TDataGid; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 var xForm: TCChoosePeriodAccountForm;
+    xList: TList;
+    xData: String;
 begin
   xForm := TCChoosePeriodAccountForm.Create(Nil);
   xForm.CanBeEmpty := ACanBeEmpty;
+  if ACurrencyView = Nil then begin
+    xForm.GroupBoxView.Visible := False;
+    xForm.Height := xForm.Height - xForm.GroupBoxView.Height - 15;
+    xList := TList.Create;
+    xForm.GetTabOrderList(xList);
+    xForm.GroupBoxView.TabOrder := xList.Count;
+    xList.Free;
+  end;
+  if (AStartDate = GWorkDate) and (AEndDate = GWorkDate) then begin
+    xForm.ComboBoxPredefined.ItemIndex := 1;
+    xForm.ComboBoxPredefinedChange(xForm.ComboBoxPredefined);
+  end;
   Result := xForm.ShowConfig(coEdit);
   if Result then begin
     AStartDate := xForm.CDateTime1.Value;
     AEndDate := xForm.CDateTime2.Value;
     AIdAccount := xForm.CStaticAccount.DataId;
+    if ACurrencyView <> Nil then begin
+      xData := xForm.CStaticCurrencyView.DataId[1];
+      CopyMemory(ACurrencyView, @xData[1], 1);
+    end;
   end;
   xForm.Free;
 end;

@@ -1,13 +1,17 @@
 inherited CChoosePeriodAccountListGroupForm: TCChoosePeriodAccountListGroupForm
-  Left = 487
-  Top = 378
-  ClientHeight = 377
+  Left = 324
+  Top = 122
+  ClientHeight = 476
   ClientWidth = 369
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 369
-    Height = 336
+    Height = 435
+    inherited GroupBoxView: TGroupBox
+      Top = 344
+      TabOrder = 3
+    end
     object GroupBox3: TGroupBox
       Left = 16
       Top = 248
@@ -44,7 +48,7 @@ inherited CChoosePeriodAccountListGroupForm: TCChoosePeriodAccountListGroupForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 336
+    Top = 435
     Width = 369
     inherited BitBtnOk: TBitBtn
       Left = 192
