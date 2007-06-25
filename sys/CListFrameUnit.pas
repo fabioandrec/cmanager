@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, VirtualTrees, CDatabase, GraphUtil,
-  PngImageList, Menus, CComponents;
+  PngImageList, Menus, CComponents, CDataObjects;
 
 type
   TCListFrame = class(TCBaseFrame)
@@ -31,11 +31,25 @@ type
     function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
   end;
 
+function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
+
 implementation
 
-uses CFrameFormUnit;
+uses CFrameFormUnit, CConsts;
 
 {$R *.dfm}
+
+function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
+var xList: TStringList;
+    xGid, xText: String;
+    xRect: TRect;
+begin
+  xList := TStringList.Create;
+  xList.Add(CCurrencyViewMovements + '=<waluta operacji>');
+  xList.Add(CCurrencyViewAccounts + '=<waluta konta>');
+  xRect := Rect(10, 10, 200, 300);
+  Result := TCFrameForm.ShowFrame(TCListFrame, ACurrencType, AText, xList, @xRect);
+end;
 
 destructor TCListFrame.Destroy;
 begin

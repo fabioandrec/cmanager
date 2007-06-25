@@ -50,8 +50,9 @@ type
     Fsum: Currency;
     Fchilds: TStartupHelperList;
     Fitem: TObject;
+    FidCurrencyDef: TDataGid;
   public
-    constructor Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TObject; AType: TStartupHelperType);
+    constructor Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TObject; AType: TStartupHelperType; AIdCurrencyDef: TDataGid);
     property childs: TStartupHelperList read Fchilds write Fchilds;
     property helperType: TStartupHelperType read FhelperType write FhelperType;
     property group: TStartupHelperGroup read Fgroup write Fgroup;
@@ -100,6 +101,7 @@ var xDf, xDt: TDateTime;
     xDate: TStartupHelper;
     xItem: TStartupHelper;
     xAmount: Currency;
+    xCurrencyDef: TDataGid;
 begin
   RepaymentList.BeginUpdate;
   RepaymentList.Clear;
@@ -174,12 +176,27 @@ begin
          ((xItemGroup = shgOvertimeOut) and startupInfoOldOut) then begin
         xGroup := FHelperList.ByGroup(xItemGroup, True);
         xDate := xGroup.childs.ByDate(xPlannedTreeItem.triggerDate, xItemGroup, True);
-        xItem := TStartupHelper.Create(xPlannedTreeItem.triggerDate, xItemGroup, xPlannedTreeItem, shtPlannedItem);
+        if xPlannedTreeItem.done <> Nil then begin
+          xCurrencyDef := xPlannedTreeItem.done.idDoneCurrencyDef;
+        end else begin
+          xCurrencyDef := xPlannedTreeItem.planned.idMovementCurrencyDef;
+        end;
+        xItem := TStartupHelper.Create(xPlannedTreeItem.triggerDate, xItemGroup, xPlannedTreeItem, shtPlannedItem, xCurrencyDef);
         xDate.childs.Add(xItem);
         xGroup.count := xGroup.count + 1;
-        xGroup.sum := xGroup.sum + xPlannedTreeItem.planned.cash;
         xDate.count := xDate.count + 1;
-        xDate.sum := xDate.sum + xPlannedTreeItem.planned.cash;
+        if (xGroup.FidCurrencyDef = xCurrencyDef) or (xGroup.FidCurrencyDef = CEmptyDataGid) then begin
+          xGroup.sum := xGroup.sum + xPlannedTreeItem.planned.cash;
+          xGroup.FidCurrencyDef := xCurrencyDef;
+        end else begin
+          xGroup.FidCurrencyDef := '*';
+        end;
+        if (xDate.FidCurrencyDef = xCurrencyDef) or (xDate.FidCurrencyDef = CEmptyDataGid) then begin
+          xDate.sum := xDate.sum + xPlannedTreeItem.planned.cash;
+          xDate.FidCurrencyDef := xCurrencyDef;
+        end else begin
+          xDate.FidCurrencyDef := '*';
+        end;
       end;
     end;
     if startupInfoSurpassedLimit or startupInfoValidLimits then begin
@@ -198,7 +215,7 @@ begin
           end;
         end;
         if xGroup <> Nil then begin
-          xItem := TStartupHelper.Create(GWorkDate, xGroup.group, xLimit, shtLimit);
+          xItem := TStartupHelper.Create(GWorkDate, xGroup.group, xLimit, shtLimit, CEmptyDataGid);
           xItem.sum := xAmount;
           xGroup.count := xGroup.count + 1;
           xGroup.childs.Add(xItem);
@@ -218,13 +235,14 @@ begin
   end;
 end;
 
-constructor TStartupHelper.Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TObject; AType: TStartupHelperType);
+constructor TStartupHelper.Create(ADate: TDateTime; AGroup: TStartupHelperGroup; AItem: TObject; AType: TStartupHelperType; AIdCurrencyDef: TDataGid);
 begin
   inherited Create;
   Fdate := ADate;
   Fgroup := AGroup;
   Fitem := AItem;
   FhelperType := AType;
+  FidCurrencyDef := AIdCurrencyDef;
   Fchilds := TStartupHelperList.Create(True);
   Fcount := 0;
   Fsum := 0;
@@ -248,7 +266,7 @@ begin
     Inc(xCount);
   end;
   if ACanCreate and (Result = Nil) then begin
-    Result := TStartupHelper.Create(ADate, AGroup, Nil, shtDate);
+    Result := TStartupHelper.Create(ADate, AGroup, Nil, shtDate, CEmptyDataGid);
     Add(Result);
   end;
 end;
@@ -265,7 +283,7 @@ begin
     Inc(xCount);
   end;
   if ACanCreate and (Result = Nil) then begin
-    Result := TStartupHelper.Create(0, AGroup, Nil, shtGroup);
+    Result := TStartupHelper.Create(0, AGroup, Nil, shtGroup, CEmptyDataGid);
     Add(Result);
   end;
 end;
@@ -306,6 +324,7 @@ end;
 
 procedure TCStartupInfoFrame.RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 var xData: TStartupHelper;
+    xSumStr: String;
 begin
   CellText := '';
   xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
@@ -392,7 +411,12 @@ begin
   end else begin
     if (xData.helperType = shtGroup) and (Column = 0) then begin
       if xData.group <> shgLimit then begin
-        CellText := '(razem ' + IntToStr(xData.count) + ', na kwotê ' + CurrencyToString(xData.sum) + ')';
+        if xData.FidCurrencyDef = '*' then begin
+          xSumStr := ', operacje wielowalutowe';
+        end else begin
+          xSumStr := ', na kwotê ' + CurrencyToString(xData.sum, xData.FidCurrencyDef);
+        end;
+        CellText := '(razem ' + IntToStr(xData.count) + xSumStr + ')';
       end else begin
         CellText := '(razem ' + IntToStr(xData.count) + ')';
       end;

@@ -1,15 +1,24 @@
 inherited CProductsFrame: TCProductsFrame
+  Width = 692
+  inherited Bevel: TBevel
+    Width = 692
+  end
+  inherited FilterPanel: TPanel
+    Width = 692
+  end
   inherited List: TCDataList
+    Width = 692
     Header.MainColumn = 0
     Columns = <
       item
         Position = 0
-        Width = 443
+        Width = 692
         WideText = 'Nazwa'
       end>
     WideDefaultText = ''
   end
   inherited ButtonPanel: TPanel
+    Width = 692
     inherited CButtonAdd: TCButton
       Width = 136
     end
@@ -23,7 +32,7 @@ inherited CProductsFrame: TCProductsFrame
     end
     object CButtonAddSubcategory: TCButton
       Left = 144
-      Top = 8
+      Top = 4
       Width = 145
       Height = 30
       Cursor = crHandPoint

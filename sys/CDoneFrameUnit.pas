@@ -463,7 +463,7 @@ var xList: TStringList;
 begin
   xList := TStringList.Create;
   xList.Add('1=<tylko dziœ>');
-  xList.Add('2=<w tym tygodni>');
+  xList.Add('2=<w tym tygodniu>');
   xList.Add('3=<w tym miesi¹cu>');
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');

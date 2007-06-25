@@ -40,7 +40,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Action = ActionTemplate
         Color = clBtnFace
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
         Width = 457

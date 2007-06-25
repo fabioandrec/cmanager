@@ -839,6 +839,81 @@ begin
         Result := CStaticInoutCyclicCategory.Caption;
       end;
     end;
+  end else if ATemplate = '@isowalutykonta@' then begin
+    Result := '<iso waluty konta>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInOutOnceCurrencyAccount.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetIso(CStaticInOutOnceCurrencyAccount.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInOutCyclicCurrencyAccount.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetIso(CStaticInOutCyclicCurrencyAccount.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransCurrencyDest.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetIso(CStaticTransCurrencyDest.DataId);
+      end;
+    end;
+  end else if ATemplate = '@isowalutyoperacji@' then begin
+    Result := '<iso waluty operacji>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInOutOnceMovementCurrency.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetIso(CStaticInOutOnceMovementCurrency.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInOutCyclicMovementCurrency.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetIso(CStaticInOutCyclicMovementCurrency.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransCurrencySource.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetIso(CStaticTransCurrencySource.DataId);
+      end;
+    end;
+  end else if ATemplate = '@symbolwalutykonta@' then begin
+    Result := '<symbol waluty konta>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInOutOnceCurrencyAccount.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetSymbol(CStaticInOutOnceCurrencyAccount.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInOutCyclicCurrencyAccount.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetSymbol(CStaticInOutCyclicCurrencyAccount.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransCurrencyDest.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetSymbol(CStaticTransCurrencyDest.DataId);
+      end;
+    end;
+  end else if ATemplate = '@symbolwalutyoperacji@' then begin
+    Result := '<symbol waluty operacji>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInOutOnceMovementCurrency.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetSymbol(CStaticInOutOnceMovementCurrency.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInOutCyclicMovementCurrency.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetSymbol(CStaticInOutCyclicMovementCurrency.DataId);
+      end;
+    end else if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransCurrencySource.DataId <> CEmptyDataGid then begin
+        Result := GCurrencyCache.GetSymbol(CStaticTransCurrencySource.DataId);
+      end;
+    end;
+  end else if ATemplate = '@przelicznik@' then begin
+    Result := '<przelicznik kursu waluty>';
+    if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
+      if CStaticInOutOnceRate.DataId <> CEmptyDataGid then begin
+        Result := CStaticInOutOnceRate.Caption;
+      end;
+    end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
+      if CStaticInOutCyclicRate.DataId <> CEmptyDataGid then begin
+        Result := CStaticInOutCyclicRate.Caption;
+      end;
+    end else if (ComboBoxType.ItemIndex = 2) then begin
+      if CStaticTransRate.DataId <> CEmptyDataGid then begin
+        Result := CStaticTransRate.Caption;
+      end;
+    end;
   end else if ATemplate = '@pelnakategoria@' then begin
     Result := '<pelnakategoria>';
     if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin

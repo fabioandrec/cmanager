@@ -124,12 +124,19 @@ initialization
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
     AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
     AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@isowalutykonta@', 'iso waluty konta');
+    AddTemplate('@isowalutyoperacji@', 'iso waluty operacji');
+    AddTemplate('@symbolwalutykonta@', 'symbol waluty konta');
+    AddTemplate('@symbolwalutyoperacji@', 'symbol waluty operacji');
+    AddTemplate('@przelicznik@', 'opis przelicznika waluty');
   end;
   with GMovementListTemplatesList do begin
     AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');
     AddTemplate('@rodzaj@', 'rodzaj operacji');
     AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
     AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@isowalutykonta@', 'iso waluty konta');
+    AddTemplate('@symbolwalutykonta@', 'symbol waluty konta');
   end;
   with GPlannedMovementTemplatesList do begin
     AddTemplate('@status@', 'aktywnoœæ planowanej operacji');
@@ -143,6 +150,16 @@ initialization
   end;
   with GMovementListElementsTemplatesList do begin
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
+    AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');
+    AddTemplate('@rodzaj@', 'rodzaj operacji');
+    AddTemplate('@kontozrodlowe@', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kontrahent@', 'nazwa kontrahenta wybranego w operacji');
+    AddTemplate('@isowalutykonta@', 'iso waluty konta');
+    AddTemplate('@isowalutyoperacji@', 'iso waluty operacji');
+    AddTemplate('@symbolwalutykonta@', 'symbol waluty konta');
+    AddTemplate('@symbolwalutyoperacji@', 'symbol waluty operacji');
+    AddTemplate('@przelicznik@', 'opis przelicznika waluty');
   end;
   with GCurrencydefTemplatesList do begin
     AddTemplate('@datakursu@', 'data kursu w formacie RRRR-MM-DD');

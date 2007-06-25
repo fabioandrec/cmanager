@@ -43,6 +43,9 @@ type
     CStaticCurrency: TCStatic;
     Label21: TLabel;
     CCurrEditCash: TCCurrEdit;
+    Panel: TPanel;
+    Label8: TLabel;
+    CStaticViewCurrency: TCStatic;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -64,6 +67,8 @@ type
     procedure ComboBoxTemplateChange(Sender: TObject);
     procedure CStaticCurrencyChanged(Sender: TObject);
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticViewCurrencyChanged(Sender: TObject);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -103,7 +108,7 @@ uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
   CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit,
-  CCurrencydefFrameUnit, CSurpassedFormUnit;
+  CCurrencydefFrameUnit, CSurpassedFormUnit, CListFrameUnit;
 
 {$R *.dfm}
 
@@ -291,9 +296,17 @@ begin
   end else if Column = 1 then begin
     CellText := xData.description;
   end else if Column = 2 then begin
-    CellText := CurrencyToString(xData.movementCash, '', False);
+    if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
+      CellText := CurrencyToString(xData.movementCash, '', False);
+    end else begin
+      CellText := CurrencyToString(xData.cash, '', False);
+    end;
   end else if Column = 3 then begin
-    CellText := GCurrencyCache.GetSymbol(xData.idMovementCurrencyDef);
+    if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
+      CellText := GCurrencyCache.GetSymbol(xData.idMovementCurrencyDef);
+    end else begin
+      CellText := GCurrencyCache.GetSymbol(xData.idAccountCurrencyDef);
+    end;
   end;
 end;
 
@@ -698,6 +711,16 @@ begin
     if CStaticInoutOnceCashpoint.DataId <> CEmptyDataGid then begin
       Result := CStaticInoutOnceCashpoint.Caption;
     end;
+  end else if ATemplate = '@isowalutykonta@' then begin
+    Result := '<iso waluty konta>';
+    if CStaticCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetIso(CStaticCurrency.DataId);
+    end;
+  end else if ATemplate = '@symbolwalutykonta@' then begin
+    Result := '<symbol waluty konta>';
+    if CStaticCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetSymbol(CStaticCurrency.DataId);
+    end;
   end;
 end;
 
@@ -722,6 +745,16 @@ begin
   ComboBox1.Enabled := (Fmovements.Count = 0) and (Operation = coAdd);
   CStaticInoutOnceAccount.Enabled := Fmovements.Count = 0;
   CStaticInoutOnceCashpoint.Enabled := Fmovements.Count = 0;
+end;
+
+procedure TCMovementListForm.CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := ShowCurrencyViewType(ADataGid, AText);
+end;
+
+procedure TCMovementListForm.CStaticViewCurrencyChanged(Sender: TObject);
+begin
+  MovementList.Repaint;
 end;
 
 end.

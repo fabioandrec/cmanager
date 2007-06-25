@@ -103,7 +103,7 @@ implementation
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
      CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
      CPreferences, CRichtext, CDataobjectFrameUnit, CCurrencydefFrameUnit,
-  CCurrencyRateFrameUnit, CSurpassedFormUnit;
+  CCurrencyRateFrameUnit, CSurpassedFormUnit, StrUtils;
 
 {$R *.dfm}
 
@@ -241,7 +241,11 @@ end;
 function TCMovmentListElementForm.ExpandTemplate(ATemplate: String): String;
 begin
   Result := inherited ExpandTemplate(ATemplate);
-  if ATemplate = '@kategoria@' then begin
+  if ATemplate = '@dataoperacji@' then begin
+    Result := GetFormattedDate(Felement.dateTime, 'yyyy-MM-dd');
+  end else if ATemplate = '@kategoria@' then begin
+    Result := IfThen(Felement.movementType = CInMovement, 'Przychód', 'Rozchód');
+  end else if ATemplate = '@kategoria@' then begin
     Result := '<kategoria>';
     if CStaticCategory.DataId <> CEmptyDataGid then begin
       Result := CStaticCategory.Caption;
@@ -250,6 +254,29 @@ begin
     Result := '<pelnakategoria>';
     if CStaticCategory.DataId <> CEmptyDataGid then begin
       Result := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).treeDesc;
+    end;
+  end else if ATemplate = '@kontozrodlowe@' then begin
+    Result := TAccount(TAccount.LoadObject(AccountProxy, Felement.idAccount, False)).name;
+  end else if ATemplate = '@kontrahent@' then begin
+    Result := TCashPoint(TCashPoint.LoadObject(CashPointProxy, Felement.idCashpoint, False)).name;
+  end else if ATemplate = '@isowalutykonta@' then begin
+    Result := GCurrencyCache.GetIso(Felement.idAccountCurrencyDef);
+  end else if ATemplate = '@symbolwalutykonta@' then begin
+    Result := GCurrencyCache.GetSymbol(Felement.idAccountCurrencyDef);
+  end else if ATemplate = '@isowalutyoperacji@' then begin
+    Result := '<iso waluty operacji>';
+    if CStaticMovementCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetIso(CStaticMovementCurrency.DataId);
+    end;
+  end else if ATemplate = '@symbolwalutyoperacji@' then begin
+    Result := '<symbol waluty operacji>';
+    if CStaticMovementCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetSymbol(CStaticMovementCurrency.DataId);
+    end;
+  end else if ATemplate = '@przelicznik@' then begin
+    Result := '<przelicznik kursu waluty>';
+    if CStaticRate.DataId <> CEmptyDataGid then begin
+      Result := CStaticRate.Caption;
     end;
   end;
 end;

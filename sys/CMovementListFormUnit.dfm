@@ -154,7 +154,7 @@ inherited CMovementListForm: TCMovementListForm
         Action = ActionTemplate
         Color = clBtnFace
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
         Width = 457
@@ -268,9 +268,9 @@ inherited CMovementListForm: TCMovementListForm
         end
         object MovementList: TCList
           Left = 1
-          Top = 1
+          Top = 22
           Width = 455
-          Height = 164
+          Height = 143
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -330,6 +330,50 @@ inherited CMovementListForm: TCMovementListForm
             end>
           WideDefaultText = ''
         end
+        object Panel: TPanel
+          Left = 1
+          Top = 1
+          Width = 455
+          Height = 21
+          Align = alTop
+          Alignment = taLeftJustify
+          TabOrder = 2
+          object Label8: TLabel
+            Left = 8
+            Top = 4
+            Width = 32
+            Height = 13
+            Caption = 'Kwoty:'
+          end
+          object CStaticViewCurrency: TCStatic
+            Left = 49
+            Top = 4
+            Width = 88
+            Height = 15
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelInner = bvNone
+            BevelKind = bkTile
+            BevelOuter = bvNone
+            Caption = '<waluta operacji>'
+            Color = clBtnFace
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentColor = False
+            ParentFont = False
+            TabOrder = 0
+            TabStop = True
+            Transparent = False
+            DataId = 'M'
+            TextOnEmpty = '<dowolny typ>'
+            OnGetDataId = CStaticViewCurrencyGetDataId
+            OnChanged = CStaticViewCurrencyChanged
+            HotTrack = True
+          end
+        end
       end
       object CStaticCurrency: TCStatic
         Left = 96
@@ -377,8 +421,8 @@ inherited CMovementListForm: TCMovementListForm
   end
   object ActionManager1: TActionManager
     Images = CImageLists.OperationsImageList24x24
-    Left = 248
-    Top = 232
+    Left = 256
+    Top = 184
     StyleName = 'XP Style'
     object Action1: TAction
       Caption = 'Dodaj operacj'#281
@@ -398,8 +442,8 @@ inherited CMovementListForm: TCMovementListForm
   end
   object ActionManager: TActionManager
     Images = CImageLists.TemplateImageList16x16
-    Left = 56
-    Top = 226
+    Left = 48
+    Top = 194
     StyleName = 'XP Style'
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'

@@ -128,6 +128,9 @@ const
   CCurrencyRateTypeSellDesc = 'kurs sprzeda¿y';
   CCurrencyRateTypeBuyDesc = 'kurs kupna';
 
+  CCurrencyViewMovements = 'M';
+  CCurrencyViewAccounts = 'A';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

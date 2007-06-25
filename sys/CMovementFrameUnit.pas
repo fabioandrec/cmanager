@@ -14,6 +14,7 @@ type
   TMovementTreeElement = class(TTreeObject)
   private
     FelementType: TMovementTreeElementType;
+    FcurrencyView: String;
     function GetDescription: String;
     function Getcash: Currency;
     function Getregdate: TDateTime;
@@ -26,6 +27,7 @@ type
     property regDate: TDateTime read Getregdate;
     property idCurrencyDef: TDataGid read GetidCurrencyDef;
     property movementType: TBaseEnumeration read GetmovementType;
+    property currencyView: String read FcurrencyView write FcurrencyView;
   end;
 
   TCMovementFrame = class(TCBaseFrame)
@@ -56,6 +58,8 @@ type
     Label5: TLabel;
     ActionAddList: TAction;
     CButton1: TCButton;
+    CStaticViewCurrency: TCStatic;
+    Label6: TLabel;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -80,6 +84,9 @@ type
     procedure ActionAddListExecute(Sender: TObject);
     procedure TodayListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+    procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String;
+      var AAccepted: Boolean);
+    procedure CStaticViewCurrencyChanged(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
@@ -248,6 +255,13 @@ begin
   CStaticPeriod.DataId := '1';
   FTreeHelper := TTreeObjectList.Create(True);
   UpdateCustomPeriod;
+  Label5.Left := Panel.Width - 8;
+  CDateTimePerEnd.Left := Label5.Left - CDateTimePerEnd.Width;
+  Label4.Left := CDateTimePerEnd.Left - 15;
+  CDateTimePerStart.Left := Label4.Left - CDateTimePerStart.Width;
+  Label3.Left := CDateTimePerStart.Left - 18;
+  Label6.Left := CStaticPeriod.Left + CStaticPeriod.Width;
+  CStaticViewCurrency.Left := Label6.Left + Label6.Width + 4;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
   Label3.Anchors := [akRight, akTop];
@@ -395,6 +409,7 @@ begin
   if IsValidFilteredObject(xDataobject) then begin
     xTreeElement := TMovementTreeElement.Create;
     xTreeElement.Dataobject := xDataobject;
+    xTreeElement.currencyView := CStaticViewCurrency.DataId;
     if AOption = WMOPT_BASEMOVEMENT then begin
       xTreeElement.elementType := mtObject;
       FTodayObjects.Add(xDataobject);
@@ -575,26 +590,38 @@ var xDs: TADOQuery;
     xDf, xDt: TDateTime;
     xMultiCurrency: Boolean;
     xOneCurrency: TDataGid;
+    xSumObj: TSumElement;
+    xIs, xEs, xCs: String;
 begin
   GetFilterDates(xDf, xDt);
+  if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
+    xIs := 'movementIncome';
+    xEs := 'movementExpense';
+    xCs := 'idMovementCurrencyDef';
+  end else begin
+    xIs := 'income';
+    xEs := 'expense';
+    xCs := 'idAccountCurrencyDef';
+  end;
   xSql := Format('select v.*, a.name from ' +
-                 ' (select idAccount, idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses from balances where ' +
+                 ' (select idAccount, %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses from balances where ' +
                  '   movementType <> ''%s'' and ' +
-                 '   regDate between %s and %s group by idAccount, idMovementCurrencyDef) as v ' +
+                 '   regDate between %s and %s group by idAccount, %s) as v ' +
                  '   left outer join account a on a.idAccount = v.idAccount',
-       [CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+       [xCs, xIs, xEs, CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), xCs]);
   xDs := GDataProvider.OpenSql(xSql);
-  xMultiCurrency := IsMultiCurrencyDataset(xDs, 'idMovementCurrencyDef', xOneCurrency);
+  xMultiCurrency := IsMultiCurrencyDataset(xDs, 'idCurrencyDef', xOneCurrency);
   SumList.BeginUpdate;
   SumList.Clear;
   FSumRoot.childs.Clear;
   if xMultiCurrency then begin
+    xSumObj := Nil;
     while not xDs.Eof do begin
-      xObj := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idMovementCurrencyDef').AsString, False);
+      xObj := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idCurrencyDef').AsString, False);
       if xObj = Nil then begin
         xObj := TSumElement.Create;
         xObj.id := '*';
-        xObj.idCurrencyDef := xDs.FieldByName('idMovementCurrencyDef').AsString;
+        xObj.idCurrencyDef := xDs.FieldByName('idCurrencyDef').AsString;
         xObj.cashIn := 0;
         xObj.cashOut := 0;
         xObj.name := 'Razem w ' + GCurrencyCache.GetSymbol(xObj.idCurrencyDef);
@@ -603,18 +630,18 @@ begin
       xDs.Next;
     end;
   end else begin
-    xObj := TSumElement.Create;
-    xObj.id := '*';
-    xObj.idCurrencyDef := xOneCurrency;
-    xObj.cashIn := 0;
-    xObj.cashOut := 0;
-    xObj.name := 'Razem wszystkie operacje';
-    FSumRoot.AddChild(xObj);
+    xSumObj := TSumElement.Create;
+    xSumObj.id := '*';
+    xSumObj.idCurrencyDef := xOneCurrency;
+    xSumObj.cashIn := 0;
+    xSumObj.cashOut := 0;
+    xSumObj.name := 'Razem wszystkie operacje';
+    FSumRoot.AddChild(xSumObj);
   end;
   xDs.First;
   while not xDs.Eof do begin
     if xMultiCurrency then begin
-      xPar := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idMovementCurrencyDef').AsString, False);
+      xPar := FSumRoot.childs.FindSumObjectByCur(xDs.FieldByName('idCurrencyDef').AsString, False);
     end else begin
       xPar := FSumRoot;
     end;
@@ -627,10 +654,16 @@ begin
       xObj.id := xDs.FieldByName('idAccount').AsString;
       xObj.name := xDs.FieldByName('name').AsString;
       xObj.cashIn := xObj.cashIn + xDs.FieldByName('incomes').AsCurrency;
-      xObj.idCurrencyDef := xDs.FieldByName('idMovementCurrencyDef').AsString;
+      xObj.idCurrencyDef := xDs.FieldByName('idCurrencyDef').AsString;
       xObj.cashOut := xObj.cashOut + xDs.FieldByName('expenses').AsCurrency;
       xPar.cashIn := xPar.cashIn + xObj.cashIn;
       xPar.cashOut := xPar.cashOut + xObj.cashOut;
+      if not xMultiCurrency then begin
+        with xSumObj do begin
+          cashIn := cashIn + xObj.cashIn;
+          cashOut := cashOut + xObj.cashOut;
+        end;
+      end;
     end;
     xDs.Next;
   end;
@@ -731,7 +764,7 @@ var xList: TStringList;
 begin
   xList := TStringList.Create;
   xList.Add('1=<tylko dziœ>');
-  xList.Add('2=<w tym tygodni>');
+  xList.Add('2=<w tym tygodniu>');
   xList.Add('3=<w tym miesi¹cu>');
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
@@ -859,12 +892,14 @@ begin
     xItem := TMovementTreeElement.Create;
     xItem.elementType := mtList;
     xItem.Dataobject := FTodayLists.Items[xCount];
+    xItem.currencyView := CStaticViewCurrency.DataId;
     FTreeHelper.Add(xItem);
   end;
   for xCount := 0 to FTodayObjects.Count - 1 do begin
     xItem := TMovementTreeElement.Create;
     xItem.elementType := mtObject;
     xItem.Dataobject := FTodayObjects.Items[xCount];
+    xItem.currencyView := CStaticViewCurrency.DataId;
     if TBaseMovement(xItem.Dataobject).idMovementList <> CEmptyDataGid then begin
       xParentList := FindParentMovementList(TBaseMovement(xItem.Dataobject).idMovementList);
     end else begin
@@ -891,7 +926,11 @@ end;
 function TMovementTreeElement.Getcash: Currency;
 begin
   if FelementType = mtObject then begin
-    Result := TBaseMovement(Dataobject).movementCash;
+    if FcurrencyView = CCurrencyViewMovements then begin
+      Result := TBaseMovement(Dataobject).movementCash;
+    end else begin
+      Result := TBaseMovement(Dataobject).cash;
+    end;
   end else begin
     Result := TmovementList(Dataobject).cash;
   end;
@@ -909,7 +948,11 @@ end;
 function TMovementTreeElement.GetidCurrencyDef: TDataGid;
 begin
   if FelementType = mtObject then begin
-    Result := TBaseMovement(Dataobject).idMovementCurrencyDef;
+    if FcurrencyView = CCurrencyViewMovements then begin
+      Result := TBaseMovement(Dataobject).idMovementCurrencyDef;
+    end else begin
+      Result := TBaseMovement(Dataobject).idAccountCurrencyDef;
+    end;
   end else begin
     Result := TMovementList(Dataobject).idAccountCurrencyDef;
   end;
@@ -980,6 +1023,17 @@ var xDate: TSumElement;
 begin
   xDate := TSumElement(SumList.GetNodeData(Node)^);
   ChildCount := xDate.childs.Count;
+end;
+
+procedure TCMovementFrame.CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := ShowCurrencyViewType(ADataGid, AText);
+end;
+
+procedure TCMovementFrame.CStaticViewCurrencyChanged(Sender: TObject);
+begin
+  ReloadToday;
+  ReloadSums;
 end;
 
 end.

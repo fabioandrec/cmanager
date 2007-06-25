@@ -286,10 +286,17 @@ inherited CMovementFrame: TCMovementFrame
       Height = 13
       Caption = ')'
     end
+    object Label6: TLabel
+      Left = 240
+      Top = 4
+      Width = 32
+      Height = 13
+      Caption = 'Kwoty:'
+    end
     object CStaticPeriod: TCStatic
       Left = 235
       Top = 4
-      Width = 134
+      Width = 90
       Height = 15
       Cursor = crHandPoint
       AutoSize = False
@@ -376,6 +383,34 @@ inherited CMovementFrame: TCMovementFrame
       TabStop = True
       Transparent = False
       OnChanged = CDateTimePerStartChanged
+      HotTrack = True
+    end
+    object CStaticViewCurrency: TCStatic
+      Left = 265
+      Top = 4
+      Width = 88
+      Height = 15
+      Cursor = crHandPoint
+      AutoSize = False
+      BevelInner = bvNone
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = '<waluta operacji>'
+      Color = clBtnFace
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentColor = False
+      ParentFont = False
+      TabOrder = 4
+      TabStop = True
+      Transparent = False
+      DataId = 'M'
+      TextOnEmpty = '<dowolny typ>'
+      OnGetDataId = CStaticViewCurrencyGetDataId
+      OnChanged = CStaticViewCurrencyChanged
       HotTrack = True
     end
   end
