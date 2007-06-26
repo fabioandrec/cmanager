@@ -105,7 +105,8 @@ uses
   CChartPropsFormUnit in 'CChartPropsFormUnit.pas' {CChartPropsForm},
   CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
   CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm},
-  CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm};
+  CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm},
+  CTempFilterFormUnit in 'CTempFilterFormUnit.pas' {CTempFilterForm};
 
 {$R *.res}
 
@@ -149,6 +150,7 @@ begin
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;
+        ShowTempFilter;
         Application.CreateForm(TCMainForm, CMainForm);
         GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
