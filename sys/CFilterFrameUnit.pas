@@ -4,7 +4,7 @@ interface
 
 uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
      ImgList, Controls, PngImageList, CComponents, VirtualTrees, StdCtrls,
-     ExtCtrls, CDatabase, CDataobjectFormUnit, CImageListsUnit;
+     ExtCtrls, CDatabase, CDataobjectFormUnit, CImageListsUnit, Dialogs;
 
 type
   TCFilterFrame = class(TCDataobjectFrame)
@@ -44,7 +44,7 @@ end;
 procedure TCFilterFrame.ReloadDataobjects;
 begin
   inherited ReloadDataobjects;
-  Dataobjects := TMovementFilter.GetList(TMovementFilter, MovementFilterProxy, 'select * from movementFilter')
+  Dataobjects := TMovementFilter.GetList(TMovementFilter, MovementFilterProxy, 'select * from movementFilter where isTemp = 0')
 end;
 
 end.

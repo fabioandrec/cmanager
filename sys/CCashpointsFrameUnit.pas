@@ -17,13 +17,15 @@ type
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
   end;
 
 implementation
 
 {$R *.dfm}
 
-uses CConsts, CDataObjects, CCashpointFormUnit;
+uses CConsts, CDataObjects, CCashpointFormUnit, CReports;
 
 function TCCashpointsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
@@ -38,6 +40,11 @@ end;
 function TCCashpointsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := CashPointProxy;
+end;
+
+function TCCashpointsFrame.GetHistoryText: String;
+begin
+  Result := 'Historia kontrahenta';
 end;
 
 function TCCashpointsFrame.GetStaticFilter: TStringList;
@@ -81,6 +88,18 @@ begin
     xCondition := ' where cashpointType not in (''' + CCashpointTypeIn + ''', ''' + CCashpointTypeOut + ''')';
   end;
   Dataobjects := TDataObject.GetList(TCashPoint, CashPointProxy, 'select * from cashPoint' + xCondition);
+end;
+
+procedure TCCashpointsFrame.ShowHistory(AGid: ShortString);
+var xReport: TCPHistoryReport;
+    xParams: TCReportParams;
+begin
+  xParams := TCWithGidParams.Create(AGid);
+  xParams.acp := CGroupByCashpoint;
+  xReport := TCPHistoryReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

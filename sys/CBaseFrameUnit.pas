@@ -22,12 +22,19 @@ type
     JakoplikRTF1: TMenuItem;
     JakoplikHTML1: TMenuItem;
     plikExcel1: TMenuItem;
+    N2: TMenuItem;
+    Zaznaczwszystkie1: TMenuItem;
+    Odznaczwszystkie1: TMenuItem;
+    Odwrzaznaczenie1: TMenuItem;
     procedure Ustawienialisty1Click(Sender: TObject);
     procedure Wywietljakoraport1Click(Sender: TObject);
     procedure JakoplikTXT1Click(Sender: TObject);
     procedure JakoplikRTF1Click(Sender: TObject);
     procedure JakoplikHTML1Click(Sender: TObject);
     procedure plikExcel1Click(Sender: TObject);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure Odznaczwszystkie1Click(Sender: TObject);
+    procedure Odwrzaznaczenie1Click(Sender: TObject);
   private
     FAdditionalData: TObject;
     FOutputData: Pointer;
@@ -186,6 +193,9 @@ begin
       xList.TreeOptions.MiscOptions := xList.TreeOptions.MiscOptions + [toCheckSupport];
       xList.CheckImageKind := ckDarkTick;
     end;
+    Odwrzaznaczenie1.Visible := AMultipleCheck <> Nil;
+    Odznaczwszystkie1.Visible := AMultipleCheck <> Nil;
+    Zaznaczwszystkie1.Visible := AMultipleCheck <> Nil;
   end;
   LoadColumns;
 end;
@@ -471,6 +481,49 @@ end;
 procedure TCBaseFrame.plikExcel1Click(Sender: TObject);
 begin
   ExportTree(3);
+end;
+
+procedure TCBaseFrame.Zaznaczwszystkie1Click(Sender: TObject);
+var xNode: PVirtualNode;
+begin
+  if List <> Nil then begin
+    xNode := List.GetFirst;
+    while (xNode <> Nil) do begin
+      List.CheckState[xNode] := csCheckedNormal;
+      xNode := List.GetNext(xNode);
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.Odznaczwszystkie1Click(Sender: TObject);
+var xNode: PVirtualNode;
+begin
+  if List <> Nil then begin
+    xNode := List.GetFirst;
+    while (xNode <> Nil) do begin
+      List.CheckState[xNode] := csUncheckedNormal;
+      xNode := List.GetNext(xNode);
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.Odwrzaznaczenie1Click(Sender: TObject);
+var xNode: PVirtualNode;
+    xState: TCheckState;
+begin
+  if List <> Nil then begin
+    xNode := List.GetFirst;
+    while (xNode <> Nil) do begin
+      xState := List.CheckState[xNode];
+      if xState = csUncheckedNormal then begin
+        xState := csCheckedNormal;
+      end else if xState = csCheckedNormal then begin
+        xState := csUncheckedNormal;
+      end;
+      List.CheckState[xNode] := xState;
+      xNode := List.GetNext(xNode);
+    end;
+  end;
 end;
 
 initialization

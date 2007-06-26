@@ -1,0 +1,1 @@
+alter table movementFilter add isTemp bit not null;

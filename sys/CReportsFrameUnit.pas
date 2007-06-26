@@ -181,6 +181,8 @@ begin
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Operacje zaplanowane' , TPlannedOperationsListReport, Nil, 'Pokazuje operacje zaplanowane na wybrany okres', CHtmlReportImage), True));
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Przep³yw gotówki' , TCashFlowListReport, Nil, 'Pokazuje przep³yw gotówki miêdzy kontami/kontrahentami w wybranym okresie', CHtmlReportImage), True));
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia konta' , TAccountHistoryReport, Nil, 'Pokazuje historiê wybranego konta w wybranym okresie', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia kontrahenta' , TCPHistoryReport, TCReportParams.CreateAco(CGroupByCashpoint), 'Pokazuje historiê wybranego kontrahenta w wybranym okresie', CHtmlReportImage), True));
+  xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia kategorii' , TCPHistoryReport, TCReportParams.CreateAco(CGroupByProduct), 'Pokazuje historiê wybranego kategorii w wybranym okresie', CHtmlReportImage), True));
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres stanu kont' , TAccountBalanceChartReport, Nil, 'Pokazuje wykres stanu kont w wybranym okresie', CLineReportImage), True));
   xBase.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Sumy przychodów i rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement + COutMovement), 'Pokazuje sumy przychodów\rozchodów w wybranym okresie', CBarReportImage), True));
   xBs := TCListDataElement.Create(List, TReportListElement.CreateGroup('Rozchody', '', CNoImage), True);

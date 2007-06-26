@@ -104,7 +104,8 @@ uses
   CChoosePeriodRatesHistoryFormUnit in 'CChoosePeriodRatesHistoryFormUnit.pas' {CChoosePeriodRatesHistoryForm},
   CChartPropsFormUnit in 'CChartPropsFormUnit.pas' {CChartPropsForm},
   CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
-  CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm};
+  CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm},
+  CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm};
 
 {$R *.res}
 
@@ -149,7 +150,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;

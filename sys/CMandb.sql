@@ -184,6 +184,7 @@ create table movementFilter (
   modified datetime,
   name varchar(40) not null,
   description varchar(200),
+  isActive bit not null,
   primary key (idMovementFilter)
 );
 

@@ -40,6 +40,7 @@ inherited CChoosePeriodFilterForm: TCChoosePeriodFilterForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<brak aktywnego filtru>'
+        OnGetDataId = CStaticFilterGetDataId
         HotTrack = True
       end
     end

@@ -46,6 +46,21 @@ object CBaseFrame: TCBaseFrame
         OnClick = plikExcel1Click
       end
     end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object Zaznaczwszystkie1: TMenuItem
+      Caption = 'Zaznacz wszystkie'
+      OnClick = Zaznaczwszystkie1Click
+    end
+    object Odznaczwszystkie1: TMenuItem
+      Caption = 'Odznacz wszystkie'
+      OnClick = Odznaczwszystkie1Click
+    end
+    object Odwrzaznaczenie1: TMenuItem
+      Caption = 'Odwr'#243#263' zaznaczenie'
+      OnClick = Odwrzaznaczenie1Click
+    end
   end
   object ExportSaveDialog: TSaveDialog
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]

@@ -23,11 +23,13 @@ type
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
   end;
 
 implementation
 
-uses CDataObjects, CProductFormUnit, CConsts, CConfigFormUnit;
+uses CDataObjects, CProductFormUnit, CConsts, CConfigFormUnit, CReports;
 
 {$R *.dfm}
 
@@ -117,6 +119,23 @@ begin
   if TProduct(ADataobject).idParentProduct <> CEmptyDataGid then begin
     Result := List.RootElement.FindDataElement(TProduct(ADataobject).idParentProduct, ADataobject.ClassName);
   end;
+end;
+
+function TCProductsFrame.GetHistoryText: String;
+begin
+  Result := 'Historia kategorii'
+end;
+
+procedure TCProductsFrame.ShowHistory(AGid: ShortString);
+var xReport: TCPHistoryReport;
+    xParams: TCReportParams;
+begin
+  xParams := TCWithGidParams.Create(AGid);
+  xParams.acp := CGroupByProduct;
+  xReport := TCPHistoryReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

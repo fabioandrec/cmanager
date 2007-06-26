@@ -401,12 +401,14 @@ type
     Fproducts: TStringList;
     Fcashpoints: TStringList;
     FisLoaded: Boolean;
+    FisTemp: Boolean;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure Setaccounts(const Value: TStringList);
     procedure Setcashpoints(const Value: TStringList);
     procedure Setproducts(const Value: TStringList);
     procedure FillFilterList(AList: TStringList; AQuery: TADOQuery);
+    procedure SetisTemp(const Value: Boolean);
   protected
     procedure DeleteSubfilters;
     procedure UpdateSubfilters;
@@ -430,6 +432,7 @@ type
     property accounts: TStringList read Faccounts write Setaccounts;
     property products: TStringList read Fproducts write Setproducts;
     property cashpoints: TStringList read Fcashpoints write Setcashpoints;
+    property isTemp: Boolean read FisTemp write SetisTemp;
   end;
 
   TProfile = class(TDataObject)
@@ -1459,6 +1462,7 @@ begin
   with ADataset do begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
+    FisTemp := FieldByName('isTemp').AsBoolean;
   end;
 end;
 
@@ -1582,6 +1586,14 @@ begin
   end;
 end;
 
+procedure TMovementFilter.SetisTemp(const Value: Boolean);
+begin
+  if FisTemp <> Value then begin
+    FisTemp := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TMovementFilter.Setname(const Value: TBaseName);
 begin
   if Value <> Fname then begin
@@ -1604,6 +1616,7 @@ begin
   with DataFieldList do begin
     AddField('name', Fname, True, 'movementFilter');
     AddField('description', Fdescription, True, 'movementFilter');
+    AddField('isTemp', IntToStr(Integer(FisTemp)), False, 'movementFilter');
   end;
 end;
 
