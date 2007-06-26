@@ -81,7 +81,7 @@ type
     procedure ReloadSums;
     procedure RecreateTreeHelper;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -144,10 +144,10 @@ begin
   DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0);
 end;
 
-procedure TCDoneFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCDoneFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 var xDf, xDe: TDateTime;
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   UpdateCustomPeriod;
   GetFilterDates(xDf, xDe);
   CDateTimePerStart.Value := xDf;
@@ -170,6 +170,10 @@ begin
     end;
   end;
   ReloadDone;
+  if not AWithButtons then begin
+    Bevel.Visible := False;
+    Panel1.Visible := False;
+  end;
   DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0)
 end;
 

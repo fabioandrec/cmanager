@@ -54,7 +54,7 @@ type
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     function GetInitialiFilter: String; override;
   end;
@@ -121,9 +121,9 @@ begin
   Result := 'Kursy walut';
 end;
 
-procedure TCCurrencyRateFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCCurrencyRateFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   UpdateCustomPeriod;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;

@@ -1,9 +1,9 @@
 inherited CMovementFrame: TCMovementFrame
   object Splitter1: TSplitter [0]
     Left = 0
-    Top = 85
+    Top = 86
     Width = 443
-    Height = 3
+    Height = 2
     Cursor = crVSplit
     Align = alBottom
   end
@@ -166,7 +166,7 @@ inherited CMovementFrame: TCMovementFrame
     Left = 0
     Top = 21
     Width = 443
-    Height = 64
+    Height = 65
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone

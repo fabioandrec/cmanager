@@ -28,7 +28,7 @@ type
     function GetSelectedId: ShortString; override;
     function GetSelectedText: String; override;
   public
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function GetList: TCList; override;
     class function GetTitle: String; override;
   end;
@@ -59,9 +59,9 @@ begin
   ChildCount := TDescTemplateList(TempList.GetNodeData(Node)^).Count;
 end;
 
-procedure TCDescTemplatesFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCDescTemplatesFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   TempList.RootNodeCount := TDescAdditionalData(AdditionalData).FTemplates.Count;
   TempListFocusChanged(TempList, TempList.FocusedNode, 0);
 end;

@@ -40,6 +40,7 @@ type
     FOutputData: Pointer;
     FMultipleChecks: TStringList;
     FOwner: TComponent;
+    FWithButtons: Boolean;
     function ExportTree(AType: Integer): String;
   protected
     procedure IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
@@ -56,7 +57,7 @@ type
     function GetList: TCList; virtual;
     procedure UpdateOutputData; virtual;
     function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; virtual;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); virtual;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); virtual;
     procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
     class function GetOperation: TConfigOperation; virtual;
@@ -178,13 +179,14 @@ begin
   Result := '';
 end;
 
-procedure TCBaseFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCBaseFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 var xList: TCList;
 begin
   FOwner := AOwner;
   FAdditionalData := AAdditionalData;
   FMultipleChecks := AMultipleCheck;
   FOutputData := AOutputData;
+  FWithButtons := AWithButtons;
   xList := GetList;
   if xList <> Nil then begin
     xList.PopupMenu := ListPopupMenu;

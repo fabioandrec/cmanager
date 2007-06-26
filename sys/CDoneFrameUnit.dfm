@@ -377,7 +377,7 @@ inherited CDoneFrame: TCDoneFrame
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
-    Left = 80
-    Top = 120
+    Left = 128
+    Top = 152
   end
 end

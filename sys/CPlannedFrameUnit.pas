@@ -45,7 +45,7 @@ type
     function GetList: TCList; override;
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     class function GetPrefname: String; override;
@@ -87,9 +87,13 @@ begin
   PlannedListFocusChanged(PlannedList, PlannedList.FocusedNode, 0);
 end;
 
-procedure TCPlannedFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCPlannedFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  if not AWithButtons then begin
+    PanelFrameButtons.Visible := False;
+    List.BevelEdges := [];
+  end;
   ReloadPlanned;
 end;
 

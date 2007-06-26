@@ -106,7 +106,7 @@ uses
   CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
   CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm},
   CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm},
-  CTempFilterFormUnit in 'CTempFilterFormUnit.pas' {CTempFilterForm};
+  CFilterDetailsFrameUnit in 'CFilterDetailsFrameUnit.pas' {CFilterDetailsFrame: TFrame};
 
 {$R *.res}
 
@@ -150,7 +150,6 @@ begin
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;
-        ShowTempFilter;
         Application.CreateForm(TCMainForm, CMainForm);
         GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;

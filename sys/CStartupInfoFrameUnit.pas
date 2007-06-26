@@ -34,7 +34,7 @@ type
   public
     procedure ReloadInfoTree;
     destructor Destroy; override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     class function GetTitle: String; override;
     class function GetOperation: TConfigOperation; override;
     class function GetPrefname: String; override;
@@ -432,9 +432,9 @@ begin
   FindFontAndBackground(xData, TargetCanvas.Font, xColor);
 end;
 
-procedure TCStartupInfoFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCStartupInfoFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   FPlannedObjects := Nil;
   FDoneObjects := Nil;
   FScheduledObjects := TObjectList.Create(True);

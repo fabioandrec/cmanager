@@ -63,7 +63,7 @@ type
     procedure RecreateTreeHelper; virtual;
     procedure ReloadDataobjects; virtual;
     procedure ClearDataobjects; virtual;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     destructor Destroy; override;
     function GetList: TCList; override;
     function GetSelectedId: TDataGid; override;
@@ -119,11 +119,11 @@ begin
   Result := List.SelectedText;
 end;
 
-procedure TCDataobjectFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCDataobjectFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 var xFilters: TStringList;
     xHistory: String;
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   Dataobjects := Nil;
   xHistory := GetHistoryText;
   if xHistory <> '' then begin
@@ -145,6 +145,14 @@ begin
     FilterPanel.Visible := False;
   end;
   xFilters.Free;
+  if not AWithButtons then begin
+    Bevel.Visible := False;
+    ButtonPanel.Visible := False;
+    ActionAdd.Visible := False;
+    ActionEdit.Visible := False;
+    ActionDelete.Visible := False;
+    ActionHistory.Visible := False;
+  end;
   RefreshData;
 end;
 

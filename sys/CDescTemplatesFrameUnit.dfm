@@ -5,7 +5,7 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
     Width = 443
     Height = 277
     Align = alClient
-    BevelEdges = [beBottom]
+    BevelEdges = []
     BevelInner = bvNone
     BevelOuter = bvRaised
     BevelKind = bkFlat
@@ -38,6 +38,8 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
     OnGetNodeDataSize = TempListGetNodeDataSize
     OnInitChildren = TempListInitChildren
     OnInitNode = TempListInitNode
+    OddColor = 12437200
+    AutoExpand = True
     Columns = <
       item
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
@@ -58,5 +60,6 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
         Width = 150
         WideText = 'Aktualna warto'#347#263
       end>
+    WideDefaultText = ''
   end
 end

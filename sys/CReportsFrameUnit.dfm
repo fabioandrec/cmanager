@@ -1,7 +1,7 @@
 inherited CReportsFrame: TCReportsFrame
   object Bevel: TBevel [0]
     Left = 0
-    Top = 233
+    Top = 234
     Width = 443
     Height = 3
     Align = alBottom
@@ -9,16 +9,16 @@ inherited CReportsFrame: TCReportsFrame
   end
   object PanelFrameButtons: TPanel [1]
     Left = 0
-    Top = 236
+    Top = 237
     Width = 443
-    Height = 41
+    Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
     object CButtonExecute: TCButton
       Left = 13
-      Top = 5
+      Top = 2
       Width = 137
       Height = 33
       Cursor = crHandPoint
@@ -33,7 +33,7 @@ inherited CReportsFrame: TCReportsFrame
     Left = 0
     Top = 0
     Width = 443
-    Height = 233
+    Height = 234
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone

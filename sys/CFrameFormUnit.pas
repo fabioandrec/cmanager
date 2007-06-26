@@ -16,7 +16,7 @@ type
     FOutData: Pointer;
     FIsChoice: Boolean;
   public
-    constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True);
+    constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True);
     class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True): Boolean;
     destructor Destroy; override;
   published
@@ -29,7 +29,7 @@ uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts;
 
 {$R *.dfm}
 
-constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True);
+constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True);
 begin
   inherited Create(AOwner);
   FAdditionalData := AAdditionalData;
@@ -38,7 +38,7 @@ begin
   FFrame := AFrameClass.Create(Self);
   FFrame.Visible := False;
   FFrame.DisableAlign;
-  FFrame.InitializeFrame(Self, AAdditionalData, AOutData, AMultipleCheck);
+  FFrame.InitializeFrame(Self, AAdditionalData, AOutData, AMultipleCheck, AWithButtons);
   if FFrame.GetList <> Nil then begin
     FFrame.GetList.TabStop := True;
   end;

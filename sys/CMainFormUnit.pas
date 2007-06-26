@@ -251,7 +251,7 @@ begin
     xFrame.Height := PanelFrames.Height;
     xFrame.DisableAlign;
     xFrame.Visible := False;
-    xFrame.InitializeFrame(Self, Nil, Nil, Nil);
+    xFrame.InitializeFrame(Self, Nil, Nil, Nil, True);
     xFrame.PrepareCheckStates;
     xFrame.Parent := PanelFrames;
     xFrame.EnableAlign;

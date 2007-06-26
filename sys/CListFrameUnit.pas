@@ -25,7 +25,7 @@ type
   public
     function GetList: TCList; override;
     procedure ReloadList(AItems: TStringList);
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
@@ -87,9 +87,9 @@ begin
   Result := 'Wybierz z listy';
 end;
 
-procedure TCListFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCListFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   FGids := TStringList.Create;
   FNames := TStringList.Create;
   ReloadList(TStringList(AAdditionalData));

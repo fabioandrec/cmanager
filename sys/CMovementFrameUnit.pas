@@ -109,7 +109,7 @@ type
     procedure ReloadToday;
     procedure ReloadSums;
     constructor Create(AOwner: TComponent); override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList); override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -249,9 +249,9 @@ begin
   TodayList.EndUpdate;
 end;
 
-procedure TCMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList);
+procedure TCMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck);
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   CStaticPeriod.DataId := '1';
   FTreeHelper := TTreeObjectList.Create(True);
   UpdateCustomPeriod;
@@ -269,6 +269,10 @@ begin
   Label4.Anchors := [akRight, akTop];
   CDateTimePerEnd.Anchors := [akRight, akTop];
   Label5.Anchors := [akRight, akTop];
+  if not AWithButtons then begin
+    Bevel.Visible := False;
+    Panel1.Visible := False;
+  end;
   ReloadToday;
   ReloadSums;
 end;
