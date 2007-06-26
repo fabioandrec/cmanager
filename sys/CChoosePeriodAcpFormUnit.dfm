@@ -1,4 +1,4 @@
-inherited CChoosePeriodAccountForm: TCChoosePeriodAccountForm
+inherited CChoosePeriodAcpForm: TCChoosePeriodAcpForm
   Left = 255
   Top = 153
   ClientHeight = 377
@@ -25,7 +25,7 @@ inherited CChoosePeriodAccountForm: TCChoosePeriodAccountForm
         Alignment = taRightJustify
         Caption = 'Nazwa'
       end
-      object CStaticAccount: TCStatic
+      object CStatic: TCStatic
         Left = 72
         Top = 33
         Width = 233
@@ -40,7 +40,7 @@ inherited CChoosePeriodAccountForm: TCChoosePeriodAccountForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto z listy>'
-        OnGetDataId = CStaticAccountGetDataId
+        OnGetDataId = CStaticGetDataId
         HotTrack = True
       end
     end

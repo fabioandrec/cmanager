@@ -65,6 +65,10 @@ const
   CGroupByWeek = 'W';
   CGroupByMonth = 'M';
 
+  CGroupByAccount = 'A';
+  CGroupByCashpoint = 'C';
+  CGroupByProduct = 'P';
+
   CLongDateFormat = 'ddd, yyyy-MM-dd';
   CBaseDateFormat = 'yyyy-MM-dd';
   CDayNameDateFormat = 'ddd';

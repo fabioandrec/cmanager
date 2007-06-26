@@ -1,4 +1,4 @@
-inherited CChoosePeriodAccountListGroupForm: TCChoosePeriodAccountListGroupForm
+inherited CChoosePeriodAcpListGroupForm: TCChoosePeriodAcpListGroupForm
   Left = 324
   Top = 122
   ClientHeight = 476

@@ -149,7 +149,7 @@ type
     property marks: Integer write Setmarks;
   end;
 
-  {+}{+}TAccountBalanceOnDayReport = class(TCHtmlReport)
+  TAccountBalanceOnDayReport = class(TCHtmlReport)
   private
     FDate: TDateTime;
     FIds: TStringList;
@@ -162,7 +162,7 @@ type
     constructor CreateReport(AParams: TCReportParams); override;
   end;
 
-  {+}{+}TDoneOperationsListReport = class(TCHtmlReport)
+  TDoneOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -175,14 +175,14 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TTodayOperationsListReport = class(TDoneOperationsListReport)
+  TTodayOperationsListReport = class(TDoneOperationsListReport)
   protected
     function PrepareReportConditions: Boolean; override;
   public
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TOperationsListReport = class(TCHtmlReport)
+  TOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -194,7 +194,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TOperationsBySomethingChart = class(TCChartReport)
+  TOperationsBySomethingChart = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -207,7 +207,7 @@ type
     procedure PrepareReportChart; override;
   end;
 
-  {+}{+}TOperationsBySomethingList = class(TCHtmlReport)
+  TOperationsBySomethingList = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -220,35 +220,35 @@ type
     function GetReportBody: String; override;
   end;
 
-  {+}{+}TOperationsByCategoryChart = class(TOperationsBySomethingChart)
+  TOperationsByCategoryChart = class(TOperationsBySomethingChart)
   protected
     function GetSql: String; override;
   public
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TOperationsByCashpointChart = class(TOperationsBySomethingChart)
+  TOperationsByCashpointChart = class(TOperationsBySomethingChart)
   protected
     function GetSql: String; override;
   public
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TOperationsByCategoryList = class(TOperationsBySomethingList)
+  TOperationsByCategoryList = class(TOperationsBySomethingList)
   protected
     function GetSql: String; override;
   public
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TOperationsByCashpointList = class(TOperationsBySomethingList)
+  TOperationsByCashpointList = class(TOperationsBySomethingList)
   protected
     function GetSql: String; override;
   public
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TPlannedOperationsListReport = class(TCHtmlReport)
+  TPlannedOperationsListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -260,7 +260,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TCashFlowListReport = class(TCHtmlReport)
+  TCashFlowListReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -272,7 +272,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TAccountHistoryReport = class(TCHtmlReport)
+  TAccountHistoryReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -284,7 +284,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}{+}TAccountBalanceChartReport = class(TCChartReport)
+  TAccountBalanceChartReport = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -298,7 +298,7 @@ type
     destructor Destroy; override;
   end;
 
-  {+}{+}TSumReportList = class(TCHtmlReport)
+  TSumReportList = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -316,7 +316,7 @@ type
     destructor Destroy; override;
   end;
 
-  {+}{+}TSumReportChart = class(TCChartReport)
+  TSumReportChart = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -334,7 +334,7 @@ type
     destructor Destroy; override;
   end;
 
-  {+}{+}TAveragesReport = class(TCHtmlReport)
+  TAveragesReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -347,11 +347,12 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}TPeriodSumsReport = class(TCHtmlReport)
+  TPeriodSumsReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
     FIdFilter: TDataGid;
+    FCurrencyView: Char;
   protected
     function PrepareReportConditions: Boolean; override;
     function GetReportBody: String; override;
@@ -359,13 +360,14 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}TFuturesReport = class(TCHtmlReport)
+  TFuturesReport = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
     FStartFuture: TDateTime;
     FEndFuture: TDateTime;
     FIdFilter: TDataGid;
+    FCurrencyView: Char;
   protected
     function PrepareReportConditions: Boolean; override;
     function GetReportBody: String; override;
@@ -373,7 +375,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}TVirtualStringReport = class(TCHtmlReport)
+  TVirtualStringReport = class(TCHtmlReport)
   private
     FWidth: Integer;
     function GetColumnPercentage(AColumn: TVirtualTreeColumn): Integer;
@@ -384,7 +386,7 @@ type
     constructor CreateReport(AParams: TCReportParams); override;
   end;
 
-  {+}TLoanReportParams = class(TCReportParams)
+  TLoanReportParams = class(TCReportParams)
   private
     Floan: TLoan;
   public
@@ -393,14 +395,14 @@ type
     property loan: TLoan read Floan write Floan;
   end;
 
-  {+}TLoanReport = class(TCHtmlReport)
+  TLoanReport = class(TCHtmlReport)
   protected
     function GetReportBody: String; override;
   public
     function GetReportTitle: String; override;
   end;
 
-  {+}TCurrencyRatesHistoryReport = class(TCChartReport)
+  TCurrencyRatesHistoryReport = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -418,7 +420,7 @@ type
     function GetReportTitle: String; override;
   end;
 
-  {+}TPluginHtmlReport = class(TCHtmlReport)
+  TPluginHtmlReport = class(TCHtmlReport)
   private
     FBody: OleVariant;
   protected
@@ -443,9 +445,9 @@ implementation
 
 uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts, CDataObjects,
-     DateUtils, CSchedules, CChoosePeriodAccountFormUnit, CHtmlReportFormUnit,
+     DateUtils, CSchedules, CChoosePeriodAcpFormUnit, CHtmlReportFormUnit,
      TeeProcs, TeCanvas, TeEngine,
-     CChoosePeriodAccountListFormUnit, CChoosePeriodAccountListGroupFormUnit,
+     CChoosePeriodAcpListFormUnit, CChoosePeriodAcpListGroupFormUnit,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts;
@@ -1121,7 +1123,7 @@ end;
 
 function TAccountHistoryReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodAccountByForm(FStartDate, FEndDate, FIdAccount, Nil);
+  Result := ChoosePeriodAcpByForm(CGroupByAccount, FStartDate, FEndDate, FIdAccount, Nil);
 end;
 
 function TCBaseReport.CanShowReport: Boolean;
@@ -1371,7 +1373,7 @@ end;
 function TAccountBalanceChartReport.PrepareReportConditions: Boolean;
 begin
   if Params = Nil then begin
-    Result := ChoosePeriodAccountListByForm(FStartDate, FEndDate, FIds, Nil);
+    Result := ChoosePeriodAcpListByForm(CGroupByAccount, FStartDate, FEndDate, FIds, Nil);
   end else begin
     Result := ChoosePeriodByForm(FStartDate, FEndDate, Nil);
     FIds.Add(TCWithGidParams(Params).id);
@@ -1861,7 +1863,7 @@ end;
 
 function TSumReportList.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodAccountListGroupByForm(FStartDate, FEndDate, FIds, FGroupBy, @FCurrencyView);
+  Result := ChoosePeriodAcpListGroupByForm(CGroupByAccount, FStartDate, FEndDate, FIds, FGroupBy, @FCurrencyView);
 end;
 
 constructor TSumReportChart.CreateReport(AParams: TCReportParams);
@@ -2087,7 +2089,7 @@ end;
 
 function TSumReportChart.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodAccountListGroupByForm(FStartDate, FEndDate, FIds, FGroupBy, @FCurrencyView);
+  Result := ChoosePeriodAcpListGroupByForm(CGroupByAccount, FStartDate, FEndDate, FIds, FGroupBy, @FCurrencyView);
 end;
 
 function TAveragesReport.GetReportBody: String;
@@ -2320,7 +2322,7 @@ function TPeriodSumsReport.GetReportBody: String;
         xOneCurrency := CEmptyDataGid;
         xTitle := '';
       end else begin
-        xOneCurrency := AQuery.FieldByName('idMovementCurrencyDef').AsString;
+        xOneCurrency := AQuery.FieldByName('idCurrencyDef').AsString;
         xTitle := IfThen(AIsMultiCurrency, '', '[' + GCurrencyCache.GetIso(xOneCurrency) + ']')
       end;
       Add('<hr><p><hr>');
@@ -2362,8 +2364,8 @@ function TPeriodSumsReport.GetReportBody: String;
           end;
         end;
         if AIsMultiCurrency then begin
-          if xIdCurDef <> AQuery.FieldByName('idMovementCurrencyDef').AsString then begin
-            xIdCurDef := AQuery.FieldByName('idMovementCurrencyDef').AsString;
+          if xIdCurDef <> AQuery.FieldByName('idCurrencyDef').AsString then begin
+            xIdCurDef := AQuery.FieldByName('idCurrencyDef').AsString;
             Add('<table class="base" colspan=4>');
             Add('<tr class="' + IsEvenToStr(ARecNo) + 'base">');
             Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xIdCurDef) + ']</td>');
@@ -2388,7 +2390,17 @@ var xBody: TStringList;
     xCurDefs: TDataGids;
     xCount: Integer;
     xIsMultiCurrency: Boolean;
+    xFieldI, xFieldO, xFieldC: String;
 begin
+  if FCurrencyView = CCurrencyViewMovements then begin
+    xFieldI := 'movementIncome';
+    xFieldO := 'movementExpense';
+    xFieldC := 'idMovementCurrencyDef';
+  end else begin
+    xFieldI := 'income';
+    xFieldO := 'expense';
+    xFieldC := 'idAccountCurrencyDef';
+  end;
   xBody := TStringList.Create;
   with xBody do begin
     Add('<table class="base" colspan=5>');
@@ -2401,17 +2413,17 @@ begin
     Add('</table><hr>');
     xRec := 1;
     xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'balances.idAccount', 'balances.idCashpoint', 'balances.idProduct');
-    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses from balances where movementType <> ''%s'' and regDate between %s and %s',
-                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    xSql := Format('select %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses from balances where movementType <> ''%s'' and regDate between %s and %s',
+                   [xFieldC, xFieldI, xFieldO, CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xQuery := GDataProvider.OpenSql(xSql + ' group by idMovementCurrencyDef');
-    xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idMovementCurrencyDef');
+    xQuery := GDataProvider.OpenSql(xSql + ' group by ' + xFieldC);
+    xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idCurrencyDef');
     xIsMultiCurrency := xCurDefs.Count > 1;
     Add('<table class="base" colspan=5>');
     for xCount := 0 to xCurDefs.Count - 1 do begin
-      xQuery.Filter := 'idMovementCurrencyDef = ' + DataGidToDatabase(xCurDefs.Strings[xCount]);
+      xQuery.Filter := 'idCurrencyDef = ' + DataGidToDatabase(xCurDefs.Strings[xCount]);
       xQuery.Filtered := True;
       Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
       Add('<td class="text" width="40%">[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCount]) + ']</td>');
@@ -2425,38 +2437,38 @@ begin
     xQuery.Free;
     xCurDefs.Free;
     //konta
-    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idAccount, account.name from balances ' +
+    xSql := Format('select %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses, balances.idAccount, account.name from balances ' +
                    ' left join account on account.idAccount = balances.idAccount ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
-                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+                   [xFieldC, xFieldI, xFieldO, CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by idMovementCurrencyDef, balances.idAccount, account.name order by account.name, idMovementCurrencyDef';
+    xSql := xSql + ' group by ' + xFieldC + ', balances.idAccount, account.name order by account.name, ' + xFieldC;
     xQuery := GDataProvider.OpenSql(xSql);
     AppendGroup(xIsMultiCurrency, xQuery, 'Sumy ogó³em dla konta', 'idAccount', xRec, xBody);
     xQuery.Free;
     //kontahenci
-    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idCashpoint, cashpoint.name from balances ' +
+    xSql := Format('select %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses, balances.idCashpoint, cashpoint.name from balances ' +
                    ' left join cashpoint on cashpoint.idCashpoint = balances.idCashpoint ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
-                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+                   [xFieldC, xFieldI, xFieldO, CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by idMovementCurrencyDef, balances.idCashpoint, cashpoint.name order by cashpoint.name, idMovementCurrencyDef';
+    xSql := xSql + ' group by ' + xFieldC + ', balances.idCashpoint, cashpoint.name order by cashpoint.name, ' + xFieldC;
     xQuery := GDataProvider.OpenSql(xSql);
     AppendGroup(xIsMultiCurrency, xQuery, 'Sumy ogó³em dla kontrahenta', 'idCashpoint', xRec, xBody);
     xQuery.Free;
     //kategorie
-    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, balances.idProduct, product.name from balances ' +
+    xSql := Format('select %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses, balances.idProduct, product.name from balances ' +
                    ' left join product on product.idProduct = balances.idProduct ' +
                    '    where movementType <> ''%s'' and regDate between %s and %s',
-                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+                   [xFieldC, xFieldI, xFieldO, CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by idMovementCurrencyDef, balances.idProduct, product.name order by product.name, idMovementCurrencyDef';
+    xSql := xSql + ' group by ' + xFieldC + ', balances.idProduct, product.name order by product.name, ' + xFieldC;
     xQuery := GDataProvider.OpenSql(xSql);
     AppendGroup(xIsMultiCurrency, xQuery, 'Sumy ogó³em dla kategorii', 'idProduct', xRec, xBody);
     xQuery.Free;
@@ -2472,7 +2484,7 @@ end;
 
 function TPeriodSumsReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, Nil, True);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @FCurrencyView, True);
 end;
 
 function TFuturesReport.GetReportBody: String;
@@ -2520,7 +2532,17 @@ var xBody: TStringList;
     xFilter: String;
     xBasePeriodsIn, xBasePeriodsOut: TObjectList;
     xFuturePeriodsIn, xFuturePeriodsOut: TObjectList;
+    xFieldI, xFieldO, xFieldC: String;
 begin
+  if FCurrencyView = CCurrencyViewMovements then begin
+    xFieldI := 'movementIncome';
+    xFieldO := 'movementExpense';
+    xFieldC := 'idMovementCurrencyDef';
+  end else begin
+    xFieldI := 'income';
+    xFieldO := 'expense';
+    xFieldC := 'idAccountCurrencyDef';
+  end;
   xBody := TStringList.Create;
   with xBody do begin
     Add('<table class="base" colspan=4>');
@@ -2532,21 +2554,21 @@ begin
     Add('</tr>');
     Add('</table><hr>');
     xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True);
-    xSql := Format('select idMovementCurrencyDef, sum(movementIncome) as incomes, sum(movementExpense) as expenses, regdate from balances where movementType <> ''%s'' and regDate between %s and %s',
-                   [CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+    xSql := Format('select %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses, regdate from balances where movementType <> ''%s'' and regDate between %s and %s',
+                   [xFieldC, xFieldI, xFieldO, CTransferMovement, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
     if xFilter <> '' then begin
       xSql := xSql + ' ' + xFilter;
     end;
-    xSql := xSql + ' group by regDate, idMovementCurrencyDef';
+    xSql := xSql + ' group by regDate, ' + xFieldC;
     xQuery := GDataProvider.OpenSql(xSql);
-    xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idMovementCurrencyDef');
+    xCurDefs := GetCurrencyDefsFromDataset(xQuery, 'idCurrencyDef');
     xBasePeriodsIn := TObjectList.Create(True);
     xBasePeriodsOut := TObjectList.Create(True);
     for xCount := 0 to xCurDefs.Count - 1 do begin
       xBasePeriodsIn.Add(TPeriodSums.Create(FStartDate, FEndDate, xCurDefs.Strings[xCount]));
       xBasePeriodsOut.Add(TPeriodSums.Create(FStartDate, FEndDate, xCurDefs.Strings[xCount]));
-      TPeriodSums(xBasePeriodsIn.Last).FromDataset(xQuery, 'incomes', 'regDate', 'idMovementCurrencyDef');
-      TPeriodSums(xBasePeriodsOut.Last).FromDataset(xQuery, 'expenses', 'regDate', 'idMovementCurrencyDef');
+      TPeriodSums(xBasePeriodsIn.Last).FromDataset(xQuery, 'incomes', 'regDate', 'idCurrencyDef');
+      TPeriodSums(xBasePeriodsOut.Last).FromDataset(xQuery, 'expenses', 'regDate', 'idCurrencyDef');
     end;
     Add('<table class="base">');
     Add('<tr class="subhead"><td class="subheadtext" width="100%">Razem</td></tr>');
@@ -2613,7 +2635,7 @@ end;
 
 function TFuturesReport.PrepareReportConditions: Boolean;
 begin
-  Result := ChooseFutureFilterByForm(FStartDate, FEndDate, FStartFuture, FEndFuture, FIdFilter, True)
+  Result := ChooseFutureFilterByForm(FStartDate, FEndDate, FStartFuture, FEndFuture, FIdFilter, @FCurrencyView, True)
 end;
 
 constructor TSumForDayItem.Create(ADate: TDateTime; ASum: Currency);

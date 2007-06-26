@@ -22,7 +22,7 @@ type
     procedure GetFilterFutures(var AStartDate, AEndDate: TDateTime);
   end;
 
-function ChooseFutureFilterByForm(var AStartDate, AEndDate, AStartFuture, AEndFuture: TDateTime; var AIdFilter: TDataGid; ACanBeEmpty: Boolean = False): Boolean;
+function ChooseFutureFilterByForm(var AStartDate, AEndDate, AStartFuture, AEndFuture: TDateTime; var AIdFilter: TDataGid; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 
 implementation
 
@@ -30,11 +30,20 @@ uses CConfigFormUnit, DateUtils;
 
 {$R *.dfm}
 
-function ChooseFutureFilterByForm(var AStartDate, AEndDate, AStartFuture, AEndFuture: TDateTime; var AIdFilter: TDataGid; ACanBeEmpty: Boolean = False): Boolean;
+function ChooseFutureFilterByForm(var AStartDate, AEndDate, AStartFuture, AEndFuture: TDateTime; var AIdFilter: TDataGid; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 var xForm: TCChooseFutureFilterForm;
+    xData: String;
 begin
   xForm := TCChooseFutureFilterForm.Create(Nil);
   xForm.CanBeEmpty := ACanBeEmpty;
+  if ACurrencyView = Nil then begin
+    xForm.GroupBoxView.Visible := False;
+    xForm.Height := xForm.Height - xForm.GroupBoxView.Height - 23;
+  end;
+  if (AStartDate = GWorkDate) and (AEndDate = GWorkDate) then begin
+    xForm.ComboBoxPredefined.ItemIndex := 1;
+    xForm.ComboBoxPredefinedChange(xForm.ComboBoxPredefined);
+  end;
   Result := xForm.ShowConfig(coEdit);
   if Result then begin
     AStartDate := xForm.CDateTime1.Value;
@@ -42,6 +51,10 @@ begin
     AStartFuture := xForm.CDateTime3.Value;
     AEndFuture := xForm.CDateTime4.Value;
     AIdFilter := xForm.CStaticFilter.DataId;
+    if ACurrencyView <> Nil then begin
+      xData := xForm.CStaticCurrencyView.DataId[1];
+      CopyMemory(ACurrencyView, @xData[1], 1);
+    end;
   end;
   xForm.Free;
 end;

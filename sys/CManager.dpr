@@ -48,11 +48,11 @@ uses
   CChoosePeriodFormUnit in 'CChoosePeriodFormUnit.pas' {CChoosePeriodForm},
   CConsts in 'CConsts.pas',
   CSchedules in 'CSchedules.pas',
-  CChoosePeriodAccountFormUnit in 'CChoosePeriodAccountFormUnit.pas' {CChoosePeriodAccountForm},
+  CChoosePeriodAcpFormUnit in 'CChoosePeriodAcpFormUnit.pas' {CChoosePeriodAcpForm},
   CHtmlReportFormUnit in 'CHtmlReportFormUnit.pas' {CHtmlReportForm},
   CChartReportFormUnit in 'CChartReportFormUnit.pas' {CChartReportForm},
-  CChoosePeriodAccountListFormUnit in 'CChoosePeriodAccountListFormUnit.pas' {CChoosePeriodAccountListForm},
-  CChoosePeriodAccountListGroupFormUnit in 'CChoosePeriodAccountListGroupFormUnit.pas' {CChoosePeriodAccountListGroupForm},
+  CChoosePeriodAcpListFormUnit in 'CChoosePeriodAcpListFormUnit.pas' {CChoosePeriodAcpListForm},
+  CChoosePeriodAcpListGroupFormUnit in 'CChoosePeriodAcpListGroupFormUnit.pas' {CChoosePeriodAcpListGroupForm},
   CFilterFrameUnit in 'CFilterFrameUnit.pas' {CFilterFrame: TFrame},
   CFilterFormUnit in 'CFilterFormUnit.pas' {CFilterForm},
   CChooseDateAccountListFormUnit in 'CChooseDateAccountListFormUnit.pas' {CChooseDateAccountListForm},
@@ -149,7 +149,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
