@@ -43,54 +43,11 @@ type
     property ActiveFrameIndex: Integer read FActiveFrameIndex write SetActiveFrameIndex;
   end;
 
-function DoTemporaryMovementFilter(var ADataGid: TDataGid): Boolean;
-
 implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CProductsFrameUnit, CCashpointsFrameUnit;
 
 {$R *.dfm}
-
-function DoTemporaryMovementFilter(var ADataGid: TDataGid): Boolean;
-var xId, xText: String;
-    xData: TFilterDetailData;
-    xOutput: TFilterDetailData;
-    xFilter: TMovementFilter;
-    xMustCreate: Boolean;
-begin
-  xData := TFilterDetailData.Create;
-  xOutput := TFilterDetailData.Create;
-  if ADataGid <> CEmptyDataGid then begin
-    GDataProvider.BeginTransaction;
-    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, ADataGid, False));
-    xFilter.LoadSubfilters;
-    xData.AccountIds.Assign(xFilter.accounts);
-    xData.ProductIds.Assign(xFilter.products);
-    xData.CashpointIds.Assign(xFilter.cashpoints);
-    GDataProvider.RollbackTransaction;
-    xMustCreate := False;
-  end else begin
-    xMustCreate := True;
-  end;
-  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True);
-  if Result then begin
-    GDataProvider.BeginTransaction;
-    if xMustCreate then begin
-      xFilter := TMovementFilter.CreateObject(MovementFilterProxy, False);
-      xFilter.name := '*' + FormatDateTime('yyyymmddhhnnss', Now);
-      xFilter.description := 'filtr tymczasowy';
-      xFilter.isTemp := True;
-      ADataGid := xFilter.id;
-    end else begin
-      xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, ADataGid, False));
-    end;
-    xFilter.accounts.Assign(xOutput.AccountIds);
-    xFilter.products.Assign(xOutput.ProductIds);
-    xFilter.cashpoints.Assign(xOutput.CashpointIds);
-    GDataProvider.CommitTransaction;
-  end;
-  xOutput.Free;
-end;
 
 procedure TCFilterDetailFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 var xCount: Integer;

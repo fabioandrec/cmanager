@@ -26,7 +26,8 @@ function ChoosePeriodFilterByForm(var AStartDate, AEndDate: TDateTime; var AIdFi
 implementation
 
 uses CFilterFrameUnit, CFrameFormUnit, CConfigFormUnit, CInfoFormUnit,
-  CConsts, CListFrameUnit;
+  CConsts, CListFrameUnit, CFilterDetailFrameUnit, CDataObjects,
+  CTempFilterFormUnit;
 
 {$R *.dfm}
 
