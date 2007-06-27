@@ -63,6 +63,7 @@ type
     ActionBug: TAction;
     ActionFutureRequest: TAction;
     ActionHistory: TAction;
+    Splitter: TSplitter;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -71,7 +72,6 @@ type
     procedure ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
     procedure ShortcutListClick(Sender: TObject);
-    procedure ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
     procedure ActionStatusbarExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -84,7 +84,6 @@ type
     procedure ActionRestoreExecute(Sender: TObject);
     procedure ActionCheckDatafileExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
-    procedure ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
     procedure ActionLoanCalcExecute(Sender: TObject);
     procedure ActionCheckUpdatesExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -95,6 +94,7 @@ type
     procedure ActionBugExecute(Sender: TObject);
     procedure ActionFutureRequestExecute(Sender: TObject);
     procedure ActionHistoryExecute(Sender: TObject);
+    procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -176,7 +176,7 @@ begin
   {$ENDIF}
   UpdateShortcutList;
   UpdateStatusbar;
-  ShortcutList.RootNodeCount := FShortcutList.Count + 1;
+  ShortcutList.RootNodeCount := FShortcutList.Count;
   PerformShortcutAction(ActionShortcutStart);
 end;
 
@@ -292,11 +292,7 @@ end;
 
 procedure TCMainForm.ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 begin
-  if Node.Index = 0 then begin
-    CellText := '';
-  end else begin
-    CellText := FShortcutList.Strings[Node.Index - 1];
-  end;
+  CellText := FShortcutList.Strings[Node.Index];
 end;
 
 procedure TCMainForm.ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
@@ -314,10 +310,8 @@ procedure TCMainForm.ShortcutListClick(Sender: TObject);
 var xAction: TAction;
 begin
   if (ShortcutList.FocusedNode <> Nil) then begin
-    if (ShortcutList.FocusedNode.Index <> 0) then begin
-      xAction := TAction(FShortcutList.Objects[ShortcutList.FocusedNode.Index - 1]);
-      xAction.Execute;
-    end;
+    xAction := TAction(FShortcutList.Objects[ShortcutList.FocusedNode.Index]);
+    xAction.Execute;
   end;
 end;
 
@@ -331,17 +325,6 @@ begin
       FShortcutList.AddObject(xAction.Caption, xAction);
       xAction.OnExecute := ActionShortcutExecute;
     end;
-  end;
-end;
-
-procedure TCMainForm.ShortcutListAfterItemPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
-var xIndex, xLeft, xTop: Integer;
-begin
-  if Node.Index <> 0 then begin
-    xIndex := TAction(FShortcutList.Objects[Node.Index - 1]).ImageIndex;
-    xLeft := ((ItemRect.Right - ItemRect.Left - CImageLists.MainImageList32x32.Width) div 2);
-    xTop := 0;
-    CImageLists.MainImageList32x32.Draw(TargetCanvas, xLeft, xTop, xIndex);
   end;
 end;
 
@@ -527,15 +510,6 @@ begin
   xPrefs.Free;
 end;
 
-procedure TCMainForm.ShortcutListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-begin
-  if Node.Index = 0 then begin
-    NodeHeight := 40;
-  end else begin
-    NodeHeight := 80;
-  end;
-end;
-
 procedure TCMainForm.UnhandledException(Sender: TObject; E: Exception);
 begin
   CMainForm.ActionCloseConnection.Execute;
@@ -672,6 +646,11 @@ end;
 procedure TCMainForm.ActionHistoryExecute(Sender: TObject);
 begin
   ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname('changelog')), Nil, SW_SHOWNORMAL);
+end;
+
+procedure TCMainForm.ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+begin
+  ImageIndex := TAction(FShortcutList.Objects[Node.Index]).ImageIndex;
 end;
 
 end.

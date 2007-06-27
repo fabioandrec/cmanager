@@ -42,10 +42,10 @@ type
     CButton4: TCButton;
     ActionGraph: TAction;
     PanelThumbs: TPanel;
-    ThumbsList: TVirtualStringTree;
     Splitter: TSplitter;
     PanelParent: TPanel;
     PanelNoData: TPanel;
+    ThumbsList: TVirtualStringTree;
     procedure ActionGraphExecute(Sender: TObject);
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);

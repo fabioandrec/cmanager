@@ -41,7 +41,7 @@ inherited CChartReportForm: TCChartReportForm
         Colors.HotColor = clNavy
         Colors.UnfocusedSelectionColor = clHighlight
         Colors.UnfocusedSelectionBorderColor = clHighlight
-        DefaultNodeHeight = 80
+        DefaultNodeHeight = 60
         Header.AutoSizeIndex = -1
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText

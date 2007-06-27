@@ -106,7 +106,7 @@ uses
   CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
   CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm},
   CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm},
-  CFilterDetailsFrameUnit in 'CFilterDetailsFrameUnit.pas' {CFilterDetailsFrame: TFrame};
+  CFilterDetailFrameUnit in 'CFilterDetailFrameUnit.pas' {CFilterDetailFrame: TFrame};
 
 {$R *.res}
 
@@ -138,6 +138,7 @@ begin
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;
       end;
+      CreateTemporaryMovementFilter;
       if xProceed then begin
         xFilename := GetParamValue('/savequery');
         if xFilename <> '' then begin
@@ -151,7 +152,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;

@@ -90,6 +90,12 @@ object CMainForm: TCMainForm
       Align = alTop
       Shape = bsSpacer
     end
+    object Splitter: TSplitter
+      Left = 154
+      Top = 24
+      Width = 2
+      Height = 500
+    end
     object PanelTitle: TPanel
       Left = 0
       Top = 0
@@ -169,9 +175,9 @@ object CMainForm: TCMainForm
       end
     end
     object PanelFrames: TPanel
-      Left = 170
+      Left = 156
       Top = 24
-      Width = 685
+      Width = 699
       Height = 500
       Align = alClient
       BevelOuter = bvLowered
@@ -181,7 +187,7 @@ object CMainForm: TCMainForm
     object PanelShortcuts: TPanel
       Left = 0
       Top = 24
-      Width = 170
+      Width = 154
       Height = 500
       Align = alLeft
       BevelOuter = bvLowered
@@ -190,7 +196,7 @@ object CMainForm: TCMainForm
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
-        Width = 168
+        Width = 152
         Height = 21
         Align = alTop
         Alignment = taLeftJustify
@@ -203,10 +209,10 @@ object CMainForm: TCMainForm
         ParentFont = False
         TabOrder = 0
         DesignSize = (
-          168
+          152
           21)
         object SpeedButtonCloseShortcuts: TSpeedButton
-          Left = 151
+          Left = 135
           Top = 5
           Width = 13
           Height = 13
@@ -225,7 +231,7 @@ object CMainForm: TCMainForm
       object ShortcutList: TVirtualStringTree
         Left = 1
         Top = 22
-        Width = 168
+        Width = 152
         Height = 477
         Align = alClient
         BevelEdges = []
@@ -235,7 +241,8 @@ object CMainForm: TCMainForm
         BorderStyle = bsNone
         ButtonStyle = bsTriangle
         Colors.HotColor = clNavy
-        DefaultNodeHeight = 80
+        Colors.UnfocusedSelectionColor = clHighlight
+        DefaultNodeHeight = 60
         Header.AutoSizeIndex = -1
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText
@@ -247,25 +254,25 @@ object CMainForm: TCMainForm
         Header.SortColumn = 0
         Header.Style = hsFlatButtons
         HintMode = hmHint
+        Images = CImageLists.MainImageList32x32
         Indent = 20
+        Margin = 15
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
         TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-        TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
+        TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect]
-        OnAfterItemPaint = ShortcutListAfterItemPaint
         OnClick = ShortcutListClick
         OnGetText = ShortcutListGetText
+        OnGetImageIndex = ShortcutListGetImageIndex
         OnHotChange = ShortcutListHotChange
-        OnMeasureItem = ShortcutListMeasureItem
         Columns = <
           item
-            Alignment = taCenter
             Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
-            Width = 168
+            Width = 152
           end>
       end
     end
@@ -331,37 +338,30 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShorcutOperations
-                Caption = '&Operacje wykonane'
                 ImageIndex = 1
               end
               item
                 Action = ActionShortcutPlannedDone
-                Caption = '&Czynno'#347'ci zaplanowane'
                 ImageIndex = 2
               end
               item
                 Action = ActionShortcutPlanned
-                Caption = '&Definicje plan'#243'w'
                 ImageIndex = 3
               end
               item
                 Action = ActionShortcutAccounts
-                Caption = '&Lista kont'
                 ImageIndex = 4
               end
               item
                 Action = ActionShortcutProducts
-                Caption = 'L&ista kategorii'
                 ImageIndex = 5
               end
               item
                 Action = ActionShortcutCashpoints
-                Caption = 'Lis&ta kontrahent'#243'w'
                 ImageIndex = 6
               end
               item
                 Action = ActionShortcutReports
-                Caption = 'St&atystyka, raporty'
                 ImageIndex = 7
               end
               item
@@ -386,7 +386,6 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutCurrencyRate
-                Caption = '&Kursy walut'
                 ImageIndex = 12
               end>
             Caption = '&Skr'#243'ty'
@@ -475,37 +474,37 @@ object CMainForm: TCMainForm
     end
     object ActionShorcutOperations: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Operacje wykonane'
+      Caption = 'Operacje'
       ImageIndex = 1
     end
     object ActionShortcutPlannedDone: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Czynno'#347'ci zaplanowane'
+      Caption = 'Plany'
       ImageIndex = 2
     end
     object ActionShortcutPlanned: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Definicje plan'#243'w'
+      Caption = 'Harmonogramy'
       ImageIndex = 3
     end
     object ActionShortcutAccounts: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Lista kont'
+      Caption = 'Konta'
       ImageIndex = 4
     end
     object ActionShortcutProducts: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Lista kategorii'
+      Caption = 'Kategorie'
       ImageIndex = 5
     end
     object ActionShortcutCashpoints: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Lista kontrahent'#243'w'
+      Caption = 'Kontrahenci'
       ImageIndex = 6
     end
     object ActionShortcutReports: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Statystyka, raporty'
+      Caption = 'Raporty'
       ImageIndex = 7
     end
     object ActionStatusbar: TAction
@@ -606,7 +605,7 @@ object CMainForm: TCMainForm
     end
     object ActionShortcutCurrencyRate: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Kursy walut'
+      Caption = 'Kursy'
       ImageIndex = 12
     end
     object ActionImportCurrencyRates: TAction
