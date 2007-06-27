@@ -43,7 +43,7 @@ type
     property ActiveFrameIndex: Integer read FActiveFrameIndex write SetActiveFrameIndex;
   end;
 
-function CreateTemporaryMovementFilter: TDataGid;
+function DoTemporaryMovementFilter(var ADataGid: TDataGid): Boolean;
 
 implementation
 
@@ -51,25 +51,42 @@ uses CFrameFormUnit, CAccountsFrameUnit, CProductsFrameUnit, CCashpointsFrameUni
 
 {$R *.dfm}
 
-function CreateTemporaryMovementFilter: TDataGid;
+function DoTemporaryMovementFilter(var ADataGid: TDataGid): Boolean;
 var xId, xText: String;
     xData: TFilterDetailData;
     xOutput: TFilterDetailData;
     xFilter: TMovementFilter;
+    xMustCreate: Boolean;
 begin
-  Result := CEmptyDataGid;
   xData := TFilterDetailData.Create;
   xOutput := TFilterDetailData.Create;
-  if TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True) then begin
+  if ADataGid <> CEmptyDataGid then begin
     GDataProvider.BeginTransaction;
-    xFilter := TMovementFilter.CreateObject(MovementFilterProxy, False);
-    xFilter.name := '*' + FormatDateTime('yyyymmddhhnnss', Now);
-    xFilter.description := 'filtr tymczasowy';
-    xFilter.isTemp := True;
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, ADataGid, False));
+    xFilter.LoadSubfilters;
+    xData.AccountIds.Assign(xFilter.accounts);
+    xData.ProductIds.Assign(xFilter.products);
+    xData.CashpointIds.Assign(xFilter.cashpoints);
+    GDataProvider.RollbackTransaction;
+    xMustCreate := False;
+  end else begin
+    xMustCreate := True;
+  end;
+  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True);
+  if Result then begin
+    GDataProvider.BeginTransaction;
+    if xMustCreate then begin
+      xFilter := TMovementFilter.CreateObject(MovementFilterProxy, False);
+      xFilter.name := '*' + FormatDateTime('yyyymmddhhnnss', Now);
+      xFilter.description := 'filtr tymczasowy';
+      xFilter.isTemp := True;
+      ADataGid := xFilter.id;
+    end else begin
+      xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, ADataGid, False));
+    end;
     xFilter.accounts.Assign(xOutput.AccountIds);
     xFilter.products.Assign(xOutput.ProductIds);
     xFilter.cashpoints.Assign(xOutput.CashpointIds);
-    Result := xFilter.id;
     GDataProvider.CommitTransaction;
   end;
   xOutput.Free;

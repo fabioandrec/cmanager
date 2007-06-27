@@ -138,7 +138,6 @@ begin
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;
       end;
-      CreateTemporaryMovementFilter;
       if xProceed then begin
         xFilename := GetParamValue('/savequery');
         if xFilename <> '' then begin
@@ -152,7 +151,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;
