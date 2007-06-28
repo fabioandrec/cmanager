@@ -20,7 +20,7 @@ inherited CAccountsFrame: TCAccountsFrame
       end
       item
         Position = 3
-        Width = 100
+        Width = 10
         WideText = 'Waluta'
       end>
     WideDefaultText = ''

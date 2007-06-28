@@ -9,6 +9,7 @@ uses
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
+  TCheckChanged = procedure (ASender: TObject) of object;
 
   TCBaseFrame = class(TFrame)
     ImageList: TPngImageList;
@@ -36,19 +37,24 @@ type
     procedure Odznaczwszystkie1Click(Sender: TObject);
     procedure Odwrzaznaczenie1Click(Sender: TObject);
   private
+    FOnCheckChanged: TCheckChanged;
     FAdditionalData: TObject;
     FOutputData: Pointer;
     FMultipleChecks: TStringList;
     FOwner: TComponent;
     FWithButtons: Boolean;
+    FPreparingChecks: Boolean;
     function ExportTree(AType: Integer): String;
   protected
+    procedure SetOnCheckChanged(const Value: TCheckChanged); virtual;
     procedure IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
     function GetSelectedId: TDataGid; virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
     function GetBaseForm: TCBaseForm;
     procedure Loaded; override;
+    procedure DoCheckChanged;
+    procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   public
     procedure HideFrame; virtual;
     procedure ShowFrame; virtual;
@@ -67,12 +73,13 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; virtual;
     function FindNodeId(ANode: PVirtualNode): TDataGid; virtual;
     property OutputData: Pointer read FOutputData;
+    property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
   published
     property SelectedId: TDataGid read GetSelectedId;
     property SelectedText: String read GetSelectedText;
     property List: TCList read GetList;
     property AdditionalData: TObject read FAdditionalData;
-    property MultipleChecks: TStringList read FMultipleChecks;
+    property MultipleChecks: TStringList read FMultipleChecks write FMultipleChecks;
     property FrameOwner: TComponent read FOwner;
   end;
 
@@ -139,6 +146,7 @@ end;
 constructor TCBaseFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FPreparingChecks := False;
   GFrames.Add(Self);
 end;
 
@@ -194,6 +202,7 @@ begin
     if (AMultipleCheck <> Nil) then begin
       xList.TreeOptions.MiscOptions := xList.TreeOptions.MiscOptions + [toCheckSupport];
       xList.CheckImageKind := ckDarkTick;
+      xList.OnChecked := ListChecked;
     end;
     Odwrzaznaczenie1.Visible := AMultipleCheck <> Nil;
     Odznaczwszystkie1.Visible := AMultipleCheck <> Nil;
@@ -214,6 +223,7 @@ var xNode: PVirtualNode;
     xId: TDataGid;
     xChecked: Boolean;
 begin
+  FPreparingChecks := True;
   xList := GetList;
   if (xList <> Nil) and (FMultipleChecks <> Nil) then begin
     xAll := FMultipleChecks.Count = 0;
@@ -233,6 +243,7 @@ begin
       xNode := xList.GetNext(xNode);
     end;
   end;
+  FPreparingChecks := False;
 end;
 
 procedure TCBaseFrame.UpdateOutputData;
@@ -526,6 +537,25 @@ begin
       xNode := List.GetNext(xNode);
     end;
   end;
+end;
+
+procedure TCBaseFrame.DoCheckChanged;
+begin
+  if Assigned(FOnCheckChanged) then begin
+    FOnCheckChanged(Self);
+  end;
+end;
+
+procedure TCBaseFrame.ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+begin
+  if not FPreparingChecks then begin
+    DoCheckChanged;
+  end;
+end;
+
+procedure TCBaseFrame.SetOnCheckChanged(const Value: TCheckChanged);
+begin
+  FOnCheckChanged := Value;
 end;
 
 initialization

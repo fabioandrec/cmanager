@@ -10,11 +10,13 @@ uses
 type
   TFilterDetailData = class(TObject)
   private
+    FPredefinedId: TDataGid;
     FAccountIds: TStringList;
     FProductIds: TStringList;
     FCashpointIds: TStringList;
   public
     constructor Create;
+    property PredefinedId: TDataGid read FPredefinedId write FPredefinedId;
     property AccountIds: TStringList read FAccountIds write FAccountIds;
     property ProductIds: TStringList read FProductIds write FProductIds;
     property CashpointIds: TStringList read FCashpointIds write FCashpointIds;
@@ -31,14 +33,18 @@ type
     procedure ThumbsListChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
   private
     FActiveFrameIndex: Integer;
-    FFrames: array[0..2] of TCBaseFrame;
-    FChecks: array[0..2] of TStringList;
     procedure SetActiveFrameIndex(const Value: Integer);
+  protected
+    procedure SetOnCheckChanged(const Value: TCheckChanged); override;
   public
+    ElementFrames: array[0..2] of TCBaseFrame;
+    ElementChecks: array[0..2] of TStringList;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     destructor Destroy; override;
     class function GetTitle: String; override;
     procedure UpdateOutputData; override;
+    procedure RecheckMarks;
+    procedure ShowFrame; override;
   published
     property ActiveFrameIndex: Integer read FActiveFrameIndex write SetActiveFrameIndex;
   end;
@@ -54,21 +60,18 @@ var xCount: Integer;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   for xCount := 0 to 2 do begin
-    FFrames[xCount] := Nil;
-    FChecks[xCount] := TStringList.Create;
+    ElementFrames[xCount] := Nil;
+    ElementChecks[xCount] := TStringList.Create;
   end;
   if AdditionalData <> Nil then begin
     with TFilterDetailData(AdditionalData) do begin
-      FChecks[0].Assign(FAccountIds);
-      FChecks[1].Assign(FProductIds);
-      FChecks[2].Assign(FCashpointIds);
+      ElementChecks[0].Assign(FAccountIds);
+      ElementChecks[1].Assign(FProductIds);
+      ElementChecks[2].Assign(FCashpointIds);
     end;
   end;
   FActiveFrameIndex := -1;
   ThumbsList.RootNodeCount := 3;
-  ThumbsList.FocusedNode := ThumbsList.GetFirst;
-  ThumbsList.Selected[ThumbsList.FocusedNode] := True;
-  ActiveFrameIndex := 0;
 end;
 
 procedure TCFilterDetailFrame.ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -97,29 +100,29 @@ procedure TCFilterDetailFrame.SetActiveFrameIndex(const Value: Integer);
 begin
   if FActiveFrameIndex <> Value then begin
     if FActiveFrameIndex <> -1 then begin
-      FFrames[FActiveFrameIndex].HideFrame;
+      ElementFrames[FActiveFrameIndex].HideFrame;
     end;
     FActiveFrameIndex := Value;
-    if FFrames[FActiveFrameIndex] = Nil then begin
+    if ElementFrames[FActiveFrameIndex] = Nil then begin
       if FActiveFrameIndex = 0 then begin
-        FFrames[FActiveFrameIndex] := TCAccountsFrame.Create(Self);
+        ElementFrames[FActiveFrameIndex] := TCAccountsFrame.Create(Self);
       end else if FActiveFrameIndex = 1 then begin
-        FFrames[FActiveFrameIndex] := TCProductsFrame.Create(Self);
+        ElementFrames[FActiveFrameIndex] := TCProductsFrame.Create(Self);
       end else begin
-        FFrames[FActiveFrameIndex] := TCCashpointsFrame.Create(Self);
+        ElementFrames[FActiveFrameIndex] := TCCashpointsFrame.Create(Self);
       end;
-      FFrames[FActiveFrameIndex].Visible := False;
-      FFrames[FActiveFrameIndex].DisableAlign;
-      FFrames[FActiveFrameIndex].InitializeFrame(Self, Nil, Nil, FChecks[FActiveFrameIndex], False);
-      if FFrames[FActiveFrameIndex].GetList <> Nil then begin
-        FFrames[FActiveFrameIndex].GetList.TabStop := True;
+      ElementFrames[FActiveFrameIndex].Visible := False;
+      ElementFrames[FActiveFrameIndex].DisableAlign;
+      ElementFrames[FActiveFrameIndex].InitializeFrame(Self, Nil, Nil, ElementChecks[FActiveFrameIndex], False);
+      if ElementFrames[FActiveFrameIndex].GetList <> Nil then begin
+        ElementFrames[FActiveFrameIndex].GetList.TabStop := True;
       end;
-      FFrames[FActiveFrameIndex].PrepareCheckStates;
-      FFrames[FActiveFrameIndex].Parent := PanelFrames;
-      FFrames[FActiveFrameIndex].EnableAlign;
-      FFrames[FActiveFrameIndex].Show;
+      ElementFrames[FActiveFrameIndex].PrepareCheckStates;
+      ElementFrames[FActiveFrameIndex].Parent := PanelFrames;
+      ElementFrames[FActiveFrameIndex].EnableAlign;
     end;
-    FFrames[FActiveFrameIndex].ShowFrame;
+    ElementFrames[FActiveFrameIndex].OnCheckChanged := OnCheckChanged;
+    ElementFrames[FActiveFrameIndex].ShowFrame;
   end;
 end;
 
@@ -127,10 +130,10 @@ destructor TCFilterDetailFrame.Destroy;
 var xCount: Integer;
 begin
   for xCount := 0 to 2 do begin
-    if FFrames[xCount] <> Nil then begin
-      FFrames[xCount].Free;
+    if ElementFrames[xCount] <> Nil then begin
+      ElementFrames[xCount].Free;
     end;
-    FChecks[xCount].Free;
+    ElementChecks[xCount].Free;
   end;
   inherited Destroy;
 end;
@@ -152,13 +155,13 @@ var xCount: Integer;
 begin
   with TFilterDetailData(OutputData) do begin
     for xCount := 0 to 2 do begin
-      if FFrames[xCount] <> Nil then begin
-        FFrames[xCount].UpdateOutputData;
+      if ElementFrames[xCount] <> Nil then begin
+        ElementFrames[xCount].UpdateOutputData;
       end;
     end;
-    FAccountIds.Assign(FChecks[0]);
-    FProductIds.Assign(FChecks[1]);
-    FCashpointIds.Assign(FChecks[2]);
+    FAccountIds.Assign(ElementChecks[0]);
+    FProductIds.Assign(ElementChecks[1]);
+    FCashpointIds.Assign(ElementChecks[2]);
   end;
 end;
 
@@ -168,6 +171,7 @@ begin
   FAccountIds := TStringList.Create;
   FCashpointIds := TStringList.Create;
   FProductIds := TStringList.Create;
+  FPredefinedId := CEmptyDataGid;
 end;
 
 destructor TFilterDetailData.Destroy;
@@ -176,6 +180,38 @@ begin
   FCashpointIds.Free;
   FProductIds.Free;
   inherited Destroy;
+end;
+
+procedure TCFilterDetailFrame.RecheckMarks;
+var xCount: Integer;
+begin
+  for xCount := 0 to 2 do begin
+    if ElementFrames[xCount] <> Nil then begin
+      ElementFrames[xCount].MultipleChecks.Text := ElementChecks[xCount].Text;
+      ElementFrames[xCount].PrepareCheckStates;
+    end;
+  end;
+end;
+
+procedure TCFilterDetailFrame.ShowFrame;
+begin
+  inherited ShowFrame;
+  if FActiveFrameIndex = -1 then begin
+    ActiveFrameIndex := 0;
+    ThumbsList.FocusedNode := ThumbsList.GetFirst;
+    ThumbsList.Selected[ThumbsList.FocusedNode] := True;
+  end;
+end;
+
+procedure TCFilterDetailFrame.SetOnCheckChanged(const Value: TCheckChanged);
+var xCount: Integer;
+begin
+  inherited SetOnCheckChanged(Value);
+  for xCount := 0 to 2 do begin
+    if ElementFrames[xCount] <> Nil then begin
+      ElementFrames[xCount].OnCheckChanged := Value;
+    end;
+  end;
 end;
 
 end.

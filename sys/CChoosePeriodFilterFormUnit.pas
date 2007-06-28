@@ -71,7 +71,8 @@ end;
 
 procedure TCChoosePeriodFilterForm.CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := TCFrameForm.ShowFrame(TCFilterFrame, ADataGid, AText);
+  //AAccepted := TCFrameForm.ShowFrame(TCFilterFrame, ADataGid, AText);
+  AAccepted := DoTemporaryMovementFilter(ADataGid, AText);
 end;
 
 end.
