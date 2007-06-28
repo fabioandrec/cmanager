@@ -19,7 +19,7 @@ type
     FIsChoice: Boolean;
   public
     constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True); virtual;
-    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil): Boolean;
+    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
     destructor Destroy; override;
   published
     property IsChoice: Boolean read FIsChoice;
@@ -61,10 +61,8 @@ begin
   inherited Destroy;
 end;
 
-class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil): Boolean;
+class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
 var xForm: TCFrameForm;
-    xNode: PVirtualNode;
-    xList: TCList;
     xFormClass: TCFrameFormClass;
 begin
   if AFormClass = Nil then begin
@@ -74,13 +72,11 @@ begin
   end;
   Result := False;
   xForm := xFormClass.CreateFrame(Nil, AFrameClass, AAdditionalData, AOutData, AMultipleCheck, AIsChoice);
-  xList := xForm.FFrame.List;
-  if (ADataId <> CEmptyDataGid) and (xList <> Nil) then begin
-    xNode := xForm.FFrame.FindNode(ADataId, xList);
-    if xNode <> Nil then begin
-      xList.FocusedNode := xNode;
-      xList.Selected[xNode] := True;
-    end;
+  if (ADataId <> CEmptyDataGid) then begin
+    xForm.FFrame.SelectedId := ADataId;
+  end;
+  if not ABordered then begin
+    xForm.PanelFrame.BevelOuter := bvNone;
   end;
   if ARect <> Nil then begin
     xForm.SetBounds(ARect^.Left, ARect^.Top, ARect^.Right, ARect^.Bottom);

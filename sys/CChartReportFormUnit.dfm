@@ -27,9 +27,9 @@ inherited CChartReportForm: TCChartReportForm
       TabOrder = 0
       object ThumbsList: TVirtualStringTree
         Left = 1
-        Top = 1
+        Top = 22
         Width = 129
-        Height = 419
+        Height = 398
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -73,6 +73,40 @@ inherited CChartReportForm: TCChartReportForm
             Position = 0
             Width = 129
           end>
+      end
+      object PanelShortcutsTitle: TPanel
+        Left = 1
+        Top = 1
+        Width = 129
+        Height = 21
+        Align = alTop
+        Alignment = taLeftJustify
+        Caption = '  Waluty'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        DesignSize = (
+          129
+          21)
+        object SpeedButtonCloseShortcuts: TSpeedButton
+          Left = 133
+          Top = 5
+          Width = 13
+          Height = 13
+          Anchors = [akTop, akRight]
+          Caption = 'r'
+          Flat = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -8
+          Font.Name = 'Marlett'
+          Font.Style = []
+          ParentFont = False
+        end
       end
     end
     object PanelParent: TPanel

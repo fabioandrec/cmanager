@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees,
-  ExtCtrls, CImageListsUnit, CDatabase, CDataObjects, CConsts;
+  ExtCtrls, CImageListsUnit, CDatabase, CDataObjects, CConsts, StdCtrls,
+  CComponents, Buttons;
 
 type
   TFilterDetailData = class(TObject)
@@ -28,14 +29,22 @@ type
     ThumbsList: TVirtualStringTree;
     Splitter: TSplitter;
     PanelFrames: TPanel;
+    PanelShortcutsTitle: TPanel;
+    SpeedButtonCloseShortcuts: TSpeedButton;
+    Panel1: TPanel;
+    CStaticFilter: TCStatic;
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ThumbsListChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure CStaticPredefinedGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticPredefinedChanged(Sender: TObject);
   private
     FActiveFrameIndex: Integer;
     procedure SetActiveFrameIndex(const Value: Integer);
   protected
     procedure SetOnCheckChanged(const Value: TCheckChanged); override;
+    function GetSelectedId: ShortString; override;
+    procedure SetSelectedId(const Value: ShortString); override;
   public
     ElementFrames: array[0..2] of TCBaseFrame;
     ElementChecks: array[0..2] of TStringList;
@@ -49,9 +58,12 @@ type
     property ActiveFrameIndex: Integer read FActiveFrameIndex write SetActiveFrameIndex;
   end;
 
+function DoTemporaryMovementFilter(var ADataGid: String; var AText: String): Boolean;
+
 implementation
 
-uses CFrameFormUnit, CAccountsFrameUnit, CProductsFrameUnit, CCashpointsFrameUnit;
+uses CFrameFormUnit, CAccountsFrameUnit, CProductsFrameUnit, CCashpointsFrameUnit,
+  CFilterFrameUnit;
 
 {$R *.dfm}
 
@@ -212,6 +224,106 @@ begin
       ElementFrames[xCount].OnCheckChanged := Value;
     end;
   end;
+end;
+
+function TCFilterDetailFrame.GetSelectedId: ShortString;
+begin
+  //Result := CStaticPredefined.DataId;
+end;
+
+procedure TCFilterDetailFrame.SetSelectedId(const Value: ShortString);
+begin
+  //CStaticPredefined.DataId := Value;
+  if Value <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    //CStaticPredefined.Caption := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, Value, False)).name;
+    GDataProvider.RollbackTransaction;
+  end;
+end;
+
+procedure TCFilterDetailFrame.CStaticPredefinedGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCFilterFrame, ADataGid, AText);
+end;
+
+procedure TCFilterDetailFrame.CStaticPredefinedChanged(Sender: TObject);
+var xFilter: TMovementFilter;
+begin
+  GDataProvider.BeginTransaction;
+  //xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, CStaticPredefined.DataId, False));
+  xFilter.LoadSubfilters;
+  ElementChecks[0].Assign(xFilter.accounts);
+  ElementChecks[1].Assign(xFilter.products);
+  ElementChecks[2].Assign(xFilter.cashpoints);
+  GDataProvider.RollbackTransaction;
+  RecheckMarks;
+end;
+
+function DoTemporaryMovementFilter(var ADataGid: String; var AText: String): Boolean;
+var xId, xText: String;
+    xData: TFilterDetailData;
+    xOutput: TFilterDetailData;
+{
+    xFilter: TMovementFilter;
+    xWasTemp: Boolean;
+    xPrevious: TDataGid;
+}
+begin
+  xData := TFilterDetailData.Create;
+  xOutput := TFilterDetailData.Create;
+  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True, TCFrameForm, False);
+  xOutput.Free;
+  {
+  xData := TFilterDetailData.Create;
+  xOutput := TFilterDetailData.Create;
+  xPrevious := ADataGid;
+  if ADataGid <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, ADataGid, False));
+    xFilter.LoadSubfilters;
+    xData.AccountIds.Assign(xFilter.accounts);
+    xData.ProductIds.Assign(xFilter.products);
+    xData.CashpointIds.Assign(xFilter.cashpoints);
+    xData.PredefinedId := ADataGid;
+    xWasTemp := xFilter.isTemp;
+    GDataProvider.RollbackTransaction;
+  end else begin
+    xWasTemp := True;
+  end;
+  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True, TCTempFilterForm);
+  if Result then begin
+    GDataProvider.BeginTransaction;
+    xFilter := Nil;
+    if not ((ADataGid = CEmptyDataGid) and (xOutput.PredefinedId = CEmptyDataGid)) then begin
+      if xWasTemp and (xOutput.PredefinedId <> CEmptyDataGid) and (xOutput.PredefinedId <> xPrevious) then begin
+        if xPrevious <> CEmptyDataGid then begin
+          xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xPrevious, False));
+          xFilter.DeleteObject;
+        end;
+        xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xOutput.PredefinedId, False));
+      end else begin
+        if xPrevious = xOutput.PredefinedId then begin
+          xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xPrevious, False));
+        end;
+      end;
+    end;
+    if xFilter = Nil then begin
+      xFilter := TMovementFilter.CreateObject(MovementFilterProxy, False);
+      xFilter.name := 'szczegó³y filtru';
+      xFilter.description := 'filtr tymczasowy';
+      xFilter.isTemp := True;
+    end;
+    if xFilter.isTemp then begin
+      xFilter.accounts := xOutput.AccountIds;
+      xFilter.products := xOutput.ProductIds;
+      xFilter.cashpoints := xOutput.CashpointIds;
+    end;
+    ADataGid := xFilter.id;
+    AText := xFilter.name;
+    GDataProvider.CommitTransaction;
+  end;
+  xOutput.Free;
+  }
 end;
 
 end.

@@ -49,6 +49,7 @@ type
     procedure SetOnCheckChanged(const Value: TCheckChanged); virtual;
     procedure IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
     function GetSelectedId: TDataGid; virtual;
+    procedure SetSelectedId(const Value: TDataGid); virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
     function GetBaseForm: TCBaseForm;
@@ -75,7 +76,7 @@ type
     property OutputData: Pointer read FOutputData;
     property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
   published
-    property SelectedId: TDataGid read GetSelectedId;
+    property SelectedId: TDataGid read GetSelectedId write SetSelectedId;
     property SelectedText: String read GetSelectedText;
     property List: TCList read GetList;
     property AdditionalData: TObject read FAdditionalData;
@@ -556,6 +557,18 @@ end;
 procedure TCBaseFrame.SetOnCheckChanged(const Value: TCheckChanged);
 begin
   FOnCheckChanged := Value;
+end;
+
+procedure TCBaseFrame.SetSelectedId(const Value: TDataGid);
+var xNode: PVirtualNode;
+begin
+  if (GetList <> Nil) then begin
+    xNode := FindNode(Value, GetList);
+    if xNode <> Nil then begin
+      GetList.FocusedNode := xNode;
+      GetList.Selected[xNode] := True;
+    end;
+  end;
 end;
 
 initialization
