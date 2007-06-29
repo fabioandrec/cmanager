@@ -241,6 +241,7 @@ begin
       end else begin
         xNode.CheckState := csUncheckedNormal;
       end;
+      xList.InvalidateNode(xNode);
       xNode := xList.GetNext(xNode);
     end;
   end;

@@ -106,6 +106,7 @@ type
   private
     FForm: TCReportForm;
     FParams: TCReportParams;
+    FIdFilter: TDataGid;
   protected
     function PrepareReportConditions: Boolean; virtual;
     function GetFormClass: TCReportFormClass; virtual; abstract;
@@ -119,6 +120,7 @@ type
     procedure ShowReport;
     destructor Destroy; override;
     property Params: TCReportParams read FParams;
+    property IdFilter: TDataGid read FIdFilter write FIdFilter;
   end;
 
   TCHtmlReport = class(TCBaseReport)
@@ -324,7 +326,6 @@ type
     FEndDate: TDateTime;
     FGroupBy: String;
     FCurrencyView: Char;
-    FIdFilter: TDataGid;
   private
     function GetDescription(ADate: TDateTime): String;
   protected
@@ -338,7 +339,6 @@ type
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
-    FIdFilter: TDataGid;
     FGroupBy: String;
     FCurrencyView: Char;
   private
@@ -354,7 +354,6 @@ type
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
-    FIdFilter: TDataGid;
     FCurrencyView: Char;
   protected
     function PrepareReportConditions: Boolean; override;
@@ -367,7 +366,6 @@ type
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
-    FIdFilter: TDataGid;
     FCurrencyView: Char;
   protected
     function PrepareReportConditions: Boolean; override;
@@ -382,7 +380,6 @@ type
     FEndDate: TDateTime;
     FStartFuture: TDateTime;
     FEndFuture: TDateTime;
-    FIdFilter: TDataGid;
     FCurrencyView: Char;
   protected
     function PrepareReportConditions: Boolean; override;
@@ -1167,6 +1164,7 @@ end;
 procedure TCBaseReport.ShowReport;
 begin
   Fform := GetFormClass.CreateForm(Self);
+  FIdFilter := CEmptyDataGid;
   if PrepareReportConditions then begin
     GDataProvider.BeginTransaction;
     PrepareReportData;
@@ -1175,6 +1173,9 @@ begin
       Fform.Caption := 'Raport';
       Fform.ShowConfig(coNone);
     end;
+  end;
+  if FIdFilter <> CEmptyDataGid then begin
+    TMovementFilter.DeleteIfTemporary(FIdFilter);
   end;
   Fform.Free;
 end;

@@ -426,6 +426,7 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    class procedure DeleteIfTemporary(AId: TDataGid);
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -1424,6 +1425,17 @@ begin
   Fproducts := TStringList.Create;
   Fcashpoints := TStringList.Create;
   FisLoaded := False;
+end;
+
+class procedure TMovementFilter.DeleteIfTemporary(AId: TDataGid);
+var xFilter: TMovementFilter;
+begin
+  GDataProvider.BeginTransaction;
+  xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, AId, False));
+  if xFilter.isTemp then begin
+    xFilter.DeleteObject;
+  end;
+  GDataProvider.CommitTransaction;
 end;
 
 procedure TMovementFilter.DeleteObject;

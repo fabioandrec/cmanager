@@ -11,13 +11,11 @@ uses
 type
   TFilterDetailData = class(TObject)
   private
-    FPredefinedId: TDataGid;
     FAccountIds: TStringList;
     FProductIds: TStringList;
     FCashpointIds: TStringList;
   public
     constructor Create;
-    property PredefinedId: TDataGid read FPredefinedId write FPredefinedId;
     property AccountIds: TStringList read FAccountIds write FAccountIds;
     property ProductIds: TStringList read FProductIds write FProductIds;
     property CashpointIds: TStringList read FCashpointIds write FCashpointIds;
@@ -45,6 +43,8 @@ type
     procedure SetOnCheckChanged(const Value: TCheckChanged); override;
     function GetSelectedId: ShortString; override;
     procedure SetSelectedId(const Value: ShortString); override;
+    function GetSelectedText: String; override;
+    procedure CheckChanged(Sender: TObject);
   public
     ElementFrames: array[0..2] of TCBaseFrame;
     ElementChecks: array[0..2] of TStringList;
@@ -71,6 +71,7 @@ procedure TCFilterDetailFrame.InitializeFrame(AOwner: TComponent; AAdditionalDat
 var xCount: Integer;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  OnCheckChanged := CheckChanged;
   for xCount := 0 to 2 do begin
     ElementFrames[xCount] := Nil;
     ElementChecks[xCount] := TStringList.Create;
@@ -183,7 +184,6 @@ begin
   FAccountIds := TStringList.Create;
   FCashpointIds := TStringList.Create;
   FProductIds := TStringList.Create;
-  FPredefinedId := CEmptyDataGid;
 end;
 
 destructor TFilterDetailData.Destroy;
@@ -202,6 +202,9 @@ begin
       ElementFrames[xCount].MultipleChecks.Text := ElementChecks[xCount].Text;
       ElementFrames[xCount].PrepareCheckStates;
     end;
+  end;
+  if FActiveFrameIndex <> -1 then begin
+    ElementFrames[FActiveFrameIndex].Invalidate;
   end;
 end;
 
@@ -228,15 +231,15 @@ end;
 
 function TCFilterDetailFrame.GetSelectedId: ShortString;
 begin
-  //Result := CStaticPredefined.DataId;
+  Result := CStaticFilter.DataId;
 end;
 
 procedure TCFilterDetailFrame.SetSelectedId(const Value: ShortString);
 begin
-  //CStaticPredefined.DataId := Value;
+  CStaticFilter.DataId := Value;
   if Value <> CEmptyDataGid then begin
     GDataProvider.BeginTransaction;
-    //CStaticPredefined.Caption := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, Value, False)).name;
+    CStaticFilter.Caption := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, Value, False)).name;
     GDataProvider.RollbackTransaction;
   end;
 end;
@@ -249,81 +252,92 @@ end;
 procedure TCFilterDetailFrame.CStaticPredefinedChanged(Sender: TObject);
 var xFilter: TMovementFilter;
 begin
-  GDataProvider.BeginTransaction;
-  //xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, CStaticPredefined.DataId, False));
-  xFilter.LoadSubfilters;
-  ElementChecks[0].Assign(xFilter.accounts);
-  ElementChecks[1].Assign(xFilter.products);
-  ElementChecks[2].Assign(xFilter.cashpoints);
-  GDataProvider.RollbackTransaction;
-  RecheckMarks;
+  if CStaticFilter.DataId <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, CStaticFilter.DataId, False));
+    xFilter.LoadSubfilters;
+    ElementChecks[0].Assign(xFilter.accounts);
+    ElementChecks[1].Assign(xFilter.products);
+    ElementChecks[2].Assign(xFilter.cashpoints);
+    GDataProvider.RollbackTransaction;
+    RecheckMarks;
+  end;
 end;
 
 function DoTemporaryMovementFilter(var ADataGid: String; var AText: String): Boolean;
 var xId, xText: String;
     xData: TFilterDetailData;
     xOutput: TFilterDetailData;
-{
+    xPreviousId: TDataGid;
     xFilter: TMovementFilter;
     xWasTemp: Boolean;
-    xPrevious: TDataGid;
-}
 begin
   xData := TFilterDetailData.Create;
   xOutput := TFilterDetailData.Create;
-  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True, TCFrameForm, False);
-  xOutput.Free;
-  {
-  xData := TFilterDetailData.Create;
-  xOutput := TFilterDetailData.Create;
-  xPrevious := ADataGid;
+  xWasTemp := False;
   if ADataGid <> CEmptyDataGid then begin
+    xPreviousId := ADataGid;
     GDataProvider.BeginTransaction;
-    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, ADataGid, False));
+    xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xPreviousId, False));
+    if not xFilter.isTemp then begin
+      xId := xFilter.id;
+      xText := xFilter.name;
+      xWasTemp := False;
+    end else begin
+      xId := CEmptyDataGid;
+      xText := '';
+      xWasTemp := True;
+    end;
     xFilter.LoadSubfilters;
-    xData.AccountIds.Assign(xFilter.accounts);
-    xData.ProductIds.Assign(xFilter.products);
-    xData.CashpointIds.Assign(xFilter.cashpoints);
-    xData.PredefinedId := ADataGid;
-    xWasTemp := xFilter.isTemp;
+    xData.AccountIds.Text := xFilter.accounts.Text;
+    xData.CashpointIds.Text := xFilter.cashpoints.Text;
+    xData.ProductIds.Text := xFilter.products.Text;
     GDataProvider.RollbackTransaction;
   end else begin
-    xWasTemp := True;
+    xPreviousId := CEmptyDataGid;
+    xId := CEmptyDataGid;
+    xText := '';
   end;
-  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True, TCTempFilterForm);
+  Result := TCFrameForm.ShowFrame(TCFilterDetailFrame, xId, xText, xData, Nil, xOutput, Nil, True, TCFrameForm, False);
   if Result then begin
-    GDataProvider.BeginTransaction;
-    xFilter := Nil;
-    if not ((ADataGid = CEmptyDataGid) and (xOutput.PredefinedId = CEmptyDataGid)) then begin
-      if xWasTemp and (xOutput.PredefinedId <> CEmptyDataGid) and (xOutput.PredefinedId <> xPrevious) then begin
-        if xPrevious <> CEmptyDataGid then begin
-          xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xPrevious, False));
-          xFilter.DeleteObject;
-        end;
-        xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xOutput.PredefinedId, False));
+    if xId = CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      if (xPreviousId <> CEmptyDataGid) and xWasTemp then begin
+        xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xPreviousId, False));
+        xFilter.accounts := TFilterDetailData(xOutput).AccountIds;
+        xFilter.cashpoints := TFilterDetailData(xOutput).CashpointIds;
+        xFilter.products := TFilterDetailData(xOutput).ProductIds;
       end else begin
-        if xPrevious = xOutput.PredefinedId then begin
-          xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, xPrevious, False));
-        end;
+        xFilter := TMovementFilter.CreateObject(MovementFilterProxy, False);
+        xFilter.name := 'poka¿ szczegó³y filtru';
+        xFilter.description := '';
+        xFilter.isTemp := True;
+        xFilter.accounts := TFilterDetailData(xOutput).AccountIds;
+        xFilter.cashpoints := TFilterDetailData(xOutput).CashpointIds;
+        xFilter.products := TFilterDetailData(xOutput).ProductIds;
       end;
+      ADataGid := xFilter.id;
+      AText := xFilter.name;
+      GDataProvider.CommitTransaction;
+    end else begin
+      if xPreviousId <> CEmptyDataGid then begin
+        TMovementFilter.DeleteIfTemporary(xPreviousId);
+      end;
+      ADataGid := xId;
+      AText := xText;
     end;
-    if xFilter = Nil then begin
-      xFilter := TMovementFilter.CreateObject(MovementFilterProxy, False);
-      xFilter.name := 'szczegó³y filtru';
-      xFilter.description := 'filtr tymczasowy';
-      xFilter.isTemp := True;
-    end;
-    if xFilter.isTemp then begin
-      xFilter.accounts := xOutput.AccountIds;
-      xFilter.products := xOutput.ProductIds;
-      xFilter.cashpoints := xOutput.CashpointIds;
-    end;
-    ADataGid := xFilter.id;
-    AText := xFilter.name;
-    GDataProvider.CommitTransaction;
   end;
   xOutput.Free;
-  }
+end;
+
+function TCFilterDetailFrame.GetSelectedText: String;
+begin
+  Result := CStaticFilter.Caption;
+end;
+
+procedure TCFilterDetailFrame.CheckChanged(Sender: TObject);
+begin
+  CStaticFilter.DataId := CEmptyDataGid;
 end;
 
 end.

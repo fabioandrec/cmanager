@@ -128,14 +128,15 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
       BevelKind = bkTile
-      Caption = '<wybierz filtr z listy>'
+      Caption = '<wybierz predefiniowany filtr z listy>'
       Color = clWindow
       ParentColor = False
       TabOrder = 0
       TabStop = True
       Transparent = False
-      TextOnEmpty = '<wybierz filtr z listy>'
+      TextOnEmpty = '<wybierz predefiniowany filtr z listy>'
       OnGetDataId = CStaticPredefinedGetDataId
+      OnChanged = CStaticPredefinedChanged
       HotTrack = True
     end
   end

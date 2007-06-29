@@ -33,13 +33,13 @@ inherited CChoosePeriodFilterForm: TCChoosePeriodFilterForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz filtr z listy>'
+        Caption = '<okre'#347'l warunki wyboru>'
         Color = clWindow
         ParentColor = False
         TabOrder = 0
         TabStop = True
         Transparent = False
-        TextOnEmpty = '<wybierz filtr z listy>'
+        TextOnEmpty = '<okre'#347'l warunki wyboru>'
         OnGetDataId = CStaticFilterGetDataId
         HotTrack = True
       end
