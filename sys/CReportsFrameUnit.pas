@@ -198,8 +198,9 @@ begin
   xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista rozchodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje operacje rozchodowe w rozbiciu na kontrahentów', CHtmlReportImage), True));
   xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('Sumy', '', CNoImage), True);
   xBs.Add(xTm);
-  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres sum rozchodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CBarReportImage), True));
-  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista sum rozchodów' , TSumReportList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CHtmlReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres sum rozchodów' , TSumBySomethingChart, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CBarReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista sum rozchodów' , TSumBySomethingList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CHtmlReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Sumy rozchodów dla kont' , TSumReportList, TCSelectedMovementTypeParams.CreateAcpType(CGroupByAccount, COutMovement), 'Pokazuje sumy rozchodów w wybranym okresie', CHtmlReportImage), True));
   xBs := TCListDataElement.Create(List, TReportListElement.CreateGroup('Przychody', '', CNoImage), True);
   ARootElement.Add(xBs);
   xBs.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista operacji przychodowych' , TOperationsListReport, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w wybranym okresie', CHtmlReportImage), True));
@@ -213,8 +214,9 @@ begin
   xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista przychodów' , TOperationsByCashpointList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CHtmlReportImage), True));
   xTm := TCListDataElement.Create(List, TReportListElement.CreateGroup('Sumy', '', CNoImage), True);
   xBs.Add(xTm);
-  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres sum przychodów' , TSumReportChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CBarReportImage), True));
-  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista sum przychodów' , TSumReportList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CHtmlReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Wykres sum przychodów' , TSumBySomethingChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CBarReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Lista sum przychodów' , TSumBySomethingList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy przychodów w wybranym okresie', CHtmlReportImage), True));
+  xTm.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Sumy przychodów dla kont' , TSumReportList, TCSelectedMovementTypeParams.CreateAcpType(CGroupByAccount, COutMovement), 'Pokazuje sumy przychodów w wybranym okresie', CHtmlReportImage), True));
   xStats := TCListDataElement.Create(List, TReportListElement.CreateGroup('Statystyki', '', CNoImage), True);
   ARootElement.Add(xStats);
   xStats.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CHtmlReportImage), True));

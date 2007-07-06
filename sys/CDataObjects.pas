@@ -593,13 +593,14 @@ const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
 procedure InitializeProxies;
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
-function GetCurrencyDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
+function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
+function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFieldName: String): TStringList;
 
 implementation
 
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
 
-function GetCurrencyDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
+function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 var xGid: String;
 begin
   ADataset.First;
@@ -615,6 +616,22 @@ begin
   end;
   ADataset.First;
 end;
+
+function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFieldName: String): TStringList;
+begin
+  ADataset.First;
+  Result := TStringList.Create;
+  if not ADataset.IsEmpty then begin
+    while (not ADataset.Eof) do begin
+      if Result.IndexOfName(ADataset.FieldByName(ACurDefFieldname).AsString) = -1 then begin
+        Result.Values[ADataset.FieldByName(ACurDefFieldname).AsString] := ADataset.FieldByName(ACurNameFieldName).AsString;
+      end;
+      ADataset.Next;
+    end;
+  end;
+  ADataset.First;
+end;
+
 
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
 begin

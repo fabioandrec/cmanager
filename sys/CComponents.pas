@@ -373,9 +373,7 @@ type
     property ImageList: TPngImageList read FImageList write SetPngImageList;
   end;
 
-
   TURLClickEvent = procedure(Sender :TObject; const URL: string) of object;
-
 
   TCRichedit = class(TRichEdit)
   private

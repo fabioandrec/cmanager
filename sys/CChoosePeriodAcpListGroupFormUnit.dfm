@@ -1,24 +1,31 @@
 inherited CChoosePeriodAcpListGroupForm: TCChoosePeriodAcpListGroupForm
-  Left = 324
-  Top = 122
-  ClientHeight = 476
-  ClientWidth = 369
+  Left = 247
+  Top = 31
+  ClientHeight = 569
+  ClientWidth = 363
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 369
-    Height = 435
+    Width = 363
+    Height = 528
+    inherited GroupBox1: TGroupBox
+      Width = 329
+    end
     inherited GroupBoxView: TGroupBox
-      Top = 344
-      TabOrder = 3
+      Top = 440
+      Width = 329
+      TabOrder = 4
+    end
+    inherited GroupBox2: TGroupBox
+      Width = 329
     end
     object GroupBox3: TGroupBox
       Left = 16
-      Top = 248
-      Width = 337
+      Top = 344
+      Width = 329
       Height = 81
       Caption = ' Grupowanie '
-      TabOrder = 2
+      TabOrder = 3
       object Label3: TLabel
         Left = 38
         Top = 36
@@ -46,15 +53,49 @@ inherited CChoosePeriodAcpListGroupForm: TCChoosePeriodAcpListGroupForm
           'miesi'#281'czne')
       end
     end
+    object GroupBox4: TGroupBox
+      Left = 16
+      Top = 248
+      Width = 329
+      Height = 81
+      Caption = ' Zakres danych '
+      TabOrder = 2
+      object Label4: TLabel
+        Left = 18
+        Top = 37
+        Width = 46
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Filtruj w/g'
+      end
+      object CStaticFilter: TCStatic
+        Left = 72
+        Top = 33
+        Width = 233
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<okre'#347'l warunki wyboru>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 0
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<okre'#347'l warunki wyboru>'
+        OnGetDataId = CStaticFilterGetDataId
+        HotTrack = True
+      end
+    end
   end
   inherited PanelButtons: TPanel
-    Top = 435
-    Width = 369
+    Top = 528
+    Width = 363
     inherited BitBtnOk: TBitBtn
-      Left = 192
+      Left = 186
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 280
+      Left = 274
     end
   end
 end

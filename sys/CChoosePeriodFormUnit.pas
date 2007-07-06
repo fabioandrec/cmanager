@@ -113,6 +113,7 @@ end;
 procedure TCChoosePeriodForm.FormCreate(Sender: TObject);
 begin
   inherited;
+  Caption := 'Parametry raportu';
   ComboBoxPredefinedChange(ComboBoxPredefined);
 end;
 

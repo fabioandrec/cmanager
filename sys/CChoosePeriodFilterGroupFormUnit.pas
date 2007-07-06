@@ -12,13 +12,15 @@ type
     GroupBox3: TGroupBox;
     Label3: TLabel;
     ComboBoxSums: TComboBox;
+    Label4: TLabel;
+    ComboBoxAcp: TComboBox;
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-function ChoosePeriodFilterGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; var AGroupBy: String; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
+function ChoosePeriodFilterGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; var AGroupBy: String; var AAcp: String; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 
 implementation
 
@@ -26,7 +28,7 @@ uses CConsts;
 
 {$R *.dfm}
 
-function ChoosePeriodFilterGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; var AGroupBy: String; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
+function ChoosePeriodFilterGroupByForm(var AStartDate, AEndDate: TDateTime; var AIdFilter: TDataGid; var AGroupBy: String; var AAcp: String; ACurrencyView: PChar; ACanBeEmpty: Boolean = False): Boolean;
 var xForm: TCChoosePeriodFilterGroupForm;
     xData: String;
 begin
@@ -55,6 +57,15 @@ begin
     if ACurrencyView <> Nil then begin
       xData := xForm.CStaticCurrencyView.DataId[1];
       CopyMemory(ACurrencyView, @xData[1], 1);
+    end;
+    if xForm.ComboBoxAcp.ItemIndex = 1 then begin
+      AAcp := CGroupByAccount;
+    end else if xForm.ComboBoxAcp.ItemIndex = 2 then begin
+      AAcp := CGroupByCashpoint;
+    end else if xForm.ComboBoxAcp.ItemIndex = 3 then begin
+      AAcp := CGroupByProduct;
+    end else begin
+      AAcp := CGroupByNone;
     end;
   end;
   xForm.Free;

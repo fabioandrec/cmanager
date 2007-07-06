@@ -68,6 +68,7 @@ const
   CGroupByAccount = 'A';
   CGroupByCashpoint = 'C';
   CGroupByProduct = 'P';
+  CGroupByNone = 'N';
 
   CLongDateFormat = 'ddd, yyyy-MM-dd';
   CBaseDateFormat = 'yyyy-MM-dd';

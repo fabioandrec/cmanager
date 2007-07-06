@@ -19,7 +19,7 @@ type
     property Acp: String read FAcp write SetAcp;
   end;
 
-function ChoosePeriodAcpListByForm(AAcp: String; var AStartDate, AEndDate: TDateTime; var AIdAccounts: TStringList; ACurrencyView: PChar): Boolean;
+function ChoosePeriodAcpListByForm(AAcp: String; var AStartDate, AEndDate: TDateTime; var AIdAcps: TStringList; ACurrencyView: PChar): Boolean;
 
 implementation
 
@@ -29,7 +29,7 @@ uses CFrameFormUnit, CAccountsFrameUnit, CConfigFormUnit,
 
 {$R *.dfm}
 
-function ChoosePeriodAcpListByForm(AAcp: String; var AStartDate, AEndDate: TDateTime; var AIdAccounts: TStringList; ACurrencyView: PChar): Boolean;
+function ChoosePeriodAcpListByForm(AAcp: String; var AStartDate, AEndDate: TDateTime; var AIdAcps: TStringList; ACurrencyView: PChar): Boolean;
 var xForm: TCChoosePeriodAcpListForm;
     xList: TList;
     xData: String;
@@ -52,7 +52,7 @@ begin
   if Result then begin
     AStartDate := xForm.CDateTime1.Value;
     AEndDate := xForm.CDateTime2.Value;
-    AIdAccounts.Text := xForm.CStatic.DataId;
+    AIdAcps.Text := xForm.CStatic.DataId;
     if ACurrencyView <> Nil then begin
       xData := xForm.CStaticCurrencyView.DataId[1];
       CopyMemory(ACurrencyView, @xData[1], 1);
