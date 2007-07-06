@@ -645,7 +645,11 @@ end;
 
 procedure TCMainForm.ActionHistoryExecute(Sender: TObject);
 begin
-  ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname('changelog')), Nil, SW_SHOWNORMAL);
+  if FileExists(GetSystemPathname('changelog')) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname('changelog')), Nil, SW_SHOWNORMAL);
+  end else begin
+    ShowInfo(itError, 'Nie odnaleziono pliku changelog. Sprawdz poprawnoœæ instalacji CManager-a.', '');
+  end;
 end;
 
 procedure TCMainForm.ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
