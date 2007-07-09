@@ -466,5 +466,4 @@ begin
   Result := not Odd(AInt);
 end;
 
-
 end.
