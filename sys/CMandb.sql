@@ -71,6 +71,34 @@ create table product (
   constraint ck_productType check (productType in ('I', 'O'))
 );
 
+create table accountExtraction (
+  idAccountExtraction uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  idAccount uniqueidentifier not null,
+  state varchar(1) not null,
+  startDate datetime not null,
+  endDate datetime not null,
+  description varchar(200),
+  primary key (idAccountExtraction),
+  constraint ck_accountExtractionState check (state in ('O', 'C', 'S')),
+  constraint fk_accountExtractionaccount foreign key (idAccount) references account (idAccount)
+);
+
+create table extractionItem (
+  idExtractionItem uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  description varchar(200),
+  regDate datetime not null,
+  movementType varchar(1) not null,
+  idCurrencyDef uniqueidentifier not null,
+  cash money not null,
+  primary key (idExtractionItem),
+  constraint ck_extractionItemmovementType check (movementType in ('I', 'O')),
+  constraint fk_extractionItemCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
+);
+
 create table plannedMovement (
   idPlannedMovement uniqueidentifier not null,
   created datetime not null,
@@ -166,6 +194,7 @@ create table baseMovement (
   currencyRate money null,
   rateDescription varchar(200),
   movementCash money not null,
+  idExtractionItem uniqueidentifier null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -175,7 +204,8 @@ create table baseMovement (
   constraint fk_movementList foreign key (idMovementList) references movementList (idMovementList),
   constraint fk_movementAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_movementMovementCurrencyDef foreign key (idMovementCurrencyDef) references currencyDef (idCurrencyDef),
-  constraint fk_movementCurrencyRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate)
+  constraint fk_movementCurrencyRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),
+  constraint fk_movementExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem)
 );
 
 create table movementFilter (
@@ -240,13 +270,13 @@ create table movementLimit (
   boundaryAmount money not null,
   boundaryType varchar(1) not null,
   boundarycondition varchar(2) not null,
-  boundaryDays int,  
+  boundaryDays int,
   sumType varchar(1) not null,
   idCurrencyDef uniqueidentifier not null,
   primary key (idMovementLimit),
-  constraint ck_boundaryTypelimit check (boundaryType in ('T', 'W', 'M', 'Q', 'H', 'Y', 'D')),  
-  constraint ck_boundaryConditionlimit check (boundarycondition in ('=', '<', '>', '<=', '>=')),  
-  constraint ck_sumTypelimit check (sumType in ('I', 'O', 'B')),  
+  constraint ck_boundaryTypelimit check (boundaryType in ('T', 'W', 'M', 'Q', 'H', 'Y', 'D')),
+  constraint ck_boundaryConditionlimit check (boundarycondition in ('=', '<', '>', '<=', '>=')),
+  constraint ck_sumTypelimit check (sumType in ('I', 'O', 'B')),
   constraint fk_filterlimit foreign key (idmovementFilter) references movementFilter (idmovementFilter),
   constraint fk_limitCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );
@@ -302,7 +332,7 @@ create view balances as select * from (
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense, 0 as movementIncome, movementCash as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'T'
  union all
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense, movementCash as movementIncome, 0 as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'T') as v;
- 
+
 create view filters as
   select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m
     left outer join accountFilter a on a.idMovementFilter = m.idMovementFilter)

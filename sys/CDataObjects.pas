@@ -161,6 +161,52 @@ type
     property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
   end;
 
+  TAccountExtraction = class(TDataObject)
+  private
+    FidAccount: TDataGid;
+    FextractionState: TBaseEnumeration;
+    FstartDate: TDateTime;
+    FendDate: TDateTime;
+    Fdescription: TBaseDescription;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetendDate(const Value: TDateTime);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetstartDate(const Value: TDateTime);
+    procedure SetExtractionState(const Value: TBaseEnumeration);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property extractionState: TBaseEnumeration read FextractionState write SetExtractionState;
+    property startDate: TDateTime read FstartDate write SetstartDate;
+    property endDate: TDateTime read FendDate write SetendDate;
+    property description: TBaseDescription read Fdescription write Setdescription;
+  end;
+
+  TExtractionItem = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    FregDate: TDateTime;
+    FmovementType: TBaseEnumeration;
+    FidCurrencyDef: TDataGid;
+    Fcash: Currency;
+    procedure Setcash(const Value: Currency);
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidCurrencyDef(const Value: TDataGid);
+    procedure SetmovementType(const Value: TBaseEnumeration);
+    procedure SetregDate(const Value: TDateTime);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property regDate: TDateTime read FregDate write SetregDate;
+    property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
+    property cash: Currency read Fcash write Setcash;
+  end;
+
   TProduct = class(TDataObject)
   private
     Fname: TBaseName;
@@ -254,6 +300,7 @@ type
     FrateDescription: TBaseDescription;
     FmovementCash: Currency;
     FprevmovementCash: Currency;
+    FidExtractionItem: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -271,6 +318,7 @@ type
     procedure SetidMovementCurrencyDef(const Value: TDataGid);
     procedure SetmovementCash(const Value: Currency);
     procedure SetrateDescription(const Value: TBaseDescription);
+    procedure SetidExtractionItem(const Value: TDataGid);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -300,6 +348,7 @@ type
     property currencyRate: Currency read FcurrencyRate write SetcurrencyRate;
     property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
     property movementCash: Currency read FmovementCash write SetmovementCash;
+    property idExtractionItem: TDataGid read FidExtractionItem write SetidExtractionItem; 
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -576,12 +625,16 @@ var CashPointProxy: TDataProxy;
     CurrencyDefProxy: TDataProxy;
     CurrencyRateProxy: TDataProxy;
     AccountCurrencyRule: TDataProxy;
+    AccountExtraction: TDataProxy;
+    ExtractionItem: TDataProxy;
+
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
 
-const CDatafileTables: array[0..17] of string =
-            ('cashPoint', 'account', 'product', 'plannedMovement', 'plannedDone',
+const CDatafileTables: array[0..19] of string =
+            ('cashPoint', 'account', 'accountExtraction', 'extractionItem',
+             'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
@@ -666,6 +719,8 @@ begin
   CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef', Nil);
   CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate', Nil);
   AccountCurrencyRule := TDataProxy.Create(GDataProvider, 'accountCurrencyRule', Nil);
+  AccountExtraction := TDataProxy.Create(GDataProvider, 'accountExtraction', Nil);
+  ExtractionItem := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -957,6 +1012,7 @@ begin
     FcurrencyRate := FieldByName('currencyRate').AsCurrency;
     FrateDescription := FieldByName('rateDescription').AsString;
     FmovementCash := FieldByName('movementCash').AsCurrency;
+    FidExtractionItem := FieldByName('idExtractionItem').AsString;
     FprevmovementCash := FmovementCash;
   end;
 end;
@@ -1036,6 +1092,7 @@ begin
     AddField('currencyRate', CurrencyToDatabase(FcurrencyRate), False, 'baseMovement');
     AddField('rateDescription', FrateDescription, True, 'baseMovement');
     AddField('movementCash', CurrencyToDatabase(FmovementCash), False, 'baseMovement');
+    AddField('idExtractionItem', DataGidToDatabase(FidExtractionItem), False, 'baseMovement');
   end;
 end;
 
@@ -1886,6 +1943,7 @@ begin
   FidAccountCurrencyDef := CEmptyDataGid;
   FidMovementCurrencyDef := CEmptyDataGid;
   FidCurrencyRate := CEmptyDataGid;
+  FidExtractionItem := CEmptyDataGid;
 end;
 
 function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -2799,6 +2857,142 @@ begin
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'accountCurrencyRule');
     AddField('rateType', FrateType, True, 'accountCurrencyRule');
     AddField('movementType', FmovementType, True, 'accountCurrencyRule');
+  end;
+end;
+
+procedure TBaseMovement.SetidExtractionItem(const Value: TDataGid);
+begin
+  if FidExtractionItem <> Value then begin
+    FidExtractionItem := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountExtraction.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountExtraction.SetendDate(const Value: TDateTime);
+begin
+  if FendDate <> Value then begin
+    FendDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountExtraction.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountExtraction.SetstartDate(const Value: TDateTime);
+begin
+  if FstartDate <> Value then begin
+    FstartDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountExtraction.SetExtractionState(const Value: TBaseEnumeration);
+begin
+  if FextractionState <> Value then begin
+    FextractionState := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TExtractionItem.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+    FregDate := FieldByName('regDate').AsDateTime;
+    FmovementType := FieldByName('movementType').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    Fcash := FieldByName('cash').AsCurrency;
+  end;
+end;
+
+procedure TExtractionItem.Setcash(const Value: Currency);
+begin
+  if Fcash <> Value then begin
+    Fcash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TExtractionItem.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TExtractionItem.SetidCurrencyDef(const Value: TDataGid);
+begin
+  if FidCurrencyDef <> Value then begin
+    FidCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TExtractionItem.SetmovementType(const Value: TBaseEnumeration);
+begin
+  if FmovementType <> Value then begin
+    FmovementType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TExtractionItem.SetregDate(const Value: TDateTime);
+begin
+  if FregDate <> Value then begin
+    FregDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TAccountExtraction.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidAccount := FieldByName('idAccount').AsString;
+    FextractionState := FieldByName('extractionState').AsString;
+    FstartDate := FieldByName('startDate').AsDateTime;
+    FendDate := FieldByName('endDate').AsDateTime;
+    Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+procedure TAccountExtraction.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('idAccount', FidAccount, True, 'accountExtraction');
+    AddField('extractionState', FextractionState, True, 'accountExtraction');
+    AddField('startDate', DatetimeToDatabase(FstartDate, False), False, 'accountExtraction');
+    AddField('endDate', DatetimeToDatabase(FendDate, False), False, 'accountExtraction');
+    AddField('description', Fdescription, True, 'accountExtraction');
+  end;
+end;
+
+procedure TExtractionItem.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('description', Fdescription, True, 'extractionItem');
+    AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'extractionItem');
+    AddField('movementType', FmovementType, True, 'extractionItem');
+    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'extractionItem');
+    AddField('cash', CurrencyToDatabase(Fcash), False, 'extractionItem');
   end;
 end;
 
