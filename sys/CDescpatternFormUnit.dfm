@@ -48,7 +48,8 @@ inherited CDescpatternForm: TCDescpatternForm
           'Listy operacji wykonanych'
           'Operacje zaplanowane'
           'Elementy listy operacji'
-          'Kursy walut')
+          'Kursy walut'
+          'Wyci'#261'gi bankowe')
       end
       object ComboBoxType: TComboBox
         Left = 304
@@ -88,7 +89,7 @@ inherited CDescpatternForm: TCDescpatternForm
         Action = ActionAdd
         Color = clBtnFace
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
         Width = 457

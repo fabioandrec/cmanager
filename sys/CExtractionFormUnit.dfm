@@ -1,6 +1,6 @@
 inherited CExtractionForm: TCExtractionForm
-  Left = 319
-  Top = 161
+  Left = 211
+  Top = 25
   Caption = 'Wyci'#261'g'
   ClientHeight = 659
   ClientWidth = 595
@@ -70,6 +70,7 @@ inherited CExtractionForm: TCExtractionForm
         TabOrder = 0
         TabStop = True
         Transparent = False
+        OnChanged = CDateTimeChanged
         HotTrack = True
       end
       object CStaticAccount: TCStatic
@@ -87,6 +88,8 @@ inherited CExtractionForm: TCExtractionForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto z listy>'
+        OnGetDataId = CStaticAccountGetDataId
+        OnChanged = CStaticAccountChanged
         HotTrack = True
       end
       object ComboBoxState: TComboBox
@@ -101,6 +104,7 @@ inherited CExtractionForm: TCExtractionForm
         ItemIndex = 0
         TabOrder = 2
         Text = 'Otwarty'
+        OnChange = ComboBoxStateChange
         Items.Strings = (
           'Otwarty'
           'Zamkni'#281'ty'
@@ -120,6 +124,7 @@ inherited CExtractionForm: TCExtractionForm
         TabOrder = 3
         TabStop = True
         Transparent = False
+        OnChanged = CDateTime1Changed
         HotTrack = True
       end
       object CDateTime2: TCDateTime
@@ -136,6 +141,7 @@ inherited CExtractionForm: TCExtractionForm
         TabOrder = 4
         TabStop = True
         Transparent = False
+        OnChanged = CDateTime2Changed
         HotTrack = True
       end
     end
@@ -345,10 +351,12 @@ inherited CExtractionForm: TCExtractionForm
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'
       ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
   object ActionManager1: TActionManager

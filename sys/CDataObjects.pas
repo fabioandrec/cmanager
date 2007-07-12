@@ -2968,7 +2968,7 @@ begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     FidAccount := FieldByName('idAccount').AsString;
-    FextractionState := FieldByName('extractionState').AsString;
+    FextractionState := FieldByName('state').AsString;
     FstartDate := FieldByName('startDate').AsDateTime;
     FendDate := FieldByName('endDate').AsDateTime;
     FregDate := FieldByName('regDate').AsDateTime;
@@ -2981,7 +2981,7 @@ begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('idAccount', FidAccount, True, 'accountExtraction');
-    AddField('extractionState', FextractionState, True, 'accountExtraction');
+    AddField('state', FextractionState, True, 'accountExtraction');
     AddField('startDate', DatetimeToDatabase(FstartDate, False), False, 'accountExtraction');
     AddField('endDate', DatetimeToDatabase(FendDate, False), False, 'accountExtraction');
     AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'accountExtraction');

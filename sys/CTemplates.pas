@@ -41,6 +41,7 @@ var GBaseTemlatesList: TDescTemplateList;
     GMovementListElementsTemplatesList: TDescTemplateList;
     GPlannedMovementTemplatesList: TDescTemplateList;
     GCurrencydefTemplatesList: TDescTemplateList;
+    GAccountExtractionTemplatesList: TDescTemplateList;
 
 implementation
 
@@ -97,6 +98,7 @@ end;
 initialization
   GBaseTemlatesList := TDescTemplateList.Create('Mnemoniki podstawowe');
   GBaseMovementTemplatesList := TDescTemplateList.Create('Mnemoniki wykonanych operacji');
+  GAccountExtractionTemplatesList := TDescTemplateList.Create('Mnemoniki wyci¹gów');
   GMovementListTemplatesList := TDescTemplateList.Create('Mnemoniki list operacji');
   GPlannedMovementTemplatesList := TDescTemplateList.Create('Mnemoniki planowanych operacji');
   GMovementListElementsTemplatesList := TDescTemplateList.Create('Mnemoniki elementów listy operacji');
@@ -179,4 +181,5 @@ finalization
   GBaseMovementTemplatesList.Free;
   GMovementListTemplatesList.Free;
   GCurrencydefTemplatesList.Free;
+  GAccountExtractionTemplatesList.Free;
 end.

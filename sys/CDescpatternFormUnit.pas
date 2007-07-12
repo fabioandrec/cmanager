@@ -135,6 +135,8 @@ begin
     xData.Add(GMovementListElementsTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 4 then begin
     xData.Add(GCurrencydefTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 5 then begin
+    xData.Add(GAccountExtractionTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;
