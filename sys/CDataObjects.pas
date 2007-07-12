@@ -167,12 +167,14 @@ type
     FextractionState: TBaseEnumeration;
     FstartDate: TDateTime;
     FendDate: TDateTime;
+    FregDate: TDateTime;
     Fdescription: TBaseDescription;
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetendDate(const Value: TDateTime);
     procedure SetidAccount(const Value: TDataGid);
     procedure SetstartDate(const Value: TDateTime);
     procedure SetExtractionState(const Value: TBaseEnumeration);
+    procedure SetregDate(const Value: TDateTime);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -181,6 +183,7 @@ type
     property extractionState: TBaseEnumeration read FextractionState write SetExtractionState;
     property startDate: TDateTime read FstartDate write SetstartDate;
     property endDate: TDateTime read FendDate write SetendDate;
+    property regDate: TDateTime read FregDate write SetregDate;
     property description: TBaseDescription read Fdescription write Setdescription;
   end;
 
@@ -624,9 +627,9 @@ var CashPointProxy: TDataProxy;
     MovementLimitProxy: TDataProxy;
     CurrencyDefProxy: TDataProxy;
     CurrencyRateProxy: TDataProxy;
-    AccountCurrencyRule: TDataProxy;
-    AccountExtraction: TDataProxy;
-    ExtractionItem: TDataProxy;
+    AccountCurrencyRuleProxy: TDataProxy;
+    AccountExtractionProxy: TDataProxy;
+    ExtractionItemProxy: TDataProxy;
 
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
@@ -718,9 +721,9 @@ begin
   MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit', Nil);
   CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef', Nil);
   CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate', Nil);
-  AccountCurrencyRule := TDataProxy.Create(GDataProvider, 'accountCurrencyRule', Nil);
-  AccountExtraction := TDataProxy.Create(GDataProvider, 'accountExtraction', Nil);
-  ExtractionItem := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
+  AccountCurrencyRuleProxy := TDataProxy.Create(GDataProvider, 'accountCurrencyRule', Nil);
+  AccountExtractionProxy := TDataProxy.Create(GDataProvider, 'accountExtraction', Nil);
+  ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -2764,7 +2767,7 @@ end;
 
 class procedure TAccountCurrencyRule.DeleteRules(AIdAccount: TDataGid);
 begin
-  AccountCurrencyRule.DataProvider.ExecuteSql('delete from accountCurrencyRule where idAccount = ' + DataGidToDatabase(AIdAccount));
+  AccountCurrencyRuleProxy.DataProvider.ExecuteSql('delete from accountCurrencyRule where idAccount = ' + DataGidToDatabase(AIdAccount));
 end;
 
 class function TAccountCurrencyRule.FindRateByRule(ADate: TDateTime; AmovementType: TBaseEnumeration; AIdAccount, ASourceCurrency: TDataGid): TCurrencyRate;
@@ -2788,7 +2791,7 @@ end;
 class function TAccountCurrencyRule.FindRule(AmovementType: TBaseEnumeration; AIdAccount: TDataGid): TAccountCurrencyRule;
 var xD: TDataObjectList;
 begin
-  xD := TDataObject.GetList(TAccountCurrencyRule, AccountCurrencyRule,
+  xD := TDataObject.GetList(TAccountCurrencyRule, AccountCurrencyRuleProxy,
            Format('select * from accountCurrencyRule where movementType = ''%s'' and idAccount = %s',
                   [AmovementType, DataGidToDatabase(AIdAccount)]));
   if xD.Count > 0 then begin
@@ -2801,7 +2804,7 @@ end;
 
 class function TAccountCurrencyRule.FindRules(AIdAccount: TDataGid): TDataObjectList;
 begin
-  Result := TDataObject.GetList(TAccountCurrencyRule, AccountCurrencyRule,
+  Result := TDataObject.GetList(TAccountCurrencyRule, AccountCurrencyRuleProxy,
             Format('select * from accountCurrencyRule where idAccount = %s',
                   [DataGidToDatabase(AIdAccount)]));
 end;
@@ -2968,6 +2971,7 @@ begin
     FextractionState := FieldByName('extractionState').AsString;
     FstartDate := FieldByName('startDate').AsDateTime;
     FendDate := FieldByName('endDate').AsDateTime;
+    FregDate := FieldByName('regDate').AsDateTime;
     Fdescription := FieldByName('description').AsString;
   end;
 end;
@@ -2980,6 +2984,7 @@ begin
     AddField('extractionState', FextractionState, True, 'accountExtraction');
     AddField('startDate', DatetimeToDatabase(FstartDate, False), False, 'accountExtraction');
     AddField('endDate', DatetimeToDatabase(FendDate, False), False, 'accountExtraction');
+    AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'accountExtraction');
     AddField('description', Fdescription, True, 'accountExtraction');
   end;
 end;
@@ -2993,6 +2998,14 @@ begin
     AddField('movementType', FmovementType, True, 'extractionItem');
     AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'extractionItem');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'extractionItem');
+  end;
+end;
+
+procedure TAccountExtraction.SetregDate(const Value: TDateTime);
+begin
+  if FregDate <> Value then begin
+    FregDate := Value;
+    SetState(msModified);
   end;
 end;
 

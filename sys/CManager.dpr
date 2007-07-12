@@ -106,7 +106,9 @@ uses
   CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
   CAccountCurrencyFormUnit in 'CAccountCurrencyFormUnit.pas' {CAccountCurrencyForm},
   CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm},
-  CFilterDetailFrameUnit in 'CFilterDetailFrameUnit.pas' {CFilterDetailFrame: TFrame};
+  CFilterDetailFrameUnit in 'CFilterDetailFrameUnit.pas' {CFilterDetailFrame: TFrame},
+  CExtractionsFrameUnit in 'CExtractionsFrameUnit.pas' {CExtractionsFrame: TFrame},
+  CExtractionFormUnit in 'CExtractionFormUnit.pas' {CExtractionForm};
 
 {$R *.res}
 

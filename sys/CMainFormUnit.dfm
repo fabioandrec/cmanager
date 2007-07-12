@@ -338,30 +338,37 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShorcutOperations
+                Caption = '&Operacje'
                 ImageIndex = 1
               end
               item
                 Action = ActionShortcutPlannedDone
+                Caption = 'P&lany'
                 ImageIndex = 2
               end
               item
                 Action = ActionShortcutPlanned
+                Caption = '&Harmonogramy'
                 ImageIndex = 3
               end
               item
                 Action = ActionShortcutAccounts
+                Caption = '&Konta'
                 ImageIndex = 4
               end
               item
                 Action = ActionShortcutProducts
+                Caption = 'K&ategorie'
                 ImageIndex = 5
               end
               item
                 Action = ActionShortcutCashpoints
+                Caption = 'Ko&ntrahenci'
                 ImageIndex = 6
               end
               item
                 Action = ActionShortcutReports
+                Caption = '&Raporty'
                 ImageIndex = 7
               end
               item
@@ -386,7 +393,11 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutCurrencyRate
+                Caption = 'K&ursy'
                 ImageIndex = 12
+              end
+              item
+                Action = ActionShortcutExtractions
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -429,6 +440,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionHistory
+                Caption = '&Historia'
               end
               item
                 Caption = '-'
@@ -628,6 +640,10 @@ object CMainForm: TCMainForm
       Category = 'Pomoc'
       Caption = 'Historia'
       OnExecute = ActionHistoryExecute
+    end
+    object ActionShortcutExtractions: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Wyci'#261'gi'
     end
   end
   object OpenDialog: TOpenDialog

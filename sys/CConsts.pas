@@ -136,6 +136,10 @@ const
   CCurrencyViewMovements = 'M';
   CCurrencyViewAccounts = 'A';
 
+  CExtractionStateOpen = 'O';
+  CExtractionStateClose = 'C';
+  CExtractionStateStated = 'S';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

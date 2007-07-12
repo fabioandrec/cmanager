@@ -79,6 +79,7 @@ create table accountExtraction (
   state varchar(1) not null,
   startDate datetime not null,
   endDate datetime not null,
+  regDate datetime not null,
   description varchar(200),
   primary key (idAccountExtraction),
   constraint ck_accountExtractionState check (state in ('O', 'C', 'S')),

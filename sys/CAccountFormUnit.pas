@@ -209,7 +209,7 @@ begin
   GDataProvider.BeginTransaction;
   TAccountCurrencyRule.DeleteRules(Dataobject.id);
   for xCount := 0 to Frules.Count - 1 do begin
-    xRule := TAccountCurrencyRule.CreateObject(AccountCurrencyRule, False);
+    xRule := TAccountCurrencyRule.CreateObject(AccountCurrencyRuleProxy, False);
     xRule.idAccount := Dataobject.id;
     xRule.movementType := Frules.Names[xCount];
     xRule.rateType := Copy(Frules.ValueFromIndex[xCount], 1, 1);

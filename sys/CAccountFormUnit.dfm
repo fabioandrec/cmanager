@@ -51,7 +51,7 @@ inherited CAccountForm: TCAccountForm
         MaxLength = 40
         TabOrder = 0
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 56
         Top = 64
         Width = 265
