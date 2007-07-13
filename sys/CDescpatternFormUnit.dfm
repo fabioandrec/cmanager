@@ -49,7 +49,8 @@ inherited CDescpatternForm: TCDescpatternForm
           'Operacje zaplanowane'
           'Elementy listy operacji'
           'Kursy walut'
-          'Wyci'#261'gi bankowe')
+          'Wyci'#261'gi bankowe'
+          'Elementy wyci'#261'g'#243'w')
       end
       object ComboBoxType: TComboBox
         Left = 304

@@ -119,6 +119,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
         ItemIndex = 0
         TabOrder = 1
         Text = 'Obci'#261#380'enie'
+        OnChange = ComboBoxTypeChange
         Items.Strings = (
           'Obci'#261#380'enie'
           'Uznanie')
@@ -137,6 +138,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
         TabOrder = 0
         TabStop = True
         Transparent = False
+        OnChanged = CDateTimeChanged
         HotTrack = True
       end
       object CStaticMovementCurrency: TCStatic
@@ -154,6 +156,8 @@ inherited CExtractionItemForm: TCExtractionItemForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281'>'
+        OnGetDataId = CStaticMovementCurrencyGetDataId
+        OnChanged = CStaticMovementCurrencyChanged
         HotTrack = True
       end
       object CCurrEditMovement: TCCurrEdit
@@ -189,10 +193,12 @@ inherited CExtractionItemForm: TCExtractionItemForm
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'
       ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
 end

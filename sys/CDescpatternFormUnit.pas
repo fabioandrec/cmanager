@@ -137,6 +137,8 @@ begin
     xData.Add(GCurrencydefTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 5 then begin
     xData.Add(GAccountExtractionTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 6 then begin
+    xData.Add(GExtractionItemTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;
