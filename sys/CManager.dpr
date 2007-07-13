@@ -108,7 +108,8 @@ uses
   CChoosePeriodFilterGroupFormUnit in 'CChoosePeriodFilterGroupFormUnit.pas' {CChoosePeriodFilterGroupForm},
   CFilterDetailFrameUnit in 'CFilterDetailFrameUnit.pas' {CFilterDetailFrame: TFrame},
   CExtractionsFrameUnit in 'CExtractionsFrameUnit.pas' {CExtractionsFrame: TFrame},
-  CExtractionFormUnit in 'CExtractionFormUnit.pas' {CExtractionForm};
+  CExtractionFormUnit in 'CExtractionFormUnit.pas' {CExtractionForm},
+  CExtractionItemFormUnit in 'CExtractionItemFormUnit.pas' {CExtractionItemForm};
 
 {$R *.res}
 

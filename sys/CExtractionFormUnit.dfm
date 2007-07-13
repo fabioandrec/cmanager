@@ -273,7 +273,7 @@ inherited CExtractionForm: TCExtractionForm
             Action = Action3
           end
         end
-        object List: TCList
+        object MovementList: TCList
           Left = 1
           Top = 1
           Width = 511
@@ -367,14 +367,17 @@ inherited CExtractionForm: TCExtractionForm
     object Action1: TAction
       Caption = 'Dodaj operacj'#281
       ImageIndex = 0
+      OnExecute = Action1Execute
     end
     object Action2: TAction
       Caption = 'Edytuj operacj'#281
       ImageIndex = 1
+      OnExecute = Action2Execute
     end
     object Action3: TAction
       Caption = 'Usu'#324' operacj'#281
       ImageIndex = 2
+      OnExecute = Action3Execute
     end
   end
 end

@@ -140,6 +140,11 @@ const
   CExtractionStateClose = 'C';
   CExtractionStateStated = 'S';
 
+  CExtractionStateOpenDescription = 'Otwarty';
+  CExtractionStateCloseDescription = 'Zamkniêty';
+  CExtractionStateStatedDescription = 'Uzgodniony';
+
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

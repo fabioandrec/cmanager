@@ -178,6 +178,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
   published
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property extractionState: TBaseEnumeration read FextractionState write SetExtractionState;
@@ -193,12 +194,14 @@ type
     FregDate: TDateTime;
     FmovementType: TBaseEnumeration;
     FidCurrencyDef: TDataGid;
+    FidAccountExtraction: TDataGid;
     Fcash: Currency;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidCurrencyDef(const Value: TDataGid);
     procedure SetmovementType(const Value: TBaseEnumeration);
     procedure SetregDate(const Value: TDateTime);
+    procedure SetidAccountExtraction(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -208,6 +211,7 @@ type
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
     property cash: Currency read Fcash write Setcash;
+    property idAccountExtraction: TDataGid read FidAccountExtraction write SetidAccountExtraction;
   end;
 
   TProduct = class(TDataObject)
@@ -2919,6 +2923,7 @@ begin
     FregDate := FieldByName('regDate').AsDateTime;
     FmovementType := FieldByName('movementType').AsString;
     FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    FidAccountExtraction := FieldByName('idAccountExtraction').AsString;
     Fcash := FieldByName('cash').AsCurrency;
   end;
 end;
@@ -2935,6 +2940,14 @@ procedure TExtractionItem.Setdescription(const Value: TBaseDescription);
 begin
   if Fdescription <> Value then begin
     Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TExtractionItem.SetidAccountExtraction(const Value: TDataGid);
+begin
+  if FidAccountExtraction <> Value then begin
+    FidAccountExtraction := Value;
     SetState(msModified);
   end;
 end;
@@ -2997,6 +3010,7 @@ begin
     AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'extractionItem');
     AddField('movementType', FmovementType, True, 'extractionItem');
     AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'extractionItem');
+    AddField('idAccountExtraction', DataGidToDatabase(FidAccountExtraction), False, 'extractionItem');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'extractionItem');
   end;
 end;
@@ -3006,6 +3020,27 @@ begin
   if FregDate <> Value then begin
     FregDate := Value;
     SetState(msModified);
+  end;
+end;
+
+function TAccountExtraction.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 4 then begin
+    if FextractionState = CExtractionStateOpen then begin
+      Result := CExtractionStateOpenDescription;
+    end else if FextractionState = CExtractionStateClose then begin
+      Result := CExtractionStateCloseDescription;
+    end else begin
+      Result := CExtractionStateStatedDescription;
+    end;
+  end else if AColumnIndex = 3 then begin
+    Result := DateToStr(FendDate);
+  end else if AColumnIndex = 2 then begin
+    Result := DateToStr(FstartDate);
+  end else if AColumnIndex = 1 then begin
+    Result := description; 
+  end else begin
+    Result := DateToStr(FregDate);
   end;
 end;
 

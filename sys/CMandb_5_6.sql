@@ -21,11 +21,13 @@ create table extractionItem (
   regDate datetime not null,
   movementType varchar(1) not null,
   idCurrencyDef uniqueidentifier not null,
+  idAccountExtraction uniqueidentifier not null,
   cash money not null,
   primary key (idExtractionItem),
   constraint ck_extractionItemmovementType check (movementType in ('I', 'O')),
-  constraint fk_extractionItemCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
+  constraint fk_extractionItemaccountExtraction foreign key (idAccountExtraction) references accountExtraction (idAccountExtraction)
 );
+
 
 alter table baseMovement add idExtractionItem uniqueidentifier null;
 alter table baseMovement add constraint fk_movementExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem);
