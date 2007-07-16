@@ -303,6 +303,13 @@ inherited CExtractionForm: TCExtractionForm
           TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
           TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
+          OnCompareNodes = MovementListCompareNodes
+          OnDblClick = MovementListDblClick
+          OnFocusChanged = MovementListFocusChanged
+          OnGetText = MovementListGetText
+          OnGetHint = MovementListGetHint
+          OnGetNodeDataSize = MovementListGetNodeDataSize
+          OnInitNode = MovementListInitNode
           OddColor = 12437200
           AutoExpand = True
           Columns = <

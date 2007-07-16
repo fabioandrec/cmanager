@@ -52,6 +52,13 @@ type
     procedure Action1Execute(Sender: TObject);
     procedure Action2Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
+    procedure MovementListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure MovementListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
+    procedure MovementListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+    procedure MovementListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure MovementListDblClick(Sender: TObject);
+    procedure MovementListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -75,13 +82,14 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CTemplates, CPreferences, CConsts,
   CRichtext, CDescpatternFormUnit, DateUtils, CInfoFormUnit, CDataObjects,
-  Math, CConfigFormUnit, CExtractionsFrameUnit;
+  Math, CConfigFormUnit, CExtractionsFrameUnit, StrUtils;
 
 {$R *.dfm}
 
@@ -115,6 +123,8 @@ begin
   CDateTime.Value := GWorkDate;
   CDateTime1.Value := StartOfTheMonth(GWorkDate);
   CDateTime2.Value := EndOfTheMonth(GWorkDate);
+  MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
+  UpdateButtons;
   UpdateDescription;
 end;
 
@@ -135,6 +145,7 @@ end;
 
 procedure TCExtractionForm.ComboBoxStateChange(Sender: TObject);
 begin
+  UpdateButtons;
   UpdateDescription;
 end;
 
@@ -173,6 +184,10 @@ begin
 end;
 
 procedure TCExtractionForm.FillForm;
+var xList: TDataObjectList;
+    xCount: Integer;
+    xElement: TExtractionListElement;
+    xMovement: TExtractionItem;
 begin
   inherited FillForm;
   with TAccountExtraction(Dataobject) do begin
@@ -191,7 +206,23 @@ begin
     end else begin
       ComboBoxState.ItemIndex := 2;
     end;
+    xList := GetMovements;
+    Fmovements.Clear;
+    for xCount := 0 to xList.Count - 1 do begin
+      xElement := TExtractionListElement.Create;
+      xMovement := TExtractionItem(xList.Items[xCount]);
+      xElement.id := xMovement.id;
+      xElement.description := xMovement.description;
+      xElement.movementType := xMovement.movementType;
+      xElement.cash := xMovement.cash;
+      xElement.idCurrencyDef := xMovement.idCurrencyDef;
+      xElement.regTime := xMovement.regDate;
+      xElement.idAccount := idAccount;
+      Fmovements.Add(xElement);
+    end;
+    xList.Free;
     GDataProvider.RollbackTransaction;
+    MovementList.RootNodeCount := Fmovements.Count;
     UpdateButtons;
   end;
 end;
@@ -266,6 +297,13 @@ end;
 
 procedure TCExtractionForm.UpdateButtons;
 begin
+  CDateTime.Enabled := ComboBoxState.ItemIndex = 0;
+  CDateTime1.Enabled := ComboBoxState.ItemIndex = 0;
+  CDateTime2.Enabled := ComboBoxState.ItemIndex = 0;
+  CStaticAccount.Enabled := ComboBoxState.ItemIndex = 0;
+  CButtonOut.Enabled := ComboBoxState.ItemIndex = 0;
+  CButtonEdit.Enabled := ComboBoxState.ItemIndex = 0;
+  CButtonDel.Enabled := ComboBoxState.ItemIndex = 0;
 end;
 
 procedure TCExtractionForm.Action2Execute(Sender: TObject);
@@ -404,6 +442,98 @@ begin
     end;
   end;
   GDataProvider.CommitTransaction;
+end;
+
+procedure TCExtractionForm.MovementListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+begin
+  TExtractionListElement(MovementList.GetNodeData(Node)^) := TExtractionListElement(Fmovements.Items[Node.Index]);
+end;
+
+procedure TCExtractionForm.MovementListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+var xData: TExtractionListElement;
+begin
+  xData := TExtractionListElement(MovementList.GetNodeData(Node)^);
+  if Column = 0 then begin
+    CellText := IntToStr(Node.Index + 1);
+  end else if Column = 1 then begin
+    CellText := xData.description;
+  end else if Column = 2 then begin
+    CellText := CurrencyToString(IfThen(xData.movementType = CInMovement, 1, -1) * xData.cash, '', False);
+  end else if Column = 3 then begin
+    CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
+  end;
+end;
+
+procedure TCExtractionForm.MovementListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
+begin
+  NodeDataSize := SizeOf(TExtractionListElement);
+end;
+
+procedure TCExtractionForm.MovementListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+var xData: TExtractionListElement;
+begin
+  xData := TExtractionListElement(MovementList.GetNodeData(Node)^);
+  HintText := xData.description;
+  LineBreakStyle := hlbForceMultiLine;
+end;
+
+procedure TCExtractionForm.MovementListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+begin
+  CButtonEdit.Enabled := Node <> Nil;
+  CButtonDel.Enabled := Node <> Nil;
+end;
+
+procedure TCExtractionForm.MovementListDblClick(Sender: TObject);
+begin
+  Action2.Execute;
+end;
+
+procedure TCExtractionForm.MovementListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+var xData1: TExtractionListElement;
+    xData2: TExtractionListElement;
+begin
+  xData1 := TExtractionListElement(MovementList.GetNodeData(Node1)^);
+  xData2 := TExtractionListElement(MovementList.GetNodeData(Node2)^);
+  if Column = 0 then begin
+    if Node1.Index > Node2.Index then begin
+      Result := 1;
+    end else if Node1.Index < Node2.Index then begin
+      Result := -1;
+    end else begin
+      Result := 0;
+    end;
+  end else if Column = 1 then begin
+    Result := AnsiCompareText(xData1.description, xData2.description);
+  end else if Column = 2 then begin
+    if xData1.cash > xData2.cash then begin
+      Result := 1;
+    end else if xData1.cash < xData2.cash then begin
+      Result := -1;
+    end else begin
+      Result := 0;
+    end;
+  end;
+end;
+
+function TCExtractionForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@datawyciagu@' then begin
+    Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@oddaty@' then begin
+    Result := GetFormattedDate(CDateTime1.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@dodaty@' then begin
+    Result := GetFormattedDate(CDateTime2.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@status@' then begin
+    Result := ComboBoxState.Text;
+  end else if ATemplate = '@konto@' then begin
+    Result := '<konto>';
+    if CStaticAccount.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TAccount(TAccount.LoadObject(AccountProxy, CStaticAccount.DataId, False)).name;
+      GDataProvider.RollbackTransaction;
+    end;
+  end;
 end;
 
 end.

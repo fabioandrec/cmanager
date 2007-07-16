@@ -398,6 +398,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutExtractions
+                ImageIndex = 13
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -448,7 +449,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionBug
                 Caption = '&Zg'#322'o'#347' b'#322#261'd'
-                ImageIndex = 13
+                ImageIndex = 14
               end
               item
                 Action = ActionFutureRequest
@@ -460,7 +461,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCheckUpdates
                 Caption = 'S&prawd'#378' aktualizacje'
-                ImageIndex = 14
+                ImageIndex = 15
               end
               item
                 Action = ActionAbout
@@ -644,6 +645,7 @@ object CMainForm: TCMainForm
     object ActionShortcutExtractions: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Wyci'#261'gi'
+      ImageIndex = 13
     end
   end
   object OpenDialog: TOpenDialog

@@ -921,8 +921,6 @@ begin
   SetXmlAttribute('permitGetConnection', ANode, FpermitGetConnection);
 end;
 
-{ TChartPref }
-
 procedure TChartPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
@@ -1010,6 +1008,12 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju'));
     Fontprefs.Add(TFontPref.CreateFontPref('SL', 'Przekroczone limity'));
     Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create('accountExtraction'));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'));
+    Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'));
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodnione'));
   end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin

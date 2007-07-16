@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDataObjects,
-  CDatabase, CDataobjectFormUnit;
+  CDatabase, CDataobjectFormUnit, CImageListsUnit;
 
 type
   TCExtractionsFrame = class(TCDataobjectFrame)
@@ -19,6 +19,7 @@ type
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
@@ -40,6 +41,11 @@ end;
 function TCExtractionsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := AccountExtractionProxy;
+end;
+
+class function TCExtractionsFrame.GetPrefname: String;
+begin
+  Result := 'accountExtraction';
 end;
 
 function TCExtractionsFrame.GetStaticFilter: TStringList;

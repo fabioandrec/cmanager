@@ -63,6 +63,7 @@ type
     procedure ReadValues; override;
   public
     constructor CreateFormElement(AOwner: TComponent; AElement: TExtractionListElement);
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
@@ -162,6 +163,33 @@ var xPattern: String;
 begin
   if EditDescPattern(CDescPatternsKeys[6][IfThen(Felement.movementType = COutMovement, 1, 0)], xPattern) then begin
     UpdateDescription;
+  end;
+end;
+
+function TCExtractionItemForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@dataoperacji@' then begin
+    Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@rodzaj@' then begin
+    Result := ComboBoxType.Text;
+  end else if ATemplate = '@konto@' then begin
+    Result := '<konto>';
+    if Felement.idAccount <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TAccount(TAccount.LoadObject(AccountProxy, Felement.idAccount, False)).name;
+      GDataProvider.RollbackTransaction;
+    end;
+  end else if ATemplate = '@isowaluty@' then begin
+    Result := '<iso waluty>';
+    if CStaticMovementCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetIso(CStaticMovementCurrency.DataId);
+    end;
+  end else if ATemplate = '@symbolwaluty@' then begin
+    Result := '<symbol waluty>';
+    if CStaticMovementCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetSymbol(CStaticMovementCurrency.DataId);
+    end;
   end;
 end;
 

@@ -176,6 +176,20 @@ initialization
     AddTemplate('@ilosc@', 'iloœæ waluty bazowej');
     AddTemplate('@kurs@', 'kurs waluty');
   end;
+  with GExtractionItemTemplatesList do begin
+    AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');
+    AddTemplate('@rodzaj@', 'rodzaj operacji');
+    AddTemplate('@konto@', 'nazwa konta, którego dotyczy wyci¹g');
+    AddTemplate('@isowaluty@', 'iso waluty operacji');
+    AddTemplate('@symbolwaluty@', 'symbol waluty operacji');
+  end;
+  with GAccountExtractionTemplatesList do begin
+    AddTemplate('@datawyciagu@', 'data wyci¹gu w formacie RRRR-MM-DD');
+    AddTemplate('@oddaty@', 'data pocz¹tku wyci¹gu w formacie RRRR-MM-DD');
+    AddTemplate('@dodaty@', 'data koñca wyci¹gu w formacie RRRR-MM-DD');
+    AddTemplate('@konto@', 'nazwa konta, którego dotyczy wyci¹g');
+    AddTemplate('@status@', 'status wyci¹gu');
+  end;
 finalization
   GMovementListElementsTemplatesList.Free;
   GBaseTemlatesList.Free;

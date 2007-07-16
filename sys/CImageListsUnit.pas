@@ -30,6 +30,8 @@ type
     CurrencyRateImageList24x24: TPngImageList;
     PngImageListHistory24x24: TPngImageList;
     ChartImageList32x32: TPngImageList;
+    ExtractionImageList24x24: TPngImageList;
+    ExtstatusImageList16x16: TPngImageList;
   private
     { Private declarations }
   public

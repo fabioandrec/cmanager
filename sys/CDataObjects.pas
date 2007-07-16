@@ -179,6 +179,8 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetMovements: TDataObjectList;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
   published
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property extractionState: TBaseEnumeration read FextractionState write SetExtractionState;
@@ -202,6 +204,8 @@ type
     procedure SetmovementType(const Value: TBaseEnumeration);
     procedure SetregDate(const Value: TDateTime);
     procedure SetidAccountExtraction(const Value: TDataGid);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -255,12 +259,16 @@ type
     Fcash: Currency;
     FprevCash: Currency;
     FidAccountCurrencyDef: TDataGid;
+    FidExtractionItem: TDataGid;
+    FisStated: Boolean;
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetregDate(const Value: TDateTime);
     procedure SetmovementType(const Value: TBaseEnumeration);
     procedure SetidAccountCurrencyDef(const Value: TDataGid);
+    procedure SetidExtractionItem(const Value: TDataGid);
+    procedure SetisStated(const Value: Boolean);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
@@ -268,6 +276,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetMovements: TDataObjectList;
     procedure DeleteObject; override;
+    constructor Create(AStatic: Boolean); override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property idAccount: TDataGid read FidAccount write SetidAccount;
@@ -279,6 +288,8 @@ type
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property cash: Currency read Fcash;
     property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write SetidAccountCurrencyDef;
+    property idExtractionItem: TDataGid read FidExtractionItem write SetidExtractionItem;
+    property isStated: Boolean read FisStated write SetisStated;
   end;
 
   TBaseMovement = class(TDataObject)
@@ -308,6 +319,7 @@ type
     FmovementCash: Currency;
     FprevmovementCash: Currency;
     FidExtractionItem: TDataGid;
+    FisStated: Boolean;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -326,6 +338,7 @@ type
     procedure SetmovementCash(const Value: Currency);
     procedure SetrateDescription(const Value: TBaseDescription);
     procedure SetidExtractionItem(const Value: TDataGid);
+    procedure SetisStated(const Value: Boolean);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -355,7 +368,8 @@ type
     property currencyRate: Currency read FcurrencyRate write SetcurrencyRate;
     property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
     property movementCash: Currency read FmovementCash write SetmovementCash;
-    property idExtractionItem: TDataGid read FidExtractionItem write SetidExtractionItem; 
+    property idExtractionItem: TDataGid read FidExtractionItem write SetidExtractionItem;
+    property isStated: Boolean read FisStated write SetisStated;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -1020,6 +1034,7 @@ begin
     FrateDescription := FieldByName('rateDescription').AsString;
     FmovementCash := FieldByName('movementCash').AsCurrency;
     FidExtractionItem := FieldByName('idExtractionItem').AsString;
+    FisStated := FieldByName('isStated').AsBoolean;
     FprevmovementCash := FmovementCash;
   end;
 end;
@@ -1100,6 +1115,7 @@ begin
     AddField('rateDescription', FrateDescription, True, 'baseMovement');
     AddField('movementCash', CurrencyToDatabase(FmovementCash), False, 'baseMovement');
     AddField('idExtractionItem', DataGidToDatabase(FidExtractionItem), False, 'baseMovement');
+    AddField('isStated', IntToStr(Integer(FisStated)), False, 'baseMovement');
   end;
 end;
 
@@ -1850,6 +1866,8 @@ begin
     FmovementType := FieldByName('movementType').AsString;
     Fcash := FieldByName('cash').AsCurrency;
     FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
+    FidExtractionItem := FieldByName('idExtractionItem').AsString;
+    FisStated := FieldByName('isStated').AsBoolean;
     FprevCash := Fcash;
   end;
 end;
@@ -1935,6 +1953,8 @@ begin
     AddField('movementType', FmovementType, True, 'movementList');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'movementList');
     AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'movementList');
+    AddField('idExtractionItem', DataGidToDatabase(FidExtractionItem), False, 'movementList');
+    AddField('isStated', IntToStr(Integer(FisStated)), False, 'movementList');
   end;
 end;
 
@@ -1951,6 +1971,7 @@ begin
   FidMovementCurrencyDef := CEmptyDataGid;
   FidCurrencyRate := CEmptyDataGid;
   FidExtractionItem := CEmptyDataGid;
+  FisStated := False;
 end;
 
 function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -2871,6 +2892,11 @@ procedure TBaseMovement.SetidExtractionItem(const Value: TDataGid);
 begin
   if FidExtractionItem <> Value then begin
     FidExtractionItem := Value;
+    if FidExtractionItem <> CEmptyDataGid then begin
+      FisStated := True;
+    end else begin
+      FisStated := False;
+    end;
     SetState(msModified);
   end;
 end;
@@ -2926,6 +2952,13 @@ begin
     FidAccountExtraction := FieldByName('idAccountExtraction').AsString;
     Fcash := FieldByName('cash').AsCurrency;
   end;
+end;
+
+function TExtractionItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql('update baseMovement set idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
+  AProxy.DataProvider.ExecuteSql('update movementList set idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
 end;
 
 procedure TExtractionItem.Setcash(const Value: Currency);
@@ -3042,6 +3075,70 @@ begin
   end else begin
     Result := DateToStr(FregDate);
   end;
+end;
+
+function TAccountExtraction.GetMovements: TDataObjectList;
+begin
+  Result := TExtractionItem.GetList(TExtractionItem, ExtractionItemProxy, 'select * from extractionItem where idAccountExtraction = ' + DataGidToDatabase(id));
+end;
+
+procedure TMovementList.SetidExtractionItem(const Value: TDataGid);
+begin
+  if FidExtractionItem <> Value then begin
+    FidExtractionItem := Value;
+    if FidExtractionItem <> CEmptyDataGid then begin
+      FisStated := True;
+    end else begin
+      FisStated := False;
+    end;
+    SetState(msModified);
+  end;
+end;
+
+function TAccountExtraction.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := -1;
+  if AColumnIndex = 4 then begin
+    if FextractionState = CExtractionStateOpen then begin
+      Result := 0;
+    end else if FextractionState = CExtractionStateClose then begin
+      Result := 1;
+    end else begin
+      Result := 2;
+    end;
+  end;
+end;
+
+procedure TMovementList.SetisStated(const Value: Boolean);
+begin
+  if FisStated <> Value then begin
+    FisStated := Value;
+    if not FisStated then begin
+      FidExtractionItem := CEmptyDataGid;
+    end;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetisStated(const Value: Boolean);
+begin
+  if FisStated <> Value then begin
+    FisStated := Value;
+    if not FisStated then begin
+      FidExtractionItem := CEmptyDataGid;
+    end;
+    SetState(msModified);
+  end;
+end;
+
+constructor TMovementList.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidAccount := CEmptyDataGid;
+  FidCashPoint := CEmptyDataGid;
+  FidAccountCurrencyDef := CEmptyDataGid;
+  FidExtractionItem := CEmptyDataGid;
+  FisStated := False;
 end;
 
 initialization

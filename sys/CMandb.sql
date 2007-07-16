@@ -98,7 +98,7 @@ create table extractionItem (
   cash money not null,
   primary key (idExtractionItem),
   constraint ck_extractionItemmovementType check (movementType in ('I', 'O')),
-  constraint fk_extractionItemaccountExtraction foreign key (idAccountExtraction) references accountExtraction (idAccountExtraction),
+  constraint fk_extractionItemaccountExtraction foreign key (idAccountExtraction) references accountExtraction (idAccountExtraction) on delete cascade,
   constraint fk_extractionItemCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );
 
@@ -163,14 +163,17 @@ create table movementList (
   weekDate datetime not null,
   monthDate datetime not null,
   yearDate datetime not null,
-  movementType varchar(1) not null,  
+  movementType varchar(1) not null,
   cash money not null,
-  idAccountCurrencyDef uniqueidentifier not null,  
+  idAccountCurrencyDef uniqueidentifier not null,
+  idExtractionItem uniqueidentifier null,
+  isStated bit not null,
   primary key (idmovementList),
   constraint ck_movementTypemovementList check (movementType in ('I', 'O')),
   constraint fk_cashpointmovementList foreign key (idCashpoint) references cashpoint (idCashpoint),
   constraint fk_accountmovementList foreign key (idAccount) references account (idAccount),
-  constraint fk_movementListAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef)
+  constraint fk_movementListAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_movementListExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem)
 );
 
 create table baseMovement (
@@ -198,6 +201,7 @@ create table baseMovement (
   rateDescription varchar(200),
   movementCash money not null,
   idExtractionItem uniqueidentifier null,
+  isStated bit not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -310,6 +314,7 @@ insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementOut',
 insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementIn', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('MovementListElement', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('Currencyrate', '@isobazowej@/@isodocelowej@');
+insert into cmanagerParams (paramName, paramValue) values ('AccountExctraction', '@konto@ - wyci¹g z dnia @datawyciagu@');
 
 insert into currencyDef (idcurrencyDef, created, modified, name, symbol, iso, description, isBase) values ('{00000000-0000-0000-0000-000000000001}', #2007-04-18 10:33:02#, #2007-04-18 10:33:02#, 'z³oty polski', 'z³', 'PLN', 'z³oty polski', 1);
 

@@ -240,6 +240,11 @@ inherited CMovementFrame: TCMovementFrame
         Position = 5
         Width = 150
         WideText = 'Rodzaj'
+      end
+      item
+        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 6
+        WideText = 'Status'
       end>
     WideDefaultText = ''
   end

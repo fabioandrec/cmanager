@@ -20,6 +20,7 @@ type
     function Getregdate: TDateTime;
     function GetmovementType: TBaseEnumeration;
     function GetidCurrencyDef: TDataGid;
+    function GetisStated: Boolean;
   public
     property elementType: TMovementTreeElementType read FelementType write FelementType;
     property description: String read GetDescription;
@@ -27,6 +28,7 @@ type
     property regDate: TDateTime read Getregdate;
     property idCurrencyDef: TDataGid read GetidCurrencyDef;
     property movementType: TBaseEnumeration read GetmovementType;
+    property isStated: Boolean read GetisStated;
     property currencyView: String read FcurrencyView write FcurrencyView;
   end;
 
@@ -335,6 +337,12 @@ begin
       CellText := COutMovementDescription;
     end else begin
       CellText := CTransferMovementDescription;
+    end;
+  end else if Column = 6 then begin
+    if xData.isStated then begin
+      CellText := 'Uzgodniony';
+    end else begin
+      CellText := 'Do uzgodnienia';
     end;
   end;
 end;
@@ -874,14 +882,20 @@ end;
 procedure TCMovementFrame.TodayListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
 var xBase: TMovementTreeElement;
 begin
+ xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   if Column = 5 then begin
-    xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
     if xBase.movementType = CInMovement then begin
       ImageIndex := 0;
     end else if xBase.movementType = COutMovement then begin
       ImageIndex := 1;
     end else if xBase.movementType = CTransferMovement then begin
       ImageIndex := 2;
+    end;
+  end else if Column = 6 then begin
+    if xBase.isStated then begin
+      ImageIndex := 4;
+    end else if xBase.movementType = CTransferMovement then begin
+      ImageIndex := 3;
     end;
   end;
 end;
@@ -959,6 +973,15 @@ begin
     end;
   end else begin
     Result := TMovementList(Dataobject).idAccountCurrencyDef;
+  end;
+end;
+
+function TMovementTreeElement.GetisStated: Boolean;
+begin
+  if FelementType = mtObject then begin
+    Result := TBaseMovement(Dataobject).isStated
+  end else begin
+    Result := TMovementList(Dataobject).isStated;
   end;
 end;
 
