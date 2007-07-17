@@ -32,7 +32,13 @@ create table extractionItem (
 alter table baseMovement add idExtractionItem uniqueidentifier null;
 alter table baseMovement add constraint fk_movementExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem);
 alter table baseMovement add isStated bit not null;
+
+alter table baseMovement add idSourceExtractionItem uniqueidentifier null;
+alter table baseMovement add constraint fk_movementSourceExtractionItem foreign key (idSourceExtractionItem) references extractionItem (idExtractionItem);
+alter table baseMovement add isSourceStated bit not null;
+
 update baseMovement set isStated = 1;
+update baseMovement set isSourceStated = 1;
 
 alter table movementList add idExtractionItem uniqueidentifier null;
 alter table movementList add constraint fk_movementListExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem);

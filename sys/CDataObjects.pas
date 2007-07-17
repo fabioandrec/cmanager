@@ -1,3 +1,4 @@
+
 unit CDataObjects;
 
 interface
@@ -320,6 +321,8 @@ type
     FprevmovementCash: Currency;
     FidExtractionItem: TDataGid;
     FisStated: Boolean;
+    FidSourceExtractionItem: TDataGid;
+    FisSourceStated: Boolean;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -339,6 +342,8 @@ type
     procedure SetrateDescription(const Value: TBaseDescription);
     procedure SetidExtractionItem(const Value: TDataGid);
     procedure SetisStated(const Value: Boolean);
+    procedure SetidSourceExtractionItem(const Value: TDataGid);
+    procedure SetisSourceStated(const Value: Boolean);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -370,6 +375,8 @@ type
     property movementCash: Currency read FmovementCash write SetmovementCash;
     property idExtractionItem: TDataGid read FidExtractionItem write SetidExtractionItem;
     property isStated: Boolean read FisStated write SetisStated;
+    property idSourceExtractionItem: TDataGid read FidSourceExtractionItem write SetidSourceExtractionItem;
+    property isSourceStated: Boolean read FisSourceStated write SetisSourceStated;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -1035,6 +1042,8 @@ begin
     FmovementCash := FieldByName('movementCash').AsCurrency;
     FidExtractionItem := FieldByName('idExtractionItem').AsString;
     FisStated := FieldByName('isStated').AsBoolean;
+    FidSourceExtractionItem := FieldByName('idSourceExtractionItem').AsString;
+    FisSourceStated := FieldByName('isSourceStated').AsBoolean;
     FprevmovementCash := FmovementCash;
   end;
 end;
@@ -1116,6 +1125,8 @@ begin
     AddField('movementCash', CurrencyToDatabase(FmovementCash), False, 'baseMovement');
     AddField('idExtractionItem', DataGidToDatabase(FidExtractionItem), False, 'baseMovement');
     AddField('isStated', IntToStr(Integer(FisStated)), False, 'baseMovement');
+    AddField('idSourceExtractionItem', DataGidToDatabase(FidSourceExtractionItem), False, 'baseMovement');
+    AddField('isSourceStated', IntToStr(Integer(FisSourceStated)), False, 'baseMovement');
   end;
 end;
 
@@ -1972,6 +1983,8 @@ begin
   FidCurrencyRate := CEmptyDataGid;
   FidExtractionItem := CEmptyDataGid;
   FisStated := False;
+  FidSourceExtractionItem := CEmptyDataGid;
+  FisSourceStated := False;
 end;
 
 function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -3139,6 +3152,30 @@ begin
   FidAccountCurrencyDef := CEmptyDataGid;
   FidExtractionItem := CEmptyDataGid;
   FisStated := False;
+end;
+
+procedure TBaseMovement.SetidSourceExtractionItem(const Value: TDataGid);
+begin
+  if FidSourceExtractionItem <> Value then begin
+    FidSourceExtractionItem := Value;
+    if FidSourceExtractionItem <> CEmptyDataGid then begin
+      FisSourceStated := True;
+    end else begin
+      FisSourceStated := False;
+    end;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetisSourceStated(const Value: Boolean);
+begin
+  if FisSourceStated <> Value then begin
+    FisSourceStated := Value;
+    if not FisSourceStated then begin
+      FidSourceExtractionItem := CEmptyDataGid;
+    end;
+    SetState(msModified);
+  end;
 end;
 
 initialization

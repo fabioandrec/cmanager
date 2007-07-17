@@ -142,7 +142,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 232
-        ActivePage = TabSheetInOutOnce
+        ActivePage = TabSheetTrans
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -167,7 +167,7 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Konto operacji'
           end
           object Label12: TLabel
-            Left = 59
+            Left = 275
             Top = 81
             Width = 45
             Height = 13
@@ -175,8 +175,8 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Kategoria'
           end
           object Label13: TLabel
-            Left = 268
-            Top = 45
+            Left = 52
+            Top = 81
             Width = 52
             Height = 13
             Alignment = taRightJustify
@@ -244,7 +244,7 @@ inherited CMovementForm: TCMovementForm
           object CStaticInoutCyclicAccount: TCStatic
             Left = 112
             Top = 41
-            Width = 145
+            Width = 361
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
@@ -261,9 +261,9 @@ inherited CMovementForm: TCMovementForm
             HotTrack = True
           end
           object CStaticInoutCyclicCategory: TCStatic
-            Left = 112
+            Left = 328
             Top = 77
-            Width = 361
+            Width = 145
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
@@ -280,8 +280,8 @@ inherited CMovementForm: TCMovementForm
             HotTrack = True
           end
           object CStaticInoutCyclicCashpoint: TCStatic
-            Left = 328
-            Top = 41
+            Left = 112
+            Top = 77
             Width = 145
             Height = 21
             Cursor = crHandPoint

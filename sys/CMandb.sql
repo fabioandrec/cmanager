@@ -202,6 +202,8 @@ create table baseMovement (
   movementCash money not null,
   idExtractionItem uniqueidentifier null,
   isStated bit not null,
+  idSourceExtractionItem uniqueidentifier null,
+  isSourceStated bit not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -212,7 +214,8 @@ create table baseMovement (
   constraint fk_movementAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_movementMovementCurrencyDef foreign key (idMovementCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_movementCurrencyRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),
-  constraint fk_movementExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem)
+  constraint fk_movementExtractionItem foreign key (idExtractionItem) references extractionItem (idExtractionItem),
+  constraint fk_movementSourceExtractionItem foreign key (idSourceExtractionItem) references extractionItem (idExtractionItem)
 );
 
 create table movementFilter (
