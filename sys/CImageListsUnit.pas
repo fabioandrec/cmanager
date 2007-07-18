@@ -32,6 +32,7 @@ type
     ChartImageList32x32: TPngImageList;
     ExtractionImageList24x24: TPngImageList;
     ExtstatusImageList16x16: TPngImageList;
+    MovstatusImageList16x16: TPngImageList;
   private
     { Private declarations }
   public

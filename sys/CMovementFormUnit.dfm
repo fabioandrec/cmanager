@@ -142,7 +142,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 232
-        ActivePage = TabSheetTrans
+        ActivePage = TabSheetInOutCyclic
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -222,6 +222,19 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Kwota w walucie konta'
           end
+          object CButton6: TCButton
+            Left = 366
+            Top = 39
+            Width = 107
+            Height = 25
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = ActionStateTransSource
+            Color = clBtnFace
+          end
           object CStaticInoutCyclic: TCStatic
             Left = 112
             Top = 5
@@ -244,7 +257,7 @@ inherited CMovementForm: TCMovementForm
           object CStaticInoutCyclicAccount: TCStatic
             Left = 112
             Top = 41
-            Width = 361
+            Width = 257
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
@@ -444,10 +457,36 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Kwota w walucie konta'
           end
+          object CButton3: TCButton
+            Left = 366
+            Top = 3
+            Width = 107
+            Height = 25
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = ActionStateTransSource
+            Color = clBtnFace
+          end
+          object CButton4: TCButton
+            Left = 366
+            Top = 39
+            Width = 107
+            Height = 25
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = ActionStateTransSource
+            Color = clBtnFace
+          end
           object CStaticTransSourceAccount: TCStatic
             Left = 112
             Top = 5
-            Width = 361
+            Width = 257
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
@@ -466,7 +505,7 @@ inherited CMovementForm: TCMovementForm
           object CStaticTransDestAccount: TCStatic
             Left = 112
             Top = 41
-            Width = 361
+            Width = 257
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
@@ -636,10 +675,23 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Przelicznik'
           end
+          object CButton5: TCButton
+            Left = 366
+            Top = 3
+            Width = 107
+            Height = 25
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = ActionStateTransSource
+            Color = clBtnFace
+          end
           object CStaticInoutOnceAccount: TCStatic
             Left = 112
             Top = 5
-            Width = 361
+            Width = 257
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
@@ -806,6 +858,32 @@ inherited CMovementForm: TCMovementForm
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
       OnExecute = ActionTemplateExecute
+    end
+  end
+  object ActionManagerStates: TActionManager
+    Images = CImageLists.MovstatusImageList16x16
+    Left = 104
+    Top = 186
+    StyleName = 'XP Style'
+    object ActionStateOnce: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateOnceExecute
+    end
+    object ActionStateTransSource: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateTransSourceExecute
+    end
+    object ActionStateTransDest: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateTransDestExecute
+    end
+    object ActionStateCyclic: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateCyclicExecute
     end
   end
 end

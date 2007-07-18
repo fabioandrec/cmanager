@@ -109,7 +109,8 @@ uses
   CFilterDetailFrameUnit in 'CFilterDetailFrameUnit.pas' {CFilterDetailFrame: TFrame},
   CExtractionsFrameUnit in 'CExtractionsFrameUnit.pas' {CExtractionsFrame: TFrame},
   CExtractionFormUnit in 'CExtractionFormUnit.pas' {CExtractionForm},
-  CExtractionItemFormUnit in 'CExtractionItemFormUnit.pas' {CExtractionItemForm};
+  CExtractionItemFormUnit in 'CExtractionItemFormUnit.pas' {CExtractionItemForm},
+  CMovementStateFormUnit in 'CMovementStateFormUnit.pas' {CMovementStateForm};
 
 {$R *.res}
 

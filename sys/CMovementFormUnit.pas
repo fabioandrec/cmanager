@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
   CComponents, CDatabase, CBaseFrameUnit, ActnList, XPStyleActnCtrls,
-  ActnMan, CImageListsUnit, Contnrs, CDataObjects;
+  ActnMan, CImageListsUnit, Contnrs, CDataObjects, CMovementStateFormUnit;
 
 type
   TMovementAdditionalData = class(TAdditionalData)
@@ -87,6 +87,15 @@ type
     Label28: TLabel;
     CCurrEditTransAccount: TCCurrEdit;
     CDateTime: TCDateTime;
+    ActionManagerStates: TActionManager;
+    ActionStateOnce: TAction;
+    ActionStateTransSource: TAction;
+    ActionStateTransDest: TAction;
+    ActionStateCyclic: TAction;
+    CButton3: TCButton;
+    CButton4: TCButton;
+    CButton5: TCButton;
+    CButton6: TCButton;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -124,7 +133,15 @@ type
     procedure CStaticInOutCyclicRateChanged(Sender: TObject);
     procedure CStaticTransRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticTransRateChanged(Sender: TObject);
+    procedure ActionStateOnceExecute(Sender: TObject);
+    procedure ActionStateTransSourceExecute(Sender: TObject);
+    procedure ActionStateTransDestExecute(Sender: TObject);
+    procedure ActionStateCyclicExecute(Sender: TObject);
   private
+    FonceState: TMovementStateRecord;
+    FcyclicState: TMovementStateRecord;
+    FtransSourceState: TMovementStateRecord;
+    FtransDestState: TMovementStateRecord;
     FbaseAccount: TDataGid;
     FsourceAccount: TDataGid;
     FbaseList: TDataGid;
@@ -132,6 +149,8 @@ type
     FCyclicRateHelper: TCurrencyRateHelper;
     FTransferRateHelper: TCurrencyRateHelper;
   protected
+    procedure ChooseState(AStateRecord: TMovementStateRecord; AAction: TAction);
+    procedure UpdateState(AStateRecord: TMovementStateRecord; AAction: TAction);
     procedure UpdateCurrencyRates(AUpdateCurEdit: Boolean = True);
     procedure UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
     procedure UpdateAccountCurDef(AAccountId: TDataGid; AStatic: TCStatic; ACurEdit: TCCurrEdit);
@@ -216,6 +235,10 @@ begin
   FOnceRateHelper := Nil;
   FCyclicRateHelper := Nil;
   FTransferRateHelper := Nil;
+  FonceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
+  FcyclicState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
+  FtransSourceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
+  FtransDestState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   CDateTime.Value := GWorkDate;
   FbaseAccount := CEmptyDataGid;
   FbaseList := CEmptyDataGid;
@@ -249,6 +272,10 @@ begin
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
   UpdateCurrencyRates;
+  UpdateState(FonceState, ActionStateOnce);
+  UpdateState(FcyclicState, ActionStateCyclic);
+  UpdateState(FtransSourceState, ActionStateTransSource);
+  UpdateState(FtransDestState, ActionStateTransDest);
 end;
 
 procedure TCMovementForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -1129,6 +1156,10 @@ end;
 
 destructor TCMovementForm.Destroy;
 begin
+  FonceState.Free;
+  FcyclicState.Free;
+  FtransSourceState.Free;
+  FtransDestState.Free;
   if FOnceRateHelper <> Nil then begin
     FOnceRateHelper.Free;
   end;
@@ -1197,6 +1228,39 @@ begin
     AStatic.DataId := CEmptyDataGid;
     ACurEdit.SetCurrencyDef(CEmptyDataGid, '');
   end;
+end;
+
+procedure TCMovementForm.ChooseState(AStateRecord: TMovementStateRecord; AAction: TAction);
+begin
+  if ShowMovementState(AStateRecord) then begin
+    UpdateState(AStateRecord, AAction);
+  end;
+end;
+
+procedure TCMovementForm.UpdateState(AStateRecord: TMovementStateRecord; AAction: TAction);
+begin
+  AAction.ImageIndex := IfThen(AStateRecord.Stated, 0, 1);
+  AAction.Caption := IfThen(AStateRecord.Stated, 'Uzgodnione', 'Do uzgodnienia');
+end;
+
+procedure TCMovementForm.ActionStateOnceExecute(Sender: TObject);
+begin
+  ChooseState(FonceState, ActionStateOnce);
+end;
+
+procedure TCMovementForm.ActionStateTransSourceExecute(Sender: TObject);
+begin
+  ChooseState(FtransSourceState, ActionStateTransSource);
+end;
+
+procedure TCMovementForm.ActionStateTransDestExecute(Sender: TObject);
+begin
+  ChooseState(FtransDestState, ActionStateTransDest);
+end;
+
+procedure TCMovementForm.ActionStateCyclicExecute(Sender: TObject);
+begin
+  ChooseState(FcyclicState, ActionStateCyclic);
 end;
 
 end.
