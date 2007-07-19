@@ -1013,7 +1013,7 @@ initialization
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'));
     Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'));
-    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodnione'));
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodniona'));
   end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin

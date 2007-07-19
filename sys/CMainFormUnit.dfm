@@ -398,6 +398,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionShortcutExtractions
+                Caption = 'W&yci'#261'gi'
                 ImageIndex = 13
               end>
             Caption = '&Skr'#243'ty'
@@ -427,6 +428,9 @@ object CMainForm: TCMainForm
               item
                 Action = ActionImportCurrencyRates
                 Caption = 'W&czytaj kursy walut'
+              end
+              item
+                Action = ActionImportExtraction
               end
               item
                 Caption = '&Wtyczki'
@@ -646,6 +650,11 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Wyci'#261'gi'
       ImageIndex = 13
+    end
+    object ActionImportExtraction: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Wczytaj wyci'#261'g bankowy'
+      OnExecute = ActionImportExtractionExecute
     end
   end
   object OpenDialog: TOpenDialog

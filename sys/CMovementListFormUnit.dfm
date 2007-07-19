@@ -1,6 +1,6 @@
 inherited CMovementListForm: TCMovementListForm
-  Left = 348
-  Top = 32
+  Left = 178
+  Top = 35
   Caption = 'Lista operacji'
   ClientHeight = 667
   ClientWidth = 536
@@ -48,6 +48,19 @@ inherited CMovementListForm: TCMovementListForm
         Alignment = taRightJustify
         Caption = 'Kontrahent listy operacji'
       end
+      object CButtonStateOnce: TCButton
+        Left = 374
+        Top = 59
+        Width = 107
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionStateOnce
+        Color = clBtnFace
+      end
       object CDateTime1: TCDateTime
         Left = 48
         Top = 24
@@ -85,7 +98,7 @@ inherited CMovementListForm: TCMovementListForm
       object CStaticInoutOnceAccount: TCStatic
         Left = 192
         Top = 61
-        Width = 289
+        Width = 185
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -454,6 +467,17 @@ inherited CMovementListForm: TCMovementListForm
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
       OnExecute = ActionTemplateExecute
+    end
+  end
+  object ActionManagerStates: TActionManager
+    Images = CImageLists.MovstatusImageList16x16
+    Left = 176
+    Top = 234
+    StyleName = 'XP Style'
+    object ActionStateOnce: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateOnceExecute
     end
   end
 end

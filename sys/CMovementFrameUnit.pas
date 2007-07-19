@@ -341,13 +341,13 @@ begin
   end else if Column = 6 then begin
     if xData.movementType = CTransferMovement then begin
       if TBaseMovement(xData.Dataobject).isStated and TBaseMovement(xData.Dataobject).isSourceStated then begin
-        CellText := 'Uzgodniony';
+        CellText := 'Uzgodniona';
       end else begin
         CellText := 'Do uzgodnienia';
       end;
     end else begin
       if xData.isStated then begin
-        CellText := 'Uzgodniony';
+        CellText := 'Uzgodniona';
       end else begin
         CellText := 'Do uzgodnienia';
       end;

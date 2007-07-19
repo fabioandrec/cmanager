@@ -19,6 +19,7 @@ function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolea
 procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
 procedure UpdateCurrencyRates(ARatesText: String);
+procedure UpdateExtractions(AExtractionText: String);
 procedure ReloadCurrencyCache;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
 
@@ -27,7 +28,8 @@ implementation
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
   CTools, StrUtils, CPreferences, CXml, CUpdateCurrencyRatesFormUnit,
-  CAdox;
+  CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
+  CExtractionItemFormUnit;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -393,6 +395,92 @@ begin
   end;
   if xError <> '' then begin
     ShowInfo(itError, 'Nie uda³o siê wykonaæ eksportu do pliku w formacie Excel', xError);
+  end;
+end;
+
+procedure UpdateExtractions(AExtractionText: String);
+var xDoc: IXMLDOMDocument;
+    xRoot: IXMLDOMNode;
+    xList: IXMLDOMNodeList;
+    xValid: Boolean;
+    xError, xDesc: String;
+    xCreationDate, xStartDate, xEndDate: TDateTime;
+    xForm: TCDataobjectForm;
+    xCount: Integer;
+    xParams: TExtractionAdditionalData;
+    xNode: IXMLDOMNode;
+    xRegDate: TDateTime;
+    xCash: Currency;
+    xMovementType, xCurrencyIso: String;
+    xItem: TExtractionListElement;
+    xCurrCache: TCurrCacheItem;
+begin
+  xValid := False;
+  xDoc := GetDocumentFromString(AExtractionText);
+  if xDoc.parseError.errorCode = 0 then begin
+    xRoot := xDoc.selectSingleNode('accountExtraction');
+    if xRoot <> Nil then begin
+      xCreationDate := DmyToDate(GetXmlAttribute('creationDate', xRoot, ''), 0);
+      if xCreationDate <> 0 then begin
+        xStartDate := DmyToDate(GetXmlAttribute('startDate', xRoot, ''), 0);
+        xEndDate := DmyToDate(GetXmlAttribute('endDate', xRoot, ''), 0);
+        if (xStartDate <> 0) and (xEndDate <> 0) then begin
+          xValid := True;
+          xDesc := GetXmlAttribute('description', xRoot, '');
+          xList := xRoot.selectNodes('extractionItem');
+          xCount := 0;
+          xParams := TExtractionAdditionalData.Create(xCreationDate, xStartDate, xEndDate, xDesc);
+          while xValid and (xCount <= xList.length - 1) do begin
+            xNode := xList.item[xCount];
+            xRegDate := DmyToDate(GetXmlAttribute('date', xNode, ''), 0);
+            if xRegDate <> 0 then begin
+              xCash := StrToCurrencyDecimalDot(GetXmlAttribute('cash', xNode, ''));
+              xMovementType := GetXmlAttribute('type', xNode, '');
+              if (xMovementType = CInMovement) or (xMovementType = COutMovement) then begin
+                xCurrencyIso := GetXmlAttribute('currency', xNode, '');
+                xCurrCache := GCurrencyCache.ByIso[xCurrencyIso];
+                if xCurrCache <> Nil then begin
+                  xItem := TExtractionListElement.Create;
+                  xItem.movementType := xMovementType;
+                  xItem.cash := xCash;
+                  xItem.description := GetXmlAttribute('description', xNode, '');
+                  xItem.regTime := xRegDate;
+                  xItem.idAccount := CEmptyDataGid;
+                  xItem.idCurrencyDef := xCurrCache.CurrId;
+                  xParams.movements.Add(xItem);
+                end else begin
+                  xValid := False;
+                  xError := 'Brak waluty o symbolu Iso "' + xCurrencyIso + '". Zdefiniuj walutê o takim symbolu i spróbuj ponownie';
+                end;
+              end else begin
+                xValid := False;
+                xError := 'Brak okreœlenia typu operacji wyci¹gu dla elementu numer ' + IntToStr(xCount);
+              end;
+            end else begin
+              xValid := False;
+              xError := 'Brak okreœlenia daty operacji wyci¹gu dla elementu numer ' + IntToStr(xCount);
+            end;
+            Inc(xCount);
+          end;
+          if xValid then begin
+            xForm :=  TCExtractionForm.Create(Nil);
+            xForm.ShowDataobject(coAdd, AccountExtractionProxy, Nil, True, xParams);
+            xForm.Free;
+          end;
+        end else begin
+          xError := 'Brak okreœlenia daty pocz¹tku lub daty koñca wyci¹gu';
+        end;
+      end else begin
+        xError := 'Brak okreœlenia daty utworzenia wyci¹gu';
+      end;
+    end else begin
+      xError := 'Brak elementu zbiorczego';
+    end;
+  end else begin
+    xError := xDoc.parseError.reason;
+  end;
+  if not xValid then begin
+    ShowInfo(itError, 'Otrzymane dane nie s¹ poprawnym wyci¹giem bankowym', xError);
   end;
 end;
 

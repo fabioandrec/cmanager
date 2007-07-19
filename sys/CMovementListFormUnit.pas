@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, VirtualTrees, ActnList, XPStyleActnCtrls, ActnMan, Contnrs,
-  CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit, CTools;
+  CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit, CTools,
+  CMovementStateFormUnit;
 
 type
   TCMovementListForm = class(TCDataobjectForm)
@@ -46,6 +47,9 @@ type
     Panel: TPanel;
     Label8: TLabel;
     CStaticViewCurrency: TCStatic;
+    ActionManagerStates: TActionManager;
+    ActionStateOnce: TAction;
+    CButtonStateOnce: TCButton;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -69,6 +73,7 @@ type
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticViewCurrencyChanged(Sender: TObject);
+    procedure ActionStateOnceExecute(Sender: TObject);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -78,12 +83,15 @@ type
     FbaseCashpoint: TDataGid;
     FbaseDate: TDateTime;
     FprevSums: TSumList;
+    FonceState: TMovementStateRecord;
     procedure MessageMovementAdded(AData: TMovementListElement);
     procedure MessageMovementEdited(AData: TMovementListElement);
     procedure MessageMovementDeleted(AData: TMovementListElement);
     function FindNodeByData(AData: TMovementListElement): PVirtualNode;
     function GetCash: Currency;
     procedure UpdateButtons;
+    procedure ChooseState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
+    procedure UpdateState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure InitializeForm; override;
@@ -140,6 +148,7 @@ end;
 
 destructor TCMovementListForm.Destroy;
 begin
+  FonceState.Free;
   Fadded.Free;
   Fdeleted.Free;
   Fmodified.Free;
@@ -249,6 +258,7 @@ procedure TCMovementListForm.InitializeForm;
 var xProfile: TProfile;
 begin
   inherited InitializeForm;
+  FonceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   CCurrEditCash.Value := GetCash;
   CDateTime1.Value := GWorkDate;
   if Operation = coAdd then begin
@@ -274,6 +284,8 @@ begin
       GDataProvider.RollbackTransaction;
     end;
   end;
+  UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
+  CButtonStateOnce.Enabled := False;
   UpdateDescription;
 end;
 
@@ -472,6 +484,11 @@ begin
     CStaticCurrency.DataId := idAccountCurrencyDef;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idAccountCurrencyDef, False)).GetElementText;
     CCurrEditCash.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
+    FonceState.AccountId := idAccount;
+    FonceState.ExtrId := idExtractionItem;
+    FonceState.Stated := isStated;
+    UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
+    CButtonStateOnce.Enabled := idAccount <> CEmptyDataGid;
     xList := GetMovements;
     Fmovements.Clear;
     for xCount := 0 to xList.Count - 1 do begin
@@ -513,6 +530,8 @@ begin
     regDate := CDateTime1.Value;
     movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
     idAccountCurrencyDef := CStaticCurrency.DataId;
+    isStated := FonceState.Stated;
+    idExtractionItem := FonceState.ExtrId;
   end;
 end;
 
@@ -686,6 +705,9 @@ begin
     CStaticCurrency.DataId := CEmptyDataGid;
     CCurrEditCash.SetCurrencyDef(CEmptyDataGid, '');
   end;
+  CButtonStateOnce.Enabled := CStaticInoutOnceAccount.DataId <> CEmptyDataGid;
+  FonceState.AccountId := CStaticInoutOnceAccount.DataId;
+  UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
   UpdateDescription;
 end;
 
@@ -755,6 +777,26 @@ end;
 procedure TCMovementListForm.CStaticViewCurrencyChanged(Sender: TObject);
 begin
   MovementList.Repaint;
+end;
+
+procedure TCMovementListForm.ChooseState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
+begin
+  if ShowMovementState(AStateRecord) then begin
+    UpdateState(AStateRecord, AAction, AButton);
+  end;
+end;
+
+procedure TCMovementListForm.UpdateState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
+begin
+  AAction.ImageIndex := IfThen(AStateRecord.Stated, 0, 1);
+  AAction.Caption := IfThen(AStateRecord.Stated, 'Uzgodniona', 'Do uzgodnienia');
+  AButton.Action := AAction;
+  AButton.Enabled := AStateRecord.AccountId <> CEmptyDataGid;
+end;
+
+procedure TCMovementListForm.ActionStateOnceExecute(Sender: TObject);
+begin
+  ChooseState(FonceState, ActionStateOnce, CButtonStateOnce);
 end;
 
 end.

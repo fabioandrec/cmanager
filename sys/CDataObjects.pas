@@ -604,6 +604,7 @@ type
   published
     property CurrSymbol: String read FCurrSymbol write SetCurrSymbol;
     property CurrIso: String read FCurrIso write SetCurrIso;
+    property CurrId: String read FCurrI;
   end;
 
   TCurrCache = class(TObjectList)
@@ -611,12 +612,14 @@ type
     function GetItems(AIndex: Integer): TCurrCacheItem;
     procedure SetItems(AIndex: Integer; const Value: TCurrCacheItem);
     function GetById(AId: String): TCurrCacheItem;
+    function GetByIso(AIso: String): TCurrCacheItem;
   public
     procedure Change(AId, ASymbol, AIso: String);
     function GetSymbol(AId: String): String;
     function GetIso(AId: String): String;
     property Items[AIndex: Integer]: TCurrCacheItem read GetItems write SetItems;
     property ById[AId: String]: TCurrCacheItem read GetById;
+    property ByIso[AIso: String]: TCurrCacheItem read GetByIso;
   end;
 
   TAccountCurrencyRule = class(TDataObject)
@@ -2671,6 +2674,19 @@ begin
   xCount := 0;
   while (Result = Nil) and (xCount <= GCurrencyCache.Count - 1) do begin
     if AId = GCurrencyCache.Items[xCount].FCurrI then begin
+      Result := GCurrencyCache.Items[xCount];
+    end;
+    Inc(xCount);
+  end;
+end;
+
+function TCurrCache.GetByIso(AIso: String): TCurrCacheItem;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (Result = Nil) and (xCount <= GCurrencyCache.Count - 1) do begin
+    if AIso = GCurrencyCache.Items[xCount].FCurrIso then begin
       Result := GCurrencyCache.Items[xCount];
     end;
     Inc(xCount);

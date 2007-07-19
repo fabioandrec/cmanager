@@ -403,7 +403,7 @@ begin
     end else if CCurrEditInOutOnceAccount.Value = 0 then begin
       Result := False;
       ShowInfo(itError, 'Kwota operacji nie mo¿e byæ zerowa', '');
-      CCurrEditInOutOnceAccount.SetFocus;
+      CCurrEditInoutOnceMovement.SetFocus;
     end;
   end else if xI = 2 then begin
     if CStaticTransSourceAccount.DataId = CEmptyDataGid then begin
@@ -432,7 +432,7 @@ begin
     end else if CCurrEditTransAccount.Value = 0 then begin
       Result := False;
       ShowInfo(itError, 'Kwota transferu nie mo¿e byæ zerowa', '');
-      CCurrEditTransAccount.SetFocus;
+      CCurrEditTransMovement.SetFocus;
     end;
   end else if (xI = 3) or (xI = 4) then begin
     if CStaticInoutCyclic.DataId = CEmptyDataGid then begin
@@ -1284,7 +1284,7 @@ end;
 procedure TCMovementForm.UpdateState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
 begin
   AAction.ImageIndex := IfThen(AStateRecord.Stated, 0, 1);
-  AAction.Caption := IfThen(AStateRecord.Stated, 'Uzgodnione', 'Do uzgodnienia');
+  AAction.Caption := IfThen(AStateRecord.Stated, 'Uzgodniona', 'Do uzgodnienia');
   AButton.Action := AAction;
   AButton.Enabled := AStateRecord.AccountId <> CEmptyDataGid;
 end;

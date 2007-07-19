@@ -207,7 +207,7 @@ begin
   end else if CCurrEditAccount.Value = 0 then begin
     Result := False;
     ShowInfo(itError, 'Kwota operacji nie mo¿e byæ zerowa', '');
-    CCurrEditAccount.SetFocus;
+    CCurrEditMovement.SetFocus;
   end;
 end;
 

@@ -65,6 +65,7 @@ type
     ActionHistory: TAction;
     Splitter: TSplitter;
     ActionShortcutExtractions: TAction;
+    ActionImportExtraction: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -96,6 +97,7 @@ type
     procedure ActionFutureRequestExecute(Sender: TObject);
     procedure ActionHistoryExecute(Sender: TObject);
     procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure ActionImportExtractionExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -659,6 +661,26 @@ end;
 procedure TCMainForm.ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
 begin
   ImageIndex := TAction(FShortcutList.Objects[Node.Index]).ImageIndex;
+end;
+
+procedure TCMainForm.ActionImportExtractionExecute(Sender: TObject);
+var xStr: TStringList;
+begin
+  if OpenDialogXml.Execute then begin
+    xStr := TStringList.Create;
+    try
+      try
+        xStr.LoadFromFile(OpenDialogXml.FileName);
+        UpdateExtractions(xStr.Text);
+      except
+        on E: Exception do begin
+          ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku ' + OpenDialogXml.FileName, E.Message);
+        end;
+      end;
+    finally
+      xStr.Free;
+    end;
+  end;
 end;
 
 end.

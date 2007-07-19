@@ -142,7 +142,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 232
-        ActivePage = TabSheetInOutOnce
+        ActivePage = TabSheetInOutCyclic
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -167,7 +167,7 @@ inherited CMovementForm: TCMovementForm
             Caption = 'Konto operacji'
           end
           object Label12: TLabel
-            Left = 275
+            Left = 299
             Top = 81
             Width = 45
             Height = 13
@@ -233,7 +233,6 @@ inherited CMovementForm: TCMovementForm
             TxtOffset = 15
             Framed = False
             Action = ActionStateTransSource
-            OnClick = ActionStateCyclicExecute
             Color = clBtnFace
           end
           object CStaticInoutCyclic: TCStatic
@@ -275,14 +274,14 @@ inherited CMovementForm: TCMovementForm
             HotTrack = True
           end
           object CStaticInoutCyclicCategory: TCStatic
-            Left = 328
+            Left = 352
             Top = 77
-            Width = 145
+            Width = 121
             Height = 21
             Cursor = crHandPoint
             AutoSize = False
             BevelKind = bkTile
-            Caption = '<wybierz kategori'#281' z listy>'
+            Caption = '<wybierz kategori'#281'>'
             Color = clWindow
             ParentColor = False
             TabOrder = 3
@@ -687,7 +686,6 @@ inherited CMovementForm: TCMovementForm
             TxtOffset = 15
             Framed = False
             Action = ActionStateTransSource
-            OnClick = ActionStateOnceExecute
             Color = clBtnFace
           end
           object CStaticInoutOnceAccount: TCStatic

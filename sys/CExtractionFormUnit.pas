@@ -9,6 +9,19 @@ uses
   CDatabase, CBaseFrameUnit, CExtractionItemFormUnit;
 
 type
+  TExtractionAdditionalData = class(TAdditionalData)
+  private
+    FcreationDate: TDateTime;
+    FstartDate: TDateTime;
+    FendDate: TDateTime;
+    Fdescription: String;
+    Fmovements: TObjectList;
+  public
+    constructor Create(ACDate, ASDate, AEDate: TDateTime; ADescription: String);
+    destructor Destroy; override;
+    property movements: TObjectList read Fmovements write Fmovements;
+  end;
+
   TCExtractionForm = class(TCDataobjectForm)
     GroupBox1: TGroupBox;
     Label3: TLabel;
@@ -100,7 +113,11 @@ begin
 end;
 
 procedure TCExtractionForm.CStaticAccountChanged(Sender: TObject);
+var xCount: Integer;
 begin
+  for xCount := 0 to Fmovements.Count - 1 do begin
+    TExtractionListElement(Fmovements.Items[xCount]).idAccount := CStaticAccount.DataId;
+  end;
   UpdateDescription;
 end;
 
@@ -119,11 +136,27 @@ end;
 
 
 procedure TCExtractionForm.InitializeForm;
+var xItem: TExtractionListElement;
 begin
   inherited InitializeForm;
-  CDateTime.Value := GWorkDate;
-  CDateTime1.Value := StartOfTheMonth(GWorkDate);
-  CDateTime2.Value := EndOfTheMonth(GWorkDate);
+  if AdditionalData = Nil then begin
+    CDateTime.Value := GWorkDate;
+    CDateTime1.Value := StartOfTheMonth(GWorkDate);
+    CDateTime2.Value := EndOfTheMonth(GWorkDate);
+  end else begin
+    CDateTime.Value := TExtractionAdditionalData(AdditionalData).FcreationDate;
+    CDateTime1.Value := TExtractionAdditionalData(AdditionalData).FstartDate;
+    CDateTime2.Value := TExtractionAdditionalData(AdditionalData).FendDate;
+    ComboBoxTemplate.ItemIndex := 0;
+    SimpleRichText(TExtractionAdditionalData(AdditionalData).Fdescription, RichEditDesc);
+    while TExtractionAdditionalData(AdditionalData).movements.Count > 0 do begin
+      xItem := TExtractionListElement(TExtractionAdditionalData(AdditionalData).movements.First);
+      xItem := TExtractionListElement(TExtractionAdditionalData(AdditionalData).movements.Extract(xItem));
+      Fmovements.Add(xItem);
+      Fadded.Add(xItem);
+    end;
+    MovementList.RootNodeCount := Fmovements.Count;
+  end;
   MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
   UpdateButtons;
   UpdateDescription;
@@ -548,6 +581,22 @@ begin
     xData := TExtractionListElement(MovementList.GetNodeData(Node)^);
     ImageIndex := IfThen(xData.movementType = CInMovement, 0, 1);
   end;
+end;
+
+constructor TExtractionAdditionalData.Create(ACDate, ASDate, AEDate: TDateTime; ADescription: String);
+begin
+  inherited Create;
+  FcreationDate := ACDate;
+  FstartDate := ASDate;
+  FendDate := AEDate;
+  Fdescription := ADescription;
+  Fmovements := TObjectList.Create;
+end;
+
+destructor TExtractionAdditionalData.Destroy;
+begin
+  Fmovements.Free;
+  inherited Destroy;
 end;
 
 end.
