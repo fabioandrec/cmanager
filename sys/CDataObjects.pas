@@ -2974,7 +2974,7 @@ end;
 function TExtractionItem.GetColumnImage(AColumnIndex: Integer): Integer;
 begin
   Result := -1;
-  if AColumnIndex = 4 then begin
+  if AColumnIndex = 5 then begin
     Result := IfThen(FmovementType = CInMovement, 0, 1);
   end;
 end;
