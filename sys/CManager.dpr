@@ -110,7 +110,8 @@ uses
   CExtractionsFrameUnit in 'CExtractionsFrameUnit.pas' {CExtractionsFrame: TFrame},
   CExtractionFormUnit in 'CExtractionFormUnit.pas' {CExtractionForm},
   CExtractionItemFormUnit in 'CExtractionItemFormUnit.pas' {CExtractionItemForm},
-  CMovementStateFormUnit in 'CMovementStateFormUnit.pas' {CMovementStateForm};
+  CMovementStateFormUnit in 'CMovementStateFormUnit.pas' {CMovementStateForm},
+  CExtractionItemFrameUnit in 'CExtractionItemFrameUnit.pas' {CExtractionItemFrame: TFrame};
 
 {$R *.res}
 
@@ -155,7 +156,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;

@@ -182,6 +182,7 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetMovements: TDataObjectList;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    function GetElementText: String; override;
   published
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property extractionState: TBaseEnumeration read FextractionState write SetExtractionState;
@@ -210,6 +211,9 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    function GetElementText: String; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property regDate: TDateTime read FregDate write SetregDate;
@@ -2967,6 +2971,34 @@ begin
   end;
 end;
 
+function TExtractionItem.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := -1;
+  if AColumnIndex = 4 then begin
+    Result := IfThen(FmovementType = CInMovement, 0, 1);
+  end;
+end;
+
+function TExtractionItem.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 1 then begin
+    Result := DateToStr(FregDate);
+  end else if AColumnIndex = 2 then begin
+    Result := Fdescription;
+  end else if AColumnIndex = 3 then begin
+    Result := CurrencyToString(IfThen(FmovementType = CInMovement, 1, -1) * cash, '', False);
+  end else if AColumnIndex = 4 then begin
+    Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
+  end else if AColumnIndex = 5 then begin
+    Result := IfThen(FmovementType = CInMovement, 'Uznanie', 'Obci¹¿enie');
+  end;
+end;
+
+function TExtractionItem.GetElementText: String;
+begin
+  Result := Fdescription;
+end;
+
 function TExtractionItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
   Result := inherited OnDeleteObject(AProxy);
@@ -3176,6 +3208,11 @@ begin
     end;
     SetState(msModified);
   end;
+end;
+
+function TAccountExtraction.GetElementText: String;
+begin
+  Result := Fdescription;
 end;
 
 initialization

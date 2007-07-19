@@ -71,7 +71,8 @@ inherited CMovementStateForm: TCMovementStateForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz operacj'#281' z wyci'#261'gu>'
-        HotTrack = False
+        OnGetDataId = CStaticExtItemGetDataId
+        HotTrack = True
       end
       object CStaticAccountExt: TCStatic
         Left = 72
@@ -88,6 +89,7 @@ inherited CMovementStateForm: TCMovementStateForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz wyci'#261'g>'
+        OnGetDataId = CStaticAccountExtGetDataId
         HotTrack = True
       end
     end

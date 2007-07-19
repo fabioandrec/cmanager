@@ -339,10 +339,18 @@ begin
       CellText := CTransferMovementDescription;
     end;
   end else if Column = 6 then begin
-    if xData.isStated then begin
-      CellText := 'Uzgodniony';
+    if xData.movementType = CTransferMovement then begin
+      if TBaseMovement(xData.Dataobject).isStated and TBaseMovement(xData.Dataobject).isSourceStated then begin
+        CellText := 'Uzgodniony';
+      end else begin
+        CellText := 'Do uzgodnienia';
+      end;
     end else begin
-      CellText := 'Do uzgodnienia';
+      if xData.isStated then begin
+        CellText := 'Uzgodniony';
+      end else begin
+        CellText := 'Do uzgodnienia';
+      end;
     end;
   end;
 end;
@@ -892,10 +900,18 @@ begin
       ImageIndex := 2;
     end;
   end else if Column = 6 then begin
-    if xBase.isStated then begin
-      ImageIndex := 4;
-    end else if xBase.movementType = CTransferMovement then begin
-      ImageIndex := 3;
+    if xBase.movementType = CTransferMovement then begin
+      if TBaseMovement(xBase.Dataobject).isStated and TBaseMovement(xBase.Dataobject).isSourceStated then begin
+        ImageIndex := 4;
+      end else begin
+        ImageIndex := 3;
+      end;
+    end else begin
+      if xBase.isStated then begin
+        ImageIndex := 4;
+      end else begin
+        ImageIndex := 3;
+      end;
     end;
   end;
 end;

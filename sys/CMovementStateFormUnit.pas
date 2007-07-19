@@ -14,12 +14,13 @@ type
     FStated: Boolean;
     FExtrId: TDataGid;
     procedure SetAccountId(const Value: TDataGid);
+    procedure SetExtrId(const Value: TDataGid);
   public
     constructor Create(AAccount: TDataGid; AState: Boolean; AExtrId: TDataGid);
   published
     property AccountId: TDataGid read FAccountId write SetAccountId;
     property Stated: Boolean read FStated write FStated;
-    property ExtrId: TDataGid read FExtrId write FExtrId;
+    property ExtrId: TDataGid read FExtrId write SetExtrId;
   end;
 
   TCMovementStateForm = class(TCConfigForm)
@@ -31,6 +32,9 @@ type
     CStaticExtItem: TCStatic;
     CStaticAccountExt: TCStatic;
     procedure ComboBoxStatusChange(Sender: TObject);
+    procedure CStaticAccountExtGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticExtItemGetDataId(var ADataGid, AText: String;
+      var AAccepted: Boolean);
   private
     FRecord: TMovementStateRecord;
     FHasExts: Boolean;
@@ -42,7 +46,8 @@ function ShowMovementState(var ARecord: TMovementStateRecord): Boolean;
 
 implementation
 
-uses CConsts, Math;
+uses CConsts, Math, CFrameFormUnit, CExtractionsFrameUnit,
+  CExtractionItemFrameUnit, CInfoFormUnit;
 
 {$R *.dfm}
 
@@ -68,8 +73,8 @@ begin
   xForm.ComboBoxStatusChange(xForm.ComboBoxStatus);
   Result := xForm.ShowConfig(coEdit);
   if Result then begin
-    ARecord.Stated := xForm.ComboBoxStatus.ItemIndex = 1;
     ARecord.ExtrId := xForm.CStaticExtItem.DataId;
+    ARecord.Stated := xForm.ComboBoxStatus.ItemIndex = 1;
   end;
   xForm.Free;
 end;
@@ -99,6 +104,35 @@ begin
   FAccountId := Value;
   FStated := False;
   FExtrId := CEmptyDataGid;
+end;
+
+procedure TMovementStateRecord.SetExtrId(const Value: TDataGid);
+begin
+  FExtrId := Value;
+  FStated := FExtrId <> CEmptyDataGid;
+end;
+
+procedure TCMovementStateForm.CStaticAccountExtGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xParams: TCExtractionFrameData;
+begin
+  xParams := TCExtractionFrameData.CreateWithFilter(CFilterAllElements);
+  xParams.idAccount := FRecord.AccountId;
+  AAccepted := TCFrameForm.ShowFrame(TCExtractionsFrame, ADataGid, AText, xParams);
+end;
+
+procedure TCMovementStateForm.CStaticExtItemGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xParams: TCExtractionItemFrameData;
+begin
+  if CStaticAccountExt.DataId <> CEmptyDataGid then begin
+    xParams := TCExtractionItemFrameData.CreateWithFilter(CFilterAllElements);
+    xParams.idAccountExtraction := CStaticAccountExt.DataId;
+    AAccepted := TCFrameForm.ShowFrame(TCExtractionItemFrame, ADataGid, AText, xParams);
+  end else begin
+    AAccepted := False;
+    if ShowInfo(itQuestion, 'Nie wybrano wyci¹gu. Czy wyœwietliæ listê teraz?', '') then begin
+      CStaticAccountExt.DoGetDataId;
+    end;
+  end;
 end;
 
 end.

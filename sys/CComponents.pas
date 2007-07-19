@@ -1709,7 +1709,11 @@ procedure TCDataList.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextTyp
 begin
   inherited DoGetText(Node, Column, TextType, Text);
   if Text = '' then begin
-    Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic);
+    if Header.Columns.Items[Column].Text = 'Lp' then begin
+      Text := IntToStr(Node.Index + 1);
+    end else begin
+      Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic);
+    end;
   end;
 end;
 

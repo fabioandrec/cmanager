@@ -142,7 +142,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 232
-        ActivePage = TabSheetInOutCyclic
+        ActivePage = TabSheetInOutOnce
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -222,7 +222,7 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Kwota w walucie konta'
           end
-          object CButton6: TCButton
+          object CButtonStateCyclic: TCButton
             Left = 366
             Top = 39
             Width = 107
@@ -233,6 +233,7 @@ inherited CMovementForm: TCMovementForm
             TxtOffset = 15
             Framed = False
             Action = ActionStateTransSource
+            OnClick = ActionStateCyclicExecute
             Color = clBtnFace
           end
           object CStaticInoutCyclic: TCStatic
@@ -457,7 +458,7 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Kwota w walucie konta'
           end
-          object CButton3: TCButton
+          object CButtonStateTransSource: TCButton
             Left = 366
             Top = 3
             Width = 107
@@ -470,7 +471,7 @@ inherited CMovementForm: TCMovementForm
             Action = ActionStateTransSource
             Color = clBtnFace
           end
-          object CButton4: TCButton
+          object CButtonStateTransDest: TCButton
             Left = 366
             Top = 39
             Width = 107
@@ -480,7 +481,7 @@ inherited CMovementForm: TCMovementForm
             PicOffset = 10
             TxtOffset = 15
             Framed = False
-            Action = ActionStateTransSource
+            Action = ActionStateTransDest
             Color = clBtnFace
           end
           object CStaticTransSourceAccount: TCStatic
@@ -675,7 +676,7 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Przelicznik'
           end
-          object CButton5: TCButton
+          object CButtonStateOnce: TCButton
             Left = 366
             Top = 3
             Width = 107
@@ -686,6 +687,7 @@ inherited CMovementForm: TCMovementForm
             TxtOffset = 15
             Framed = False
             Action = ActionStateTransSource
+            OnClick = ActionStateOnceExecute
             Color = clBtnFace
           end
           object CStaticInoutOnceAccount: TCStatic

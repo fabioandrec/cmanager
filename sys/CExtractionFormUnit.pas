@@ -59,6 +59,7 @@ type
     procedure MovementListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure MovementListDblClick(Sender: TObject);
     procedure MovementListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+    procedure MovementListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -456,11 +457,15 @@ begin
   if Column = 0 then begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
-    CellText := xData.description;
+    CellText := DateToStr(xData.regTime);
   end else if Column = 2 then begin
-    CellText := CurrencyToString(IfThen(xData.movementType = CInMovement, 1, -1) * xData.cash, '', False);
+    CellText := xData.description;
   end else if Column = 3 then begin
+    CellText := CurrencyToString(IfThen(xData.movementType = CInMovement, 1, -1) * xData.cash, '', False);
+  end else if Column = 4 then begin
     CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
+  end else if Column = 5 then begin
+    CellText := IfThen(xData.movementType = CInMovement, 'Uznanie', 'Obci¹¿enie');
   end;
 end;
 
@@ -533,6 +538,15 @@ begin
       Result := TAccount(TAccount.LoadObject(AccountProxy, CStaticAccount.DataId, False)).name;
       GDataProvider.RollbackTransaction;
     end;
+  end;
+end;
+
+procedure TCExtractionForm.MovementListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+var xData: TExtractionListElement;
+begin
+  if Column = 5 then begin
+    xData := TExtractionListElement(MovementList.GetNodeData(Node)^);
+    ImageIndex := IfThen(xData.movementType = CInMovement, 0, 1);
   end;
 end;
 

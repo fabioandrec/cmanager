@@ -9,6 +9,13 @@ uses
   CDatabase, CDataobjectFormUnit, CImageListsUnit;
 
 type
+  TCExtractionFrameData = class(TCDataobjectFrameData)
+  private
+    FidAccount: TDataGid;
+  published
+    property idAccount: TDataGid read FidAccount write FidAccount;
+  end;
+
   TCExtractionsFrame = class(TCDataobjectFrame)
   private
   public
@@ -24,7 +31,7 @@ type
 
 implementation
 
-uses CConsts, CExtractionFormUnit;
+uses CConsts, CExtractionFormUnit, CBaseFrameUnit;
 
 {$R *.dfm}
 
@@ -69,6 +76,9 @@ begin
   Result := (inherited IsValidFilteredObject(AObject)) or
             (CStaticFilter.DataId = CCashpointTypeAll) or
             (TAccountExtraction(AObject).extractionState = CStaticFilter.DataId);
+  if Result and (AdditionalData <> Nil) then begin
+    Result := TCExtractionFrameData(AdditionalData).idAccount = TAccountExtraction(AObject).idAccount;
+  end;
 end;
 
 procedure TCExtractionsFrame.ReloadDataobjects;
@@ -84,7 +94,13 @@ begin
   end else if CStaticFilter.DataId = CExtractionStateStated then begin
     xCondition := ' where state = ''' + CExtractionStateStated + '''';
   end;
-  xCondition := '';
+  if (AdditionalData <> Nil) then begin
+    if xCondition = '' then begin
+      xCondition := ' where idAccount = ' + DataGidToDatabase(TCExtractionFrameData(AdditionalData).idAccount);
+    end else begin
+      xCondition := ' and idAccount = ' + DataGidToDatabase(TCExtractionFrameData(AdditionalData).idAccount);
+    end;
+  end;
   Dataobjects := TDataObject.GetList(TAccountExtraction, AccountExtractionProxy, 'select * from accountExtraction' + xCondition);
 end;
 

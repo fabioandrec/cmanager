@@ -285,7 +285,7 @@ inherited CExtractionForm: TCExtractionForm
           BevelKind = bkFlat
           BorderStyle = bsNone
           DefaultNodeHeight = 24
-          Header.AutoSizeIndex = 1
+          Header.AutoSizeIndex = -1
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11
@@ -307,6 +307,7 @@ inherited CExtractionForm: TCExtractionForm
           OnDblClick = MovementListDblClick
           OnFocusChanged = MovementListFocusChanged
           OnGetText = MovementListGetText
+          OnGetImageIndex = MovementListGetImageIndex
           OnGetHint = MovementListGetHint
           OnGetNodeDataSize = MovementListGetNodeDataSize
           OnInitNode = MovementListInitNode
@@ -321,19 +322,29 @@ inherited CExtractionForm: TCExtractionForm
             end
             item
               Position = 1
-              Width = 311
+              Width = 80
+              WideText = 'Data operacji'
+            end
+            item
+              Position = 2
+              Width = 201
               WideText = 'Opis'
-              WideHint = 'Nazwa kontrahenta'
+              WideHint = 'Opis'
             end
             item
               Alignment = taRightJustify
-              Position = 2
-              Width = 100
+              Position = 3
+              Width = 70
               WideText = 'Kwota'
             end
             item
-              Position = 3
+              Position = 4
               WideText = 'Waluta'
+            end
+            item
+              Position = 5
+              Width = 60
+              WideText = 'Rodzaj'
             end>
           WideDefaultText = ''
         end
