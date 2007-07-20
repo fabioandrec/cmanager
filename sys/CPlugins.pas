@@ -73,6 +73,7 @@ type
     procedure ScanForPlugins;
     function GetCurrencyRatePluginCount: Integer;
     function GetJustExecutePluginCount: Integer;
+    function GetExtractionPluginCount: Integer;
   end;
 
 var GPlugins: TCPluginList;
@@ -197,6 +198,7 @@ begin
       end;
       if Result then begin
         Result := (FpluginType = CPLUGINTYPE_CURRENCYRATE) or
+                  (FpluginType = CPLUGINTYPE_EXTRACTION) or
                   (FpluginType = CPLUGINTYPE_JUSTEXECUTE) or
                   (FpluginType = CPLUGINTYPE_HTMLREPORT) or
                   (FpluginType = CPLUGINTYPE_CHARTREPORT);
@@ -230,6 +232,17 @@ begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
     if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+      Inc(Result);
+    end;
+  end;
+end;
+
+function TCPluginList.GetExtractionPluginCount: Integer;
+var xCount: Integer;
+begin
+  Result := 0;
+  for xCount := 0 to Count - 1 do begin
+    if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_EXTRACTION then begin
       Inc(Result);
     end;
   end;

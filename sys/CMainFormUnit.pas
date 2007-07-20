@@ -584,14 +584,15 @@ var xMax, xCount: Integer;
     xPlugin: TCPlugin;
     xPluginBand: TActionClientItem;
 begin
-  xMax := GPlugins.GetCurrencyRatePluginCount + GPlugins.GetJustExecutePluginCount;
+  xMax := GPlugins.GetCurrencyRatePluginCount + GPlugins.GetJustExecutePluginCount + GPlugins.GetExtractionPluginCount;
   if xMax > 0 then begin
     xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
     if xPluginBand <> Nil then begin
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
         if (xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE) or
-           (xPlugin.pluginType = CPLUGINTYPE_JUSTEXECUTE) then begin
+           (xPlugin.pluginType = CPLUGINTYPE_JUSTEXECUTE) or
+           (xPlugin.pluginType = CPLUGINTYPE_EXTRACTION) then begin
           xAction := TAction.Create(Self);
           xAction.ActionList := ActionManager;
           xAction.Caption := xPlugin.pluginMenu;
@@ -615,6 +616,8 @@ begin
   if not VarIsEmpty(xOutput) then begin
     if xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE then begin
       UpdateCurrencyRates(xOutput);
+    end else if xPlugin.pluginType = CPLUGINTYPE_EXTRACTION then begin
+      UpdateExtractions(xOutput);
     end;
   end;
 end;
