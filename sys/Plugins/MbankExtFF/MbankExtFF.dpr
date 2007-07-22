@@ -11,7 +11,8 @@ uses
   Classes,
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
-  CTools in '..\..\Shared\CTools.pas';
+  CTools in '..\..\Shared\CTools.pas',
+  MbankExtFFFormUnit in 'MbankExtFFFormUnit.pas' {MbankExtFFForm};
 
 var CManInterface: ICManagerInterface;
 
