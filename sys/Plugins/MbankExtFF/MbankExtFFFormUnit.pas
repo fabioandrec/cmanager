@@ -75,6 +75,12 @@ end;
 function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boolean;
 var xDoc: IHTMLDocument2;
     xVar: Variant;
+    xBody, xElement: IHTMLElement;
+    xAll: IHTMLElementCollection;
+    xCount: Integer;
+    xFinished: Boolean;
+    xTabCount: Integer;
+    xTabHeader, xTabOperations: IHTMLTable;
 begin
   Result := False;
   try
@@ -91,6 +97,34 @@ begin
         xDoc.designMode := 'off';
         while xDoc.readyState <> 'complete' do begin
           Application.ProcessMessages;
+        end;
+        AError := 'Wskazany plik nie jest poprawnym wyci¹giem mBanku';
+        xBody := xDoc.body;
+        if xBody <> Nil then begin
+          xAll := xBody.all as IHTMLElementCollection;
+          if xAll <> Nil then begin
+            xCount := 0;
+            xFinished := False;
+            xTabCount := 0;
+            xTabHeader := Nil;
+            xTabOperations := Nil;
+            while (xCount <= xAll.length - 1) and (not xFinished) do begin
+              xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+              if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                Inc(xTabCount);
+              end;
+              if (xTabCount = 3) and (xTabHeader = Nil) then begin
+                xTabHeader := xElement as IHTMLTable;
+              end;
+              if (xTabCount = 6) and (xTabOperations = Nil) then begin
+                xTabOperations := xElement as IHTMLTable;
+              end;
+              Inc(xCount);
+            end;
+            if (xTabHeader <> Nil) then begin
+              ShowMessage((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+            end;
+          end;
         end;
       except
         AError := 'B³¹d wczytywania pliku zawieraj¹cego wyci¹g';

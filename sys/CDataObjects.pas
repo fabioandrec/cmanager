@@ -196,6 +196,7 @@ type
   private
     Fdescription: TBaseDescription;
     FregDate: TDateTime;
+    FaccountingDate: TDateTime;
     FmovementType: TBaseEnumeration;
     FidCurrencyDef: TDataGid;
     FidAccountExtraction: TDataGid;
@@ -206,6 +207,7 @@ type
     procedure SetmovementType(const Value: TBaseEnumeration);
     procedure SetregDate(const Value: TDateTime);
     procedure SetidAccountExtraction(const Value: TDataGid);
+    procedure SetaccountingDate(const Value: TDateTime);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
@@ -217,6 +219,7 @@ type
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property regDate: TDateTime read FregDate write SetregDate;
+    property accountingDate: TDateTime read FaccountingDate write SetaccountingDate;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
     property cash: Currency read Fcash write Setcash;
@@ -2980,6 +2983,7 @@ begin
   with ADataset do begin
     Fdescription := FieldByName('description').AsString;
     FregDate := FieldByName('regDate').AsDateTime;
+    FaccountingDate := FieldByName('accountingDate').AsDateTime;
     FmovementType := FieldByName('movementType').AsString;
     FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
     FidAccountExtraction := FieldByName('idAccountExtraction').AsString;
@@ -3020,6 +3024,14 @@ begin
   Result := inherited OnDeleteObject(AProxy);
   AProxy.DataProvider.ExecuteSql('update baseMovement set idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
   AProxy.DataProvider.ExecuteSql('update movementList set idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
+end;
+
+procedure TExtractionItem.SetaccountingDate(const Value: TDateTime);
+begin
+  if FaccountingDate <> Value then begin
+    FaccountingDate := Value;
+    SetState(msModified);
+  end;
 end;
 
 procedure TExtractionItem.Setcash(const Value: Currency);
@@ -3102,6 +3114,7 @@ begin
   with DataFieldList do begin
     AddField('description', Fdescription, True, 'extractionItem');
     AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'extractionItem');
+    AddField('accountingDate', DatetimeToDatabase(FaccountingDate, False), False, 'extractionItem');
     AddField('movementType', FmovementType, True, 'extractionItem');
     AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'extractionItem');
     AddField('idAccountExtraction', DataGidToDatabase(FidAccountExtraction), False, 'extractionItem');

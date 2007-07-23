@@ -409,7 +409,7 @@ var xDoc: IXMLDOMDocument;
     xCount: Integer;
     xParams: TExtractionAdditionalData;
     xNode: IXMLDOMNode;
-    xRegDate: TDateTime;
+    xRegDate, xAccountingDate: TDateTime;
     xCash: Currency;
     xMovementType, xCurrencyIso: String;
     xItem: TExtractionListElement;
@@ -432,8 +432,9 @@ begin
           xParams := TExtractionAdditionalData.Create(xCreationDate, xStartDate, xEndDate, xDesc);
           while xValid and (xCount <= xList.length - 1) do begin
             xNode := xList.item[xCount];
-            xRegDate := DmyToDate(GetXmlAttribute('date', xNode, ''), 0);
-            if xRegDate <> 0 then begin
+            xRegDate := DmyToDate(GetXmlAttribute('operationDate', xNode, ''), 0);
+            xAccountingDate := DmyToDate(GetXmlAttribute('accountingDate', xNode, ''), 0);
+            if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
               xCash := StrToCurrencyDecimalDot(GetXmlAttribute('cash', xNode, ''));
               xMovementType := GetXmlAttribute('type', xNode, '');
               if (xMovementType = CInMovement) or (xMovementType = COutMovement) then begin
@@ -445,6 +446,7 @@ begin
                   xItem.cash := xCash;
                   xItem.description := GetXmlAttribute('description', xNode, '');
                   xItem.regTime := xRegDate;
+                  xItem.accountingDate := xAccountingDate;
                   xItem.idAccount := CEmptyDataGid;
                   xItem.idCurrencyDef := xCurrCache.CurrId;
                   xParams.movements.Add(xItem);
@@ -458,7 +460,7 @@ begin
               end;
             end else begin
               xValid := False;
-              xError := 'Brak okreœlenia daty operacji wyci¹gu dla elementu numer ' + IntToStr(xCount);
+              xError := 'Brak okreœlenia daty operacji lub daty ksiêgowania dla elementu numer ' + IntToStr(xCount);
             end;
             Inc(xCount);
           end;

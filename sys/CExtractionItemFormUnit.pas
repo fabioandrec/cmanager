@@ -17,6 +17,7 @@ type
     Fcash: Currency;
     FidAccount: TDataGid;
     FregTime: TDateTime;
+    FaccountingDate: TDateTime;
     FidCurrencyDef: TDataGid;
   public
     constructor Create;
@@ -29,6 +30,7 @@ type
     property idAccount: TDataGid read FidAccount write FidAccount;
     property isNew: Boolean read FIsNew write FIsNew;
     property regTime: TDateTime read FregTime write FregTime;
+    property accountingDate: TDateTime read FaccountingDate write FaccountingDate;
   end;
 
   TCExtractionItemForm = class(TCConfigForm)
@@ -49,12 +51,15 @@ type
     CStaticMovementCurrency: TCStatic;
     Label1: TLabel;
     CCurrEditMovement: TCCurrEdit;
+    Label2: TLabel;
+    CDateTimeAcc: TCDateTime;
     procedure CDateTimeChanged(Sender: TObject);
     procedure CStaticMovementCurrencyChanged(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticMovementCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
+    procedure CDateTimeAccChanged(Sender: TObject);
   private
     Felement: TExtractionListElement;
     procedure UpdateDescription;
@@ -115,6 +120,7 @@ begin
   CStaticMovementCurrency.DataId := Felement.idCurrencyDef;
   CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idCurrencyDef);
   CDateTime.Value := Felement.regTime;
+  CDateTimeAcc.Value := Felement.accountingDate;
   if Operation = coEdit then begin
     CCurrEditMovement.Value := Felement.cash;
     SimpleRichText(Felement.description, RichEditDesc);
@@ -130,6 +136,7 @@ begin
   Felement.cash := CCurrEditMovement.Value;
   Felement.idCurrencyDef := CStaticMovementCurrency.DataId;
   Felement.regTime := CDateTime.Value;
+  Felement.accountingDate := CDateTimeAcc.Value;
   Felement.movementType := IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement);
 end;
 
@@ -171,6 +178,8 @@ begin
   Result := inherited ExpandTemplate(ATemplate);
   if ATemplate = '@dataoperacji@' then begin
     Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@dataksiêgowania@' then begin
+    Result := GetFormattedDate(CDateTimeAcc.Value, 'yyyy-MM-dd');
   end else if ATemplate = '@rodzaj@' then begin
     Result := ComboBoxType.Text;
   end else if ATemplate = '@konto@' then begin
@@ -191,6 +200,11 @@ begin
       Result := GCurrencyCache.GetSymbol(CStaticMovementCurrency.DataId);
     end;
   end;
+end;
+
+procedure TCExtractionItemForm.CDateTimeAccChanged(Sender: TObject);
+begin
+  UpdateDescription;
 end;
 
 end.

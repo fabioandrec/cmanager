@@ -92,6 +92,7 @@ create table extractionItem (
   modified datetime,
   description varchar(200),
   regDate datetime not null,
+  accountingDate datetime not null,
   movementType varchar(1) not null,
   idCurrencyDef uniqueidentifier not null,
   idAccountExtraction uniqueidentifier not null,

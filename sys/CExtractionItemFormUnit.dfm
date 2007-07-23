@@ -1,23 +1,22 @@
 inherited CExtractionItemForm: TCExtractionItemForm
-  Left = 400
-  Top = 269
+  Top = 158
   Caption = 'Operacja'
-  ClientHeight = 353
-  ClientWidth = 512
+  ClientHeight = 385
+  ClientWidth = 460
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 512
-    Height = 312
+    Width = 460
+    Height = 344
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 135
-      Width = 481
+      Top = 167
+      Width = 425
       Height = 169
       Caption = ' Opis '
       TabOrder = 1
       object CButton1: TCButton
-        Left = 206
+        Left = 158
         Top = 126
         Width = 115
         Height = 25
@@ -30,7 +29,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
         Color = clBtnFace
       end
       object CButton2: TCButton
-        Left = 324
+        Left = 276
         Top = 126
         Width = 129
         Height = 25
@@ -45,7 +44,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
       object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
-        Width = 425
+        Width = 377
         Height = 89
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -71,53 +70,61 @@ inherited CExtractionItemForm: TCExtractionItemForm
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 481
-      Height = 105
+      Width = 425
+      Height = 137
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label3: TLabel
         Left = 33
         Top = 28
-        Width = 23
+        Width = 63
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Data'
+        Caption = 'Data operacji'
       end
       object Label5: TLabel
-        Left = 175
-        Top = 28
-        Width = 33
+        Left = 23
+        Top = 62
+        Width = 73
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Rodzaj'
+        Caption = 'Rodzaj operacji'
       end
       object Label20: TLabel
-        Left = 22
-        Top = 64
+        Left = 62
+        Top = 96
         Width = 34
         Height = 13
         Alignment = taRightJustify
         Caption = 'Waluta'
       end
       object Label1: TLabel
-        Left = 178
-        Top = 65
+        Left = 266
+        Top = 97
         Width = 30
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kwota'
       end
+      object Label2: TLabel
+        Left = 211
+        Top = 28
+        Width = 85
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Data ksi'#281'gowania'
+      end
       object ComboBoxType: TComboBox
-        Left = 216
-        Top = 24
-        Width = 233
+        Left = 104
+        Top = 58
+        Width = 297
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 1
+        TabOrder = 2
         Text = 'Obci'#261#380'enie'
         OnChange = ComboBoxTypeChange
         Items.Strings = (
@@ -125,7 +132,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
           'Uznanie')
       end
       object CDateTime: TCDateTime
-        Left = 64
+        Left = 104
         Top = 24
         Width = 97
         Height = 21
@@ -142,8 +149,8 @@ inherited CExtractionItemForm: TCExtractionItemForm
         HotTrack = True
       end
       object CStaticMovementCurrency: TCStatic
-        Left = 64
-        Top = 61
+        Left = 104
+        Top = 93
         Width = 97
         Height = 21
         Cursor = crHandPoint
@@ -152,7 +159,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
         Caption = '<wybierz walut'#281'>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 2
+        TabOrder = 3
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281'>'
@@ -161,28 +168,45 @@ inherited CExtractionItemForm: TCExtractionItemForm
         HotTrack = True
       end
       object CCurrEditMovement: TCCurrEdit
-        Left = 216
-        Top = 61
-        Width = 233
+        Left = 304
+        Top = 93
+        Width = 97
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 3
+        TabOrder = 4
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
+      object CDateTimeAcc: TCDateTime
+        Left = 304
+        Top = 24
+        Width = 97
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz dat'#281'>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 1
+        TabStop = True
+        Transparent = False
+        OnChanged = CDateTimeAccChanged
+        HotTrack = True
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 312
-    Width = 512
+    Top = 344
+    Width = 460
     inherited BitBtnOk: TBitBtn
-      Left = 335
+      Left = 283
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 423
+      Left = 371
     end
   end
   object ActionManager: TActionManager

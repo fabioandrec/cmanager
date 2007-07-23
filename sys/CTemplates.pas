@@ -178,6 +178,7 @@ initialization
   end;
   with GExtractionItemTemplatesList do begin
     AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');
+    AddTemplate('@dataksiêgowania@', 'data ksiêgowania w formacie RRRR-MM-DD');
     AddTemplate('@rodzaj@', 'rodzaj operacji');
     AddTemplate('@konto@', 'nazwa konta, którego dotyczy wyci¹g');
     AddTemplate('@isowaluty@', 'iso waluty operacji');

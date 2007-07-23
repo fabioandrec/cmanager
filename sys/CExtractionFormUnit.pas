@@ -251,6 +251,7 @@ begin
       xElement.cash := xMovement.cash;
       xElement.idCurrencyDef := xMovement.idCurrencyDef;
       xElement.regTime := xMovement.regDate;
+      xElement.accountingDate := xMovement.accountingDate;
       xElement.idAccount := idAccount;
       Fmovements.Add(xElement);
     end;
@@ -318,6 +319,7 @@ begin
     xElement.idAccount := CStaticAccount.DataId;
     xElement.idCurrencyDef := CCurrencyDefGid_PLN;
     xElement.regTime := GWorkDate;
+    xElement.accountingDate := GWorkDate;
     xForm := TCExtractionItemForm.CreateFormElement(Application, xElement);
     if xForm.ShowConfig(coAdd) then begin
       Perform(WM_DATAOBJECTADDED, Integer(xElement), 0);
