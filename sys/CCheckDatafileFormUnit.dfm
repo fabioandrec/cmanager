@@ -30,9 +30,9 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
         object Label1: TLabel
           Left = 64
           Top = 24
-          Width = 240
+          Width = 234
           Height = 13
-          Caption = 'Wybierz plika danych, kt'#243'ry ma zosta'#263' sprawdzony'
+          Caption = 'Wybierz plik danych, kt'#243'ry ma zosta'#263' sprawdzony'
         end
         object CStaticName: TCStatic
           Left = 64

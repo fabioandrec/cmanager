@@ -7,6 +7,7 @@ uses
   Dialogs,
   Forms,
   Variants,
+  Messages,
   SysUtils,
   Classes,
   CPluginTypes in '..\CPluginTypes.pas',
@@ -29,8 +30,15 @@ begin
 end;
 
 function Plugin_Execute: OleVariant; stdcall; export;
+var xForm: TMbankExtFFForm;
 begin
   VarClear(Result);
+  xForm := TMbankExtFFForm.Create(Nil);
+  xForm.Icon.Handle := SendMessage(Application.Handle, WM_GETICON, ICON_BIG, 0);
+  if xForm.ShowModal = ID_OK then begin
+    Result := xForm.ExtOutput;
+  end;
+  xForm.Free;
 end;
 
 exports
