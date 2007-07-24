@@ -84,6 +84,7 @@ type
     FbaseDate: TDateTime;
     FprevSums: TSumList;
     FonceState: TMovementStateRecord;
+    FprevState: TMovementStateRecord;
     procedure MessageMovementAdded(AData: TMovementListElement);
     procedure MessageMovementEdited(AData: TMovementListElement);
     procedure MessageMovementDeleted(AData: TMovementListElement);
@@ -149,6 +150,7 @@ end;
 destructor TCMovementListForm.Destroy;
 begin
   FonceState.Free;
+  FprevState.Free;
   Fadded.Free;
   Fdeleted.Free;
   Fmodified.Free;
@@ -259,6 +261,7 @@ var xProfile: TProfile;
 begin
   inherited InitializeForm;
   FonceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
+  FprevState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   CCurrEditCash.Value := GetCash;
   CDateTime1.Value := GWorkDate;
   if Operation = coAdd then begin
@@ -468,6 +471,9 @@ var xList: TDataObjectList;
 begin
   inherited FillForm;
   with TMovementList(Dataobject) do begin
+    FprevState.AccountId := idAccount;
+    FprevState.ExtrId := idExtractionItem;
+    FprevState.Stated := isStated;
     ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     GDataProvider.BeginTransaction;
     CStaticInoutOnceAccount.DataId := idAccount;
@@ -610,6 +616,13 @@ begin
                            'monthDate = ' + DatetimeToDatabase(TMovementList(Dataobject).monthDate, False) + ', ' +
                            'yearDate = ' + DatetimeToDatabase(TMovementList(Dataobject).yearDate, False);
     end;
+    if (FprevState.Stated <> FonceState.Stated) or (FprevState.ExtrId <> FprevState.ExtrId) or (FprevState.AccountId <> FonceState.AccountId) then begin
+      if xUpdate <> '' then begin
+        xUpdate := xUpdate + ', ';
+      end;
+      xUpdate := xUpdate +  'isStated = ' + IntToStr(Integer(FonceState.Stated)) + ', ' +
+                            'idExtractionItem = ' + DataGidToDatabase(FonceState.ExtrId);
+    end;
     if xUpdate <> '' then begin
       GDataProvider.ExecuteSql('update baseMovement set ' + xUpdate + ' where idMovementList = ' + DataGidToDatabase(Dataobject.id));
     end;
@@ -629,8 +642,10 @@ end;
 procedure TCMovementListForm.UpdateFrames(ADataGid: ShortString; AMessage, AOption: Integer);
 var xCount: Integer;
     xId: TDataGid;
+    xRefreshedGids: TStringList;
 begin
   inherited UpdateFrames(ADataGid, AMessage, AOption);
+  xRefreshedGids := TStringList.Create;
   xId := CStaticInoutOnceAccount.DataId;
   SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xId), 0);
   if Operation = coEdit then begin
@@ -641,15 +656,27 @@ begin
   for xCount := 0 to Fadded.Count - 1 do begin
     xId := TMovementListElement(Fadded.Items[xCount]).id;
     SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xId), WMOPT_BASEMOVEMENT);
+    xRefreshedGids.Add(xId);
   end;
   for xCount := 0 to Fmodified.Count - 1 do begin
     xId := TMovementListElement(Fmodified.Items[xCount]).id;
     SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xId), WMOPT_BASEMOVEMENT);
+    xRefreshedGids.Add(xId);
   end;
   for xCount := 0 to Fdeleted.Count - 1 do begin
     xId := TMovementListElement(Fdeleted.Items[xCount]).id;
     SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xId), WMOPT_BASEMOVEMENT);
+    xRefreshedGids.Add(xId);
   end;
+  if (FprevState.Stated <> FonceState.Stated) then begin
+    for xCount := 0 to Fmovements.Count - 1 do begin
+      xId := TMovementListElement(Fmovements.Items[xCount]).id;
+      if xRefreshedGids.IndexOf(xId) = -1 then begin
+        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xId), WMOPT_BASEMOVEMENT);
+      end;
+    end;
+  end;
+  xRefreshedGids.Free;
 end;
 
 procedure TCMovementListForm.ActionAddExecute(Sender: TObject);
@@ -707,6 +734,11 @@ begin
   end;
   CButtonStateOnce.Enabled := CStaticInoutOnceAccount.DataId <> CEmptyDataGid;
   FonceState.AccountId := CStaticInoutOnceAccount.DataId;
+  if (FonceState.AccountId <> CEmptyDataGid) and (Operation = coAdd) then begin
+    GDataProvider.BeginTransaction;
+    FonceState.Stated := TAccount(TAccount.LoadObject(AccountProxy, FonceState.AccountId, False)).accountType = CCashAccount;
+    GDataProvider.RollbackTransaction;
+  end;
   UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
   UpdateDescription;
 end;

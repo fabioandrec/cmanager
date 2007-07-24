@@ -463,6 +463,13 @@ type
     function GetPrefname: String; override;
   end;
 
+  TAccountExtractionReport = class(TCHtmlReport)
+  protected
+    function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
 implementation
 
 uses Forms, Adodb, CConfigFormUnit, Math,
@@ -3685,6 +3692,82 @@ constructor TCSelectedMovementTypeParams.CreateAcpType(AAcp, AType: String);
 begin
   CreateAco(AAcp);
   FmovementType := AType;
+end;
+
+function TAccountExtractionReport.GetReportBody: String;
+var xOperations: TADOQuery;
+    xSum: TSumList;
+    xBody: TStringList;
+    xCash: Currency;
+    xCashStr: String;
+    xMovement: String;
+    xCount: Integer;
+begin
+  xOperations := GDataProvider.OpenSql('select * from extractionItem where idAccountExtraction = ' + DataGidToDatabase(TCWithGidParams(Params).id));
+  xSum := TSumList.Create(True);
+  xBody := TStringList.Create;
+  with xOperations, xBody do begin
+    Add('<table class="base" colspan=7>');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data operacji</td>');
+    Add('<td class="headtext" width="15%">Data ksiêgowania</td>');
+    Add('<td class="headtext" width="30%">Opis</td>');
+    Add('<td class="headcash" width="10%">Waluta</td>');
+    Add('<td class="headcash" width="10%">Kwota</td>');
+    Add('<td class="headtext" width="15%">Rodzaj</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=7>');
+    while not Eof do begin
+      Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
+      if FieldByName('movementType').AsString = CInMovement then begin
+        xCash := FieldByName('cash').AsCurrency;
+        xMovement := 'Uznanie';
+      end else begin
+        xCash := (-1) * FieldByName('cash').AsCurrency;
+        xMovement := 'Obci¹¿enie';
+      end;
+      xCashStr := CurrencyToString(xCash, '', False);
+      xSum.AddSum(FieldByName('idCurrencyDef').AsString, xCash, CEmptyDataGid);
+      Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + DateToStr(FieldByName('accountingDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="30%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
+      Add('<td class="cash" width="10%">' + xCashStr + '</td>');
+      Add('<td class="text" width="15%">' + xMovement + '</td>');
+      Add('</tr>');
+      Next;
+    end;
+    Add('</table><hr>');
+    if xSum.Count > 0 then begin
+      Add('<table class="base" colspan=4>');
+      for xCount := 0 to xSum.Count - 1 do begin
+        Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
+        Add('<td class="sumtext" width="65%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
+        Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xSum.Items[xCount].name) + '</td>');
+        Add('<td class="sumcash" width="10%">' + CurrencyToString(xSum.Items[xCount].value, '', False) + '</td>');
+        Add('<td class="sumtext" width="15%"></td>');
+        Add('</tr>');
+      end;
+      Add('</table>');
+    end else begin
+      Add('<table class="base"><tr class="sum"><td class="sumtext" width="100%">Razem</td></tr></table>');
+    end;
+  end;
+  xOperations.Free;
+  Result := xBody.Text;
+  xSum.Free;
+  xBody.Free;
+end;
+
+function TAccountExtractionReport.GetReportTitle: String;
+var xExt: TAccountExtraction;
+begin
+  GDataProvider.BeginTransaction;
+  xExt := TAccountExtraction(TAccountExtraction.LoadObject(AccountExtractionProxy, TCWithGidParams(Params).id, False));
+  Result := xExt.description + ', za okres od ' + DateTimeToStr(xExt.startDate) + ' do ' + DateTimeToStr(xExt.endDate);
+  GDataProvider.RollbackTransaction;
 end;
 
 end.

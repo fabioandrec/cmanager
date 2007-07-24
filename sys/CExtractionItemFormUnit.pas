@@ -142,6 +142,7 @@ end;
 
 procedure TCExtractionItemForm.CStaticMovementCurrencyChanged(Sender: TObject);
 begin
+  CCurrEditMovement.SetCurrencyDef(CStaticMovementCurrency.DataId, GCurrencyCache.GetSymbol(CStaticMovementCurrency.DataId));
   UpdateDescription;
 end;
 

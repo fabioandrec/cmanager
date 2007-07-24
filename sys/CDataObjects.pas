@@ -183,6 +183,7 @@ type
     function GetMovements: TDataObjectList;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
     function GetElementText: String; override;
+    class function FindAccountExtraction(AIdAccount: TDataGid; ARegDate: TDateTime): TAccountExtraction;
   published
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property extractionState: TBaseEnumeration read FextractionState write SetExtractionState;
@@ -3242,6 +3243,12 @@ end;
 function TAccountExtraction.GetElementText: String;
 begin
   Result := Fdescription;
+end;
+
+class function TAccountExtraction.FindAccountExtraction(AIdAccount: TDataGid; ARegDate: TDateTime): TAccountExtraction;
+begin
+  Result := TAccountExtraction(TAccountExtraction.FindByCondition(AccountExtractionProxy,
+     'select * from accountExtraction where idAccount = ' + DataGidToDatabase(AIdAccount) + ' and regDate = ' + DatetimeToDatabase(ARegDate, False), False));
 end;
 
 initialization

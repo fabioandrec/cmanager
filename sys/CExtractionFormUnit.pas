@@ -202,12 +202,24 @@ begin
 end;
 
 function TCExtractionForm.CanAccept: Boolean;
+var xExt: TAccountExtraction;
 begin
-  Result := True;
   if CStaticAccount.DataId = CEmptyDataGid then begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano konta z jakim bêdzie zwi¹zany wyci¹g. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticAccount.DoGetDataId;
+    end;
+  end else begin
+    GDataProvider.BeginTransaction;
+    xExt := TAccountExtraction.FindAccountExtraction(CStaticAccount.DataId, CDateTime.Value);
+    if xExt <> Nil then begin
+      Result := xExt.id = Dataobject.id;
+    end else begin
+      Result := True;
+    end;
+    GDataProvider.RollbackTransaction;
+    if not Result then begin
+      ShowInfo(itError, 'Istnieje ju¿ wyci¹g dla konta "' + CStaticAccount.Caption + '" z dnia ' + CDateTime.Caption, '');
     end;
   end;
 end;
@@ -457,6 +469,7 @@ begin
       xItem.cash := cash;
       xItem.movementType := movementType;
       xItem.regDate := regTime;
+      xItem.accountingDate := accountingDate;
       xItem.idCurrencyDef := idCurrencyDef;
       xItem.idAccountExtraction := Dataobject.id;
     end;
@@ -468,6 +481,7 @@ begin
       xItem.cash := cash;
       xItem.movementType := movementType;
       xItem.regDate := regTime;
+      xItem.accountingDate := accountingDate;
       xItem.idCurrencyDef := idCurrencyDef;
     end;
   end;

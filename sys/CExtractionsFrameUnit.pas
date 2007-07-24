@@ -27,11 +27,13 @@ type
     function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     class function GetPrefname: String; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
   end;
 
 implementation
 
-uses CConsts, CExtractionFormUnit, CBaseFrameUnit;
+uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports;
 
 {$R *.dfm}
 
@@ -48,6 +50,11 @@ end;
 function TCExtractionsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := AccountExtractionProxy;
+end;
+
+function TCExtractionsFrame.GetHistoryText: String;
+begin
+  Result := 'Drukuj wyci¹g';
 end;
 
 class function TCExtractionsFrame.GetPrefname: String;
@@ -102,6 +109,17 @@ begin
     end;
   end;
   Dataobjects := TDataObject.GetList(TAccountExtraction, AccountExtractionProxy, 'select * from accountExtraction' + xCondition);
+end;
+
+procedure TCExtractionsFrame.ShowHistory(AGid: ShortString);
+var xReport: TAccountExtractionReport;
+    xParams: TCReportParams;
+begin
+  xParams := TCWithGidParams.Create(AGid);
+  xReport := TAccountExtractionReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

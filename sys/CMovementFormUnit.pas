@@ -362,6 +362,11 @@ begin
   UpdateAccountCurDef(CStaticInoutOnceAccount.DataId, CStaticInOutOnceCurrencyAccount, CCurrEditInOutOnceAccount);
   CButtonStateOnce.Enabled := CStaticInoutOnceAccount.DataId <> CEmptyDataGid;
   FonceState.AccountId := CStaticInoutOnceAccount.DataId;
+  if (FonceState.AccountId <> CEmptyDataGid) and (Operation = coAdd) then begin
+    GDataProvider.BeginTransaction;
+    FonceState.Stated := TAccount(TAccount.LoadObject(AccountProxy, FonceState.AccountId, False)).accountType = CCashAccount;
+    GDataProvider.RollbackTransaction;
+  end;
   UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
   CStaticInOutOnceRate.DataId := CEmptyDataGid;
   UpdateDescription;
@@ -505,6 +510,7 @@ begin
     end else begin
       xI := -1;
     end;
+    FbaseList := idMovementList;
     ComboBoxType.ItemIndex := xI;
     ComboBoxType.Enabled := False;
     CStaticInoutCyclic.Enabled := False;
@@ -541,7 +547,6 @@ begin
         FonceState.ExtrId := idExtractionItem;
         FonceState.Stated := isStated;
         UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
-        CButtonStateOnce.Enabled := idAccount <> CEmptyDataGid;
       end else begin
         CStaticInoutCyclicAccount.DataId := idAccount;
         CStaticInoutCyclicAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
@@ -574,7 +579,6 @@ begin
         FcyclicState.ExtrId := idExtractionItem;
         FcyclicState.Stated := isStated;
         UpdateState(FcyclicState, ActionStateCyclic, CButtonStateCyclic);
-        CButtonStateCyclic.Enabled := idAccount <> CEmptyDataGid;
       end;
       FbaseAccount := idAccount;
     end else if (movementType = CTransferMovement) then begin
@@ -601,17 +605,14 @@ begin
       FtransDestState.ExtrId := idExtractionItem;
       FtransDestState.Stated := isStated;
       UpdateState(FtransDestState, ActionStateTransDest, CButtonStateTransDest);
-      CButtonStateTransDest.Enabled := idAccount <> CEmptyDataGid;
       FtransSourceState.AccountId := idSourceAccount;
       FtransSourceState.ExtrId := idSourceExtractionItem;
       FtransSourceState.Stated := isSourceStated;
       UpdateState(FtransSourceState, ActionStateTransSource, CButtonStateTransSource);
-      CButtonStateTransSource.Enabled := idSourceAccount <> CEmptyDataGid;
     end;
     GDataProvider.RollbackTransaction;
     CDateTime.Value := regDate;
     SimpleRichText(description, RichEditDesc);
-    FbaseList := idMovementList;
     UpdateCurrencyRates(False);
   end;
 end;
@@ -1131,6 +1132,11 @@ begin
   CStaticInOutCyclicRate.DataId := CEmptyDataGid;
   CButtonStateCyclic.Enabled := CStaticInoutCyclicAccount.DataId <> CEmptyDataGid;
   FcyclicState.AccountId := CStaticInoutCyclicAccount.DataId;
+  if (FcyclicState.AccountId <> CEmptyDataGid) and (Operation = coAdd) then begin
+    GDataProvider.BeginTransaction;
+    FcyclicState.Stated := TAccount(TAccount.LoadObject(AccountProxy, FcyclicState.AccountId, False)).accountType = CCashAccount;
+    GDataProvider.RollbackTransaction;
+  end;
   UpdateState(FcyclicState, ActionStateCyclic, CButtonStateCyclic);
   UpdateAccountCurDef(CStaticInoutCyclicAccount.DataId, CStaticInOutCyclicCurrencyAccount, CCurrEditInOutCyclicAccount);
   UpdateDescription;
@@ -1142,6 +1148,11 @@ begin
   CStaticTransRate.DataId := CEmptyDataGid;
   CButtonStateTransSource.Enabled := CStaticTransSourceAccount.DataId <> CEmptyDataGid;
   FtransSourceState.AccountId := CStaticTransSourceAccount.DataId;
+  if (FtransSourceState.AccountId <> CEmptyDataGid) and (Operation = coAdd) then begin
+    GDataProvider.BeginTransaction;
+    FtransSourceState.Stated := TAccount(TAccount.LoadObject(AccountProxy, FtransSourceState.AccountId, False)).accountType = CCashAccount;
+    GDataProvider.RollbackTransaction;
+  end;
   UpdateState(FtransSourceState, ActionStateTransSource, CButtonStateTransSource);
   UpdateAccountCurDef(CStaticTransSourceAccount.DataId, CStaticTransCurrencySource, CCurrEditTransMovement);
   UpdateDescription;
@@ -1153,6 +1164,11 @@ begin
   CStaticTransRate.DataId := CEmptyDataGid;
   CButtonStateTransDest.Enabled := CStaticTransDestAccount.DataId <> CEmptyDataGid;
   FtransDestState.AccountId := CStaticTransDestAccount.DataId;
+  if (FtransDestState.AccountId <> CEmptyDataGid) and (Operation = coAdd) then begin
+    GDataProvider.BeginTransaction;
+    FtransDestState.Stated := TAccount(TAccount.LoadObject(AccountProxy, FtransDestState.AccountId, False)).accountType = CCashAccount;
+    GDataProvider.RollbackTransaction;
+  end;
   UpdateState(FtransDestState, ActionStateTransDest, CButtonStateTransDest);
   UpdateAccountCurDef(CStaticTransDestAccount.DataId, CStaticTransCurrencyDest, CCurrEditTransAccount);
   UpdateDescription;
@@ -1286,7 +1302,7 @@ begin
   AAction.ImageIndex := IfThen(AStateRecord.Stated, 0, 1);
   AAction.Caption := IfThen(AStateRecord.Stated, 'Uzgodniona', 'Do uzgodnienia');
   AButton.Action := AAction;
-  AButton.Enabled := AStateRecord.AccountId <> CEmptyDataGid;
+  AButton.Enabled := (AStateRecord.AccountId <> CEmptyDataGid) and (FbaseList = CEmptyDataGid);
 end;
 
 procedure TCMovementForm.ActionStateOnceExecute(Sender: TObject);

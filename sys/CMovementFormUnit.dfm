@@ -142,7 +142,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 232
-        ActivePage = TabSheetInOutCyclic
+        ActivePage = TabSheetInOutOnce
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -281,7 +281,7 @@ inherited CMovementForm: TCMovementForm
             Cursor = crHandPoint
             AutoSize = False
             BevelKind = bkTile
-            Caption = '<wybierz kategori'#281'>'
+            Caption = '<wybierz kategori'#281' z listy>'
             Color = clWindow
             ParentColor = False
             TabOrder = 3
