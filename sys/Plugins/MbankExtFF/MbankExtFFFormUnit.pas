@@ -28,6 +28,8 @@ type
 
 implementation
 
+uses CTools, DateUtils;
+
 {$R *.dfm}
 
 procedure TMbankExtFFForm.BitBtnOkClick(Sender: TObject);
@@ -73,14 +75,37 @@ begin
 end;
 
 function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boolean;
+
+  function DecodeDate(AStr: String; var AStart, AEnd: TDateTime): Boolean;
+  var xMonth: Integer;
+      xYear: Integer;
+  begin
+    AStart := 0;
+    AEnd := 0;
+    Result := False;
+    xMonth := GetMonthNumber(Copy(AStr, 1, Length(AStr) - 5));
+    if (xMonth > 0) and (xMonth <= 12) then begin
+      xYear := StrToIntDef(Copy(AStr, Length(AStr) - 3, 4), 0);
+      if xYear > 0 then begin
+        Result := TryEncodeDate(xYear, xMonth, 1, AStart);
+        if Result then begin
+          Result := TryEncodeDate(xYear, xMonth, DaysInMonth(AStart), AEnd);
+        end;
+      end;
+    end;
+  end;
+
 var xDoc: IHTMLDocument2;
     xVar: Variant;
     xBody, xElement: IHTMLElement;
     xAll: IHTMLElementCollection;
     xCount: Integer;
     xFinished: Boolean;
-    xTabCount: Integer;
-    xTabHeader, xTabOperations: IHTMLTable;
+    xTabCount, xPos: Integer;
+    xTabHeader, xTabBase, xTabOperations: IHTMLTable;
+    xBaseRow: IHTMLElement;
+    xPeriodStr: String;
+    xStartDate, xEndDate: TDateTime;
 begin
   Result := False;
   try
@@ -107,7 +132,7 @@ begin
             xFinished := False;
             xTabCount := 0;
             xTabHeader := Nil;
-            xTabOperations := Nil;
+            xTabBase := Nil;
             while (xCount <= xAll.length - 1) and (not xFinished) do begin
               xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
               if AnsiLowerCase(xElement.tagName) = 'table' then begin
@@ -116,13 +141,36 @@ begin
               if (xTabCount = 3) and (xTabHeader = Nil) then begin
                 xTabHeader := xElement as IHTMLTable;
               end;
-              if (xTabCount = 6) and (xTabOperations = Nil) then begin
-                xTabOperations := xElement as IHTMLTable;
+              if (xTabCount = 6) and (xTabBase = Nil) then begin
+                xTabBase := xElement as IHTMLTable;
               end;
               Inc(xCount);
+              xFinished := (xTabHeader <> Nil) and (xTabBase <> Nil);
             end;
-            if (xTabHeader <> Nil) then begin
-              ShowMessage((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+            if (xTabHeader <> Nil) and (xTabBase <> Nil) then begin
+              xPeriodStr := AnsiUpperCase((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+              xPos := Pos('ZA', xPeriodStr);
+              if xPos > 0 then begin
+                xPeriodStr := Copy(xPeriodStr, xPos + 3, MaxInt);
+                if DecodeDate(xPeriodStr, xStartDate, xEndDate) then begin
+                  if xTabBase.rows.length >= 4 then begin
+                    xBaseRow := (xTabHeader.rows.item(3, varEmpty) as IHTMLElement);
+                    xAll := xBaseRow.all as IHTMLElementCollection;
+                    xTabOperations := Nil;
+                    xCount := 0;
+                    while (xCount <= xAll.length - 1) and (xTabOperations = Nil) do begin
+                      xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+                      if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                        xTabOperations := xElement as IHTMLTable;
+                      end;;
+                      Inc(xCount);
+                    end;
+                    if xTabOperations <> Nil then begin
+                      ShowMessage(IntToStr(xTabOperations.rows.length));
+                    end;
+                  end;
+                end;
+              end;
             end;
           end;
         end;

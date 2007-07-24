@@ -76,6 +76,8 @@ procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex:
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
 
+function GetMonthNumber(AMonthName: String): Integer;
+
 implementation
 
 uses SysUtils, StrUtils;
@@ -464,6 +466,21 @@ end;
 function IsEven(AInt: Integer): Boolean;
 begin
   Result := not Odd(AInt);
+end;
+
+function GetMonthNumber(AMonthName: String): Integer;
+var xName: String;
+    xCount: Integer;
+begin
+  xName := AnsiUpperCase(AMonthName);
+  xCount := Low(LongMonthNames);
+  Result := 0;
+  while (xCount <= High(LongMonthNames)) and (Result = 0) do begin
+    if AnsiUpperCase(LongMonthNames[xCount]) = AMonthName then begin
+      Result := xCount;
+    end;
+    Inc(xCount);
+  end;
 end;
 
 end.
