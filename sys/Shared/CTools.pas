@@ -76,6 +76,7 @@ function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
+function GetDescText(ADescription: String): String;
 
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
@@ -534,6 +535,16 @@ begin
         until (xCountJ > xPolishCount) or xChanged;
       end;
     end;
+  end;
+end;
+
+function GetDescText(ADescription: String): String;
+var xPos: Integer;
+begin
+  Result := ADescription;
+  xPos := Pos(sLineBreak, Result);
+  if xPos > 0 then begin
+    Result := Copy(Result, 1, xPos - 1) + ' (...)';
   end;
 end;
 

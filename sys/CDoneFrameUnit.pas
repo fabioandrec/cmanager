@@ -93,7 +93,7 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit;
+  Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit, CTools;
 
 {$R *.dfm}
 
@@ -580,9 +580,9 @@ begin
   if DoneList.FocusedNode <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
     if xData.planned.movementType = COutMovement then begin
-      Result := xData.planned.description + ' (p³atne do ' + DateToStr(xData.triggerDate) + ')'
+      Result := xData.planned.description + ' (p³atne do ' + DateToStr(xData.triggerDate) + ')';
     end else begin
-      Result := xData.planned.description + ' (wp³yw do ' + DateToStr(xData.triggerDate) + ')'
+      Result := xData.planned.description + ' (wp³yw do ' + DateToStr(xData.triggerDate) + ')';
     end;
   end;
 end;

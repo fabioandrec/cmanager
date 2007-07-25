@@ -35,7 +35,7 @@ type
 
 implementation
 
-uses CTemplates, CBaseFormUnit, CFrameFormUnit;
+uses CTemplates, CBaseFormUnit, CFrameFormUnit, CTools;
 
 {$R *.dfm}
 

@@ -124,7 +124,7 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
   CListPreferencesFormUnit, CReports, CMovmentListElementFormUnit,
-  CMovementListFormUnit;
+  CMovementListFormUnit, CTools;
 
 {$R *.dfm}
 
@@ -323,7 +323,7 @@ begin
       CellText := IntToStr(Node.Index + 1);
     end;
   end else if Column = 1 then begin
-    CellText := xData.description;
+    CellText := GetDescText(xData.description);
   end else if Column = 2 then begin
     CellText := DateToStr(xData.regDate);
   end else if Column = 3 then begin

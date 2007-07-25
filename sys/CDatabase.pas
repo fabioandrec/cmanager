@@ -648,29 +648,38 @@ begin
 end;
 
 function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True): Boolean;
-var xSqls: TStringList;
-    xCount: Integer;
+var xFinished: Boolean;
+    xPos: Integer;
+    xSql, xRemains: String;
 begin
   Result := True;
-  xSqls := TStringList.Create;
-  xSqls.Text := StringReplace(StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]), ';', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
-  xCount := 0;
-  while Result and (xCount <= xSqls.Count - 1) do begin
-    try
-      SaveToLog('Wykonywanie "' + xSqls.Strings[xCount] + '"', GSqllogfile);
-      FConnection.Execute(xSqls.Strings[xCount], cmdText, [eoExecuteNoRecords]);
-    except
-      on E: Exception do begin
-        if AShowError then begin
-           ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+  xRemains := ASql;
+  xFinished := False;
+  repeat
+    xPos := Pos(';', xRemains);
+    if xPos > 0 then begin
+      xSql := Copy(xRemains, 1, xPos - 1);
+      Delete(xRemains, 1, xPos);
+    end else begin
+      xSql := xRemains;
+      xFinished := True;
+    end;
+    if Trim(xSql) <> '' then begin
+      try
+        SaveToLog('Wykonywanie "' + xSql + '"', GSqllogfile);
+        FConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
+      except
+        on E: Exception do begin
+          if AShowError then begin
+             ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+          end;
+          FLastError := E.Message;
+          Result := False;
+          xFinished := True;
         end;
-        FLastError := E.Message;
-        Result := False;
       end;
     end;
-    Inc(xCount);
-  end;
-  xSqls.Free;
+  until xFinished;
   if not Result then begin
     SaveToLog('B³¹d "' + FLastError + '"', GSqllogfile);
   end;

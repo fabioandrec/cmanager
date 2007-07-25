@@ -690,7 +690,8 @@ function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFiel
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
+uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit,
+  CTools;
 
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 var xGid: String;
@@ -3146,7 +3147,7 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := DateToStr(FstartDate);
   end else if AColumnIndex = 1 then begin
-    Result := description; 
+    Result := description;
   end else begin
     Result := DateToStr(FregDate);
   end;
