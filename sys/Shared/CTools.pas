@@ -76,7 +76,7 @@ function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
-function GetDescText(ADescription: String): String;
+function GetDescText(ADescription: String; ALineNo: Integer = 0; AWithInfo: Boolean = True): String;
 
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
@@ -538,13 +538,23 @@ begin
   end;
 end;
 
-function GetDescText(ADescription: String): String;
-var xPos: Integer;
+function GetDescText(ADescription: String; ALineNo: Integer = 0; AWithInfo: Boolean = True): String;
+var xStr: TStringList;
 begin
-  Result := ADescription;
-  xPos := Pos(sLineBreak, Result);
-  if xPos > 0 then begin
-    Result := Copy(Result, 1, xPos - 1) + ' (...)';
+  if ALineNo <> -1 then begin
+    xStr := TStringList.Create;
+    xStr.Text := ADescription;
+    if ALineNo <= xStr.Count - 1 then begin
+      Result := xStr.Strings[ALineNo];
+      if AWithInfo and (xStr.Count > 1) then begin
+        Result := Result + ' (...)';
+      end;
+    end else begin
+      Result := ADescription;
+    end;
+    xStr.Free;
+  end else begin
+    Result := ADescription;
   end;
 end;
 
