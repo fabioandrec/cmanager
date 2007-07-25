@@ -9,6 +9,8 @@ interface
 uses Windows, Types, Contnrs, Classes, StdCtrls;
 
 type
+  TPolishEncodings = (splASCII, splISO, splLatinII, splMazovia, splWindows);
+
   TSum = class(TObject)
   private
     Fvalue: Currency;
@@ -69,9 +71,11 @@ function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray
 function LPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 procedure SaveToLog(AText: String; ALogFilename: String);
+function YmdToDate(AString: String; ADefault: TDateTime): TDateTime;
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
+function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
 
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
@@ -423,12 +427,27 @@ begin
   end;
 end;
 
+function YmdToDate(AString: String; ADefault: TDateTime): TDateTime;
+var xY, xM, xD: Word;
+    xStr: String;
+begin
+  xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xY := StrToIntDef(Copy(xStr, 1, 4), 0);
+  xM := StrToIntDef(Copy(xStr, 5, 2), 0);
+  xD := StrToIntDef(Copy(xStr, 7, 2), 0);
+  if not TryEncodeDate(xY, xM, xD, Result) then begin
+    Result := ADefault;
+  end;
+end;
+
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 var xY, xM, xD: Word;
+    xStr: String;
 begin
-  xY := StrToIntDef(Copy(AString, 1, 4), 0);
-  xM := StrToIntDef(Copy(AString, 5, 2), 0);
-  xD := StrToIntDef(Copy(AString, 7, 2), 0);
+  xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xD := StrToIntDef(Copy(xStr, 1, 2), 0);
+  xM := StrToIntDef(Copy(xStr, 3, 2), 0);
+  xY := StrToIntDef(Copy(xStr, 5, 4), 0);
   if not TryEncodeDate(xY, xM, xD, Result) then begin
     Result := ADefault;
   end;
@@ -480,6 +499,41 @@ begin
       Result := xCount;
     end;
     Inc(xCount);
+  end;
+end;
+
+function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
+const xPolishCount = 18;
+      xTabCode: array[TPolishEncodings, 1..xPolishCount] of Char =
+      ((#65, #67, #69, #76, #78, #79, #83, #90, #90, #97, #99, #101, #108, #110, #111, #115, #122, #122),
+        (#161, #198, #202, #163, #209, #211, #166, #172, #175, #177, #230, #234, #179, #241, #243, #182, #188, #191),
+        (#164, #143, #168, #157, #227, #224, #151, #141, #189, #165, #134, #169, #136, #228, #162, #152, #171, #190),
+        (#143, #149, #144, #156, #165, #163, #152, #160, #161, #134, #141, #145, #146, #164, #162, #158, #166, #167),
+        (#165, #198, #202, #163, #209, #211, #140, #143, #175, #185, #230, #234, #179, #241, #243, #156, #159, #191));
+      xTabSets: array[TPolishEncodings] of set of Char =
+      ([#97, #99, #101, #108, #110, #111, #115, #120, #122, #65, #67, #69, #76, #78, #79, #83, #88, #90],
+        [#161, #198, #202, #163, #209, #211, #166, #172, #175, #177, #230, #234, #179, #241, #243, #182, #188, #191],
+        [#164, #143, #168, #157, #227, #224, #151, #141, #189, #165, #134, #169, #136, #228, #162, #152, #171, #190],
+        [#143, #149, #144, #156, #165, #163, #152, #160, #161, #134, #141, #145, #146, #164, #162, #158, #166, #167],
+        [#165, #198, #202, #163, #209, #211, #140, #143, #175, #185, #230, #234, #179, #241, #243, #156, #159, #191]);
+var xCountI, xCountJ: integer;
+    xChanged: boolean;
+begin
+  Result := ALine;
+  if (AStdIn <> AStdOut) and (AStdIn <> splASCII) then begin
+    for xCountI := 1 to length(Result) do begin
+      if Result[xCountI] in xTabSets[AStdIn] then begin
+        xChanged := false;
+        xCountJ := 1;
+        repeat
+          if Result[xCountI] = xTabCode[AStdIn, xCountJ] then begin
+            Result[xCountI] := xTabCode[AStdOut, xCountJ];
+            xChanged := True;
+          end;
+          inc(xCountJ);
+        until (xCountJ > xPolishCount) or xChanged;
+      end;
+    end;
   end;
 end;
 

@@ -318,7 +318,7 @@ inherited CExtractionForm: TCExtractionForm
               Alignment = taRightJustify
               Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 0
-              Width = 40
+              Width = 60
               WideText = 'Lp'
             end
             item
@@ -344,7 +344,7 @@ inherited CExtractionForm: TCExtractionForm
             end
             item
               Position = 5
-              Width = 101
+              Width = 81
               WideText = 'Rodzaj'
             end>
           WideDefaultText = ''

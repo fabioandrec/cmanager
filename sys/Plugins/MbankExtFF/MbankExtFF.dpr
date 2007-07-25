@@ -13,7 +13,8 @@ uses
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
   CTools in '..\..\Shared\CTools.pas',
-  MbankExtFFFormUnit in 'MbankExtFFFormUnit.pas' {MbankExtFFForm};
+  MbankExtFFFormUnit in 'MbankExtFFFormUnit.pas' {MbankExtFFForm},
+  CXml in '..\..\Shared\CXml.pas';
 
 var CManInterface: ICManagerInterface;
 

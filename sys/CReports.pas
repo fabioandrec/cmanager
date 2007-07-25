@@ -3238,7 +3238,7 @@ begin
           xItemNode := xItems.item[xCountI];
           xLabel := GetXmlAttribute('label', xItemNode, '');
           if xSerieObject.XValues.DateTime then begin
-            xX := DmyToDate(GetXmlAttribute('domain', xItemNode, ''), 0);
+            xX := YmdToDate(GetXmlAttribute('domain', xItemNode, ''), 0);
           end else begin
             xX := StrToCurrencyDecimalDot(GetXmlAttribute('domain', xItemNode, ''));
           end;

@@ -33,7 +33,7 @@ var xObject: IInterface;
 begin
   VarClear(Result);
   xObject := CManInterface.GetConnection;
-  if not VarIsEmpty(xObject) then begin
+  if xObject <> Nil then begin
     xForm := TDBStatsForm.Create(Application);
     xForm.Icon.Handle := SendMessage(CManInterface.GetAppHandle, WM_GETICON, ICON_BIG, 0);
     xForm.Intf := xObject as _Connection;

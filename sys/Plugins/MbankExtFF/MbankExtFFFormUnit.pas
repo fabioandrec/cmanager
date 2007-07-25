@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX;
+  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, MsXml;
 
 type
   TMbankExtFFForm = class(TForm)
@@ -28,7 +28,7 @@ type
 
 implementation
 
-uses CTools, DateUtils;
+uses CTools, DateUtils, CXml, CPluginConsts;
 
 {$R *.dfm}
 
@@ -95,6 +95,79 @@ function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boo
     end;
   end;
 
+  function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: IHTMLElement; var AError: String): Boolean;
+  var xAll: IHTMLElementCollection;
+      xCount: Integer;
+      xElement: IHTMLElement;
+      xData: Integer;
+      xDatesStr: TStringList;
+      xTitlesStr: TStringList;
+      xCashStr, xTitle: String;
+      xRegDate, xAccountingDate: TDateTime;
+      xCash: Currency;
+      xExtractionNode: IXMLDOMNode;
+  begin
+    Result := True;
+    AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
+    xAll := ARow.all as IHTMLElementCollection;
+    xCount := 0;
+    xData := 0;
+    xDatesStr := TStringList.Create;
+    xTitlesStr := TStringList.Create;
+    xCashStr := '';
+    while (xCount <= xAll.length - 1) and Result do begin
+      xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+      if xElement.className = 'data' then begin
+        if xData = 0 then begin
+          xDatesStr.Text := xElement.innerText;
+        end else if xData = 1 then begin
+          xTitlesStr.Text := PolishConversion(splISO, splWindows, xElement.innerText);
+        end else if xData = 2 then begin
+          xCashStr := StringReplace(xElement.innerText, '.', '', [rfReplaceAll, rfIgnoreCase]);
+        end;
+        Inc(xData);
+      end;
+      Inc(xCount);
+    end;
+    if (xDatesStr.Text <> '') and (xTitlesStr.Text <> '') and (xCashStr <> '') then begin
+      if xDatesStr.Count > 0 then begin
+        xRegDate := DmyToDate(xDatesStr.Strings[0], 0);
+      end else begin
+        xRegDate := 0;
+      end;
+      if xDatesStr.Count > 1 then begin
+        xAccountingDate := DmyToDate(xDatesStr.Strings[1], 0);
+      end else begin
+        xAccountingDate := 0;
+      end;
+      if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
+        xCash := StrToCurrencyDecimalDot(xCashStr);
+        xTitle := StringReplace(xTitlesStr.Text, sLineBreak, ', ', [rfReplaceAll, rfIgnoreCase]);
+        xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
+        ARootNode.appendChild(xExtractionNode);
+        SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));
+        SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyymmdd', xAccountingDate));
+        if xCash > 0 then begin
+          SetXmlAttribute('type', xExtractionNode, CEXTRACTION_INMOVEMENT);
+        end else begin
+          SetXmlAttribute('type', xExtractionNode, CEXTRACTION_OUTMOVEMENT);
+        end;
+        SetXmlAttribute('currency', xExtractionNode, 'PLN');
+        SetXmlAttribute('description', xExtractionNode, xTitle);
+        SetXmlAttribute('cash', xExtractionNode, Trim(Format('%-10.4f', [xCash])));
+      end else begin
+        Result := False;
+      end;
+    end else begin
+      Result := False;
+    end;
+    xDatesStr.Free;
+    xTitlesStr.Free;
+    if Result then begin
+      AError := '';
+    end;
+  end;
+
 var xDoc: IHTMLDocument2;
     xVar: Variant;
     xBody, xElement: IHTMLElement;
@@ -106,8 +179,11 @@ var xDoc: IHTMLDocument2;
     xBaseRow: IHTMLElement;
     xPeriodStr: String;
     xStartDate, xEndDate: TDateTime;
+    xOutXml: IXMLDOMDocument;
+    xDocElement: IXMLDOMElement;
 begin
   Result := False;
+  FExtOutput := '';
   try
     xDoc := CoHTMLDocument.Create as IHTMLDocument2;
     try
@@ -153,6 +229,13 @@ begin
               if xPos > 0 then begin
                 xPeriodStr := Copy(xPeriodStr, xPos + 3, MaxInt);
                 if DecodeDate(xPeriodStr, xStartDate, xEndDate) then begin
+                  xOutXml := GetXmlDocument;
+                  xDocElement := xOutXml.createElement('accountExtraction');
+                  xOutXml.appendChild(xDocElement);
+                  SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                  SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
+                  SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                  SetXmlAttribute('description', xDocElement, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
                   if xTabBase.rows.length >= 4 then begin
                     xBaseRow := (xTabHeader.rows.item(3, varEmpty) as IHTMLElement);
                     xAll := xBaseRow.all as IHTMLElementCollection;
@@ -166,8 +249,19 @@ begin
                       Inc(xCount);
                     end;
                     if xTabOperations <> Nil then begin
-                      ShowMessage(IntToStr(xTabOperations.rows.length));
+                      xCount := 0;
+                      Result := True;
+                      while (xCount <= xTabOperations.rows.length - 1) and Result do begin
+                        if (xCount > 1) and (xCount < xTabOperations.rows.length - 1) then begin
+                          xElement := xTabOperations.rows.item(xCount, varEmpty) as IHTMLElement;
+                          Result := AppendExtractionItem(xDocElement, xElement, AError);
+                        end;
+                        Inc(xCount);
+                      end;
                     end;
+                  end;
+                  if Result then begin
+                    FExtOutput := GetStringFromDocument(xOutXml);
                   end;
                 end;
               end;
@@ -183,7 +277,6 @@ begin
   except
     AError := 'Brak obiektu IHTMLDocument2';
   end;
-  FExtOutput := '';
 end;
 
 end.
