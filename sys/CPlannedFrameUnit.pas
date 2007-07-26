@@ -55,7 +55,7 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  CPlannedFormUnit, CDoneFrameUnit, CConsts, CPreferences;
+  CPlannedFormUnit, CDoneFrameUnit, CConsts, CPreferences, CTools;
 
 {$R *.dfm}
 
@@ -124,7 +124,7 @@ begin
   if Column = 0 then begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
-    CellText := xData.description;
+    CellText := GetDescText(xData.description);
   end else if Column = 2 then begin
     if (xData.movementType = CInMovement) then begin
       CellText := CInMovementDescription;

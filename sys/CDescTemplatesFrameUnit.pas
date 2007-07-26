@@ -80,7 +80,7 @@ begin
     if Column = 0 then begin
       CellText := xObj.symbol;
     end else if Column = 1 then begin
-      CellText := xObj.description;
+      CellText := GetDescText(xObj.description);
     end else if Column = 2 then begin
       xBase := GetBaseForm;
       if xBase <> Nil then begin

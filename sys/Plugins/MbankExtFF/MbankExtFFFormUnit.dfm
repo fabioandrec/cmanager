@@ -287,7 +287,6 @@ object MbankExtFFForm: TMbankExtFFForm
     BevelKind = bkTile
     BorderStyle = bsNone
     TabOrder = 1
-    Text = 'c:\x.htm'
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

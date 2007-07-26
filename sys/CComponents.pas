@@ -84,6 +84,7 @@ type
     procedure DoExit; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure WndProc(var Message: TMessage); override;
+    procedure CreateParams(var Params: TCreateParams); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure DoGetDataId;
@@ -397,7 +398,7 @@ procedure Register;
 implementation
 
 uses Forms, CCalendarFormUnit, DateUtils, ComObj, CCalculatorFormUnit,
-  Math;
+  Math, StrUtils;
 
 procedure Register;
 begin
@@ -674,6 +675,12 @@ begin
   TabStop := True;
   Transparent := False;
   TControlCanvas(FCanvas).Control := Self;
+end;
+
+procedure TCStatic.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  Params.Style := Params.Style or SS_WORDELLIPSIS
 end;
 
 destructor TCStatic.Destroy;
@@ -1709,10 +1716,12 @@ procedure TCDataList.DoGetText(Node: PVirtualNode; Column: TColumnIndex; TextTyp
 begin
   inherited DoGetText(Node, Column, TextType, Text);
   if Text = '' then begin
-    if Header.Columns.Items[Column].Text = 'Lp' then begin
-      Text := IntToStr(Node.Index + 1);
-    end else begin
-      Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic);
+    if (Column >= 0) and (Column <= Header.Columns.Count - 1) then begin
+      if Header.Columns.Items[Column].Text = 'Lp' then begin
+        Text := IntToStr(Node.Index + 1);
+      end else begin
+        Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic);
+      end;
     end;
   end;
 end;

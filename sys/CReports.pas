@@ -703,7 +703,7 @@ begin
         end;
         Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
         Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-        Add('<td class="text" width="30%">' + FieldByName('description').AsString + '</td>');
+        Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
         Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
         Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName(xFieldC).AsString) + '</td>');
         Add('<td class="cash" width="10%">' + xIn + '</td>');
@@ -1120,7 +1120,7 @@ begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="40%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idMovementCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('movementCash').AsCurrency, '', False) + '</td>');
       xSum := xSum + FieldByName('cash').AsCurrency;
@@ -1457,7 +1457,7 @@ begin
       xSums.AddSum(FieldByName(xFieldC).AsString, xCash, CEmptyDataGid);
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="40%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="40%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName(xFieldC).AsString) + '</td>');
       Add('<td class="cash" width="10%">' + CurrencyToString(xCash, '', False) + '</td>');
@@ -3328,8 +3328,8 @@ begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="30%">' + FieldByName('description').AsString + '</td>');
-      Add('<td class="text" width="25%">' + FieldByName('descriptionSecond').AsString + '</td>');
+      Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
+      Add('<td class="text" width="25%">' + ReplaceLinebreaksBR(FieldByName('descriptionSecond').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('cash').AsCurrency, '', False) + '</td>');
       Add('</tr>');
@@ -3732,7 +3732,7 @@ begin
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('accountingDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="30%">' + FieldByName('description').AsString + '</td>');
+      Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + xCashStr + '</td>');
       Add('<td class="text" width="15%">' + xMovement + '</td>');

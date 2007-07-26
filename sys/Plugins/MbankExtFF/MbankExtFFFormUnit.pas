@@ -142,7 +142,7 @@ function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boo
       end;
       if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
         xCash := StrToCurrencyDecimalDot(xCashStr);
-        xTitle := StringReplace(xTitlesStr.Text, sLineBreak, ', ', [rfReplaceAll, rfIgnoreCase]);
+        xTitle := xTitlesStr.Text;
         xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
         ARootNode.appendChild(xExtractionNode);
         SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));

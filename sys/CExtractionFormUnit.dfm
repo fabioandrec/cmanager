@@ -292,7 +292,7 @@ inherited CExtractionForm: TCExtractionForm
           Header.Font.Name = 'MS Sans Serif'
           Header.Font.Style = []
           Header.Height = 21
-          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
           Header.Style = hsFlatButtons
           HintMode = hmHint
           Images = CImageLists.MovementIcons16x16
@@ -328,14 +328,14 @@ inherited CExtractionForm: TCExtractionForm
             end
             item
               Position = 2
-              Width = 170
+              Width = 160
               WideText = 'Opis'
               WideHint = 'Opis'
             end
             item
               Alignment = taRightJustify
               Position = 3
-              Width = 70
+              Width = 60
               WideText = 'Kwota'
             end
             item

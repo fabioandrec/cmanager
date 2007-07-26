@@ -208,9 +208,9 @@ begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
     if xData.done = Nil then begin
-      CellText := xData.planned.description;
+      CellText := GetDescText(xData.planned.description);
     end else begin
-      CellText := xData.done.description;
+      CellText := GetDescText(xData.done.description);
     end;
   end else if Column = 2 then begin
     CellText := DateToStr(xData.triggerDate);

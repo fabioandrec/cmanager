@@ -77,6 +77,7 @@ function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
 function GetDescText(ADescription: String; ALineNo: Integer = 0; AWithInfo: Boolean = True): String;
+function ReplaceLinebreaksBR(AText: String): String;
 
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
@@ -556,6 +557,12 @@ begin
   end else begin
     Result := ADescription;
   end;
+end;
+
+function ReplaceLinebreaksBR(AText: String): String;
+begin
+  Result := StringReplace(AText, sLineBreak, '<br>', [rfReplaceAll, rfIgnoreCase]);
+  Result := StringReplace(Result, Chr(10), '<br>', [rfReplaceAll, rfIgnoreCase]);
 end;
 
 end.

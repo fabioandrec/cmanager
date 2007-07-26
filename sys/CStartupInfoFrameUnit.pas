@@ -75,7 +75,7 @@ type
 
 implementation
 
-uses CPreferences, CConsts, DateUtils;
+uses CPreferences, CConsts, DateUtils, CTools;
 
 {$R *.dfm}
 
@@ -347,7 +347,7 @@ begin
           CellText := GetFormattedDate(xData.date, CLongDateFormat);
         end;
       end else if xData.helperType = shtPlannedItem then begin
-        CellText := TPlannedTreeItem(xData.item).planned.description;
+        CellText := GetDescText(TPlannedTreeItem(xData.item).planned.description);
       end else if xData.helperType = shtLimit then begin
         CellText := TMovementLimit(xData.item).name;
       end;

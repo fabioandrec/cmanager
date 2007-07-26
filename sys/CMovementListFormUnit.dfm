@@ -291,14 +291,14 @@ inherited CMovementListForm: TCMovementListForm
           BevelKind = bkFlat
           BorderStyle = bsNone
           DefaultNodeHeight = 24
-          Header.AutoSizeIndex = 1
+          Header.AutoSizeIndex = -1
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11
           Header.Font.Name = 'MS Sans Serif'
           Header.Font.Style = []
           Header.Height = 21
-          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
           Header.Style = hsFlatButtons
           HintMode = hmHint
           Images = CImageLists.MovementIcons16x16

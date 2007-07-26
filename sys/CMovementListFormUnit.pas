@@ -309,7 +309,7 @@ begin
   if Column = 0 then begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
-    CellText := xData.description;
+    CellText := GetDescText(xData.description);
   end else if Column = 2 then begin
     if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
       CellText := CurrencyToString(xData.movementCash, '', False);

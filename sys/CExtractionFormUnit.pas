@@ -103,7 +103,7 @@ implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CTemplates, CPreferences, CConsts,
   CRichtext, CDescpatternFormUnit, DateUtils, CInfoFormUnit, CDataObjects,
-  Math, CConfigFormUnit, CExtractionsFrameUnit, StrUtils;
+  Math, CConfigFormUnit, CExtractionsFrameUnit, StrUtils, CTools;
 
 {$R *.dfm}
 
@@ -213,7 +213,11 @@ begin
     GDataProvider.BeginTransaction;
     xExt := TAccountExtraction.FindAccountExtraction(CStaticAccount.DataId, CDateTime.Value);
     if xExt <> Nil then begin
-      Result := xExt.id = Dataobject.id;
+      if Operation = coAdd then begin
+        Result := False;
+      end else begin
+        Result := xExt.id = Dataobject.id;
+      end;
     end else begin
       Result := True;
     end;
@@ -508,7 +512,7 @@ begin
   end else if Column = 1 then begin
     CellText := DateToStr(xData.regTime);
   end else if Column = 2 then begin
-    CellText := xData.description;
+    CellText := GetDescText(xData.description);
   end else if Column = 3 then begin
     CellText := CurrencyToString(IfThen(xData.movementType = CInMovement, 1, -1) * xData.cash, '', False);
   end else if Column = 4 then begin

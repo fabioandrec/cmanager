@@ -176,6 +176,8 @@ type
     procedure SetstartDate(const Value: TDateTime);
     procedure SetExtractionState(const Value: TBaseEnumeration);
     procedure SetregDate(const Value: TDateTime);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -2576,7 +2578,7 @@ begin
   if AColumnIndex = 0 then begin
     Result := DateToStr(FbindingDate);
   end else if AColumnIndex = 1 then begin
-    Result := Fdescription;
+    Result := GetDescText(Fdescription);
   end else if AColumnIndex = 3 then begin
     Result := GetTypeDesc(FrateType);
   end else begin
@@ -3006,7 +3008,7 @@ begin
   if AColumnIndex = 1 then begin
     Result := DateToStr(FregDate);
   end else if AColumnIndex = 2 then begin
-    Result := Fdescription;
+    Result := GetDescText(Fdescription);
   end else if AColumnIndex = 3 then begin
     Result := CurrencyToString(IfThen(FmovementType = CInMovement, 1, -1) * cash, '', False);
   end else if AColumnIndex = 4 then begin
@@ -3024,8 +3026,8 @@ end;
 function TExtractionItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
   Result := inherited OnDeleteObject(AProxy);
-  AProxy.DataProvider.ExecuteSql('update baseMovement set idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
-  AProxy.DataProvider.ExecuteSql('update movementList set idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
+  AProxy.DataProvider.ExecuteSql('update baseMovement set isStated = 0, idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
+  AProxy.DataProvider.ExecuteSql('update movementList set isStated = 0, idExtractionItem = null where idExtractionItem = ' + DataGidToDatabase(id));
 end;
 
 procedure TExtractionItem.SetaccountingDate(const Value: TDateTime);
@@ -3147,7 +3149,7 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := DateToStr(FstartDate);
   end else if AColumnIndex = 1 then begin
-    Result := description;
+    Result := GetDescText(Fdescription);
   end else begin
     Result := DateToStr(FregDate);
   end;
@@ -3250,6 +3252,13 @@ class function TAccountExtraction.FindAccountExtraction(AIdAccount: TDataGid; AR
 begin
   Result := TAccountExtraction(TAccountExtraction.FindByCondition(AccountExtractionProxy,
      'select * from accountExtraction where idAccount = ' + DataGidToDatabase(AIdAccount) + ' and regDate = ' + DatetimeToDatabase(ARegDate, False), False));
+end;
+
+function TAccountExtraction.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql('update baseMovement set isStated = 0, idExtractionItem = null where idExtractionItem in (select idExtractionItem from extractionItem where idAccountExtraction = ' + DataGidToDatabase(id) + ')');
+  AProxy.DataProvider.ExecuteSql('update movementList set isStated = 0, idExtractionItem = null where idExtractionItem in (select idExtractionItem from extractionItem where idAccountExtraction = ' + DataGidToDatabase(id) + ')');
 end;
 
 initialization
