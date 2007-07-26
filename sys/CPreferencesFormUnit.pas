@@ -336,6 +336,8 @@ begin
   CheckBoxAutoOut.Enabled := ComboBoxDays.Enabled;
   CheckBoxAutoOldIn.Enabled := ComboBoxDays.Enabled;
   CheckBoxAutoOldOut.Enabled := ComboBoxDays.Enabled;
+  CheckBoxSurpassed.Enabled := CheckBoxAutostartOperations.Checked;
+  CheckBoxValid.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
                                 CheckBoxSurpassed.Checked or
                                 CheckBoxValid.Checked;
