@@ -19,6 +19,8 @@ type
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     FExtOutput: String;
     function PrepareOutput(AInpage: String; var AError: String): Boolean;
@@ -276,6 +278,13 @@ begin
     end;
   except
     AError := 'Brak obiektu IHTMLDocument2';
+  end;
+end;
+
+procedure TMbankExtFFForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then begin
+    ModalResult := mrCancel;
   end;
 end;
 

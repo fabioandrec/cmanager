@@ -151,8 +151,8 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=6
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item1=..\others\PngComponents\Source;..\others\Vtv\Source
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item2=.\;..\Wspolne;.\System;..\Wspolne\Formatki;..\Wspolne\Klasy biznesowe;..\Wspolne\Komponenty3 ;..\Wspolne\Raporty;..\Administracja\Klasy sterujace;..\Administracja\Formatki;..\Wspolne\Raporty\Formatki;..\Wspolne\Klasy sterujace;..\Bin;..\Wspolne\Komponenty3
 Item3=..\Wspolne\Komponenty3 ;..\temp;..\Wspolne\Komponenty3;..\Wspolne;..\Wspolne\Siec\pinpad;..\Wspolne\Siec\Biblioteki;..\Wspolne\Raporty;..\Wspolne\Raporty\Formatki;..\Administracja\Formatki;..\Wspolne\Formatki
 Item4=..\..\Wspolne;..\..\Wspolne\Formatki;..\..\Wspolne\Klasy biznesowe;..\..\Wspolne\Raporty;..\..\Wspolne\Klasy sterujace;..\..\Wspolne\Komponenty3;..\..\ImportSPG\Wspolne\Formatki

@@ -8,7 +8,8 @@ cd ..\NBPACurrencyRates
 dcc32 /b /q NBPACurrencyRates.dpr
 cd ..\NBPBSCurrencyRates
 dcc32 /b /q NBPBSCurrencyRates.dpr
-cd ..\RunCalc 
+cd ..\RunCalc
 dcc32 /b /q RunCalc.dpr
+cd ..\MbankExtFF
+dcc32 /b /q MbankExtFF.dpr
 cd ..\..
-

@@ -414,7 +414,7 @@ var xStream: TFileStream;
     xText: String;
 begin
   if (ALogFilename <> '') then begin
-    xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + AText;
+    xText := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + #9 + StringReplace(AText, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
     if PosEx(sLineBreak, xText, Length(xText) - Length(sLineBreak)) = 0 then begin
       xText := xText + sLineBreak;
     end;
