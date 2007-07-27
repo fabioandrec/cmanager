@@ -82,7 +82,7 @@ var GPlugins: TCPluginList;
 implementation
 
 uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
-  Variants, CDataObjects;
+  Variants, CDataObjects, CConsts;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -385,13 +385,13 @@ function TCManagerInterfaceObject.GetReportCss: OleVariant;
 var xRes: TResourceStream;
     xStr: TStringList;
 begin
-  if not FileExists(GetSystemPathname('report.css')) then begin
+  if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
     xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname('report.css'));
+    xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
     xRes.Free;
   end;
   xStr := TStringList.Create;
-  xStr.LoadFromFile(GetSystemPathname('report.css'));
+  xStr.LoadFromFile(GetSystemPathname(CCSSReportFile));
   Result := xStr.Text;
   xStr.Free;
 end;

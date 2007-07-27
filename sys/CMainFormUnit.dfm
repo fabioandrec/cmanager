@@ -426,11 +426,21 @@ object CMainForm: TCMainForm
                 Caption = '&Kalkulator kredytowy'
               end
               item
+                Action = ActionCss
+              end
+              item
+                Caption = '-'
+              end
+              item
                 Action = ActionImportCurrencyRates
                 Caption = 'W&czytaj kursy walut'
               end
               item
                 Action = ActionImportExtraction
+                Caption = 'Wc&zytaj wyci'#261'g bankowy'
+              end
+              item
+                Caption = '-'
               end
               item
                 Caption = '&Wtyczki'
@@ -655,6 +665,11 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Wczytaj wyci'#261'g bankowy'
       OnExecute = ActionImportExtractionExecute
+    end
+    object ActionCss: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Arkusz styli raport'#243'w'
+      OnExecute = ActionCssExecute
     end
   end
   object OpenDialog: TOpenDialog

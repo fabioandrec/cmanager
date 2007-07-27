@@ -66,6 +66,7 @@ type
     Splitter: TSplitter;
     ActionShortcutExtractions: TAction;
     ActionImportExtraction: TAction;
+    ActionCss: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -98,6 +99,7 @@ type
     procedure ActionHistoryExecute(Sender: TObject);
     procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ActionImportExtractionExecute(Sender: TObject);
+    procedure ActionCssExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -657,7 +659,7 @@ begin
   if FileExists(GetSystemPathname('changelog')) then begin
     ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname('changelog')), Nil, SW_SHOWNORMAL);
   end else begin
-    ShowInfo(itError, 'Nie odnaleziono pliku changelog. Sprawdz poprawnoœæ instalacji CManager-a.', '');
+    ShowInfo(itError, 'Nie odnaleziono pliku "changelog". Sprawdz poprawnoœæ instalacji CManager-a.', '');
   end;
 end;
 
@@ -683,6 +685,21 @@ begin
     finally
       xStr.Free;
     end;
+  end;
+end;
+
+procedure TCMainForm.ActionCssExecute(Sender: TObject);
+var xRes: TResourceStream;
+begin
+  if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
+    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
+    xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
+    xRes.Free;
+  end;
+  if FileExists(GetSystemPathname(CCSSReportFile)) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CCSSReportFile)), Nil, SW_SHOWNORMAL);
+  end else begin
+    ShowInfo(itError, 'Nie odnaleziono pliku "report.css". Sprawdz poprawnoœæ instalacji CManager-a.', '');
   end;
 end;
 

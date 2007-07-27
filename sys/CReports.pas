@@ -1254,9 +1254,9 @@ end;
 procedure TCHtmlReport.PrepareReportPath;
 var xRes: TResourceStream;
 begin
-  if not FileExists(GetSystemPathname('report.css')) then begin
+  if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
     xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname('report.css'));
+    xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
     xRes.Free;
   end;
   if not FileExists(GetSystemPathname('report.htm')) then begin
@@ -1265,7 +1265,7 @@ begin
     xRes.Free;
   end;
   FreportText.LoadFromFile(GetSystemPathname('report.htm'));
-  FreportStyle.LoadFromFile(GetSystemPathname('report.css'));
+  FreportStyle.LoadFromFile(GetSystemPathname(CCSSReportFile));
 end;
 
 function TCChartReport.CanShowReport: Boolean;
