@@ -145,7 +145,7 @@ const
 
   CExtractionStateOpenDescription = 'Otwarty';
   CExtractionStateCloseDescription = 'Zamkniêty';
-  CExtractionStateStatedDescription = 'Uzgodniona';
+  CExtractionStateStatedDescription = 'Uzgodniony';
 
 
 const
