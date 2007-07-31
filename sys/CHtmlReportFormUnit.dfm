@@ -1,4 +1,6 @@
 inherited CHtmlReportForm: TCHtmlReportForm
+  Left = 102
+  Top = 54
   Caption = 'CHtmlReportForm'
   PixelsPerInch = 96
   TextHeight = 13

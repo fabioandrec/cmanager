@@ -21,6 +21,8 @@ type
     function GetReportCss: OleVariant;
     function GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant;
     function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
+    function ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean;
+    procedure ShowReportBox(AFormTitle: OleVariant; AReportBody: OleVariant);
   end;
 
   TCPlugin_Configure = function: Boolean; stdcall;

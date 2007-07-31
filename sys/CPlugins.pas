@@ -31,6 +31,8 @@ type
     function GetVersion: OleVariant;
     function GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant;
     function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
+    function ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean;
+    procedure ShowReportBox(AFormTitle: OleVariant; AReportBody: OleVariant);
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -82,7 +84,7 @@ var GPlugins: TCPluginList;
 implementation
 
 uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
-  Variants, CDataObjects, CConsts;
+  Variants, CDataObjects, CConsts, CReports;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -429,6 +431,31 @@ end;
 function TCManagerInterfaceObject.GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant;
 begin
   Result := GCurrencyCache.GetSymbol(ACurrencyId);
+end;
+
+function TCManagerInterfaceObject.ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean;
+var xType: TIconType;
+    xText: String;
+begin
+  xText := AMessage;
+  if ADialogType = CDIALOGBOX_WARNING then begin
+    xType := itWarning;
+  end else if ADialogType = CDIALOGBOX_ERROR then begin
+    xType := itError;
+  end else if ADialogType = CDIALOGBOX_INFO then begin
+    xType := itInfo;
+  end else if ADialogType = CDIALOGBOX_QUESTION then begin
+    xType := itQuestion;
+  end else begin
+    xType := itError;
+    xText := 'Plugin wywo³a³ metodê ShowDialogBox z niepoprawnym typem dialogu';
+  end;
+  Result := ShowInfo(xType, xText, '');
+end;
+
+procedure TCManagerInterfaceObject.ShowReportBox(AFormTitle, AReportBody: OleVariant);
+begin
+  ShowSimpleReport(AFormTitle, AReportBody);
 end;
 
 initialization

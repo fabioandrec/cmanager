@@ -114,11 +114,11 @@ type
     function PrepareReportConditions: Boolean; virtual;
     function GetFormClass: TCReportFormClass; virtual; abstract;
     procedure PrepareReportData; virtual; abstract;
-    procedure SaveContentToFile(AFilename: String); virtual; abstract;
     function CanShowReport: Boolean; virtual;
   public
     function GetReportTitle: String; virtual; abstract;
     function GetReportFooter: String; virtual; abstract;
+    function GetFormTitle: String; virtual;
     constructor CreateReport(AParams: TCReportParams); virtual;
     procedure ShowReport;
     destructor Destroy; override;
@@ -470,6 +470,28 @@ type
     function GetReportTitle: String; override;
   end;
 
+  TSimpleReportParams = class(TCReportParams)
+  private
+    FFormTitle: String;
+    FReportText: String;
+  public
+    property formTitle: String read FFormTitle write FFormTitle;
+    property reportText: String read FReportText write FReportText;
+  end;
+
+  TSimpleReportDialog = class(TCBaseReport)
+  private
+  protected
+    function GetFormClass: TCReportFormClass; override;
+    procedure PrepareReportData; override;
+  public
+    function GetFormTitle: String; override;
+    function GetReportFooter: String; override;
+    function GetReportTitle: String; override;
+  end;
+
+procedure ShowSimpleReport(AFormTitle, AReportText: string);
+
 implementation
 
 uses Forms, Adodb, CConfigFormUnit, Math,
@@ -480,7 +502,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
-  CChoosePeriodFilterGroupFormUnit;
+     CChoosePeriodFilterGroupFormUnit;
 
 function GetDescription(AGroupType: String; ADate: TDateTime): String;
 begin
@@ -1176,6 +1198,11 @@ begin
   inherited Destroy;
 end;
 
+function TCBaseReport.GetFormTitle: String;
+begin
+  Result := 'Raport';
+end;
+
 function TCBaseReport.PrepareReportConditions: Boolean;
 begin
   Result := True;
@@ -1190,7 +1217,7 @@ begin
     PrepareReportData;
     GDataProvider.RollbackTransaction;
     if CanShowReport then begin
-      Fform.Caption := 'Raport';
+      Fform.Caption := GetFormTitle;
       Fform.ShowConfig(coNone);
     end;
   end;
@@ -3768,6 +3795,44 @@ begin
   xExt := TAccountExtraction(TAccountExtraction.LoadObject(AccountExtractionProxy, TCWithGidParams(Params).id, False));
   Result := xExt.description + ', za okres od ' + DateTimeToStr(xExt.startDate) + ' do ' + DateTimeToStr(xExt.endDate);
   GDataProvider.RollbackTransaction;
+end;
+
+function TSimpleReportDialog.GetFormClass: TCReportFormClass;
+begin
+  Result := TCHtmlReportForm;
+end;
+
+function TSimpleReportDialog.GetFormTitle: String;
+begin
+  Result := TSimpleReportParams(FParams).formTitle;
+end;
+
+function TSimpleReportDialog.GetReportFooter: String;
+begin
+  Result := '';
+end;
+
+function TSimpleReportDialog.GetReportTitle: String;
+begin
+  Result := '';
+end;
+
+procedure TSimpleReportDialog.PrepareReportData;
+begin
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(TSimpleReportParams(FParams).reportText);
+end;
+
+procedure ShowSimpleReport(AFormTitle, AReportText: string);
+var xParams: TSimpleReportParams;
+    xReport: TSimpleReportDialog;
+begin
+  xParams := TSimpleReportParams.Create;
+  xParams.formTitle := AFormTitle;
+  xParams.reportText := AReportText;
+  xReport := TSimpleReportDialog.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

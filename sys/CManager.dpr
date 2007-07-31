@@ -8,6 +8,8 @@ program CManager;
 {%File 'CMandb_1_2.sql'}
 {%File 'CMandb_2_3.sql'}
 {%File 'CMandb_3_4.sql'}
+{%File 'CMandb_4_5.sql'}
+{%File 'CMandb_5_6.sql'}
 {%File 'CMandf.sql'}
 
 uses
