@@ -33,6 +33,9 @@ type
     function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
     function ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean;
     procedure ShowReportBox(AFormTitle: OleVariant; AReportBody: OleVariant);
+    function GetSelectedType: Integer;
+    function GetSelectedId: OleVariant;
+    function GetShutdownEvent: Cardinal;
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -50,6 +53,7 @@ type
     FpluginMenu: String;
     FcmanInterface: TCManagerInterfaceObject;
     function GetisConfigurable: Boolean;
+    function GetisTypeOf(AType: Integer): Boolean;
   public
     constructor Create(AFilename: String);
     function LoadAndInitialize: Boolean;
@@ -58,6 +62,7 @@ type
     function Configure: Boolean;
     function Execute: OleVariant;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    property isTypeof[AType: Integer]: Boolean read GetisTypeOf;
   published
     property fileName: String read FFilename;
     property pluginType: Integer read FpluginType write FpluginType;
@@ -84,7 +89,7 @@ var GPlugins: TCPluginList;
 implementation
 
 uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
-  Variants, CDataObjects, CConsts, CReports;
+  Variants, CDataObjects, CConsts, CReports, CMainFormUnit, StrUtils;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -181,6 +186,11 @@ begin
   Result := (@FPlugin_Configure <> Nil);
 end;
 
+function TCPlugin.GetisTypeOf(AType: Integer): Boolean;
+begin
+  Result := (pluginType and 255) = AType;
+end;
+
 function TCPlugin.LoadAndInitialize: Boolean;
 begin
   FHandle := LoadLibrary(PChar(FFilename));
@@ -199,11 +209,12 @@ begin
         Result := False;
       end;
       if Result then begin
-        Result := (FpluginType = CPLUGINTYPE_CURRENCYRATE) or
-                  (FpluginType = CPLUGINTYPE_EXTRACTION) or
-                  (FpluginType = CPLUGINTYPE_JUSTEXECUTE) or
-                  (FpluginType = CPLUGINTYPE_HTMLREPORT) or
-                  (FpluginType = CPLUGINTYPE_CHARTREPORT);
+        Result := isTypeof[CPLUGINTYPE_CURRENCYRATE] or
+                  isTypeof[CPLUGINTYPE_EXTRACTION] or
+                  isTypeof[CPLUGINTYPE_JUSTEXECUTE] or
+                  isTypeof[CPLUGINTYPE_HTMLREPORT] or
+                  isTypeof[CPLUGINTYPE_CHARTREPORT] or
+                  isTypeof[CPLUGINTYPE_SELECTEDITEM];
         if not Result then begin
           SaveToLog('Typ pluginu jest niepoprawny lub nie zosta³ ustawiony ' + FShortName, GPluginlogfile);
         end;
@@ -233,7 +244,7 @@ var xCount: Integer;
 begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
-    if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+    if TCPlugin(Items[xCount]).isTypeof[CPLUGINTYPE_CURRENCYRATE] then begin
       Inc(Result);
     end;
   end;
@@ -244,7 +255,7 @@ var xCount: Integer;
 begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
-    if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_EXTRACTION then begin
+    if TCPlugin(Items[xCount]).isTypeof[CPLUGINTYPE_EXTRACTION] then begin
       Inc(Result);
     end;
   end;
@@ -255,7 +266,7 @@ var xCount: Integer;
 begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
-    if TCPlugin(Items[xCount]).pluginType = CPLUGINTYPE_JUSTEXECUTE then begin
+    if TCPlugin(Items[xCount]).isTypeof[CPLUGINTYPE_JUSTEXECUTE] then begin
       Inc(Result);
     end;
   end;
@@ -302,7 +313,7 @@ begin
     xPermit := False;
   end;
   if xAsk then begin
-    xPermit := ShowInfo(itQuestion, 'Wtyczka "' + FParentPlugin.FpluginDescription + '" ¿¹da dostêpu do pliku danych. Czy chcesz na to zezwoliæ ?', '', @xAlways);
+    xPermit := ShowInfo(itQuestion, 'Wtyczka "' + FParentPlugin.pluginMenu + '" ¿¹da dostêpu do pliku danych. Czy chcesz na to zezwoliæ ?', '', @xAlways);
     if xAlways then begin
       if xPref = Nil then begin
         xPref := TPluginPref.CreatePluginPref(FParentPlugin.fileName, FParentPlugin.pluginConfiguration);
@@ -456,6 +467,36 @@ end;
 procedure TCManagerInterfaceObject.ShowReportBox(AFormTitle, AReportBody: OleVariant);
 begin
   ShowSimpleReport(AFormTitle, AReportBody);
+end;
+
+function TCManagerInterfaceObject.GetSelectedId: OleVariant;
+var xRes: String;
+    xPos: Integer;
+begin
+  VarClear(Result);
+  if CMainForm <> Nil then begin
+    xRes := CMainForm.SelectedId;
+    if xRes <> '' then begin
+      Result := xRes;
+      xPos := Pos('|', Result);
+      if xPos > 0 then begin
+        Result := Copy(Result, 1, xPos - 1);
+      end;
+    end;
+  end;
+end;
+
+function TCManagerInterfaceObject.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_INCORRECT;
+  if CMainForm <> Nil then begin
+    Result := CMainForm.SelectedType;
+  end;
+end;
+
+function TCManagerInterfaceObject.GetShutdownEvent: Cardinal;
+begin
+  Result := GShutdownEvent;
 end;
 
 initialization

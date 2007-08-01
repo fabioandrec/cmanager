@@ -41,6 +41,10 @@ type
     procedure FindFontAndBackground(AMovement: TPlannedMovement; AFont: TFont; var ABackground: TColor);
   protected
     procedure WndProc(var Message: TMessage); override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
+    function GetSelectedType: Integer; override;
+    function GetSelectedId: ShortString; override;
   public
     function GetList: TCList; override;
     procedure ReloadPlanned;
@@ -55,7 +59,8 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  CPlannedFormUnit, CDoneFrameUnit, CConsts, CPreferences, CTools;
+  CPlannedFormUnit, CDoneFrameUnit, CConsts, CPreferences, CTools,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -67,11 +72,7 @@ end;
 
 procedure TCPlannedFrame.PlannedListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 begin
-  CButtonEdit.Enabled := Node <> Nil;
-  CButtonDel.Enabled := Node <> Nil;
-  if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
-  end;
+  UpdateButtons(Node <> Nil);
 end;
 
 procedure TCPlannedFrame.ReloadPlanned;
@@ -342,6 +343,32 @@ begin
     end else if xBase.movementType = COutMovement then begin
       ImageIndex := 1;
     end;
+  end;
+end;
+
+function TCPlannedFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_PLANNEDMOVEMENT) = CSELECTEDITEM_PLANNEDMOVEMENT;
+end;
+
+procedure TCPlannedFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  CButtonEdit.Enabled := AIsSelectedSomething;
+  CButtonDel.Enabled := AIsSelectedSomething;
+end;
+
+function TCPlannedFrame.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_PLANNEDMOVEMENT;
+end;
+
+function TCPlannedFrame.GetSelectedId: ShortString;
+begin
+  if PlannedList.FocusedNode <> Nil then begin
+    Result := TPlannedMovement(PlannedList.GetNodeData(PlannedList.FocusedNode)^).id;
+  end else begin
+    Result := CEmptyDataGid;
   end;
 end;
 

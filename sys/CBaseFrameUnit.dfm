@@ -61,6 +61,9 @@ object CBaseFrame: TCBaseFrame
       Caption = 'Odwr'#243#263' zaznaczenie'
       OnClick = Odwrzaznaczenie1Click
     end
+    object N3: TMenuItem
+      Caption = '-'
+    end
   end
   object ExportSaveDialog: TSaveDialog
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]

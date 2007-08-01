@@ -112,6 +112,8 @@ type
     procedure SetStatusbarVisible(const Value: Boolean);
     procedure UnhandledException(Sender: TObject; E: Exception);
     function CallHelp(ACommand: Word; AData: Longint; var ACallHelp: Boolean): Boolean;
+    function GetSelectedId: String;
+    function GetSelectedType: Integer;
   protected
     procedure WndProc(var Message: TMessage); override;
   public
@@ -124,6 +126,9 @@ type
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
     property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
+    property ActiveFrame: TFrame read FActiveFrame write FActiveFrame;
+    property SelectedType: Integer read GetSelectedType;
+    property SelectedId: String read GetSelectedId;
   end;
 
 var
@@ -520,6 +525,7 @@ end;
 
 procedure TCMainForm.UnhandledException(Sender: TObject; E: Exception);
 begin
+  SetEvent(GShutdownEvent);
   CMainForm.ActionCloseConnection.Execute;
   ShowInfo(itError, 'Podczas pracy wyst¹pi³ wyj¹tek programowy. CManager zostanie zamkniêty', E.Message);
   Application.Terminate;
@@ -538,6 +544,7 @@ end;
 procedure TCMainForm.FinalizeMainForm;
 var xCount: Integer;
 begin
+  SetEvent(GShutdownEvent);
   for xCount := 0 to FShortcutsFrames.Count - 1 do begin
     TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
   end;
@@ -592,9 +599,9 @@ begin
     if xPluginBand <> Nil then begin
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
-        if (xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE) or
-           (xPlugin.pluginType = CPLUGINTYPE_JUSTEXECUTE) or
-           (xPlugin.pluginType = CPLUGINTYPE_EXTRACTION) then begin
+        if xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] or
+           xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE] or
+           xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION] then begin
           xAction := TAction.Create(Self);
           xAction.ActionList := ActionManager;
           xAction.Caption := xPlugin.pluginMenu;
@@ -616,9 +623,9 @@ begin
   xPlugin := TCPlugin(GPlugins.Items[TAction(ASender).Tag]);
   xOutput := xPlugin.Execute;
   if not VarIsEmpty(xOutput) then begin
-    if xPlugin.pluginType = CPLUGINTYPE_CURRENCYRATE then begin
+    if xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] then begin
       UpdateCurrencyRates(xOutput);
-    end else if xPlugin.pluginType = CPLUGINTYPE_EXTRACTION then begin
+    end else if xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION] then begin
       UpdateExtractions(xOutput);
     end;
   end;
@@ -700,6 +707,26 @@ begin
     ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CCSSReportFile)), Nil, SW_SHOWNORMAL);
   end else begin
     ShowInfo(itError, 'Nie odnaleziono pliku "report.css". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+  end;
+end;
+
+function TCMainForm.GetSelectedId: String;
+begin
+  Result := '';
+  if FActiveFrame <> Nil then begin
+    if FActiveFrame.InheritsFrom(TCBaseFrame) then begin
+      Result := TCBaseFrame(FActiveFrame).SelectedId;
+    end;
+  end;
+end;
+
+function TCMainForm.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_INCORRECT;
+  if FActiveFrame <> Nil then begin
+    if FActiveFrame.InheritsFrom(TCBaseFrame) then begin
+      Result := TCBaseFrame(FActiveFrame).SelectedType;
+    end;
   end;
 end;
 

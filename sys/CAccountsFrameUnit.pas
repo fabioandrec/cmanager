@@ -22,7 +22,7 @@ type
 
 implementation
 
-uses CDataObjects, CAccountFormUnit, CConsts, CReports;
+uses CDataObjects, CAccountFormUnit, CConsts, CReports, CPluginConsts;
 
 {$R *.dfm}
 

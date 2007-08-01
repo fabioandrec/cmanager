@@ -51,7 +51,7 @@ type
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionHistoryExecute(Sender: TObject);
   protected
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     procedure WndProc(var Message: TMessage); override;
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
     procedure MessageMovementEdited(AId: TDataGid; AOptions: Integer); virtual;
@@ -216,17 +216,11 @@ end;
 
 procedure TCDataobjectFrame.UpdateButtons(AIsSelectedSomething: Boolean);
 begin
+  inherited UpdateButtons(AIsSelectedSomething);
   ActionAdd.Enabled := True;
   ActionEdit.Enabled := List.FocusedNode <> Nil;
   ActionDelete.Enabled := List.FocusedNode <> Nil;
   ActionHistory.Enabled := List.FocusedNode <> Nil;
-  if Owner.InheritsFrom(TCFrameForm) then begin
-    if TCFrameForm(Owner).IsChoice then begin
-      TCFrameForm(Owner).BitBtnOk.Enabled := AIsSelectedSomething or (MultipleChecks <> Nil);
-    end else begin
-      TCFrameForm(Owner).BitBtnOk.Enabled := True;
-    end;
-  end;
 end;
 
 procedure TCDataobjectFrame.WndProc(var Message: TMessage);

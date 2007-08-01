@@ -27,6 +27,7 @@ type
     Zaznaczwszystkie1: TMenuItem;
     Odznaczwszystkie1: TMenuItem;
     Odwrzaznaczenie1: TMenuItem;
+    N3: TMenuItem;
     procedure Ustawienialisty1Click(Sender: TObject);
     procedure Wywietljakoraport1Click(Sender: TObject);
     procedure JakoplikTXT1Click(Sender: TObject);
@@ -50,12 +51,17 @@ type
     procedure IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
     function GetSelectedId: TDataGid; virtual;
     procedure SetSelectedId(const Value: TDataGid); virtual;
+    function GetSelectedType: Integer; virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
     function GetBaseForm: TCBaseForm;
     procedure Loaded; override;
     procedure DoCheckChanged;
     procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure UpdateSelectedItemPlugins;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; virtual;
+    procedure ExecuteSelectedPluginAction(ASender: TObject);
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
   public
     procedure HideFrame; virtual;
     procedure ShowFrame; virtual;
@@ -78,6 +84,7 @@ type
   published
     property SelectedId: TDataGid read GetSelectedId write SetSelectedId;
     property SelectedText: String read GetSelectedText;
+    property SelectedType: Integer read GetSelectedType;
     property List: TCList read GetList;
     property AdditionalData: TObject read FAdditionalData;
     property MultipleChecks: TStringList read FMultipleChecks write FMultipleChecks;
@@ -93,7 +100,7 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 implementation
 
 uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
-  CDatatools, CInfoFormUnit;
+  CDatatools, CInfoFormUnit, CPluginConsts, CPlugins, CFrameFormUnit;
 
 {$R *.dfm}
 
@@ -175,7 +182,7 @@ end;
 
 function TCBaseFrame.GetSelectedId: TDataGid;
 begin
-  Result := '';
+  Result := CEmptyDataGid;
 end;
 
 function TCBaseFrame.GetSelectedText: String;
@@ -208,6 +215,7 @@ begin
     Odwrzaznaczenie1.Visible := AMultipleCheck <> Nil;
     Odznaczwszystkie1.Visible := AMultipleCheck <> Nil;
     Zaznaczwszystkie1.Visible := AMultipleCheck <> Nil;
+    UpdateSelectedItemPlugins;
   end;
   LoadColumns;
 end;
@@ -568,6 +576,61 @@ begin
     if xNode <> Nil then begin
       GetList.FocusedNode := xNode;
       GetList.Selected[xNode] := True;
+    end;
+  end;
+end;
+
+function TCBaseFrame.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_INCORRECT;
+end;
+
+procedure TCBaseFrame.UpdateSelectedItemPlugins;
+var xCount: Integer;
+    xPlugin: TCPlugin;
+    xItemPopup: TMenuItem;
+begin
+  for xCount := 0 to GPlugins.Count - 1 do begin
+    xPlugin := TCPlugin(GPlugins.Items[xCount]);
+    if xPlugin.isTypeof[CPLUGINTYPE_SELECTEDITEM] and IsSelectedTypeCompatible(xPlugin.pluginType) then begin
+      xItemPopup := TMenuItem.Create(Self);
+      xItemPopup.Caption := xPlugin.pluginMenu;
+      xItemPopup.Tag := xCount + 1024;
+      xItemPopup.OnClick := ExecuteSelectedPluginAction;
+      ListPopupMenu.Items.Add(xItemPopup);
+    end;
+  end;
+end;
+
+function TCBaseFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := False;
+end;
+
+procedure TCBaseFrame.ExecuteSelectedPluginAction(ASender: TObject);
+var xCount: Integer;
+begin
+  if ASender.InheritsFrom(TMenuItem) then begin
+    xCount := TMenuItem(ASender).Tag - 1024;
+    if (xCount >= 0) and (xCount <= GPlugins.Count - 1) then begin
+      TCPlugin(GPlugins.Items[xCount]).Execute;
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+var xCount: Integer;
+begin
+  if Owner.InheritsFrom(TCFrameForm) then begin
+    if TCFrameForm(Owner).IsChoice then begin
+      TCFrameForm(Owner).BitBtnOk.Enabled := AIsSelectedSomething or (MultipleChecks <> Nil);
+    end else begin
+      TCFrameForm(Owner).BitBtnOk.Enabled := True;
+    end;
+  end;
+  for xCount := 0 to ListPopupMenu.Items.Count - 1 do begin
+    if ListPopupMenu.Items.Items[xCount].Tag >= 1024 then begin
+      ListPopupMenu.Items.Items[xCount].Enabled := AIsSelectedSomething;
     end;
   end;
 end;

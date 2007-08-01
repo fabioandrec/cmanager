@@ -23,6 +23,9 @@ type
     function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
     function ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean;
     procedure ShowReportBox(AFormTitle: OleVariant; AReportBody: OleVariant);
+    function GetSelectedType: Integer;
+    function GetSelectedId: OleVariant;
+    function GetShutdownEvent: Cardinal;
   end;
 
   TCPlugin_Configure = function: Boolean; stdcall;

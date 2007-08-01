@@ -21,6 +21,7 @@ type
     function GetmovementType: TBaseEnumeration;
     function GetidCurrencyDef: TDataGid;
     function GetisStated: Boolean;
+    function GetId: TDataGid;
   public
     property elementType: TMovementTreeElementType read FelementType write FelementType;
     property description: String read GetDescription;
@@ -30,6 +31,7 @@ type
     property movementType: TBaseEnumeration read GetmovementType;
     property isStated: Boolean read GetisStated;
     property currencyView: String read FcurrencyView write FcurrencyView;
+    property id: TDataGid read GetId;
   end;
 
   TCMovementFrame = class(TCBaseFrame)
@@ -86,8 +88,7 @@ type
     procedure ActionAddListExecute(Sender: TObject);
     procedure TodayListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
-    procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticViewCurrencyChanged(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
@@ -106,6 +107,10 @@ type
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+    function GetSelectedType: Integer; override;
+    function GetSelectedId: ShortString; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
   public
     function GetList: TCList; override;
     procedure ReloadToday;
@@ -124,7 +129,7 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
   CListPreferencesFormUnit, CReports, CMovmentListElementFormUnit,
-  CMovementListFormUnit, CTools;
+  CMovementListFormUnit, CTools, CPluginConsts;
 
 {$R *.dfm}
 
@@ -215,11 +220,7 @@ end;
 
 procedure TCMovementFrame.TodayListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 begin
-  CButtonEdit.Enabled := Node <> Nil;
-  CButtonDel.Enabled := Node <> Nil;
-  if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
-  end;
+  UpdateButtons(Node <> Nil);
 end;
 
 procedure TCMovementFrame.ReloadToday;
@@ -979,6 +980,11 @@ begin
   end;
 end;
 
+function TMovementTreeElement.GetId: TDataGid;
+begin
+  Result := Dataobject.id;
+end;
+
 function TMovementTreeElement.GetidCurrencyDef: TDataGid;
 begin
   if FelementType = mtObject then begin
@@ -1077,6 +1083,43 @@ procedure TCMovementFrame.CStaticViewCurrencyChanged(Sender: TObject);
 begin
   ReloadToday;
   ReloadSums;
+end;
+
+function TCMovementFrame.GetSelectedType: Integer;
+var xData: TMovementTreeElement;
+begin
+  if TodayList.FocusedNode <> Nil then begin
+    xData := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+    if xData.elementType = mtObject then begin
+      Result := CSELECTEDITEM_BASEMOVEMENT;
+    end else begin
+      Result := CSELECTEDITEM_MOVEMENTLIST;
+    end;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
+function TCMovementFrame.GetSelectedId: ShortString;
+begin
+  if TodayList.FocusedNode <> Nil then begin
+    Result := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^).id;
+  end else begin
+    Result := CEmptyDataGid;
+  end;
+end;
+
+function TCMovementFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := ((APluginSelectedItemTypes and CSELECTEDITEM_BASEMOVEMENT) = CSELECTEDITEM_BASEMOVEMENT) or
+            ((APluginSelectedItemTypes and CSELECTEDITEM_MOVEMENTLIST) = CSELECTEDITEM_MOVEMENTLIST);
+end;
+
+procedure TCMovementFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  CButtonEdit.Enabled := AIsSelectedSomething;
+  CButtonDel.Enabled := AIsSelectedSomething;
 end;
 
 end.

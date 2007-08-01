@@ -222,6 +222,7 @@ var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
     GDatabaseName: String;
     GSqllogfile: String = '';
+    GShutdownEvent: THandle;
 
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
@@ -1427,7 +1428,9 @@ initialization
   CoInitialize(Nil);
   GDataProvider := TDataProvider.Create;
   GWorkDate := Today;
+  GShutdownEvent := CreateEvent(Nil, True, False, Nil);
 finalization
+  CloseHandle(GShutdownEvent);
   GDataProvider.Free;
   CoUninitialize;
 end.

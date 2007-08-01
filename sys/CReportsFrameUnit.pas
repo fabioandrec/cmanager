@@ -227,9 +227,9 @@ begin
   xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport('Historia wybranej waluty' , TCurrencyRatesHistoryReport, Nil, 'Pokazuje historiê waluty w/g wybranego kontrahenta w zadanym okresis', CLineReportImage), True));
   for xCount := 0 to GPlugins.Count - 1 do begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
-    if (xPlugin.pluginType = CPLUGINTYPE_HTMLREPORT) then begin
+    if xPlugin.isTypeof[CPLUGINTYPE_HTMLREPORT] then begin
       xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport(xPlugin.pluginMenu, TPluginHtmlReport, TCPluginReportParams.Create(xPlugin), xPlugin.pluginDescription, CPluginReportImage), True));
-    end else if (xPlugin.pluginType = CPLUGINTYPE_CHARTREPORT) then begin
+    end else if xPlugin.isTypeof[CPLUGINTYPE_CHARTREPORT] then begin
       xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport(xPlugin.pluginMenu, TPluginChartReport, TCPluginReportParams.Create(xPlugin), xPlugin.pluginDescription, CPluginReportImage), True));
     end;
   end;

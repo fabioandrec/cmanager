@@ -75,6 +75,8 @@ type
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
     function GetSelectedId: ShortString; override;
     function GetSelectedText: String; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
+    function GetSelectedType: Integer; override;
   public
     function GetList: TCList; override;
     procedure ReloadDone;
@@ -93,7 +95,8 @@ implementation
 
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit, CTools;
+  Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit, CTools,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -566,10 +569,11 @@ end;
 function TCDoneFrame.GetSelectedId: ShortString;
 var xData: TPlannedTreeItem;
 begin
-  Result := '';
   if DoneList.FocusedNode <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
     Result := xData.planned.id + '|' + DatetimeToDatabase(xData.triggerDate, False);
+  end else begin
+    Result := CEmptyDataGid;
   end;
 end;
 
@@ -593,6 +597,7 @@ var xData: TPlannedTreeItem;
     xStat: Boolean;
     xOper: Boolean;
 begin
+  UpdateButtons(Node <> Nil);
   xCanAccept := False;
   xOper := False;
   xStat := False;
@@ -851,6 +856,16 @@ var xDate: TSumElement;
 begin
   xDate := TSumElement(SumList.GetNodeData(Node)^);
   ChildCount := xDate.childs.Count;
+end;
+
+function TCDoneFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_PLANNEDDONE) = CSELECTEDITEM_PLANNEDDONE; 
+end;
+
+function TCDoneFrame.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_PLANNEDDONE;
 end;
 
 end.

@@ -11,7 +11,7 @@ BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
 PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe \
   NBPCurrencyRates.dll NBPBSCurrencyRates.dll RunCalc.dll DbStats.dll \
-  AccountList.dll AccountChart.dll MbankExtFF.dll
+  AccountList.dll AccountChart.dll MbankExtFF.dll ShOper.dll
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -47,6 +47,9 @@ NBPBSCurrencyRates.dll: ..\sys\Plugins\NBPBSCurrencyRates\NBPBSCurrencyRates.dpr
   $(DCC)
 
 MbankExtFF.dll: ..\sys\Plugins\MbankExtFF\MbankExtFF.dpr
+  $(DCC)
+
+ShOper.dll: ..\sys\Plugins\ShOper\ShOper.dpr
   $(DCC)
 
 
