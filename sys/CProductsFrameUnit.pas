@@ -13,6 +13,8 @@ type
     procedure ActionAddSubcategoryExecute(Sender: TObject);
   protected
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
+    function GetSelectedType: Integer; override;
   public
     class function GetTitle: String; override;
     function GetStaticFilter: TStringList; override;
@@ -29,7 +31,8 @@ type
 
 implementation
 
-uses CDataObjects, CProductFormUnit, CConsts, CConfigFormUnit, CReports;
+uses CDataObjects, CProductFormUnit, CConsts, CConfigFormUnit, CReports,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -136,6 +139,16 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+function TCProductsFrame.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_PRODUCT;
+end;
+
+function TCProductsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_PRODUCT) = CSELECTEDITEM_PRODUCT;
 end;
 
 end.

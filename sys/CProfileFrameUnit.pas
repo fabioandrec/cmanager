@@ -4,10 +4,13 @@ interface
 
 uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
      ImgList, Controls, PngImageList, CComponents, VirtualTrees, StdCtrls,
-     ExtCtrls, CDatabase, CDataobjectFormUnit, CImageListsUnit;
+     ExtCtrls, CDatabase, CDataobjectFormUnit, CImageListsUnit, Dialogs;
 
 type
   TCProfileFrame = class(TCDataobjectFrame)
+  protected
+    function GetSelectedType: Integer; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
@@ -18,7 +21,7 @@ type
 
 implementation
 
-uses CDataObjects, CProfileFormUnit;
+uses CDataObjects, CProfileFormUnit, CPluginConsts;
 
 {$R *.dfm}
 
@@ -37,9 +40,23 @@ begin
   Result := ProfileProxy;
 end;
 
+function TCProfileFrame.GetSelectedType: Integer;
+begin
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_PROFILE;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
 class function TCProfileFrame.GetTitle: String;
 begin
   Result := 'Profile';
+end;
+
+function TCProfileFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_PROFILE) = CSELECTEDITEM_PROFILE;
 end;
 
 procedure TCProfileFrame.ReloadDataobjects;

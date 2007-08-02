@@ -9,6 +9,9 @@ uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
 
 type
   TCCashpointsFrame = class(TCDataobjectFrame)
+  protected
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
+    function GetSelectedType: Integer; override;
   public
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -25,7 +28,7 @@ implementation
 
 {$R *.dfm}
 
-uses CConsts, CDataObjects, CCashpointFormUnit, CReports;
+uses CConsts, CDataObjects, CCashpointFormUnit, CReports, CPluginConsts;
 
 function TCCashpointsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
@@ -47,6 +50,11 @@ begin
   Result := 'Historia kontrahenta';
 end;
 
+function TCCashpointsFrame.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_CASHPOINT;
+end;
+
 function TCCashpointsFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
@@ -62,6 +70,11 @@ end;
 class function TCCashpointsFrame.GetTitle: String;
 begin
   Result := 'Kontrahenci';
+end;
+
+function TCCashpointsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_CASHPOINT) = CSELECTEDITEM_CASHPOINT;
 end;
 
 function TCCashpointsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;

@@ -17,7 +17,9 @@ type
   end;
 
   TCExtractionsFrame = class(TCDataobjectFrame)
-  private
+  protected
+    function GetSelectedType: Integer; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
     procedure ReloadDataobjects; override;
     function GetStaticFilter: TStringList; override;
@@ -33,7 +35,7 @@ type
 
 implementation
 
-uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports;
+uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts;
 
 {$R *.dfm}
 
@@ -62,6 +64,15 @@ begin
   Result := 'accountExtraction';
 end;
 
+function TCExtractionsFrame.GetSelectedType: Integer;
+begin
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_EXTRACTION;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
 function TCExtractionsFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
@@ -76,6 +87,11 @@ end;
 class function TCExtractionsFrame.GetTitle: String;
 begin
   Result := 'Wyci¹gi';
+end;
+
+function TCExtractionsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_EXTRACTION) = CSELECTEDITEM_EXTRACTION;
 end;
 
 function TCExtractionsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;

@@ -10,6 +10,9 @@ uses
 
 type
   TCLimitsFrame = class(TCDataobjectFrame)
+  protected
+    function GetSelectedType: Integer; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
     procedure ReloadDataobjects; override;
     function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
@@ -21,7 +24,8 @@ type
 
 implementation
 
-uses CDataObjects, CDatatools, CCashpointFormUnit, CLimitFormUnit, CConsts;
+uses CDataObjects, CDatatools, CCashpointFormUnit, CLimitFormUnit, CConsts,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -40,6 +44,15 @@ begin
   Result := MovementLimitProxy;
 end;
 
+function TCLimitsFrame.GetSelectedType: Integer;
+begin
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_LIMIT;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
 function TCLimitsFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
@@ -48,6 +61,11 @@ begin
     Add(CLimitActive + '=<aktywne>');
     Add(CLimitDisabled + '=<wy³¹czone>');
   end;
+end;
+
+function TCLimitsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_LIMIT) = CSELECTEDITEM_LIMIT;
 end;
 
 function TCLimitsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;

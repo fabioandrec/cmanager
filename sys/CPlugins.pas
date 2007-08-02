@@ -470,27 +470,29 @@ begin
 end;
 
 function TCManagerInterfaceObject.GetSelectedId: OleVariant;
-var xRes: String;
+var xRes: Integer;
     xPos: Integer;
+    xWnd: THandle;
 begin
   VarClear(Result);
-  if CMainForm <> Nil then begin
-    xRes := CMainForm.SelectedId;
-    if xRes <> '' then begin
-      Result := xRes;
-      xPos := Pos('|', Result);
-      if xPos > 0 then begin
-        Result := Copy(Result, 1, xPos - 1);
-      end;
+  xWnd := GetActiveWindow;
+  if xWnd <> 0 then begin
+    xRes := SendMessage(xWnd, WM_GETSELECTEDID, 0, 0);
+    Result := PDataGid(xRes)^;
+    xPos := Pos('|', Result);
+    if xPos > 0 then begin
+      Result := Copy(Result, 1, xPos - 1);
     end;
   end;
 end;
 
 function TCManagerInterfaceObject.GetSelectedType: Integer;
+var xWnd: THandle;
 begin
   Result := CSELECTEDITEM_INCORRECT;
-  if CMainForm <> Nil then begin
-    Result := CMainForm.SelectedType;
+  xWnd := GetActiveWindow;
+  if xWnd <> 0 then begin
+    Result := SendMessage(xWnd, WM_GETSELECTEDTYPE, 0, 0);
   end;
 end;
 

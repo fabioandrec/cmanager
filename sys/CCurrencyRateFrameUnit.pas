@@ -47,6 +47,8 @@ type
     procedure UpdateCustomPeriod;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
     function GetAdditionalDataForObject: TAdditionalData; override;
+    function GetSelectedType: Integer; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
@@ -62,7 +64,8 @@ type
 implementation
 
 uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils,
-  CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit, CBaseFrameUnit;
+  CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit, CBaseFrameUnit,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -246,6 +249,20 @@ begin
   inherited Create;
   FIdSource := AIdSource;
   FIdDest := AIdDest;
+end;
+
+function TCCurrencyRateFrame.GetSelectedType: Integer;
+begin
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_CURRENCYRATE;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
+function TCCurrencyRateFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_CURRENCYRATE) = CSELECTEDITEM_CURRENCYRATE;
 end;
 
 end.

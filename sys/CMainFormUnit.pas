@@ -127,8 +127,6 @@ type
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
     property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
     property ActiveFrame: TFrame read FActiveFrame write FActiveFrame;
-    property SelectedType: Integer read GetSelectedType;
-    property SelectedId: String read GetSelectedId;
   end;
 
 var
@@ -407,6 +405,7 @@ begin
 end;
 
 procedure TCMainForm.WndProc(var Message: TMessage);
+var xGid: TDataGid;
 begin
   inherited WndProc(Message);
   if Message.Msg = WM_FORMMAXIMIZE then begin
@@ -437,6 +436,11 @@ begin
     StatusBar.Panels.Items[1].Text := 'Podczas wykonywania kopii pliku danych wyst¹pi³ b³¹d';
     TCStatusPanel(StatusBar.Panels.Items[1]).ImageIndex := 3;
     TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := True;
+  end else if Message.Msg = WM_GETSELECTEDTYPE then begin
+    Message.Result := GetSelectedType;
+  end else if Message.Msg = WM_GETSELECTEDID then begin
+    xGid := GetSelectedId;
+    Message.Result := Integer(@xGid);
   end;
 end;
 

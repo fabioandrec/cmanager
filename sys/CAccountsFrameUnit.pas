@@ -8,6 +8,9 @@ uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
 
 type
   TCAccountsFrame = class(TCDataobjectFrame)
+  protected
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
+    function GetSelectedType: Integer; override;
   public
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -46,6 +49,15 @@ begin
   Result := 'Historia konta';
 end;
 
+function TCAccountsFrame.GetSelectedType: Integer;
+begin
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_ACCOUNT;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
 function TCAccountsFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
@@ -62,6 +74,10 @@ begin
   Result := 'Konta';
 end;
 
+function TCAccountsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_ACCOUNT) = CSELECTEDITEM_ACCOUNT;
+end;
 
 function TCAccountsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 begin

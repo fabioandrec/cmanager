@@ -24,7 +24,9 @@ begin
     Application.Handle := GetAppHandle;
     SetType(CPLUGINTYPE_SELECTEDITEM or
                CSELECTEDITEM_BASEMOVEMENT or
-               CSELECTEDITEM_MOVEMENTLIST);
+               CSELECTEDITEM_MOVEMENTLIST or
+               CSELECTEDITEM_ACCOUNT or
+               CSELECTEDITEM_EXTRACTIONITEM);
     SetCaption('Poka¿ potwierdzenie');
     SetDescription('Pozwala drukowaæ potwierdzenie operacji');
   end;

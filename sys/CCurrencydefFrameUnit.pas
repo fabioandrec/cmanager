@@ -10,6 +10,9 @@ uses
 
 type
   TCCurrencydefFrame = class(TCDataobjectFrame)
+  protected
+    function GetSelectedType: Integer; override;
+    function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
@@ -22,7 +25,7 @@ type
 
 implementation
 
-uses CCurrencydefFormUnit, CReports;
+uses CCurrencydefFormUnit, CReports, CPluginConsts;
 
 {$R *.dfm}
 
@@ -46,9 +49,23 @@ begin
   Result := 'Historia waluty';
 end;
 
+function TCCurrencydefFrame.GetSelectedType: Integer;
+begin
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_CURRENCY;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
+end;
+
 class function TCCurrencydefFrame.GetTitle: String;
 begin
   Result := 'Waluty';
+end;
+
+function TCCurrencydefFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+begin
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_CURRENCY) = CSELECTEDITEM_CURRENCY;
 end;
 
 procedure TCCurrencydefFrame.ReloadDataobjects;
@@ -69,4 +86,3 @@ begin
 end;
 
 end.
- 

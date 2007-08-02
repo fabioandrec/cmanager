@@ -17,6 +17,10 @@ type
     FAdditionalData: TObject;
     FOutData: Pointer;
     FIsChoice: Boolean;
+  protected
+    procedure WndProc(var Message: TMessage); override;
+    function GetSelectedId: String;
+    function GetSelectedType: Integer;
   public
     constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True); virtual;
     class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
@@ -28,7 +32,7 @@ type
 
 implementation
 
-uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts;
+uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts, CPluginConsts;
 
 {$R *.dfm}
 
@@ -61,6 +65,26 @@ begin
   inherited Destroy;
 end;
 
+function TCFrameForm.GetSelectedId: String;
+begin
+  Result := '';
+  if FFrame <> Nil then begin
+    if FFrame.InheritsFrom(TCBaseFrame) then begin
+      Result := TCBaseFrame(FFrame).SelectedId;
+    end;
+  end;
+end;
+
+function TCFrameForm.GetSelectedType: Integer;
+begin
+  Result := CSELECTEDITEM_INCORRECT;
+  if FFrame <> Nil then begin
+    if FFrame.InheritsFrom(TCBaseFrame) then begin
+      Result := TCBaseFrame(FFrame).SelectedType;
+    end;
+  end;
+end;
+
 class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
 var xForm: TCFrameForm;
     xFormClass: TCFrameFormClass;
@@ -90,6 +114,18 @@ begin
     Result := True;
   end;
   xForm.Free;
+end;
+
+procedure TCFrameForm.WndProc(var Message: TMessage);
+var xGid: TDataGid;
+begin
+  inherited WndProc(Message);
+  if Message.Msg = WM_GETSELECTEDTYPE then begin
+    Message.Result := GetSelectedType;
+  end else if Message.Msg = WM_GETSELECTEDID then begin
+    xGid := GetSelectedId;
+    Message.Result := Integer(@xGid);
+  end;
 end;
 
 end.
