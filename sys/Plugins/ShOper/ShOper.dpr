@@ -27,8 +27,8 @@ begin
                CSELECTEDITEM_MOVEMENTLIST or
                CSELECTEDITEM_ACCOUNT or
                CSELECTEDITEM_EXTRACTIONITEM);
-    SetCaption('Poka¿ potwierdzenie');
-    SetDescription('Pozwala drukowaæ potwierdzenie operacji');
+    SetCaption('Poka¿ zaznaczenie');
+    SetDescription('Pozwala pokazaæ zaznaczenie');
   end;
   Result := True;
 end;
@@ -44,7 +44,9 @@ begin
     xGid :=  CManInterface.GetSelectedId;
     if not VarIsEmpty(xGid) then begin
       if xType = CSELECTEDITEM_BASEMOVEMENT then begin
-      end else if xType = CSELECTEDITEM_BASEMOVEMENT then begin
+        CManInterface.ShowReportBox('Informacja', '<html><body>Typ: <b>Operacja</b></div>Gid: <b>' + xGid + '</b></body><html>');
+      end else if xType = CSELECTEDITEM_MOVEMENTLIST then begin
+        CManInterface.ShowReportBox('Informacja', '<html><body>Typ: <b>Lista operacji</b></div>Gid: <b>' + xGid + '</b></body><html>');
       end else begin
         CManInterface.ShowDialogBox('Wtyczka otrzyma³a nieobs³ugiwany typ obiektu', CDIALOGBOX_ERROR);
       end;

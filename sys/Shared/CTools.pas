@@ -69,6 +69,7 @@ function GetParamValue(AParam: String): String;
 function GetSwitch(ASwitch: String): Boolean;
 function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
 function LPad(AString: String; AChar: Char; ALength: Integer): String;
+function RPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 procedure SaveToLog(AText: String; ALogFilename: String);
 function YmdToDate(AString: String; ADefault: TDateTime): TDateTime;
@@ -176,6 +177,14 @@ begin
   Result := AString;
   while Length(Result) < ALength do begin
     Result := AChar + Result;
+  end;
+end;
+
+function RPad(AString: String; AChar: Char; ALength: Integer): String;
+begin
+  Result := AString;
+  while Length(Result) < ALength do begin
+    Result := Result + AChar;
   end;
 end;
 

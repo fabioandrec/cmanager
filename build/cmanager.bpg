@@ -11,7 +11,7 @@ BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
 PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe \
   NBPCurrencyRates.dll NBPBSCurrencyRates.dll RunCalc.dll DbStats.dll \
-  AccountList.dll AccountChart.dll MbankExtFF.dll ShOper.dll
+  AccountList.dll AccountChart.dll MbankExtFF.dll ShOper.dll SqlConsole.dll
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -50,6 +50,9 @@ MbankExtFF.dll: ..\sys\Plugins\MbankExtFF\MbankExtFF.dpr
   $(DCC)
 
 ShOper.dll: ..\sys\Plugins\ShOper\ShOper.dpr
+  $(DCC)
+
+SqlConsole.dll: ..\sys\Plugins\SqlConsole\SqlConsole.dpr
   $(DCC)
 
 

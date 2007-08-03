@@ -66,7 +66,11 @@ begin
           while not xQuery.Eof do begin
             for xCf := 0 to xQuery.Fields.Count - 1 do begin
               try
-                xValue := xQuery.Fields.Item[xCf].Value;
+                if VarIsNull(xQuery.Fields.Item[xCf].Value) then begin
+                  xValue := 'null';
+                end else begin
+                  xValue := xQuery.Fields.Item[xCf].Value;
+                end;
               except
                 xValue := '<b³¹d>';
               end;
