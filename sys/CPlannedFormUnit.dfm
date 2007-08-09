@@ -214,6 +214,7 @@ inherited CPlannedForm: TCPlannedForm
         HotTrack = True
       end
       object CCurrEditQuantity: TCCurrEdit
+        Tag = 1
         Left = 384
         Top = 61
         Width = 89

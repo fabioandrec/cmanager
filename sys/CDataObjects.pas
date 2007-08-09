@@ -68,6 +68,7 @@ type
   private
     Fname: TBaseName;
     Fsymbol: TBaseName;
+    FpreviousSymbol: TBaseName;
     Fdescription: TBaseDescription;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
@@ -79,6 +80,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    procedure AfterPost; override;
   published
     property name: TBaseName read Fname write Setname;
     property symbol: TBaseName read Fsymbol write Setsymbol;
@@ -3341,6 +3343,14 @@ begin
   AProxy.DataProvider.ExecuteSql('update movementList set isStated = 0, idExtractionItem = null where idExtractionItem in (select idExtractionItem from extractionItem where idAccountExtraction = ' + DataGidToDatabase(id) + ')');
 end;
 
+procedure TUnitDef.AfterPost;
+begin
+  if Fsymbol <> FpreviousSymbol then begin
+    GUnitdefCache.Change(id, symbol, '');
+  end;
+  inherited AfterPost;
+end;
+
 class function TUnitDef.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
@@ -3361,6 +3371,7 @@ begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
     Fsymbol := FieldByName('symbol').AsString;
+    FpreviousSymbol := Fsymbol;
   end;
 end;
 

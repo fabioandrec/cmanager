@@ -150,6 +150,14 @@ inherited CMovementForm: TCMovementForm
         object TabSheetInOutCyclic: TTabSheet
           Caption = 'TabSheetInOutCyclic'
           TabVisible = False
+          object Label16: TLabel
+            Left = 354
+            Top = 81
+            Width = 22
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Ilo'#347#263
+          end
           object Label11: TLabel
             Left = 61
             Top = 9
@@ -235,13 +243,20 @@ inherited CMovementForm: TCMovementForm
             Action = ActionStateTransSource
             Color = clBtnFace
           end
-          object Label16: TLabel
-            Left = 354
-            Top = 81
-            Width = 22
-            Height = 13
-            Alignment = taRightJustify
-            Caption = 'Ilo'#347#263
+          object CCurrEditCyclicQuantity: TCCurrEdit
+            Tag = 1
+            Left = 384
+            Top = 77
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            TabOrder = 3
+            OnChange = CCurrEditInoutOnceMovementChange
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
           end
           object CStaticInoutCyclic: TCStatic
             Left = 112
@@ -398,20 +413,6 @@ inherited CMovementForm: TCMovementForm
             BorderStyle = bsNone
             Enabled = False
             TabOrder = 9
-            Decimals = 2
-            ThousandSep = True
-            CurrencyStr = 'z'#322
-            BevelKind = bkTile
-            WithCalculator = True
-          end
-          object CCurrEditCyclicQuantity: TCCurrEdit
-            Left = 384
-            Top = 77
-            Width = 89
-            Height = 21
-            BorderStyle = bsNone
-            TabOrder = 3
-            OnChange = CCurrEditInoutOnceMovementChange
             Decimals = 2
             ThousandSep = True
             CurrencyStr = 'z'#322
@@ -633,6 +634,14 @@ inherited CMovementForm: TCMovementForm
           Caption = 'TabSheetInOutOnce'
           ImageIndex = 4
           TabVisible = False
+          object Label15: TLabel
+            Left = 354
+            Top = 45
+            Width = 22
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Ilo'#347#263
+          end
           object Label4: TLabel
             Left = 36
             Top = 9
@@ -710,13 +719,20 @@ inherited CMovementForm: TCMovementForm
             Action = ActionStateTransSource
             Color = clBtnFace
           end
-          object Label15: TLabel
-            Left = 354
-            Top = 45
-            Width = 22
-            Height = 13
-            Alignment = taRightJustify
-            Caption = 'Ilo'#347#263
+          object CCurrEditOnceQuantity: TCCurrEdit
+            Tag = 1
+            Left = 384
+            Top = 41
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            TabOrder = 2
+            OnChange = CCurrEditInoutOnceMovementChange
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
           end
           object CStaticInoutOnceAccount: TCStatic
             Left = 112
@@ -859,20 +875,6 @@ inherited CMovementForm: TCMovementForm
             OnGetDataId = CStaticInOutOnceRateGetDataId
             OnChanged = CStaticInOutOnceRateChanged
             HotTrack = True
-          end
-          object CCurrEditOnceQuantity: TCCurrEdit
-            Left = 384
-            Top = 41
-            Width = 89
-            Height = 21
-            BorderStyle = bsNone
-            TabOrder = 2
-            OnChange = CCurrEditInoutOnceMovementChange
-            Decimals = 2
-            ThousandSep = True
-            CurrencyStr = 'z'#322
-            BevelKind = bkTile
-            WithCalculator = True
           end
         end
       end

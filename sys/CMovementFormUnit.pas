@@ -258,8 +258,8 @@ begin
     CCurrEditInoutCyclicMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
     CCurrEditTransMovement.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditTransAccount.SetCurrencyDef(CEmptyDataGid, '');
-    SetComponentUnitdef(CEmptyDataGid, CCurrEditOnceQuantity);
-    SetComponentUnitdef(CEmptyDataGid, CCurrEditCyclicQuantity);
+    CStaticInoutOnceCategoryChanged(Nil);
+    CStaticInoutCyclicCategoryChanged(Nil);
   end;
   if AdditionalData <> Nil then begin
     xAdd := TMovementAdditionalData(AdditionalData);
@@ -1122,8 +1122,11 @@ begin
 end;
 
 procedure TCMovementForm.CStaticInoutOnceCategoryChanged(Sender: TObject);
+var xHasQuant: TDataGid;
 begin
-  SetComponentUnitdef(TProduct.HasQuantity(CStaticInoutOnceCategory.DataId), CCurrEditOnceQuantity);
+  xHasQuant := TProduct.HasQuantity(CStaticInoutOnceCategory.DataId);
+  CStaticInoutOnceCategory.Width := IfThen(xHasQuant = CEmptyDataGid, 361, 169);
+  SetComponentUnitdef(xHasQuant, CCurrEditOnceQuantity);
   UpdateDescription;
 end;
 
@@ -1138,8 +1141,11 @@ begin
 end;
 
 procedure TCMovementForm.CStaticInoutCyclicCategoryChanged(Sender: TObject);
+var xHasQuant: TDataGid;
 begin
-  SetComponentUnitdef(TProduct.HasQuantity(CStaticInoutCyclicCategory.DataId), CCurrEditCyclicQuantity);
+  xHasQuant := TProduct.HasQuantity(CStaticInoutCyclicCategory.DataId);
+  CStaticInoutCyclicCategory.Width := IfThen(xHasQuant = CEmptyDataGid, 361, 169);
+  SetComponentUnitdef(xHasQuant, CCurrEditCyclicQuantity);
   UpdateDescription;
 end;
 
