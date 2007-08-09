@@ -12,10 +12,9 @@ uses
   SysUtils,
   Variants,
   Classes,
-  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
-  {$ENDIF}
-  CTools in '.\Shared\CTools.pas';
+  CTools in 'Shared\CTools.pas',
+  CAdotools in 'Shared\CAdotools.pas';
 
 {$R *.res}
 
@@ -40,11 +39,10 @@ begin
   end;
 end;
 
-function ExecuteSql(ADb: TADOConnection; ASql: String; var AError: String): Boolean;
+function ExecuteSql(ADb: TADOConnection; ASql: String; var AError: String; ADelimeter: String): Boolean;
 var xSqls: TStringList;
     xCount: Integer;
     xQuery: _Recordset;
-    xCf: Integer;
     xValue: String;
 begin
   Result := True;
@@ -56,32 +54,8 @@ begin
       try
         xQuery := ADb.Execute(xSqls.Strings[xCount], cmdText);
         if xQuery.State = adStateOpen then begin
-          for xCf := 0 to xQuery.Fields.Count - 1 do begin
-            Write(xQuery.Fields.Item[xCf].Name);
-            if xCf <> xQuery.Fields.Count - 1 then begin
-              Write(#9);
-            end;
-          end;
-          Writeln;
-          while not xQuery.Eof do begin
-            for xCf := 0 to xQuery.Fields.Count - 1 do begin
-              try
-                if VarIsNull(xQuery.Fields.Item[xCf].Value) then begin
-                  xValue := 'null';
-                end else begin
-                  xValue := xQuery.Fields.Item[xCf].Value;
-                end;
-              except
-                xValue := '<b³¹d>';
-              end;
-              Write(xValue);
-              if xCf <> xQuery.Fields.Count - 1 then begin
-                Write(#9);
-              end;
-            end;
-            Writeln;
-            xQuery.MoveNext;
-          end;
+          xValue := GetRowsAsString(xQuery, ADelimeter);
+          Writeln(xValue);
         end;
       except
         on E: Exception do begin
@@ -103,16 +77,20 @@ var xAction: Integer;
     xSql: String;
     xDatabase: TADOConnection;
     xScript: TStringList;
+    xDelimeter: String;
+    xCode: Integer;
 begin
   {$IFDEF DEBUG}
   MemChk;
   {$ENDIF}
   xExitCode := $FF;
+  xDelimeter := '';
   CoInitialize(Nil);
   if GetSwitch('-h') then begin
-    xText := 'CQuery [-s komenda] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
+    xText := 'CQuery [-s komenda] -d [separator pól] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
              '  -s wykonaj komendê sql [komenda]' + sLineBreak +
              '  -f wykonaj skrypt sql [plik]' + sLineBreak +
+             '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
              '  -h wyœwietla ten ekran';
   end else begin
     xAction := 0;
@@ -123,6 +101,15 @@ begin
     if GetSwitch('-f') then begin
       xAction := xAction or $02;
       xSql := GetParamValue('-f');
+    end;
+    xDelimeter := GetParamValue('-d');
+    if xDelimeter <> '' then begin
+      if AnsiLowerCase(Copy(xDelimeter, 1, 2)) = '0x' then begin
+        xCode := StrToInt64Def('$' + Copy(xDelimeter, 3, MaxInt), -1);
+        if xCode >= 0 then begin
+          xDelimeter := Chr(xCode);
+        end;
+      end;
     end;
     if (xAction <= 0) or (xAction >= 3) then begin
       xText := 'Niepoprawne parametry wywo³ania. Spróbuj "CQuery -h"';
@@ -153,7 +140,7 @@ begin
           xDatabase := TADOConnection.Create(Nil);
           try
             if ConnectToDatabase(xFile, xDatabase, xText) then begin
-              if ExecuteSql(xDatabase, xSql, xText) then begin
+              if ExecuteSql(xDatabase, xSql, xText, xDelimeter) then begin
                 xExitCode := $00;
               end;
               xDatabase.Close;

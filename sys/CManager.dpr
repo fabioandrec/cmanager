@@ -10,6 +10,7 @@ program CManager;
 {%File 'CMandb_3_4.sql'}
 {%File 'CMandb_4_5.sql'}
 {%File 'CMandb_5_6.sql'}
+{%File 'CMandb_6_7.sql'}
 {%File 'CMandf.sql'}
 
 uses
@@ -113,7 +114,10 @@ uses
   CExtractionFormUnit in 'CExtractionFormUnit.pas' {CExtractionForm},
   CExtractionItemFormUnit in 'CExtractionItemFormUnit.pas' {CExtractionItemForm},
   CMovementStateFormUnit in 'CMovementStateFormUnit.pas' {CMovementStateForm},
-  CExtractionItemFrameUnit in 'CExtractionItemFrameUnit.pas' {CExtractionItemFrame: TFrame};
+  CExtractionItemFrameUnit in 'CExtractionItemFrameUnit.pas' {CExtractionItemFrame: TFrame},
+  CAdotools in 'Shared\CAdotools.pas',
+  CUnitDefFrameUnit in 'CUnitDefFrameUnit.pas' {CUnitDefFrame: TFrame},
+  CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm};
 
 {$R *.res}
 
@@ -141,7 +145,6 @@ begin
       xProceed := True;
     end;
     if xProceed then begin
-      ReloadCurrencyCache;
       if GetSwitch('/checkonly') then begin
         xProceed := CheckPendingInformations;
       end;
@@ -158,7 +161,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
           CheckForBackups;

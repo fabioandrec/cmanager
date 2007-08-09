@@ -64,6 +64,27 @@ type
     property isBase: Boolean read FisBase write SetisBase;
   end;
 
+  TUnitDef = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fsymbol: TBaseName;
+    Fdescription: TBaseDescription;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: TBaseName);
+    procedure Setsymbol(const Value: TBaseName);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property symbol: TBaseName read Fsymbol write Setsymbol;
+    property description: TBaseDescription read Fdescription write Setdescription;
+  end;
+
   TCurrencyRate = class(TDataObject)
   private
     FidSourceCurrencyDef: TDataGid;
@@ -235,16 +256,20 @@ type
     Fdescription: TBaseDescription;
     FidParentProduct: TDataGid;
     FproductType: TBaseEnumeration;
+    FidUnitDef: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure SetidParentProduct(const Value: TDataGid);
     function GettreeDesc: String;
     procedure SetproductType(const Value: TBaseEnumeration);
+    procedure SetidUnitDef(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    class function CanChangeUnitdef(AId: ShortString): Boolean;
     class function HasSubcategory(AId: TDataGid): Boolean;
+    class function HasQuantity(AId: TDataGid): TDataGid;
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
@@ -254,6 +279,7 @@ type
     property idParentProduct: TDataGid read FidParentProduct write SetidParentProduct;
     property treeDesc: String read GettreeDesc;
     property productType: TBaseEnumeration read FproductType write SetproductType;
+    property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
   end;
 
   TMovementList = class(TDataObject)
@@ -333,6 +359,7 @@ type
     FisStated: Boolean;
     FidSourceExtractionItem: TDataGid;
     FisSourceStated: Boolean;
+    Fquantity: Currency;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -354,6 +381,7 @@ type
     procedure SetisStated(const Value: Boolean);
     procedure SetidSourceExtractionItem(const Value: TDataGid);
     procedure SetisSourceStated(const Value: Boolean);
+    procedure Setquantity(const Value: Currency);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -387,6 +415,7 @@ type
     property isStated: Boolean read FisStated write SetisStated;
     property idSourceExtractionItem: TDataGid read FidSourceExtractionItem write SetidSourceExtractionItem;
     property isSourceStated: Boolean read FisSourceStated write SetisSourceStated;
+    property quantity: Currency read Fquantity write Setquantity;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -408,6 +437,7 @@ type
     FdoneCount: Integer;
     FfreeDays: TBaseEnumeration;
     FidMovementCurrencyDef: TDataGid;
+    Fquantity: Currency;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -424,6 +454,7 @@ type
     procedure SetisActive(const Value: Boolean);
     procedure SetfreeDays(const Value: TBaseEnumeration);
     procedure SetidMovementCurrencyDef(const Value: TDataGid);
+    procedure Setquantity(const Value: Currency);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -448,6 +479,7 @@ type
     property doneCount: Integer read FdoneCount;
     property freeDays: TBaseEnumeration read FfreeDays write SetfreeDays;
     property idMovementCurrencyDef: TDataGid read FidMovementCurrencyDef write SetidMovementCurrencyDef;
+    property quantity: Currency read Fquantity write Setquantity;
   end;
 
   TPlannedDone = class(TDataObject)
@@ -600,13 +632,14 @@ type
 
   TCurrCacheItem = class(TObject)
   private
+    FComponentTag: Integer;
     FCurrI: String;
     FCurrSymbol: String;
     FCurrIso: String;
     procedure SetCurrSymbol(const Value: String);
     procedure SetCurrIso(const Value: String);
   public
-    constructor Create(AId, ASymbol, AIso: String);
+    constructor Create(AComponentTag: Integer; AId, ASymbol, AIso: String);
   published
     property CurrSymbol: String read FCurrSymbol write SetCurrSymbol;
     property CurrIso: String read FCurrIso write SetCurrIso;
@@ -615,11 +648,13 @@ type
 
   TCurrCache = class(TObjectList)
   private
+    FComponentTag: Integer;
     function GetItems(AIndex: Integer): TCurrCacheItem;
     procedure SetItems(AIndex: Integer; const Value: TCurrCacheItem);
     function GetById(AId: String): TCurrCacheItem;
     function GetByIso(AIso: String): TCurrCacheItem;
   public
+    constructor Create(AComponentTag: Integer);
     procedure Change(AId, ASymbol, AIso: String);
     function GetSymbol(AId: String): String;
     function GetIso(AId: String): String;
@@ -668,13 +703,15 @@ var CashPointProxy: TDataProxy;
     AccountCurrencyRuleProxy: TDataProxy;
     AccountExtractionProxy: TDataProxy;
     ExtractionItemProxy: TDataProxy;
+    UnitDefProxy: TDataProxy;
 
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
+    GUnitdefCache: TCurrCache;
 
-const CDatafileTables: array[0..19] of string =
-            ('cashPoint', 'account', 'accountExtraction', 'extractionItem',
+const CDatafileTables: array[0..20] of string =
+            ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
@@ -763,6 +800,7 @@ begin
   AccountCurrencyRuleProxy := TDataProxy.Create(GDataProvider, 'accountCurrencyRule', Nil);
   AccountExtractionProxy := TDataProxy.Create(GDataProvider, 'accountExtraction', Nil);
   ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
+  UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -928,6 +966,12 @@ begin
   end;
 end;
 
+class function TProduct.CanChangeUnitdef(AId: ShortString): Boolean;
+begin
+  Result := (GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idProduct = ' + DataGidToDatabase(AId), 0) = 0) and
+            (GDataProvider.GetSqlInteger('select count(*) from baseMovement where idProduct = ' + DataGidToDatabase(AId), 0) = 0);
+end;
+
 procedure TProduct.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -936,6 +980,7 @@ begin
     Fdescription := FieldByName('description').AsString;
     FidParentProduct := FieldByName('idParentProduct').AsString;
     FproductType := FieldByName('productType').AsString;
+    FidUnitDef := FieldByName('idUnitDef').AsString;
   end;
 end;
 
@@ -979,6 +1024,11 @@ begin
   xStr.Free;
 end;
 
+class function TProduct.HasQuantity(AId: TDataGid): TDataGid;
+begin
+  Result := GDataProvider.GetSqlString('select idUnitdef from product where idProduct = ' + DataGidToDatabase(AId), CEmptyDataGid);
+end;
+
 class function TProduct.HasSubcategory(AId: TDataGid): Boolean;
 begin
   Result := GDataProvider.GetSqlInteger('select count(*) from product where idParentProduct = ' + DataGidToDatabase(AId), 0) <> 0;
@@ -996,6 +1046,14 @@ procedure TProduct.SetidParentProduct(const Value: TDataGid);
 begin
   if FidParentProduct <> Value then begin
     FidParentProduct := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TProduct.SetidUnitDef(const Value: TDataGid);
+begin
+  if FidUnitDef <> Value then begin
+    FidUnitDef := Value;
     SetState(msModified);
   end;
 end;
@@ -1024,6 +1082,7 @@ begin
     AddField('description', Fdescription, True, 'product');
     AddField('idParentProduct', DataGidToDatabase(FidParentProduct), False, 'product');
     AddField('productType', FproductType, True, 'product');
+    AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'product');
   end;
 end;
 
@@ -1058,6 +1117,7 @@ begin
     FisStated := FieldByName('isStated').AsBoolean;
     FidSourceExtractionItem := FieldByName('idSourceExtractionItem').AsString;
     FisSourceStated := FieldByName('isSourceStated').AsBoolean;
+    Fquantity := FieldByName('quantity').AsCurrency;
     FprevmovementCash := FmovementCash;
   end;
 end;
@@ -1141,6 +1201,7 @@ begin
     AddField('isStated', IntToStr(Integer(FisStated)), False, 'baseMovement');
     AddField('idSourceExtractionItem', DataGidToDatabase(FidSourceExtractionItem), False, 'baseMovement');
     AddField('isSourceStated', IntToStr(Integer(FisSourceStated)), False, 'baseMovement');
+    AddField('quantity', CurrencyToDatabase(Fquantity), False, 'baseMovement');
   end;
 end;
 
@@ -1204,6 +1265,7 @@ begin
   FidCashPoint := CEmptyDataGid;
   FidProduct := CEmptyDataGid;
   FidMovementCurrencyDef := CEmptyDataGid;
+  Fquantity := 1;
 end;
 
 procedure TPlannedMovement.FromDataset(ADataset: TADOQuery);
@@ -1226,6 +1288,7 @@ begin
     FtriggerType := FieldByName('triggerType').AsString;
     FtriggerDay := FieldByName('triggerDay').AsInteger;
     FfreeDays := FieldByName('freeDays').AsString;
+    Fquantity := FieldByName('quantity').AsCurrency;
     xField := FindField('doneCount');
     if xField <> Nil then begin
       FdoneCount := xField.AsInteger;
@@ -1342,6 +1405,14 @@ begin
   end;
 end;
 
+procedure TPlannedMovement.Setquantity(const Value: Currency);
+begin
+  if Fquantity <> Value then begin
+    Fquantity := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TPlannedMovement.SetscheduleDate(const Value: TDateTime);
 begin
   if FscheduleDate <> Value then begin
@@ -1394,6 +1465,7 @@ begin
     AddField('triggerDay', IntToStr(FtriggerDay), False, 'plannedMovement');
     AddField('freeDays', FfreeDays, True, 'plannedMovement');
     AddField('idMovementCurrencyDef', DataGidToDatabase(FidMovementCurrencyDef), False, 'plannedMovement');
+    AddField('quantity', CurrencyToDatabase(Fquantity), False, 'plannedMovement');
   end;
 end;
 
@@ -1999,6 +2071,7 @@ begin
   FisStated := False;
   FidSourceExtractionItem := CEmptyDataGid;
   FisSourceStated := False;
+  Fquantity := 1;
 end;
 
 function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -2637,11 +2710,12 @@ begin
   end;
 end;
 
-constructor TCurrCacheItem.Create(AId, ASymbol, AIso: String);
+constructor TCurrCacheItem.Create(AComponentTag: Integer; AId, ASymbol, AIso: String);
 begin
   inherited Create;
   FCurrI := AId;
   FCurrSymbol := ASymbol;
+  FComponentTag := AComponentTag;
   FCurrIso := AIso;
 end;
 
@@ -2656,7 +2730,7 @@ procedure TCurrCacheItem.SetCurrSymbol(const Value: String);
 begin
   if FCurrSymbol <> Value then begin
     FCurrSymbol := Value;
-    SetCurrencySymbol(FCurrI, FCurrSymbol);
+    SetCurrencySymbol(FCurrI, FCurrSymbol, FComponentTag);
     SendMessageToFrames(Nil, WM_MUSTREPAINT, 0, 0);
   end;
 end;
@@ -2666,12 +2740,18 @@ var xCur: TCurrCacheItem;
 begin
   xCur := ById[AId];
   if xCur = Nil then begin
-    xCur := TCurrCacheItem.Create(AId, ASymbol, AIso);
+    xCur := TCurrCacheItem.Create(FComponentTag, AId, ASymbol, AIso);
     Add(xCur);
   end else begin
     xCur.CurrSymbol := ASymbol;
     xCur.CurrIso := AIso;
   end;
+end;
+
+constructor TCurrCache.Create(AComponentTag: Integer);
+begin
+  inherited Create(True);
+  FComponentTag := AComponentTag;
 end;
 
 function TCurrCache.GetById(AId: String): TCurrCacheItem;
@@ -3261,8 +3341,90 @@ begin
   AProxy.DataProvider.ExecuteSql('update movementList set isStated = 0, idExtractionItem = null where idExtractionItem in (select idExtractionItem from extractionItem where idAccountExtraction = ' + DataGidToDatabase(id) + ')');
 end;
 
+class function TUnitDef.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  if GDataProvider.GetSqlInteger('select count(*) from product where idUnitDef = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ kategorie';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ jednostki miary, gdy¿ ' + xText, '');
+    Result := False;
+  end;
+end;
+
+procedure TUnitDef.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+    Fsymbol := FieldByName('symbol').AsString;
+  end;
+end;
+
+function TUnitDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TUnitDef.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TUnitDef.GetElementText: String;
+begin
+  Result := Fname;
+end;
+
+procedure TUnitDef.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TUnitDef.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TUnitDef.Setsymbol(const Value: TBaseName);
+begin
+  if Fsymbol <> Value then begin
+    Fsymbol := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TUnitDef.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fname, True, 'unitDef');
+    AddField('symbol', Fsymbol, True, 'unitDef');
+    AddField('description', Fdescription, True, 'unitDef');
+  end;
+end;
+
+procedure TBaseMovement.Setquantity(const Value: Currency);
+begin
+  if Fquantity <> Value then begin
+    Fquantity := Value;
+    SetState(msModified);
+  end;
+end;
+
 initialization
-  GCurrencyCache := TCurrCache.Create(True);
+  GCurrencyCache := TCurrCache.Create(0);
+  GUnitdefCache := TCurrCache.Create(1);
 finalization
   GCurrencyCache.Free;
+  GUnitdefCache.Free;
 end.

@@ -388,7 +388,7 @@ type
   end;
 
 function GetCurrencySymbol: string;
-procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String);
+procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String; AComponentTag: Integer);
 function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
 
 var CurrencyComponents: TObjectList;
@@ -1908,13 +1908,13 @@ begin
   inherited Destroy;
 end;
 
-procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String);
+procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String; AComponentTag: Integer);
 var xCount: Integer;
     xCur: TCCurrEdit;
 begin
   for xCount := 0 to CurrencyComponents.Count - 1 do begin
     xCur := TCCurrEdit(CurrencyComponents.Items[xCount]);
-    if xCur.CurrencyId = ACurrencyId then begin
+    if (xCur.CurrencyId = ACurrencyId) and (xCur.Tag = AComponentTag) then begin
       xCur.CurrencyStr := ACurrencySymbol;
     end;
   end;

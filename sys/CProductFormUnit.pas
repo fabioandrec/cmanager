@@ -27,6 +27,9 @@ type
     RichEditDesc: TCRichEdit;
     GroupBoxAccountType: TGroupBox;
     ComboBoxType: TComboBox;
+    Label5: TLabel;
+    CStaticUnitdef: TCStatic;
+    procedure CStaticUnitdefGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
@@ -38,7 +41,8 @@ type
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CConsts, CProductsFrameUnit, CRichtext;
+uses CDataObjects, CInfoFormUnit, CConsts, CProductsFrameUnit, CRichtext,
+  CUnitDefFrameUnit, CFrameFormUnit;
 
 {$R *.dfm}
 
@@ -65,6 +69,12 @@ begin
     end else begin
       ComboBoxType.ItemIndex := 0;
     end;
+    CStaticUnitdef.DataId := idUnitDef;
+    if CStaticUnitdef.DataId <> CEmptyDataGid then begin
+      CStaticUnitdef.Caption := TUnitDef(TUnitDef.LoadObject(UnitDefProxy, idUnitDef, False)).GetElementText;
+    end;
+    CStaticUnitdef.Enabled := CanChangeUnitdef(id);
+    CStaticUnitdef.HotTrack := CStaticUnitdef.Enabled;
   end;
 end;
 
@@ -120,6 +130,7 @@ begin
     if AdditionalData <> Nil then begin
       idParentProduct := TCProductAdditionalData(AdditionalData).ParentGid;
     end;
+    idUnitDef := CStaticUnitdef.DataId;
   end;
 end;
 
@@ -130,4 +141,10 @@ begin
   FProductType := AProductType;
 end;
 
+procedure TCProductForm.CStaticUnitdefGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCUnitDefFrame, ADataGid, AText);
+end;
+
 end.
+

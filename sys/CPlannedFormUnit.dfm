@@ -42,7 +42,7 @@ inherited CPlannedForm: TCPlannedForm
         Action = ActionTemplate
         Color = clBtnFace
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
         Width = 457
@@ -101,7 +101,7 @@ inherited CPlannedForm: TCPlannedForm
         Caption = 'Kontrahent'
       end
       object Label9: TLabel
-        Left = 250
+        Left = 306
         Top = 139
         Width = 70
         Height = 13
@@ -115,6 +115,14 @@ inherited CPlannedForm: TCPlannedForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Waluta operacji'
+      end
+      object Label15: TLabel
+        Left = 354
+        Top = 65
+        Width = 22
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Ilo'#347#263
       end
       object CStaticAccount: TCStatic
         Left = 112
@@ -138,7 +146,7 @@ inherited CPlannedForm: TCPlannedForm
       object CStaticCategory: TCStatic
         Left = 112
         Top = 61
-        Width = 361
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -165,7 +173,7 @@ inherited CPlannedForm: TCPlannedForm
         Caption = '<wybierz kontrahenta z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 2
+        TabOrder = 3
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
@@ -174,12 +182,12 @@ inherited CPlannedForm: TCPlannedForm
         HotTrack = True
       end
       object CCurrEdit: TCCurrEdit
-        Left = 328
+        Left = 384
         Top = 135
-        Width = 145
+        Width = 89
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 4
+        TabOrder = 5
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
@@ -189,7 +197,7 @@ inherited CPlannedForm: TCPlannedForm
       object CStaticCurrency: TCStatic
         Left = 112
         Top = 135
-        Width = 129
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -197,13 +205,26 @@ inherited CPlannedForm: TCPlannedForm
         Caption = '<wybierz walut'#281' z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 3
+        TabOrder = 4
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281' z listy>'
         OnGetDataId = CStaticCurrencyGetDataId
         OnChanged = CStaticCurrencyChanged
         HotTrack = True
+      end
+      object CCurrEditQuantity: TCCurrEdit
+        Left = 384
+        Top = 61
+        Width = 89
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 2
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
     object GroupBox1: TGroupBox

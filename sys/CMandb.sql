@@ -9,6 +9,16 @@ create table cashPoint (
   constraint ck_cashpointType check (cashpointType in ('I', 'O', 'W', 'X'))
 );
 
+create table unitDef (
+  idUnitDef uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  name varchar(40) not null,
+  symbol varchar(40) not null,
+  description varchar(200),
+  primary key (idUnitDef)
+);
+
 create table currencyDef (
   idcurrencyDef uniqueidentifier not null,
   created datetime not null,
@@ -66,9 +76,11 @@ create table product (
   description varchar(200),
   idParentProduct uniqueidentifier,
   productType varchar(1) not null,
+  idUnitDef uniqueidentifier,
   primary key (idProduct),
   constraint fk_parentProduct foreign key (idParentProduct) references product (idProduct),
-  constraint ck_productType check (productType in ('I', 'O'))
+  constraint ck_productType check (productType in ('I', 'O')),
+  constraint fk_productunitDef foreign key (idUnitDef) references unitDef (idUnitDef)
 );
 
 create table accountExtraction (
@@ -123,6 +135,7 @@ create table plannedMovement (
   triggerDay int not null,
   freeDays varchar(1) not null,
   idMovementCurrencyDef uniqueidentifier not null,
+  quantity money not null,
   primary key (idPlannedMovement),
   constraint ck_plannedType check (movementType in ('I', 'O')),
   constraint ck_freeDays check (freeDays in ('E', 'D', 'I')),
@@ -205,6 +218,7 @@ create table baseMovement (
   isStated bit not null,
   idSourceExtractionItem uniqueidentifier null,
   isSourceStated bit not null,
+  quantity money not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -328,22 +342,22 @@ create table cmanagerInfo (
 );
 
 create view transactions as select * from (
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'I'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity from baseMovement where movementType = 'I'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash, (-1) * movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'O'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash, (-1) * movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity from baseMovement where movementType = 'O'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * movementCash as cash, (-1) * movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'T'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * movementCash as cash, (-1) * movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, 0 as quantity from baseMovement where movementType = 'T'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'T') as v;
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, 0 as quantity from baseMovement where movementType = 'T') as v;
 
 create view balances as select * from (
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense, movementCash as movementIncome, 0 as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'I'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense, movementCash as movementIncome, 0 as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef, quantity from baseMovement where movementType = 'I'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense, 0 as movementIncome, movementCash as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'O'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense, 0 as movementIncome, movementCash as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef, quantity from baseMovement where movementType = 'O'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense, 0 as movementIncome, movementCash as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'T'
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idSourceAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, 0 as income, cash as expense, 0 as movementIncome, movementCash as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef, 0 as quantity from baseMovement where movementType = 'T'
  union all
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense, movementCash as movementIncome, 0 as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef from baseMovement where movementType = 'T') as v;
+ select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense, movementCash as movementIncome, 0 as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef, 0 as quantity from baseMovement where movementType = 'T') as v;
 
 create view filters as
   select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m

@@ -12,4 +12,6 @@ cd ..\RunCalc
 dcc32 /b /q RunCalc.dpr
 cd ..\MbankExtFF
 dcc32 /b /q MbankExtFF.dpr
+cd ..\SqlConsole
+dcc32 /b /q SqlConsole.dpr
 cd ..\..

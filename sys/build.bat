@@ -8,4 +8,3 @@ dcc32 /q /b cmanager.dpr
 dcc32 /q /b cupdate.dpr
 dcc32 /q /b carchive.dpr
 dcc32 /q /b cquery.dpr
-dcc32 /q /b cquery.dpr

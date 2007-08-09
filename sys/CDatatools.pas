@@ -20,8 +20,9 @@ procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExtractions(AExtractionText: String);
-procedure ReloadCurrencyCache;
+procedure ReloadCaches;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
+procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
 
 implementation
 
@@ -312,16 +313,23 @@ begin
   end;
 end;
 
-procedure ReloadCurrencyCache;
+procedure ReloadCaches;
 var xC: TDataObjectList;
     xCount: Integer;
     xCur: TCurrencyDef;
+    xUni: TUnitDef;
 begin
   if GDataProvider.IsConnected then begin
     xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
     for xCount := 0 to xC.Count - 1 do begin
       xCur := TCurrencyDef(xC.Items[xCount]);
       GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
+    end;
+    xC.Free;
+    xC := TUnitDef.GetAllObjects(UnitDefProxy);
+    for xCount := 0 to xC.Count - 1 do begin
+      xUni := TUnitDef(xC.Items[xCount]);
+      GUnitdefCache.Change(xUni.id, xUni.symbol, '');
     end;
     xC.Free;
   end;
@@ -483,6 +491,19 @@ begin
   end;
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawnym wyci¹giem bankowym', xError);
+  end;
+end;
+
+procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
+var xSymbol: String;
+begin
+  AComponent.Enabled := AUnitdefId <> CEmptyDataGid;
+  if AUnitdefId <> CEmptyDataGid then begin
+    xSymbol := GDataProvider.GetSqlString('select symbol from unitDef where idUnitDef = ' + DataGidToDatabase(AUnitdefId), '');
+    AComponent.SetCurrencyDef(AUnitdefId, xSymbol);
+  end else begin
+    AComponent.SetCurrencyDef(CEmptyDataGid, '');
+    AComponent.Value := 1;
   end;
 end;
 

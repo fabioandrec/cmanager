@@ -36,6 +36,8 @@ type
     ComboBoxTemplate: TComboBox;
     Label17: TLabel;
     CStaticCurrency: TCStatic;
+    Label15: TLabel;
+    CCurrEditQuantity: TCCurrEdit;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -77,7 +79,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit, CTemplates,
   CDescpatternFormUnit, CPreferences, CRichtext, CDataobjectFrameUnit,
-  CCurrencydefFrameUnit;
+  CCurrencydefFrameUnit, CDatatools;
 
 {$R *.dfm}
 
@@ -98,6 +100,7 @@ begin
     CStaticCurrency.DataId := CCurrencyDefGid_PLN;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
     CCurrEdit.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+    SetComponentUnitdef(CEmptyDataGid, CCurrEditQuantity);
   end;
   ComboBoxTypeChange(ComboBoxType);
   CStaticSchedule.Caption := FSchedule.AsString;
@@ -181,9 +184,9 @@ end;
 
 procedure TCPlannedForm.CStaticAccountChanged(Sender: TObject);
 begin
+  SetComponentUnitdef(TProduct.HasQuantity(CStaticCategory.DataId), CCurrEditQuantity);
   UpdateDescription;
 end;
-
 
 function TCPlannedForm.CanAccept: Boolean;
 begin
@@ -231,9 +234,11 @@ begin
     CStaticSchedule.Caption := FSchedule.AsString;
     CStaticCashpoint.DataId := idCashPoint;
     CStaticCurrency.DataId := idMovementCurrencyDef;
+    CCurrEditQuantity.Value := quantity;
     if idMovementCurrencyDef <> CEmptyDataGid then begin
       CStaticCurrency.Caption := GCurrencyCache.GetIso(idMovementCurrencyDef);
     end;
+    SetComponentUnitdef(TProduct.HasQuantity(idProduct), CCurrEditQuantity);
     CCurrEdit.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
   end;
 end;
@@ -262,6 +267,7 @@ begin
     triggerDay := FSchedule.triggerDay;
     freeDays := FSchedule.freeDays;
     idMovementCurrencyDef := CStaticCurrency.DataId;
+    quantity := CCurrEditQuantity.Value;
   end;
 end;
 

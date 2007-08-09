@@ -378,6 +378,7 @@ begin
     end;
     if Result then begin
       GBasePreferences.lastOpenedDatafilename := GDatabaseName;
+      ReloadCaches;
     end;
   end;
 end;

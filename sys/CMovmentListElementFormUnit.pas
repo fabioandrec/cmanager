@@ -26,6 +26,7 @@ type
     FcurrencyQuantity: Integer;
     FcurrencyRate: Currency;
     FrateDescription: TBaseDescription;
+    Fquantity: Currency;
   public
     constructor Create;
   published
@@ -45,6 +46,7 @@ type
     property idAccount: TDataGid read FidAccount write FidAccount;
     property idCashpoint: TDataGid read FidCashpoint write FidCashpoint;
     property dateTime: TDateTime read FdateTime write FdateTime;
+    property quantity: Currency read Fquantity write Fquantity;
   end;
 
   TCMovmentListElementForm = class(TCConfigForm)
@@ -69,6 +71,8 @@ type
     CStaticAccountCurrency: TCStatic;
     Label21: TLabel;
     CCurrEditAccount: TCCurrEdit;
+    Label15: TLabel;
+    CCurrEditQuantity: TCCurrEdit;
     procedure CStaticCategoryChanged(Sender: TObject);
     procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ActionAddExecute(Sender: TObject);
@@ -122,6 +126,7 @@ end;
 
 procedure TCMovmentListElementForm.CStaticCategoryChanged(Sender: TObject);
 begin
+  SetComponentUnitdef(TProduct.HasQuantity(CStaticCategory.DataId), CCurrEditQuantity);
   UpdateDescription;
 end;
 
@@ -150,8 +155,10 @@ end;
 
 procedure TCMovmentListElementForm.FillForm;
 var xProduct: TProduct;
+    xUnitdef: TDataGid;
 begin
   inherited FillForm;
+  xUnitdef := CEmptyDataGid;
   ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
   CCurrEditAccount.SetCurrencyDef(Felement.idAccountCurrencyDef, GCurrencyCache.GetSymbol(Felement.idAccountCurrencyDef));
   CStaticAccountCurrency.DataId := Felement.idAccountCurrencyDef;
@@ -173,8 +180,11 @@ begin
     GDataProvider.RollbackTransaction;
     CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
     CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
+    CCurrEditQuantity.Value := Felement.quantity;
+    xUnitdef := TProduct.HasQuantity(Felement.productId);
   end;
   CStaticRate.Enabled := CStaticMovementCurrency.DataId <> CStaticAccountCurrency.DataId;
+  SetComponentUnitdef(xUnitdef, CCurrEditQuantity);
 end;
 
 procedure TCMovmentListElementForm.ReadValues;
@@ -186,6 +196,7 @@ begin
   Felement.movementCash := CCurrEditMovement.Value;
   Felement.idMovementCurrencyDef := CStaticMovementCurrency.DataId;
   Felement.rateDescription := CStaticRate.Caption;
+  Felement.quantity := CCurrEditQuantity.Value;
   if FRateHelper <> Nil then begin
     Felement.currencyQuantity := FRateHelper.quantity;
     Felement.currencyRate := FRateHelper.rate;
@@ -218,6 +229,7 @@ begin
   FIsNew := False;
   CreateGUID(xGuid);
   Fid := GUIDToString(xGuid);
+  Fquantity := 1;
 end;
 
 procedure TCMovmentListElementForm.ActionAddExecute(Sender: TObject);

@@ -96,6 +96,10 @@ type
     CButtonStateTransDest: TCButton;
     CButtonStateOnce: TCButton;
     CButtonStateCyclic: TCButton;
+    CCurrEditOnceQuantity: TCCurrEdit;
+    Label15: TLabel;
+    Label16: TLabel;
+    CCurrEditCyclicQuantity: TCCurrEdit;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -182,7 +186,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
   CTemplates, CPreferences, CRichtext, CDataobjectFrameUnit,
   CSurpassedFormUnit, CTools, CCurrencydefFrameUnit,
-  CCurrencyRateFrameUnit;
+  CCurrencyRateFrameUnit, CDatatools;
 
 {$R *.dfm}
 
@@ -254,6 +258,8 @@ begin
     CCurrEditInoutCyclicMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
     CCurrEditTransMovement.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditTransAccount.SetCurrencyDef(CEmptyDataGid, '');
+    SetComponentUnitdef(CEmptyDataGid, CCurrEditOnceQuantity);
+    SetComponentUnitdef(CEmptyDataGid, CCurrEditCyclicQuantity);
   end;
   if AdditionalData <> Nil then begin
     xAdd := TMovementAdditionalData(AdditionalData);
@@ -543,6 +549,8 @@ begin
         CCurrEditInoutOnceMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
         CCurrEditInOutOnceAccount.Value := cash;
         CCurrEditInOutOnceAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
+        CCurrEditOnceQuantity.Value := quantity;
+        SetComponentUnitdef(TProduct.HasQuantity(idProduct), CCurrEditOnceQuantity);
         FonceState.AccountId := idAccount;
         FonceState.ExtrId := idExtractionItem;
         FonceState.Stated := isStated;
@@ -575,6 +583,8 @@ begin
         CCurrEditInoutCyclicMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
         CCurrEditInOutCyclicAccount.Value := cash;
         CCurrEditInOutCyclicAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
+        CCurrEditCyclicQuantity.Value := quantity;
+        SetComponentUnitdef(TProduct.HasQuantity(idProduct), CCurrEditCyclicQuantity);
         FcyclicState.AccountId := idAccount;
         FcyclicState.ExtrId := idExtractionItem;
         FcyclicState.Stated := isStated;
@@ -657,6 +667,7 @@ begin
       idPlannedDone := CEmptyDataGid;
       isStated := FonceState.Stated;
       idExtractionItem := FonceState.ExtrId;
+      quantity := CCurrEditOnceQuantity.Value;
     end else if (xI = 2) then begin
       movementType := CTransferMovement;
       if CStaticTransRate.Enabled then begin
@@ -704,6 +715,7 @@ begin
       idSourceAccount := CEmptyDataGid;
       idCashPoint := CStaticInoutCyclicCashpoint.DataId;
       idProduct := CStaticInoutCyclicCategory.DataId;
+      quantity := CCurrEditCyclicQuantity.Value;
       if Operation = coAdd then begin
         xPos := Pos('|', CStaticInoutCyclic.DataId);
         xTrMove := Copy(CStaticInoutCyclic.DataId, 1, xPos - 1);
@@ -774,6 +786,8 @@ begin
   CStaticInOutCyclicMovementCurrency.DataId := xPlan.idMovementCurrencyDef;
   CStaticInOutCyclicMovementCurrency.Caption := GCurrencyCache.GetIso(xPlan.idMovementCurrencyDef);
   CCurrEditInoutCyclicMovement.SetCurrencyDef(xPlan.idMovementCurrencyDef, GCurrencyCache.GetSymbol(xPlan.idMovementCurrencyDef));
+  CCurrEditCyclicQuantity.Value := xPlan.quantity;
+  SetComponentUnitdef(TProduct.HasQuantity(xPlan.idProduct), CCurrEditCyclicQuantity);
   GDataProvider.RollbackTransaction;
   UpdateDescription;
 end;
@@ -1109,6 +1123,7 @@ end;
 
 procedure TCMovementForm.CStaticInoutOnceCategoryChanged(Sender: TObject);
 begin
+  SetComponentUnitdef(TProduct.HasQuantity(CStaticInoutOnceCategory.DataId), CCurrEditOnceQuantity);
   UpdateDescription;
 end;
 
@@ -1124,6 +1139,7 @@ end;
 
 procedure TCMovementForm.CStaticInoutCyclicCategoryChanged(Sender: TObject);
 begin
+  SetComponentUnitdef(TProduct.HasQuantity(CStaticInoutCyclicCategory.DataId), CCurrEditCyclicQuantity);
   UpdateDescription;
 end;
 

@@ -91,7 +91,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Caption = 'Waluta operacji'
       end
       object Label1: TLabel
-        Left = 274
+        Left = 306
         Top = 65
         Width = 70
         Height = 13
@@ -115,17 +115,25 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Caption = 'Waluta konta'
       end
       object Label21: TLabel
-        Left = 234
+        Left = 296
         Top = 137
-        Width = 110
+        Width = 80
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Kwota w walucie konta'
+        Caption = 'W walucie konta'
+      end
+      object Label15: TLabel
+        Left = 354
+        Top = 29
+        Width = 22
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Ilo'#347#263
       end
       object CStaticCategory: TCStatic
         Left = 112
         Top = 25
-        Width = 361
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -144,7 +152,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
       object CStaticMovementCurrency: TCStatic
         Left = 112
         Top = 61
-        Width = 97
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -152,7 +160,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Caption = '<wybierz walut'#281'>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 1
+        TabOrder = 2
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281'>'
@@ -161,12 +169,12 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         HotTrack = True
       end
       object CCurrEditMovement: TCCurrEdit
-        Left = 352
+        Left = 384
         Top = 61
-        Width = 121
+        Width = 89
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 2
+        TabOrder = 3
         OnChange = CCurrEditMovementChange
         Decimals = 2
         ThousandSep = True
@@ -185,7 +193,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Caption = '<wybierz przelicznik kursu z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 3
+        TabOrder = 4
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz przelicznik kursu z listy>'
@@ -196,7 +204,7 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
       object CStaticAccountCurrency: TCStatic
         Left = 112
         Top = 133
-        Width = 97
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -205,20 +213,33 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Color = clWindow
         Enabled = False
         ParentColor = False
-        TabOrder = 4
+        TabOrder = 5
         TabStop = True
         Transparent = False
         TextOnEmpty = '<brak konta>'
         HotTrack = False
       end
       object CCurrEditAccount: TCCurrEdit
-        Left = 352
+        Left = 384
         Top = 133
-        Width = 121
+        Width = 89
         Height = 21
         BorderStyle = bsNone
         Enabled = False
-        TabOrder = 5
+        TabOrder = 6
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
+      end
+      object CCurrEditQuantity: TCCurrEdit
+        Left = 384
+        Top = 25
+        Width = 89
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 1
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322

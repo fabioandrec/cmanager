@@ -1,18 +1,18 @@
-inherited CCurrencydefForm: TCCurrencydefForm
-  Caption = 'Waluta'
-  ClientHeight = 316
+inherited CUnitdefForm: TCUnitdefForm
+  Caption = 'Jednostka miary'
+  ClientHeight = 282
   ClientWidth = 370
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 370
-    Height = 275
+    Height = 241
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
       Width = 337
-      Height = 249
-      Caption = ' Dane waluty '
+      Height = 217
+      Caption = 'jednostki miary '
       TabOrder = 0
       object Label1: TLabel
         Left = 15
@@ -24,7 +24,7 @@ inherited CCurrencydefForm: TCCurrencydefForm
       end
       object Label2: TLabel
         Left = 27
-        Top = 140
+        Top = 108
         Width = 21
         Height = 13
         Alignment = taRightJustify
@@ -38,14 +38,6 @@ inherited CCurrencydefForm: TCCurrencydefForm
         Alignment = taRightJustify
         Caption = 'Symbol wy'#347'wietlany'
       end
-      object Label4: TLabel
-        Left = 57
-        Top = 104
-        Width = 55
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Symbol ISO'
-      end
       object EditName: TEdit
         Left = 56
         Top = 28
@@ -58,12 +50,12 @@ inherited CCurrencydefForm: TCCurrencydefForm
       end
       object RichEditDesc: TCRichedit
         Left = 56
-        Top = 136
+        Top = 104
         Width = 257
         Height = 89
         BevelKind = bkTile
         BorderStyle = bsNone
-        TabOrder = 3
+        TabOrder = 2
       end
       object EditSymbol: TEdit
         Left = 120
@@ -75,20 +67,10 @@ inherited CCurrencydefForm: TCCurrencydefForm
         MaxLength = 40
         TabOrder = 1
       end
-      object EditIso: TEdit
-        Left = 120
-        Top = 100
-        Width = 193
-        Height = 21
-        BevelKind = bkTile
-        BorderStyle = bsNone
-        MaxLength = 40
-        TabOrder = 2
-      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 275
+    Top = 241
     Width = 370
     inherited BitBtnOk: TBitBtn
       Left = 193

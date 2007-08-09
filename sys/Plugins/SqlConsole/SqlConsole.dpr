@@ -15,7 +15,8 @@ uses
   CPluginConsts in '..\CPluginConsts.pas',
   CTools in '..\..\Shared\CTools.pas',
   SqlConsoleFormUnit in 'SqlConsoleFormUnit.pas' {SqlConsoleForm},
-  CRichtext in '..\..\Shared\CRichtext.pas';
+  CRichtext in '..\..\Shared\CRichtext.pas',
+  CAdotools in '..\..\Shared\CAdotools.pas';
 
 var CManInterface: ICManagerInterface;
     CConnection: _Connection;
