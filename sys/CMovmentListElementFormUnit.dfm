@@ -74,6 +74,14 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
       Height = 177
       Caption = ' Szczeg'#243#322'y operacji '
       TabOrder = 0
+      object Label15: TLabel
+        Left = 354
+        Top = 29
+        Width = 22
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Ilo'#347#263
+      end
       object Label2: TLabel
         Left = 59
         Top = 29
@@ -122,13 +130,19 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         Alignment = taRightJustify
         Caption = 'W walucie konta'
       end
-      object Label15: TLabel
-        Left = 354
-        Top = 29
-        Width = 22
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Ilo'#347#263
+      object CCurrEditQuantity: TCCurrEdit
+        Tag = 1
+        Left = 384
+        Top = 25
+        Width = 89
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 1
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
       object CStaticCategory: TCStatic
         Left = 112
@@ -227,20 +241,6 @@ inherited CMovmentListElementForm: TCMovmentListElementForm
         BorderStyle = bsNone
         Enabled = False
         TabOrder = 6
-        Decimals = 2
-        ThousandSep = True
-        CurrencyStr = 'z'#322
-        BevelKind = bkTile
-        WithCalculator = True
-      end
-      object CCurrEditQuantity: TCCurrEdit
-        Tag = 1
-        Left = 384
-        Top = 25
-        Width = 89
-        Height = 21
-        BorderStyle = bsNone
-        TabOrder = 1
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322

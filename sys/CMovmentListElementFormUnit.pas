@@ -125,8 +125,11 @@ begin
 end;
 
 procedure TCMovmentListElementForm.CStaticCategoryChanged(Sender: TObject);
+var xHasQuant: TDataGid;
 begin
-  SetComponentUnitdef(TProduct.HasQuantity(CStaticCategory.DataId), CCurrEditQuantity);
+  xHasQuant := TProduct.HasQuantity(CStaticCategory.DataId);
+  CStaticCategory.Width := IfThen(xHasQuant = CEmptyDataGid, 361, 169);
+  SetComponentUnitdef(xHasQuant, CCurrEditQuantity);
   UpdateDescription;
 end;
 
@@ -155,10 +158,8 @@ end;
 
 procedure TCMovmentListElementForm.FillForm;
 var xProduct: TProduct;
-    xUnitdef: TDataGid;
 begin
   inherited FillForm;
-  xUnitdef := CEmptyDataGid;
   ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
   CCurrEditAccount.SetCurrencyDef(Felement.idAccountCurrencyDef, GCurrencyCache.GetSymbol(Felement.idAccountCurrencyDef));
   CStaticAccountCurrency.DataId := Felement.idAccountCurrencyDef;
@@ -181,10 +182,9 @@ begin
     CStaticMovementCurrency.DataId := Felement.idMovementCurrencyDef;
     CStaticMovementCurrency.Caption := GCurrencyCache.GetIso(Felement.idMovementCurrencyDef);
     CCurrEditQuantity.Value := Felement.quantity;
-    xUnitdef := TProduct.HasQuantity(Felement.productId);
   end;
   CStaticRate.Enabled := CStaticMovementCurrency.DataId <> CStaticAccountCurrency.DataId;
-  SetComponentUnitdef(xUnitdef, CCurrEditQuantity);
+  CStaticCategoryChanged(Nil);
 end;
 
 procedure TCMovmentListElementForm.ReadValues;
@@ -214,6 +214,11 @@ begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCategory.DoGetDataId;
+    end;
+  end else if (CStaticRate.DataId = CEmptyDataGid) and (CStaticRate.Enabled) then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano przelicznika waluty. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticRate.DoGetDataId;
     end;
   end else if CCurrEditAccount.Value = 0 then begin
     Result := False;

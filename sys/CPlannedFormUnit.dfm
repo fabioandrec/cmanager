@@ -76,6 +76,14 @@ inherited CPlannedForm: TCPlannedForm
       Height = 177
       Caption = ' Szczeg'#243#322'y operacji '
       TabOrder = 1
+      object Label15: TLabel
+        Left = 354
+        Top = 65
+        Width = 22
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Ilo'#347#263
+      end
       object Label4: TLabel
         Left = 36
         Top = 29
@@ -116,13 +124,19 @@ inherited CPlannedForm: TCPlannedForm
         Alignment = taRightJustify
         Caption = 'Waluta operacji'
       end
-      object Label15: TLabel
-        Left = 354
-        Top = 65
-        Width = 22
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Ilo'#347#263
+      object CCurrEditQuantity: TCCurrEdit
+        Tag = 1
+        Left = 384
+        Top = 61
+        Width = 89
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 2
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
       object CStaticAccount: TCStatic
         Left = 112
@@ -159,7 +173,7 @@ inherited CPlannedForm: TCPlannedForm
         Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
         OnGetDataId = CStaticCategoryGetDataId
-        OnChanged = CStaticAccountChanged
+        OnChanged = CStaticCategoryChanged
         HotTrack = True
       end
       object CStaticCashpoint: TCStatic
@@ -212,20 +226,6 @@ inherited CPlannedForm: TCPlannedForm
         OnGetDataId = CStaticCurrencyGetDataId
         OnChanged = CStaticCurrencyChanged
         HotTrack = True
-      end
-      object CCurrEditQuantity: TCCurrEdit
-        Tag = 1
-        Left = 384
-        Top = 61
-        Width = 89
-        Height = 21
-        BorderStyle = bsNone
-        TabOrder = 2
-        Decimals = 2
-        ThousandSep = True
-        CurrencyStr = 'z'#322
-        BevelKind = bkTile
-        WithCalculator = True
       end
     end
     object GroupBox1: TGroupBox

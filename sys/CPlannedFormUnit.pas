@@ -55,6 +55,7 @@ type
     procedure ComboBoxTemplateChange(Sender: TObject);
     procedure CStaticCurrencyChanged(Sender: TObject);
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticCategoryChanged(Sender: TObject);
   private
     FSchedule: TSchedule;
   protected
@@ -100,7 +101,7 @@ begin
     CStaticCurrency.DataId := CCurrencyDefGid_PLN;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
     CCurrEdit.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
-    SetComponentUnitdef(CEmptyDataGid, CCurrEditQuantity);
+    CStaticCategoryChanged(Nil);
   end;
   ComboBoxTypeChange(ComboBoxType);
   CStaticSchedule.Caption := FSchedule.AsString;
@@ -184,7 +185,7 @@ end;
 
 procedure TCPlannedForm.CStaticAccountChanged(Sender: TObject);
 begin
-  SetComponentUnitdef(TProduct.HasQuantity(CStaticCategory.DataId), CCurrEditQuantity);
+  CCurrEdit.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
   UpdateDescription;
 end;
 
@@ -238,7 +239,7 @@ begin
     if idMovementCurrencyDef <> CEmptyDataGid then begin
       CStaticCurrency.Caption := GCurrencyCache.GetIso(idMovementCurrencyDef);
     end;
-    SetComponentUnitdef(TProduct.HasQuantity(idProduct), CCurrEditQuantity);
+    CStaticCategoryChanged(Nil);
     CCurrEdit.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
   end;
 end;
@@ -359,6 +360,15 @@ end;
 procedure TCPlannedForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
+end;
+
+procedure TCPlannedForm.CStaticCategoryChanged(Sender: TObject);
+var xHasQuant: TDataGid;
+begin
+  xHasQuant := TProduct.HasQuantity(CStaticCategory.DataId);
+  CStaticCategory.Width := IfThen(xHasQuant = CEmptyDataGid, 361, 169);
+  SetComponentUnitdef(xHasQuant, CCurrEditQuantity);
+  UpdateDescription;
 end;
 
 end.

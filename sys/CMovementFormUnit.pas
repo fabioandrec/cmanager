@@ -550,7 +550,7 @@ begin
         CCurrEditInOutOnceAccount.Value := cash;
         CCurrEditInOutOnceAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
         CCurrEditOnceQuantity.Value := quantity;
-        SetComponentUnitdef(TProduct.HasQuantity(idProduct), CCurrEditOnceQuantity);
+        CStaticInoutOnceCategoryChanged(Nil);
         FonceState.AccountId := idAccount;
         FonceState.ExtrId := idExtractionItem;
         FonceState.Stated := isStated;
@@ -584,7 +584,7 @@ begin
         CCurrEditInOutCyclicAccount.Value := cash;
         CCurrEditInOutCyclicAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
         CCurrEditCyclicQuantity.Value := quantity;
-        SetComponentUnitdef(TProduct.HasQuantity(idProduct), CCurrEditCyclicQuantity);
+        CStaticInoutCyclicCategoryChanged(Nil);
         FcyclicState.AccountId := idAccount;
         FcyclicState.ExtrId := idExtractionItem;
         FcyclicState.Stated := isStated;
