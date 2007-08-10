@@ -269,6 +269,7 @@ begin
     freeDays := FSchedule.freeDays;
     idMovementCurrencyDef := CStaticCurrency.DataId;
     quantity := CCurrEditQuantity.Value;
+    idUnitDef := TProduct.HasQuantity(idProduct);
   end;
 end;
 

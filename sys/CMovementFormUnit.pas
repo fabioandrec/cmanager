@@ -668,6 +668,7 @@ begin
       isStated := FonceState.Stated;
       idExtractionItem := FonceState.ExtrId;
       quantity := CCurrEditOnceQuantity.Value;
+      idUnitDef := TProduct.HasQuantity(idProduct);
     end else if (xI = 2) then begin
       movementType := CTransferMovement;
       if CStaticTransRate.Enabled then begin
@@ -738,6 +739,7 @@ begin
       end;
       isStated := FcyclicState.Stated;
       idExtractionItem := FcyclicState.ExtrId;
+      idUnitDef := TProduct.HasQuantity(idProduct);
     end;
   end;
 end;

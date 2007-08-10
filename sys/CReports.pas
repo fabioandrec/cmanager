@@ -3335,7 +3335,7 @@ begin
   end;
   xOperations := GDataProvider.OpenSql(
       Format('select t.movementType, t.idAccount, t.description, t.regDate, ' +
-                     't.%s as cash, t.%s as idCurrencyDef, x.name as descriptionSecond from transactions t ' +
+                     't.%s as cash, t.%s as idCurrencyDef, x.name as descriptionSecond, idUnitDef, t.quantity from transactions t ' +
                      xJoin + ' ' +
                      'where t.regDate between %s and %s and t.%s = %s order by t.regDate',
              [xFieldR, xFieldC, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xFieldT, DataGidToDatabase(FIdCp)]));

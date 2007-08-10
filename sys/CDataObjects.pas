@@ -362,6 +362,7 @@ type
     FidSourceExtractionItem: TDataGid;
     FisSourceStated: Boolean;
     Fquantity: Currency;
+    FidUnitDef: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -384,6 +385,7 @@ type
     procedure SetidSourceExtractionItem(const Value: TDataGid);
     procedure SetisSourceStated(const Value: Boolean);
     procedure Setquantity(const Value: Currency);
+    procedure SetidUnitDef(const Value: TDataGid);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -418,6 +420,7 @@ type
     property idSourceExtractionItem: TDataGid read FidSourceExtractionItem write SetidSourceExtractionItem;
     property isSourceStated: Boolean read FisSourceStated write SetisSourceStated;
     property quantity: Currency read Fquantity write Setquantity;
+    property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -440,6 +443,7 @@ type
     FfreeDays: TBaseEnumeration;
     FidMovementCurrencyDef: TDataGid;
     Fquantity: Currency;
+    FidUnitDef: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -457,6 +461,7 @@ type
     procedure SetfreeDays(const Value: TBaseEnumeration);
     procedure SetidMovementCurrencyDef(const Value: TDataGid);
     procedure Setquantity(const Value: Currency);
+    procedure SetidUnitDef(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -482,6 +487,7 @@ type
     property freeDays: TBaseEnumeration read FfreeDays write SetfreeDays;
     property idMovementCurrencyDef: TDataGid read FidMovementCurrencyDef write SetidMovementCurrencyDef;
     property quantity: Currency read Fquantity write Setquantity;
+    property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
   end;
 
   TPlannedDone = class(TDataObject)
@@ -726,6 +732,7 @@ const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
 procedure InitializeProxies;
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
+function IsUnitdefDataset(ADataset: TADOQuery; ACDefFieldname: String = 'idUnitdef'): Boolean;
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFieldName: String): TStringList;
 
@@ -783,6 +790,19 @@ begin
   if Result then begin
     AOneCurrDef := '';
   end;
+end;
+
+function IsUnitdefDataset(ADataset: TADOQuery; ACDefFieldname: String = 'idUnitdef'): Boolean;
+begin
+  ADataset.First;
+  Result := False;
+  if not ADataset.IsEmpty then begin
+    while (not Result) and (not ADataset.Eof) do begin
+      Result := (ADataset.FieldByName(ACDefFieldname).AsString <> CEmptyDataGid);
+      ADataset.Next;
+    end;
+  end;
+  ADataset.First;
 end;
 
 procedure InitializeProxies;
@@ -1119,6 +1139,7 @@ begin
     FisStated := FieldByName('isStated').AsBoolean;
     FidSourceExtractionItem := FieldByName('idSourceExtractionItem').AsString;
     FisSourceStated := FieldByName('isSourceStated').AsBoolean;
+    FidUnitDef := FieldByName('idUnitDef').AsString;
     Fquantity := FieldByName('quantity').AsCurrency;
     FprevmovementCash := FmovementCash;
   end;
@@ -1204,6 +1225,7 @@ begin
     AddField('idSourceExtractionItem', DataGidToDatabase(FidSourceExtractionItem), False, 'baseMovement');
     AddField('isSourceStated', IntToStr(Integer(FisSourceStated)), False, 'baseMovement');
     AddField('quantity', CurrencyToDatabase(Fquantity), False, 'baseMovement');
+    AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'baseMovement');
   end;
 end;
 
@@ -1268,6 +1290,7 @@ begin
   FidProduct := CEmptyDataGid;
   FidMovementCurrencyDef := CEmptyDataGid;
   Fquantity := 1;
+  FidUnitDef := CEmptyDataGid;
 end;
 
 procedure TPlannedMovement.FromDataset(ADataset: TADOQuery);
@@ -1291,6 +1314,7 @@ begin
     FtriggerDay := FieldByName('triggerDay').AsInteger;
     FfreeDays := FieldByName('freeDays').AsString;
     Fquantity := FieldByName('quantity').AsCurrency;
+    FidUnitDef := FieldByName('idUnitDef').AsString;
     xField := FindField('doneCount');
     if xField <> Nil then begin
       FdoneCount := xField.AsInteger;
@@ -1391,6 +1415,14 @@ begin
   end;
 end;
 
+procedure TPlannedMovement.SetidUnitDef(const Value: TDataGid);
+begin
+  if FidUnitDef <> Value then begin
+    FidUnitDef := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TPlannedMovement.SetisActive(const Value: Boolean);
 begin
   if FisActive <> Value then begin
@@ -1468,6 +1500,7 @@ begin
     AddField('freeDays', FfreeDays, True, 'plannedMovement');
     AddField('idMovementCurrencyDef', DataGidToDatabase(FidMovementCurrencyDef), False, 'plannedMovement');
     AddField('quantity', CurrencyToDatabase(Fquantity), False, 'plannedMovement');
+    AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'plannedMovement');
   end;
 end;
 
@@ -2074,6 +2107,7 @@ begin
   FidSourceExtractionItem := CEmptyDataGid;
   FisSourceStated := False;
   Fquantity := 1;
+  FidUnitDef := CEmptyDataGid;
 end;
 
 function TBaseMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -2761,9 +2795,9 @@ var xCount: Integer;
 begin
   Result := Nil;
   xCount := 0;
-  while (Result = Nil) and (xCount <= GCurrencyCache.Count - 1) do begin
-    if AId = GCurrencyCache.Items[xCount].FCurrI then begin
-      Result := GCurrencyCache.Items[xCount];
+  while (Result = Nil) and (xCount <= Count - 1) do begin
+    if AId = Items[xCount].FCurrI then begin
+      Result := Items[xCount];
     end;
     Inc(xCount);
   end;
@@ -2774,9 +2808,9 @@ var xCount: Integer;
 begin
   Result := Nil;
   xCount := 0;
-  while (Result = Nil) and (xCount <= GCurrencyCache.Count - 1) do begin
-    if AIso = GCurrencyCache.Items[xCount].FCurrIso then begin
-      Result := GCurrencyCache.Items[xCount];
+  while (Result = Nil) and (xCount <= Count - 1) do begin
+    if AIso = Items[xCount].FCurrIso then begin
+      Result := Items[xCount];
     end;
     Inc(xCount);
   end;
@@ -3428,6 +3462,14 @@ procedure TBaseMovement.Setquantity(const Value: Currency);
 begin
   if Fquantity <> Value then begin
     Fquantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TBaseMovement.SetidUnitDef(const Value: TDataGid);
+begin
+  if FidUnitDef <> Value then begin
+    FidUnitDef := Value;
     SetState(msModified);
   end;
 end;

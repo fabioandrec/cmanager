@@ -567,6 +567,9 @@ begin
       xMovement.currencyRate := currencyRate;
       xMovement.idCurrencyRate := idCurrencyRate;
       xMovement.rateDescription := rateDescription;
+      xMovement.isStated := FonceState.Stated;
+      xMovement.idExtractionItem := FonceState.ExtrId;
+      xMovement.idUnitDef := TProduct.HasQuantity(productId);
     end;
   end;
   for xCount := 0 to Fmodified.Count - 1 do begin
@@ -587,6 +590,9 @@ begin
       xMovement.currencyRate := currencyRate;
       xMovement.idCurrencyRate := idCurrencyRate;
       xMovement.rateDescription := rateDescription;
+      xMovement.isStated := FonceState.Stated;
+      xMovement.idExtractionItem := FonceState.ExtrId;
+      xMovement.idUnitDef := TProduct.HasQuantity(productId);
     end;
   end;
   for xCount := 0 to Fdeleted.Count - 1 do begin
