@@ -49,7 +49,7 @@ implementation
 
 uses CFrameFormUnit, CFilterFrameUnit, CInfoFormUnit, CDataObjects,
   CConsts, Math, CRichtext, CLimitsFrameUnit, CCurrencydefFrameUnit,
-  CConfigFormUnit;
+  CConfigFormUnit, CTools;
 
 {$R *.dfm}
 

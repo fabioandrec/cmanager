@@ -32,7 +32,7 @@ type
 implementation
 
 uses CDataObjects, CProductFormUnit, CConsts, CConfigFormUnit, CReports,
-  CPluginConsts;
+  CPluginConsts, CTools;
 
 {$R *.dfm}
 

@@ -36,7 +36,7 @@ implementation
 
 uses CDataObjects, CInfoFormUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CAccountsFrameUnit, CProductsFrameUnit, CProfileFrameUnit, CConsts,
-  CDatatools, CRichtext;
+  CDatatools, CRichtext, CTools;
 
 {$R *.dfm}
 

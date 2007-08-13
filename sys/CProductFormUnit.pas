@@ -42,7 +42,7 @@ type
 implementation
 
 uses CDataObjects, CInfoFormUnit, CConsts, CProductsFrameUnit, CRichtext,
-  CUnitDefFrameUnit, CFrameFormUnit;
+  CUnitDefFrameUnit, CFrameFormUnit, CTools;
 
 {$R *.dfm}
 

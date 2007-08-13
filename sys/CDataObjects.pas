@@ -3,7 +3,8 @@ unit CDataObjects;
 
 interface
 
-uses CDatabase, SysUtils, AdoDb, Classes, CConsts, CComponents, Math, Contnrs;
+uses CDatabase, SysUtils, AdoDb, Classes, CConsts, CComponents, Math, Contnrs,
+     CTools;
 
 type
   TBaseName = string[40];
@@ -738,8 +739,7 @@ function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFiel
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit,
-  CTools;
+uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
 
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 var xGid: String;

@@ -31,7 +31,7 @@ type
 
 implementation
 
-uses CDataObjects, CPluginConsts;
+uses CDataObjects, CPluginConsts, CTools;
 
 {$R *.dfm}
 

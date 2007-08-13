@@ -47,7 +47,7 @@ function ShowMovementState(var ARecord: TMovementStateRecord): Boolean;
 implementation
 
 uses CConsts, Math, CFrameFormUnit, CExtractionsFrameUnit,
-  CExtractionItemFrameUnit, CInfoFormUnit;
+  CExtractionItemFrameUnit, CInfoFormUnit, CTools;
 
 {$R *.dfm}
 

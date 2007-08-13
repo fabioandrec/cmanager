@@ -50,7 +50,7 @@ inherited CLimitForm: TCLimitForm
         MaxLength = 40
         TabOrder = 1
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 56
         Top = 65
         Width = 417

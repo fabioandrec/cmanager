@@ -317,6 +317,7 @@ type
     FStartDate: TDateTime;
     FEndDate: TDateTime;
     FIdCp: TDataGid;
+    FIdUnitDef: TDataGid;
   protected
     function GetReportBody: String; override;
     function PrepareReportConditions: Boolean; override;
@@ -3315,6 +3316,7 @@ var xOperations: TADOQuery;
     xFieldR, xFieldC, xFieldT, xDescSec, xJoin: String;
     xSums: TSumList;
     xCount: Integer;
+    xQuantitySum: Currency;
 begin
   xSums := TSumList.Create(True);
   if CurrencyView = CCurrencyViewMovements then begin
@@ -3333,9 +3335,10 @@ begin
     xDescSec := 'Kontrahent';
     xJoin := ' left outer join cashpoint x on x.idCashpoint = t.idCashpoint ';
   end;
+  xQuantitySum := 0;
   xOperations := GDataProvider.OpenSql(
       Format('select t.movementType, t.idAccount, t.description, t.regDate, ' +
-                     't.%s as cash, t.%s as idCurrencyDef, x.name as descriptionSecond, idUnitDef, t.quantity from transactions t ' +
+                     't.%s as cash, t.%s as idCurrencyDef, x.name as descriptionSecond, t.idUnitDef, t.quantity from transactions t ' +
                      xJoin + ' ' +
                      'where t.regDate between %s and %s and t.%s = %s order by t.regDate',
              [xFieldR, xFieldC, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), xFieldT, DataGidToDatabase(FIdCp)]));
@@ -3345,22 +3348,29 @@ begin
     Add('<tr class="head">');
     Add('<td class="headtext" width="5%">Lp</td>');
     Add('<td class="headtext" width="15%">Data</td>');
-    Add('<td class="headtext" width="30%">Opis</td>');
-    Add('<td class="headtext" width="25%">' + xDescSec +  '</td>');
+    Add('<td class="headtext" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '30', '25') + '%">Opis</td>');
+    Add('<td class="headtext" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '25', '20') + '%">' + xDescSec +  '</td>');
     Add('<td class="headcash" width="10%">Waluta</td>');
     Add('<td class="headcash" width="15%">Kwota operacji</td>');
+    if FIdUnitDef <> CEmptyDataGid then begin
+      Add('<td class="headcash" width="10%">' + GUnitdefCache.GetSymbol(FIdUnitDef) + '</td>');
+    end;
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=6>');
     while not Eof do begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
-      Add('<td class="text" width="25%">' + ReplaceLinebreaksBR(FieldByName('descriptionSecond').AsString) + '</td>');
+      Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '30', '25') + '%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
+      Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '25', '20') + '%">' + ReplaceLinebreaksBR(FieldByName('descriptionSecond').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('cash').AsCurrency, '', False) + '</td>');
+      if FIdUnitDef <> CEmptyDataGid then begin
+        Add('<td class="cash" width="10%">' + CurrencyToString(FieldByName('quantity').AsCurrency, '', False) + '</td>');
+      end;
       Add('</tr>');
       xSums.AddSum(FieldByName('idCurrencyDef').AsString, FieldByName('cash').AsCurrency, '');
+      xQuantitySum := xQuantitySum + FieldByName('quantity').AsCurrency;
       Next;
     end;
     Add('</table><hr>');
@@ -3368,9 +3378,12 @@ begin
       Add('<table class="base" colspan=3>');
       for xCount := 0 to xSums.Count - 1 do begin
         Add('<tr class="' + IsEvenToStr(xCount) + 'sum">');
-        Add('<td class="sumtext" width="75%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
+        Add('<td class="sumtext" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '75', '65') + '%">' + IfThen(xCount = 0, 'Razem', '') + '</td>');
         Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xSums.Items[xCount].name) + '</td>');
         Add('<td class="sumcash" width="15%">' + CurrencyToString(xSums.Items[xCount].value, '', False) + '</td>');
+        if FIdUnitDef <> CEmptyDataGid then begin
+          Add('<td class="sumcash" width="10%">' + CurrencyToString(xQuantitySum, '', False) + '</td>');
+        end;
         Add('</tr>');
       end;
       Add('</table>');
@@ -3402,7 +3415,12 @@ begin
     Result := ChoosePeriodByForm(FStartDate, FEndDate, @CurrencyView);
     FIdCp := TCWithGidParams(FParams).id;
   end else begin
-    Result := ChoosePeriodAcpByForm(TCReportParams(FParams).acp , FStartDate, FEndDate, FIdCp, @CurrencyView);
+    Result := ChoosePeriodAcpByForm(TCReportParams(FParams).acp, FStartDate, FEndDate, FIdCp, @CurrencyView);
+  end;
+  if TCReportParams(FParams).acp = CGroupByProduct then begin
+    FIdUnitDef := TProduct.HasQuantity(FIdCp);
+  end else begin
+    FIdUnitDef := CEmptyDataGid;
   end;
 end;
 

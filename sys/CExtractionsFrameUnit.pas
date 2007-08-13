@@ -35,7 +35,8 @@ type
 
 implementation
 
-uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts;
+uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts,
+  CTools;
 
 {$R *.dfm}
 

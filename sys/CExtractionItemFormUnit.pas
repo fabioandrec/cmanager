@@ -74,7 +74,7 @@ type
 implementation
 
 uses CCurrencydefFrameUnit, CFrameFormUnit, Math, CRichtext, StrUtils,
-  CConsts, CTemplates, CDescpatternFormUnit, CPreferences;
+  CConsts, CTemplates, CDescpatternFormUnit, CPreferences, CTools;
 
 {$R *.dfm}
 

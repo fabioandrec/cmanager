@@ -44,7 +44,7 @@ procedure FillDatabaseExampleData;
 implementation
 
 uses CDatabase, CDatatools, CDataObjects, CConsts, Math, DateUtils,
-  CWaitFormUnit, CProgressFormUnit, CInfoFormUnit;
+  CWaitFormUnit, CProgressFormUnit, CInfoFormUnit, CTools;
 
 {$R *.dfm}
 

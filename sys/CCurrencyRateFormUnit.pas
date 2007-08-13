@@ -66,7 +66,7 @@ implementation
 uses CCurrencyRateFrameUnit, CRichtext, CConsts,
   CFrameFormUnit, CCashpointsFrameUnit, CDataobjectFrameUnit,
   CCurrencydefFrameUnit, CInfoFormUnit, CTemplates, CPreferences, Math,
-  CConfigFormUnit, Contnrs, CDescpatternFormUnit;
+  CConfigFormUnit, Contnrs, CDescpatternFormUnit, CTools;
 
 {$R *.dfm}
 

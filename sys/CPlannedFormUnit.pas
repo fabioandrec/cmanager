@@ -80,7 +80,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CProductsFrameUnit, CDataObjects, DateUtils, StrUtils, Math,
   CConfigFormUnit, CInfoFormUnit, CConsts, CPlannedFrameUnit, CTemplates,
   CDescpatternFormUnit, CPreferences, CRichtext, CDataobjectFrameUnit,
-  CCurrencydefFrameUnit, CDatatools;
+  CCurrencydefFrameUnit, CDatatools, CTools;
 
 {$R *.dfm}
 

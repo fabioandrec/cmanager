@@ -26,6 +26,7 @@ type
     function GetSelectedType: Integer;
     function GetSelectedId: OleVariant;
     function GetShutdownEvent: Cardinal;
+    procedure SendFrameMessage(AMessage: OleVariant; AFrameType: OleVariant; ADataGid: OleVariant; AOptParam: OleVariant);
   end;
 
   TCPlugin_Configure = function: Boolean; stdcall;

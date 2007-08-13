@@ -87,7 +87,7 @@ type
 implementation
 
 uses CFrameFormUnit, CConsts, CConfigFormUnit, CInfoFormUnit, CDatatools,
-  CListFrameUnit;
+  CListFrameUnit, CTools;
 
 {$R *.dfm}
 

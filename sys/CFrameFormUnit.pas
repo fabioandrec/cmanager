@@ -32,7 +32,8 @@ type
 
 implementation
 
-uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts, CPluginConsts;
+uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts, CPluginConsts,
+  CTools;
 
 {$R *.dfm}
 

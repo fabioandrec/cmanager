@@ -107,7 +107,7 @@ implementation
 uses CConsts, CDatatools, CHelp, CFrameFormUnit, CProductsFrameUnit,
      CInfoFormUnit, Contnrs, CTemplates, CDescpatternFormUnit, Math,
      CPreferences, CRichtext, CDataobjectFrameUnit, CCurrencydefFrameUnit,
-  CCurrencyRateFrameUnit, CSurpassedFormUnit, StrUtils;
+  CCurrencyRateFrameUnit, CSurpassedFormUnit, StrUtils, CTools;
 
 {$R *.dfm}
 

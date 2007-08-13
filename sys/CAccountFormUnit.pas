@@ -55,7 +55,8 @@ implementation
 
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
   CCashpointsFrameUnit, CConsts, CAccountsFrameUnit, CRichtext,
-  CCurrencydefFormUnit, CCurrencydefFrameUnit, CAccountCurrencyFormUnit;
+  CCurrencydefFormUnit, CCurrencydefFrameUnit, CAccountCurrencyFormUnit,
+  CTools;
 
 {$R *.dfm}
 

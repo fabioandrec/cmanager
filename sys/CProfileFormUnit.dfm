@@ -40,7 +40,7 @@ inherited CProfileForm: TCProfileForm
         MaxLength = 40
         TabOrder = 0
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 56
         Top = 64
         Width = 257
@@ -93,6 +93,8 @@ inherited CProfileForm: TCProfileForm
         Color = clWindow
         ParentColor = False
         TabOrder = 0
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
         OnGetDataId = CStaticAccountGetDataId
         HotTrack = True
@@ -109,6 +111,8 @@ inherited CProfileForm: TCProfileForm
         Color = clWindow
         ParentColor = False
         TabOrder = 1
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
         OnGetDataId = CStaticCashpointGetDataId
         HotTrack = True
@@ -125,6 +129,8 @@ inherited CProfileForm: TCProfileForm
         Color = clWindow
         ParentColor = False
         TabOrder = 2
+        TabStop = True
+        Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
         OnGetDataId = CStaticProductsGetDataId
         HotTrack = True

@@ -63,7 +63,7 @@ function DoTemporaryMovementFilter(var ADataGid: String; var AText: String): Boo
 implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CProductsFrameUnit, CCashpointsFrameUnit,
-  CFilterFrameUnit;
+  CFilterFrameUnit, CTools;
 
 {$R *.dfm}
 

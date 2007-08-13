@@ -227,9 +227,7 @@ var GDataProvider: TDataProvider;
 function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
-function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
-function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
@@ -241,25 +239,11 @@ function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
 function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
 
-function DataGidToDatabase(ADataGid: TDataGid): String;
-
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
      CPreferences, CTools, CAdox, CDataObjects;
 
-function DataGidToDatabase(ADataGid: TDataGid): String;
-begin
-  Result := IfThen(ADataGid = CEmptyDataGid, 'Null', '''' + ADataGid + '''');
-end;
-
-function CurrencyToDatabase(ACurrency: Currency): String;
-var xFormat: TFormatSettings;
-begin
-  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
-  xFormat.DecimalSeparator := '.';
-  Result := CurrToStr(ACurrency, xFormat);
-end;
 
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
 var xCurSymbol: String;
@@ -273,19 +257,6 @@ begin
     Result := CurrToStrF(ACurrency, ffNumber, ADecimal) + ' ' + xCurSymbol;
   end else begin
     Result := CurrToStrF(ACurrency, ffNumber, ADecimal);
-  end;
-end;
-
-function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
-begin
-  if ADatetime = 0 then begin
-    Result := 'Null';
-  end else begin
-    if not AWithTime then begin
-      Result := '#' + FormatDateTime('yyyy-mm-dd', ADatetime) + '#';
-    end else begin
-      Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '#';
-    end;
   end;
 end;
 

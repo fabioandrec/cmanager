@@ -8,6 +8,9 @@ interface
 
 uses Windows, Types, Contnrs, Classes, StdCtrls;
 
+const
+  CEmptyDataGid = '';
+
 type
   TPolishEncodings = (splASCII, splISO, splLatinII, splMazovia, splWindows);
 
@@ -79,9 +82,12 @@ procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex:
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
 function GetDescText(ADescription: String; ALineNo: Integer = 0; AWithInfo: Boolean = True): String;
 function ReplaceLinebreaksBR(AText: String): String;
-
+function CreateNewGuid: String;
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
+function DataGidToDatabase(ADataGid: String): String;
+function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
+function CurrencyToDatabase(ACurrency: Currency): String;
 
 function GetMonthNumber(AMonthName: String): Integer;
 
@@ -572,6 +578,39 @@ function ReplaceLinebreaksBR(AText: String): String;
 begin
   Result := StringReplace(AText, sLineBreak, '<br>', [rfReplaceAll, rfIgnoreCase]);
   Result := StringReplace(Result, Chr(10), '<br>', [rfReplaceAll, rfIgnoreCase]);
+end;
+
+function CreateNewGuid: String;
+var xGuid: TGUID;
+begin
+  CreateGUID(xGuid);
+  Result := GUIDToString(xGuid);
+end;
+
+function DataGidToDatabase(ADataGid: String): String;
+begin
+  Result := IfThen(ADataGid = CEmptyDataGid, 'Null', '''' + ADataGid + '''');
+end;
+
+function CurrencyToDatabase(ACurrency: Currency): String;
+var xFormat: TFormatSettings;
+begin
+  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
+  xFormat.DecimalSeparator := '.';
+  Result := CurrToStr(ACurrency, xFormat);
+end;
+
+function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
+begin
+  if ADatetime = 0 then begin
+    Result := 'Null';
+  end else begin
+    if not AWithTime then begin
+      Result := '#' + FormatDateTime('yyyy-mm-dd', ADatetime) + '#';
+    end else begin
+      Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '#';
+    end;
+  end;
 end;
 
 end.

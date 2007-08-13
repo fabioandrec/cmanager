@@ -31,7 +31,6 @@ const
   CCSSReportFile = 'report.css';
 
 const
-  CEmptyDataGid = '';
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
   CDefaultFilename = 'CManager.dat';
 

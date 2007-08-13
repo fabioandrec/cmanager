@@ -100,7 +100,8 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 implementation
 
 uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
-  CDatatools, CInfoFormUnit, CPluginConsts, CPlugins, CFrameFormUnit;
+  CDatatools, CInfoFormUnit, CPluginConsts, CPlugins, CFrameFormUnit,
+  CTools;
 
 {$R *.dfm}
 

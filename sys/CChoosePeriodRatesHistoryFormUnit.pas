@@ -32,7 +32,7 @@ function ChoosePeriodRatesHistory(var AStartDate, AEndDate: TDateTime; var ASour
 implementation
 
 uses CConfigFormUnit, CFrameFormUnit, CCurrencydefFrameUnit,
-  CCashpointsFrameUnit, CConsts, CInfoFormUnit, CDataObjects;
+  CCashpointsFrameUnit, CConsts, CInfoFormUnit, CDataObjects, CTools;
 
 {$R *.dfm}
 

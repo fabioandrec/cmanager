@@ -29,7 +29,7 @@ function ChoosePeriodACPByForm(AAcp: String; var AStartDate, AEndDate: TDateTime
 implementation
 
 uses CConfigFormUnit, CFrameFormUnit, CAccountsFrameUnit, CInfoFormUnit,
-  CConsts, CCashpointsFrameUnit, CProductsFrameUnit;
+  CConsts, CCashpointsFrameUnit, CProductsFrameUnit, CTools;
 
 {$R *.dfm}
 

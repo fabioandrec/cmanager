@@ -65,7 +65,7 @@ implementation
 
 uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils,
   CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit, CBaseFrameUnit,
-  CPluginConsts;
+  CPluginConsts, CTools;
 
 {$R *.dfm}
 

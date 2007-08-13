@@ -36,6 +36,7 @@ type
     function GetSelectedType: Integer;
     function GetSelectedId: OleVariant;
     function GetShutdownEvent: Cardinal;
+    procedure SendFrameMessage(AMessage: OleVariant; AFrameType: OleVariant; ADataGid: OleVariant; AOptParam: OleVariant);
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -89,7 +90,12 @@ var GPlugins: TCPluginList;
 implementation
 
 uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
-  Variants, CDataObjects, CConsts, CReports, CMainFormUnit, StrUtils;
+  Variants, CDataObjects, CConsts, CReports, CMainFormUnit, StrUtils,
+  CBaseFrameUnit, CCashpointsFrameUnit, CAccountsFrameUnit,
+  CProductsFrameUnit, CMovementFrameUnit, CPlannedFrameUnit,
+  CDoneFrameUnit, CFilterFrameUnit, CProfileFormUnit, CProfileFrameUnit,
+  CLimitsFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
+  CExtractionsFrameUnit, CExtractionItemFrameUnit, CUnitDefFrameUnit;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -499,6 +505,67 @@ end;
 function TCManagerInterfaceObject.GetShutdownEvent: Cardinal;
 begin
   Result := GShutdownEvent;
+end;
+
+procedure TCManagerInterfaceObject.SendFrameMessage(AMessage, AFrameType, ADataGid: OleVariant; AOptParam: OleVariant);
+var xMessage: Cardinal;
+    xClass: TCBaseFrameClass;
+    xDataGid: TDataGid;
+    xOptParam: Integer;
+begin
+  xMessage := 0;
+  xClass := Nil;
+  xOptParam := 0;
+  xDataGid := '';
+  if not VarIsEmpty(AMessage) then begin
+    if AMessage = CFRAMEMESSAGE_REFRESH then begin
+      xMessage := WM_DATAREFRESH;
+    end else if AMessage = CFRAMEMESSAGE_ITEMADDED then begin
+      xMessage := WM_DATAOBJECTADDED;
+      xDataGid := TDataGid(ADataGid);
+      xOptParam := AOptParam;
+    end else if AMessage = CFRAMEMESSAGE_ITEMMODIFIED then begin
+      xMessage := WM_DATAOBJECTEDITED;
+      xDataGid := TDataGid(ADataGid);
+      xOptParam := AOptParam;
+    end else if AMessage = CFRAMEMESSAGE_ITEMDELETED then begin
+      xMessage := WM_DATAOBJECTDELETED;
+      xDataGid := TDataGid(ADataGid);
+      xOptParam := AOptParam;
+    end;
+    if AFrameType = CFRAMETYPE_CASHPOINTSFRAME then begin
+      xClass := TCCashpointsFrame;
+    end else if AFrameType = CFRAMETYPE_ACCOUNTSFRAME then begin
+      xClass := TCAccountsFrame;
+    end else if AFrameType = CFRAMETYPE_PRODUCTSFRAME then begin
+      xClass := TCProductsFrame;
+    end else if AFrameType = CFRAMETYPE_MOVEMENTFRAME then begin
+      xClass := TCMovementFrame;
+    end else if AFrameType = CFRAMETYPE_PLANNEDFRAME then begin
+      xClass := TCPlannedFrame;
+    end else if AFrameType = CFRAMETYPE_DONEFRAME then begin
+      xClass := TCDoneFrame;
+    end else if AFrameType = CFRAMETYPE_FILTERFRAME then begin
+      xClass := TCFilterFrame;
+    end else if AFrameType = CFRAMETYPE_PROFILEFRAME then begin
+      xClass := TCProfileFrame;
+    end else if AFrameType = CFRAMETYPE_LIMITSFRAME then begin
+      xClass := TCLimitsFrame;
+    end else if AFrameType = CFRAMETYPE_CURRENCYDEFFRAME then begin
+      xClass := TCCurrencydefFrame;
+    end else if AFrameType = CFRAMETYPE_CURRENCYRATEFRAME then begin
+      xClass := TCCurrencyRateFrame;
+    end else if AFrameType = CFRAMETYPE_EXTRACTIONSFRAME then begin
+      xClass := TCExtractionsFrame;
+    end else if AFrameType = CFRAMETYPE_EXTRACTIONITEMFRAME then begin
+      xClass := TCExtractionItemFrame;
+    end else if AFrameType = CFRAMETYPE_UNITDEFFRAME then begin
+      xClass := TCUnitDefFrame;
+    end;
+  end;
+  if (xMessage <> 0) and (xClass <> Nil) then begin
+    SendMessageToFrames(xClass, xMessage, Integer(@xDataGid), xOptParam);
+  end;
 end;
 
 initialization

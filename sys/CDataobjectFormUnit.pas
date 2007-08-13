@@ -33,7 +33,7 @@ type
 
 implementation
 
-uses CConsts, Math;
+uses CConsts, Math, CTools;
 
 {$R *.dfm}
 
