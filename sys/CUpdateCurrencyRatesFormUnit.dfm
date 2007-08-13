@@ -184,7 +184,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
           Header.Font.Name = 'MS Sans Serif'
           Header.Font.Style = []
           Header.Height = 21
-          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
           Header.Style = hsFlatButtons
           HintMode = hmHint
           ParentShowHint = False
@@ -209,7 +209,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
             end
             item
               Position = 1
-              Width = 200
+              Width = 185
               WideText = 'Opis'
             end
             item
