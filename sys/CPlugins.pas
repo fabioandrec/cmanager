@@ -79,9 +79,7 @@ type
   public
     constructor Create(APath: String);
     procedure ScanForPlugins;
-    function GetCurrencyRatePluginCount: Integer;
-    function GetJustExecutePluginCount: Integer;
-    function GetExtractionPluginCount: Integer;
+    function GetCountOfType(AType: Integer): Integer;
   end;
 
 var GPlugins: TCPluginList;
@@ -220,6 +218,7 @@ begin
                   isTypeof[CPLUGINTYPE_JUSTEXECUTE] or
                   isTypeof[CPLUGINTYPE_HTMLREPORT] or
                   isTypeof[CPLUGINTYPE_CHARTREPORT] or
+                  isTypeof[CPLUGINTYPE_ONSTARTUP] or
                   isTypeof[CPLUGINTYPE_SELECTEDITEM];
         if not Result then begin
           SaveToLog('Typ pluginu jest niepoprawny lub nie zosta³ ustawiony ' + FShortName, GPluginlogfile);
@@ -245,34 +244,12 @@ begin
   FPluginPath := IncludeTrailingPathDelimiter(ExpandFileName(APath));
 end;
 
-function TCPluginList.GetCurrencyRatePluginCount: Integer;
+function TCPluginList.GetCountOfType(AType: Integer): Integer;
 var xCount: Integer;
 begin
   Result := 0;
   for xCount := 0 to Count - 1 do begin
-    if TCPlugin(Items[xCount]).isTypeof[CPLUGINTYPE_CURRENCYRATE] then begin
-      Inc(Result);
-    end;
-  end;
-end;
-
-function TCPluginList.GetExtractionPluginCount: Integer;
-var xCount: Integer;
-begin
-  Result := 0;
-  for xCount := 0 to Count - 1 do begin
-    if TCPlugin(Items[xCount]).isTypeof[CPLUGINTYPE_EXTRACTION] then begin
-      Inc(Result);
-    end;
-  end;
-end;
-
-function TCPluginList.GetJustExecutePluginCount: Integer;
-var xCount: Integer;
-begin
-  Result := 0;
-  for xCount := 0 to Count - 1 do begin
-    if TCPlugin(Items[xCount]).isTypeof[CPLUGINTYPE_JUSTEXECUTE] then begin
+    if TCPlugin(Items[xCount]).isTypeof[AType] then begin
       Inc(Result);
     end;
   end;

@@ -121,6 +121,7 @@ type
     procedure ActionPluginsExecute(ASender: TObject);
     procedure UpdateStatusbar;
     procedure UpdatePluginsMenu;
+    procedure ExecuteOnstartupPlugins;
     procedure FinalizeMainForm;
     function OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
   published
@@ -597,7 +598,9 @@ var xMax, xCount: Integer;
     xPlugin: TCPlugin;
     xPluginBand: TActionClientItem;
 begin
-  xMax := GPlugins.GetCurrencyRatePluginCount + GPlugins.GetJustExecutePluginCount + GPlugins.GetExtractionPluginCount;
+  xMax := GPlugins.GetCountOfType(CPLUGINTYPE_CURRENCYRATE) +
+          GPlugins.GetCountOfType(CPLUGINTYPE_JUSTEXECUTE) +
+          GPlugins.GetCountOfType(CPLUGINTYPE_EXTRACTION);
   if xMax > 0 then begin
     xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
     if xPluginBand <> Nil then begin
@@ -730,6 +733,18 @@ begin
   if FActiveFrame <> Nil then begin
     if FActiveFrame.InheritsFrom(TCBaseFrame) then begin
       Result := TCBaseFrame(FActiveFrame).SelectedType;
+    end;
+  end;
+end;
+
+procedure TCMainForm.ExecuteOnstartupPlugins;
+var xCount: Integer;
+    xPlugin: TCPlugin;
+begin
+  for xCount := 0 to GPlugins.Count - 1 do begin
+    xPlugin := TCPlugin(GPlugins.Items[xCount]);
+    if xPlugin.isTypeof[CPLUGINTYPE_ONSTARTUP] then begin
+      xPlugin.Execute;
     end;
   end;
 end;
