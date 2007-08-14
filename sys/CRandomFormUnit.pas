@@ -32,11 +32,13 @@ type
     CIntEdit6: TCIntEdit;
     Label9: TLabel;
     CIntEdit7: TCIntEdit;
+    Label10: TLabel;
+    CIntEdit8: TCIntEdit;
     procedure FormCreate(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
   public
-    procedure FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount: Integer);
+    procedure FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount, AUnitdefsCount: Integer);
   end;
 
 procedure FillDatabaseExampleData;
@@ -56,7 +58,7 @@ begin
   xForm.Free;
 end;
 
-procedure TCRandomForm.FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount: Integer);
+procedure TCRandomForm.FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount, AUnitdefsCount: Integer);
 var xCount: Integer;
     xDate: TDateTime;
     xAccounts: TDataObjectList;
@@ -64,6 +66,7 @@ var xCount: Integer;
     xInproducts: TDataObjectList;
     xOutproducts: TDataObjectList;
     xCurdefs: TDataObjectList;
+    xUnitdefs: TDataObjectList;
     xProduct: TProduct;
     xAccount, xSourceAccount: TAccount;
     xCashpoint: TCashPoint;
@@ -78,7 +81,7 @@ begin
   BitBtn1.Enabled := False;
   Application.ProcessMessages;
   GDataProvider.BeginTransaction;
-  ShowWaitForm(wtProgressbar, 'Trwa generowanie konfiguracji...', 0, ACurrenciesCount + ACashpointCount + AAcountCount + AProductCount);
+  ShowWaitForm(wtProgressbar, 'Trwa generowanie konfiguracji...', 0, ACurrenciesCount + ACashpointCount + AAcountCount + AProductCount + AUnitdefsCount);
   for xCount := 1 to ACurrenciesCount do begin
     with TCurrencyDef.CreateObject(CurrencyDefProxy, False) do begin
       name := 'Waluta ' + IntToStr(xCount);
@@ -89,8 +92,18 @@ begin
       StepWaitForm(1);
     end;
   end;
+  for xCount := 1 to AUnitdefsCount do begin
+    with TUnitDef.CreateObject(UnitDefProxy, False) do begin
+      name := 'Jednostka ' + IntToStr(xCount);
+      description := name;
+      symbol := 'jm' + IntToStr(xCount);
+      StepWaitForm(1);
+    end;
+  end;
   GDataProvider.PostProxies;
+  Randomize;
   xCurdefs := TCurrencyDef.GetList(TCurrencyDef, CurrencyDefProxy, 'select * from currencyDef');
+  xUnitdefs := TUnitDef.GetList(TUnitDef, UnitDefProxy, 'select * from unitDef');
   for xCount := 1 to AAcountCount do begin
     with TAccount.CreateObject(AccountProxy, False) do begin
       accountType := CCashAccount;
@@ -110,12 +123,18 @@ begin
       StepWaitForm(1);
     end;
   end;
+  Randomize;
   for xCount := 1 to AProductCount do begin
     with TProduct.CreateObject(ProductProxy, False) do begin
       name := 'Produkt ' + IntToStr(xCount);
       description := name;
       idParentProduct := CEmptyDataGid;
       productType := IfThen(Random(2) = 0, CInMovement, COutMovement);
+      if Random(10) < 7 then begin
+        idUnitDef := xUnitdefs.Items[Random(xUnitdefs.Count)].id;
+      end else begin
+        idUnitDef := CEmptyDataGid;
+      end;
       StepWaitForm(1);
     end;
   end;
@@ -185,6 +204,10 @@ begin
         idAccountCurrencyDef := xAccount.idCurrencyDef;
         idMovementCurrencyDef := xMovementCurrency.id;
         xProduct := TProduct(xOutproducts.Items[Random(xOutproducts.Count)]);
+        idUnitDef := xProduct.idUnitDef;
+        if idUnitDef <> CEmptyDataGid then begin
+          quantity := RandomRange(1, 20);
+        end;
         xCashpoint := TCashPoint(xCashpoints.Items[Random(xCashpoints.Count)]);
         description := xProduct.name;
         if idMovementCurrencyDef <> idAccountCurrencyDef then begin
@@ -223,6 +246,10 @@ begin
         idAccountCurrencyDef := xAccount.idCurrencyDef;
         idMovementCurrencyDef := xMovementCurrency.id;
         xProduct := TProduct(xInproducts.Items[Random(xInproducts.Count)]);
+        idUnitDef := xProduct.idUnitDef;
+        if idUnitDef <> CEmptyDataGid then begin
+          quantity := RandomRange(1, 20);
+        end;
         xCashpoint := TCashPoint(xCashpoints.Items[Random(xCashpoints.Count)]);
         description := xProduct.name;
         if idMovementCurrencyDef <> idAccountCurrencyDef then begin
@@ -279,6 +306,7 @@ begin
             rateDescription := '';
             idCurrencyRate := CEmptyDataGid;
           end;
+          idUnitDef := CEmptyDataGid;
           description := 'Transfer z ' + xSourceAccount.name + ' do ' + xAccount.name;
           movementCash := Random(500) + RandomRange(1, 99) / 100;
           if idMovementCurrencyDef <> idAccountCurrencyDef then begin
@@ -302,6 +330,7 @@ begin
   xCashpoints.Free;
   xInproducts.Free;
   xOutproducts.Free;
+  xUnitdefs.Free;
   HideWaitForm;
   BitBtnOk.Enabled := True;
   BitBtn1.Enabled := True;
@@ -321,7 +350,7 @@ end;
 procedure TCRandomForm.BitBtnOkClick(Sender: TObject);
 begin
   if ShowInfo(itQuestion, 'Czy rzeczywiœcie chcesz wype³niæ aktualny plik danych losowymi operacjami i innymi danymi konfiguracyjnymi?', '') then begin
-    FillDatabaseExampleData(CDateTime1.Value, CDateTime2.Value, CIntEdit1.Value, CIntEdit5.Value, CIntEdit6.Value, CIntEdit2.Value, CIntEdit3.Value, CIntEdit4.Value, CIntEdit7.Value);
+    FillDatabaseExampleData(CDateTime1.Value, CDateTime2.Value, CIntEdit1.Value, CIntEdit5.Value, CIntEdit6.Value, CIntEdit2.Value, CIntEdit3.Value, CIntEdit4.Value, CIntEdit7.Value, CIntEdit8.Value);
     CloseForm;
   end;
 end;

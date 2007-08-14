@@ -141,9 +141,8 @@ function TCCurrencyRateFrame.IsValidFilteredObject(AObject: TDataObject): Boolea
 var xDf, xDt: TDateTime;
 begin
   GetFilterDates(xDf, xDt);
-  Result := (inherited IsValidFilteredObject(AObject)) or
-            ((xDf <= TCurrencyRate(AObject).bindingDate) and (TCurrencyRate(AObject).bindingDate <= xDt)
-            and (CStaticFilter.DataId = TCurrencyRate(AObject).rateType));
+  Result := ((inherited IsValidFilteredObject(AObject)) or (CStaticFilter.DataId = TCurrencyRate(AObject).rateType)) and
+            (xDf <= TCurrencyRate(AObject).bindingDate) and (TCurrencyRate(AObject).bindingDate <= xDt);
   if Result and (AdditionalData <> Nil) then begin
     with TRateFrameAdditionalData(AdditionalData) do begin
       Result := (FIdSource = TCurrencyRate(AObject).idSourceCurrencyDef) and (FIdDest = TCurrencyRate(AObject).idTargetCurrencyDef);

@@ -59,8 +59,10 @@ type
   private
     function GetItems(AIndex: Integer): TDataObject;
     procedure SetItems(AIndex: Integer; const Value: TDataObject);
+    function GetobjectById(AGid: TDataGid): TDataObject;
   public
     property Items[AIndex: Integer]: TDataObject read GetItems write SetItems;
+    property ObjectById[AGid: TDataGid]: TDataObject read GetobjectById;
   end;
 
   TDataProxy = class(TObject)
@@ -1075,6 +1077,19 @@ end;
 function TDataObjectList.GetItems(AIndex: Integer): TDataObject;
 begin
   Result := TDataObject(inherited Items[AIndex]);
+end;
+
+function TDataObjectList.GetobjectById(AGid: TDataGid): TDataObject;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= Count - 1) and (Result = Nil) do begin
+    if Items[xCount].Id = AGid then begin
+      Result := Items[xCount];
+    end;
+    Inc(xCount);
+  end;
 end;
 
 procedure TDataObjectList.SetItems(AIndex: Integer; const Value: TDataObject);

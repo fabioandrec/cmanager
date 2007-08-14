@@ -339,7 +339,7 @@ type
     destructor Destroy; override;
   end;
 
-  TSumReportList = class(TCHtmlReport)
+  TCashSumReportList = class(TCHtmlReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -351,7 +351,19 @@ type
     function GetReportTitle: String; override;
   end;
 
-  TSumReportChart = class(TCChartReport)
+  TQuantitySumReportList = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FGroupBy: String;
+  protected
+    function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
+  TCashSumReportChart = class(TCChartReport)
   private
     FStartDate: TDateTime;
     FEndDate: TDateTime;
@@ -1776,7 +1788,7 @@ begin
   FmovementType := AType;
 end;
 
-function TSumReportList.GetReportBody: String;
+function TCashSumReportList.GetReportBody: String;
 var xOperations: TADOQuery;
     xGb: String;
     xGbSum, xSums: TSumList;
@@ -1833,7 +1845,9 @@ begin
       First;
       xGbSum := TSumList.Create(True);
       while not Eof do begin
-        xGbSum.AddSum(FieldByName('idCurrencyDef').AsString, Abs(FieldByName('cash').AsCurrency), CEmptyDataGid);
+        if IsValidGid(FieldByName('idAccount').AsString, FAcps) then begin
+          xGbSum.AddSum(FieldByName('idCurrencyDef').AsString, Abs(FieldByName('cash').AsCurrency), CEmptyDataGid);
+        end;
         Next;
       end;
       if xGbSum.Count > 0 then begin
@@ -1884,7 +1898,7 @@ begin
   xSums.Free;
 end;
 
-function TSumReportList.GetReportTitle: String;
+function TCashSumReportList.GetReportTitle: String;
 begin
   Result := 'Sumy ';
   if FGroupBy = CGroupByDay then begin
@@ -1902,12 +1916,12 @@ begin
   Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
-function TSumReportList.PrepareReportConditions: Boolean;
+function TCashSumReportList.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAcpListGroupByForm(FParams.acp, FStartDate, FEndDate, FAcps, FIdFilter, FGroupBy, @CurrencyView);
 end;
 
-function TSumReportChart.GetReportTitle: String;
+function TCashSumReportChart.GetReportTitle: String;
 begin
   Result := 'Sumy ';
   if FGroupBy = CGroupByDay then begin
@@ -1927,7 +1941,7 @@ begin
   Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
 end;
 
-procedure TSumReportChart.PrepareReportChart;
+procedure TCashSumReportChart.PrepareReportChart;
 var xInOperations, xOutOperations: TADOQuery;
     xGb: String;
     xGbSum: Currency;
@@ -2106,7 +2120,7 @@ begin
   xOverallCurDefs.Free;
 end;
 
-function TSumReportChart.PrepareReportConditions: Boolean;
+function TCashSumReportChart.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAcpListGroupByForm(CGroupByAccount, FStartDate, FEndDate, FAcps, FIdFilter, FGroupBy, @CurrencyView);
 end;
@@ -3043,6 +3057,8 @@ var xChart: TChart;
     xCount: Integer;
     xSerie: TChartSeries;
     xTypeCondition: String;
+    xPrevValue: Currency;
+    xPercentage: String;
 begin
   xChart := GetChart;
   if Length(FrateTypes) = 1 then begin
@@ -3084,13 +3100,18 @@ begin
       HorizAxis := aBottomAxis;
       XValues.DateTime := True;
     end;
+    xPrevValue := -1;
     while xCurDate <= FEndDate do begin
       xRate := FindCurrencyRate(xRates, xCurDate, FrateTypes[xCount]);
       if xRate <> Nil then begin
         xCurValue := xMaxQuantity * xRate.rate / xRate.quantity;
       end;
       if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
-        xSerie.AddXY(xCurDate, xCurValue, '');
+        if xPrevValue <> -1 then begin
+          xPercentage := CurrencyToString(xCurValue, '', False, 4) + ' (' + CurrencyToString((xCurValue/xPrevValue - 1) * 100, '', False, 4) + '%)';
+        end;
+        xSerie.AddXY(xCurDate, xCurValue, xPercentage);
+        xPrevValue := xCurValue;
       end else begin
         xSerie.AddNullXY(xCurDate, 0, '');
       end;
@@ -3851,6 +3872,134 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+function TQuantitySumReportList.GetReportBody: String;
+var xOperations: TADOQuery;
+    xGb: String;
+    xQuantsSum, xOccursSum: TSumList;
+    xBody: TStringList;
+    xName: String;
+    xCurDate: TDateTime;
+    xRec, xCount: Integer;
+    xFilter: String;
+    xProducts: TDataObjectList;
+    xUnitid: String;
+begin
+  xGb := 'regDate';
+  xName := 'Dzieñ';
+  if FGroupBy = CGroupByWeek then begin
+    xGb := 'weekDate';
+    xName := 'Tydzieñ';
+  end else if FGroupBy = CGroupByMonth then begin
+    xGb := 'monthDate';
+    xName := 'Miesi¹c';
+  end;
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'transactions.idAccount', 'transactions.idCashpoint', 'transactions.idProduct');
+  xOperations := GDataProvider.OpenSql(Format('select count(*) as occurs, sum(quantity) as quants, idProduct, idUnitDef, %s from transactions where movementType = ''%s'' and regDate between %s and %s %s group by %s, idProduct, idUnitDef order by %s',
+                             [xGb, TCSelectedMovementTypeParams(FParams).movementType,
+                              DatetimeToDatabase(FStartDate, False),
+                              DatetimeToDatabase(FEndDate, False), xFilter,
+                              xGb, xGb]));
+  xProducts := TProduct.GetAllObjects(ProductProxy);
+  xRec := 1;
+  xBody := TStringList.Create;
+  with xOperations, xBody do begin
+    Add('<table class="base" colspan=5>');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="30%">' + xName + '</td>');
+    Add('<td class="headtext" width="30%">Kategoria</td>');
+    Add('<td class="headcash" width="10%">Wykonañ</td>');
+    Add('<td class="headcash" width="20%">Jednostka</td>');
+    Add('<td class="headcash" width="10%">Iloœæ</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=5>');
+    if FGroupBy = CGroupByWeek then begin
+      xCurDate := StartOfTheWeek(FStartDate);
+    end else if FGroupBy = CGroupByMonth then begin
+      xCurDate := StartOfTheMonth(FStartDate);
+    end else begin
+      xCurDate := FStartDate;
+    end;
+    while (xCurDate <= FEndDate) do begin
+      Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False);
+      Filtered := True;
+      First;
+      xQuantsSum := TSumList.Create(True);
+      xOccursSum := TSumList.Create(True);
+      while not Eof do begin
+        if IsValidGid(FieldByName('idProduct').AsString, FAcps) then begin
+          xQuantsSum.AddSum(FieldByName('idProduct').AsString, Abs(FieldByName('quants').AsCurrency), CEmptyDataGid);
+          xOccursSum.AddSum(FieldByName('idProduct').AsString, Abs(FieldByName('occurs').AsCurrency), CEmptyDataGid);
+        end;
+        Next;
+      end;
+      if xQuantsSum.Count > 0 then begin
+        for xCount := 0 to xQuantsSum.Count - 1 do begin
+          Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
+          Add('<td class="text" width="30%">' + IfThen(xCount = 0, GetDescription(FGroupBy, xCurDate), '') + '</td>');
+          Add('<td class="text" width="30%">' + TProduct(xProducts.ObjectById[xQuantsSum.Items[xCount].name]).name + '</td>');
+          Add('<td class="cash" width="10%">' + CurrencyToString(xOccursSum.ByNameCurrency[xQuantsSum.Items[xCount].name, CEmptyDataGid].value, '', False, 0) + '</td>');
+          xUnitid := TProduct(xProducts.ObjectById[xQuantsSum.Items[xCount].name]).idUnitDef;
+          if xUnitid <> CEmptyDataGid then begin
+            Add('<td class="cash" width="20%">' + GUnitdefCache.GetSymbol(xUnitid) + '</td>');
+            Add('<td class="cash" width="10%">' + CurrencyToString(xQuantsSum.Items[xCount].value, '', False) + '</td>');
+          end else begin
+            Add('<td class="cash" width="20%">-</td>');
+            Add('<td class="cash" width="10%">-</td>');
+          end;
+          Add('</tr>');
+          Inc(xRec);
+        end;
+      end else begin
+        Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
+        Add('<td class="text" width="30%">' + GetDescription(FGroupBy, xCurDate) + '</td>');
+        Add('<td class="text" width="30%">-</td>');
+        Add('<td class="cash" width="10%">-</td>');
+        Add('<td class="text" width="20%">-</td>');
+        Add('<td class="cash" width="10%">-</td>');
+        Add('</tr>');
+        Inc(xRec);
+      end;
+      xQuantsSum.Free;
+      xOccursSum.Free;
+      if FGroupBy = CGroupByWeek then begin
+        xCurDate := IncWeek(xCurDate, 1);
+      end else if FGroupBy = CGroupByMonth then begin
+        xCurDate := IncMonth(xCurDate, 1);
+      end else begin
+        xCurDate := IncDay(xCurDate, 1);
+      end;
+    end;
+    Add('</table>');
+  end;
+  xOperations.Free;
+  xProducts.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TQuantitySumReportList.GetReportTitle: String;
+begin
+  Result := 'Sumy iloœciowe';
+  if FGroupBy = CGroupByDay then begin
+    Result := Result + 'dziennych ';
+  end else if FGroupBy = CGroupByWeek then begin
+    Result := Result + 'tygodniowych ';
+  end else if FGroupBy = CGroupByMonth then begin
+    Result := Result + 'miesiêcznych ';
+  end;
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := Result + 'przychodów ';
+  end else if TCSelectedMovementTypeParams(FParams).movementType = COutMovement then begin
+    Result := Result + 'rozchodów ';
+  end;
+  Result := Result + '(' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+end;
+
+function TQuantitySumReportList.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodAcpListGroupByForm(FParams.acp, FStartDate, FEndDate, FAcps, FIdFilter, FGroupBy, Nil);
 end;
 
 end.

@@ -98,7 +98,6 @@ end;
 function TCExtractionsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 begin
   Result := (inherited IsValidFilteredObject(AObject)) or
-            (CStaticFilter.DataId = CCashpointTypeAll) or
             (TAccountExtraction(AObject).extractionState = CStaticFilter.DataId);
   if Result and (AdditionalData <> Nil) then begin
     Result := TCExtractionFrameData(AdditionalData).idAccount = TAccountExtraction(AObject).idAccount;

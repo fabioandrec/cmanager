@@ -1,10 +1,10 @@
 inherited CRandomForm: TCRandomForm
-  Left = 322
-  Top = 68
+  Left = 342
+  Top = 136
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Generowanie losowych danych'
-  ClientHeight = 530
+  ClientHeight = 566
   ClientWidth = 323
   Position = poScreenCenter
   OnCreate = FormCreate
@@ -68,7 +68,7 @@ inherited CRandomForm: TCRandomForm
     Left = 16
     Top = 296
     Width = 289
-    Height = 177
+    Height = 213
     Caption = ' Ilo'#347'ci '
     TabOrder = 2
     object Label4: TLabel
@@ -102,6 +102,14 @@ inherited CRandomForm: TCRandomForm
       Height = 13
       Alignment = taRightJustify
       Caption = 'Waluty'
+    end
+    object Label10: TLabel
+      Left = 35
+      Top = 176
+      Width = 45
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Jednostki'
     end
     object CIntEdit2: TCIntEdit
       Left = 91
@@ -143,10 +151,20 @@ inherited CRandomForm: TCRandomForm
       TabOrder = 3
       Text = '0'
     end
+    object CIntEdit8: TCIntEdit
+      Left = 91
+      Top = 172
+      Width = 158
+      Height = 21
+      BevelKind = bkTile
+      BorderStyle = bsNone
+      TabOrder = 4
+      Text = '0'
+    end
   end
   object BitBtnOk: TBitBtn
     Left = 16
-    Top = 488
+    Top = 528
     Width = 75
     Height = 25
     Caption = 'Generuj'
@@ -155,7 +173,7 @@ inherited CRandomForm: TCRandomForm
   end
   object BitBtn1: TBitBtn
     Left = 230
-    Top = 488
+    Top = 528
     Width = 75
     Height = 25
     Caption = 'Zamknij'
