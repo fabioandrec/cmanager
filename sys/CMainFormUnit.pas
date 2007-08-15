@@ -122,6 +122,7 @@ type
     procedure UpdateStatusbar;
     procedure UpdatePluginsMenu;
     procedure ExecuteOnstartupPlugins;
+    procedure ExecuteOnexitPlugins;
     procedure FinalizeMainForm;
     function OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
   published
@@ -550,6 +551,7 @@ procedure TCMainForm.FinalizeMainForm;
 var xCount: Integer;
 begin
   SetEvent(GShutdownEvent);
+  ExecuteOnexitPlugins;
   for xCount := 0 to FShortcutsFrames.Count - 1 do begin
     TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
   end;
@@ -607,7 +609,7 @@ begin
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
         if xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] or
-           xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE] or
+           (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE] and ((xPlugin.pluginType and CJUSTEXECUTE_DISABLEONDEMAND) = 0)) or
            xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION] then begin
           xAction := TAction.Create(Self);
           xAction.ActionList := ActionManager;
@@ -743,11 +745,26 @@ var xCount: Integer;
 begin
   for xCount := 0 to GPlugins.Count - 1 do begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
-    if xPlugin.isTypeof[CPLUGINTYPE_ONSTARTUP] then begin
+    if (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE]) and
+       ((xPlugin.pluginType and CJUSTEXECUTE_EXECUTEONSTART) = CJUSTEXECUTE_EXECUTEONSTART) then begin
       xPlugin.Execute;
     end;
   end;
 end;
+
+procedure TCMainForm.ExecuteOnexitPlugins;
+var xCount: Integer;
+    xPlugin: TCPlugin;
+begin
+  for xCount := 0 to GPlugins.Count - 1 do begin
+    xPlugin := TCPlugin(GPlugins.Items[xCount]);
+    if (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE]) and
+       ((xPlugin.pluginType and CJUSTEXECUTE_EXECUTEONEXIT) = CJUSTEXECUTE_EXECUTEONEXIT) then begin
+      xPlugin.Execute;
+    end;
+  end;
+end;
+
 
 end.
 

@@ -218,7 +218,6 @@ begin
                   isTypeof[CPLUGINTYPE_JUSTEXECUTE] or
                   isTypeof[CPLUGINTYPE_HTMLREPORT] or
                   isTypeof[CPLUGINTYPE_CHARTREPORT] or
-                  isTypeof[CPLUGINTYPE_ONSTARTUP] or
                   isTypeof[CPLUGINTYPE_SELECTEDITEM];
         if not Result then begin
           SaveToLog('Typ pluginu jest niepoprawny lub nie zosta³ ustawiony ' + FShortName, GPluginlogfile);

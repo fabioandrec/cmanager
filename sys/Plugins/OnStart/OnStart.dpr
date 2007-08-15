@@ -22,7 +22,7 @@ begin
   CManInterface := ACManagerInterface;
   with CManInterface do begin
     Application.Handle := GetAppHandle;
-    SetType(CPLUGINTYPE_ONSTARTUP);
+    SetType(CPLUGINTYPE_JUSTEXECUTE or CJUSTEXECUTE_EXECUTEONSTART or CJUSTEXECUTE_DISABLEONDEMAND);
     SetCaption('Poka¿ okno');
     SetDescription('Pokazuje okno na starcie');
     GShutdownEvent := CManInterface.GetShutdownEvent;
