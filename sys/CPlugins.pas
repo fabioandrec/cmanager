@@ -37,6 +37,7 @@ type
     function GetSelectedId: OleVariant;
     function GetShutdownEvent: Cardinal;
     procedure SendFrameMessage(AMessage: OleVariant; AFrameType: OleVariant; ADataGid: OleVariant; AOptParam: OleVariant);
+    function GetState: Integer;
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -84,6 +85,7 @@ type
 
 var GPlugins: TCPluginList;
     GPluginlogfile: String = '';
+    GCmanagerState: Integer;
 
 implementation
 
@@ -542,6 +544,11 @@ begin
   if (xMessage <> 0) and (xClass <> Nil) then begin
     SendMessageToFrames(xClass, xMessage, Integer(@xDataGid), xOptParam);
   end;
+end;
+
+function TCManagerInterfaceObject.GetState: Integer;
+begin
+  Result := GCmanagerState;
 end;
 
 initialization

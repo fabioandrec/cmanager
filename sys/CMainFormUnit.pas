@@ -550,7 +550,6 @@ end;
 procedure TCMainForm.FinalizeMainForm;
 var xCount: Integer;
 begin
-  SetEvent(GShutdownEvent);
   ExecuteOnexitPlugins;
   for xCount := 0 to FShortcutsFrames.Count - 1 do begin
     TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
@@ -567,6 +566,8 @@ end;
 
 procedure TCMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  GCmanagerState := CMANAGERSTATE_CLOSING;
+  SetEvent(GShutdownEvent);
   HelpCloseAll;
 end;
 

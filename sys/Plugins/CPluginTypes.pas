@@ -13,6 +13,7 @@ type
     function GetWorkdate: OleVariant;
     function GetAppHandle: HWND;
     function GetConfiguration: OleVariant;
+    function GetState: Integer;
     procedure SetConfiguration(AConfigurationBuffer: OleVariant);
     procedure SetType(AType: Integer);
     procedure SetDescription(ADescription: OleVariant);

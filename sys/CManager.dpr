@@ -130,6 +130,7 @@ begin
   {$ENDIF}
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
+  GCmanagerState := CMANAGERSTATE_STARTING;
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     InitializeProxies;
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
@@ -168,6 +169,7 @@ begin
           CheckForBackups;
         end;
         Application.ProcessMessages;
+        GCmanagerState := CMANAGERSTATE_RUNNING;
         Application.Run;
         CMainForm.FinalizeMainForm;
       end;
