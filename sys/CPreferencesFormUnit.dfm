@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 471
           Height = 421
-          ActivePage = TabSheetAutostart
+          ActivePage = TabSheetPlugins
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -514,6 +514,15 @@ inherited CPreferencesForm: TCPreferencesForm
                 TabOrder = 8
                 OnClick = CheckBoxValidClick
               end
+              object CheckBoxExtractions: TCheckBox
+                Left = 16
+                Top = 248
+                Width = 233
+                Height = 17
+                Caption = 'Powiadamiaj nieuzgodnionych wyci'#261'gach'
+                TabOrder = 10
+                OnClick = CheckBoxValidClick
+              end
             end
           end
           object TabSheetPlugins: TTabSheet
@@ -532,6 +541,16 @@ inherited CPreferencesForm: TCPreferencesForm
               Framed = False
               Action = Action9
               Color = clBtnFace
+            end
+            object Label7: TLabel
+              Left = 8
+              Top = 376
+              Width = 254
+              Height = 26
+              Caption = 
+                '(*) Zmiany aktywno'#347'ci wtyczek zostan'#261' wprowadzone'#13#10'    dopiero p' +
+                'o ponownym uruchomieniu CManager-a'
+              Visible = False
             end
             object Panel3: TPanel
               Left = 8
@@ -552,6 +571,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 BevelKind = bkFlat
                 BorderStyle = bsNone
                 ButtonStyle = bsTriangle
+                CheckImageKind = ckDarkTick
                 DefaultNodeHeight = 24
                 Header.AutoSizeIndex = -1
                 Header.Font.Charset = DEFAULT_CHARSET
@@ -563,6 +583,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
                 Header.Style = hsFlatButtons
                 HintMode = hmHint
+                Indent = 0
                 ParentShowHint = False
                 ShowHint = True
                 TabOrder = 0
@@ -570,19 +591,26 @@ inherited CPreferencesForm: TCPreferencesForm
                 TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
                 TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
                 TreeOptions.SelectionOptions = [toFullRowSelect]
+                OnChecked = ListChecked
                 OnFocusChanged = ListFocusChanged
+                OnInitNode = ListInitNode
                 OddColor = 12437200
                 AutoExpand = True
                 OnCDataListReloadTree = ListCDataListReloadTree
                 Columns = <
                   item
                     Position = 0
+                    Width = 55
+                    WideText = 'Aktywna'
+                  end
+                  item
+                    Position = 1
                     Width = 150
                     WideText = 'Nazwa'
                   end
                   item
-                    Position = 1
-                    Width = 289
+                    Position = 2
+                    Width = 234
                     WideText = 'Opis'
                   end>
                 WideDefaultText = ''

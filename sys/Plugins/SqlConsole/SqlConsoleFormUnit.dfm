@@ -1,8 +1,8 @@
 object SqlConsoleForm: TSqlConsoleForm
-  Left = 290
-  Top = 172
-  Width = 562
-  Height = 457
+  Left = 242
+  Top = 407
+  Width = 715
+  Height = 358
   Caption = 'Kosola Sql'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object SqlConsoleForm: TSqlConsoleForm
   object Splitter: TSplitter
     Left = 0
     Top = 145
-    Width = 554
+    Width = 707
     Height = 2
     Cursor = crVSplit
     Align = alTop
@@ -27,7 +27,7 @@ object SqlConsoleForm: TSqlConsoleForm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 554
+    Width = 707
     Height = 145
     Align = alTop
     BevelOuter = bvNone
@@ -35,9 +35,9 @@ object SqlConsoleForm: TSqlConsoleForm
     OnConstrainedResize = Panel1ConstrainedResize
     object RichEditCommand: TRichEdit
       Left = 0
-      Top = 41
-      Width = 554
-      Height = 104
+      Top = 34
+      Width = 707
+      Height = 111
       Align = alClient
       BevelKind = bkTile
       BorderStyle = bsNone
@@ -54,40 +54,40 @@ object SqlConsoleForm: TSqlConsoleForm
     object Panel4: TPanel
       Left = 0
       Top = 0
-      Width = 554
-      Height = 41
+      Width = 707
+      Height = 34
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 1
       object PngSpeedButton1: TPngSpeedButton
         Left = 8
-        Top = 6
+        Top = 4
         Width = 129
-        Height = 29
+        Height = 25
         Action = ActionExecute
         Flat = True
       end
       object PngSpeedButton2: TPngSpeedButton
         Left = 144
-        Top = 6
+        Top = 4
         Width = 129
-        Height = 29
+        Height = 25
         Action = ActionOpen
         Flat = True
       end
       object PngSpeedButton3: TPngSpeedButton
         Left = 280
-        Top = 6
+        Top = 4
         Width = 129
-        Height = 29
+        Height = 25
         Action = ActionSave
         Flat = True
       end
       object PngSpeedButton4: TPngSpeedButton
         Left = 416
-        Top = 6
+        Top = 4
         Width = 129
-        Height = 29
+        Height = 25
         Action = ActionPrint
         Flat = True
       end
@@ -96,16 +96,16 @@ object SqlConsoleForm: TSqlConsoleForm
   object Panel2: TPanel
     Left = 0
     Top = 147
-    Width = 554
-    Height = 283
+    Width = 707
+    Height = 184
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
     object RichEditResult: TRichEdit
       Left = 0
       Top = 0
-      Width = 554
-      Height = 283
+      Width = 707
+      Height = 184
       Align = alClient
       BevelKind = bkTile
       BorderStyle = bsNone

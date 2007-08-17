@@ -609,9 +609,9 @@ begin
     if xPluginBand <> Nil then begin
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
-        if xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] or
+        if (xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] or
            (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE] and ((xPlugin.pluginType and CJUSTEXECUTE_DISABLEONDEMAND) = 0)) or
-           xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION] then begin
+           xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION]) and xPlugin.pluginIsEnabled then begin
           xAction := TAction.Create(Self);
           xAction.ActionList := ActionManager;
           xAction.Caption := xPlugin.pluginMenu;
@@ -746,8 +746,9 @@ var xCount: Integer;
 begin
   for xCount := 0 to GPlugins.Count - 1 do begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
-    if (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE]) and
-       ((xPlugin.pluginType and CJUSTEXECUTE_EXECUTEONSTART) = CJUSTEXECUTE_EXECUTEONSTART) then begin
+    if xPlugin.pluginIsEnabled and
+       ((xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE]) and
+       ((xPlugin.pluginType and CJUSTEXECUTE_EXECUTEONSTART) = CJUSTEXECUTE_EXECUTEONSTART)) then begin
       xPlugin.Execute;
     end;
   end;
@@ -759,8 +760,9 @@ var xCount: Integer;
 begin
   for xCount := 0 to GPlugins.Count - 1 do begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
-    if (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE]) and
-       ((xPlugin.pluginType and CJUSTEXECUTE_EXECUTEONEXIT) = CJUSTEXECUTE_EXECUTEONEXIT) then begin
+    if xPlugin.pluginIsEnabled and 
+       ((xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE]) and
+       ((xPlugin.pluginType and CJUSTEXECUTE_EXECUTEONEXIT) = CJUSTEXECUTE_EXECUTEONEXIT)) then begin
       xPlugin.Execute;
     end;
   end;

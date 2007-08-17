@@ -54,6 +54,7 @@ type
     FpluginConfiguration: String;
     FpluginMenu: String;
     FcmanInterface: TCManagerInterfaceObject;
+    FpluginIsEnabled: Boolean;
     function GetisConfigurable: Boolean;
     function GetisTypeOf(AType: Integer): Boolean;
   public
@@ -71,6 +72,7 @@ type
     property pluginDescription: String read FpluginDescription write FpluginDescription;
     property pluginMenu: String read FpluginMenu write FpluginMenu;
     property pluginConfiguration: String read FpluginConfiguration write FpluginConfiguration;
+    property pluginIsEnabled: Boolean read FpluginIsEnabled write FpluginIsEnabled;
     property isConfigurable: Boolean read GetisConfigurable;
   end;
 
@@ -95,7 +97,7 @@ uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
   CProductsFrameUnit, CMovementFrameUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CFilterFrameUnit, CProfileFormUnit, CProfileFrameUnit,
   CLimitsFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
-  CExtractionsFrameUnit, CExtractionItemFrameUnit, CUnitDefFrameUnit;
+  CExtractionsFrameUnit, CExtractionItemFrameUnit, CUnitDefFrameUnit, Math;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -139,6 +141,7 @@ begin
   FHandle := 0;
   FpluginType := CPLUGINTYPE_INCORRECT;
   FcmanInterface := TCManagerInterfaceObject.Create(Self);
+  FpluginIsEnabled := True;
 end;
 
 destructor TCPlugin.Destroy;
@@ -180,10 +183,12 @@ end;
 
 function TCPlugin.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
-  if AColumnIndex = 0 then begin
+  if AColumnIndex = 1 then begin
     Result := ExtractFileName(FFilename);
+  end else if AColumnIndex = 2 then begin
+    Result := pluginDescription;
   end else begin
-    Result := FpluginDescription;
+    Result := '';
   end;
 end;
 
@@ -271,6 +276,7 @@ begin
         xPref := TPluginPref(GPluginsPreferences.ByPrefname[xPlugin.FFilename]);
         if xPref <> Nil then begin
           xPlugin.pluginConfiguration := xPref.configuration;
+          xPlugin.pluginIsEnabled := xPref.isEnabled;
         end;
         Add(xPlugin);
       end else begin
@@ -290,8 +296,13 @@ var xPref: TPluginPref;
 begin
   xPref := TPluginPref(GPluginsPreferences.ByPrefname[FParentPlugin.fileName]);
   if xPref <> Nil then begin
-    xAsk := False;
-    xPermit := xPref.permitGetConnection;
+    if xPref.permitGetConnection = 0 then begin
+      xAsk := True;
+      xPermit := False;
+    end else begin
+      xAsk := False;
+      xPermit := xPref.permitGetConnection = 1;
+    end;
   end else begin
     xAsk := True;
     xPermit := False;
@@ -303,7 +314,7 @@ begin
         xPref := TPluginPref.CreatePluginPref(FParentPlugin.fileName, FParentPlugin.pluginConfiguration);
         GPluginsPreferences.Add(xPref);
       end;
-      xPref.permitGetConnection := xPermit;
+      xPref.permitGetConnection := IfThen(xPermit, 1, -1);
     end;
   end;
   if xPermit then begin

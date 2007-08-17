@@ -35,7 +35,7 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
     OnGetText = RepaymentListGetText
     OnPaintText = RepaymentListPaintText
-    OnGetImageIndex = RepaymentListGetImageIndex
+    OnGetImageIndexEx = RepaymentListGetImageIndexEx
     OnGetNodeDataSize = RepaymentListGetNodeDataSize
     OnInitChildren = RepaymentListInitChildren
     OnInitNode = RepaymentListInitNode

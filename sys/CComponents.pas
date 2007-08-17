@@ -1657,6 +1657,7 @@ procedure TCDataList.DoInitNode(Parent, Node: PVirtualNode; var InitStates: TVir
 var xData: TCListDataElement;
     xParent: TCListDataElement;
 begin
+  inherited DoInitNode(Parent, Node, InitStates);
   if Parent = Nil then begin
     xData := FRootElement.Items[Node.Index];
   end else begin

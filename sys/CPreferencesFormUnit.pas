@@ -93,6 +93,8 @@ type
     List: TCDataList;
     CButton10: TCButton;
     Action9: TAction;
+    CheckBoxExtractions: TCheckBox;
+    Label7: TLabel;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -111,6 +113,8 @@ type
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure Action9Execute(Sender: TObject);
+    procedure ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -219,6 +223,9 @@ begin
 end;
 
 procedure TCPreferencesForm.FillForm;
+var xNode: PVirtualNode;
+    xChecked: Boolean;
+    xPref: TPluginPref;
 begin
   inherited FillForm;
   with FBasePrefs do begin
@@ -258,17 +265,36 @@ begin
     CStaticBackupCat.Caption := MinimizeName(backupDirectory, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
     EditBackupName.Text := backupFileName;
     CheckBoxCanOverwrite.Checked := backupOverwrite;
+    CheckBoxExtractions.Checked := startupUncheckedExtractions;
   end;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
   ComboBoxBackupActionChange(Nil);
   UpdateFilenameState;
   List.ReloadTree;
+  xNode := List.GetFirst;
+  while xNode <> Nil do begin
+    xPref := TPluginPref(FPluginPrefs.ByPrefname[TCPlugin(GPlugins.Items[xNode.Index]).fileName]);
+    if xPref <> Nil then begin
+      xChecked := xPref.isEnabled;
+    end else begin
+      xChecked := True;
+    end;
+    if xChecked then begin
+      xNode.CheckState := csCheckedNormal;
+    end else begin
+      xNode.CheckState := csUncheckedNormal;
+    end;
+    xNode := List.GetNext(xNode);
+  end;
   ListFocusChanged(List, Nil, 0);
 end;
 
 procedure TCPreferencesForm.ReadValues;
 var xReg: TRegistry;
+    xPref: TPluginPref;
+    xPlugin: TCPlugin;
+    xNode: PVirtualNode;
 begin
   inherited ReadValues;
   with FBasePrefs do begin
@@ -305,6 +331,7 @@ begin
     backupDirectory := CStaticBackupCat.DataId;;
     backupFileName := EditBackupName.Text;
     backupOverwrite := CheckBoxCanOverwrite.Checked;
+    startupUncheckedExtractions := CheckBoxExtractions.Checked;
     xReg := TRegistry.Create;
     try
       xReg.RootKey := HKEY_CURRENT_USER;
@@ -318,6 +345,17 @@ begin
       end;
     finally
       xReg.Free;
+    end;
+    xNode := List.GetFirst;
+    while xNode <> Nil do begin
+      xPlugin := TCPlugin(GPlugins.Items[xNode.Index]);
+      xPref := TPluginPref(FPluginPrefs.ByPrefname[xPlugin.fileName]);
+      if xPref = Nil then begin
+        xPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xPlugin.pluginConfiguration);
+        FPluginPrefs.Add(xPref);
+      end;
+      xPref.isEnabled := xNode.CheckState = csCheckedNormal;
+      xNode := List.GetNext(xNode);
     end;
   end;
 end;
@@ -338,9 +376,11 @@ begin
   CheckBoxAutoOldOut.Enabled := ComboBoxDays.Enabled;
   CheckBoxSurpassed.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxValid.Enabled := CheckBoxAutostartOperations.Checked;
+  CheckBoxExtractions.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
                                 CheckBoxSurpassed.Checked or
-                                CheckBoxValid.Checked;
+                                CheckBoxValid.Checked or
+                                CheckBoxExtractions.Checked;
   ComboBoxDaysChange(Nil);
 end;
 
@@ -488,6 +528,16 @@ begin
     end;
     xPluginPref.configuration := xPlugin.pluginConfiguration;
   end;
+end;
+
+procedure TCPreferencesForm.ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+begin
+  Node.CheckType := ctCheckBox;
+end;
+
+procedure TCPreferencesForm.ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+begin
+  Label7.Visible := True;
 end;
 
 end.

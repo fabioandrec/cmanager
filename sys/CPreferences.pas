@@ -55,17 +55,18 @@ type
   TPluginPref = class(TPrefItem)
   private
     Fconfiguration: String;
-    FpermitGetConnection: Boolean;
+    FpermitGetConnection: Integer;
+    FisEnabled: Boolean;
   public
     function GetNodeName: String; override;
     procedure SaveToXml(ANode: IXMLDOMNode); override;
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
     constructor CreatePluginPref(AFilename: String; AConfiguration: String);
-    property configuration: String read Fconfiguration write Fconfiguration;
-    property permitGetConnection: Boolean read FpermitGetConnection write FpermitGetConnection;
     procedure Clone(APrefItem: TPrefItem); override;
+    property configuration: String read Fconfiguration write Fconfiguration;
+    property permitGetConnection: Integer read FpermitGetConnection write FpermitGetConnection;
+    property isEnabled: Boolean read FisEnabled write FisEnabled;
   end;
-
 
   TBackupThread = class(TThread)
   private
@@ -185,6 +186,7 @@ type
     FbakupDirectory: String;
     FbackupFileName: String;
     FbackupOverwrite: Boolean;
+    FstartupUncheckedExtractions: Boolean;
   public
     function GetBackupfilename: String;
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
@@ -213,6 +215,7 @@ type
     property startupCheckUpdates: Boolean read FstartupCheckUpdates write FstartupCheckUpdates;
     property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
     property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
+    property startupUncheckedExtractions: Boolean read FstartupUncheckedExtractions write FstartupUncheckedExtractions;
     property workDays: String read FworkDays write FworkDays;
     property backupAction: Integer read FbackupAction write FbackupAction;
     property backupDaysOld: Integer read FbackupDaysOld write FbackupDaysOld;
@@ -541,6 +544,7 @@ begin
   FbakupDirectory := TBasePref(APrefItem).backupDirectory;
   FbackupFileName := TBasePref(APrefItem).backupFileName;
   FbackupOverwrite := TBasePref(APrefItem).backupOverwrite;
+  FstartupUncheckedExtractions := TBasePref(APrefItem).startupUncheckedExtractions;
 end;
 
 function TBasePref.ExpandTemplate(ATemplate: String): String;
@@ -613,6 +617,7 @@ begin
   FbakupDirectory := GetXmlAttribute('backupDirectory', ANode, ExpandFileName(ExtractFilePath(ParamStr(0))));
   FbackupFileName := GetXmlAttribute('backupFilename', ANode, '@data@.cmb');
   FbackupOverwrite := GetXmlAttribute('backupOverwrite', ANode, False);
+  FstartupUncheckedExtractions := GetXmlAttribute('startupUncheckedExtractions', ANode, False);
 end;
 
 function TBasePref.QueryInterface(const IID: TGUID; out Obj): HRESULT;
@@ -649,6 +654,7 @@ begin
   SetXmlAttribute('backupDirectory', ANode, FbakupDirectory);
   SetXmlAttribute('backupFilename', ANode, FbackupFileName);
   SetXmlAttribute('backupOverwrite', ANode, FbackupOverwrite);
+  SetXmlAttribute('startupUncheckedExtractions', ANode, FstartupUncheckedExtractions);
 end;
 
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
@@ -893,13 +899,15 @@ begin
   inherited Clone(APrefItem);
   Fconfiguration := TPluginPref(APrefItem).configuration;
   FpermitGetConnection := TPluginPref(APrefItem).permitGetConnection;
+  FisEnabled := TPluginPref(APrefItem).isEnabled;
 end;
 
 constructor TPluginPref.CreatePluginPref(AFilename, AConfiguration: String);
 begin
   inherited Create(AFilename);
   Fconfiguration := AConfiguration;
-  FpermitGetConnection := False;
+  FpermitGetConnection := 0;
+  FisEnabled := True;
 end;
 
 function TPluginPref.GetNodeName: String;
@@ -911,7 +919,8 @@ procedure TPluginPref.LoadFromXml(ANode: IXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   Fconfiguration := GetXmlAttribute('configuration', ANode, '');
-  FpermitGetConnection := GetXmlAttribute('permitGetConnection', ANode, False);
+  FpermitGetConnection := GetXmlAttribute('permitGetConnection', ANode, 0);
+  FisEnabled := GetXmlAttribute('isEnabeld', ANode, True);
 end;
 
 procedure TPluginPref.SaveToXml(ANode: IXMLDOMNode);
@@ -919,6 +928,7 @@ begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('configuration', ANode, Fconfiguration);
   SetXmlAttribute('permitGetConnection', ANode, FpermitGetConnection);
+  SetXmlAttribute('isEnabeld', ANode, FisEnabled);
 end;
 
 procedure TChartPref.Clone(APrefItem: TPrefItem);
@@ -1008,6 +1018,7 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju'));
     Fontprefs.Add(TFontPref.CreateFontPref('SL', 'Przekroczone limity'));
     Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'));
+    Fontprefs.Add(TFontPref.CreateFontPref('UE', 'Nieuzgodnione wyci¹gi'));
   end;
   GViewsPreferences.Add(TViewPref.Create('accountExtraction'));
   with TViewPref(GViewsPreferences.Last) do begin
@@ -1031,6 +1042,7 @@ initialization
     startupInfoOldOut := True;
     startupInfoAlways := True;
     startupInfoSurpassedLimit := False;
+    startupUncheckedExtractions := False;
     startupInfoValidLimits := False;
     startupCheckUpdates := False;
     workDays := '+++++--';

@@ -9,8 +9,8 @@ uses
   CImageListsUnit, CComponents, CDataObjects;
 
 type
-  TStartupHelperType = (shtGroup, shtDate, shtPlannedItem, shtLimit);
-  TStartupHelperGroup = (shgIntimeIn, shgIntimeOut, shgOvertimeIn, shgOvertimeOut, shgLimit);
+  TStartupHelperType = (shtGroup, shtDate, shtPlannedItem, shtLimit, shtExtraction);
+  TStartupHelperGroup = (shgIntimeIn, shgIntimeOut, shgOvertimeIn, shgOvertimeOut, shgLimit, shgExtraction);
   TStartupHelperList = class;
   TStartupHelper = class;
 
@@ -23,12 +23,13 @@ type
     procedure RepaymentListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure RepaymentListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure RepaymentListGetImageIndexEx(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; var ImageList: TCustomImageList);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
     FScheduledObjects: TObjectList;
     FLimitData: TDataObjectList;
+    FExtractionsData: TDataObjectList;
     FHelperList: TStartupHelperList;
     procedure FindFontAndBackground(AHelper: TStartupHelper; AFont: TFont; var ABackground: TColor);
   public
@@ -85,6 +86,7 @@ begin
   FreeAndNil(FDoneObjects);
   FreeAndNil(FScheduledObjects);
   FreeAndNil(FLimitData);
+  FreeAndNil(FExtractionsData);
   FreeAndNil(FHelperList);
   inherited Destroy;
 end;
@@ -102,6 +104,7 @@ var xDf, xDt: TDateTime;
     xItem: TStartupHelper;
     xAmount: Currency;
     xCurrencyDef: TDataGid;
+    xExtraction: TAccountExtraction;
 begin
   RepaymentList.BeginUpdate;
   RepaymentList.Clear;
@@ -222,6 +225,17 @@ begin
         end;
       end;
     end;
+    if startupUncheckedExtractions then begin
+      FExtractionsData := TAccountExtraction.GetList(TAccountExtraction, AccountExtractionProxy, 'select * from accountExtraction where state <> ''S''');
+      for xCount := 0 to FExtractionsData.Count - 1 do begin
+        xExtraction := TAccountExtraction(FExtractionsData.Items[xCount]);
+        xGroup := FHelperList.ByGroup(shgExtraction, True);
+        xItem := TStartupHelper.Create(GWorkDate, xGroup.group, xExtraction, shtExtraction, CEmptyDataGid);
+        xItem.sum := 0;
+        xGroup.count := xGroup.count + 1;
+        xGroup.childs.Add(xItem);
+      end;
+    end;
   end;
   with RepaymentList do begin
     RootNodeCount := FHelperList.Count;
@@ -337,6 +351,7 @@ begin
           shgOvertimeIn: CellText := 'Zaleg³e operacje przychodowe';
           shgOvertimeOut: CellText := 'Zaleg³e operacje rozchodowe';
           shgLimit: CellText := 'Limity';
+          shgExtraction: CellText := 'Nieuzgodnione wyci¹gi';
         end;
       end else if xData.helperType = shtDate then begin
         if xData.date = GWorkDate then begin
@@ -350,6 +365,8 @@ begin
         CellText := GetDescText(TPlannedTreeItem(xData.item).planned.description);
       end else if xData.helperType = shtLimit then begin
         CellText := TMovementLimit(xData.item).name;
+      end else if xData.helperType = shtExtraction then begin
+        CellText := TAccountExtraction(xData.item).GetElementText;
       end;
     end else if Column = 1 then begin
       if xData.helperType = shtPlannedItem then begin
@@ -406,19 +423,29 @@ begin
             CellText := CLimitValidDesc;
           end;
         end;
+      end else if xData.helperType = shtExtraction then begin
+        if xData.group = shgExtraction then begin
+          if TAccountExtraction(xData.item).extractionState = CExtractionStateOpen then begin
+            CellText := CExtractionStateOpenDescription;
+          end else begin
+            CellText := CExtractionStateCloseDescription;
+          end;
+        end;
       end;
     end;
   end else begin
     if (xData.helperType = shtGroup) and (Column = 0) then begin
-      if xData.group <> shgLimit then begin
+      if xData.group = shgLimit then begin
+        CellText := '(razem ' + IntToStr(xData.count) + ')';
+      end else if xData.group = shgExtraction then begin
+        CellText := '(razem ' + IntToStr(xData.count) + ')';
+      end else begin
         if xData.FidCurrencyDef = '*' then begin
           xSumStr := ', operacje wielowalutowe';
         end else begin
           xSumStr := ', na kwotê ' + CurrencyToString(xData.sum, xData.FidCurrencyDef);
         end;
         CellText := '(razem ' + IntToStr(xData.count) + xSumStr + ')';
-      end else begin
-        CellText := '(razem ' + IntToStr(xData.count) + ')';
       end;
     end;
   end;
@@ -470,6 +497,8 @@ begin
     xKey := 'TT';
   end else if AHelper.helperType = shtDate then begin
     xKey := 'DD';
+  end else if AHelper.helperType = shtExtraction then begin
+    xKey := 'UE';
   end else if AHelper.helperType = shtLimit then begin
     if TMovementLimit(AHelper.item).IsSurpassed(AHelper.sum) then begin
       xKey := 'SL';
@@ -493,10 +522,11 @@ begin
   end;
 end;
 
-procedure TCStartupInfoFrame.RepaymentListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+procedure TCStartupInfoFrame.RepaymentListGetImageIndexEx(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; var ImageList: TCustomImageList);
 var xData: TStartupHelper;
     xBase: TPlannedTreeItem;
 begin
+  ImageList := CImageLists.DoneImageList16x16;
   xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
   if Column = 3 then begin
     if xData.helperType = shtPlannedItem then begin
@@ -539,6 +569,12 @@ begin
         ImageIndex := 4;
       end else begin
         ImageIndex := 2;
+      end;
+    end else if xData.helperType = shtExtraction then begin
+      if TAccountExtraction(xData.item).extractionState = CExtractionStateOpen then begin
+        ImageIndex := 8;
+      end else begin
+        ImageIndex := 9;
       end;
     end;
   end;

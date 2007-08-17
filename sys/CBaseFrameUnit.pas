@@ -593,7 +593,7 @@ var xCount: Integer;
 begin
   for xCount := 0 to GPlugins.Count - 1 do begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
-    if xPlugin.isTypeof[CPLUGINTYPE_SELECTEDITEM] and IsSelectedTypeCompatible(xPlugin.pluginType) then begin
+    if xPlugin.isTypeof[CPLUGINTYPE_SELECTEDITEM] and xPlugin.pluginIsEnabled and IsSelectedTypeCompatible(xPlugin.pluginType) then begin
       xItemPopup := TMenuItem.Create(Self);
       xItemPopup.Caption := xPlugin.pluginMenu;
       xItemPopup.Tag := xCount + 1024;
