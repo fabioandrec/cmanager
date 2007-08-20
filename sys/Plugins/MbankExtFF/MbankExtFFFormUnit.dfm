@@ -292,7 +292,9 @@ object MbankExtFFForm: TMbankExtFFForm
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'
-    Filter = 'Pliki wyci'#261'g'#243'w|*.htm;*.html|Wszystkie pliki|*.*'
+    Filter = 
+      'Pliki wyci'#261'g'#243'w html|*.htm;*.html|Pliki wyci'#261'g'#243'w csv|*.txt;*.csv|' +
+      'Wszystkie pliki|*.*'
     FilterIndex = 0
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 8

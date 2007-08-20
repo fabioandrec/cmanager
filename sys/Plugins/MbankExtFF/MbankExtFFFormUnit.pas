@@ -19,11 +19,11 @@ type
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FExtOutput: String;
-    function PrepareOutput(AInpage: String; var AError: String): Boolean;
+    function PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
+    function PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
   public
     property ExtOutput: String read FExtOutput;
   end;
@@ -37,6 +37,8 @@ uses CTools, DateUtils, CXml, CPluginConsts;
 procedure TMbankExtFFForm.BitBtnOkClick(Sender: TObject);
 var xStr: TStringList;
     xError: String;
+    xExt: String;
+    xRes: Boolean;
 begin
   if Trim(EditName.Text) = '' then begin
     MessageBox(Handle, 'Nie podano nazwy pliku z wyci¹giem', 'B³¹d', MB_OK + MB_ICONERROR);
@@ -44,22 +46,33 @@ begin
   end else if not FileExists(EditName.Text) then begin
     MessageBox(Handle, PChar('Brak pliku o nazwie ' + EditName.Text), 'B³¹d', MB_OK + MB_ICONERROR);
   end else begin
-    xStr := TStringList.Create;
-    try
+    xExt := AnsiLowerCase(ExtractFileExt(EditName.Text));
+    if (xExt = '.txt') or (xExt = '.csv') or (xExt = '.htm') or (xExt = '.html') then begin
+      xStr := TStringList.Create;
       try
-        xStr.LoadFromFile(EditName.Text);
-        if PrepareOutput(xStr.Text, xError) then begin
-          ModalResult := mrOk;
-        end else begin
-          MessageBox(Handle, PChar(xError), 'B³¹d', MB_OK + MB_ICONERROR);
+        try
+          xStr.LoadFromFile(EditName.Text);
+          if (xExt = '.txt') or (xExt = '.csv') then begin
+            xRes := PrepareOutputCsv(xStr.Text, xError);
+          end else begin
+            xRes := PrepareOutputHtml(xStr.Text, xError);
+          end;
+          if xRes then begin
+            ModalResult := mrOk;
+          end else begin
+            MessageBox(Handle, PChar(xError), 'B³¹d', MB_OK + MB_ICONERROR);
+          end;
+        except
+          on E: Exception do begin
+            MessageBox(Handle, PChar('Nie mo¿na wczytaæ pliku ' + EditName.Text), 'B³¹d', MB_OK + MB_ICONERROR);
+          end;
         end;
-      except
-        on E: Exception do begin
-          MessageBox(Handle, PChar('Nie mo¿na wczytaæ pliku ' + EditName.Text), 'B³¹d', MB_OK + MB_ICONERROR);
-        end;
+      finally
+        xStr.Free;
       end;
-    finally
-      xStr.Free;
+    end else begin
+      MessageBox(Handle, PChar('Nieznane rozszerzenie pliku z wyci¹giem. Plik powienien mieæ ' + sLineBreak +
+                         'jedno z nastêpuj¹cych rozszerzeñ *.txt, *.csv, *.htm, *.html'), 'B³¹d', MB_OK + MB_ICONERROR);
     end;
   end;
 end;
@@ -76,28 +89,34 @@ begin
   end;
 end;
 
-function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boolean;
+function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
 
-  function DecodeDate(AStr: String; var AStart, AEnd: TDateTime): Boolean;
+  function DecodeDate(AStr: String; AIsCreditCard: Boolean; var AStart, AEnd: TDateTime): Boolean;
   var xMonth: Integer;
       xYear: Integer;
   begin
     AStart := 0;
     AEnd := 0;
     Result := False;
-    xMonth := GetMonthNumber(Copy(AStr, 1, Length(AStr) - 5));
-    if (xMonth > 0) and (xMonth <= 12) then begin
-      xYear := StrToIntDef(Copy(AStr, Length(AStr) - 3, 4), 0);
-      if xYear > 0 then begin
-        Result := TryEncodeDate(xYear, xMonth, 1, AStart);
-        if Result then begin
-          Result := TryEncodeDate(xYear, xMonth, DaysInMonth(AStart), AEnd);
+    if AIsCreditCard then begin
+      AStart := YmdToDate(Copy(AStr, 1, 10), 0);
+      AEnd := YmdToDate(Copy(AStr, Length(AStr) - 9, 10), 0);
+      Result := (AStart <> 0) and (AEnd <> 0);
+    end else begin
+      xMonth := GetMonthNumber(Copy(AStr, 1, Length(AStr) - 5));
+      if (xMonth > 0) and (xMonth <= 12) then begin
+        xYear := StrToIntDef(Copy(AStr, Length(AStr) - 3, 4), 0);
+        if xYear > 0 then begin
+          Result := TryEncodeDate(xYear, xMonth, 1, AStart);
+          if Result then begin
+            Result := TryEncodeDate(xYear, xMonth, DaysInMonth(AStart), AEnd);
+          end;
         end;
       end;
     end;
   end;
 
-  function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: IHTMLElement; var AError: String): Boolean;
+  function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: IHTMLElement; AIsCreditCard: Boolean; var AError: String): Boolean;
   var xAll: IHTMLElementCollection;
       xCount: Integer;
       xElement: IHTMLElement;
@@ -107,7 +126,9 @@ function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boo
       xCashStr, xTitle: String;
       xRegDate, xAccountingDate: TDateTime;
       xCash: Currency;
+      xCurrStr: String;
       xExtractionNode: IXMLDOMNode;
+      xAppenRow: Boolean;
   begin
     Result := True;
     AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
@@ -117,51 +138,92 @@ function TMbankExtFFForm.PrepareOutput(AInpage: String; var AError: String): Boo
     xDatesStr := TStringList.Create;
     xTitlesStr := TStringList.Create;
     xCashStr := '';
-    while (xCount <= xAll.length - 1) and Result do begin
-      xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
-      if xElement.className = 'data' then begin
-        if xData = 0 then begin
-          xDatesStr.Text := xElement.innerText;
-        end else if xData = 1 then begin
-          xTitlesStr.Text := PolishConversion(splISO, splWindows, xElement.innerText);
-        end else if xData = 2 then begin
-          xCashStr := StringReplace(xElement.innerText, '.', '', [rfReplaceAll, rfIgnoreCase]);
+    xAppenRow := False;
+    if AIsCreditCard then begin
+      if xAll.length > 1 then begin
+        xElement := xAll.item(0, varEmpty) as IHTMLElement;
+        if StrToIntDef(xElement.innerText, -1) >= 1 then begin
+          xAppenRow := True;
+          while (xCount <= xAll.length - 1) and Result do begin
+            xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+            if xCount = 1 then begin
+              xDatesStr.Text := xElement.innerText;
+            end else if xCount = 3 then begin
+              xTitlesStr.Text := PolishConversion(splISO, splWindows, xElement.innerText);
+            end else if xCount = 4 then begin
+              if xTitlesStr.Text <> '' then begin
+                xTitlesStr.Text := xTitlesStr.Text + ' ';
+              end;
+              xTitlesStr.Text := xTitlesStr.Text + PolishConversion(splISO, splWindows, xElement.innerText);
+            end else if xCount = 5 then begin
+              xCashStr := StringReplace(xElement.innerText, '.', '', [rfReplaceAll, rfIgnoreCase]);
+              xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+              xCurrStr := Copy(xCashStr, Length(xCashStr) - 2, 3);
+              Delete(xCashStr, Length(xCashStr) - 2, 3);
+            end;
+            Inc(xCount);
+          end;
         end;
-        Inc(xData);
       end;
-      Inc(xCount);
+    end else begin
+      xCurrStr := 'PLN';
+      xAppenRow := True;
+      while (xCount <= xAll.length - 1) and Result do begin
+        xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+        if xElement.className = 'data' then begin
+          if xData = 0 then begin
+            xDatesStr.Text := xElement.innerText;
+          end else if xData = 1 then begin
+            xTitlesStr.Text := PolishConversion(splISO, splWindows, xElement.innerText);
+          end else if xData = 2 then begin
+            xCashStr := StringReplace(xElement.innerText, '.', '', [rfReplaceAll, rfIgnoreCase]);
+          end;
+          Inc(xData);
+        end;
+        Inc(xCount);
+      end;
     end;
-    if (xDatesStr.Text <> '') and (xTitlesStr.Text <> '') and (xCashStr <> '') then begin
-      if xDatesStr.Count > 0 then begin
-        xRegDate := DmyToDate(xDatesStr.Strings[0], 0);
-      end else begin
-        xRegDate := 0;
-      end;
-      if xDatesStr.Count > 1 then begin
-        xAccountingDate := DmyToDate(xDatesStr.Strings[1], 0);
-      end else begin
-        xAccountingDate := 0;
-      end;
-      if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
-        xCash := StrToCurrencyDecimalDot(xCashStr);
-        xTitle := xTitlesStr.Text;
-        xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
-        ARootNode.appendChild(xExtractionNode);
-        SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));
-        SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyymmdd', xAccountingDate));
-        if xCash > 0 then begin
-          SetXmlAttribute('type', xExtractionNode, CEXTRACTION_INMOVEMENT);
+    if xAppenRow then begin
+      if (xDatesStr.Text <> '') and (xTitlesStr.Text <> '') and (xCashStr <> '') then begin
+        if xDatesStr.Count > 0 then begin
+          if AIsCreditCard then begin
+            xRegDate := YmdToDate(xDatesStr.Strings[0], 0);
+          end else begin
+            xRegDate := DmyToDate(xDatesStr.Strings[0], 0);
+          end;
         end else begin
-          SetXmlAttribute('type', xExtractionNode, CEXTRACTION_OUTMOVEMENT);
+          xRegDate := 0;
         end;
-        SetXmlAttribute('currency', xExtractionNode, 'PLN');
-        SetXmlAttribute('description', xExtractionNode, xTitle);
-        SetXmlAttribute('cash', xExtractionNode, Trim(Format('%-10.4f', [xCash])));
+        if xDatesStr.Count > 1 then begin
+          if AIsCreditCard then begin
+            xAccountingDate := YmdToDate(xDatesStr.Strings[1], 0);
+          end else begin
+            xAccountingDate := DmyToDate(xDatesStr.Strings[1], 0);
+          end;
+        end else begin
+          xAccountingDate := 0;
+        end;
+        if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
+          xCash := StrToCurrencyDecimalDot(xCashStr);
+          xTitle := xTitlesStr.Text;
+          xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
+          ARootNode.appendChild(xExtractionNode);
+          SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));
+          SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyymmdd', xAccountingDate));
+          if xCash > 0 then begin
+            SetXmlAttribute('type', xExtractionNode, CEXTRACTION_INMOVEMENT);
+          end else begin
+            SetXmlAttribute('type', xExtractionNode, CEXTRACTION_OUTMOVEMENT);
+          end;
+          SetXmlAttribute('currency', xExtractionNode, xCurrStr);
+          SetXmlAttribute('description', xExtractionNode, xTitle);
+          SetXmlAttribute('cash', xExtractionNode, Trim(Format('%-10.4f', [xCash])));
+        end else begin
+          Result := False;
+        end;
       end else begin
         Result := False;
       end;
-    end else begin
-      Result := False;
     end;
     xDatesStr.Free;
     xTitlesStr.Free;
@@ -183,9 +245,12 @@ var xDoc: IHTMLDocument2;
     xStartDate, xEndDate: TDateTime;
     xOutXml: IXMLDOMDocument;
     xDocElement: IXMLDOMElement;
+    xIsCreditCard: Boolean;
+    xStr: String;
 begin
   Result := False;
   FExtOutput := '';
+  xIsCreditCard := Pos('RACHUNKU KARTY KREDYTOWEJ', AInpage) > 0;
   try
     xDoc := CoHTMLDocument.Create as IHTMLDocument2;
     try
@@ -206,64 +271,121 @@ begin
         if xBody <> Nil then begin
           xAll := xBody.all as IHTMLElementCollection;
           if xAll <> Nil then begin
-            xCount := 0;
-            xFinished := False;
-            xTabCount := 0;
-            xTabHeader := Nil;
-            xTabBase := Nil;
-            while (xCount <= xAll.length - 1) and (not xFinished) do begin
-              xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
-              if AnsiLowerCase(xElement.tagName) = 'table' then begin
-                Inc(xTabCount);
+            if not xIsCreditCard then begin
+              xCount := 0;
+              xFinished := False;
+              xTabCount := 0;
+              xTabHeader := Nil;
+              xTabBase := Nil;
+              while (xCount <= xAll.length - 1) and (not xFinished) do begin
+                xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+                if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                  Inc(xTabCount);
+                end;
+                if (xTabCount = 3) and (xTabHeader = Nil) then begin
+                  xTabHeader := xElement as IHTMLTable;
+                end;
+                if (xTabCount = 6) and (xTabBase = Nil) then begin
+                  xTabBase := xElement as IHTMLTable;
+                end;
+                Inc(xCount);
+                xFinished := (xTabHeader <> Nil) and (xTabBase <> Nil);
               end;
-              if (xTabCount = 3) and (xTabHeader = Nil) then begin
-                xTabHeader := xElement as IHTMLTable;
-              end;
-              if (xTabCount = 6) and (xTabBase = Nil) then begin
-                xTabBase := xElement as IHTMLTable;
-              end;
-              Inc(xCount);
-              xFinished := (xTabHeader <> Nil) and (xTabBase <> Nil);
-            end;
-            if (xTabHeader <> Nil) and (xTabBase <> Nil) then begin
-              xPeriodStr := AnsiUpperCase((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
-              xPos := Pos('ZA', xPeriodStr);
-              if xPos > 0 then begin
-                xPeriodStr := Copy(xPeriodStr, xPos + 3, MaxInt);
-                if DecodeDate(xPeriodStr, xStartDate, xEndDate) then begin
-                  xOutXml := GetXmlDocument;
-                  xDocElement := xOutXml.createElement('accountExtraction');
-                  xOutXml.appendChild(xDocElement);
-                  SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
-                  SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
-                  SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
-                  SetXmlAttribute('description', xDocElement, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
-                  if xTabBase.rows.length >= 4 then begin
-                    xBaseRow := (xTabHeader.rows.item(3, varEmpty) as IHTMLElement);
-                    xAll := xBaseRow.all as IHTMLElementCollection;
-                    xTabOperations := Nil;
-                    xCount := 0;
-                    while (xCount <= xAll.length - 1) and (xTabOperations = Nil) do begin
-                      xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
-                      if AnsiLowerCase(xElement.tagName) = 'table' then begin
-                        xTabOperations := xElement as IHTMLTable;
-                      end;;
-                      Inc(xCount);
-                    end;
-                    if xTabOperations <> Nil then begin
+              if (xTabHeader <> Nil) and (xTabBase <> Nil) then begin
+                xPeriodStr := AnsiUpperCase((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+                xPos := Pos('ZA', xPeriodStr);
+                if xPos > 0 then begin
+                  xPeriodStr := Copy(xPeriodStr, xPos + 3, MaxInt);
+                  if DecodeDate(xPeriodStr, False, xStartDate, xEndDate) then begin
+                    xOutXml := GetXmlDocument;
+                    xDocElement := xOutXml.createElement('accountExtraction');
+                    xOutXml.appendChild(xDocElement);
+                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
+                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                    SetXmlAttribute('description', xDocElement, PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText));
+                    if xTabBase.rows.length >= 4 then begin
+                      xBaseRow := (xTabHeader.rows.item(3, varEmpty) as IHTMLElement);
+                      xAll := xBaseRow.all as IHTMLElementCollection;
+                      xTabOperations := Nil;
                       xCount := 0;
-                      Result := True;
-                      while (xCount <= xTabOperations.rows.length - 1) and Result do begin
-                        if (xCount > 1) and (xCount < xTabOperations.rows.length - 1) then begin
-                          xElement := xTabOperations.rows.item(xCount, varEmpty) as IHTMLElement;
-                          Result := AppendExtractionItem(xDocElement, xElement, AError);
-                        end;
+                      while (xCount <= xAll.length - 1) and (xTabOperations = Nil) do begin
+                        xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+                        if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                          xTabOperations := xElement as IHTMLTable;
+                        end;;
                         Inc(xCount);
                       end;
+                      if xTabOperations <> Nil then begin
+                        xCount := 0;
+                        Result := True;
+                        while (xCount <= xTabOperations.rows.length - 1) and Result do begin
+                          if (xCount > 1) and (xCount < xTabOperations.rows.length - 1) then begin
+                            xElement := xTabOperations.rows.item(xCount, varEmpty) as IHTMLElement;
+                            Result := AppendExtractionItem(xDocElement, xElement, False, AError);
+                          end;
+                          Inc(xCount);
+                        end;
+                      end;
+                    end;
+                    if Result then begin
+                      FExtOutput := GetStringFromDocument(xOutXml);
                     end;
                   end;
-                  if Result then begin
-                    FExtOutput := GetStringFromDocument(xOutXml);
+                end;
+              end;
+            end else begin
+              xCount := 0;
+              xFinished := False;
+              xTabCount := 0;
+              xTabHeader := Nil;
+              xTabBase := Nil;
+              while (xCount <= xAll.length - 1) and (not xFinished) do begin
+                xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+                if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                  Inc(xTabCount);
+                end;
+                if (xTabCount = 3) and (xTabHeader = Nil) then begin
+                  xTabHeader := xElement as IHTMLTable;
+                end;
+                if (xTabCount = 9) and (xTabBase = Nil) then begin
+                  xTabBase := xElement as IHTMLTable;
+                end;
+                Inc(xCount);
+                xFinished := (xTabHeader <> Nil) and (xTabBase <> Nil);
+              end;
+              if (xTabHeader <> Nil) and (xTabBase <> Nil) then begin
+                xPeriodStr := AnsiUpperCase((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+                xPos := Pos('ZA OKRES OD', xPeriodStr);
+                if xPos > 0 then begin
+                  xPeriodStr := Copy(xPeriodStr, xPos + 12, MaxInt);
+                  if DecodeDate(xPeriodStr, True, xStartDate, xEndDate) then begin
+                    xOutXml := GetXmlDocument;
+                    xDocElement := xOutXml.createElement('accountExtraction');
+                    xOutXml.appendChild(xDocElement);
+                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
+                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                    xStr := PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+                    SetXmlAttribute('description', xDocElement, TrimStr(xStr, sLineBreak));
+                    if xTabBase.rows <> Nil then begin
+                      if xTabBase.rows.length >= 0 then begin
+                        xCount := 0;
+                        Result := True;
+                        while (xCount <= xTabBase.rows.length - 1) and Result do begin
+                          if (xCount >= 1) and (xCount < xTabBase.rows.length - 1) then begin
+                            xElement := xTabBase.rows.item(xCount, varEmpty) as IHTMLElement;
+                            if AnsiLowerCase(xElement.className) <> 'head' then begin
+                              Result := AppendExtractionItem(xDocElement, xElement, True, AError);
+                            end;
+                          end;
+                          Inc(xCount);
+                        end;
+                      end;
+                    end;
+                    if Result then begin
+                      FExtOutput := GetStringFromDocument(xOutXml);
+                    end;
                   end;
                 end;
               end;
@@ -286,6 +408,12 @@ begin
   if Key = VK_ESCAPE then begin
     ModalResult := mrCancel;
   end;
+end;
+
+function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
+begin
+  Result := False;
+  AError := 'Format nie obs³ugiwany'
 end;
 
 end.

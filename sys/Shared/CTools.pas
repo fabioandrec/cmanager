@@ -88,6 +88,7 @@ function IsEven(AInt: Integer): Boolean; overload;
 function DataGidToDatabase(ADataGid: String): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function CurrencyToDatabase(ACurrency: Currency): String;
+function TrimStr(AStr: String; AUnwanted: String): String;
 
 function GetMonthNumber(AMonthName: String): Integer;
 
@@ -610,6 +611,19 @@ begin
     end else begin
       Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '#';
     end;
+  end;
+end;
+
+function TrimStr(AStr: String; AUnwanted: String): String;
+var xLenUnwanted: Integer;
+begin
+  Result := AStr;
+  xLenUnwanted := Length(AUnwanted);
+  while Copy(Result, 1, xLenUnwanted) = AUnwanted do begin
+    Delete(Result, 1, xLenUnwanted);
+  end;
+  while Copy(Result, Length(Result) - xLenUnwanted + 1, xLenUnwanted) = AUnwanted do begin
+    Delete(Result, Length(Result) - xLenUnwanted + 1, xLenUnwanted);
   end;
 end;
 
