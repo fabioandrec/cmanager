@@ -34,6 +34,7 @@ type
   TCPlugin_Execute = function: OleVariant; stdcall;
   TCPlugin_Initialize = function (ACManagerInterface: ICManagerInterface): Boolean; stdcall;
   TCPlugin_Finalize = procedure; stdcall;
+  TCPlugin_About = procedure; stdcall;
 
 implementation
 

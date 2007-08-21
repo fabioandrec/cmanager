@@ -49,6 +49,7 @@ type
     FPlugin_Execute: TCPlugin_Execute;
     FPlugin_Initialize: TCPlugin_Initialize;
     FPlugin_Finalize: TCPlugin_Finalize;
+    FPlugin_About: TCPlugin_About;
     FpluginType: Integer;
     FpluginDescription: String;
     FpluginConfiguration: String;
@@ -57,10 +58,12 @@ type
     FpluginIsEnabled: Boolean;
     function GetisConfigurable: Boolean;
     function GetisTypeOf(AType: Integer): Boolean;
+    function GethasAbout: Boolean;
   public
     constructor Create(AFilename: String);
     function LoadAndInitialize: Boolean;
     procedure FinalizeAndUnload;
+    procedure About;
     destructor Destroy; override;
     function Configure: Boolean;
     function Execute: OleVariant;
@@ -74,6 +77,7 @@ type
     property pluginConfiguration: String read FpluginConfiguration write FpluginConfiguration;
     property pluginIsEnabled: Boolean read FpluginIsEnabled write FpluginIsEnabled;
     property isConfigurable: Boolean read GetisConfigurable;
+    property hasAbout: Boolean read GethasAbout;
   end;
 
   TCPluginList = class(TObjectList)
@@ -117,6 +121,19 @@ begin
   Result := GetXmlDocument;
   xRoot := Result.createElement('plugin');
   Result.appendChild(xRoot);
+end;
+
+procedure TCPlugin.About;
+begin
+  if FHandle <> 0 then begin
+    if @FPlugin_About <> Nil then begin
+      SaveToLog('Wyœwietlanie About pluginu ' + FShortName, GPluginlogfile);
+      try
+        FPlugin_About;
+      except
+      end;
+    end;
+  end;
 end;
 
 function TCPlugin.Configure: Boolean;
@@ -190,6 +207,11 @@ begin
   end else begin
     Result := '';
   end;
+end;
+
+function TCPlugin.GethasAbout: Boolean;
+begin
+  Result := (@FPlugin_About <> Nil);
 end;
 
 function TCPlugin.GetisConfigurable: Boolean;

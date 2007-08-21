@@ -2,18 +2,18 @@ inherited CPreferencesForm: TCPreferencesForm
   Left = 313
   Top = 226
   Caption = 'Preferencje'
-  ClientHeight = 485
+  ClientHeight = 486
   ClientWidth = 602
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 602
-    Height = 444
+    Height = 445
     object PanelMain: TPanel
       Left = 0
       Top = 0
       Width = 602
-      Height = 444
+      Height = 445
       Align = alClient
       BevelOuter = bvNone
       Caption = 'PanelMain'
@@ -22,7 +22,7 @@ inherited CPreferencesForm: TCPreferencesForm
         Left = 129
         Top = 0
         Width = 473
-        Height = 444
+        Height = 445
         Align = alClient
         BevelOuter = bvLowered
         TabOrder = 0
@@ -47,7 +47,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Left = 1
           Top = 22
           Width = 471
-          Height = 421
+          Height = 422
           ActivePage = TabSheetPlugins
           Align = alClient
           Style = tsFlatButtons
@@ -542,15 +542,18 @@ inherited CPreferencesForm: TCPreferencesForm
               Action = Action9
               Color = clBtnFace
             end
-            object Label7: TLabel
-              Left = 8
-              Top = 376
-              Width = 254
-              Height = 26
-              Caption = 
-                '(*) Zmiany aktywno'#347'ci wtyczek zostan'#261' wprowadzone'#13#10'    dopiero p' +
-                'o ponownym uruchomieniu CManager-a'
-              Visible = False
+            object CButton11: TCButton
+              Left = 0
+              Top = 380
+              Width = 161
+              Height = 25
+              Cursor = crHandPoint
+              PicPosition = ppLeft
+              PicOffset = 10
+              TxtOffset = 15
+              Framed = False
+              Action = Action10
+              Color = clBtnFace
             end
             object Panel3: TPanel
               Left = 8
@@ -623,7 +626,7 @@ inherited CPreferencesForm: TCPreferencesForm
         Left = 0
         Top = 0
         Width = 129
-        Height = 444
+        Height = 445
         Align = alLeft
         BevelOuter = bvLowered
         Color = clWindow
@@ -696,7 +699,7 @@ inherited CPreferencesForm: TCPreferencesForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 444
+    Top = 445
     Width = 602
     inherited BitBtnOk: TBitBtn
       Left = 425
@@ -1264,6 +1267,35 @@ inherited CPreferencesForm: TCPreferencesForm
           BF7E3F6DAA546625B69C6C66140C267F708A172853599254A9A769DB7F357B83
           82737CE3490000000049454E44AE426082}
         Name = 'PngImage4'
+      end
+      item
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+          6100000006624B4744000000000000F943BB7F000000097048597300000B1300
+          000B1301009A9C18000002B44944415478DA7D53494C5351143DEFF79796F653
+          8AA5D0A240881094C932B8348118773571E1861D2C4C4C1C481C161AE3408803
+          6022261A8D22DDE19E1AA32E5C187161808A0295188310DB022DB4B674F8A3EF
+          7F0258416FF236F7BE7BCEB913C13F6CF0CE8C030AF6290AA0288AFFC4E59AD0
+          4EFFC8DF8E67BDFE0E42D0C5E8888BB330200C412C2242E0659F2C290327AFD6
+          7A7604F0F4FB3959C6306761DD352D56ECA9E0C0F322583D0386300887929878
+          1FC17220E3A58ADA4FDDA84F640150E691A2DD0677F3A12288A200B3458F029B
+          498BF119913E19A93509E3A3017C9B4C794F77D71FDD0450659B38DDD0C1563B
+          F52870949A6032E7602D2E523019967CBD564A3894A63E011FDE84B01C4C779E
+          ED69F06800437DFE89CA3A8BCBEECC05A3935155B70BE994841FB3714D412E07
+          94EDB5221AC9203097C4E2CF38A63EC67C677A1A1A89DA6D5A67707F9315AC8E
+          D6CB129457712A03125101922CA2BCDA0C7B711EA6C656E01F8F429D4C6431A5
+          9238C9E0ED9956A389795B5A99B76D448A22A2B6A500B6220E619AF0EE451092
+          B81E8BAD64F02B2AB491A7B7D6016CC5C66D00D54D665454D9A89A14465F8720
+          F2CA666C35AC02F06DE4C9CD69079BC3040B6C3959C932FD7BE4B80346A3012F
+          9FCF431494AC78682149A7223AB5263EEE999EB097185C0C93BD5735CD569A08
+          CC4E46B3FC92A8D006277CE77A0F346A198FBAA73A38AB6EA8D061DA5240B7AA
+          B2DEA42998198BE14FFEC05C022B4B7CE7857E976793F2E1F52F238E32BDDB6A
+          33AFB3D06E1D3E560642F77AF45508998CA4F99717E398FF9AF65EBCDBB8B548
+          AA3DB8F699A3E3192E74EADD25E566B0AC1E9C95858E8E3616E121080216BEC7
+          119CCB78E9F7760A90BDCA1B76FFCA6407C3285DF9858CCB60A493A1DA93C914
+          5697249F24900155F67FAF71C3EE5DFAE4A06DA0E7ACDE33FCE7FB5C3B9EF36F
+          B6322E251644F2710000000049454E44AE426082}
+        Name = 'PngImage5'
       end>
     Left = 46
     Top = 340
@@ -1298,6 +1330,11 @@ inherited CPreferencesForm: TCPreferencesForm
       Caption = 'Konfiguruj wtyczk'#281
       ImageIndex = 4
       OnExecute = Action9Execute
+    end
+    object Action10: TAction
+      Caption = 'Informacje o wtyczce'
+      ImageIndex = 5
+      OnExecute = Action10Execute
     end
   end
   object ActionManager: TActionManager

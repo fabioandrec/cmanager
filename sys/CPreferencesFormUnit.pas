@@ -94,7 +94,8 @@ type
     CButton10: TCButton;
     Action9: TAction;
     CheckBoxExtractions: TCheckBox;
-    Label7: TLabel;
+    CButton11: TCButton;
+    Action10: TAction;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -115,12 +116,14 @@ type
     procedure Action9Execute(Sender: TObject);
     procedure ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure Action10Execute(Sender: TObject);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
     FViewPrefs: TPrefList;
     FBasePrefs: TBasePref;
     FPluginPrefs: TPrefList;
+    FRestartInfo: String;
     procedure SetActiveAction(const Value: TAction);
     procedure ActionExecute(Sender: TObject);
     procedure UpdateFilenameState;
@@ -154,6 +157,7 @@ begin
   FViewPrefs.Clone(GViewsPreferences);
   FBasePrefs.Clone(GBasePreferences);
   FPluginPrefs.Clone(GPluginsPreferences);
+  FRestartInfo := '';
   Result := ShowConfig(coEdit);
   if Result then begin
     GViewsPreferences.Clone(FViewPrefs);
@@ -458,6 +462,9 @@ begin
     ShowInfo(itError, 'Nazwa kopii nie mo¿e byæ pusta', '');
     EditBackupName.SetFocus;
   end;
+  if Result and (FRestartInfo <> '') then begin
+    ShowInfo(itInfo, FRestartInfo, '');
+  end;
 end;
 
 procedure TCPreferencesForm.ComboBoxBackupActionChange(Sender: TObject);
@@ -501,12 +508,16 @@ end;
 
 procedure TCPreferencesForm.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 var xConfigurable: Boolean;
+    xHasAbout: Boolean;
 begin
   xConfigurable := False;
+  xHasAbout := False;
   if Node <> Nil then begin
     xConfigurable := TCPlugin(List.GetTreeElement(Node).Data).isConfigurable;
+    xHasAbout := TCPlugin(List.GetTreeElement(Node).Data).hasAbout;
   end;
   Action9.Enabled := xConfigurable;
+  Action10.Enabled := xHasAbout;
 end;
 
 procedure TCPreferencesForm.Action9Execute(Sender: TObject);
@@ -537,7 +548,14 @@ end;
 
 procedure TCPreferencesForm.ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
 begin
-  Label7.Visible := True;
+  if FRestartInfo = '' then begin
+    FRestartInfo := 'Zmiany aktywnoœci wtyczek zostan¹ wprowadzone dopiero po ponownym uruchomieniu CManager-a';
+  end;
+end;
+
+procedure TCPreferencesForm.Action10Execute(Sender: TObject);
+begin
+  TCPlugin(List.SelectedElement.Data).About;
 end;
 
 end.
