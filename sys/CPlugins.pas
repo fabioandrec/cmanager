@@ -231,6 +231,7 @@ begin
   SaveToLog('£adowanie i inicjowanie plugin-u ' + FShortName, GPluginlogfile);
   if Result then begin
     @FPlugin_Configure := GetProcAddress(FHandle, 'Plugin_Configure');
+    @FPlugin_About := GetProcAddress(FHandle, 'Plugin_About');
     @FPlugin_Execute := GetProcAddress(FHandle, 'Plugin_Execute');
     @FPlugin_Initialize := GetProcAddress(FHandle, 'Plugin_Initialize');
     @FPlugin_Finalize := GetProcAddress(FHandle, 'Plugin_Finalize');
