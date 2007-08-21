@@ -289,6 +289,7 @@ object MbankExtFFForm: TMbankExtFFForm
     BevelKind = bkTile
     BorderStyle = bsNone
     TabOrder = 1
+    Text = 'D:\VISA CLASSIC  nr 48.csv'
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

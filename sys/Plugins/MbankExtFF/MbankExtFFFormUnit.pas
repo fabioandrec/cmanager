@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, MsXml;
+  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, MsXml, Types;
 
 type
   TMbankExtFFForm = class(TForm)
@@ -24,6 +24,8 @@ type
     FExtOutput: String;
     function PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
     function PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
+    function DecodeDate(AStr: String; AIsCreditCard: Boolean; var AStart,
+      AEnd: TDateTime): Boolean;
   public
     property ExtOutput: String read FExtOutput;
   end;
@@ -89,32 +91,32 @@ begin
   end;
 end;
 
-function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
-
-  function DecodeDate(AStr: String; AIsCreditCard: Boolean; var AStart, AEnd: TDateTime): Boolean;
-  var xMonth: Integer;
-      xYear: Integer;
-  begin
-    AStart := 0;
-    AEnd := 0;
-    Result := False;
-    if AIsCreditCard then begin
-      AStart := YmdToDate(Copy(AStr, 1, 10), 0);
-      AEnd := YmdToDate(Copy(AStr, Length(AStr) - 9, 10), 0);
-      Result := (AStart <> 0) and (AEnd <> 0);
-    end else begin
-      xMonth := GetMonthNumber(Copy(AStr, 1, Length(AStr) - 5));
-      if (xMonth > 0) and (xMonth <= 12) then begin
-        xYear := StrToIntDef(Copy(AStr, Length(AStr) - 3, 4), 0);
-        if xYear > 0 then begin
-          Result := TryEncodeDate(xYear, xMonth, 1, AStart);
-          if Result then begin
-            Result := TryEncodeDate(xYear, xMonth, DaysInMonth(AStart), AEnd);
-          end;
+function TMbankExtFFForm.DecodeDate(AStr: String; AIsCreditCard: Boolean; var AStart, AEnd: TDateTime): Boolean;
+var xMonth: Integer;
+    xYear: Integer;
+begin
+  AStart := 0;
+  AEnd := 0;
+  Result := False;
+  if AIsCreditCard then begin
+    AStart := YmdToDate(Copy(AStr, 1, 10), 0);
+    AEnd := YmdToDate(Copy(AStr, Length(AStr) - 9, 10), 0);
+    Result := (AStart <> 0) and (AEnd <> 0);
+  end else begin
+    xMonth := GetMonthNumber(Copy(AStr, 1, Length(AStr) - 5));
+    if (xMonth > 0) and (xMonth <= 12) then begin
+      xYear := StrToIntDef(Copy(AStr, Length(AStr) - 3, 4), 0);
+      if xYear > 0 then begin
+        Result := TryEncodeDate(xYear, xMonth, 1, AStart);
+        if Result then begin
+          Result := TryEncodeDate(xYear, xMonth, DaysInMonth(AStart), AEnd);
         end;
       end;
     end;
   end;
+end;
+
+function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
 
   function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: IHTMLElement; AIsCreditCard: Boolean; var AError: String): Boolean;
   var xAll: IHTMLElementCollection;
@@ -411,9 +413,97 @@ begin
 end;
 
 function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
+
+  function SplitToArray(AString: String): TStringDynArray;
+  var xStr: String;
+      xPos: Integer;
+      xPart: String;
+  begin
+    xStr := AString;
+    SetLength(Result, 0);
+    repeat
+      xPos := Pos(';', xStr);
+      if xPos > 0 then begin
+        xPart := Trim(Copy(xStr, 1, xPos - 1));
+        Delete(xStr, 1, xPos);
+      end else begin
+        xPart := Trim(xStr);
+      end;
+      if xPart <> '' then begin
+        SetLength(Result, Length(Result) + 1);
+        Result[High(Result)] := xPart;
+      end;
+    until xStr = '';
+  end;
+
+var xIsCreditCard: Boolean;
+    xLines: TStringList;
+    xStartDate, xEndDate: TDateTime;
+    xCount: Integer;
+    xSplit: TStringDynArray;
+    xTitle: String;
+    xOutXml: IXMLDOMDocument;
+    xDocElement: IXMLDOMNode;
+    xPeriodStr: String;
 begin
   Result := False;
-  AError := 'Format nie obs³ugiwany'
+  FExtOutput := '';
+  xLines := TStringList.Create;
+  xOutXml := GetXmlDocument;
+  xDocElement := xOutXml.createElement('accountExtraction');
+  xOutXml.appendChild(xDocElement);
+  try
+    xLines.Text := AInpage;
+    xIsCreditCard := Pos('Z RACHUNKU KARTY KREDYTOWEJ', AInpage) > 0;
+    if xIsCreditCard then begin
+      xCount := 0;
+      xTitle := '';
+      while (xCount <= xLines.Count - 1) do begin
+        xSplit := SplitToArray(xLines.Strings[xCount]);
+        if Length(xSplit) > 0 then begin
+          if xSplit[Low(xSplit)] = 'WYCI¥G NR' then begin
+            xTitle := xSplit[Low(xSplit)] + ' ' + xSplit[High(xSplit)];
+            Inc(xCount);
+            if xCount <= xLines.Count then begin
+              xSplit := SplitToArray(xLines.Strings[xCount]);
+              if Length(xSplit) > 0 then begin
+                xTitle := xTitle + ' ' + xSplit[Low(xSplit)];
+              end;
+            end;
+            Inc(xCount);
+            if xCount <= xLines.Count then begin
+              xSplit := SplitToArray(xLines.Strings[xCount]);
+              if Length(xSplit) > 0 then begin
+                xTitle := xTitle + ' ' + xSplit[Low(xSplit)];
+              end;
+            end;
+            Inc(xCount);
+            if xCount <= xLines.Count then begin
+              xSplit := SplitToArray(xLines.Strings[xCount]);
+              if Length(xSplit) > 0 then begin
+                xTitle := xTitle + sLineBreak + xSplit[Low(xSplit)];
+                xPeriodStr := Trim(Copy(xSplit[Low(xSplit)], 13, MaxInt));
+                DecodeDate(xPeriodStr, True, xStartDate, xEndDate);
+              end;
+            end;
+          end;
+        end;
+        Inc(xCount);
+      end;
+    end else begin
+      AError := 'Format nie obs³ugiwany';
+    end;
+    if Result then begin
+      SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+      SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
+      SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+      SetXmlAttribute('description', xDocElement, xTitle);
+      FExtOutput := GetStringFromDocument(xOutXml);
+    end;
+  finally
+    xLines.Free;
+    xOutXml := Nil;
+  end;
 end;
 
 end.
