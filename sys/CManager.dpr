@@ -117,7 +117,8 @@ uses
   CExtractionItemFrameUnit in 'CExtractionItemFrameUnit.pas' {CExtractionItemFrame: TFrame},
   CAdotools in 'Shared\CAdotools.pas',
   CUnitDefFrameUnit in 'CUnitDefFrameUnit.pas' {CUnitDefFrame: TFrame},
-  CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm};
+  CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm},
+  CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm};
 
 {$R *.res}
 
@@ -162,7 +163,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

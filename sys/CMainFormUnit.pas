@@ -67,6 +67,7 @@ type
     ActionShortcutExtractions: TAction;
     ActionImportExtraction: TAction;
     ActionCss: TAction;
+    ActionImport: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -100,6 +101,7 @@ type
     procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ActionImportExtractionExecute(Sender: TObject);
     procedure ActionCssExecute(Sender: TObject);
+    procedure ActionImportExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -148,7 +150,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
      CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts, CDataobjectFrameUnit,
-  CExtractionsFrameUnit;
+  CExtractionsFrameUnit, CImportDatafileFormUnit;
 
 {$R *.dfm}
 
@@ -768,6 +770,11 @@ begin
   end;
 end;
 
+
+procedure TCMainForm.ActionImportExecute(Sender: TObject);
+begin
+  ShowProgressForm(TCImportDatafileForm);
+end;
 
 end.
 

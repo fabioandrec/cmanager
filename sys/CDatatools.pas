@@ -8,6 +8,7 @@ uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBa
      DateUtils, MsXml, AdoDb, VirtualTrees;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
+function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
@@ -182,6 +183,42 @@ begin
   xResStream.Free;
 end;
 
+function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
+var xError, xDesc: String;
+    xStr: TStringList;
+begin
+  Result := InitializeDataProvider(ATargetFile, xError, xDesc, False);
+  if Result then begin
+    xStr := TStringList.Create;
+    try
+      try
+        xStr.LoadFromFile(AFilename);
+        GDataProvider.BeginTransaction;
+        Result := GDataProvider.ExecuteSql(xStr.Text, False);
+        if not Result then begin
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + GDataProvider.LastError);
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + GDataProvider.LastStatement + '"');
+          AError := GDataProvider.LastError;
+          GDataProvider.RollbackTransaction;
+        end else begin
+          GDataProvider.CommitTransaction;
+        end;
+      except
+        on E: Exception do begin
+          Result := False;
+          AError := E.Message;
+        end;
+      end;
+    finally
+      xStr.Free;
+      GDataProvider.DisconnectFromDatabase;
+    end;
+  end else begin
+    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
+    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
+  end;
+end;
+
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xError, xDesc: String;
     xStr: TStringList;
@@ -198,9 +235,14 @@ begin
         xMax := High(CDatafileTables);
         while (xCount <= xMax) and Result do begin
           AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Eksportowanie tabeli ' + CDatafileTables[xCount]);
-          Result := GDataProvider.ExportTable(CDatafileTables[xCount], xStr);
+          if CDatafileDeletes[xCount] <> '' then begin
+            xStr.Add('delete from ' + CDatafileDeletes[xCount] + ';');
+          end;
+          Result := GDataProvider.ExportTable(CDatafileTables[xCount], CDatafileTablesExportConditions[xCount], xStr);
           if not Result then begin
             AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + GDataProvider.LastError);
+            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + GDataProvider.LastStatement + '"');
+            AError := GDataProvider.LastError;
           end;
           Inc(xCount);
           AProgressEvent(Trunc(100 * xCount/(xMax - xMin)));

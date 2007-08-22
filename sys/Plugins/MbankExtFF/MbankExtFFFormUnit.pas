@@ -414,6 +414,48 @@ end;
 
 function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
 
+  function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: TStringDynArray; AIsCreditCard: Boolean; var AError: String): Boolean;
+  var xTitle, xCurrStr, xCashStr: String;
+      xRegDate, xAccountingDate: TDateTime;
+      xCash: Currency;
+      xExtractionNode: IXMLDOMNode;
+  begin
+    Result := True;
+    AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
+    if AIsCreditCard then begin
+      xRegDate := YmdToDate(ARow[Low(ARow) + 1], 0);
+      xAccountingDate := YmdToDate(ARow[Low(ARow) + 2], 0);
+      xTitle := Trim(ARow[Low(ARow) + 3]) + sLineBreak + Trim(ARow[Low(ARow) + 4]);
+      xCashStr := StringReplace(Trim(ARow[Low(ARow) + 5]), '.', '', [rfReplaceAll, rfIgnoreCase]);
+      xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+      xCash := StrToCurrencyDecimalDot(xCashStr);
+      xCurrStr := Trim(ARow[Low(ARow) + 6])
+    end else begin
+      Result := False;
+      xCash := 0;
+      xAccountingDate := 0;
+      xTitle := '';
+      xRegDate := 0;
+    end;
+    if Result then begin
+      xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
+      ARootNode.appendChild(xExtractionNode);
+      SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));
+      SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyymmdd', xAccountingDate));
+      if xCash > 0 then begin
+        SetXmlAttribute('type', xExtractionNode, CEXTRACTION_INMOVEMENT);
+      end else begin
+        SetXmlAttribute('type', xExtractionNode, CEXTRACTION_OUTMOVEMENT);
+      end;
+      SetXmlAttribute('currency', xExtractionNode, xCurrStr);
+      SetXmlAttribute('description', xExtractionNode, xTitle);
+      SetXmlAttribute('cash', xExtractionNode, Trim(Format('%-10.4f', [xCash])));
+    end;
+    if Result then begin
+      AError := '';
+    end;
+  end;
+
   function SplitToArray(AString: String): TStringDynArray;
   var xStr: String;
       xPos: Integer;
@@ -426,12 +468,14 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
       if xPos > 0 then begin
         xPart := Trim(Copy(xStr, 1, xPos - 1));
         Delete(xStr, 1, xPos);
-      end else begin
-        xPart := Trim(xStr);
-      end;
-      if xPart <> '' then begin
         SetLength(Result, Length(Result) + 1);
         Result[High(Result)] := xPart;
+      end else begin
+        xPart := Trim(xStr);
+        if (xPart <> '') then begin
+          SetLength(Result, Length(Result) + 1);
+          Result[High(Result)] := xPart;
+        end;
       end;
     until xStr = '';
   end;
@@ -445,6 +489,8 @@ var xIsCreditCard: Boolean;
     xOutXml: IXMLDOMDocument;
     xDocElement: IXMLDOMNode;
     xPeriodStr: String;
+    xOperationsBlock: Boolean;
+    xValid: Boolean;
 begin
   Result := False;
   FExtOutput := '';
@@ -458,7 +504,9 @@ begin
     if xIsCreditCard then begin
       xCount := 0;
       xTitle := '';
-      while (xCount <= xLines.Count - 1) do begin
+      xOperationsBlock := False;
+      xValid := True;
+      while (xCount <= xLines.Count - 1) and xValid do begin
         xSplit := SplitToArray(xLines.Strings[xCount]);
         if Length(xSplit) > 0 then begin
           if xSplit[Low(xSplit)] = 'WYCI¥G NR' then begin
@@ -487,9 +535,24 @@ begin
               end;
             end;
           end;
+          if xOperationsBlock then begin
+            if Length(xSplit) = 8 then begin
+              if StrToIntDef(Trim(xSplit[Low(xSplit)]), -1) > 0 then begin
+                xValid := AppendExtractionItem(xDocElement, xSplit, True, AError);
+              end else begin
+                xOperationsBlock := False;
+              end;
+            end else begin
+              xOperationsBlock := False;
+            end;
+          end;
+          if AnsiUpperCase(xSplit[Low(xSplit)]) = '#NR OPER.' then begin
+            xOperationsBlock := True;
+          end;
         end;
         Inc(xCount);
       end;
+      Result := xValid and (xStartDate <> 0) and (xEndDate <> 0);
     end else begin
       AError := 'Format nie obs³ugiwany';
     end;

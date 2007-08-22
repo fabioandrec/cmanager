@@ -310,6 +310,9 @@ object CMainForm: TCMainForm
                     Caption = '&Eksportuj plik danych'
                   end
                   item
+                    Action = ActionImport
+                  end
+                  item
                     Action = ActionBackup
                     Caption = '&Wykonaj kopi'#281' pliku danych'
                   end
@@ -670,6 +673,11 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Arkusz styli raport'#243'w'
       OnExecute = ActionCssExecute
+    end
+    object ActionImport: TAction
+      Category = 'Plik'
+      Caption = 'Importuj plik danych'
+      OnExecute = ActionImportExecute
     end
   end
   object OpenDialog: TOpenDialog

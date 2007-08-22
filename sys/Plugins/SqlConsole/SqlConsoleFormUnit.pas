@@ -32,13 +32,11 @@ type
     procedure RichEditCommandKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
-    procedure Panel1ConstrainedResize(Sender: TObject; var MinWidth,
-      MinHeight, MaxWidth, MaxHeight: Integer);
+    procedure Panel1ConstrainedResize(Sender: TObject; var MinWidth, MinHeight, MaxWidth, MaxHeight: Integer);
     procedure ActionPrintExecute(Sender: TObject);
     procedure ActionSaveExecute(Sender: TObject);
     procedure ActionOpenExecute(Sender: TObject);
-    procedure FormCanResize(Sender: TObject; var NewWidth,
-      NewHeight: Integer; var Resize: Boolean);
+    procedure FormCanResize(Sender: TObject; var NewWidth, NewHeight: Integer; var Resize: Boolean);
   private
     FConnection: _Connection;
     FRecordset: _Recordset;

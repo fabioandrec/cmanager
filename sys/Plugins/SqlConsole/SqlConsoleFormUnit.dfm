@@ -49,6 +49,7 @@ object SqlConsoleForm: TSqlConsoleForm
       ParentFont = False
       ScrollBars = ssBoth
       TabOrder = 0
+      WordWrap = False
       OnKeyDown = RichEditCommandKeyDown
     end
     object Panel4: TPanel

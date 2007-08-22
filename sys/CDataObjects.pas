@@ -727,7 +727,21 @@ const CDatafileTables: array[0..20] of string =
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
              'accountCurrencyRule');
 
+const CDatafileTablesExportConditions: array[0..20] of string =
+            ('', '', '', '', '',
+             '', '', '',
+             '', '', '', '',
+             '', '', '', '',
+             '', '', 'isBase <> True', '',
+             '');
 
+const CDatafileDeletes: array[0..20] of string =
+            ('', '', '', '', '',
+             '', '', '',
+             '', '', '', '',
+             '', '', '', 'cmanagerInfo',
+             'cmanagerParams', '', '', '',
+             '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 

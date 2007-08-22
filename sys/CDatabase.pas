@@ -23,12 +23,13 @@ type
   TDataProvider = class(TObject)
   private
     FLastError: String;
+    FLastStatemenet: String;
     FConnection: TADOConnection;
     FDataProxyList: TObjectList;
     function GetInTransaction: Boolean;
     function GetIsConnected: Boolean;
   public
-    function ExportTable(ATableName: String; AStrings: TStringList): Boolean;
+    function ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
     procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
@@ -52,6 +53,7 @@ type
     property InTransaction: Boolean read GetInTransaction;
     property IsConnected: Boolean read GetIsConnected;
     property LastError: String read FLastError;
+    property LastStatement: String read FLastStatemenet;
     property Connection: TADOConnection read FConnection;
   end;
 
@@ -605,6 +607,7 @@ begin
   FDataProxyList := TObjectList.Create(True);
   FConnection := TADOConnection.Create(Nil);
   FLastError := '';
+  FLastStatemenet := '';
 end;
 
 destructor TDataProvider.Destroy;
@@ -642,6 +645,7 @@ begin
     if Trim(xSql) <> '' then begin
       try
         SaveToLog('Wykonywanie "' + xSql + '"', GSqllogfile);
+        FLastStatemenet := StringReplace(xSql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
         FConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
       except
         on E: Exception do begin
@@ -703,6 +707,7 @@ begin
   try
     Result.Connection := FConnection;
     Result.SQL.Text := ASql;
+    FLastStatemenet := StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);;    
     Result.Prepared := True;
     Result.Open
   except
@@ -753,7 +758,7 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.ExportTable(ATableName: String; AStrings: TStringList): Boolean;
+function TDataProvider.ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
 var xDataset: TADOQuery;
     xStrSchema, xStr: String;
     xCount: Integer;
@@ -761,7 +766,7 @@ var xDataset: TADOQuery;
     xVal: String;
 begin
   Result := False;
-  xDataset := OpenSql('select * from ' + ATableName, False);
+  xDataset := OpenSql('select * from ' + ATableName + IfThen(ACondition <> '', ' where ' + ACondition, ''), False);
   if xDataset <> Nil then begin
     Result := True;
     xStrSchema := 'insert into ' + ATableName + ' (';
