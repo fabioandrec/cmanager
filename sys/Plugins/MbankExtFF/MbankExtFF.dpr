@@ -45,8 +45,8 @@ end;
 procedure Plugin_About; stdcall; export;
 var xInfo: String;
 begin
-  xInfo := 'MbankExtFF - wtyczka pozalaj¹ca wczytywaæ wyci¹gi z mBanku' + sLineBreak +
-           'Dostêpne formaty wyci¹gów to csv i html z rachunków i kart kredytowych';
+  xInfo := 'MbankExtFF - wtyczka pozwalaj¹ca wczytywaæ wyci¹gi z mBanku' + sLineBreak +
+           'Dostêpne formaty wyci¹gów to csv i html, z rachunków oraz kart kredytowych';
   CManInterface.ShowDialogBox(xInfo, CDIALOGBOX_INFO);
 end;
 
