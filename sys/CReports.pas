@@ -4,7 +4,7 @@ interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
-     CComponents, CChartReportFormUnit, CTemplates;
+     CComponents, CChartReportFormUnit, CTemplates, ShDocVW;
 
 type
   TSumForDayItem = class(TObject)
@@ -497,7 +497,6 @@ type
   end;
 
   TSimpleReportDialog = class(TCBaseReport)
-  private
   protected
     function GetFormClass: TCReportFormClass; override;
     procedure PrepareReportData; override;
@@ -505,6 +504,15 @@ type
     function GetFormTitle: String; override;
     function GetReportFooter: String; override;
     function GetReportTitle: String; override;
+  end;
+
+  TPrivateReport = class(TCHtmlReport)
+  private
+    FErrorText: String;
+  protected
+    procedure PrepareReportData; override;
+    function PrepareReportConditions: Boolean; override;
+    function CanShowReport: Boolean; override;
   end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
@@ -520,7 +528,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
-     CChoosePeriodFilterGroupFormUnit;
+     CChoosePeriodFilterGroupFormUnit, CAdotools;
 
 function GetDescription(AGroupType: String; ADate: TDateTime): String;
 begin
@@ -4049,6 +4057,64 @@ end;
 function TCBaseReport._Release: Integer;
 begin
   Result := 0;
+end;
+
+function TPrivateReport.CanShowReport: Boolean;
+begin
+  Result := FErrorText = '';
+  if not Result then begin
+    ShowInfo(itError, FErrorText, '');
+  end;
+end;
+
+function TPrivateReport.PrepareReportConditions: Boolean;
+begin
+  Result := True;
+  FErrorText := '';
+end;
+
+procedure TPrivateReport.PrepareReportData;
+var xDef: TReportDef;
+    xHandle: THandle;
+    xBody, xTransform: String;
+    xQuery: TADOQuery;
+    xResInfo: Cardinal;
+    xResStream: TResourceStream;
+    xStringStream: TStringStream;
+    xXml, xSheet: IXMLDOMDocument;
+begin
+  xDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, TCWithGidParams(Params).id, False));
+  if xDef.xsltText = '' then begin
+    xTransform := '';
+    xHandle := LoadLibrary('msxml.dll');
+    if xHandle >= 32 then begin
+      xResInfo := FindResource(xHandle, 'DEFAULTSS.XSL', MakeIntResource(23));
+      if xResInfo <> 0 then begin
+        xResStream := TResourceStream.Create(xHandle, 'DEFAULTSS.XSL', MakeIntResource(23));
+        xStringStream := TStringStream.Create('');
+        xResStream.SaveToStream(xStringStream);
+        xResStream.Free;
+        xTransform := xStringStream.DataString;
+        xStringStream.Free;
+      end;
+      FreeLibrary(xHandle);
+    end;
+  end else begin
+    xTransform := xDef.xsltText;
+  end;
+  xQuery := GDataProvider.OpenSql(xDef.queryText, False);
+  if xQuery <> Nil then begin
+    xBody := GetRowsAsXml(xQuery.Recordset);
+    xQuery.Free;
+    xXml := GetDocumentFromString(xBody);
+    xSheet := GetDocumentFromString(xTransform);
+    xBody := xXml.transformNode(xSheet);
+    TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(xBody, Self));
+  end else begin
+    FErrorText := 'Podczas wykonywania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu' + sLineBreak +
+                  'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.' + sLineBreak +
+                  '(' + GDataProvider.LastError + ')';
+  end;
 end;
 
 end.

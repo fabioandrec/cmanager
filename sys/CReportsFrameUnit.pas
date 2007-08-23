@@ -63,7 +63,13 @@ type
     procedure ActionDelExecute(Sender: TObject);
   private
     FPrivateList: TDataObjectList;
+    FPrivateElement: TCListDataElement;
     procedure ReloadPrivate(ARootElement: TCListDataElement);
+  protected
+    procedure WndProc(var Message: TMessage); override;
+    procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
+    procedure MessageMovementEdited(AId: TDataGid; AOptions: Integer); virtual;
+    procedure MessageMovementDeleted(AId: TDataGid; AOptions: Integer); virtual;
   public
     function GetList: TCList; override;
     class function GetTitle: String; override;
@@ -194,7 +200,7 @@ end;
 
 function TReportListElement.GetElementId: String;
 begin
-  Result := Fname;
+  Result := Fid;
 end;
 
 procedure TCReportsFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
@@ -270,7 +276,11 @@ begin
 end;
 
 procedure TReportListElement.GetElementReload;
+var xDef: TReportDef;
 begin
+  xDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, id, False));
+  Fname := xDef.name;
+  Fdesc := xDef.description;
 end;
 
 function TReportListElement.GetElementText: String;
@@ -291,12 +301,17 @@ begin
 end;
 
 procedure TCReportsFrame.ReloadPrivate(ARootElement: TCListDataElement);
-var xPrivate: TCListDataElement;
+var xCount: Integer;
+    xDef: TReportDef;
 begin
   GDataProvider.BeginTransaction;
   FPrivateList := TReportDef.GetAllObjects(ReportDefProxy);
-  xPrivate := TCListDataElement.Create(List, TReportListElement.CreateGroup('W³asne', '', CNoImage), True);
-  ARootElement.Add(xPrivate);
+  FPrivateElement := TCListDataElement.Create(List, TReportListElement.CreateGroup('W³asne', '', CNoImage), True);
+  ARootElement.Add(FPrivateElement);
+  for xCount := 0 to FPrivateList.Count - 1 do begin
+    xDef := TReportDef(FPrivateList.Items[xCount]);
+    FPrivateElement.AppendDataElement(TCListDataElement.Create(List, TReportListElement.CreatePrivate(xDef.name, TPrivateReport, TCWithGidParams.Create(xDef.id), xDef.description, CHtmlReportImage, xDef.id), True));
+  end;
   GDataProvider.RollbackTransaction;
 end;
 
@@ -319,7 +334,7 @@ var xForm: TCReportDefForm;
 begin
   if List.FocusedNode <> Nil then begin
     xForm := TCReportDefForm.Create(Nil);
-    xForm.ShowDataobject(coEdit, ReportDefProxy, FPrivateList.ObjectById[TReportListElement(List.SelectedElement).id], True);
+    xForm.ShowDataobject(coEdit, ReportDefProxy, FPrivateList.ObjectById[TReportListElement(List.SelectedElement.Data).id], True);
     xForm.Free;
   end;
 end;
@@ -329,10 +344,52 @@ var xId: TDataGid;
 begin
   if List.FocusedNode <> Nil then begin
     if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ definicjê raportu ?', '') then begin
-      xId := TReportListElement(List.SelectedElement).id;
+      xId := TReportListElement(List.SelectedElement.Data).id;
       FPrivateList.ObjectById[xId].DeleteObject;
       GDataProvider.CommitTransaction;
       SendMessageToFrames(TCReportsFrame, WM_DATAOBJECTDELETED, Integer(@xId), 0);
+    end;
+  end;
+end;
+
+procedure TCReportsFrame.MessageMovementAdded(AId: TDataGid; AOptions: Integer);
+var xDataobject: TReportDef;
+    xElement: TCListDataElement;
+begin
+  xDataobject := TReportDef(TReportDef.LoadObject(ReportDefProxy, AId, True));
+  FPrivateList.Add(xDataobject);
+  xElement := TCListDataElement.Create(List, TReportListElement.CreatePrivate(xDataobject.name, TPrivateReport, TCWithGidParams.Create(xDataobject.id), xDataobject.description, CHtmlReportImage, xDataobject.id), True);
+  List.FocusedNode := FPrivateElement.AppendDataElement(xElement);
+end;
+
+procedure TCReportsFrame.MessageMovementDeleted(AId: TDataGid; AOptions: Integer);
+begin
+  FPrivateElement.DeleteDataElement(AId, TReportListElement.ClassName);
+end;
+
+procedure TCReportsFrame.MessageMovementEdited(AId: TDataGid; AOptions: Integer);
+var xElement: TCListDataElement;
+begin
+  xElement := FPrivateElement.FindDataElement(AId, TReportListElement.ClassName);
+  if xElement <> Nil then begin
+    FPrivateElement.RefreshDataElement(AId, TReportListElement.ClassName);
+  end;
+end;
+
+procedure TCReportsFrame.WndProc(var Message: TMessage);
+var xDataGid: TDataGid;
+begin
+  inherited WndProc(Message);
+  with Message do begin
+    if Msg = WM_DATAOBJECTADDED then begin
+      xDataGid := PDataGid(WParam)^;
+      MessageMovementAdded(xDataGid, LParam);
+    end else if Msg = WM_DATAOBJECTEDITED then begin
+      xDataGid := PDataGid(WParam)^;
+      MessageMovementEdited(xDataGid, LParam);
+    end else if Msg = WM_DATAOBJECTDELETED then begin
+      xDataGid := PDataGid(WParam)^;
+      MessageMovementDeleted(xDataGid, LParam);
     end;
   end;
 end;

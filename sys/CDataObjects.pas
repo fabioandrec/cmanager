@@ -3519,6 +3519,9 @@ begin
   with ADataset do begin
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
+    FqueryText := FieldByName('queryText').AsString;
+    FparamsDefs := FieldByName('paramsDefs').AsString;
+    FxsltText := FieldByName('xsltText').AsString;
   end;
 end;
 
@@ -3568,6 +3571,9 @@ begin
   with DataFieldList do begin
     AddField('name', Fname, True, 'reportDef');
     AddField('description', Fdescription, True, 'reportDef');
+    AddField('queryText', FqueryText, True, 'reportDef');
+    AddField('paramsDefs', FparamsDefs, True, 'reportDef');
+    AddField('xsltText', FxsltText, True, 'reportDef');
   end;
 end;
 
