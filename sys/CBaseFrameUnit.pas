@@ -71,6 +71,7 @@ type
     procedure UpdateOutputData; virtual;
     function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; virtual;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); virtual;
+    procedure FinalizeFrame; virtual;
     procedure PrepareCheckStates; virtual;
     class function GetTitle: String; virtual;
     class function GetOperation: TConfigOperation; virtual;
@@ -162,6 +163,7 @@ end;
 destructor TCBaseFrame.Destroy;
 begin
   SaveColumns;
+  FinalizeFrame;
   GFrames.Remove(Self);
   inherited Destroy;
 end;
@@ -634,6 +636,10 @@ begin
       ListPopupMenu.Items.Items[xCount].Enabled := AIsSelectedSomething;
     end;
   end;
+end;
+
+procedure TCBaseFrame.FinalizeFrame;
+begin
 end;
 
 initialization

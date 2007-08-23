@@ -325,6 +325,18 @@ create table accountCurrencyRule (
   constraint fk_accountCurrencycashPoint foreign key (idCashPoint) references cashPoint (idCashPoint) on delete cascade
 );
 
+create table reportDef (
+  idreportDef uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  name varchar(40) not null,
+  description varchar(200),  
+  queryText memo not null,
+  paramsDefs memo,
+  xsltText memo,
+  primary key (idreportDef)
+);
+
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementIn', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');

@@ -12,12 +12,15 @@ type
   TReportListElement = class(TCDataListElementObject)
   private
     FisReport: Boolean;
+    FisPrivate: Boolean;
     FreportClass: TCReportClass;
     FreportParams: TCReportParams;
     Fname: String;
     Fdesc: String;
     Fimage: Integer;
+    Fid: TDataGid;
   public
+    constructor CreatePrivate(AName: String; AReportClass: TCReportClass; AReportParams: TCReportParams; ADesc: String; AImage: Integer; AId: TDataGid);
     constructor CreateReport(AName: String; AReportClass: TCReportClass; AReportParams: TCReportParams; ADesc: String; AImage: Integer);
     constructor CreateGroup(AName: String; ADesc: String; AImage: Integer);
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
@@ -43,20 +46,30 @@ type
     CButtonExecute: TCButton;
     List: TCDataList;
     Bevel: TBevel;
+    ActionAdd: TAction;
+    ActionEdit: TAction;
+    ActionDel: TAction;
+    CButton1: TCButton;
+    CButton2: TCButton;
+    CButton3: TCButton;
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+  private
+    FPrivateList: TDataObjectList;
+    procedure ReloadPrivate(ARootElement: TCListDataElement);
   public
     function GetList: TCList; override;
     class function GetTitle: String; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
+    procedure FinalizeFrame; override;
   end;
 
 implementation
 
 uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts,
-  CPlugins, CPluginConsts;
+  CPlugins, CPluginConsts, CTools;
 
 {$R *.dfm}
 
@@ -122,6 +135,13 @@ begin
   FreportClass := Nil;
 end;
 
+constructor TReportListElement.CreatePrivate(AName: String; AReportClass: TCReportClass; AReportParams: TCReportParams; ADesc: String; AImage: Integer; AId: TDataGid);
+begin
+  CreateReport(AName, AReportClass, AReportParams, ADesc, AImage);
+  FisPrivate := True;
+  Fid := AId;
+end;
+
 constructor TReportListElement.CreateReport(AName: String; AReportClass: TCReportClass; AReportParams: TCReportParams; ADesc: String; AImage: Integer);
 begin
   inherited Create;
@@ -131,6 +151,8 @@ begin
   Fimage := AImage;
   FreportParams := AReportParams;
   FreportClass := AReportClass;
+  FisPrivate := False;
+  Fid := CEmptyDataGid;
 end;
 
 destructor TReportListElement.Destroy;
@@ -235,6 +257,7 @@ begin
       xOthers.Add(TCListDataElement.Create(List, TReportListElement.CreateReport(xPlugin.pluginMenu, TPluginChartReport, TCPluginReportParams.Create(xPlugin), xPlugin.pluginDescription, CPluginReportImage), True));
     end;
   end;
+  ReloadPrivate(ARootElement);
 end;
 
 procedure TReportListElement.GetElementReload;
@@ -255,6 +278,22 @@ begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   List.RootElement.FreeDataOnClear := True;
   List.ReloadTree;
+end;
+
+procedure TCReportsFrame.ReloadPrivate(ARootElement: TCListDataElement);
+var xPrivate: TCListDataElement;
+begin
+  GDataProvider.BeginTransaction;
+  FPrivateList := TReportDef.GetAllObjects(ReportDefProxy);
+  xPrivate := TCListDataElement.Create(List, TReportListElement.CreateGroup('W³asne', '', CNoImage), True);
+  ARootElement.Add(xPrivate);
+  GDataProvider.RollbackTransaction;
+end;
+
+procedure TCReportsFrame.FinalizeFrame;
+begin
+  FPrivateList.Free;
+  inherited FinalizeFrame;
 end;
 
 end.

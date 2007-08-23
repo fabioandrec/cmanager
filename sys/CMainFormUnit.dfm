@@ -1,8 +1,8 @@
 object CMainForm: TCMainForm
-  Left = 129
-  Top = 66
-  Width = 863
-  Height = 635
+  Left = 132
+  Top = 68
+  Width = 860
+  Height = 633
   Caption = 'CManager'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +20,7 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 855
+    Width = 852
     Height = 24
     UseSystemFont = False
     ActionManager = ActionManager
@@ -39,8 +39,8 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TCStatusBar
     Left = 0
-    Top = 589
-    Width = 855
+    Top = 587
+    Width = 852
     Height = 19
     Panels = <
       item
@@ -61,7 +61,7 @@ object CMainForm: TCMainForm
   object PanelNotconnected: TPanel
     Left = 0
     Top = 24
-    Width = 855
+    Width = 852
     Height = 41
     Align = alTop
     BevelOuter = bvLowered
@@ -76,8 +76,8 @@ object CMainForm: TCMainForm
   object PanelMain: TPanel
     Left = 0
     Top = 65
-    Width = 855
-    Height = 524
+    Width = 852
+    Height = 522
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelMain'
@@ -85,7 +85,7 @@ object CMainForm: TCMainForm
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 855
+      Width = 852
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -94,12 +94,12 @@ object CMainForm: TCMainForm
       Left = 154
       Top = 24
       Width = 2
-      Height = 500
+      Height = 498
     end
     object PanelTitle: TPanel
       Left = 0
       Top = 0
-      Width = 855
+      Width = 852
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -113,12 +113,12 @@ object CMainForm: TCMainForm
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        855
+        852
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 855
+        Width = 852
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -146,7 +146,7 @@ object CMainForm: TCMainForm
         PngOptions = []
       end
       object CDateTime: TCDateTime
-        Left = 770
+        Left = 767
         Top = 3
         Width = 81
         Height = 15
@@ -177,8 +177,8 @@ object CMainForm: TCMainForm
     object PanelFrames: TPanel
       Left = 156
       Top = 24
-      Width = 699
-      Height = 500
+      Width = 696
+      Height = 498
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -188,7 +188,7 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 154
-      Height = 500
+      Height = 498
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
@@ -232,7 +232,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 22
         Width = 152
-        Height = 477
+        Height = 475
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone

@@ -696,6 +696,28 @@ type
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
   end;
 
+  TReportDef = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    FqueryText: string;
+    FparamsDefs: string;
+    FxsltText: string;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: TBaseName);
+    procedure SetparamsDefs(const Value: string);
+    procedure SetqueryText(const Value: string);
+    procedure SetxsltText(const Value: string);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property queryText: string read FqueryText write SetqueryText;
+    property paramsDefs: string read FparamsDefs write SetparamsDefs;
+    property xsltText: string read FxsltText write SetxsltText;
+  end;
 
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
@@ -713,35 +735,35 @@ var CashPointProxy: TDataProxy;
     AccountExtractionProxy: TDataProxy;
     ExtractionItemProxy: TDataProxy;
     UnitDefProxy: TDataProxy;
-
+    ReportDefProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
 
-const CDatafileTables: array[0..20] of string =
+const CDatafileTables: array[0..21] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
-             'accountCurrencyRule');
+             'accountCurrencyRule', 'reportDef');
 
-const CDatafileTablesExportConditions: array[0..20] of string =
+const CDatafileTablesExportConditions: array[0..21] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
-             '');
+             '', '');
 
-const CDatafileDeletes: array[0..20] of string =
+const CDatafileDeletes: array[0..21] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '');
+             '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
@@ -837,6 +859,7 @@ begin
   AccountExtractionProxy := TDataProxy.Create(GDataProvider, 'accountExtraction', Nil);
   ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
   UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef', Nil);
+  ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -3485,6 +3508,66 @@ begin
   if FidUnitDef <> Value then begin
     FidUnitDef := Value;
     SetState(msModified);
+  end;
+end;
+
+{ TReportDef }
+
+procedure TReportDef.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+procedure TReportDef.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TReportDef.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TReportDef.SetparamsDefs(const Value: string);
+begin
+  if FparamsDefs <> Value then begin
+    FparamsDefs := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TReportDef.SetqueryText(const Value: string);
+begin
+  if FqueryText <> Value then begin
+    FqueryText := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TReportDef.SetxsltText(const Value: string);
+begin
+  if FxsltText <> Value then begin
+    FxsltText := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TReportDef.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fname, True, 'reportDef');
+    AddField('description', Fdescription, True, 'reportDef');
   end;
 end;
 

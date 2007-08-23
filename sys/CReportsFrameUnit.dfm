@@ -16,6 +16,9 @@ inherited CReportsFrame: TCReportsFrame
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
+    DesignSize = (
+      443
+      40)
     object CButtonExecute: TCButton
       Left = 13
       Top = 2
@@ -27,6 +30,45 @@ inherited CReportsFrame: TCReportsFrame
       TxtOffset = 15
       Framed = False
       Action = ActionExecute
+    end
+    object CButton1: TCButton
+      Left = 221
+      Top = 3
+      Width = 76
+      Height = 33
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Action = ActionAdd
+      Anchors = [akTop, akRight]
+    end
+    object CButton2: TCButton
+      Left = 293
+      Top = 3
+      Width = 76
+      Height = 33
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Action = ActionEdit
+      Anchors = [akTop, akRight]
+    end
+    object CButton3: TCButton
+      Left = 365
+      Top = 3
+      Width = 76
+      Height = 33
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Action = ActionDel
+      Anchors = [akTop, akRight]
     end
   end
   object List: TCDataList [2]
@@ -227,6 +269,18 @@ inherited CReportsFrame: TCReportsFrame
       Caption = 'Uruchom raport'
       ImageIndex = 0
       OnExecute = ActionExecuteExecute
+    end
+    object ActionAdd: TAction
+      Caption = 'Dodaj'
+      ImageIndex = 1
+    end
+    object ActionEdit: TAction
+      Caption = 'Edytuj'
+      ImageIndex = 2
+    end
+    object ActionDel: TAction
+      Caption = 'Usu'#324
+      ImageIndex = 3
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

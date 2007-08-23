@@ -4,7 +4,7 @@ interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
-     CComponents, CChartReportFormUnit;
+     CComponents, CChartReportFormUnit, CTemplates;
 
 type
   TSumForDayItem = class(TObject)
@@ -103,7 +103,7 @@ type
     property title: String read Ftitle;
   end;
 
-  TCBaseReport = class(TObject)
+  TCBaseReport = class(TObject, IDescTemplateExpander)
   private
     FForm: TCReportForm;
     FParams: TCReportParams;
@@ -124,6 +124,10 @@ type
     destructor Destroy; override;
     property Params: TCReportParams read FParams;
     property IdFilter: TDataGid read FIdFilter write FIdFilter;
+    function ExpandTemplate(ATemplate: String): String;
+    function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
   end;
 
   TCHtmlReport = class(TCBaseReport)
@@ -663,7 +667,7 @@ end;
 
 function TAccountBalanceOnDayReport.GetReportTitle: String;
 begin
-  Result := 'Stan kont (' + GetFormattedDate(FDate, CLongDateFormat) + ')';
+  Result := 'Stan kont (' + GetFormattedDate(FDate, CLongDateFormat);
 end;
 
 function TAccountBalanceOnDayReport.PrepareReportConditions: Boolean;
@@ -1212,6 +1216,11 @@ begin
   inherited Destroy;
 end;
 
+function TCBaseReport.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := GBasePreferences.ExpandTemplate(ATemplate);
+end;
+
 function TCBaseReport.GetFormTitle: String;
 begin
   Result := 'Raport';
@@ -1220,6 +1229,15 @@ end;
 function TCBaseReport.PrepareReportConditions: Boolean;
 begin
   Result := True;
+end;
+
+function TCBaseReport.QueryInterface(const IID: TGUID; out Obj): HRESULT;
+begin
+  if GetInterface(IID, Obj) then begin
+    Result := 0
+  end else begin
+    Result := E_NOINTERFACE;
+  end;
 end;
 
 procedure TCBaseReport.ShowReport;
@@ -1289,7 +1307,7 @@ procedure TCHtmlReport.PrepareReportData;
 begin
   PrepareReportPath;
   PrepareReportContent;
-  TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(FreportText.Text, Self));
 end;
 
 procedure TCHtmlReport.PrepareReportPath;
@@ -3172,7 +3190,7 @@ end;
 
 procedure TPluginHtmlReport.PrepareReportData;
 begin
-  TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(FreportText.Text, Self));
 end;
 
 procedure TCChartReport.SetChartProps;
@@ -3319,7 +3337,7 @@ begin
   xOut := TCPluginReportParams(Params).plugin.Execute;
   Result := False;
   if not VarIsEmpty(xOut) then begin
-    FXml := GetDocumentFromString(xOut);
+    FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self));
     Result := FXml.parseError.errorCode = 0;
     if not Result then begin
       ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', FXml.parseError.reason);
@@ -3859,7 +3877,7 @@ end;
 
 procedure TSimpleReportDialog.PrepareReportData;
 begin
-  TCHtmlReportForm(FForm).CBrowser.LoadFromString(TSimpleReportParams(FParams).reportText);
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(TSimpleReportParams(FParams).reportText, Self));
 end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
@@ -4021,6 +4039,16 @@ begin
       end;
     end;
   end;
+end;
+
+function TCBaseReport._AddRef: Integer;
+begin
+  Result := 0;
+end;
+
+function TCBaseReport._Release: Integer;
+begin
+  Result := 0;
 end;
 
 end.
