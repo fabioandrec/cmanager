@@ -36,6 +36,8 @@ type
     property isReport: Boolean read FisReport;
     property reportClass: TCReportClass read FreportClass;
     property reportParams: TCReportParams read FreportParams;
+    property isPrivate: Boolean read FisPrivate;
+    property id: TDataGid read Fid;
   end;
 
   TCReportsFrame = class(TCBaseFrame)
@@ -56,6 +58,9 @@ type
     procedure ListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure ActionEditExecute(Sender: TObject);
+    procedure ActionDelExecute(Sender: TObject);
   private
     FPrivateList: TDataObjectList;
     procedure ReloadPrivate(ARootElement: TCListDataElement);
@@ -69,7 +74,7 @@ type
 implementation
 
 uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts,
-  CPlugins, CPluginConsts, CTools;
+  CPlugins, CPluginConsts, CTools, CReportDefFormUnit;
 
 {$R *.dfm}
 
@@ -84,8 +89,12 @@ procedure TCReportsFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtu
 begin
   if Node <> Nil then begin
     CButtonExecute.Enabled := TReportListElement(List.GetTreeElement(Node).Data).isReport;
+    CButton2.Enabled := TReportListElement(List.GetTreeElement(Node).Data).isPrivate;
+    CButton3.Enabled := TReportListElement(List.GetTreeElement(Node).Data).isPrivate;
   end else begin
     CButtonExecute.Enabled := False;
+    CButton2.Enabled := False;
+    CButton3.Enabled := False;
   end;
 end;
 
@@ -278,6 +287,7 @@ begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   List.RootElement.FreeDataOnClear := True;
   List.ReloadTree;
+  ListFocusChanged(List, List.FocusedNode, 0);  
 end;
 
 procedure TCReportsFrame.ReloadPrivate(ARootElement: TCListDataElement);
@@ -294,6 +304,37 @@ procedure TCReportsFrame.FinalizeFrame;
 begin
   FPrivateList.Free;
   inherited FinalizeFrame;
+end;
+
+procedure TCReportsFrame.ActionAddExecute(Sender: TObject);
+var xForm: TCReportDefForm;
+begin
+  xForm := TCReportDefForm.Create(Nil);
+  xForm.ShowDataobject(coAdd, ReportDefProxy, Nil, True);
+  xForm.Free;
+end;
+
+procedure TCReportsFrame.ActionEditExecute(Sender: TObject);
+var xForm: TCReportDefForm;
+begin
+  if List.FocusedNode <> Nil then begin
+    xForm := TCReportDefForm.Create(Nil);
+    xForm.ShowDataobject(coEdit, ReportDefProxy, FPrivateList.ObjectById[TReportListElement(List.SelectedElement).id], True);
+    xForm.Free;
+  end;
+end;
+
+procedure TCReportsFrame.ActionDelExecute(Sender: TObject);
+var xId: TDataGid;
+begin
+  if List.FocusedNode <> Nil then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ definicjê raportu ?', '') then begin
+      xId := TReportListElement(List.SelectedElement).id;
+      FPrivateList.ObjectById[xId].DeleteObject;
+      GDataProvider.CommitTransaction;
+      SendMessageToFrames(TCReportsFrame, WM_DATAOBJECTDELETED, Integer(@xId), 0);
+    end;
+  end;
 end;
 
 end.

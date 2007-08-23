@@ -118,7 +118,8 @@ uses
   CAdotools in 'Shared\CAdotools.pas',
   CUnitDefFrameUnit in 'CUnitDefFrameUnit.pas' {CUnitDefFrame: TFrame},
   CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm},
-  CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm};
+  CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
+  CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm};
 
 {$R *.res}
 

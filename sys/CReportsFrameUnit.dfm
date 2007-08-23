@@ -273,14 +273,17 @@ inherited CReportsFrame: TCReportsFrame
     object ActionAdd: TAction
       Caption = 'Dodaj'
       ImageIndex = 1
+      OnExecute = ActionAddExecute
     end
     object ActionEdit: TAction
       Caption = 'Edytuj'
       ImageIndex = 2
+      OnExecute = ActionEditExecute
     end
     object ActionDel: TAction
       Caption = 'Usu'#324
       ImageIndex = 3
+      OnExecute = ActionDelExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
