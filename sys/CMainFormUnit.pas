@@ -202,10 +202,12 @@ procedure TCMainForm.SetShortcutsVisible(const Value: Boolean);
 begin
   DisableAlign;
   if Value then begin
+    Splitter.Visible := True;
     PanelShortcuts.Visible := True;
     ActionShortcuts.Checked := True;
   end else begin
     PanelShortcuts.Visible := False;
+    Splitter.Visible := False;
     ActionShortcuts.Checked := False;
   end;
   EnableAlign;

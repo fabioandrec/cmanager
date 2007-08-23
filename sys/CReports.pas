@@ -504,6 +504,7 @@ type
   end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
+procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
 
 implementation
 
@@ -4000,6 +4001,26 @@ end;
 function TQuantitySumReportList.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodAcpListGroupByForm(FParams.acp, FStartDate, FEndDate, FAcps, FIdFilter, FGroupBy, Nil);
+end;
+
+procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
+var xXml, xXslt: IXMLDOMDocument;
+    xBody: String;
+begin
+  xXml := GetDocumentFromString(AXmlText);
+  if xXml <> Nil then begin
+    xXslt := GetDocumentFromString(AXsltText);
+    if xXslt <> Nil then begin
+      try
+        xBody := xXml.transformNode(xXslt.documentElement);
+        ShowSimpleReport(AFormTitle, xBody);
+      except
+        on E: Exception do begin
+          ShowInfo(itError, E.Message, '');
+        end;
+      end;
+    end;
+  end;
 end;
 
 end.
