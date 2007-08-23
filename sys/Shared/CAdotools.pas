@@ -2,14 +2,15 @@ unit CAdotools;
 
 interface
 
-uses AdoInt, Contnrs, Classes, Variants;
+uses AdoInt, Contnrs, Classes, Variants, MsXml;
 
 function GetRowsAsObjectList(ARecordset: _Recordset): TObjectList;
 function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String): String;
+function GetRowsAsXml(ARecordset: _Recordset): String;
 
 implementation
 
-uses Math, CTools, StrUtils;
+uses Math, CTools, StrUtils, CXml;
 
 function GetRowsAsObjectList(ARecordset: _Recordset): TObjectList;
 var xCf: Integer;
@@ -76,6 +77,39 @@ begin
       Result := Result + sLineBreak;
     end;
   end;
+end;
+
+function GetRowsAsXml(ARecordset: _Recordset): String;
+var xDoc: IXMLDOMDocument;
+    xRoot: IXMLDOMNode;
+    xRow: IXMLDOMNode;
+    xCf: Integer;
+    xColumn: IXMLDOMNode;
+    xValue: String;
+begin
+  xDoc := GetXmlDocument;
+  xRoot := xDoc.createElement('recordset');
+  xDoc.appendChild(xRoot);
+  while not ARecordset.Eof do begin
+    xRow := xDoc.createElement('row');
+    xRoot.appendChild(xRow);
+    for xCf := 0 to ARecordset.Fields.Count - 1 do begin
+      try
+        if VarIsNull(ARecordset.Fields.Item[xCf].Value) then begin
+          xValue := 'null';
+        end else begin
+          xValue := ARecordset.Fields.Item[xCf].Value;
+        end;
+      except
+        xValue := '<b³¹d>';
+      end;
+      xColumn := xDoc.createElement(ARecordset.Fields.Item[xCf].Name);
+      xColumn.text := xValue;
+      xRow.appendChild(xColumn);
+    end;
+    ARecordset.MoveNext;
+  end;
+  Result := GetStringFromDocument(xDoc);
 end;
 
 end.

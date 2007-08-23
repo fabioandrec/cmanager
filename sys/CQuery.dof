@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=-d 0xA -s "select * from product" -u CManager.dat
+RunParams=-x -s "select * from product" -u CManager.dat
 HostApplication=
 Launcher=
 UseLauncher=0

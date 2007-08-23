@@ -14,7 +14,8 @@ uses
   Classes,
   MemCheck in 'MemCheck.pas',
   CTools in 'Shared\CTools.pas',
-  CAdotools in 'Shared\CAdotools.pas';
+  CAdotools in 'Shared\CAdotools.pas',
+  CXml in 'Shared\CXml.pas';
 
 {$R *.res}
 
@@ -39,7 +40,7 @@ begin
   end;
 end;
 
-function ExecuteSql(ADb: TADOConnection; ASql: String; var AError: String; ADelimeter: String): Boolean;
+function ExecuteSql(ADb: TADOConnection; ASql: String; var AError: String; ADelimeter: String; AToXml: Boolean): Boolean;
 var xSqls: TStringList;
     xCount: Integer;
     xQuery: _Recordset;
@@ -54,7 +55,11 @@ begin
       try
         xQuery := ADb.Execute(xSqls.Strings[xCount], cmdText);
         if xQuery.State = adStateOpen then begin
-          xValue := GetRowsAsString(xQuery, ADelimeter);
+          if AToXml then begin
+            xValue := GetRowsAsXml(xQuery);
+          end else begin
+            xValue := GetRowsAsString(xQuery, ADelimeter);
+          end;
           Writeln(xValue);
         end;
       except
@@ -79,6 +84,7 @@ var xAction: Integer;
     xScript: TStringList;
     xDelimeter: String;
     xCode: Integer;
+    xToXml: Boolean;
 begin
   {$IFDEF DEBUG}
   MemChk;
@@ -87,10 +93,11 @@ begin
   xDelimeter := '';
   CoInitialize(Nil);
   if GetSwitch('-h') then begin
-    xText := 'CQuery [-s komenda] -d [separator pól] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
+    xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
              '  -s wykonaj komendê sql [komenda]' + sLineBreak +
              '  -f wykonaj skrypt sql [plik]' + sLineBreak +
              '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
+             '  -x wynik w postaci xml-a' + sLineBreak +
              '  -h wyœwietla ten ekran';
   end else begin
     xAction := 0;
@@ -111,6 +118,7 @@ begin
         end;
       end;
     end;
+    xToXml := GetSwitch('-x');
     if (xAction <= 0) or (xAction >= 3) then begin
       xText := 'Niepoprawne parametry wywo³ania. Spróbuj "CQuery -h"';
     end else begin
@@ -140,7 +148,7 @@ begin
           xDatabase := TADOConnection.Create(Nil);
           try
             if ConnectToDatabase(xFile, xDatabase, xText) then begin
-              if ExecuteSql(xDatabase, xSql, xText, xDelimeter) then begin
+              if ExecuteSql(xDatabase, xSql, xText, xDelimeter, xToXml) then begin
                 xExitCode := $00;
               end;
               xDatabase.Close;
