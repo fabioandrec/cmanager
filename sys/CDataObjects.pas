@@ -702,7 +702,7 @@ type
     Fdescription: TBaseDescription;
     FqueryText: string;
     FparamsDefs: string;
-    FxsltText: string;
+    FxsltText: String;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure SetparamsDefs(const Value: string);
@@ -775,7 +775,8 @@ function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFiel
 
 implementation
 
-uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit;
+uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit,
+  CBase64;
 
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 var xGid: String;
@@ -3510,8 +3511,6 @@ begin
     SetState(msModified);
   end;
 end;
-
-{ TReportDef }
 
 procedure TReportDef.FromDataset(ADataset: TADOQuery);
 begin

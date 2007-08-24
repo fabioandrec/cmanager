@@ -119,7 +119,8 @@ uses
   CUnitDefFrameUnit in 'CUnitDefFrameUnit.pas' {CUnitDefFrame: TFrame},
   CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm},
   CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
-  CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm};
+  CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm},
+  CBase64 in 'Shared\CBase64.pas';
 
 {$R *.res}
 
@@ -164,7 +165,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

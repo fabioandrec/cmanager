@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=7
 Release=1
-Build=26
+Build=29
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.7.1.26
+FileVersion=1.7.1.29
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -134,9 +134,6 @@ OriginalFilename=CManager
 ProductName=CManager
 ProductVersion=1.7.1
 Comments=
-[HistoryLists\hlConditionals]
-Count=1
-Item0=DEBUG
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;

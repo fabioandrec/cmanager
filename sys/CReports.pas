@@ -134,9 +134,9 @@ type
   private
     FreportText: TStringList;
     FreportStyle: TStringList;
-    procedure PrepareReportPath;
-    procedure PrepareReportContent;
   protected
+    procedure PrepareReportPath; virtual;
+    procedure PrepareReportContent; virtual;
     procedure PrepareReportData; override;
     function GetReportBody: String; virtual; abstract;
   public
@@ -496,10 +496,10 @@ type
     property reportText: String read FReportText write FReportText;
   end;
 
-  TSimpleReportDialog = class(TCBaseReport)
+  TSimpleReportDialog = class(TCHtmlReport)
   protected
-    function GetFormClass: TCReportFormClass; override;
-    procedure PrepareReportData; override;
+    procedure PrepareReportContent; override;
+    function GetReportBody: String; override;
   public
     function GetFormTitle: String; override;
     function GetReportFooter: String; override;
@@ -509,10 +509,11 @@ type
   TPrivateReport = class(TCHtmlReport)
   private
     FErrorText: String;
+    FAddText: String;
   protected
-    procedure PrepareReportData; override;
     function PrepareReportConditions: Boolean; override;
     function CanShowReport: Boolean; override;
+    procedure PrepareReportContent; override;
   end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
@@ -528,7 +529,46 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
-     CChoosePeriodFilterGroupFormUnit, CAdotools;
+     CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64;
+
+var LDefaultXsl: IXMLDOMDocument;
+
+function GetDefaultXsl: IXMLDOMDocument;
+var xLibHandle: THandle;
+    xResInfo: HRSRC;
+    xResStream: TResourceStream;
+    xStrStream: TStringStream;
+begin
+  if LDefaultXsl = Nil then begin
+    Result := Nil;
+    xLibHandle := LoadLibrary(CMSXmlLibraryName);
+    if xLibHandle > HINSTANCE_ERROR then begin
+      try
+        xResinfo := FindResource(xLibHandle, CXSLDefaultTransformResname, CXSLDefaultTransforRestype);
+        if xResInfo <> 0 then begin
+          try
+            xResStream := TResourceStream.Create(xLibHandle, CXSLDefaultTransformResname, CXSLDefaultTransforRestype);
+            xStrStream := TStringStream.Create('');
+            xResStream.SaveToStream(xStrStream);
+            xResStream.Free;
+            LDefaultXsl := GetDocumentFromString(xStrStream.DataString);
+            xStrStream.Free;
+            if LDefaultXsl.parseError.errorCode <> 0 then begin
+              LDefaultXsl := Nil;
+            end else begin
+              Result := LDefaultXsl;
+            end;
+          except
+          end;
+        end;
+      finally
+        FreeLibrary(xLibHandle);
+      end;
+    end;
+  end else begin
+    Result := LDefaultXsl;
+  end;
+end;
 
 function GetDescription(AGroupType: String; ADate: TDateTime): String;
 begin
@@ -3863,14 +3903,13 @@ begin
   GDataProvider.RollbackTransaction;
 end;
 
-function TSimpleReportDialog.GetFormClass: TCReportFormClass;
-begin
-  Result := TCHtmlReportForm;
-end;
-
 function TSimpleReportDialog.GetFormTitle: String;
 begin
   Result := TSimpleReportParams(FParams).formTitle;
+end;
+
+function TSimpleReportDialog.GetReportBody: String;
+begin
 end;
 
 function TSimpleReportDialog.GetReportFooter: String;
@@ -3881,11 +3920,6 @@ end;
 function TSimpleReportDialog.GetReportTitle: String;
 begin
   Result := '';
-end;
-
-procedure TSimpleReportDialog.PrepareReportData;
-begin
-  TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(TSimpleReportParams(FParams).reportText, Self));
 end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
@@ -4063,7 +4097,7 @@ function TPrivateReport.CanShowReport: Boolean;
 begin
   Result := FErrorText = '';
   if not Result then begin
-    ShowInfo(itError, FErrorText, '');
+    ShowInfo(itError, FErrorText, FAddText);
   end;
 end;
 
@@ -4073,50 +4107,61 @@ begin
   FErrorText := '';
 end;
 
-procedure TPrivateReport.PrepareReportData;
+procedure TPrivateReport.PrepareReportContent;
 var xDef: TReportDef;
-    xHandle: THandle;
-    xBody, xTransform: String;
     xQuery: TADOQuery;
-    xResInfo: Cardinal;
-    xResStream: TResourceStream;
-    xStringStream: TStringStream;
     xXml, xSheet: IXMLDOMDocument;
+    xBufferOut: String;
 begin
   xDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, TCWithGidParams(Params).id, False));
-  if xDef.xsltText = '' then begin
-    xTransform := '';
-    xHandle := LoadLibrary('msxml.dll');
-    if xHandle >= 32 then begin
-      xResInfo := FindResource(xHandle, 'DEFAULTSS.XSL', MakeIntResource(23));
-      if xResInfo <> 0 then begin
-        xResStream := TResourceStream.Create(xHandle, 'DEFAULTSS.XSL', MakeIntResource(23));
-        xStringStream := TStringStream.Create('');
-        xResStream.SaveToStream(xStringStream);
-        xResStream.Free;
-        xTransform := xStringStream.DataString;
-        xStringStream.Free;
-      end;
-      FreeLibrary(xHandle);
-    end;
-  end else begin
-    xTransform := xDef.xsltText;
+
+  if not DecodeBase64Buffer(xDef.xsltText, xBufferOut) then begin
+    FErrorText := 'Dane arkusza styli s¹ uszkodzone i nie zostan¹ wyœwietlone. Prawdopodobnie plik danych jest uszkodzony.' +
+                  'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                  'i nastêpnie kompaktowanie pliku danych.';
   end;
-  xQuery := GDataProvider.OpenSql(xDef.queryText, False);
-  if xQuery <> Nil then begin
-    xBody := GetRowsAsXml(xQuery.Recordset);
-    xQuery.Free;
-    xXml := GetDocumentFromString(xBody);
-    xSheet := GetDocumentFromString(xTransform);
-    xBody := xXml.transformNode(xSheet);
-    TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(xBody, Self));
-  end else begin
-    FErrorText := 'Podczas wykonywania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu' + sLineBreak +
-                  'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.' + sLineBreak +
-                  '(' + GDataProvider.LastError + ')';
+  if FErrorText = '' then begin
+    if xBufferOut = '' then begin
+      xSheet := GetDefaultXsl;
+    end else begin
+      xSheet := GetDocumentFromString(xBufferOut);
+    end;
+    xQuery := GDataProvider.OpenSql(GBaseTemlatesList.ExpandTemplates(xDef.queryText, Self), False);
+    if xQuery <> Nil then begin
+      FreportText.Text := GetRowsAsXml(xQuery.Recordset);
+      xXml := GetDocumentFromString(FreportText.Text);
+      if xSheet <> Nil then begin
+        try
+          FreportText.Text := xXml.transformNode(xSheet);
+        except
+          on E: Exception do begin
+            FErrorText := 'Podczas transformacji za pomoc¹ arkusza styli wyst¹pi³ b³¹d. Sprawdz definicjê raportu pod k¹tem poprawnoœci sk³adniowej arkusza stylów.';
+            FAddText := E.Message;
+          end;
+        end;
+      end;
+      xQuery.Free;
+      if FErrorText = '' then begin
+        FreportText.Text := GBaseTemlatesList.ExpandTemplates(FreportText.Text, Self);
+        TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
+      end;
+    end else begin
+      FErrorText := 'Podczas wykonywania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu' + sLineBreak +
+                    'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.';
+      FAddText := GDataProvider.LastError;
+    end;
   end;
 end;
 
+procedure TSimpleReportDialog.PrepareReportContent;
+begin
+  FreportText.Text := GBaseTemlatesList.ExpandTemplates(TSimpleReportParams(FParams).reportText, Self);
+end;
+
+initialization
+  LDefaultXsl := Nil;
+finalization
+  LDefaultXsl := Nil;
 end.
 
 

@@ -172,7 +172,7 @@ begin
             CFoundNewVersion := True;
             AddToReport('Znaleziono now¹ wersjê CManager-a ' + CRtfSB + GetXmlAttribute('name', xNode, '') + CRtfEB);
             AddToReport('Wydanie z dnia ' + GetXmlAttribute('date', xNode, ''));
-            xDesc := StringReplace(GetXmlAttribute('desc', xNode, ''), '/n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+            xDesc := StringReplace(GetXmlAttribute('desc', xNode, ''), '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
             if xDesc <> '' then begin
               AddToReport('');
               AddToReport(xDesc);

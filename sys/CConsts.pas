@@ -2,7 +2,7 @@ unit CConsts;
 
 interface
 
-uses Messages;
+uses Windows, Messages;
 
 const
   WM_DATAOBJECTADDED = WM_USER + 1;
@@ -29,6 +29,9 @@ const
 
 const
   CCSSReportFile = 'report.css';
+  CXSLDefaultTransformResname = 'DEFAULTSS.XSL';
+  CXSLDefaultTransforRestype = MAKEINTRESOURCE(23);
+  CMSXmlLibraryName = 'msxml.dll';
 
 const
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';

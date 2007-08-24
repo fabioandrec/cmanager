@@ -29,6 +29,7 @@ var xForm: TCInfoForm;
     xWidth: Integer;
     xHeight: Integer;
     xText: String;
+    xAdditional: String;
 begin
   xForm := TCInfoForm.Create(Nil);
   if AAlways <> Nil then begin
@@ -62,9 +63,13 @@ begin
   end;
   xForm.Caption := xCaption;
   xForm.Image.Picture.Icon.Handle := LoadIcon(0, xIconRes);
-  xText := AText;
+  xText := StringReplace(AText, sLineBreak, ' ', [rfReplaceAll, rfIgnoreCase]);
+  xText := StringReplace(xText, '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+  xText := WrapText(xText, 130);
   if AAdditional <> '' then begin
-    xText := xText + #10 + '(Szczegó³y: ' + AAdditional + ')';
+    xAdditional := StringReplace(AAdditional, sLineBreak, ' ', [rfReplaceAll, rfIgnoreCase]);
+    xAdditional := StringReplace(xAdditional, '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+    xText := xText + sLineBreak + WrapText('(Szczegó³y: ' + xAdditional + ')', 130);
   end;
   xForm.LabelInfo.Caption := xText;
   xWidth := xForm.LabelInfo.Width + xForm.LabelInfo.Left + xForm.Image.Left;
