@@ -20,6 +20,8 @@ procedure NotImplemented(AFunctionName: String);
 
 implementation
 
+uses CTools;
+
 {$R *.dfm}
 
 function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil): Boolean;
@@ -65,11 +67,11 @@ begin
   xForm.Image.Picture.Icon.Handle := LoadIcon(0, xIconRes);
   xText := StringReplace(AText, sLineBreak, ' ', [rfReplaceAll, rfIgnoreCase]);
   xText := StringReplace(xText, '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
-  xText := WrapText(xText, 130);
+  xText := WrapTextToLength(xText, 130);
   if AAdditional <> '' then begin
     xAdditional := StringReplace(AAdditional, sLineBreak, ' ', [rfReplaceAll, rfIgnoreCase]);
     xAdditional := StringReplace(xAdditional, '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
-    xText := xText + sLineBreak + WrapText('(Szczegó³y: ' + xAdditional + ')', 130);
+    xText := xText + sLineBreak + WrapTextToLength('(Szczegó³y: ' + xAdditional + ')', 130);
   end;
   xForm.LabelInfo.Caption := xText;
   xWidth := xForm.LabelInfo.Width + xForm.LabelInfo.Left + xForm.Image.Left;

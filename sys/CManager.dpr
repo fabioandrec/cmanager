@@ -122,7 +122,8 @@ uses
   CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm},
   CBase64 in 'Shared\CBase64.pas',
   CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame},
-  CParamDefFormUnit in 'CParamDefFormUnit.pas' {CParamDefForm};
+  CParamDefFormUnit in 'CParamDefFormUnit.pas' {CParamDefForm},
+  CChooseByParamsDefsFormUnit in 'CChooseByParamsDefsFormUnit.pas' {CChooseByParamsDefsForm};
 
 {$R *.res}
 
@@ -167,7 +168,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

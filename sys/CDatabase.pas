@@ -1283,7 +1283,7 @@ begin
     xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
     xToDbversion := StrToIntDef(xToDynArray[1], -1);
     if xCurDbversion < xToDbversion then begin
-      xText := 'Otwierany plik danych ma strukturê ' + AFromVersion + ' i musi byæ uaktualniony do wersji ' + AToVersion + sLineBreak +
+      xText := 'Otwierany plik danych ma strukturê ' + AFromVersion + ' i musi byæ uaktualniony do wersji ' + AToVersion + '\n' +
                'Czy rozpocz¹æ uaktualnianie pliku danych ?';
       Result := ShowInfo(itQuestion, xText, '');
       if Result then begin
@@ -1296,7 +1296,7 @@ begin
           Inc(xCurDbversion);
         end;
         if not Result then begin
-          xText := 'Podczas uaktualniania pliku danych z wersji ' + AFromVersion + ' do ' + AToVersion + ' wyst¹pi³ b³¹d' + sLineBreak +
+          xText := 'Podczas uaktualniania pliku danych z wersji ' + AFromVersion + ' do ' + AToVersion + ' wyst¹pi³ b³¹d' + '\n' +
                    'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
           ShowInfo(itError, xText, xError);
         end;
@@ -1324,9 +1324,9 @@ begin
     xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
     xToDbversion := StrToIntDef(xToDynArray[1], -1);
     if (xCurDbversion < 4) and (xToDbversion = 4) then begin
-      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹ ' + sLineBreak +
-                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list' + sLineBreak +
-                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane' + sLineBreak +
+      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
+                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
+                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
                        'zostan¹ domyœlne ustawienia.', '');
       GColumnsPreferences.Clear;
       GChartPreferences.Clear;

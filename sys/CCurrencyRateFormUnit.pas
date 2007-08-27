@@ -117,10 +117,10 @@ begin
       xRate := TCurrencyRate.FindRate(formRateType, CStaticBaseCurrencydef.DataId, CStaticTargetCurrencydef.DataId, CStaticCashpoint.DataId, CDateTime.Value);
       if xRate <> Nil then begin
         if CStaticCashpoint.DataId <> CEmptyDataGid then begin
-          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
+          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + '\n' +
                    'Czy chcesz go zast¹piæ ?';
         end else begin
-          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + sLineBreak +
+          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + DateToStr(CDateTime.Value) + '\n' +
                    'Czy chcesz go zast¹piæ ?';
         end;
         Result := ShowInfo(itQuestion, xText, '');

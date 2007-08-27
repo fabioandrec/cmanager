@@ -1,7 +1,8 @@
 inherited CParamsDefsFrame: TCParamsDefsFrame
+  Height = 278
   object Bevel: TBevel [0]
     Left = 0
-    Top = 234
+    Top = 235
     Width = 443
     Height = 3
     Align = alBottom
@@ -11,7 +12,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     Left = 0
     Top = 0
     Width = 443
-    Height = 234
+    Height = 235
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -20,6 +21,9 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     BorderStyle = bsNone
     ButtonStyle = bsTriangle
     DefaultNodeHeight = 24
+    DragMode = dmAutomatic
+    DragOperations = [doMove]
+    DragType = dtVCL
     Header.AutoSizeIndex = -1
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
@@ -35,9 +39,12 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     ShowHint = True
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-    TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+    TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toFullRowDrag]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnDragOver = ListDragOver
+    OnDragDrop = ListDragDrop
+    OnFocusChanged = ListFocusChanged
     OddColor = 12437200
     AutoExpand = True
     OnCDataListReloadTree = ListCDataListReloadTree
@@ -58,7 +65,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
   end
   object ButtonPanel: TPanel [2]
     Left = 0
-    Top = 237
+    Top = 238
     Width = 443
     Height = 40
     Align = alBottom
@@ -136,6 +143,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     object ActionPreview: TAction
       Caption = 'Podgl'#261'd dialogu'
       ImageIndex = 3
+      OnExecute = ActionPreviewExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

@@ -197,6 +197,15 @@ const
   CBackupActionAsk = 2;
   CBackupActionNever = 3;
 
+  CParamTypeText = 'text';
+  CParamTypeDecimal = 'decimal';
+  CParamTypeFloat = 'float';
+
+  CReportParamTypes: array[0..2, 0..1] of String =
+    (('Dowolny tekst', CParamTypeText),
+     ('Dowolna liczba ca³kowita', CParamTypeDecimal),
+     ('Dowolna liczba zmiennoprzecinkowa', CParamTypeFloat));
+
 implementation
 
 end.

@@ -290,11 +290,11 @@ begin
     xMustbackup := True;
   end else if GBasePreferences.backupAction = CBackupActionAsk then begin
     if xPref = Nil then begin
-      xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.' + sLineBreak +
+      xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.\n' +
                                           'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
     end else begin
       if DaysBetween(Today, xPref.lastBackup) + 1 >= GBasePreferences.backupDaysOld then begin
-        xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.' + sLineBreak +
+        xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.\n' + 
                                             'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
       end;
     end;

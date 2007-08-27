@@ -13,6 +13,11 @@ type
     ComboBoxGroup: TComboBox;
     Label1: TLabel;
     EditName: TEdit;
+    GroupBox2: TGroupBox;
+    Label2: TLabel;
+    ComboBoxType: TComboBox;
+    Label3: TLabel;
+    EditDesc: TEdit;
   private
     FParamDef: TReportDialgoParamDef;
   protected
@@ -25,7 +30,7 @@ type
 
 implementation
 
-uses CInfoFormUnit;
+uses CInfoFormUnit, CConsts;
 
 {$R *.dfm}
 
@@ -51,13 +56,25 @@ end;
 
 procedure TCParamDefForm.FillForm;
 var xCount: Integer;
+    xIndex: Integer;
 begin
   inherited FillForm;
   for xCount := 0 to FParamDef.parentParamsDefs.groups.Count - 1 do begin
     ComboBoxGroup.Items.Add(FParamDef.parentParamsDefs.groups.Strings[xCount]);
   end;
+  xIndex := 0;
+  for xCount := Low(CReportParamTypes) to High(CReportParamTypes) do begin
+    ComboBoxType.Items.Add(CReportParamTypes[xCount][0]);
+    if Operation = coEdit then begin
+      if FParamDef.paramType = CReportParamTypes[xCount][1] then begin
+        xIndex := xCount;
+      end;
+    end;
+  end;
+  ComboBoxType.ItemIndex := xIndex;
   if Operation = coEdit then begin
     EditName.Text := FParamDef.name;
+    EditDesc.Text := FParamDef.desc;
     ComboBoxGroup.Text := FParamDef.group;
   end;
 end;
@@ -67,7 +84,9 @@ begin
   inherited ReadValues;
   with FParamDef do begin
     name := EditName.Text;
+    desc := EditDesc.Text;
     group := ComboBoxGroup.Text;
+    paramType := CReportParamTypes[ComboBoxType.ItemIndex][1];
   end;
 end;
 

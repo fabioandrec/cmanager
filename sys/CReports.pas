@@ -12,8 +12,11 @@ type
   TReportDialgoParamDef = class(TCDataListElementObject)
   private
     Fname: String;
+    Fdesc: String;
     Fgroup: String;
+    FparamType: string;
     FparentParamsDefs: TReportDialogParamsDefs;
+    FparamValue: Variant;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: IXMLDOMNode);
@@ -21,10 +24,14 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementId: String; override;
     function GetElementType: String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: String read Fname write Fname;
+    property desc: String read Fdesc write Fdesc;
     property group: String read Fgroup write Fgroup;
+    property paramType: String read FparamType write FparamType;
     property parentParamsDefs: TReportDialogParamsDefs read FparentParamsDefs;
+    property paramValue: Variant read FparamValue write FparamValue;
   end;
 
   TReportDialogParamsDefs = class(TObjectList)
@@ -4189,7 +4196,7 @@ begin
         TCHtmlReportForm(FForm).CBrowser.LoadFromString(FreportText.Text);
       end;
     end else begin
-      FErrorText := 'Podczas wykonywania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu' + sLineBreak +
+      FErrorText := 'Podczas wykonywania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu\n' +
                     'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.';
       FAddText := GDataProvider.LastError;
     end;
@@ -4300,6 +4307,7 @@ constructor TReportDialgoParamDef.Create(AParentParamsDefs: TReportDialogParamsD
 begin
   inherited Create;
   FparentParamsDefs := AParentParamsDefs;
+  VarClear(FparamValue);
 end;
 
 function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
@@ -4309,6 +4317,11 @@ begin
   end else begin
     Result := Fname;
   end;
+end;
+
+function TReportDialgoParamDef.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdesc;
 end;
 
 function TReportDialgoParamDef.GetElementId: String;
@@ -4324,13 +4337,17 @@ end;
 procedure TReportDialgoParamDef.LoadFromXml(ANode: IXMLDOMNode);
 begin
   Fname := GetXmlAttribute('name', ANode, '');
+  Fdesc := GetXmlAttribute('desc', ANode, '');
   Fgroup := GetXmlAttribute('group', ANode, '');
+  FparamType := GetXmlAttribute('type', ANode, '');
 end;
 
 procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
 begin
   SetXmlAttribute('name', ANode, Fname);
+  SetXmlAttribute('desc', ANode, Fdesc);
   SetXmlAttribute('group', ANode, Fgroup);
+  SetXmlAttribute('type', ANode, FparamType);
 end;
 
 procedure TReportDialogParamsDefs.SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);

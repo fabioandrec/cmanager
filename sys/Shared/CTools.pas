@@ -89,7 +89,7 @@ function DataGidToDatabase(ADataGid: String): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function TrimStr(AStr: String; AUnwanted: String): String;
-
+function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
 
 implementation
@@ -625,6 +625,36 @@ begin
   while Copy(Result, Length(Result) - xLenUnwanted + 1, xLenUnwanted) = AUnwanted do begin
     Delete(Result, Length(Result) - xLenUnwanted + 1, xLenUnwanted);
   end;
+end;
+
+function WrapTextToLength(AText: String; ALength: Integer): String;
+var xStr: TStringList;
+    xCount: Integer;
+    xCurr: String;
+    xPos: Integer;
+begin
+  xStr := TStringList.Create;
+  xStr.Text := AText;
+  for xCount := 0 to xStr.Count - 1 do begin
+    xCurr := WrapText(xStr.Strings[xCount], ALength);
+    xPos := Pos(sLineBreak, xCurr);
+    if xPos > 0 then begin
+      xStr.Strings[xCount] := Copy(xCurr, 1, xPos - 1);
+      Delete(xCurr, 1, xPos + Length(sLineBreak) - 1);
+      if Length(xCurr) > 0 then begin
+        if xCount + 1 <= xStr.Count - 1 then begin
+          xStr.Strings[xCount + 1] := xCurr + ' ' + xStr.Strings[xCount + 1];
+        end else begin
+          xStr.Add(xCurr);
+        end;
+      end;
+    end;
+  end;
+  Result := '';
+  for xCount := 0 to xStr.Count - 1 do begin
+    Result := Result + xStr.Strings[xCount] + IfThen(xCount < xStr.Count - 1, sLineBreak, '');
+  end;
+  xStr.Free;
 end;
 
 end.
