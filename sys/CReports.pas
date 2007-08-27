@@ -35,12 +35,14 @@ type
     procedure SetAsString(const Value: String);
     function GetItems(AIndex: Integer): TReportDialgoParamDef;
     procedure SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
+    function GetByName(AName: String): TReportDialgoParamDef;
   public
     constructor Create;
     function ShowParamsDefsList(AChoice: Boolean): String;
     function AddParam(AParam: TReportDialgoParamDef): Integer;
     procedure RemoveParam(AParam: TReportDialgoParamDef);
     property Items[AIndex: Integer]: TReportDialgoParamDef read GetItems write SetItems;
+    property ByName[AName: String]: TReportDialgoParamDef read GetByName;
     destructor Destroy; override;
   published
     property AsString: String read GetAsString write SetAsString;
@@ -4235,6 +4237,19 @@ begin
   end;
   FasString := GetStringFromDocument(xXml);
   Result := FasString;
+end;
+
+function TReportDialogParamsDefs.GetByName(AName: String): TReportDialgoParamDef;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (Result = Nil) and (xCount <= Count - 1) do begin
+    if (Items[xCount].name = AName) then begin
+      Result := Items[xCount];
+    end;
+    Inc(xCount);
+  end;
 end;
 
 function TReportDialogParamsDefs.GetItems(AIndex: Integer): TReportDialgoParamDef;

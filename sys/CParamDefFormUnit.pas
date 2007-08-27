@@ -30,12 +30,22 @@ uses CInfoFormUnit;
 {$R *.dfm}
 
 function TCParamDefForm.CanAccept: Boolean;
+var xParam: TReportDialgoParamDef;
 begin
-  Result := inherited CanAccept;
   if Trim(EditName.Text) = '' then begin
     Result := False;
     ShowInfo(itError, 'Nazwa parametru nie mo¿e byæ pusta', '');
     EditName.SetFocus;
+  end else begin
+    xParam := FParamDef.parentParamsDefs.ByName[EditName.Text];
+    Result := xParam = Nil;
+    if (not Result) and (Operation = coEdit) then begin
+      Result := xParam = FParamDef;
+    end;
+    if not Result then begin
+      ShowInfo(itError, 'Istnieje ju¿ parametr o nazwie "' + EditName.Text + '". Wybierz inn¹ nazwê dla parametru.', '');
+      EditName.SetFocus;
+    end;
   end;
 end;
 
