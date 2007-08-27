@@ -121,7 +121,8 @@ uses
   CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
   CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm},
   CBase64 in 'Shared\CBase64.pas',
-  CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame};
+  CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame},
+  CParamDefFormUnit in 'CParamDefFormUnit.pas' {CParamDefForm};
 
 {$R *.res}
 

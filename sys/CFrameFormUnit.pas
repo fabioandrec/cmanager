@@ -58,9 +58,11 @@ begin
 end;
 
 destructor TCFrameForm.Destroy;
+var xFreeAdditional: Boolean;
 begin
+  xFreeAdditional := FFrame.MustFreeAdditionalData;
   FreeAndNil(FFrame);
-  if Assigned(FAdditionalData) then begin
+  if Assigned(FAdditionalData) and (xFreeAdditional) then begin
     FAdditionalData.Free;
   end;
   inherited Destroy;

@@ -19,20 +19,32 @@ type
     procedure LoadFromXml(ANode: IXMLDOMNode);
     procedure SaveToXml(ANode: IXMLDOMNode);
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementId: String; override;
+    function GetElementType: String; override;
   published
     property name: String read Fname write Fname;
     property group: String read Fgroup write Fgroup;
+    property parentParamsDefs: TReportDialogParamsDefs read FparentParamsDefs;
   end;
 
   TReportDialogParamsDefs = class(TObjectList)
   private
     FasString: String;
+    Fgroups: TStringList;
     function GetAsString: String;
     procedure SetAsString(const Value: String);
+    function GetItems(AIndex: Integer): TReportDialgoParamDef;
+    procedure SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
   public
+    constructor Create;
     function ShowParamsDefsList(AChoice: Boolean): String;
+    function AddParam(AParam: TReportDialgoParamDef): Integer;
+    procedure RemoveParam(AParam: TReportDialgoParamDef);
+    property Items[AIndex: Integer]: TReportDialgoParamDef read GetItems write SetItems;
+    destructor Destroy; override;
   published
     property AsString: String read GetAsString write SetAsString;
+    property groups: TStringList read Fgroups;
   end;
 
   TSumForDayItem = class(TObject)
@@ -4187,6 +4199,26 @@ begin
   FreportText.Text := GBaseTemlatesList.ExpandTemplates(TSimpleReportParams(FParams).reportText, Self);
 end;
 
+function TReportDialogParamsDefs.AddParam(AParam: TReportDialgoParamDef): Integer;
+begin
+  Result :=Add(AParam);
+  if Fgroups.IndexOf(AParam.group) = -1 then begin
+    Fgroups.Add(AParam.group);
+  end;
+end;
+
+constructor TReportDialogParamsDefs.Create;
+begin
+  inherited Create(True);
+  Fgroups := TStringList.Create;
+end;
+
+destructor TReportDialogParamsDefs.Destroy;
+begin
+  Fgroups.Free;
+  inherited Destroy;
+end;
+
 function TReportDialogParamsDefs.GetAsString: String;
 var xXml: IXMLDOMDocument;
     xRoot: IXMLDOMNode;
@@ -4205,6 +4237,29 @@ begin
   Result := FasString;
 end;
 
+function TReportDialogParamsDefs.GetItems(AIndex: Integer): TReportDialgoParamDef;
+begin
+  Result := TReportDialgoParamDef(inherited Items[AIndex]);
+end;
+
+procedure TReportDialogParamsDefs.RemoveParam(AParam: TReportDialgoParamDef);
+var xGroup: String;
+    xCount: Integer;
+    xFound: Boolean;
+begin
+  xGroup := AParam.group;
+  Remove(AParam);
+  xCount := 0;
+  xFound := False;
+  while (not xFound) and (xCount <= Count - 1) do begin
+    xFound := xGroup = Items[xCount].group;
+    Inc(xCount);
+  end;
+  if not xFound then begin
+    Fgroups.Delete(Fgroups.IndexOf(xGroup));
+  end;
+end;
+
 procedure TReportDialogParamsDefs.SetAsString(const Value: String);
 var xXml: IXMLDOMDocument;
     xCount: Integer;
@@ -4219,7 +4274,7 @@ begin
         for xCount := 0 to xXml.documentElement.childNodes.length - 1 do begin
           xParam := TReportDialgoParamDef.Create(Self);
           xParam.LoadFromXml(xXml.documentElement.childNodes.item[xCount]);
-          Add(xParam);
+          AddParam(xParam);
         end;
       end;
     end;
@@ -4241,6 +4296,16 @@ begin
   end;
 end;
 
+function TReportDialgoParamDef.GetElementId: String;
+begin
+  Result := name;
+end;
+
+function TReportDialgoParamDef.GetElementType: String;
+begin
+  Result := '';
+end;
+
 procedure TReportDialgoParamDef.LoadFromXml(ANode: IXMLDOMNode);
 begin
   Fname := GetXmlAttribute('name', ANode, '');
@@ -4253,10 +4318,15 @@ begin
   SetXmlAttribute('group', ANode, Fgroup);
 end;
 
+procedure TReportDialogParamsDefs.SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
+begin
+  inherited Items[AIndex] := Value;
+end;
+
 function TReportDialogParamsDefs.ShowParamsDefsList(AChoice: Boolean): String;
 var xText: String;
 begin
-  if not TCFrameForm.ShowFrame(TCParamsDefsFrame, Result, xText, Nil, Nil, Nil, Nil, AChoice) then begin
+  if not TCFrameForm.ShowFrame(TCParamsDefsFrame, Result, xText, Self, Nil, Nil, Nil, AChoice) then begin
     Result := '';
   end;
 end;

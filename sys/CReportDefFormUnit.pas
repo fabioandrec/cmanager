@@ -181,7 +181,7 @@ end;
 procedure TCReportDefForm.InitializeForm;
 begin
   inherited InitializeForm;
-  FparamsDefs := TReportDialogParamsDefs.Create(True);
+  FparamsDefs := TReportDialogParamsDefs.Create;
   FparamsDefs.AsString := '';
 end;
 

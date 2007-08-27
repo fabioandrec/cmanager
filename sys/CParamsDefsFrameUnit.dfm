@@ -27,7 +27,6 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
     Header.Height = 21
-    Header.MainColumn = -1
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
     Header.PopupMenu = VTHeaderPopupMenu
     Header.Style = hsFlatButtons
@@ -41,7 +40,20 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OddColor = 12437200
     AutoExpand = True
-    Columns = <>
+    OnCDataListReloadTree = ListCDataListReloadTree
+    Columns = <
+      item
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+        Position = 0
+        Width = 200
+        WideText = 'Grupa'
+      end
+      item
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+        Position = 1
+        Width = 243
+        WideText = 'Nazwa'
+      end>
     WideDefaultText = ''
   end
   object ButtonPanel: TPanel [2]
@@ -109,14 +121,17 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     object ActionAdd: TAction
       Caption = 'Dodaj parametr'
       ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
     object ActionEdit: TAction
       Caption = 'Edytuj parametr'
       ImageIndex = 1
+      OnExecute = ActionEditExecute
     end
     object ActionDelete: TAction
       Caption = 'Usu'#324' parametr'
       ImageIndex = 2
+      OnExecute = ActionDeleteExecute
     end
     object ActionPreview: TAction
       Caption = 'Podgl'#261'd dialogu'

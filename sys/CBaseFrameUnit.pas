@@ -81,6 +81,7 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; virtual;
     function FindNodeId(ANode: PVirtualNode): TDataGid; virtual;
     property OutputData: Pointer read FOutputData;
+    function MustFreeAdditionalData: Boolean; virtual;
     property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
   published
     property SelectedId: TDataGid read GetSelectedId write SetSelectedId;
@@ -640,6 +641,11 @@ end;
 
 procedure TCBaseFrame.FinalizeFrame;
 begin
+end;
+
+function TCBaseFrame.MustFreeAdditionalData: Boolean;
+begin
+  Result := True;
 end;
 
 initialization
