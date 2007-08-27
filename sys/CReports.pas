@@ -7,6 +7,34 @@ uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windo
      CComponents, CChartReportFormUnit, CTemplates, ShDocVW;
 
 type
+  TReportDialogParamsDefs = class;
+
+  TReportDialgoParamDef = class(TCDataListElementObject)
+  private
+    Fname: String;
+    Fgroup: String;
+    FparentParamsDefs: TReportDialogParamsDefs;
+  public
+    constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
+    procedure LoadFromXml(ANode: IXMLDOMNode);
+    procedure SaveToXml(ANode: IXMLDOMNode);
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+  published
+    property name: String read Fname write Fname;
+    property group: String read Fgroup write Fgroup;
+  end;
+
+  TReportDialogParamsDefs = class(TObjectList)
+  private
+    FasString: String;
+    function GetAsString: String;
+    procedure SetAsString(const Value: String);
+  public
+    function ShowParamsDefsList(AChoice: Boolean): String;
+  published
+    property AsString: String read GetAsString write SetAsString;
+  end;
+
   TSumForDayItem = class(TObject)
   private
     Fsum: Currency;
@@ -529,7 +557,8 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
-     CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64;
+     CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
+  CParamsDefsFrameUnit, CFrameFormUnit;
 
 var LDefaultXsl: IXMLDOMDocument;
 
@@ -4156,6 +4185,80 @@ end;
 procedure TSimpleReportDialog.PrepareReportContent;
 begin
   FreportText.Text := GBaseTemlatesList.ExpandTemplates(TSimpleReportParams(FParams).reportText, Self);
+end;
+
+function TReportDialogParamsDefs.GetAsString: String;
+var xXml: IXMLDOMDocument;
+    xRoot: IXMLDOMNode;
+    xNode: IXMLDOMNode;
+    xCount: Integer;
+begin
+  xXml := GetXmlDocument;
+  xRoot := xXml.createElement('paramsDefs');
+  xXml.appendChild(xRoot);
+  for xCount := 0 to Count - 1 do begin
+    xNode := xXml.createElement('paramDef');
+    xRoot.appendChild(xNode);
+    TReportDialgoParamDef(Items[xCount]).SaveToXml(xNode);
+  end;
+  FasString := GetStringFromDocument(xXml);
+  Result := FasString;
+end;
+
+procedure TReportDialogParamsDefs.SetAsString(const Value: String);
+var xXml: IXMLDOMDocument;
+    xCount: Integer;
+    xParam: TReportDialgoParamDef;
+begin
+  Clear;
+  FasString := Value;
+  if FasString <> '' then begin
+    xXml := GetDocumentFromString(FasString);
+    if xXml.parseError.errorCode = 0 then begin
+      if xXml.documentElement <> Nil then begin
+        for xCount := 0 to xXml.documentElement.childNodes.length - 1 do begin
+          xParam := TReportDialgoParamDef.Create(Self);
+          xParam.LoadFromXml(xXml.documentElement.childNodes.item[xCount]);
+          Add(xParam);
+        end;
+      end;
+    end;
+  end;
+end;
+
+constructor TReportDialgoParamDef.Create(AParentParamsDefs: TReportDialogParamsDefs);
+begin
+  inherited Create;
+  FparentParamsDefs := AParentParamsDefs;
+end;
+
+function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  if AColumnIndex = 0 then begin
+    Result := Fgroup;
+  end else begin
+    Result := Fname;
+  end;
+end;
+
+procedure TReportDialgoParamDef.LoadFromXml(ANode: IXMLDOMNode);
+begin
+  Fname := GetXmlAttribute('name', ANode, '');
+  Fgroup := GetXmlAttribute('group', ANode, '');
+end;
+
+procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
+begin
+  SetXmlAttribute('name', ANode, Fname);
+  SetXmlAttribute('group', ANode, Fgroup);
+end;
+
+function TReportDialogParamsDefs.ShowParamsDefsList(AChoice: Boolean): String;
+var xText: String;
+begin
+  if not TCFrameForm.ShowFrame(TCParamsDefsFrame, Result, xText, Nil, Nil, Nil, Nil, AChoice) then begin
+    Result := '';
+  end;
 end;
 
 initialization

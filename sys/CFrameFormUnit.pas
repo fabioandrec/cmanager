@@ -89,6 +89,7 @@ end;
 class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
 var xForm: TCFrameForm;
     xFormClass: TCFrameFormClass;
+    xOperation: TConfigOperation;
 begin
   if AFormClass = Nil then begin
     xFormClass := TCFrameForm;
@@ -106,7 +107,12 @@ begin
   if ARect <> Nil then begin
     xForm.SetBounds(ARect^.Left, ARect^.Top, ARect^.Right, ARect^.Bottom);
   end;
-  if xForm.ShowConfig(AFrameClass.GetOperation, True) then begin
+  if AIsChoice then begin
+    xOperation := AFrameClass.GetOperation;
+  end else begin
+    xOperation := coNone;
+  end;
+  if xForm.ShowConfig(xOperation, True) then begin
     ADataId := xForm.FFrame.SelectedId;
     AText := xForm.FFrame.SelectedText;
     if (AOutData <> Nil) or (AMultipleCheck <> Nil) then begin

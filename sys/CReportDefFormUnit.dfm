@@ -2,11 +2,11 @@ inherited CReportDefForm: TCReportDefForm
   Left = 318
   Top = 55
   Caption = 'Definicja raportu'
-  ClientHeight = 626
+  ClientHeight = 643
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Height = 585
+    Height = 602
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -54,12 +54,12 @@ inherited CReportDefForm: TCReportDefForm
       Left = 16
       Top = 176
       Width = 561
-      Height = 153
+      Height = 193
       Caption = ' Zapytanie tworz'#261'ce '
       TabOrder = 1
       object CButton1: TCButton
-        Left = 432
-        Top = 116
+        Left = 424
+        Top = 132
         Width = 113
         Height = 25
         Cursor = crHandPoint
@@ -71,8 +71,8 @@ inherited CReportDefForm: TCReportDefForm
         Color = clBtnFace
       end
       object CButton3: TCButton
-        Left = 206
-        Top = 116
+        Left = 198
+        Top = 132
         Width = 217
         Height = 25
         Cursor = crHandPoint
@@ -83,11 +83,37 @@ inherited CReportDefForm: TCReportDefForm
         Action = ActionTemp
         Color = clBtnFace
       end
+      object CButton4: TCButton
+        Left = 422
+        Top = 156
+        Width = 147
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionParams
+        Color = clBtnFace
+      end
+      object CButton5: TCButton
+        Left = 198
+        Top = 156
+        Width = 217
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionAddParam
+        Color = clBtnFace
+      end
       object RicheditSql: TCRichedit
         Left = 24
         Top = 32
         Width = 513
-        Height = 81
+        Height = 97
         BevelKind = bkTile
         BorderStyle = bsNone
         PlainText = True
@@ -98,14 +124,14 @@ inherited CReportDefForm: TCReportDefForm
     end
     object GroupBox3: TGroupBox
       Left = 16
-      Top = 344
+      Top = 384
       Width = 561
-      Height = 233
+      Height = 217
       Caption = ' Arkusz styli '
       TabOrder = 2
       object CButton2: TCButton
-        Left = 432
-        Top = 197
+        Left = 424
+        Top = 181
         Width = 113
         Height = 25
         Cursor = crHandPoint
@@ -120,7 +146,7 @@ inherited CReportDefForm: TCReportDefForm
         Left = 24
         Top = 32
         Width = 513
-        Height = 161
+        Height = 145
         BevelKind = bkTile
         BorderStyle = bsNone
         PlainText = True
@@ -131,7 +157,7 @@ inherited CReportDefForm: TCReportDefForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 585
+    Top = 602
   end
   object ActionManager: TActionManager
     Images = CImageLists.TemplateImageList16x16
@@ -152,6 +178,16 @@ inherited CReportDefForm: TCReportDefForm
       Caption = 'Dodaj mnemonik w wybranym miejscu'
       ImageIndex = 0
       OnExecute = ActionTempExecute
+    end
+    object ActionParams: TAction
+      Caption = 'Lista parametr'#243'w'
+      ImageIndex = 4
+      OnExecute = ActionParamsExecute
+    end
+    object ActionAddParam: TAction
+      Caption = 'Dodaj parametr w wybranym miejscu'
+      ImageIndex = 5
+      OnExecute = ActionAddParamExecute
     end
   end
   object OpenDialog: TOpenDialog

@@ -33,6 +33,7 @@ type
     ExtractionImageList24x24: TPngImageList;
     ExtstatusImageList16x16: TPngImageList;
     MovstatusImageList16x16: TPngImageList;
+    ParamsDefsImageList: TPngImageList;
   private
     { Private declarations }
   public

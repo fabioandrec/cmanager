@@ -9,6 +9,9 @@ inherited CFrameForm: TCFrameForm
   inherited PanelConfig: TPanel
     Width = 877
     Height = 580
+    DesignSize = (
+      877
+      580)
     object PanelFrame: TPanel
       Left = 2
       Top = 2
@@ -22,6 +25,9 @@ inherited CFrameForm: TCFrameForm
   inherited PanelButtons: TPanel
     Top = 580
     Width = 877
+    DesignSize = (
+      877
+      41)
     inherited BitBtnOk: TBitBtn
       Left = 700
     end

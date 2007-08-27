@@ -120,7 +120,8 @@ uses
   CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm},
   CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
   CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm},
-  CBase64 in 'Shared\CBase64.pas';
+  CBase64 in 'Shared\CBase64.pas',
+  CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame};
 
 {$R *.res}
 

@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
   CComponents, CDatabase, CBaseFrameUnit, ActnList, XPStyleActnCtrls,
-  ActnMan, Contnrs, MsXml;
+  ActnMan, Contnrs, MsXml, VirtualTrees, CReports;
 
 type
   TCReportDefForm = class(TCDataobjectForm)
@@ -27,10 +27,17 @@ type
     OpenDialog: TOpenDialog;
     CButton3: TCButton;
     ActionTemp: TAction;
+    ActionParams: TAction;
+    CButton4: TCButton;
+    CButton5: TCButton;
+    ActionAddParam: TAction;
     procedure ActionSqlExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
     procedure ActionTempExecute(Sender: TObject);
+    procedure ActionParamsExecute(Sender: TObject);
+    procedure ActionAddParamExecute(Sender: TObject);
   private
+    FparamsDefs: TReportDialogParamsDefs;
     function CheckValidXsl: Boolean;
   protected
     procedure LoadFromFile(ASql: Boolean);
@@ -39,6 +46,9 @@ type
     procedure FillForm; override;
     function CanAccept: Boolean; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
+    procedure InitializeForm; override;
+  public
+    destructor Destroy; override;
   end;
 
 implementation
@@ -55,7 +65,11 @@ begin
     ShowInfo(itError, 'Nazwa raportu nie mo¿e byæ pusta', '');
     EditName.SetFocus;
   end else begin
-    Result := CheckValidXsl;
+    if RicheditXslt.Text <> '' then begin
+      Result := CheckValidXsl;
+    end else begin
+      Result := True;
+    end;
   end;
 end;
 
@@ -70,6 +84,13 @@ begin
       SimpleRichText(xBufferOut, RicheditXslt);
     end else begin
       ShowInfo(itWarning, 'Dane arkusza styli s¹ uszkodzone i nie zostan¹ wyœwietlone. Prawdopodobnie plik danych jest uszkodzony.' +
+                          'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                          'i nastêpnie kompaktowanie pliku danych.', '');
+    end;
+    if DecodeBase64Buffer(paramsDefs, xBufferOut) then begin
+      FparamsDefs.AsString := xBufferOut;
+    end else begin
+      ShowInfo(itWarning, 'Dane parametrów raportu s¹ uszkodzone i nie bêd¹ dostêpne. Prawdopodobnie plik danych jest uszkodzony.' +
                           'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
                           'i nastêpnie kompaktowanie pliku danych.', '');
     end;
@@ -121,9 +142,10 @@ begin
     name := EditName.Text;
     description := RichEditDesc.Text;
     queryText := RicheditSql.Text;
-    paramsDefs := 'test';
     EncodeBase64Buffer(RicheditXslt.Text, xBufferOut);
     xsltText := xBufferOut;
+    EncodeBase64Buffer(FparamsDefs.AsString, xBufferOut);
+    paramsDefs := xBufferOut;
   end;
 end;
 
@@ -153,6 +175,45 @@ begin
   Result := xXml.parseError.errorCode = 0;
   if not Result then begin
     ShowInfo(itError, 'Zdefiniowany arkusz styli jest niepoprawny', xXml.parseError.reason);
+  end;
+end;
+
+procedure TCReportDefForm.InitializeForm;
+begin
+  inherited InitializeForm;
+  FparamsDefs := TReportDialogParamsDefs.Create(True);
+  FparamsDefs.AsString := '';
+end;
+
+destructor TCReportDefForm.Destroy;
+begin
+  FparamsDefs.Free;
+  inherited Destroy;
+end;
+
+procedure TCReportDefForm.ActionParamsExecute(Sender: TObject);
+begin
+  FparamsDefs.ShowParamsDefsList(False);
+end;
+
+procedure TCReportDefForm.ActionAddParamExecute(Sender: TObject);
+var xParam: String;
+    xDesc: String;
+    xSelStart, xSelLength: Integer;
+begin
+  xParam := FparamsDefs.ShowParamsDefsList(True);
+  if xParam <> '' then begin
+    xParam := '[' + xParam + ']';
+    RicheditSql.Lines.BeginUpdate;
+    xDesc := RicheditSql.Text;
+    xSelStart := RicheditSql.SelStart + 1;
+    xSelLength := RicheditSql.SelLength;
+    System.Delete(xDesc, xSelStart, xSelLength);
+    xDesc := Copy(xDesc, 1, xSelStart - 1) + xParam + Copy(xDesc, xSelStart, MaxInt);
+    RicheditSql.Text := xDesc;
+    RicheditSql.SelStart := xSelStart + Length(xParam) - 1;
+    RicheditSql.SelLength := 0;
+    RicheditSql.Lines.EndUpdate
   end;
 end;
 
