@@ -37,7 +37,11 @@ uses CInfoFormUnit, CConsts;
 function TCParamDefForm.CanAccept: Boolean;
 var xParam: TReportDialgoParamDef;
 begin
-  if Trim(EditName.Text) = '' then begin
+  if Trim(ComboBoxGroup.Text) = '' then begin
+    Result := False;
+    ShowInfo(itError, 'Grupa, do której ma nale¿eæ parametr nie mo¿e byæ pusta', '');
+    ComboBoxGroup.SetFocus;
+  end else if Trim(EditName.Text) = '' then begin
     Result := False;
     ShowInfo(itError, 'Nazwa parametru nie mo¿e byæ pusta', '');
     EditName.SetFocus;
