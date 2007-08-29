@@ -18,7 +18,7 @@ procedure CheckForUpdates(AQuiet: Boolean);
 procedure CheckForBackups;
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 procedure SetDatabaseDefaultData;
-procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
+procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExtractions(AExtractionText: String);
 procedure ReloadCaches;
@@ -264,12 +264,12 @@ begin
   end;
 end;
 
-procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement);
+procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 var xCount: Integer;
     xElement: TCListDataElement;
 begin
   for xCount := 0 to AList.Count - 1 do begin
-    xElement := TCListDataElement.Create(ARootElement.ParentList, AList.Items[xCount]);
+    xElement := TCListDataElement.Create(ACheckSupport, ARootElement.ParentList, AList.Items[xCount]);
     ARootElement.Add(xElement);
   end;
 end;

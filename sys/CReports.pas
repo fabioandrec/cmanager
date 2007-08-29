@@ -8,6 +8,7 @@ uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windo
 
 type
   TReportDialogParamsDefs = class;
+  TParamValues = array of Variant;
 
   TReportDialgoParamDef = class(TCDataListElementObject)
   private
@@ -16,7 +17,11 @@ type
     Fgroup: String;
     FparamType: string;
     FparentParamsDefs: TReportDialogParamsDefs;
-    FparamValue: Variant;
+    FparamValues: TParamValues;
+    FisRequired: Boolean;
+    FframeType: Integer;
+    procedure SetparamValues(const Value: TParamValues);
+    function GetParamValuesLength: Integer;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: IXMLDOMNode);
@@ -25,13 +30,16 @@ type
     function GetElementId: String; override;
     function GetElementType: String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    property paramValues: TParamValues read FparamValues write SetparamValues;
+    property paramValuesLength: Integer read GetParamValuesLength;
   published
     property name: String read Fname write Fname;
     property desc: String read Fdesc write Fdesc;
     property group: String read Fgroup write Fgroup;
     property paramType: String read FparamType write FparamType;
     property parentParamsDefs: TReportDialogParamsDefs read FparentParamsDefs;
-    property paramValue: Variant read FparamValue write FparamValue;
+    property isRequired: Boolean read FisRequired write FisRequired;
+    property frameType: Integer read FframeType write FframeType;
   end;
 
   TReportDialogParamsDefs = class(TObjectList)
@@ -4307,7 +4315,9 @@ constructor TReportDialgoParamDef.Create(AParentParamsDefs: TReportDialogParamsD
 begin
   inherited Create;
   FparentParamsDefs := AParentParamsDefs;
-  VarClear(FparamValue);
+  SetLength(FparamValues, 0);
+  FisRequired := True;
+  FframeType := CFRAMETYPE_UNKNOWN;
 end;
 
 function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
@@ -4334,12 +4344,19 @@ begin
   Result := '';
 end;
 
+function TReportDialgoParamDef.GetParamValuesLength: Integer;
+begin
+  Result := Length(FparamValues);
+end;
+
 procedure TReportDialgoParamDef.LoadFromXml(ANode: IXMLDOMNode);
 begin
   Fname := GetXmlAttribute('name', ANode, '');
   Fdesc := GetXmlAttribute('desc', ANode, '');
   Fgroup := GetXmlAttribute('group', ANode, '');
+  FisRequired := GetXmlAttribute('isRequired', ANode, True);
   FparamType := GetXmlAttribute('type', ANode, '');
+  FframeType := GetXmlAttribute('frame', ANode, CFRAMETYPE_UNKNOWN);
 end;
 
 procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
@@ -4348,6 +4365,8 @@ begin
   SetXmlAttribute('desc', ANode, Fdesc);
   SetXmlAttribute('group', ANode, Fgroup);
   SetXmlAttribute('type', ANode, FparamType);
+  SetXmlAttribute('isRequired', ANode, FisRequired);
+  SetXmlAttribute('frame', ANode, FframeType);
 end;
 
 procedure TReportDialogParamsDefs.SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
@@ -4360,6 +4379,15 @@ var xText: String;
 begin
   if not TCFrameForm.ShowFrame(TCParamsDefsFrame, Result, xText, Self, Nil, Nil, Nil, AChoice) then begin
     Result := '';
+  end;
+end;
+
+procedure TReportDialgoParamDef.SetparamValues(const Value: TParamValues);
+var xCount: Integer;
+begin
+  SetLength(FparamValues, Length(Value));
+  for xCount := Low(Value) to High(Value) do begin
+    FparamValues[xCount] := Value[xCount];
   end;
 end;
 

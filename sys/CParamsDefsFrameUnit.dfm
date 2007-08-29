@@ -1,8 +1,7 @@
 inherited CParamsDefsFrame: TCParamsDefsFrame
-  Height = 278
   object Bevel: TBevel [0]
     Left = 0
-    Top = 235
+    Top = 234
     Width = 443
     Height = 3
     Align = alBottom
@@ -12,7 +11,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     Left = 0
     Top = 0
     Width = 443
-    Height = 235
+    Height = 234
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -65,7 +64,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
   end
   object ButtonPanel: TPanel [2]
     Left = 0
-    Top = 238
+    Top = 237
     Width = 443
     Height = 40
     Align = alBottom

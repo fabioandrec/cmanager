@@ -162,7 +162,7 @@ begin
       end;
     end;
     if xLimit.IsSurpassed(xAmount) then begin
-      xElement := TCListDataElement.Create(SurpassedList, TSurpassedLimit.Create(xLimit, xAmount), True);
+      xElement := TCListDataElement.Create(False, SurpassedList, TSurpassedLimit.Create(xLimit, xAmount), True);
       ARootElement.Add(xElement);
     end;
   end;

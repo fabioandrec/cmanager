@@ -15,7 +15,8 @@ type
     Fparam: TReportDialgoParamDef;
     function GetNextTop: Integer;
     function GetIsValid: String;
-    function GetValue: Variant;
+    function GetValues: TParamValues;
+    procedure ChooseDataobject(var ADataGid, AText: String; var AAccepted: Boolean);
   public
     constructor Create(ADescLabel: TLabel; AParam: TReportDialgoParamDef; AControl: TWinControl);
     function FindChildByParamName(AParamName: String): TDialogParamControl;
@@ -25,7 +26,7 @@ type
     property param: TReportDialgoParamDef read Fparam write Fparam;
     property nextTop: Integer read GetNextTop;
     property isValid: String read GetIsValid;
-    property value: Variant read GetValue;
+    property values: TParamValues read GetValues;
   end;
 
   TCChooseByParamsDefsForm = class(TCConfigForm)
@@ -44,7 +45,8 @@ function ChooseByParamsDefs(var AParams: TReportDialogParamsDefs): Boolean;
 
 implementation
 
-uses CConsts, CInfoFormUnit;
+uses CConsts, CInfoFormUnit, StrUtils, CBaseFrameUnit, CFrameFormUnit,
+  CDatabase, CDataObjects, CDatatools, CTools;
 
 {$R *.dfm}
 
@@ -78,7 +80,7 @@ begin
           ShowInfo(itError, xErrorText, '');
           TDialogParamControl(xParent.Items[xCount]).control.SetFocus;
         end else begin
-          TDialogParamControl(xParent.Items[xCount]).param.paramValue := TDialogParamControl(xParent.Items[xCount]).value;
+          TDialogParamControl(xParent.Items[xCount]).param.paramValues := TDialogParamControl(xParent.Items[xCount]).values;
         end;
         Inc(xCount);
       end;
@@ -127,6 +129,7 @@ begin
     xParam := FParams.Items[xCount];
     xParent := TDialogParamControl(Fgroups.FindChildByGriupName(xParam.group));
     xControlTop := xParent.nextTop;
+    xCurrent := TDialogParamControl.Create(Nil, xParam, Nil);
     if xParam.paramType = CParamTypeText then begin
       xControl := TEdit.Create(Self);
       xControl.Name := 'Edit' + IntToStr(xCount);
@@ -149,25 +152,44 @@ begin
       TCCurrEdit(xControl).BorderStyle := bsNone;
       TCCurrEdit(xControl).CurrencyStr := '';
       TCCurrEdit(xControl).CurrencyId := '';
+    end else if xParam.paramType = CParamTypeDate then begin
+      xControl := TCDateTime.Create(Self);
+      xControl.Name := 'DateEdit' + IntToStr(xCount);
+      TCDateTime(xControl).Parent := TGroupBox(xParent.control);
+      TCDateTime(xControl).BevelKind := bkTile;
+    end else if xParam.paramType = CParamTypeDataobject then begin
+      xControl := TCStatic.Create(Self);
+      xControl.Name := 'StaticEdit' + IntToStr(xCount);
+      TCStatic(xControl).Parent := TGroupBox(xParent.control);
+      TCStatic(xControl).BevelKind := bkTile;
+      TCStatic(xControl).OnGetDataId := xCurrent.ChooseDataobject;
+    end else if xParam.paramType = CParamTypeMultiobject then begin
+      xControl := TCStatic.Create(Self);
+      xControl.Name := 'StaticEdit' + IntToStr(xCount);
+      TCStatic(xControl).Parent := TGroupBox(xParent.control);
+      TCStatic(xControl).BevelKind := bkTile;
+      TCStatic(xControl).OnGetDataId := xCurrent.ChooseDataobject;
+      TCStatic(xControl).TextOnEmpty := '<wszystkie elementy>';
     end else begin
       xControl := Nil;
     end;
+    xLabel := TLabel.Create(Self);
+    xLabel.Name := 'Label' + IntToStr(xCount);
+    xLabel.Alignment := taRightJustify;
+    xLabel.Parent := TGroupBox(xParent.control);
+    xLabel.Caption := xParam.desc;
+    if xMaxLabelWidth < xLabel.Width then begin
+      xMaxLabelWidth := xLabel.Width;
+    end;
+    xCurrent.descLabel := xLabel;
+    xCurrent.control := xControl;
     if xControl <> Nil then begin
-      xLabel := TLabel.Create(Self);
-      xLabel.Name := 'Label' + IntToStr(xCount);
-      xLabel.Alignment := taRightJustify;
-      xLabel.Parent := TGroupBox(xParent.control);
-      xLabel.Caption := xParam.desc;
-      if xMaxLabelWidth < xLabel.Width then begin
-        xMaxLabelWidth := xLabel.Width;
-      end;
       xControl.Top := xControlTop;
       xControl.Width := 250;
       xControlHeight := xControl.Height;
       xLabel.Top := xControlTop + ((xControlHeight - xLabel.Height) div 2);
-      xCurrent := TDialogParamControl.Create(xLabel, xParam, xControl);
-      xParent.Add(xCurrent);
     end;
+    xParent.Add(xCurrent);
   end;
   xGbTop := 16;
   for xCountGroup := 0 to Fgroups.Count - 1 do begin
@@ -226,6 +248,21 @@ end;
 function TDialogParamControl.GetIsValid: String;
 begin
   Result := '';
+  if Fparam.isRequired then begin
+    if Fparam.paramType = CParamTypeText then begin
+      Result := IfThen(Trim(values[Low(values)]) = '', 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
+    end else if Fparam.paramType = CParamTypeDecimal then begin
+      Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ równy 0', '');
+    end else if Fparam.paramType = CParamTypeFloat then begin
+      Result := IfThen(values[Low(values)] = 0.00, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ równy 0.00', '');
+    end else if Fparam.paramType = CParamTypeDate then begin
+      Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
+    end else if Fparam.paramType = CParamTypeDataobject then begin
+      Result := IfThen(Trim(values[Low(values)]) = CEmptyDataGid, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
+    end else if Fparam.paramType = CParamTypeMultiobject then begin
+      Result := IfThen(Length(values) = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
+    end;
+  end;
 end;
 
 function TDialogParamControl.GetNextTop: Integer;
@@ -239,16 +276,53 @@ begin
   end;
 end;
 
-function TDialogParamControl.GetValue: Variant;
+function TDialogParamControl.GetValues: TParamValues;
 begin
-  VarClear(Result);
+  SetLength(Result, 0);
   if Fparam.paramType = CParamTypeText then begin
-    Result := TEdit(control).Text;
+    SetLength(Result, 1);
+    Result[Low(Result)] := TEdit(control).Text;
   end else if Fparam.paramType = CParamTypeDecimal then begin
-    Result := TCIntEdit(control).Value;
+    SetLength(Result, 1);
+    Result[Low(Result)] := TCIntEdit(control).Value;
   end else if Fparam.paramType = CParamTypeFloat then begin
-    Result := TCCurrEdit(control).Value;
+    SetLength(Result, 1);
+    Result[Low(Result)] := TCCurrEdit(control).Value;
+  end else if Fparam.paramType = CParamTypeDate then begin
+    SetLength(Result, 1);
+    Result[Low(Result)] := TCDateTime(control).Value;
+  end else if Fparam.paramType = CParamTypeDataobject then begin
+    SetLength(Result, 2);
+    Result[Low(Result)] := TCStatic(control).DataId;
+    Result[High(Result)] := TCStatic(control).Caption;
+  end else if Fparam.paramType = CParamTypeMultiobject then begin
   end;
 end;
+
+procedure TDialogParamControl.ChooseDataobject(var ADataGid, AText: String; var AAccepted: Boolean);
+var xClass: TCBaseFrameClass;
+    xList: TStringList;
+    xDataGid: String;
+begin
+  xClass := GRegisteredClasses.FindClass(Fparam.frameType);
+  if xClass <> Nil then begin
+    if Fparam.paramType = CParamTypeDataobject then begin
+      AAccepted := TCFrameForm.ShowFrame(xClass, ADataGid, AText);
+    end else if Fparam.paramType = CParamTypeMultiobject then begin
+      xDataGid := '';
+      xList := TStringList.Create;
+      xList.Text := ADataGid;
+      AAccepted := TCFrameForm.ShowFrame(xClass, xDataGid, AText, Nil, Nil, Nil, xList);
+      ADataGid := xList.Text;
+      if ADataGid = '' then begin
+        AText := '<wszystkie elementy>';
+      end else begin
+        AText := '<wybrano ' + IntToStr(xList.Count) + '>';
+      end;
+      xList.Free;
+    end;
+  end;
+end;
+
 
 end.

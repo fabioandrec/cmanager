@@ -17,13 +17,13 @@ uses
   MemCheck in 'MemCheck.pas',
   Forms,
   Windows,
+  CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},
   CDatabase in 'CDatabase.pas',
   CDataObjects in 'CDataObjects.pas',
   CMainFormUnit in 'CMainFormUnit.pas' {CMainForm},
   CBaseFormUnit in 'CBaseFormUnit.pas' {CBaseForm},
   CConfigFormUnit in 'CConfigFormUnit.pas' {CConfigForm},
   CInfoFormUnit in 'CInfoFormUnit.pas' {CInfoForm},
-  CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},
   CCashpointsFrameUnit in 'CCashpointsFrameUnit.pas' {CCashpointsFrame: TFrame},
   CComponents in 'CComponents.pas',
   CFrameFormUnit in 'CFrameFormUnit.pas' {CFrameForm},
@@ -136,6 +136,7 @@ begin
   {$ENDIF}
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
+  InitializeFrameGlobals;
   GCmanagerState := CMANAGERSTATE_STARTING;
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     InitializeProxies;

@@ -28,7 +28,8 @@ implementation
 
 {$R *.dfm}
 
-uses CConsts, CDataObjects, CCashpointFormUnit, CReports, CPluginConsts;
+uses CConsts, CDataObjects, CCashpointFormUnit, CReports, CPluginConsts,
+  CBaseFrameUnit;
 
 function TCCashpointsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin

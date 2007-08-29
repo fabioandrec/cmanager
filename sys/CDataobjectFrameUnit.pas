@@ -174,7 +174,7 @@ var xDataobject: TDataObject;
 begin
   xDataobject := GetDataobjectClass(AOptions).LoadObject(GetDataobjectProxy(AOptions), AId, True);
   if IsValidFilteredObject(xDataobject) then begin
-    xElement := TCListDataElement.Create(List, xDataobject);
+    xElement := TCListDataElement.Create(MultipleChecks <> Nil, List, xDataobject);
     Dataobjects.Add(xDataobject);
     xNode := GetDataobjectParent(xDataobject).AppendDataElement(xElement);
     if MultipleChecks <> Nil then begin
@@ -276,7 +276,7 @@ end;
 
 procedure TCDataobjectFrame.RecreateTreeHelper;
 begin
-  CopyListToTreeHelper(Dataobjects, List.RootElement);
+  CopyListToTreeHelper(Dataobjects, List.RootElement, MultipleChecks <> Nil);
 end;
 
 procedure TCDataobjectFrame.CStaticFilterChanged(Sender: TObject);

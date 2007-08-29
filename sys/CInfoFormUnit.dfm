@@ -4,6 +4,7 @@ inherited CInfoForm: TCInfoForm
   Caption = 'InfoForm'
   ClientHeight = 471
   ClientWidth = 774
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel

@@ -93,17 +93,40 @@ type
     property FrameOwner: TComponent read FOwner;
   end;
 
+  TRegisteredFrameClass = class(TObject)
+  private
+    FframeClass: TCBaseFrameClass;
+    FframeType: Integer;
+  public
+    property frameClass: TCBaseFrameClass read FframeClass write FframeClass;
+    property frameType: Integer read FframeType write FframeType;
+  end;
+
+  TRegisteredFrameClasses = class(TObjectList)
+  public
+    procedure AddClass(AFrameClass: TCBaseFrameClass; AFrameType: Integer);
+    function FindClass(AFrameType: Integer): TCBaseFrameClass;
+  end;
+
 var GFrames: TObjectList;
+    GRegisteredClasses: TRegisteredFrameClasses;
 
 procedure SendMessageToFrames(AFrameClass: TCBaseFrameClass; AMsg: Cardinal; AWParam: Cardinal; ALParam: Cardinal);
 function FindDataobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
+procedure InitializeFrameGlobals;
+procedure FinalizeFrameGlobals;
 
 implementation
 
 uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
   CDatatools, CInfoFormUnit, CPluginConsts, CPlugins, CFrameFormUnit,
-  CTools;
+  CTools, CAccountsFrameUnit, CCashpointsFrameUnit, CCurrencydefFrameUnit,
+  CCurrencyRateFrameUnit, CDoneFrameUnit, CExtractionItemFrameUnit,
+  CExtractionsFrameUnit, CFilterFrameUnit, CLimitsFrameUnit,
+  CMovementFrameUnit, CPlannedFrameUnit, CProductsFrameUnit,
+  CProfileFrameUnit, CUnitdefFormUnit, CUpdateCurrencyRatesFormUnit,
+  CUnitDefFrameUnit;
 
 {$R *.dfm}
 
@@ -648,8 +671,55 @@ begin
   Result := True;
 end;
 
-initialization
+procedure TRegisteredFrameClasses.AddClass(AFrameClass: TCBaseFrameClass; AFrameType: Integer);
+var xObj: TRegisteredFrameClass;
+begin
+  xObj := TRegisteredFrameClass.Create;
+  xObj.frameClass := AFrameClass;
+  xObj.frameType := AFrameType;
+  Add(xObj);
+end;
+
+function TRegisteredFrameClasses.FindClass(AFrameType: Integer): TCBaseFrameClass;
+var xCount: Integer;
+begin
+  xCount := 0;
+  Result := Nil;
+  while (xCount <= Count - 1) and (Result = Nil) do begin
+    if TRegisteredFrameClass(Items[xCount]).frameType = AFrameType then begin
+      Result := TRegisteredFrameClass(Items[xCount]).frameClass;
+    end;
+    Inc(xCount);
+  end;
+end;
+
+procedure InitializeFrameGlobals;
+begin
   GFrames := TObjectList.Create(False);
-finalization
+  GRegisteredClasses := TRegisteredFrameClasses.Create(True);
+  GRegisteredClasses.AddClass(TCAccountsFrame, CFRAMETYPE_ACCOUNTSFRAME);
+  GRegisteredClasses.AddClass(TCCashpointsFrame, CFRAMETYPE_CASHPOINTSFRAME);
+  GRegisteredClasses.AddClass(TCCurrencydefFrame, CFRAMETYPE_CURRENCYDEFFRAME);
+  GRegisteredClasses.AddClass(TCCurrencyRateFrame, CFRAMETYPE_CURRENCYRATEFRAME);
+  GRegisteredClasses.AddClass(TCDoneFrame, CFRAMETYPE_DONEFRAME);
+  GRegisteredClasses.AddClass(TCExtractionItemFrame, CFRAMETYPE_EXTRACTIONITEMFRAME);
+  GRegisteredClasses.AddClass(TCExtractionsFrame, CFRAMETYPE_EXTRACTIONSFRAME);
+  GRegisteredClasses.AddClass(TCFilterFrame, CFRAMETYPE_FILTERFRAME);
+  GRegisteredClasses.AddClass(TCLimitsFrame, CFRAMETYPE_LIMITSFRAME);
+  GRegisteredClasses.AddClass(TCMovementFrame, CFRAMETYPE_MOVEMENTFRAME);
+  GRegisteredClasses.AddClass(TCPlannedFrame, CFRAMETYPE_PLANNEDFRAME);
+  GRegisteredClasses.AddClass(TCProductsFrame, CFRAMETYPE_PRODUCTSFRAME);
+  GRegisteredClasses.AddClass(TCProfileFrame, CFRAMETYPE_PROFILEFRAME);
+  GRegisteredClasses.AddClass(TCUnitDefFrame, CFRAMETYPE_UNITDEFFRAME);
+end;
+
+procedure FinalizeFrameGlobals;
+begin
   GFrames.Free;
+  GRegisteredClasses.Free;
+end;
+
+initialization
+finalization
+  FinalizeFrameGlobals;
 end.

@@ -23,7 +23,7 @@ type
 
 implementation
 
-uses CDataObjects, CPluginConsts, CUnitdefFormUnit;
+uses CDataObjects, CPluginConsts, CUnitdefFormUnit, CBaseFrameUnit;
 
 {$R *.dfm}
 

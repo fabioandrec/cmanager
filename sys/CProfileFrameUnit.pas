@@ -21,7 +21,7 @@ type
 
 implementation
 
-uses CDataObjects, CProfileFormUnit, CPluginConsts;
+uses CDataObjects, CProfileFormUnit, CPluginConsts, CBaseFrameUnit;
 
 {$R *.dfm}
 

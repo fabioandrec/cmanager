@@ -71,7 +71,7 @@ var xDefs: TReportDialogParamsDefs;
 begin
   xDefs := TReportDialogParamsDefs(AdditionalData);
   for xCount := 0 to xDefs.Count - 1 do begin
-    ARootElement.AppendDataElement(TCListDataElement.Create(List, xDefs.Items[xCount]));
+    ARootElement.AppendDataElement(TCListDataElement.Create(False, List, xDefs.Items[xCount]));
   end;
 end;
 
@@ -84,7 +84,7 @@ begin
   xForm.paramDef := xParam;
   if xForm.ShowConfig(coEdit) then begin
     TReportDialogParamsDefs(AdditionalData).AddParam(xParam);
-    List.RootElement.AppendDataElement(TCListDataElement.Create(List, xParam));
+    List.RootElement.AppendDataElement(TCListDataElement.Create(False, List, xParam));
   end else begin
     xParam.Free;
   end;

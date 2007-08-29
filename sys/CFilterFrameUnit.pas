@@ -21,7 +21,7 @@ type
 
 implementation
 
-uses CDataObjects, CFilterFormUnit, CPluginConsts;
+uses CDataObjects, CFilterFormUnit, CPluginConsts, CBaseFrameUnit;
 
 {$R *.dfm}
 

@@ -545,35 +545,7 @@ begin
       xDataGid := TDataGid(ADataGid);
       xOptParam := AOptParam;
     end;
-    if AFrameType = CFRAMETYPE_CASHPOINTSFRAME then begin
-      xClass := TCCashpointsFrame;
-    end else if AFrameType = CFRAMETYPE_ACCOUNTSFRAME then begin
-      xClass := TCAccountsFrame;
-    end else if AFrameType = CFRAMETYPE_PRODUCTSFRAME then begin
-      xClass := TCProductsFrame;
-    end else if AFrameType = CFRAMETYPE_MOVEMENTFRAME then begin
-      xClass := TCMovementFrame;
-    end else if AFrameType = CFRAMETYPE_PLANNEDFRAME then begin
-      xClass := TCPlannedFrame;
-    end else if AFrameType = CFRAMETYPE_DONEFRAME then begin
-      xClass := TCDoneFrame;
-    end else if AFrameType = CFRAMETYPE_FILTERFRAME then begin
-      xClass := TCFilterFrame;
-    end else if AFrameType = CFRAMETYPE_PROFILEFRAME then begin
-      xClass := TCProfileFrame;
-    end else if AFrameType = CFRAMETYPE_LIMITSFRAME then begin
-      xClass := TCLimitsFrame;
-    end else if AFrameType = CFRAMETYPE_CURRENCYDEFFRAME then begin
-      xClass := TCCurrencydefFrame;
-    end else if AFrameType = CFRAMETYPE_CURRENCYRATEFRAME then begin
-      xClass := TCCurrencyRateFrame;
-    end else if AFrameType = CFRAMETYPE_EXTRACTIONSFRAME then begin
-      xClass := TCExtractionsFrame;
-    end else if AFrameType = CFRAMETYPE_EXTRACTIONITEMFRAME then begin
-      xClass := TCExtractionItemFrame;
-    end else if AFrameType = CFRAMETYPE_UNITDEFFRAME then begin
-      xClass := TCUnitDefFrame;
-    end;
+    xClass := GRegisteredClasses.FindClass(AFrameType);
   end;
   if (xMessage <> 0) and (xClass <> Nil) then begin
     SendMessageToFrames(xClass, xMessage, Integer(@xDataGid), xOptParam);

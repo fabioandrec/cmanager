@@ -545,7 +545,7 @@ end;
 
 class function TCMovementFrame.GetTitle: String;
 begin
-  Result := 'Na dziœ';
+  Result := 'Operacje wykonane';
 end;
 
 function TCMovementFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;

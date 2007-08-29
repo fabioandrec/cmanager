@@ -25,7 +25,8 @@ type
 
 implementation
 
-uses CDataObjects, CAccountFormUnit, CConsts, CReports, CPluginConsts;
+uses CDataObjects, CAccountFormUnit, CConsts, CReports, CPluginConsts,
+  CBaseFrameUnit;
 
 {$R *.dfm}
 

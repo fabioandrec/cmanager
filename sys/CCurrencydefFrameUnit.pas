@@ -25,7 +25,7 @@ type
 
 implementation
 
-uses CCurrencydefFormUnit, CReports, CPluginConsts;
+uses CCurrencydefFormUnit, CReports, CPluginConsts, CBaseFrameUnit;
 
 {$R *.dfm}
 

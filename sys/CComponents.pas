@@ -282,10 +282,12 @@ type
     FParentList: TCDataList;
     FData: TCDataListElementObject;
     FNode: PVirtualNode;
+    FCheckState: Boolean;
+    FCheckSupport: Boolean;
     function GetItems(AIndex: Integer): TCListDataElement;
     procedure SetItems(AIndex: Integer; const Value: TCListDataElement);
   public
-    constructor Create(AParentList: TCDataList; AData: TCDataListElementObject; AFreeDataOnClear: Boolean = False);
+    constructor Create(ACheckSupport: Boolean; AParentList: TCDataList; AData: TCDataListElementObject; AFreeDataOnClear: Boolean = False; ACheckState: Boolean = True);
     function FindDataElement(AId: String; AElementType: String = ''; ARecursive: Boolean = True): TCListDataElement;
     procedure DeleteDataElement(AId: String; AElementType: String = '');
     procedure RefreshDataElement(AId: String; AElementType: String = '');
@@ -294,6 +296,8 @@ type
     property ParentList: TCDataList read FParentList write FParentList;
     property Data: TCDataListElementObject read FData write FData;
     property Node: PVirtualNode read FNode write FNode;
+    property CheckState: Boolean read FCheckState write FCheckState;
+    property CheckSupport: Boolean read FCheckSupport write FCheckSupport;
     destructor Destroy; override;
     property FreeDataOnClear: Boolean read FFreeDataOnClear write FFreeDataOnClear;
   end;
@@ -1567,12 +1571,14 @@ begin
   FParentList.EndUpdate;
 end;
 
-constructor TCListDataElement.Create(AParentList: TCDataList; AData: TCDataListElementObject; AFreeDataOnClear: Boolean = False);
+constructor TCListDataElement.Create(ACheckSupport: Boolean; AParentList: TCDataList; AData: TCDataListElementObject; AFreeDataOnClear: Boolean = False; ACheckState: Boolean = True);
 begin
   inherited Create(True);
   FParentList := AParentList;
   FFreeDataOnClear := AFreeDataOnClear;
   FData := AData;
+  FCheckState := ACheckState;
+  FCheckSupport := ACheckSupport;
 end;
 
 procedure TCListDataElement.DeleteDataElement(AId, AElementType: String);
@@ -1643,7 +1649,7 @@ end;
 constructor TCDataList.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRootElement := TCListDataElement.Create(Self, Nil);
+  FRootElement := TCListDataElement.Create(False, Self, Nil);
   FCOnReloadTree := Nil;
 end;
 
@@ -1671,6 +1677,16 @@ begin
     if AutoExpand then begin
       InitStates := InitStates + [ivsExpanded];
     end;
+  end;
+  if xData.CheckState then begin
+    Node.CheckState := csCheckedNormal;
+  end else begin
+    Node.CheckState := csUncheckedNormal;
+  end;
+  if xData.CheckSupport then begin
+    Node.CheckType := ctCheckBox;
+  end else begin
+    Node.CheckType := ctNone;
   end;
 end;
 

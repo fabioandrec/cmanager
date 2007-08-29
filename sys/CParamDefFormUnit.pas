@@ -18,8 +18,14 @@ type
     ComboBoxType: TComboBox;
     Label3: TLabel;
     EditDesc: TEdit;
+    Label4: TLabel;
+    ComboBoxReq: TComboBox;
+    Label6: TLabel;
+    ComboBoxFrameType: TComboBox;
+    procedure ComboBoxTypeChange(Sender: TObject);
   private
     FParamDef: TReportDialgoParamDef;
+    procedure RefreshControls;
   protected
     function CanAccept: Boolean; override;
     procedure FillForm; override;
@@ -30,7 +36,7 @@ type
 
 implementation
 
-uses CInfoFormUnit, CConsts;
+uses CInfoFormUnit, CConsts, Math, CBaseFrameUnit;
 
 {$R *.dfm}
 
@@ -60,27 +66,41 @@ end;
 
 procedure TCParamDefForm.FillForm;
 var xCount: Integer;
-    xIndex: Integer;
+    xIndexType, xIndexFrame: Integer;
+    xRegs: TRegisteredFrameClass;
 begin
   inherited FillForm;
   for xCount := 0 to FParamDef.parentParamsDefs.groups.Count - 1 do begin
     ComboBoxGroup.Items.Add(FParamDef.parentParamsDefs.groups.Strings[xCount]);
   end;
-  xIndex := 0;
+  xIndexFrame := 0;
+  for xCount := 0 to GRegisteredClasses.Count - 1 do begin
+    xRegs := TRegisteredFrameClass(GRegisteredClasses.Items[xCount]);
+    ComboBoxFrameType.Items.AddObject(xRegs.frameClass.GetTitle, xRegs);
+    if Operation = coEdit then begin
+      if FParamDef.frameType = xRegs.frameType then begin
+        xIndexFrame := xCount;
+      end;
+    end;
+  end;
+  xIndexType := 0;
   for xCount := Low(CReportParamTypes) to High(CReportParamTypes) do begin
     ComboBoxType.Items.Add(CReportParamTypes[xCount][0]);
     if Operation = coEdit then begin
       if FParamDef.paramType = CReportParamTypes[xCount][1] then begin
-        xIndex := xCount;
+        xIndexType := xCount;
       end;
     end;
   end;
-  ComboBoxType.ItemIndex := xIndex;
+  ComboBoxType.ItemIndex := xIndexType;
+  ComboBoxFrameType.ItemIndex := xIndexFrame;
   if Operation = coEdit then begin
     EditName.Text := FParamDef.name;
     EditDesc.Text := FParamDef.desc;
     ComboBoxGroup.Text := FParamDef.group;
+    ComboBoxReq.ItemIndex := IfThen(FParamDef.isRequired, 0, 1);
   end;
+  RefreshControls;
 end;
 
 procedure TCParamDefForm.ReadValues;
@@ -91,7 +111,22 @@ begin
     desc := EditDesc.Text;
     group := ComboBoxGroup.Text;
     paramType := CReportParamTypes[ComboBoxType.ItemIndex][1];
+    isRequired := ComboBoxReq.ItemIndex = 0;
+    frameType := TRegisteredFrameClass(ComboBoxFrameType.Items.Objects[ComboBoxFrameType.ItemIndex]).frameType;
   end;
+end;
+
+procedure TCParamDefForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  RefreshControls;
+end;
+
+procedure TCParamDefForm.RefreshControls;
+begin
+  ComboBoxFrameType.Visible :=
+    (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDataobject) or
+    (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeMultiobject);
+  Label6.Visible := ComboBoxFrameType.Visible;
 end;
 
 end.

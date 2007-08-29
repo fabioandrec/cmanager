@@ -20,6 +20,7 @@ type
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetStaticFilter: TStringList; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
+    class function GetTitle: String; override;
   end;
 
 implementation
@@ -63,6 +64,11 @@ begin
   end;
 end;
 
+class function TCLimitsFrame.GetTitle: String;
+begin
+  Result := 'Limity';
+end;
+
 function TCLimitsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
 begin
   Result := (APluginSelectedItemTypes and CSELECTEDITEM_LIMIT) = CSELECTEDITEM_LIMIT;
@@ -86,6 +92,5 @@ begin
   end;
   Dataobjects := TMovementLimit.GetList(TMovementLimit, MovementLimitProxy, 'select * from movementLimit' + xCondition);
 end;
-
 
 end.
