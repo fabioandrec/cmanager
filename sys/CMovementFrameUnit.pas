@@ -111,6 +111,7 @@ type
     function GetSelectedId: ShortString; override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
+    function GetSelectedText: String; override;
   public
     function GetList: TCList; override;
     procedure ReloadToday;
@@ -1120,6 +1121,15 @@ begin
   inherited UpdateButtons(AIsSelectedSomething);
   CButtonEdit.Enabled := AIsSelectedSomething;
   CButtonDel.Enabled := AIsSelectedSomething;
+end;
+
+function TCMovementFrame.GetSelectedText: String;
+begin
+  if TodayList.FocusedNode <> Nil then begin
+    Result := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^).description;
+  end else begin
+    Result := '';
+  end;
 end;
 
 end.
