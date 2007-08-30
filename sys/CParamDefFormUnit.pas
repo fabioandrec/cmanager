@@ -76,10 +76,12 @@ begin
   xIndexFrame := 0;
   for xCount := 0 to GRegisteredClasses.Count - 1 do begin
     xRegs := TRegisteredFrameClass(GRegisteredClasses.Items[xCount]);
-    ComboBoxFrameType.Items.AddObject(xRegs.frameClass.GetTitle, xRegs);
-    if Operation = coEdit then begin
-      if FParamDef.frameType = xRegs.frameType then begin
-        xIndexFrame := xCount;
+    if xRegs.isReportParamAvaliable then begin
+      ComboBoxFrameType.Items.AddObject(xRegs.frameClass.GetTitle, xRegs);
+      if Operation = coEdit then begin
+        if FParamDef.frameType = xRegs.frameType then begin
+          xIndexFrame := xCount;
+        end;
       end;
     end;
   end;

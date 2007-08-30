@@ -17,8 +17,8 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     procedure ReloadDataobjects; override;
     function GetStaticFilter: TStringList; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
@@ -31,7 +31,7 @@ implementation
 uses CConsts, CDataObjects, CCashpointFormUnit, CReports, CPluginConsts,
   CBaseFrameUnit;
 
-function TCCashpointsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCCashpointsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TCashPoint;
 end;
@@ -41,7 +41,7 @@ begin
   Result := TCCashpointForm;
 end;
 
-function TCCashpointsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCCashpointsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := CashPointProxy;
 end;

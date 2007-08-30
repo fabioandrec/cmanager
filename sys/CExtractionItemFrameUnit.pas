@@ -23,8 +23,8 @@ type
   public
     procedure ReloadDataobjects; override;
     class function GetTitle: String; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     class function GetPrefname: String; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
   end;
@@ -35,12 +35,12 @@ uses CDataObjects, CPluginConsts, CTools, CBaseFrameUnit;
 
 {$R *.dfm}
 
-function TCExtractionItemFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCExtractionItemFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TExtractionItem;
 end;
 
-function TCExtractionItemFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCExtractionItemFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := ExtractionItemProxy;
 end;

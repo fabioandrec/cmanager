@@ -53,8 +53,8 @@ type
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
     function GetStaticFilter: TStringList; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -69,7 +69,7 @@ uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils,
 
 {$R *.dfm}
 
-function TCCurrencyRateFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCCurrencyRateFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TCurrencyRate;
 end;
@@ -79,7 +79,7 @@ begin
   Result := TCCurrencyRateForm;
 end;
 
-function TCCurrencyRateFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCCurrencyRateFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := CurrencyRateProxy;
 end;

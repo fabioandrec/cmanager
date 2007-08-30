@@ -16,8 +16,8 @@ type
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
@@ -29,7 +29,7 @@ uses CCurrencydefFormUnit, CReports, CPluginConsts, CBaseFrameUnit;
 
 {$R *.dfm}
 
-function TCCurrencydefFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCCurrencydefFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TCurrencyDef;
 end;
@@ -39,7 +39,7 @@ begin
   Result := TCCurrencydefForm;
 end;
 
-function TCCurrencydefFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCCurrencydefFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := CurrencyDefProxy;
 end;

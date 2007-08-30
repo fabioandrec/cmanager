@@ -4,11 +4,10 @@ interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
-     CComponents, CChartReportFormUnit, CTemplates, ShDocVW;
+     CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools;
 
 type
   TReportDialogParamsDefs = class;
-  TParamValues = array of Variant;
 
   TReportDialgoParamDef = class(TCDataListElementObject)
   private
@@ -17,10 +16,10 @@ type
     Fgroup: String;
     FparamType: string;
     FparentParamsDefs: TReportDialogParamsDefs;
-    FparamValues: TParamValues;
+    FparamValues: TVariantDynArray;
     FisRequired: Boolean;
     FframeType: Integer;
-    procedure SetparamValues(const Value: TParamValues);
+    procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
@@ -30,7 +29,7 @@ type
     function GetElementId: String; override;
     function GetElementType: String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
-    property paramValues: TParamValues read FparamValues write SetparamValues;
+    property paramValues: TVariantDynArray read FparamValues write SetparamValues;
     property paramValuesLength: Integer read GetParamValuesLength;
   published
     property name: String read Fname write Fname;
@@ -584,7 +583,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAcpListFormUnit, CChoosePeriodAcpListGroupFormUnit,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
-     CChooseFutureFilterFormUnit, CTools, CChoosePeriodRatesHistoryFormUnit,
+     CChooseFutureFilterFormUnit, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
   CParamsDefsFrameUnit, CFrameFormUnit;
@@ -4382,7 +4381,7 @@ begin
   end;
 end;
 
-procedure TReportDialgoParamDef.SetparamValues(const Value: TParamValues);
+procedure TReportDialgoParamDef.SetparamValues(const Value: TVariantDynArray);
 var xCount: Integer;
 begin
   SetLength(FparamValues, Length(Value));

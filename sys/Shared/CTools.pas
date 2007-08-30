@@ -65,12 +65,15 @@ type
     property Parameters: String read FParameters;
   end;
 
+  TVariantDynArray = array of Variant;
+
 function FileVersion(AName: string): String;
 function FileNumbers(AName: String; var AMS, ALS: DWORD): Boolean;
 function FileSize(AName: String): Int64;
 function GetParamValue(AParam: String): String;
 function GetSwitch(ASwitch: String): Boolean;
-function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
+function StringToStringArray(AString: String; ADelimeter: String): TStringDynArray;
+function StringToVariantArray(AString: String; ADelimeter: String): TVariantDynArray;
 function LPad(AString: String; AChar: Char; ALength: Integer): String;
 function RPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
@@ -166,7 +169,20 @@ begin
   end;
 end;
 
-function StringToStringArray(AString: String; ADelimeter: Char): TStringDynArray;
+function StringToStringArray(AString: String; ADelimeter: String): TStringDynArray;
+var xStr: TStringList;
+    xCount: Integer;
+begin
+  xStr := TStringList.Create;
+  xStr.Text := StringReplace(AString, ADelimeter, sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+  SetLength(Result, xStr.Count);
+  for xCount := 0 to xStr.Count - 1 do begin
+    Result[xCount] := xStr.Strings[xCount];
+  end;
+  xStr.Free;
+end;
+
+function StringToVariantArray(AString: String; ADelimeter: String): TVariantDynArray;
 var xStr: TStringList;
     xCount: Integer;
 begin

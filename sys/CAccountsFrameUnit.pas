@@ -16,8 +16,8 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     procedure ReloadDataobjects; override;
     function GetStaticFilter: TStringList; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
@@ -30,7 +30,7 @@ uses CDataObjects, CAccountFormUnit, CConsts, CReports, CPluginConsts,
 
 {$R *.dfm}
 
-function TCAccountsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCAccountsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TAccount;
 end;
@@ -40,7 +40,7 @@ begin
   Result := TCAccountForm;
 end;
 
-function TCAccountsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCAccountsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := AccountProxy;
 end;

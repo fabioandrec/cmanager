@@ -25,8 +25,8 @@ type
     function GetStaticFilter: TStringList; override;
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     class function GetPrefname: String; override;
     function GetHistoryText: String; override;
@@ -40,7 +40,7 @@ uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts,
 
 {$R *.dfm}
 
-function TCExtractionsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCExtractionsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TAccountExtraction;
 end;
@@ -50,7 +50,7 @@ begin
   Result := TCExtractionForm;
 end;
 
-function TCExtractionsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCExtractionsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := AccountExtractionProxy;
 end;

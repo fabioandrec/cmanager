@@ -82,6 +82,7 @@ type
     function FindNodeId(ANode: PVirtualNode): TDataGid; virtual;
     property OutputData: Pointer read FOutputData;
     function MustFreeAdditionalData: Boolean; virtual;
+    function IsAllElementChecked(ACheckedCount: Integer): Boolean; virtual;
     property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
   published
     property SelectedId: TDataGid read GetSelectedId write SetSelectedId;
@@ -97,14 +98,16 @@ type
   private
     FframeClass: TCBaseFrameClass;
     FframeType: Integer;
+    FisReportParamAvaliable: Boolean;
   public
     property frameClass: TCBaseFrameClass read FframeClass write FframeClass;
     property frameType: Integer read FframeType write FframeType;
+    property isReportParamAvaliable: Boolean read FisReportParamAvaliable write FisReportParamAvaliable;
   end;
 
   TRegisteredFrameClasses = class(TObjectList)
   public
-    procedure AddClass(AFrameClass: TCBaseFrameClass; AFrameType: Integer);
+    procedure AddClass(AFrameClass: TCBaseFrameClass; AFrameType: Integer; AisReportParamAvaliable: Boolean);
     function FindClass(AFrameType: Integer): TCBaseFrameClass;
   end;
 
@@ -301,7 +304,7 @@ begin
       end;
       xNode := xList.GetNext(xNode);
     end;
-    if xAll then begin
+    if xAll and IsAllElementChecked(FMultipleChecks.Count) then begin
       FMultipleChecks.Clear;
     end;
   end;
@@ -671,12 +674,13 @@ begin
   Result := True;
 end;
 
-procedure TRegisteredFrameClasses.AddClass(AFrameClass: TCBaseFrameClass; AFrameType: Integer);
+procedure TRegisteredFrameClasses.AddClass(AFrameClass: TCBaseFrameClass; AFrameType: Integer; AisReportParamAvaliable: Boolean);
 var xObj: TRegisteredFrameClass;
 begin
   xObj := TRegisteredFrameClass.Create;
   xObj.frameClass := AFrameClass;
   xObj.frameType := AFrameType;
+  xObj.isReportParamAvaliable := AisReportParamAvaliable;
   Add(xObj);
 end;
 
@@ -697,26 +701,31 @@ procedure InitializeFrameGlobals;
 begin
   GFrames := TObjectList.Create(False);
   GRegisteredClasses := TRegisteredFrameClasses.Create(True);
-  GRegisteredClasses.AddClass(TCAccountsFrame, CFRAMETYPE_ACCOUNTSFRAME);
-  GRegisteredClasses.AddClass(TCCashpointsFrame, CFRAMETYPE_CASHPOINTSFRAME);
-  GRegisteredClasses.AddClass(TCCurrencydefFrame, CFRAMETYPE_CURRENCYDEFFRAME);
-  GRegisteredClasses.AddClass(TCCurrencyRateFrame, CFRAMETYPE_CURRENCYRATEFRAME);
-  GRegisteredClasses.AddClass(TCDoneFrame, CFRAMETYPE_DONEFRAME);
-  GRegisteredClasses.AddClass(TCExtractionItemFrame, CFRAMETYPE_EXTRACTIONITEMFRAME);
-  GRegisteredClasses.AddClass(TCExtractionsFrame, CFRAMETYPE_EXTRACTIONSFRAME);
-  GRegisteredClasses.AddClass(TCFilterFrame, CFRAMETYPE_FILTERFRAME);
-  GRegisteredClasses.AddClass(TCLimitsFrame, CFRAMETYPE_LIMITSFRAME);
-  GRegisteredClasses.AddClass(TCMovementFrame, CFRAMETYPE_MOVEMENTFRAME);
-  GRegisteredClasses.AddClass(TCPlannedFrame, CFRAMETYPE_PLANNEDFRAME);
-  GRegisteredClasses.AddClass(TCProductsFrame, CFRAMETYPE_PRODUCTSFRAME);
-  GRegisteredClasses.AddClass(TCProfileFrame, CFRAMETYPE_PROFILEFRAME);
-  GRegisteredClasses.AddClass(TCUnitDefFrame, CFRAMETYPE_UNITDEFFRAME);
+  GRegisteredClasses.AddClass(TCAccountsFrame, CFRAMETYPE_ACCOUNTSFRAME, True);
+  GRegisteredClasses.AddClass(TCCashpointsFrame, CFRAMETYPE_CASHPOINTSFRAME, True);
+  GRegisteredClasses.AddClass(TCCurrencydefFrame, CFRAMETYPE_CURRENCYDEFFRAME, True);
+  GRegisteredClasses.AddClass(TCCurrencyRateFrame, CFRAMETYPE_CURRENCYRATEFRAME, False);
+  GRegisteredClasses.AddClass(TCDoneFrame, CFRAMETYPE_DONEFRAME, False);
+  GRegisteredClasses.AddClass(TCExtractionItemFrame, CFRAMETYPE_EXTRACTIONITEMFRAME, False);
+  GRegisteredClasses.AddClass(TCExtractionsFrame, CFRAMETYPE_EXTRACTIONSFRAME, True);
+  GRegisteredClasses.AddClass(TCFilterFrame, CFRAMETYPE_FILTERFRAME, True);
+  GRegisteredClasses.AddClass(TCLimitsFrame, CFRAMETYPE_LIMITSFRAME, True);
+  GRegisteredClasses.AddClass(TCMovementFrame, CFRAMETYPE_MOVEMENTFRAME, False);
+  GRegisteredClasses.AddClass(TCPlannedFrame, CFRAMETYPE_PLANNEDFRAME, False);
+  GRegisteredClasses.AddClass(TCProductsFrame, CFRAMETYPE_PRODUCTSFRAME, True);
+  GRegisteredClasses.AddClass(TCProfileFrame, CFRAMETYPE_PROFILEFRAME, True);
+  GRegisteredClasses.AddClass(TCUnitDefFrame, CFRAMETYPE_UNITDEFFRAME, True);
 end;
 
 procedure FinalizeFrameGlobals;
 begin
   GFrames.Free;
   GRegisteredClasses.Free;
+end;
+
+function TCBaseFrame.IsAllElementChecked(ACheckedCount: Integer): Boolean;
+begin
+  Result := True;
 end;
 
 initialization

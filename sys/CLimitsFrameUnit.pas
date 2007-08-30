@@ -15,8 +15,8 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
     procedure ReloadDataobjects; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetStaticFilter: TStringList; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -30,7 +30,7 @@ uses CDataObjects, CDatatools, CCashpointFormUnit, CLimitFormUnit, CConsts,
 
 {$R *.dfm}
 
-function TCLimitsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCLimitsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TMovementLimit;
 end;
@@ -40,7 +40,7 @@ begin
   Result := TCLimitForm;
 end;
 
-function TCLimitsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCLimitsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := MovementLimitProxy;
 end;

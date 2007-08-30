@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports, Contnrs,
-  CComponents;
+  CComponents, CTools;
 
 type
   TDialogParamControl = class(TObjectList)
@@ -15,7 +15,7 @@ type
     Fparam: TReportDialgoParamDef;
     function GetNextTop: Integer;
     function GetIsValid: String;
-    function GetValues: TParamValues;
+    function GetValues: TVariantDynArray;
     procedure ChooseDataobject(var ADataGid, AText: String; var AAccepted: Boolean);
   public
     constructor Create(ADescLabel: TLabel; AParam: TReportDialgoParamDef; AControl: TWinControl);
@@ -26,7 +26,7 @@ type
     property param: TReportDialgoParamDef read Fparam write Fparam;
     property nextTop: Integer read GetNextTop;
     property isValid: String read GetIsValid;
-    property values: TParamValues read GetValues;
+    property values: TVariantDynArray read GetValues;
   end;
 
   TCChooseByParamsDefsForm = class(TCConfigForm)
@@ -46,7 +46,7 @@ function ChooseByParamsDefs(var AParams: TReportDialogParamsDefs): Boolean;
 implementation
 
 uses CConsts, CInfoFormUnit, StrUtils, CBaseFrameUnit, CFrameFormUnit,
-  CDatabase, CDataObjects, CDatatools, CTools;
+  CDatabase, CDataObjects, CDatatools;
 
 {$R *.dfm}
 
@@ -260,7 +260,7 @@ begin
     end else if Fparam.paramType = CParamTypeDataobject then begin
       Result := IfThen(Trim(values[Low(values)]) = CEmptyDataGid, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
     end else if Fparam.paramType = CParamTypeMultiobject then begin
-      Result := IfThen(Length(values) = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
+      Result := '';
     end;
   end;
 end;
@@ -276,7 +276,7 @@ begin
   end;
 end;
 
-function TDialogParamControl.GetValues: TParamValues;
+function TDialogParamControl.GetValues: TVariantDynArray;
 begin
   SetLength(Result, 0);
   if Fparam.paramType = CParamTypeText then begin
@@ -296,6 +296,8 @@ begin
     Result[Low(Result)] := TCStatic(control).DataId;
     Result[High(Result)] := TCStatic(control).Caption;
   end else if Fparam.paramType = CParamTypeMultiobject then begin
+    Result := StringToVariantArray(TCStatic(control).DataId, sLineBreak);
+    ShowMessage(IntToStr(Length(Result)));
   end;
 end;
 

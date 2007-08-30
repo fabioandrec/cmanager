@@ -14,8 +14,8 @@ type
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
   end;
 
@@ -25,7 +25,7 @@ uses CDataObjects, CProfileFormUnit, CPluginConsts, CBaseFrameUnit;
 
 {$R *.dfm}
 
-function TCProfileFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCProfileFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TProfile;
 end;
@@ -35,7 +35,7 @@ begin
   Result := TCProfileForm;
 end;
 
-function TCProfileFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCProfileFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := ProfileProxy;
 end;

@@ -21,8 +21,8 @@ type
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     procedure ReloadDataobjects; override;
     procedure RecreateTreeHelper; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; override;
     function GetHistoryText: String; override;
@@ -36,7 +36,7 @@ uses CDataObjects, CProductFormUnit, CConsts, CConfigFormUnit, CReports,
 
 {$R *.dfm}
 
-function TCProductsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCProductsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TProduct;
 end;
@@ -46,7 +46,7 @@ begin
   Result := TCProductForm;
 end;
 
-function TCProductsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCProductsFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := ProductProxy;
 end;

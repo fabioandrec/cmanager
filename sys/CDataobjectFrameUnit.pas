@@ -71,8 +71,8 @@ type
     function GetHistoryText: String; virtual;
     procedure ShowHistory(AGid: TDataGid); virtual;
     function GetInitialiFilter: String; virtual;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; virtual; abstract;
     function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; virtual;
     function GetStaticFilter: TStringList; virtual;
@@ -82,6 +82,7 @@ type
     function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; override;
     procedure ShowFrame; override;
     procedure HideFrame; override;
+    function IsAllElementChecked(ACheckedCount: Integer): Boolean; override;
   end;
 
 implementation
@@ -423,6 +424,11 @@ end;
 function TCDataobjectFrame.GetAdditionalDataForObject: TAdditionalData;
 begin
   Result := Nil;
+end;
+
+function TCDataobjectFrame.IsAllElementChecked(ACheckedCount: Integer): Boolean;
+begin
+  Result := GDataProvider.GetSqlInteger('select count(*) from ' + GetDataObjectProxy(WMOPT_NONE).TableName, -1) = ACheckedCount;
 end;
 
 end.

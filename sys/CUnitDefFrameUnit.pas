@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDatabase,
-  CDataObjectFormUnit;
+  CDataObjectFormUnit, CImageListsUnit;
 
 type
   TCUnitDefFrame = class(TCDataobjectFrame)
@@ -16,8 +16,8 @@ type
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
   end;
 
@@ -27,7 +27,7 @@ uses CDataObjects, CPluginConsts, CUnitdefFormUnit, CBaseFrameUnit;
 
 {$R *.dfm}
 
-function TCUnitDefFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCUnitDefFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TUnitDef;
 end;
@@ -37,7 +37,7 @@ begin
   Result := TCUnitdefForm;
 end;
 
-function TCUnitDefFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCUnitDefFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := UnitDefProxy;
 end;

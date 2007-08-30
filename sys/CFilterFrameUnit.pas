@@ -14,8 +14,8 @@ type
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
-    function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
   end;
 
@@ -25,7 +25,7 @@ uses CDataObjects, CFilterFormUnit, CPluginConsts, CBaseFrameUnit;
 
 {$R *.dfm}
 
-function TCFilterFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCFilterFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TMovementFilter;
 end;
@@ -35,7 +35,7 @@ begin
   Result := TCFilterForm;
 end;
 
-function TCFilterFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCFilterFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := MovementFilterProxy;
 end;
