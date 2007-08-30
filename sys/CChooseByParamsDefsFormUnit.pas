@@ -297,7 +297,6 @@ begin
     Result[High(Result)] := TCStatic(control).Caption;
   end else if Fparam.paramType = CParamTypeMultiobject then begin
     Result := StringToVariantArray(TCStatic(control).DataId, sLineBreak);
-    ShowMessage(IntToStr(Length(Result)));
   end;
 end;
 

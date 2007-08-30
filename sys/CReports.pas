@@ -4,7 +4,7 @@ interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
-     CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools;
+     CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects;
 
 type
   TReportDialogParamsDefs = class;
@@ -58,6 +58,7 @@ type
     property Items[AIndex: Integer]: TReportDialgoParamDef read GetItems write SetItems;
     property ByName[AName: String]: TReportDialgoParamDef read GetByName;
     destructor Destroy; override;
+    function RebuildStringWithParams(var AString: String): Boolean;
   published
     property AsString: String read GetAsString write SetAsString;
     property groups: TStringList read Fgroups;
@@ -566,6 +567,9 @@ type
   private
     FErrorText: String;
     FAddText: String;
+    FxsltDoc: IXMLDOMDocument;
+    FreportDef: TReportDef;
+    Fparams: TReportDialogParamsDefs;
   protected
     function PrepareReportConditions: Boolean; override;
     function CanShowReport: Boolean; override;
@@ -578,7 +582,7 @@ procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String
 implementation
 
 uses Forms, Adodb, CConfigFormUnit, Math,
-     CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts, CDataObjects,
+     CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts,
      DateUtils, CSchedules, CChoosePeriodAcpFormUnit, CHtmlReportFormUnit,
      TeeProcs, TeCanvas, TeEngine,
      CChoosePeriodAcpListFormUnit, CChoosePeriodAcpListGroupFormUnit,
@@ -586,7 +590,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseFutureFilterFormUnit, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
-  CParamsDefsFrameUnit, CFrameFormUnit;
+  CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit;
 
 var LDefaultXsl: IXMLDOMDocument;
 
@@ -4159,42 +4163,59 @@ begin
 end;
 
 function TPrivateReport.PrepareReportConditions: Boolean;
+var xBufferOut: String;
 begin
-  Result := True;
-  FErrorText := '';
+  FreportDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, TCWithGidParams(Params).id, False));
+  Result := DecodeBase64Buffer(FreportDef.xsltText, xBufferOut);
+  if Result then begin
+    if xBufferOut = '' then begin
+      FxsltDoc := GetDefaultXsl;
+    end else begin
+      FxsltDoc := GetXmlDocument(xBufferOut);
+    end;
+    if FxsltDoc.parseError.errorCode = 0 then begin
+      Result := DecodeBase64Buffer(FreportDef.paramsDefs, xBufferOut);
+      if Result then begin
+        Fparams := TReportDialogParamsDefs.Create;
+        Fparams.AsString := xBufferOut;
+        Result := ChooseByParamsDefs(Fparams);
+      end else begin
+        ShowInfo(itError, 'Dane parametrów raportu s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
+                          'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                          'i nastêpnie kompaktowanie pliku danych.', '');
+
+      end;
+    end else begin
+      Result := False;
+      ShowInfo(itError, 'Zdefiniowany dla raportu arkusz styli jest niepoprawny', FxsltDoc.parseError.reason);
+    end;
+  end else begin
+    ShowInfo(itError, 'Dane arkusza styli s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
+                      'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                      'i nastêpnie kompaktowanie pliku danych.', '');
+  end;
+  if not Result then begin
+    Fparams.Free;
+  end;
 end;
 
 procedure TPrivateReport.PrepareReportContent;
-var xDef: TReportDef;
-    xQuery: TADOQuery;
-    xXml, xSheet: IXMLDOMDocument;
-    xBufferOut: String;
+var xQuery: TADOQuery;
+    xXml: IXMLDOMDocument;
+    xSql: String;
 begin
-  xDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, TCWithGidParams(Params).id, False));
-
-  if not DecodeBase64Buffer(xDef.xsltText, xBufferOut) then begin
-    FErrorText := 'Dane arkusza styli s¹ uszkodzone i nie zostan¹ wyœwietlone. Prawdopodobnie plik danych jest uszkodzony.' +
-                  'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
-                  'i nastêpnie kompaktowanie pliku danych.';
-  end;
-  if FErrorText = '' then begin
-    if xBufferOut = '' then begin
-      xSheet := GetDefaultXsl;
-    end else begin
-      xSheet := GetDocumentFromString(xBufferOut);
-    end;
-    xQuery := GDataProvider.OpenSql(GBaseTemlatesList.ExpandTemplates(xDef.queryText, Self), False);
+  xSql := GBaseTemlatesList.ExpandTemplates(FreportDef.queryText, Self);
+  if Fparams.RebuildStringWithParams(xSql) then begin
+    xQuery := GDataProvider.OpenSql(xSql, False);
     if xQuery <> Nil then begin
       FreportText.Text := GetRowsAsXml(xQuery.Recordset);
       xXml := GetDocumentFromString(FreportText.Text);
-      if xSheet <> Nil then begin
-        try
-          FreportText.Text := xXml.transformNode(xSheet);
-        except
-          on E: Exception do begin
-            FErrorText := 'Podczas transformacji za pomoc¹ arkusza styli wyst¹pi³ b³¹d. Sprawdz definicjê raportu pod k¹tem poprawnoœci sk³adniowej arkusza stylów.';
-            FAddText := E.Message;
-          end;
+      try
+        FreportText.Text := xXml.transformNode(FxsltDoc);
+      except
+        on E: Exception do begin
+          FErrorText := 'Podczas transformacji za pomoc¹ arkusza styli wyst¹pi³ b³¹d. Sprawdz definicjê raportu pod k¹tem poprawnoœci sk³adniowej arkusza stylów.';
+          FAddText := E.Message;
         end;
       end;
       xQuery.Free;
@@ -4208,6 +4229,7 @@ begin
       FAddText := GDataProvider.LastError;
     end;
   end;
+  Fparams.Free;
 end;
 
 procedure TSimpleReportDialog.PrepareReportContent;
@@ -4269,6 +4291,11 @@ end;
 function TReportDialogParamsDefs.GetItems(AIndex: Integer): TReportDialgoParamDef;
 begin
   Result := TReportDialgoParamDef(inherited Items[AIndex]);
+end;
+
+function TReportDialogParamsDefs.RebuildStringWithParams(var AString: String): Boolean;
+begin
+  Result := True;
 end;
 
 procedure TReportDialogParamsDefs.RemoveParam(AParam: TReportDialgoParamDef);
