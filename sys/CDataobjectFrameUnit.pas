@@ -71,8 +71,6 @@ type
     function GetHistoryText: String; virtual;
     procedure ShowHistory(AGid: TDataGid); virtual;
     function GetInitialiFilter: String; virtual;
-    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
-    class function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; virtual; abstract;
     function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; virtual;
     function GetStaticFilter: TStringList; virtual;

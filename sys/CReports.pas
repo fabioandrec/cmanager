@@ -21,6 +21,8 @@ type
     FframeType: Integer;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
+    function GetparamAsString(AParamOption: String): String;
+    function GetvalueAsString(AIndex: Integer): String;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: IXMLDOMNode);
@@ -31,6 +33,8 @@ type
     function GetElementHint(AColumnIndex: Integer): String; override;
     property paramValues: TVariantDynArray read FparamValues write SetparamValues;
     property paramValuesLength: Integer read GetParamValuesLength;
+    property paramAsString[AParamOption: String]: String read GetparamAsString;
+    property valueAsString[AIndex: Integer]: String read GetvalueAsString;
   published
     property name: String read Fname write Fname;
     property desc: String read Fdesc write Fdesc;
@@ -44,22 +48,29 @@ type
   TReportDialogParamsDefs = class(TObjectList)
   private
     FasString: String;
+    FtestSqlStatemenet: String;
     Fgroups: TStringList;
     function GetAsString: String;
     procedure SetAsString(const Value: String);
     function GetItems(AIndex: Integer): TReportDialgoParamDef;
     procedure SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
     function GetByName(AName: String): TReportDialgoParamDef;
+    function GetParamsListFromString(AString: String; var AErrorText: String; var AErrorPos: Integer): TStringList;
+    function GetParamsOption(AParam: String): String;
+    function GetParamsName(AParam: String): String;
   public
     constructor Create;
-    function ShowParamsDefsList(AChoice: Boolean): String;
+    function ShowParamsDefsList(AChoice: Boolean; ASqlStatement: String): String;
     function AddParam(AParam: TReportDialgoParamDef): Integer;
+    function ParamValueAsString(AParamName: String; AParamOption: String): String;
     procedure RemoveParam(AParam: TReportDialgoParamDef);
     property Items[AIndex: Integer]: TReportDialgoParamDef read GetItems write SetItems;
     property ByName[AName: String]: TReportDialgoParamDef read GetByName;
     destructor Destroy; override;
-    function RebuildStringWithParams(var AString: String): Boolean;
+    function RebuildStringWithParams(var AString: String; var AErrorText: String): Boolean;
+    function CheckStringWithParams(AString: String; var AErrorText: String; var AErrorPos: Integer): Boolean;
   published
+    property testSqlStatemenet: String read FtestSqlStatemenet;
     property AsString: String read GetAsString write SetAsString;
     property groups: TStringList read Fgroups;
   end;
@@ -590,7 +601,8 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseFutureFilterFormUnit, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
-  CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit;
+  CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
+  CBaseFrameUnit;
 
 var LDefaultXsl: IXMLDOMDocument;
 
@@ -4183,7 +4195,6 @@ begin
         ShowInfo(itError, 'Dane parametrów raportu s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
                           'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
                           'i nastêpnie kompaktowanie pliku danych.', '');
-
       end;
     end else begin
       Result := False;
@@ -4205,7 +4216,7 @@ var xQuery: TADOQuery;
     xSql: String;
 begin
   xSql := GBaseTemlatesList.ExpandTemplates(FreportDef.queryText, Self);
-  if Fparams.RebuildStringWithParams(xSql) then begin
+  if Fparams.RebuildStringWithParams(xSql, FAddText) then begin
     xQuery := GDataProvider.OpenSql(xSql, False);
     if xQuery <> Nil then begin
       FreportText.Text := GetRowsAsXml(xQuery.Recordset);
@@ -4228,6 +4239,9 @@ begin
                     'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.';
       FAddText := GDataProvider.LastError;
     end;
+  end else begin
+    FErrorText := 'Podczas przygotowania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu\n' +
+                  'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.';
   end;
   Fparams.Free;
 end;
@@ -4242,6 +4256,26 @@ begin
   Result :=Add(AParam);
   if Fgroups.IndexOf(AParam.group) = -1 then begin
     Fgroups.Add(AParam.group);
+  end;
+end;
+
+function TReportDialogParamsDefs.CheckStringWithParams(AString: String; var AErrorText: String; var AErrorPos: Integer): Boolean;
+var xParams: TStringList;
+    xCount: Integer;
+begin
+  xParams := GetParamsListFromString(AString, AErrorText, AErrorPos);
+  Result := AErrorPos = 0;
+  if Result then begin
+    xCount := 0;
+    while (xCount <= xParams.Count - 1) and Result do begin
+      if ByName[GetParamsName(xParams.Strings[xCount])] = Nil then begin
+        Result := False;
+        AErrorText := 'Nie zdefiniowano parametru "' + GetParamsName(xParams.Strings[xCount]) + '"';
+        AErrorPos := Pos('$' + xParams.Strings[xCount] + '$', AString);
+      end;
+      Inc(xCount);
+    end;
+    xParams.Free;
   end;
 end;
 
@@ -4293,9 +4327,87 @@ begin
   Result := TReportDialgoParamDef(inherited Items[AIndex]);
 end;
 
-function TReportDialogParamsDefs.RebuildStringWithParams(var AString: String): Boolean;
+function TReportDialogParamsDefs.GetParamsListFromString(AString: String; var AErrorText: String; var AErrorPos: Integer): TStringList;
+var xStartPos, xEndPos: Integer;
+    xParamText: String;
+    xParamOption: String;
 begin
-  Result := True;
+  Result := TStringList.Create;
+  AErrorText := '';
+  AErrorPos := 0;
+  xStartPos := 1;
+  repeat
+    xStartPos := PosEx('$', AString, xStartPos);
+    if xStartPos > 0 then begin
+      xEndPos := PosEx('$', AString, xStartPos + 1);
+      if xEndPos > 0 then begin
+        xParamText := Copy(AString, xStartPos + 1, xEndPos - xStartPos - 1);
+        xParamOption := GetParamsOption(xParamText);
+        if (xParamOption = '') or (StrToIntDef(xParamOption, -1) >= 0) then begin
+          Result.Add(xParamText);
+          xStartPos := xEndPos + 1;
+        end else begin
+          AErrorText := 'Zdefiniowane wskaŸnik tablicy wartoœci parametru "' + GetParamsName(xParamText) + '" nie jest liczb¹ ca³kowit¹';
+          AErrorPos := xStartPos;
+        end;
+      end else begin
+        AErrorText := 'B³ad sk³adniowy parametru, nie odnaleziono koñcz¹cego $';
+        AErrorPos := xStartPos;
+      end;
+    end;
+  until (xStartPos = 0) or (AErrorText <> '');
+  if AErrorText <> '' then begin
+    FreeAndNil(Result);
+  end;
+end;
+
+function TReportDialogParamsDefs.GetParamsName(AParam: String): String;
+var xPos: Integer;
+begin
+  Result := AParam;
+  xPos := Pos(',', Result);
+  if xPos > 0 then begin
+    Result := Trim(Copy(Result, 1, xPos - 1));
+  end;
+end;
+
+function TReportDialogParamsDefs.GetParamsOption(AParam: String): String;
+var xPos: Integer;
+begin
+  Result := '';
+  xPos := Pos(',', AParam);
+  if xPos > 0 then begin
+    Result := Trim(Copy(AParam, xPos + 1, Length(AParam)));
+  end;
+end;
+
+function TReportDialogParamsDefs.ParamValueAsString(AParamName, AParamOption: String): String;
+var xParam: TReportDialgoParamDef;
+begin
+  Result := '';
+  xParam := ByName[AParamName];
+  if xParam <> Nil then begin
+    Result := xParam.paramAsString[AParamOption];
+  end;
+end;
+
+function TReportDialogParamsDefs.RebuildStringWithParams(var AString: String; var AErrorText: String): Boolean;
+var xErrorPos: Integer;
+    xParams: TStringList;
+    xValue: String;
+    xCount: Integer;
+begin
+  Result := CheckStringWithParams(AString, AErrorText, xErrorPos);
+  if Result then begin
+    xParams := GetParamsListFromString(AString, AErrorText, xErrorPos);
+    if xParams <> Nil then begin
+      for xCount := 0 to xParams.Count - 1 do begin
+        xValue := ParamValueAsString(GetParamsName(xParams.Strings[xCount]), GetParamsOption(xParams.Strings[xCount]));
+        AString := StringReplace(AString, '$' + xParams.Strings[xCount] + '$', xValue, [rfReplaceAll, rfIgnoreCase]);
+      end;
+      xParams.Free;
+    end;
+  end;
 end;
 
 procedure TReportDialogParamsDefs.RemoveParam(AParam: TReportDialgoParamDef);
@@ -4370,9 +4482,63 @@ begin
   Result := '';
 end;
 
+function TReportDialgoParamDef.GetparamAsString(AParamOption: String): String;
+var xIndex: Integer;
+begin
+  Result := '';
+  if AParamOption = '' then begin
+    xIndex := -1;
+  end else begin
+    xIndex := StrToIntDef(AParamOption, -1);
+    if xIndex > paramValuesLength - 1 then begin
+      xIndex := -1;
+    end;
+  end;
+  Result := valueAsString[xIndex];
+end;
+
 function TReportDialgoParamDef.GetParamValuesLength: Integer;
 begin
   Result := Length(FparamValues);
+end;
+
+function TReportDialgoParamDef.GetvalueAsString(AIndex: Integer): String;
+var xCount: Integer;
+    xTable: String;
+begin
+  Result := '';
+  if FparamType = CParamTypeText then begin
+    Result := QuotedStr(FparamValues[0]);
+  end else if FparamType = CParamTypeDecimal then begin
+    Result := IntToStr(FparamValues[0]);
+  end else if FparamType = CParamTypeFloat then begin
+    Result := CurrencyToDatabase(FparamValues[0]);
+  end else if FparamType = CParamTypeDate then begin
+    Result := DatetimeToDatabase(FparamValues[0], False)
+  end else if FparamType = CParamTypeDataobject then begin
+    if AIndex <= 0 then begin
+      Result := DataGidToDatabase(FparamValues[0]);
+    end else begin
+      Result := QuotedStr(FparamValues[1]);
+    end;
+  end else if FparamType = CParamTypeMultiobject then begin
+    if (0 <= AIndex) and (AIndex <= paramValuesLength) then begin
+      Result := DataGidToDatabase(FparamValues[AIndex]);
+    end else begin
+      Result := '';
+      if paramValuesLength > 0 then begin
+        for xCount := 0 to paramValuesLength - 1 do begin
+          Result := Result + DataGidToDatabase(FparamValues[xCount]);
+          if xCount <> paramValuesLength - 1 then begin
+            Result := Result + ', ';
+          end;
+        end;
+      end else begin
+        xTable := GRegisteredClasses.FindClass(frameType).GetDataobjectProxy(WMOPT_NONE).TableName;
+        Result := Format('select id%s from %s', [xTable, xTable]);
+      end;
+    end;
+  end;
 end;
 
 procedure TReportDialgoParamDef.LoadFromXml(ANode: IXMLDOMNode);
@@ -4400,9 +4566,10 @@ begin
   inherited Items[AIndex] := Value;
 end;
 
-function TReportDialogParamsDefs.ShowParamsDefsList(AChoice: Boolean): String;
+function TReportDialogParamsDefs.ShowParamsDefsList(AChoice: Boolean; ASqlStatement: String): String;
 var xText: String;
 begin
+  FtestSqlStatemenet := ASqlStatement;
   if not TCFrameForm.ShowFrame(TCParamsDefsFrame, Result, xText, Self, Nil, Nil, Nil, AChoice) then begin
     Result := '';
   end;

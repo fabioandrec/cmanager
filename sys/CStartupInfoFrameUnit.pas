@@ -40,6 +40,8 @@ type
     class function GetOperation: TConfigOperation; override;
     class function GetPrefname: String; override;
     function GetList: TCList; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
   end;
 
   TStartupHelper = class(TObject)
@@ -578,6 +580,16 @@ begin
       end;
     end;
   end;
+end;
+
+class function TCStartupInfoFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+begin
+  Result := Nil;
+end;
+
+class function TCStartupInfoFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+begin
+  Result := Nil;
 end;
 
 end.

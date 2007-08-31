@@ -51,6 +51,10 @@ begin
     Result := False;
     ShowInfo(itError, 'Nazwa parametru nie mo¿e byæ pusta', '');
     EditName.SetFocus;
+  end else if Pos(',', EditName.Text) > 0 then begin
+    Result := False;
+    ShowInfo(itError, 'Nazwa parametru nie mo¿e zawieraæ przecinka', '');
+    EditName.SetFocus;
   end else begin
     xParam := FParamDef.parentParamsDefs.ByName[EditName.Text];
     Result := xParam = Nil;

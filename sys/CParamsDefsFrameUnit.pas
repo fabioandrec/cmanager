@@ -41,7 +41,7 @@ type
 implementation
 
 uses CReports, CParamDefFormUnit, CConfigFormUnit, CInfoFormUnit,
-  CChooseByParamsDefsFormUnit;
+  CChooseByParamsDefsFormUnit, CMemoFormUnit;
 
 {$R *.dfm}
 
@@ -128,13 +128,26 @@ end;
 
 procedure TCParamsDefsFrame.ActionPreviewExecute(Sender: TObject);
 var xParams: TReportDialogParamsDefs;
+    xSql: String;
+    xErrorText: String;
 begin
   xParams := TReportDialogParamsDefs(AdditionalData);
   if xParams.Count = 0 then begin
     ShowInfo(itInfo, 'Brak zdefiniowanych parametrów raportu, formatka przyk³adowa nie zostanie wyœwietlona.\nPrzy uruchomieniu ' +
-                     'raportu CManager przejdzie od razu do przygotowania i wyœwietlenia raportu', '');
+                     'raportu CManager przejdzie od razu do przygotowania i wyœwietlenia raportu.\nU¿yte zostanie zapytanie tworz¹ce' +
+                     ' takie jak zdefiniowano.', '');
   end else begin
-    ChooseByParamsDefs(xParams);
+    if ChooseByParamsDefs(xParams) then begin
+      if ShowInfo(itQuestion, 'Czy chcesz obejrzeæ uzupe³nione o wybrane parametry zapytanie tworz¹ce ?', '') then begin
+        xSql := xParams.testSqlStatemenet;
+        if xParams.RebuildStringWithParams(xSql, xErrorText) then begin
+          ShowReport('Zapytanie tworz¹ce', xSql, 500, 400);
+        end else begin
+          ShowInfo(itError, 'Podczas przygotowania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu\n' +
+                            'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.', xErrorText);
+        end;
+      end;
+    end;
   end;
 end;
 

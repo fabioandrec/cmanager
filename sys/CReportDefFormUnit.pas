@@ -39,6 +39,7 @@ type
   private
     FparamsDefs: TReportDialogParamsDefs;
     function CheckValidXsl: Boolean;
+    function CheckValidParams: Boolean;
   protected
     procedure LoadFromFile(ASql: Boolean);
     procedure ReadValues; override;
@@ -69,6 +70,9 @@ begin
       Result := CheckValidXsl;
     end else begin
       Result := True;
+    end;
+    if Result then begin
+      Result := CheckValidParams;
     end;
   end;
 end;
@@ -193,7 +197,7 @@ end;
 
 procedure TCReportDefForm.ActionParamsExecute(Sender: TObject);
 begin
-  FparamsDefs.ShowParamsDefsList(False);
+  FparamsDefs.ShowParamsDefsList(False, RicheditSql.Text);
 end;
 
 procedure TCReportDefForm.ActionAddParamExecute(Sender: TObject);
@@ -201,9 +205,9 @@ var xParam: String;
     xDesc: String;
     xSelStart, xSelLength: Integer;
 begin
-  xParam := FparamsDefs.ShowParamsDefsList(True);
+  xParam := FparamsDefs.ShowParamsDefsList(True, RicheditSql.Text);
   if xParam <> '' then begin
-    xParam := '[' + xParam + ']';
+    xParam := '$' + xParam + '$';
     RicheditSql.Lines.BeginUpdate;
     xDesc := RicheditSql.Text;
     xSelStart := RicheditSql.SelStart + 1;
@@ -214,6 +218,21 @@ begin
     RicheditSql.SelStart := xSelStart + Length(xParam) - 1;
     RicheditSql.SelLength := 0;
     RicheditSql.Lines.EndUpdate
+  end;
+end;
+
+function TCReportDefForm.CheckValidParams: Boolean;
+var xError: String;
+    xPos: Integer;
+begin
+  Result := FparamsDefs.CheckStringWithParams(RicheditSql.Text, xError, xPos);
+  if not Result then begin
+    ShowInfo(itError, xError, '');
+    if xPos > 0 then begin
+      RicheditSql.SelStart := xPos;
+      RicheditSql.SelLength := 0;
+      RicheditSql.SetFocus;
+    end;
   end;
 end;
 

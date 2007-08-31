@@ -84,6 +84,8 @@ type
     function MustFreeAdditionalData: Boolean; virtual;
     function IsAllElementChecked(ACheckedCount: Integer): Boolean; virtual;
     property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
+    class function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
   published
     property SelectedId: TDataGid read GetSelectedId write SetSelectedId;
     property SelectedText: String read GetSelectedText;
