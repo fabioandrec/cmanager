@@ -34,10 +34,9 @@ end;
 
 procedure TCHtmlReportForm.DoSave;
 begin
-  SaveDialog.Filter := 'pliki HTML|*.html';
-  SaveDialog.DefaultExt := '.html';
+  inherited DoSave;
   if SaveDialog.Execute then begin
-    TCHtmlReport(Report).reportText.SaveToFile(SaveDialog.FileName);
+    TCHtmlReport(Report).SaveToFile(SaveDialog.FileName);
   end;
 end;
 

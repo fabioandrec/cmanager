@@ -1,6 +1,6 @@
 inherited CReportDefForm: TCReportDefForm
-  Left = 318
-  Top = 55
+  Left = 204
+  Top = 33
   Caption = 'Definicja raportu'
   ClientHeight = 643
   PixelsPerInch = 96
@@ -127,11 +127,11 @@ inherited CReportDefForm: TCReportDefForm
       Top = 384
       Width = 561
       Height = 217
-      Caption = ' Arkusz styli '
+      Caption = ' Dokument wynikowy  '
       TabOrder = 2
       object CButton2: TCButton
         Left = 424
-        Top = 181
+        Top = 22
         Width = 113
         Height = 25
         Cursor = crHandPoint
@@ -142,17 +142,43 @@ inherited CReportDefForm: TCReportDefForm
         Action = ActionXsl
         Color = clBtnFace
       end
+      object Label5: TLabel
+        Left = 23
+        Top = 28
+        Width = 33
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Rodzaj'
+      end
       object RicheditXslt: TCRichedit
         Left = 24
-        Top = 32
+        Top = 64
         Width = 513
-        Height = 145
+        Height = 133
         BevelKind = bkTile
         BorderStyle = bsNone
         PlainText = True
         ScrollBars = ssBoth
         TabOrder = 0
         WordWrap = False
+      end
+      object ComboBoxxslType: TComboBox
+        Left = 64
+        Top = 24
+        Width = 353
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 1
+        Text = 'Wygeneruj za pomoc'#261' domy'#347'lnego arkusza styli'
+        OnChange = ComboBoxxslTypeChange
+        Items.Strings = (
+          'Wygeneruj za pomoc'#261' domy'#347'lnego arkusza styli'
+          'Przedstaw w postaci dokumentu xml'
+          'Wygeneruj za pomoc'#261' w'#322'asnego arkusza styli')
       end
     end
   end

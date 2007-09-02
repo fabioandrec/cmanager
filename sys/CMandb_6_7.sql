@@ -7,6 +7,7 @@ create table unitDef (
   description varchar(200),
   primary key (idUnitDef)
 );
+
 alter table product add column idUnitDef uniqueidentifier;
 alter table product add constraint fk_productunitDef foreign key (idUnitDef) references unitDef (idUnitDef);
 alter table baseMovement add column quantity money not null;
@@ -49,5 +50,7 @@ create table reportDef (
   queryText memo not null,
   paramsDefs memo,
   xsltText memo,
-  primary key (idreportDef)
+  xsltType varchar(1) not null,
+  primary key (idreportDef),
+  constraint ck_xsltType check (xsltType in ('D', 'S', 'P'))
 );

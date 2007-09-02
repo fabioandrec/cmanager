@@ -703,11 +703,13 @@ type
     FqueryText: string;
     FparamsDefs: string;
     FxsltText: String;
+    FxsltType: TBaseEnumeration;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure SetparamsDefs(const Value: string);
     procedure SetqueryText(const Value: string);
     procedure SetxsltText(const Value: string);
+    procedure SetxsltType(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -717,6 +719,7 @@ type
     property queryText: string read FqueryText write SetqueryText;
     property paramsDefs: string read FparamsDefs write SetparamsDefs;
     property xsltText: string read FxsltText write SetxsltText;
+    property xsltType: TBaseEnumeration read FxsltType write SetxsltType;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -3521,6 +3524,7 @@ begin
     FqueryText := FieldByName('queryText').AsString;
     FparamsDefs := FieldByName('paramsDefs').AsString;
     FxsltText := FieldByName('xsltText').AsString;
+    FxsltType := FieldByName('xsltType').AsString;
   end;
 end;
 
@@ -3564,6 +3568,14 @@ begin
   end;
 end;
 
+procedure TReportDef.SetxsltType(const Value: TBaseEnumeration);
+begin
+  if FxsltType <> Value then begin
+    FxsltType := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TReportDef.UpdateFieldList;
 begin
   inherited UpdateFieldList;
@@ -3573,6 +3585,7 @@ begin
     AddField('queryText', FqueryText, True, 'reportDef');
     AddField('paramsDefs', FparamsDefs, True, 'reportDef');
     AddField('xsltText', FxsltText, True, 'reportDef');
+    AddField('xsltType', FxsltType, True, 'reportDef');
   end;
 end;
 

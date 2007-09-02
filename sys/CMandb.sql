@@ -334,7 +334,9 @@ create table reportDef (
   queryText memo not null,
   paramsDefs memo,
   xsltText memo,
-  primary key (idreportDef)
+  xsltType varchar(1) not null,
+  primary key (idreportDef),
+  constraint ck_xsltType check (xsltType in ('D', 'S', 'P'))
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');

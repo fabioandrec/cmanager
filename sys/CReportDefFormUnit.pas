@@ -31,11 +31,14 @@ type
     CButton4: TCButton;
     CButton5: TCButton;
     ActionAddParam: TAction;
+    Label5: TLabel;
+    ComboBoxxslType: TComboBox;
     procedure ActionSqlExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
     procedure ActionTempExecute(Sender: TObject);
     procedure ActionParamsExecute(Sender: TObject);
     procedure ActionAddParamExecute(Sender: TObject);
+    procedure ComboBoxxslTypeChange(Sender: TObject);
   private
     FparamsDefs: TReportDialogParamsDefs;
     function CheckValidXsl: Boolean;
@@ -55,7 +58,7 @@ type
 implementation
 
 uses CInfoFormUnit, CDataObjects, CReportsFrameUnit, CRichtext, StrUtils,
-  CTemplates, CDescpatternFormUnit, CXml, CBase64;
+  CTemplates, CDescpatternFormUnit, CXml, CBase64, CConsts;
 
 {$R *.dfm}
 
@@ -66,7 +69,7 @@ begin
     ShowInfo(itError, 'Nazwa raportu nie mo¿e byæ pusta', '');
     EditName.SetFocus;
   end else begin
-    if RicheditXslt.Text <> '' then begin
+    if (RicheditXslt.Text <> '') and (ComboBoxxslType.ItemIndex = 2) then begin
       Result := CheckValidXsl;
     end else begin
       Result := True;
@@ -98,7 +101,15 @@ begin
                           'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
                           'i nastêpnie kompaktowanie pliku danych.', '');
     end;
+    if xsltType = CXsltTypePrivate then begin
+      ComboBoxxslType.ItemIndex := 2;
+    end else if xsltType = CXsltTypeSystem then begin
+      ComboBoxxslType.ItemIndex := 1;
+    end else begin
+      ComboBoxxslType.ItemIndex := 0;
+    end;
   end;
+  ComboBoxxslTypeChange(Nil);
 end;
 
 function TCReportDefForm.GetDataobjectClass: TDataObjectClass;
@@ -150,6 +161,13 @@ begin
     xsltText := xBufferOut;
     EncodeBase64Buffer(FparamsDefs.AsString, xBufferOut);
     paramsDefs := xBufferOut;
+    if ComboBoxxslType.ItemIndex = 2 then begin
+      xsltType := CXsltTypePrivate;
+    end else if ComboBoxxslType.ItemIndex = 1 then begin
+      xsltType := CXsltTypeSystem;
+    end else begin
+      xsltType := CXsltTypeDefault;
+    end;
   end;
 end;
 
@@ -187,6 +205,7 @@ begin
   inherited InitializeForm;
   FparamsDefs := TReportDialogParamsDefs.Create;
   FparamsDefs.AsString := '';
+  ComboBoxxslTypeChange(Nil);
 end;
 
 destructor TCReportDefForm.Destroy;
@@ -234,6 +253,12 @@ begin
       RicheditSql.SetFocus;
     end;
   end;
+end;
+
+procedure TCReportDefForm.ComboBoxxslTypeChange(Sender: TObject);
+begin
+  CButton2.Enabled := ComboBoxxslType.ItemIndex = 2;
+  RicheditXslt.Enabled := ComboBoxxslType.ItemIndex = 2;
 end;
 
 end.

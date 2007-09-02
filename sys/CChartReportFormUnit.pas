@@ -90,8 +90,7 @@ end;
 
 procedure TCChartReportForm.DoSave;
 begin
-  SaveDialog.Filter := 'pliki BMP|*.bmp';
-  SaveDialog.DefaultExt := '.bmp';
+  inherited DoSave;
   if FActiveChartIndex <> -1 then begin
     if SaveDialog.Execute then begin
       ActiveChart.SaveToBitmapFile(SaveDialog.FileName);

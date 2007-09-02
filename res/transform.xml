@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:output method="html" encoding="Windows-1250" doctype-public="-//W3C//DTD HTML 4.01//EN"/>
+	<xsl:template match="/">
+		<html>
+			<style type="text/css">[repstyle]</style>
+			<body>
+				<table class="base">
+					<tr><td colspan="999"><hr/></td></tr>
+					<tr class="head">
+						<xsl:for-each select="recordset/header/field">
+							<td class="headtext"><xsl:value-of select="." /></td>
+						</xsl:for-each>
+					</tr>
+					<tr><td colspan="999"><hr/></td></tr>
+					<xsl:for-each select="recordset/content/row">
+						<xsl:choose>
+							<xsl:when test="position() mod 2">
+								<tr class="evenbase">
+									<xsl:for-each select="field">
+										<td class="text"><xsl:value-of select="." /></td>
+									</xsl:for-each>
+								</tr>
+							</xsl:when>
+							<xsl:otherwise>
+								<tr class="base">
+									<xsl:for-each select="field">
+										<td class="text"><xsl:value-of select="." /></td>
+									</xsl:for-each>
+								</tr>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+					<tr><td colspan="999"><hr/></td></tr>
+				</table>
+			</body>
+		</html>
+	</xsl:template>
+</xsl:stylesheet>

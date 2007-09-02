@@ -35,6 +35,8 @@ implementation
 
 {$R *.dfm}
 
+uses CReports;
+
 procedure TCReportForm.DoPreview;
 begin
 end;
@@ -54,8 +56,11 @@ begin
 end;
 
 procedure TCReportForm.DoSave;
+var xFilter, xDefExtension: String;
 begin
-  DoSave;
+  TCBaseReport(FReport).GetSaveDialogProperties(xFilter, xDefExtension);
+  SaveDialog.Filter := xFilter;
+  SaveDialog.DefaultExt := xDefExtension;
 end;
 
 procedure TCReportForm.Action2Execute(Sender: TObject);

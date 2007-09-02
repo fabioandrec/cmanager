@@ -9,10 +9,8 @@ MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
 DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
-PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe \
-  NBPCurrencyRates.dll NBPBSCurrencyRates.dll RunCalc.dll DbStats.dll \
-  AccountList.dll AccountChart.dll MbankExtFF.dll ShOper.dll SqlConsole.dll \
-  SndMess.dll OnStart.dll
+PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe CTransform.exe NBPCurrencyRates.dll NBPBSCurrencyRates.dll \
+  RunCalc.dll DbStats.dll AccountList.dll AccountChart.dll MbankExtFF.dll ShOper.dll SqlConsole.dll SndMess.dll OnStart.dll
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -60,6 +58,9 @@ SndMess.dll: ..\sys\Plugins\SndMess\SndMess.dpr
   $(DCC)
 
 OnStart.dll: ..\sys\Plugins\OnStart\OnStart.dpr
+  $(DCC)
+
+CTransform.exe: ..\sys\CTransform.dpr
   $(DCC)
 
 

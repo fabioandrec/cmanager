@@ -184,6 +184,7 @@ type
     procedure PrepareReportData; virtual; abstract;
     function CanShowReport: Boolean; virtual;
   public
+    procedure GetSaveDialogProperties(var AFilter, AExtension: String); virtual;  
     function GetReportTitle: String; virtual; abstract;
     function GetReportFooter: String; virtual; abstract;
     function GetFormTitle: String; virtual;
@@ -196,12 +197,15 @@ type
     function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
+    procedure SaveToFile(AFilename: String); virtual;
   end;
 
   TCHtmlReport = class(TCBaseReport)
   private
     FreportText: TStringList;
     FreportStyle: TStringList;
+    function GetDefaultXsl(var AError: String): IXMLDOMDocument;
+    function GetSystemXsl(var AError: String): IXMLDOMDocument;
   protected
     procedure PrepareReportPath; virtual;
     procedure PrepareReportContent; virtual;
@@ -214,6 +218,8 @@ type
     function PrepareContent: String;
     destructor Destroy; override;
     property reportText: TStringList read FreportText;
+    procedure SaveToFile(AFilename: String); override;
+    procedure GetSaveDialogProperties(var AFilter: String; var AExtension: String); override;
   end;
 
   TCChartReport = class(TCBaseReport)
@@ -231,6 +237,7 @@ type
     function GetReportFooter: String; override;
     function GetPrefname: String; virtual;
     property marks: Integer write Setmarks;
+    procedure GetSaveDialogProperties(var AFilter: String; var AExtension: String); override;
   end;
 
   TAccountBalanceOnDayReport = class(TCHtmlReport)
@@ -579,12 +586,16 @@ type
     FErrorText: String;
     FAddText: String;
     FxsltDoc: IXMLDOMDocument;
+    FdataDoc: IXMLDOMDocument;
     FreportDef: TReportDef;
     Fparams: TReportDialogParamsDefs;
   protected
     function PrepareReportConditions: Boolean; override;
     function CanShowReport: Boolean; override;
     procedure PrepareReportContent; override;
+  public
+    procedure SaveToFile(AFilename: String); override;
+    procedure GetSaveDialogProperties(var AFilter: String; var AExtension: String); override;
   end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
@@ -601,12 +612,43 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseFutureFilterFormUnit, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
-  CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
-  CBaseFrameUnit;
+     CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
+     CBaseFrameUnit;
 
 var LDefaultXsl: IXMLDOMDocument;
 
-function GetDefaultXsl: IXMLDOMDocument;
+function TCHtmlReport.GetDefaultXsl(var AError: String): IXMLDOMDocument;
+var xRes: TResourceStream;
+    xStr: TStringList;
+begin
+  Result := Nil;
+  PrepareReportPath;
+  if not FileExists(GetSystemPathname(CXSLReportFile)) then begin
+    xRes := TResourceStream.Create(HInstance, 'REPXSL', RT_RCDATA);
+    xRes.SaveToFile(GetSystemPathname(CXSLReportFile));
+    xRes.Free;
+  end;
+  xStr := TStringList.Create;
+  try
+    try
+      xStr.LoadFromFile(GetSystemPathname(CXSLReportFile));
+      xStr.Text := StringReplace(xStr.Text, '[repstyle]', FreportStyle.Text, [rfReplaceAll, rfIgnoreCase]);
+      Result := GetDocumentFromString(xStr.Text);
+      if Result.parseError.errorCode <> 0 then begin
+        AError := Result.parseError.reason;
+        Result := Nil;
+      end;
+    except
+      on E: Exception do begin
+        AError := E.Message;
+      end;
+    end;
+  finally
+    xStr.Free;
+  end;
+end;
+
+function TCHtmlReport.GetSystemXsl(var AError: String): IXMLDOMDocument;
 var xLibHandle: THandle;
     xResInfo: HRSRC;
     xResStream: TResourceStream;
@@ -627,11 +669,15 @@ begin
             LDefaultXsl := GetDocumentFromString(xStrStream.DataString);
             xStrStream.Free;
             if LDefaultXsl.parseError.errorCode <> 0 then begin
+              AError := LDefaultXsl.parseError.reason;
               LDefaultXsl := Nil;
             end else begin
               Result := LDefaultXsl;
             end;
           except
+            on E: Exception do begin
+              AError := E.Message;
+            end;
           end;
         end;
       finally
@@ -788,7 +834,7 @@ end;
 
 function TAccountBalanceOnDayReport.GetReportTitle: String;
 begin
-  Result := 'Stan kont (' + GetFormattedDate(FDate, CLongDateFormat);
+  Result := 'Stan kont (' + GetFormattedDate(FDate, CLongDateFormat) + ')';
 end;
 
 function TAccountBalanceOnDayReport.PrepareReportConditions: Boolean;
@@ -1347,6 +1393,12 @@ begin
   Result := 'Raport';
 end;
 
+procedure TCBaseReport.GetSaveDialogProperties(var AFilter, AExtension: String);
+begin
+  AFilter := '';
+  AExtension := '';
+end;
+
 function TCBaseReport.PrepareReportConditions: Boolean;
 begin
   Result := True;
@@ -1359,6 +1411,10 @@ begin
   end else begin
     Result := E_NOINTERFACE;
   end;
+end;
+
+procedure TCBaseReport.SaveToFile(AFilename: String);
+begin
 end;
 
 procedure TCBaseReport.ShowReport;
@@ -1404,6 +1460,12 @@ begin
   Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
 end;
 
+procedure TCHtmlReport.GetSaveDialogProperties(var AFilter, AExtension: String);
+begin
+  AFilter := 'pliki HTML|*.html';
+  AExtension := '.html';
+end;
+
 function TCHtmlReport.PrepareContent: String;
 begin
   GDataProvider.BeginTransaction;
@@ -1439,12 +1501,12 @@ begin
     xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
     xRes.Free;
   end;
-  if not FileExists(GetSystemPathname('report.htm')) then begin
+  if not FileExists(GetSystemPathname(CHTMReportFile)) then begin
     xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname('report.htm'));
+    xRes.SaveToFile(GetSystemPathname(CHTMReportFile));
     xRes.Free;
   end;
-  FreportText.LoadFromFile(GetSystemPathname('report.htm'));
+  FreportText.LoadFromFile(GetSystemPathname(CHTMReportFile));
   FreportStyle.LoadFromFile(GetSystemPathname(CCSSReportFile));
 end;
 
@@ -1472,6 +1534,12 @@ end;
 function TCChartReport.GetReportFooter: String;
 begin
   Result := 'CManager wer. ' + FileVersion(ParamStr(0)) + ', ' + DateTimeToStr(Now);
+end;
+
+procedure TCChartReport.GetSaveDialogProperties(var AFilter, AExtension: String);
+begin
+  AFilter := 'pliki BMP|*.bmp';
+  AExtension := '.bmp';
 end;
 
 procedure TCChartReport.PrepareReportData;
@@ -4174,45 +4242,67 @@ begin
   end;
 end;
 
+procedure TPrivateReport.GetSaveDialogProperties(var AFilter, AExtension: String);
+begin
+  if FreportDef.xsltType = CXsltTypeSystem then begin
+    AFilter := 'pliki XML|*.xml';
+    AExtension := '.xml';
+  end else begin
+    inherited GetSaveDialogProperties(AFilter, AExtension);
+  end;
+end;
+
 function TPrivateReport.PrepareReportConditions: Boolean;
 var xBufferOut: String;
+    xError: String;
 begin
-  FreportDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, TCWithGidParams(Params).id, False));
-  Result := DecodeBase64Buffer(FreportDef.xsltText, xBufferOut);
-  if Result then begin
-    if xBufferOut = '' then begin
-      FxsltDoc := GetDefaultXsl;
-    end else begin
+  Result := False;
+  xError := '';
+  FreportDef := TReportDef(TReportDef.LoadObject(ReportDefProxy, TCWithGidParams(Params).id, True));
+  if FreportDef.xsltType = CXsltTypePrivate then begin
+    if DecodeBase64Buffer(FreportDef.xsltText, xBufferOut) then begin
       FxsltDoc := GetXmlDocument(xBufferOut);
+      if FxsltDoc.parseError.errorCode <> 0 then begin
+        xError := FxsltDoc.parseError.reason;
+        FxsltDoc := Nil;
+      end;
+    end else begin
+      ShowInfo(itError, 'Dane arkusza styli s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
+                        'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                        'i nastêpnie kompaktowanie pliku danych.', '');
+      FxsltDoc := Nil;
     end;
+  end else if FreportDef.xsltType = CXsltTypeSystem then begin
+    FxsltDoc := GetSystemXsl(xError);
+  end else begin
+    FxsltDoc := GetDefaultXsl(xError);
+  end;
+  if FxsltDoc <> Nil then begin
     if FxsltDoc.parseError.errorCode = 0 then begin
-      Result := DecodeBase64Buffer(FreportDef.paramsDefs, xBufferOut);
-      if Result then begin
+      if DecodeBase64Buffer(FreportDef.paramsDefs, xBufferOut) then begin
         Fparams := TReportDialogParamsDefs.Create;
         Fparams.AsString := xBufferOut;
         Result := ChooseByParamsDefs(Fparams);
+        if not Result then begin
+          Fparams.Free;
+        end;
       end else begin
         ShowInfo(itError, 'Dane parametrów raportu s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
                           'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
                           'i nastêpnie kompaktowanie pliku danych.', '');
       end;
     end else begin
-      Result := False;
       ShowInfo(itError, 'Zdefiniowany dla raportu arkusz styli jest niepoprawny', FxsltDoc.parseError.reason);
     end;
   end else begin
-    ShowInfo(itError, 'Dane arkusza styli s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
-                      'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
-                      'i nastêpnie kompaktowanie pliku danych.', '');
-  end;
-  if not Result then begin
-    Fparams.Free;
+    if xError <> '' then begin
+      ShowInfo(itError, 'Dane arkusza styli nie mog¹ zostaæ poprawnie zainicjowane i raport nie mo¿e zostaæ wykonany', xError);
+    end;
   end;
 end;
 
 procedure TPrivateReport.PrepareReportContent;
 var xQuery: TADOQuery;
-    xXml: IXMLDOMDocument;
     xSql: String;
 begin
   xSql := GBaseTemlatesList.ExpandTemplates(FreportDef.queryText, Self);
@@ -4220,9 +4310,9 @@ begin
     xQuery := GDataProvider.OpenSql(xSql, False);
     if xQuery <> Nil then begin
       FreportText.Text := GetRowsAsXml(xQuery.Recordset);
-      xXml := GetDocumentFromString(FreportText.Text);
+      FdataDoc := GetDocumentFromString(FreportText.Text);
       try
-        FreportText.Text := xXml.transformNode(FxsltDoc);
+        FreportText.Text := FdataDoc.transformNode(FxsltDoc);
       except
         on E: Exception do begin
           FErrorText := 'Podczas transformacji za pomoc¹ arkusza styli wyst¹pi³ b³¹d. Sprawdz definicjê raportu pod k¹tem poprawnoœci sk³adniowej arkusza stylów.';
@@ -4581,6 +4671,20 @@ begin
   SetLength(FparamValues, Length(Value));
   for xCount := Low(Value) to High(Value) do begin
     FparamValues[xCount] := Value[xCount];
+  end;
+end;
+
+procedure TCHtmlReport.SaveToFile(AFilename: String);
+begin
+  reportText.SaveToFile(AFilename);
+end;
+
+procedure TPrivateReport.SaveToFile(AFilename: String);
+begin
+  if FreportDef.xsltType = CXsltTypeSystem then begin
+    FdataDoc.save(AFilename);
+  end else begin
+    inherited SaveToFile(AFilename);
   end;
 end;
 

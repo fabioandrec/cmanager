@@ -29,6 +29,8 @@ const
 
 const
   CCSSReportFile = 'report.css';
+  CXSLReportFile = 'transform.xml';
+  CHTMReportFile = 'report.htm';
   CXSLDefaultTransformResname = 'DEFAULTSS.XSL';
   CXSLDefaultTransforRestype = MAKEINTRESOURCE(23);
   CMSXmlLibraryName = 'msxml.dll';
@@ -151,6 +153,9 @@ const
   CExtractionStateCloseDescription = 'Zamkniêty';
   CExtractionStateStatedDescription = 'Uzgodniony';
 
+  CXsltTypeDefault = 'D';
+  CXsltTypeSystem = 'S';
+  CXsltTypePrivate = 'P';
 
 const
   CInMovementDescription = 'Przychód';
