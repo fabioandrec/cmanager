@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=0
-Build=34
+Build=2
 Debug=0
 PreRelease=0
 Special=0
@@ -125,23 +125,24 @@ Locale=1045
 CodePage=1250
 [Version Info Keys]
 CompanyName=
-FileDescription=CArchive - tworzenie kopii plików danych
-FileVersion=1.0.0.34
+FileDescription=CQuery - bezpoœredni dostêp do pliku danych
+FileVersion=1.0.0.2
 InternalName=
 LegalCopyright=
 LegalTrademarks=
-OriginalFilename=CArchive
-ProductName=CArchive
+OriginalFilename=CQuery
+ProductName=CQuery
 ProductVersion=1.0.0.0
 Comments=
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item1=..\..\..\others\PngComponents\Source
-Item2=..\..\others\PngComponents\Source
+Count=4
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
+Item2=..\..\..\others\PngComponents\Source
+Item3=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
 Item0=..\..\Trash
