@@ -49,6 +49,7 @@ Source: ..\..\docs\Help\CManager.chm; DestDir: {app}\Help\; Components: program;
 Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\bin\CArchive.exe; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\bin\CQuery.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CTransform.exe; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\NBPACurrencyRates.dll; DestDir: {app}\Wtyczki\; Components: plugins\currency; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\NBPBSCurrencyRates.dll; DestDir: {app}\Wtyczki\; Components: plugins\currency; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\MbankExtFF.dll; DestDir: {app}\Wtyczki\; Components: plugins\mbank; Flags: ignoreversion
