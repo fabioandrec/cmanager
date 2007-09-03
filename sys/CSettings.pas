@@ -203,7 +203,7 @@ begin
     GSettings.resolveExternals := True;
     GSettings.load(AFileName);
     if GSettings.parseError.errorCode <> 0 then begin
-      ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GSettings.parseError.reason);
+      ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GetParseErrorDescription(GSettings.parseError));
       Result := False;
     end else begin
       if GSettings.firstChild <> Nil then begin

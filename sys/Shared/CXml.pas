@@ -11,8 +11,11 @@ function GetStringFromDocument(ADocument: IXMLDOMDocument): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: IXMLDOMNode; ADefault: String): String;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument;
 procedure AppendEncoding(var AXml: IXMLDOMDocument; AEncoding: String = 'Windows-1250');
+function GetParseErrorDescription(AError: IXMLDOMParseError): String;
 
 implementation
+
+uses SysUtils, StrUtils;
 
 procedure AppendEncoding(var AXml: IXMLDOMDocument; AEncoding: String = 'Windows-1250');
 var xProc: IXMLDOMProcessingInstruction;
@@ -83,6 +86,22 @@ begin
   ADocument.save(xHelper as IStream);
   Result := xStream.DataString;
   xStream.Free;
+end;
+
+function GetParseErrorDescription(AError: IXMLDOMParseError): String;
+begin
+  Result := '';
+  if AError <> Nil then begin
+    if AError.errorCode <> 0 then begin
+      Result := Trim(AError.reason);
+      if RightStr(Result, 1) <> '.' then begin
+        Result := Result + '.';
+      end;
+      Result := Result + ' Linia ' + IntToStr(AError.line) +
+                         ', wiersz ' + IntToStr(AError.linepos) +
+                         ',\nŸród³o b³êdu ' + Trim(AError.srcText);
+    end;
+  end;
 end;
 
 end.

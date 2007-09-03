@@ -587,6 +587,7 @@ type
     FAddText: String;
     FxsltDoc: IXMLDOMDocument;
     FdataDoc: IXMLDOMDocument;
+    FqueryText: String;
     FreportDef: TReportDef;
     Fparams: TReportDialogParamsDefs;
   protected
@@ -638,7 +639,7 @@ begin
       xStr.Text := StringReplace(xStr.Text, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
       Result := GetDocumentFromString(xStr.Text);
       if Result.parseError.errorCode <> 0 then begin
-        AError := Result.parseError.reason;
+        AError := GetParseErrorDescription(Result.parseError);
         Result := Nil;
       end;
     except
@@ -672,7 +673,7 @@ begin
             LDefaultXsl := GetDocumentFromString(xStrStream.DataString);
             xStrStream.Free;
             if LDefaultXsl.parseError.errorCode <> 0 then begin
-              AError := LDefaultXsl.parseError.reason;
+              AError := GetParseErrorDescription(LDefaultXsl.parseError);
               LDefaultXsl := Nil;
             end else begin
               Result := LDefaultXsl;
@@ -3532,7 +3533,7 @@ begin
     FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self));
     Result := FXml.parseError.errorCode = 0;
     if not Result then begin
-      ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', FXml.parseError.reason);
+      ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', GetParseErrorDescription(FXml.parseError));
     end;
   end;
 end;
@@ -4247,7 +4248,7 @@ end;
 
 function TPrivateReport.GetReportTitle: String;
 begin
-  Result := FreportDef.description;
+  Result := FreportDef.name;
 end;
 
 procedure TPrivateReport.GetSaveDialogProperties(var AFilter, AExtension: String);
@@ -4271,7 +4272,7 @@ begin
     if DecodeBase64Buffer(FreportDef.xsltText, xBufferOut) then begin
       FxsltDoc := GetXmlDocument(xBufferOut);
       if FxsltDoc.parseError.errorCode <> 0 then begin
-        xError := FxsltDoc.parseError.reason;
+        xError := GetParseErrorDescription(FxsltDoc.parseError);
         FxsltDoc := Nil;
       end;
     end else begin
@@ -4288,11 +4289,17 @@ begin
   if FxsltDoc <> Nil then begin
     if FxsltDoc.parseError.errorCode = 0 then begin
       if DecodeBase64Buffer(FreportDef.paramsDefs, xBufferOut) then begin
-        Fparams := TReportDialogParamsDefs.Create;
-        Fparams.AsString := xBufferOut;
-        Result := ChooseByParamsDefs(Fparams);
-        if not Result then begin
-          Fparams.Free;
+        if DecodeBase64Buffer(FreportDef.queryText, FqueryText) then begin
+          Fparams := TReportDialogParamsDefs.Create;
+          Fparams.AsString := xBufferOut;
+          Result := ChooseByParamsDefs(Fparams);
+          if not Result then begin
+            Fparams.Free;
+          end;
+        end else begin
+          ShowInfo(itError, 'Dane zaptania tworz¹cego s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
+                            'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                            'i nastêpnie kompaktowanie pliku danych.', '');
         end;
       end else begin
         ShowInfo(itError, 'Dane parametrów raportu s¹ uszkodzone i raport nie mo¿e zostaæ wykonany. Prawdopodobnie plik danych jest uszkodzony. ' +
@@ -4300,7 +4307,7 @@ begin
                           'i nastêpnie kompaktowanie pliku danych.', '');
       end;
     end else begin
-      ShowInfo(itError, 'Zdefiniowany dla raportu arkusz styli jest niepoprawny', FxsltDoc.parseError.reason);
+      ShowInfo(itError, 'Zdefiniowany dla raportu arkusz styli jest niepoprawny', GetParseErrorDescription(FxsltDoc.parseError));
     end;
   end else begin
     if xError <> '' then begin
@@ -4313,7 +4320,7 @@ procedure TPrivateReport.PrepareReportContent;
 var xQuery: TADOQuery;
     xSql: String;
 begin
-  xSql := GBaseTemlatesList.ExpandTemplates(FreportDef.queryText, Self);
+  xSql := GBaseTemlatesList.ExpandTemplates(FqueryText, Self);
   if Fparams.RebuildStringWithParams(xSql, FAddText) then begin
     xQuery := GDataProvider.OpenSql(xSql, False);
     if xQuery <> Nil then begin

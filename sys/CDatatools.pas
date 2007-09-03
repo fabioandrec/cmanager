@@ -348,7 +348,7 @@ begin
       xError := 'Brak elementu zbiorczego';
     end;
   end else begin
-    xError := xDoc.parseError.reason;
+    xError := GetParseErrorDescription(xDoc.parseError);
   end;
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut', xError);
@@ -529,7 +529,7 @@ begin
       xError := 'Brak elementu zbiorczego';
     end;
   end else begin
-    xError := xDoc.parseError.reason;
+    xError := GetParseErrorDescription(xDoc.parseError);
   end;
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawnym wyci¹giem bankowym', xError);

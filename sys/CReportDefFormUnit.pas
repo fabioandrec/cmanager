@@ -86,7 +86,13 @@ begin
   with TReportDef(Dataobject) do begin
     EditName.Text := name;
     SimpleRichText(description, RichEditDesc);
-    SimpleRichText(queryText, RicheditSql);
+    if DecodeBase64Buffer(queryText, xBufferOut) then begin
+      SimpleRichText(xBufferOut, RicheditSql);
+    end else begin
+      ShowInfo(itWarning, 'Dane zapytania tworz¹cego s¹ uszkodzone i nie zostan¹ wyœwietlone. Prawdopodobnie plik danych jest uszkodzony.' +
+                          'Mo¿esz kontynuowaæ pracê, ale zalecane jest abyœ uruchomi³ CManager-a ponownie, wykona³ kopiê pliku danych ' +
+                          'i nastêpnie kompaktowanie pliku danych.', '');
+    end;
     if DecodeBase64Buffer(xsltText, xBufferOut) then begin
       SimpleRichText(xBufferOut, RicheditXslt);
     end else begin
@@ -156,7 +162,8 @@ begin
   with TReportDef(Dataobject) do begin
     name := EditName.Text;
     description := RichEditDesc.Text;
-    queryText := RicheditSql.Text;
+    EncodeBase64Buffer(RicheditSql.Text, xBufferOut);
+    queryText := xBufferOut;
     EncodeBase64Buffer(RicheditXslt.Text, xBufferOut);
     xsltText := xBufferOut;
     EncodeBase64Buffer(FparamsDefs.AsString, xBufferOut);
@@ -196,7 +203,7 @@ begin
   xXml := GetDocumentFromString(RicheditXslt.Text);
   Result := xXml.parseError.errorCode = 0;
   if not Result then begin
-    ShowInfo(itError, 'Zdefiniowany arkusz styli jest niepoprawny', xXml.parseError.reason);
+    ShowInfo(itError, 'Zdefiniowany arkusz styli jest niepoprawny', GetParseErrorDescription(xXml.parseError));
   end;
 end;
 

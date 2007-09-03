@@ -70,7 +70,7 @@ type
     function GetSelectedText: String; override;
     function GetHistoryText: String; virtual;
     procedure ShowHistory(AGid: TDataGid); virtual;
-    function GetInitialiFilter: String; virtual;
+    function GetInitialFilter: String; virtual;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; virtual; abstract;
     function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; virtual;
     function GetStaticFilter: TStringList; virtual;
@@ -132,7 +132,7 @@ begin
     CButtonHistory.Anchors := [akTop, akRight];
   end;
   ActionHistory.Visible := xHistory <> '';
-  CStaticFilter.DataId := GetInitialiFilter;
+  CStaticFilter.DataId := GetInitialFilter;
   xFilters := GetStaticFilter;
   if xFilters <> Nil then begin
     if AAdditionalData <> Nil then begin
@@ -384,7 +384,7 @@ begin
   end;
 end;
 
-function TCDataobjectFrame.GetInitialiFilter: String;
+function TCDataobjectFrame.GetInitialFilter: String;
 begin
   Result := CFilterAllElements;
 end;

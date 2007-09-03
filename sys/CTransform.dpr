@@ -103,7 +103,7 @@ begin
                   xOutput.Free;
                 end;
               end else begin
-                xText := 'Plik ' + xXslFilename + ' nie jest poprawnym dokumentem xml, ' + xXslDoc.parseError.reason;
+                xText := 'Plik ' + xXslFilename + ' nie jest poprawnym dokumentem xml, ' + GetParseErrorDescription(xXslDoc.parseError);
               end;
             except
               on E: Exception do begin
@@ -111,7 +111,7 @@ begin
               end;
             end;
           end else begin
-            xText := 'Plik ' + xXmlFilename + ' nie jest poprawnym dokumentem xml, ' +  xXmlDoc.parseError.reason;
+            xText := 'Plik ' + xXmlFilename + ' nie jest poprawnym dokumentem xml, ' +  GetParseErrorDescription(xXmlDoc.parseError);
           end;
         except
           on E: Exception do begin

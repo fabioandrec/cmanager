@@ -58,7 +58,7 @@ type
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
-    function GetInitialiFilter: String; override;
+    function GetInitialFilter: String; override;
   end;
 
 implementation
@@ -194,7 +194,7 @@ begin
   RefreshData;
 end;
 
-function TCCurrencyRateFrame.GetInitialiFilter: String;
+function TCCurrencyRateFrame.GetInitialFilter: String;
 begin
   Result := CFilterAllElements;
 end;
