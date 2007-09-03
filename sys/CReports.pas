@@ -596,6 +596,7 @@ type
   public
     procedure SaveToFile(AFilename: String); override;
     procedure GetSaveDialogProperties(var AFilter: String; var AExtension: String); override;
+    function GetReportTitle: String; override;
   end;
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
@@ -633,6 +634,8 @@ begin
     try
       xStr.LoadFromFile(GetSystemPathname(CXSLReportFile));
       xStr.Text := StringReplace(xStr.Text, '[repstyle]', FreportStyle.Text, [rfReplaceAll, rfIgnoreCase]);
+      xStr.Text := StringReplace(xStr.Text, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
+      xStr.Text := StringReplace(xStr.Text, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
       Result := GetDocumentFromString(xStr.Text);
       if Result.parseError.errorCode <> 0 then begin
         AError := Result.parseError.reason;
@@ -4240,6 +4243,11 @@ begin
   if not Result then begin
     ShowInfo(itError, FErrorText, FAddText);
   end;
+end;
+
+function TPrivateReport.GetReportTitle: String;
+begin
+  Result := FreportDef.description;
 end;
 
 procedure TPrivateReport.GetSaveDialogProperties(var AFilter, AExtension: String);

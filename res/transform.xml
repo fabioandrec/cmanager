@@ -2,37 +2,54 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 <xsl:output method="html" encoding="Windows-1250" doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 	<xsl:template match="/">
+	  <xsl:param name="colwidth" select="100 div count(//recordset/header/field)"/>
 		<html>
 			<style type="text/css">[repstyle]</style>
 			<body>
+			  <div class="reptitle">[reptitle]</div>
+			  <hr/>
 				<table class="base">
-					<tr><td colspan="999"><hr/></td></tr>
 					<tr class="head">
 						<xsl:for-each select="recordset/header/field">
-							<td class="headtext"><xsl:value-of select="." /></td>
+						  <xsl:text disable-output-escaping="yes">&lt;td class=&quot;headtext&quot; width=&quot;</xsl:text>
+							<xsl:copy-of select="$colwidth"/>
+							<xsl:text disable-output-escaping="yes">%&quot;&gt;</xsl:text>
+							<xsl:value-of select="." />
+							<xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
 						</xsl:for-each>
 					</tr>
-					<tr><td colspan="999"><hr/></td></tr>
+				</table>
+				<hr/>
+				<table class="base">
 					<xsl:for-each select="recordset/content/row">
 						<xsl:choose>
 							<xsl:when test="position() mod 2">
-								<tr class="evenbase">
+								<tr class="base">
 									<xsl:for-each select="field">
-										<td class="text"><xsl:value-of select="." /></td>
+									  <xsl:text disable-output-escaping="yes">&lt;td class=&quot;text&quot; width=&quot;</xsl:text>
+										<xsl:copy-of select="$colwidth"/>
+										<xsl:text disable-output-escaping="yes">%&quot;&gt;</xsl:text>
+										<xsl:value-of select="." />
+										<xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
 									</xsl:for-each>
 								</tr>
 							</xsl:when>
 							<xsl:otherwise>
-								<tr class="base">
+								<tr class="evenbase">
 									<xsl:for-each select="field">
-										<td class="text"><xsl:value-of select="." /></td>
+									  <xsl:text disable-output-escaping="yes">&lt;td class=&quot;text&quot; width=&quot;</xsl:text>
+										<xsl:copy-of select="$colwidth"/>
+										<xsl:text disable-output-escaping="yes">%&quot;&gt;</xsl:text>
+										<xsl:value-of select="." />
+										<xsl:text disable-output-escaping="yes">&lt;/td&gt;</xsl:text>
 									</xsl:for-each>
 								</tr>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:for-each>
-					<tr><td colspan="999"><hr/></td></tr>
 				</table>
+			<hr/>
+		  <div class="repfooter">[repfooter]</div>
 			</body>
 		</html>
 	</xsl:template>

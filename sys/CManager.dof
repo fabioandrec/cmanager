@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=7
 Release=1
-Build=35
+Build=36
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.7.1.35
+FileVersion=1.7.1.36
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -138,15 +138,16 @@ Comments=
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item1=..\..\..\others\PngComponents\Source
-Item2=..\..\others\PngComponents\Source
+Count=4
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
+Item2=..\..\..\others\PngComponents\Source
+Item3=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\Trash
-Item1=..\..\..\..\Trash
+Item0=..\..\..\..\Trash
+Item1=..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\Bin
-Item1=..\..\..\..\Bin\Wtyczki
+Item0=..\..\..\..\Bin\Wtyczki
+Item1=..\..\Bin
