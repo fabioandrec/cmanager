@@ -68,6 +68,7 @@ type
     ActionImportExtraction: TAction;
     ActionCss: TAction;
     ActionImport: TAction;
+    ActionXsl: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -102,6 +103,7 @@ type
     procedure ActionImportExtractionExecute(Sender: TObject);
     procedure ActionCssExecute(Sender: TObject);
     procedure ActionImportExecute(Sender: TObject);
+    procedure ActionXslExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -776,6 +778,21 @@ end;
 procedure TCMainForm.ActionImportExecute(Sender: TObject);
 begin
   ShowProgressForm(TCImportDatafileForm);
+end;
+
+procedure TCMainForm.ActionXslExecute(Sender: TObject);
+var xRes: TResourceStream;
+begin
+  if not FileExists(GetSystemPathname(CXSLReportFile)) then begin
+    xRes := TResourceStream.Create(HInstance, 'REPXSL', RT_RCDATA);
+    xRes.SaveToFile(GetSystemPathname(CXSLReportFile));
+    xRes.Free;
+  end;
+  if FileExists(GetSystemPathname(CCSSReportFile)) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CXSLReportFile)), Nil, SW_SHOWNORMAL);
+  end else begin
+    ShowInfo(itError, 'Nie odnaleziono pliku "' + CXSLReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+  end;
 end;
 
 end.
