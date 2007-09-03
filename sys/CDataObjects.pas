@@ -758,7 +758,7 @@ const CDatafileTablesExportConditions: array[0..21] of string =
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
-             '', '');
+             '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')');
 
 const CDatafileDeletes: array[0..21] of string =
             ('', '', '', '', '',
@@ -766,7 +766,7 @@ const CDatafileDeletes: array[0..21] of string =
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')');
+             '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
