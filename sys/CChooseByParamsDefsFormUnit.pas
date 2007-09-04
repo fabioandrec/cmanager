@@ -427,8 +427,6 @@ begin
   xIsCustom := (FcomboControl.ItemIndex = FcomboControl.Items.Count -1);
   FstartDateControl.Enabled := xIsCustom;
   FendDateControl.Enabled := xIsCustom;
-  FstartLabel.Enabled := FstartDateControl.Enabled;
-  FendLabel.Enabled := FendDateControl.Enabled;
   if not xIsCustom then begin
     GetFilterDates(xDs, xDe);
     FstartDateControl.Value := xDs;
