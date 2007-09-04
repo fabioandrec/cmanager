@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports,
+  CComponents;
 
 type
   TCParamDefForm = class(TCConfigForm)
@@ -22,7 +23,12 @@ type
     ComboBoxReq: TComboBox;
     Label6: TLabel;
     ComboBoxFrameType: TComboBox;
+    Label7: TLabel;
+    ComboBoxMultiple: TComboBox;
+    CIntDecimal: TCIntEdit;
+    Label8: TLabel;
     procedure ComboBoxTypeChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     FParamDef: TReportDialgoParamDef;
     procedure RefreshControls;
@@ -105,6 +111,8 @@ begin
     EditDesc.Text := FParamDef.desc;
     ComboBoxGroup.Text := FParamDef.group;
     ComboBoxReq.ItemIndex := IfThen(FParamDef.isRequired, 0, 1);
+    ComboBoxMultiple.ItemIndex := IfThen(FParamDef.isMultiple, 0, 1);
+    CIntDecimal.Text := IntToStr(FParamDef.decimalLen);
   end;
   RefreshControls;
 end;
@@ -118,7 +126,9 @@ begin
     group := ComboBoxGroup.Text;
     paramType := CReportParamTypes[ComboBoxType.ItemIndex][1];
     isRequired := ComboBoxReq.ItemIndex = 0;
+    isMultiple := ComboBoxMultiple.ItemIndex = 0;
     frameType := TRegisteredFrameClass(ComboBoxFrameType.Items.Objects[ComboBoxFrameType.ItemIndex]).frameType;
+    decimalLen := CIntDecimal.Value;
   end;
 end;
 
@@ -128,11 +138,25 @@ begin
 end;
 
 procedure TCParamDefForm.RefreshControls;
+var xWithDataobject: Boolean;
+    xWithDecimal: Boolean;
 begin
-  ComboBoxFrameType.Visible :=
-    (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDataobject) or
-    (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeMultiobject);
+  xWithDataobject := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDataobject);
+  xWithDecimal := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDecimal);
+  ComboBoxType.Width := IfThen(xWithDataobject, 153, 393);
+  ComboBoxFrameType.Visible := xWithDataobject;
   Label6.Visible := ComboBoxFrameType.Visible;
+  Label7.Visible := xWithDataobject;
+  ComboBoxMultiple.Visible := xWithDataobject;
+  Label8.Visible := xWithDecimal;
+  CIntDecimal.Visible := xWithDecimal
+end;
+
+procedure TCParamDefForm.FormCreate(Sender: TObject);
+begin
+  inherited;
+  Label8.Top := Label7.Top;
+  CIntDecimal.Top := ComboBoxMultiple.Top;
 end;
 
 end.

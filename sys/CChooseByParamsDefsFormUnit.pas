@@ -41,12 +41,29 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TCPeriod = class(TCustomPanel)
+  private
+    FcomboControl: TComboBox;
+    FstartLabel: TLabel;
+    FstartDateControl: TCDateTime;
+    FendLabel: TLabel;
+    FendDateControl: TCDateTime;
+    procedure ComboChanged(Sender: TObject);
+    procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+  protected
+    procedure UpdateDateControls;
+    procedure SetParent(AParent: TWinControl); override;
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
 function ChooseByParamsDefs(var AParams: TReportDialogParamsDefs): Boolean;
 
 implementation
 
 uses CConsts, CInfoFormUnit, StrUtils, CBaseFrameUnit, CFrameFormUnit,
-  CDatabase, CDataObjects, CDatatools;
+  CDatabase, CDataObjects, CDatatools, Types, DateUtils;
 
 {$R *.dfm}
 
@@ -138,38 +155,41 @@ begin
       TEdit(xControl).BorderStyle := bsNone;
       TEdit(xControl).Text := '';
     end else if xParam.paramType = CParamTypeDecimal then begin
-      xControl := TCIntEdit.Create(Self);
-      xControl.Name := 'IntEdit' + IntToStr(xCount);
-      TCIntEdit(xControl).Parent := TGroupBox(xParent.control);
-      TCIntEdit(xControl).BevelKind := bkTile;
-      TCIntEdit(xControl).BorderStyle := bsNone;
-      TCIntEdit(xControl).Text := '0';
-    end else if xParam.paramType = CParamTypeFloat then begin
-      xControl := TCCurrEdit.Create(Self);
-      xControl.Name := 'CurrEdit' + IntToStr(xCount);
-      TCCurrEdit(xControl).Parent := TGroupBox(xParent.control);
-      TCCurrEdit(xControl).BevelKind := bkTile;
-      TCCurrEdit(xControl).BorderStyle := bsNone;
-      TCCurrEdit(xControl).CurrencyStr := '';
-      TCCurrEdit(xControl).CurrencyId := '';
+      if xParam.decimalLen = 0 then begin
+        xControl := TCIntEdit.Create(Self);
+        xControl.Name := 'IntEdit' + IntToStr(xCount);
+        TCIntEdit(xControl).Parent := TGroupBox(xParent.control);
+        TCIntEdit(xControl).BevelKind := bkTile;
+        TCIntEdit(xControl).BorderStyle := bsNone;
+        TCIntEdit(xControl).Text := '0';
+      end else begin
+        xControl := TCCurrEdit.Create(Self);
+        xControl.Name := 'CurrEdit' + IntToStr(xCount);
+        TCCurrEdit(xControl).Parent := TGroupBox(xParent.control);
+        TCCurrEdit(xControl).BevelKind := bkTile;
+        TCCurrEdit(xControl).BorderStyle := bsNone;
+        TCCurrEdit(xControl).Decimals := xParam.decimalLen;
+        TCCurrEdit(xControl).CurrencyStr := '';
+        TCCurrEdit(xControl).CurrencyId := '';
+      end;
     end else if xParam.paramType = CParamTypeDate then begin
       xControl := TCDateTime.Create(Self);
       xControl.Name := 'DateEdit' + IntToStr(xCount);
       TCDateTime(xControl).Parent := TGroupBox(xParent.control);
       TCDateTime(xControl).BevelKind := bkTile;
+    end else if xParam.paramType = CParamTypePeriod then begin
+      xControl := TCPeriod.Create(Self);
+      xControl.Name := 'PeriodEdit' + IntToStr(xCount);
+      TCPeriod(xControl).Parent := TGroupBox(xParent.control);
     end else if xParam.paramType = CParamTypeDataobject then begin
       xControl := TCStatic.Create(Self);
       xControl.Name := 'StaticEdit' + IntToStr(xCount);
       TCStatic(xControl).Parent := TGroupBox(xParent.control);
       TCStatic(xControl).BevelKind := bkTile;
       TCStatic(xControl).OnGetDataId := xCurrent.ChooseDataobject;
-    end else if xParam.paramType = CParamTypeMultiobject then begin
-      xControl := TCStatic.Create(Self);
-      xControl.Name := 'StaticEdit' + IntToStr(xCount);
-      TCStatic(xControl).Parent := TGroupBox(xParent.control);
-      TCStatic(xControl).BevelKind := bkTile;
-      TCStatic(xControl).OnGetDataId := xCurrent.ChooseDataobject;
-      TCStatic(xControl).TextOnEmpty := '<wszystkie elementy>';
+      if xParam.isMultiple then begin
+        TCStatic(xControl).TextOnEmpty := '<wszystkie elementy>';
+      end;
     end else begin
       xControl := Nil;
     end;
@@ -187,7 +207,11 @@ begin
       xControl.Top := xControlTop;
       xControl.Width := 250;
       xControlHeight := xControl.Height;
-      xLabel.Top := xControlTop + ((xControlHeight - xLabel.Height) div 2);
+      if xControl is TCPeriod then begin
+        xLabel.Top := xControlTop + 5;
+      end else begin
+        xLabel.Top := xControlTop + ((xControlHeight - xLabel.Height) div 2);
+      end;
     end;
     xParent.Add(xCurrent);
   end;
@@ -252,15 +276,17 @@ begin
     if Fparam.paramType = CParamTypeText then begin
       Result := IfThen(Trim(values[Low(values)]) = '', 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
     end else if Fparam.paramType = CParamTypeDecimal then begin
-      Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ równy 0', '');
-    end else if Fparam.paramType = CParamTypeFloat then begin
-      Result := IfThen(values[Low(values)] = 0.00, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ równy 0.00', '');
+      Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ równy zero', '');
+    end else if Fparam.paramType = CParamTypePeriod then begin
+      Result := '';
     end else if Fparam.paramType = CParamTypeDate then begin
       Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
     end else if Fparam.paramType = CParamTypeDataobject then begin
-      Result := IfThen(Trim(values[Low(values)]) = CEmptyDataGid, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
-    end else if Fparam.paramType = CParamTypeMultiobject then begin
-      Result := '';
+      if Fparam.isMultiple then begin
+        Result := '';
+      end else begin
+        Result := IfThen(Trim(values[Low(values)]) = CEmptyDataGid, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
+      end;
     end;
   end;
 end;
@@ -283,20 +309,28 @@ begin
     SetLength(Result, 1);
     Result[Low(Result)] := TEdit(control).Text;
   end else if Fparam.paramType = CParamTypeDecimal then begin
-    SetLength(Result, 1);
-    Result[Low(Result)] := TCIntEdit(control).Value;
-  end else if Fparam.paramType = CParamTypeFloat then begin
-    SetLength(Result, 1);
-    Result[Low(Result)] := TCCurrEdit(control).Value;
+    if Fparam.decimalLen = 0 then begin
+      SetLength(Result, 1);
+      Result[Low(Result)] := TCIntEdit(control).Value;
+    end else begin
+      SetLength(Result, 1);
+      Result[Low(Result)] := TCCurrEdit(control).Value;
+    end;
   end else if Fparam.paramType = CParamTypeDate then begin
     SetLength(Result, 1);
     Result[Low(Result)] := TCDateTime(control).Value;
-  end else if Fparam.paramType = CParamTypeDataobject then begin
+  end else if Fparam.paramType = CParamTypePeriod then begin
     SetLength(Result, 2);
-    Result[Low(Result)] := TCStatic(control).DataId;
-    Result[High(Result)] := TCStatic(control).Caption;
-  end else if Fparam.paramType = CParamTypeMultiobject then begin
-    Result := StringToVariantArray(TCStatic(control).DataId, sLineBreak);
+    Result[Low(Result)] := TCPeriod(control).FstartDateControl.Value;
+    Result[High(Result)] := TCPeriod(control).FendDateControl.Value;
+  end else if Fparam.paramType = CParamTypeDataobject then begin
+    if Fparam.isMultiple then begin
+      Result := StringToVariantArray(TCStatic(control).DataId, sLineBreak);
+    end else begin
+      SetLength(Result, 2);
+      Result[Low(Result)] := TCStatic(control).DataId;
+      Result[High(Result)] := TCStatic(control).Caption;
+    end;
   end;
 end;
 
@@ -308,22 +342,165 @@ begin
   xClass := GRegisteredClasses.FindClass(Fparam.frameType);
   if xClass <> Nil then begin
     if Fparam.paramType = CParamTypeDataobject then begin
-      AAccepted := TCFrameForm.ShowFrame(xClass, ADataGid, AText);
-    end else if Fparam.paramType = CParamTypeMultiobject then begin
-      xDataGid := '';
-      xList := TStringList.Create;
-      xList.Text := ADataGid;
-      AAccepted := TCFrameForm.ShowFrame(xClass, xDataGid, AText, Nil, Nil, Nil, xList);
-      ADataGid := xList.Text;
-      if ADataGid = '' then begin
-        AText := '<wszystkie elementy>';
+      if Fparam.isMultiple then begin
+        xDataGid := '';
+        xList := TStringList.Create;
+        xList.Text := ADataGid;
+        AAccepted := TCFrameForm.ShowFrame(xClass, xDataGid, AText, Nil, Nil, Nil, xList);
+        ADataGid := xList.Text;
+        if ADataGid = '' then begin
+          AText := '<wszystkie elementy>';
+        end else begin
+          AText := '<wybrano ' + IntToStr(xList.Count) + '>';
+        end;
+        xList.Free;
       end else begin
-        AText := '<wybrano ' + IntToStr(xList.Count) + '>';
+        AAccepted := TCFrameForm.ShowFrame(xClass, ADataGid, AText);
       end;
-      xList.Free;
     end;
   end;
 end;
 
+procedure TCPeriod.ComboChanged(Sender: TObject);
+begin
+  UpdateDateControls;
+end;
+
+constructor TCPeriod.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  BevelInner := bvNone;
+  BevelOuter := bvNone;
+  BevelKind := bkNone;
+  Caption := '';
+  FcomboControl := TComboBox.Create(Self);
+  FcomboControl.Name := 'ComboControl';
+  FcomboControl.BevelInner := bvNone;
+  FcomboControl.BevelKind := bkTile;
+  FcomboControl.Style := csDropDownList;
+  FstartDateControl := TCDateTime.Create(Self);
+  FstartDateControl.Name := 'StartDateControl';
+  FendDateControl := TCDateTime.Create(Self);
+  FendDateControl.Name := 'EndDateControl';
+  FcomboControl.OnChange := ComboChanged;
+  FstartLabel := TLabel.Create(Self);
+  FendLabel := TLabel.Create(Self);
+  Height := Height + 20;
+end;
+
+procedure TCPeriod.SetParent(AParent: TWinControl);
+begin
+  inherited SetParent(AParent);
+  if not (csDestroying in ComponentState) then begin
+    FcomboControl.parent := Self;
+    FstartDateControl.Parent := Self;
+    FendDateControl.Parent := Self;
+    FstartLabel.Parent := Self;
+    FendLabel.Parent := Self;
+    with FcomboControl.Items do begin
+      Clear;
+      Add('tylko dziœ');
+      Add('w tym tygodniu');
+      Add('w tym miesi¹cu');
+      Add('ostatnie 7 dni');
+      Add('ostatnie 14 dni');
+      Add('ostatnie 30 dni');
+      Add('w przysz³ym tygodni');
+      Add('w przysz³ym miesi¹cu');
+      Add('nastêpne 7 dni');
+      Add('nastêpne 14 dni');
+      Add('nastêpne 30 dni');
+      Add('dowolny');
+    end;
+    Caption := '';
+    FstartLabel.Caption := 'Zakres od';
+    FendLabel.Caption := 'do';
+    FcomboControl.ItemIndex := 0;
+    UpdateDateControls;
+  end;
+end;
+
+procedure TCPeriod.UpdateDateControls;
+var xIsCustom: Boolean;
+    xDs, xDe: TDateTime;
+begin
+  xIsCustom := (FcomboControl.ItemIndex = FcomboControl.Items.Count -1);
+  FstartDateControl.Enabled := xIsCustom;
+  FendDateControl.Enabled := xIsCustom;
+  FstartLabel.Enabled := FstartDateControl.Enabled;
+  FendLabel.Enabled := FendDateControl.Enabled;
+  if not xIsCustom then begin
+    GetFilterDates(xDs, xDe);
+    FstartDateControl.Value := xDs;
+    FendDateControl.Value := xDe;
+  end;
+end;
+
+procedure TCPeriod.WMSize(var Message: TWMSize);
+begin
+  if (not (csDestroying in ComponentState)) then begin
+    FcomboControl.Top := 0;
+    FcomboControl.Left := 0;
+    FcomboControl.Width := Width;
+    FcomboControl.Height := 21;
+    FstartDateControl.Height := 21;
+    FstartDateControl.Top := FcomboControl.BoundsRect.Bottom + 16;
+    FstartDateControl.Width := (FcomboControl.Width div 2) - 40;
+    FendDateControl.Height := 21;
+    FendDateControl.Top := FcomboControl.BoundsRect.Bottom + 16;
+    FendDateControl.Width := (FcomboControl.Width div 2) - 40;
+    FendDateControl.Left := FcomboControl.BoundsRect.Right - FendDateControl.Width;
+    FstartDateControl.Left := FendDateControl.Left - FstartDateControl.Width - 24;
+    FstartLabel.Top := FstartDateControl.Top + ((FstartDateControl.Height - FstartLabel.Height) div 2);
+    FstartLabel.Left := FstartDateControl.Left - FstartLabel.Width - 5;
+    FendLabel.Top := FendDateControl.Top + ((FendDateControl.Height - FendLabel.Height) div 2);
+    FendLabel.Left := FendDateControl.Left - FendLabel.Width - 5;
+  end;
+end;
+
+procedure TCPeriod.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+var xId: Integer;
+begin
+  ADateFrom := 0;
+  ADateTo := 0;
+  xId := FcomboControl.ItemIndex;
+  if xId = 0 then begin
+    ADateFrom := GWorkDate;
+    ADateTo := GWorkDate;
+  end else if xId = 1 then begin
+    ADateFrom := StartOfTheWeek(GWorkDate);
+    ADateTo := EndOfTheWeek(GWorkDate);
+  end else if xId = 2 then begin
+    ADateFrom := StartOfTheMonth(GWorkDate);
+    ADateTo := EndOfTheMonth(GWorkDate);
+  end else if xId = 3 then begin
+    ADateFrom := IncDay(GWorkDate, -6);
+    ADateTo := GWorkDate;
+  end else if xId = 4 then begin
+    ADateFrom := IncDay(GWorkDate, -13);
+    ADateTo := GWorkDate;
+  end else if xId = 5 then begin
+    ADateFrom := IncDay(GWorkDate, -29);
+    ADateTo := GWorkDate;
+  end else if xId = 6 then begin
+    ADateFrom := StartOfTheWeek(IncDay(GWorkDate, 7));
+    ADateTo := EndOfTheWeek(IncDay(GWorkDate, 7));
+  end else if xId = 7 then begin
+    ADateFrom := StartOfTheMonth(IncDay(EndOfTheMonth(GWorkDate), 1));
+    ADateTo := EndOfTheMonth(IncDay(EndOfTheMonth(GWorkDate), 1));
+  end else if xId = 8 then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, 6);
+  end else if xId = 9 then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, 13);
+  end else if xId = 10 then begin
+    ADateFrom := GWorkDate;
+    ADateTo := IncDay(GWorkDate, 29);
+  end else if xId = 11 then begin
+    ADateFrom := FstartDateControl.Value;
+    ADateTo := FendDateControl.Value;
+  end;
+end;
 
 end.

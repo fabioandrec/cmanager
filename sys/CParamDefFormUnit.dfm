@@ -1,16 +1,17 @@
 inherited CParamDefForm: TCParamDefForm
   Caption = 'Parametr'
-  ClientHeight = 316
-  ClientWidth = 524
+  ClientHeight = 317
+  ClientWidth = 566
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 524
-    Height = 275
+    Width = 566
+    Height = 276
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 489
+      Width = 529
       Height = 113
       Caption = ' Dane podstawowe '
       TabOrder = 0
@@ -51,7 +52,7 @@ inherited CParamDefForm: TCParamDefForm
       object EditName: TEdit
         Left = 280
         Top = 32
-        Width = 177
+        Width = 225
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -61,7 +62,7 @@ inherited CParamDefForm: TCParamDefForm
       object EditDesc: TEdit
         Left = 64
         Top = 72
-        Width = 393
+        Width = 441
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -72,20 +73,20 @@ inherited CParamDefForm: TCParamDefForm
     object GroupBox2: TGroupBox
       Left = 16
       Top = 144
-      Width = 489
+      Width = 529
       Height = 121
       Caption = ' Rodzaj kontrolki parametru '
       TabOrder = 1
       object Label2: TLabel
-        Left = 30
+        Left = 27
         Top = 36
-        Width = 26
+        Width = 69
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Klasa'
+        Caption = 'Klasa kontrolki'
       end
       object Label4: TLabel
-        Left = 338
+        Left = 42
         Top = 76
         Width = 54
         Height = 13
@@ -93,18 +94,34 @@ inherited CParamDefForm: TCParamDefForm
         Caption = 'Wymagane'
       end
       object Label6: TLabel
-        Left = 73
-        Top = 76
-        Width = 71
+        Left = 272
+        Top = 36
+        Width = 64
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Rodzaj obiektu'
+        Caption = 'Klasa obiektu'
         FocusControl = BitBtnCancel
       end
+      object Label7: TLabel
+        Left = 275
+        Top = 76
+        Width = 61
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Multiselekcja'
+      end
+      object Label8: TLabel
+        Left = 250
+        Top = 92
+        Width = 86
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Miejsca dziesi'#281'tne'
+      end
       object ComboBoxType: TComboBox
-        Left = 64
+        Left = 104
         Top = 32
-        Width = 393
+        Width = 153
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -114,42 +131,68 @@ inherited CParamDefForm: TCParamDefForm
         OnChange = ComboBoxTypeChange
       end
       object ComboBoxReq: TComboBox
-        Left = 400
+        Left = 104
         Top = 72
-        Width = 57
+        Width = 49
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 1
+        TabOrder = 2
         Text = 'Tak'
         Items.Strings = (
           'Tak'
           'Nie')
       end
       object ComboBoxFrameType: TComboBox
-        Left = 152
-        Top = 72
-        Width = 169
+        Left = 344
+        Top = 32
+        Width = 153
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
-        TabOrder = 2
+        TabOrder = 1
+      end
+      object ComboBoxMultiple: TComboBox
+        Left = 344
+        Top = 72
+        Width = 153
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 1
+        TabOrder = 3
+        Text = 'Nie'
+        Items.Strings = (
+          'Tak'
+          'Nie')
+      end
+      object CIntDecimal: TCIntEdit
+        Left = 344
+        Top = 88
+        Width = 153
+        Height = 21
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        TabOrder = 4
+        Text = '2'
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 275
-    Width = 524
+    Top = 276
+    Width = 566
     inherited BitBtnOk: TBitBtn
-      Left = 347
+      Left = 389
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 435
+      Left = 477
     end
   end
 end

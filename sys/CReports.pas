@@ -18,7 +18,9 @@ type
     FparentParamsDefs: TReportDialogParamsDefs;
     FparamValues: TVariantDynArray;
     FisRequired: Boolean;
+    FisMultiple: Boolean;
     FframeType: Integer;
+    FdecimalLen: Integer;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
     function GetparamAsString(AParamOption: String): String;
@@ -42,7 +44,9 @@ type
     property paramType: String read FparamType write FparamType;
     property parentParamsDefs: TReportDialogParamsDefs read FparentParamsDefs;
     property isRequired: Boolean read FisRequired write FisRequired;
+    property isMultiple: Boolean read FisMultiple write FisMultiple;
     property frameType: Integer read FframeType write FframeType;
+    property decimalLen: Integer read FdecimalLen write FdecimalLen;
   end;
 
   TReportDialogParamsDefs = class(TObjectList)
@@ -4560,6 +4564,8 @@ begin
   FparentParamsDefs := AParentParamsDefs;
   SetLength(FparamValues, 0);
   FisRequired := True;
+  FisMultiple := False;
+  FdecimalLen := 2;
   FframeType := CFRAMETYPE_UNKNOWN;
 end;
 
@@ -4615,32 +4621,44 @@ begin
   if FparamType = CParamTypeText then begin
     Result := QuotedStr(FparamValues[0]);
   end else if FparamType = CParamTypeDecimal then begin
-    Result := IntToStr(FparamValues[0]);
-  end else if FparamType = CParamTypeFloat then begin
-    Result := CurrencyToDatabase(FparamValues[0]);
+    if FdecimalLen = 0 then begin
+      Result := IntToStr(FparamValues[0]);
+    end else begin
+      Result := CurrencyToDatabase(FparamValues[0]);
+    end;
   end else if FparamType = CParamTypeDate then begin
     Result := DatetimeToDatabase(FparamValues[0], False)
-  end else if FparamType = CParamTypeDataobject then begin
-    if AIndex <= 0 then begin
-      Result := DataGidToDatabase(FparamValues[0]);
+  end else if FparamType = CParamTypePeriod then begin
+    if AIndex = 0 then begin
+      Result := DatetimeToDatabase(FparamValues[0], False)
+    end else if AIndex = 1 then begin
+      Result := DatetimeToDatabase(FparamValues[1], False)
     end else begin
-      Result := QuotedStr(FparamValues[1]);
+      Result := DatetimeToDatabase(FparamValues[0], False) + ' and ' + DatetimeToDatabase(FparamValues[1], False);
     end;
-  end else if FparamType = CParamTypeMultiobject then begin
-    if (0 <= AIndex) and (AIndex <= paramValuesLength) then begin
-      Result := DataGidToDatabase(FparamValues[AIndex]);
-    end else begin
-      Result := '';
-      if paramValuesLength > 0 then begin
-        for xCount := 0 to paramValuesLength - 1 do begin
-          Result := Result + DataGidToDatabase(FparamValues[xCount]);
-          if xCount <> paramValuesLength - 1 then begin
-            Result := Result + ', ';
-          end;
-        end;
+  end else if FparamType = CParamTypeDataobject then begin
+    if FisMultiple then begin
+      if (0 <= AIndex) and (AIndex <= paramValuesLength) then begin
+        Result := DataGidToDatabase(FparamValues[AIndex]);
       end else begin
-        xTable := GRegisteredClasses.FindClass(frameType).GetDataobjectProxy(WMOPT_NONE).TableName;
-        Result := Format('select id%s from %s', [xTable, xTable]);
+        Result := '';
+        if paramValuesLength > 0 then begin
+          for xCount := 0 to paramValuesLength - 1 do begin
+            Result := Result + DataGidToDatabase(FparamValues[xCount]);
+            if xCount <> paramValuesLength - 1 then begin
+              Result := Result + ', ';
+            end;
+          end;
+        end else begin
+          xTable := GRegisteredClasses.FindClass(frameType).GetDataobjectProxy(WMOPT_NONE).TableName;
+          Result := Format('select id%s from %s', [xTable, xTable]);
+        end;
+      end;
+    end else begin
+      if AIndex <= 0 then begin
+        Result := DataGidToDatabase(FparamValues[0]);
+      end else begin
+        Result := QuotedStr(FparamValues[1]);
       end;
     end;
   end;
@@ -4652,8 +4670,10 @@ begin
   Fdesc := GetXmlAttribute('desc', ANode, '');
   Fgroup := GetXmlAttribute('group', ANode, '');
   FisRequired := GetXmlAttribute('isRequired', ANode, True);
+  FisMultiple := GetXmlAttribute('isMultiple', ANode, False);
   FparamType := GetXmlAttribute('type', ANode, '');
   FframeType := GetXmlAttribute('frame', ANode, CFRAMETYPE_UNKNOWN);
+  FdecimalLen := GetXmlAttribute('decimalLen', ANode, FdecimalLen);
 end;
 
 procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
@@ -4663,7 +4683,9 @@ begin
   SetXmlAttribute('group', ANode, Fgroup);
   SetXmlAttribute('type', ANode, FparamType);
   SetXmlAttribute('isRequired', ANode, FisRequired);
+  SetXmlAttribute('isMultiple', ANode, FisMultiple);
   SetXmlAttribute('frame', ANode, FframeType);
+  SetXmlAttribute('decimalLen', ANode, FdecimalLen);
 end;
 
 procedure TReportDialogParamsDefs.SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);

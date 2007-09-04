@@ -204,18 +204,18 @@ const
 
   CParamTypeText = 'text';
   CParamTypeDecimal = 'decimal';
-  CParamTypeFloat = 'float';
   CParamTypeDate = 'date';
+  CParamTypePeriod = 'period';
   CParamTypeDataobject = 'dataobject';
-  CParamTypeMultiobject = 'multiobject';
 
-  CReportParamTypes: array[0..5, 0..1] of String =
-    (('tekst', CParamTypeText),
-     ('liczba ca³kowita', CParamTypeDecimal),
-     ('liczba zmiennoprzecinkowa', CParamTypeFloat),
+  CReportParamTypes: array[0..4, 0..1] of String =
+    (
+     ('tekst', CParamTypeText),
+     ('liczba', CParamTypeDecimal),
      ('data', CParamTypeDate),
-     ('obiekt wybranej klasy', CParamTypeDataobject),
-     ('lista obiektów wybranej klasy', CParamTypeMultiobject));
+     ('zakres dat', CParamTypePeriod),
+     ('obiekt', CParamTypeDataobject)
+    );
 
 implementation
 
