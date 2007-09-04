@@ -443,16 +443,16 @@ begin
     FcomboControl.Height := 21;
     FstartDateControl.Height := 21;
     FstartDateControl.Top := FcomboControl.BoundsRect.Bottom + 16;
-    FstartDateControl.Width := (FcomboControl.Width div 2) - 40;
+    FstartDateControl.Width := (FcomboControl.Width div 2) - 42;
     FendDateControl.Height := 21;
     FendDateControl.Top := FcomboControl.BoundsRect.Bottom + 16;
-    FendDateControl.Width := (FcomboControl.Width div 2) - 40;
+    FendDateControl.Width := (FcomboControl.Width div 2) - 42;
     FendDateControl.Left := FcomboControl.BoundsRect.Right - FendDateControl.Width;
-    FstartDateControl.Left := FendDateControl.Left - FstartDateControl.Width - 24;
+    FstartDateControl.Left := FendDateControl.Left - FstartDateControl.Width - 26;
     FstartLabel.Top := FstartDateControl.Top + ((FstartDateControl.Height - FstartLabel.Height) div 2);
-    FstartLabel.Left := FstartDateControl.Left - FstartLabel.Width - 5;
+    FstartLabel.Left := FstartDateControl.Left - FstartLabel.Width - 7;
     FendLabel.Top := FendDateControl.Top + ((FendDateControl.Height - FendLabel.Height) div 2);
-    FendLabel.Left := FendDateControl.Left - FendLabel.Width - 5;
+    FendLabel.Left := FendDateControl.Left - FendLabel.Width - 7;
   end;
 end;
 
