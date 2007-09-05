@@ -56,7 +56,7 @@ type
     procedure WndProc(var Message: TMessage); override;
     function GetBaseForm: TCBaseForm;
     procedure Loaded; override;
-    procedure DoCheckChanged;
+    procedure DoCheckChanged; virtual; 
     procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure UpdateSelectedItemPlugins;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; virtual;
@@ -83,6 +83,7 @@ type
     property OutputData: Pointer read FOutputData;
     function MustFreeAdditionalData: Boolean; virtual;
     function IsAllElementChecked(ACheckedCount: Integer): Boolean; virtual;
+    function IsAnyElementChecked: Boolean; virtual;
     property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
@@ -655,7 +656,7 @@ var xCount: Integer;
 begin
   if Owner.InheritsFrom(TCFrameForm) then begin
     if TCFrameForm(Owner).IsChoice then begin
-      TCFrameForm(Owner).BitBtnOk.Enabled := AIsSelectedSomething or (MultipleChecks <> Nil);
+      TCFrameForm(Owner).BitBtnOk.Enabled := (AIsSelectedSomething and (MultipleChecks = Nil)) or ((MultipleChecks <> Nil) and IsAnyElementChecked);
     end else begin
       TCFrameForm(Owner).BitBtnOk.Enabled := True;
     end;
@@ -728,6 +729,19 @@ end;
 function TCBaseFrame.IsAllElementChecked(ACheckedCount: Integer): Boolean;
 begin
   Result := True;
+end;
+
+function TCBaseFrame.IsAnyElementChecked: Boolean;
+var xNode: PVirtualNode;
+begin
+  Result := False;
+  if GetList <> Nil then begin
+    xNode := GetList.GetFirst;
+    while (xNode <> Nil) and (not Result) do begin
+      Result := (xNode.CheckState = csCheckedNormal) and (xNode.CheckType = ctCheckBox);
+      xNode := GetList.GetNext(xNode);
+    end;
+  end;
 end;
 
 initialization

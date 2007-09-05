@@ -58,6 +58,7 @@ type
     procedure MessageMovementDeleted(AId: TDataGid; AOptions: Integer); virtual;
     procedure RefreshData; virtual;
     function GetAdditionalDataForObject: TAdditionalData; virtual;
+    procedure DoCheckChanged; override;
   public
     Dataobjects: TDataObjectList;
     procedure RecreateTreeHelper; virtual;
@@ -285,19 +286,10 @@ end;
 
 procedure TCDataobjectFrame.CStaticFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 var xList: TStringList;
-    xGid, xText: String;
-    xRect: TRect;
 begin
   xList := GetStaticFilter;
   if xList <> Nil then begin
-    xGid := CEmptyDataGid;
-    xText := '';
-    xRect := Rect(10, 10, 300, 500);
-    AAccepted := TCFrameForm.ShowFrame(TCListFrame, xGid, xText, xList, @xRect);
-    if AAccepted then begin
-      ADataGid := xGid;
-      AText := xText;
-    end;
+    AAccepted := ShowList(xList, ADataGid, AText, False);
   end;
 end;
 
@@ -427,6 +419,11 @@ end;
 function TCDataobjectFrame.IsAllElementChecked(ACheckedCount: Integer): Boolean;
 begin
   Result := GDataProvider.GetSqlInteger('select count(*) from ' + GetDataObjectProxy(WMOPT_NONE).TableName, -1) = ACheckedCount;
+end;
+
+procedure TCDataobjectFrame.DoCheckChanged;
+begin
+  UpdateButtons(List.SelectedCount > 0);
 end;
 
 end.

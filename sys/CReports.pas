@@ -4628,6 +4628,8 @@ begin
     end;
   end else if FparamType = CParamTypeDate then begin
     Result := DatetimeToDatabase(FparamValues[0], False)
+  end else if FparamType = CParamTypeBoolean then begin
+    Result := IntToStr(Integer(FparamValues[0]));
   end else if FparamType = CParamTypePeriod then begin
     if AIndex = 0 then begin
       Result := DatetimeToDatabase(FparamValues[0], False)

@@ -24,8 +24,7 @@ type
     FExtOutput: String;
     function PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
     function PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
-    function DecodeDate(AStr: String; AIsCreditCard: Boolean; var AStart,
-      AEnd: TDateTime): Boolean;
+    function DecodeDate(AStr: String; AIsCreditCard: Boolean; var AStart, AEnd: TDateTime): Boolean;
   public
     property ExtOutput: String read FExtOutput;
   end;
@@ -420,7 +419,6 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
       xCash: Currency;
       xExtractionNode: IXMLDOMNode;
   begin
-    Result := True;
     AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
     if AIsCreditCard then begin
       xRegDate := YmdToDate(ARow[Low(ARow) + 1], 0);
@@ -429,13 +427,19 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
       xCashStr := StringReplace(Trim(ARow[Low(ARow) + 5]), '.', '', [rfReplaceAll, rfIgnoreCase]);
       xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
       xCash := StrToCurrencyDecimalDot(xCashStr);
-      xCurrStr := Trim(ARow[Low(ARow) + 6])
+      xCurrStr := Trim(ARow[Low(ARow) + 6]);
+      Result := (xRegDate <> 0) and (xAccountingDate <> 0);
     end else begin
-      Result := False;
-      xCash := 0;
-      xAccountingDate := 0;
-      xTitle := '';
-      xRegDate := 0;
+      xRegDate := DmyToDate(ARow[Low(ARow)], 0);
+      xAccountingDate := YmdToDate(ARow[Low(ARow) + 1], 0);
+      xCashStr := StringReplace(Trim(ARow[Low(ARow) + 7]), '.', '', [rfReplaceAll, rfIgnoreCase]);
+      xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+      xCash := StrToCurrencyDecimalDot(xCashStr);
+      xTitle := Trim(ARow[Low(ARow) + 2]) + sLineBreak + Trim(ARow[Low(ARow) + 3]) + sLineBreak +
+                Trim(ARow[Low(ARow) + 4]) + sLineBreak + Trim(ARow[Low(ARow) + 5]) + sLineBreak +
+                Trim(ARow[Low(ARow) + 6]);
+      xCurrStr := 'PLN';
+      Result := (xRegDate <> 0) and (xAccountingDate <> 0);
     end;
     if Result then begin
       xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
@@ -476,6 +480,7 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
           SetLength(Result, Length(Result) + 1);
           Result[High(Result)] := xPart;
         end;
+        xStr := '';
       end;
     until xStr = '';
   end;
@@ -483,6 +488,7 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
 var xIsCreditCard: Boolean;
     xLines: TStringList;
     xStartDate, xEndDate: TDateTime;
+    xM, xY: Word;
     xCount: Integer;
     xSplit: TStringDynArray;
     xTitle: String;
@@ -492,7 +498,6 @@ var xIsCreditCard: Boolean;
     xOperationsBlock: Boolean;
     xValid: Boolean;
 begin
-  Result := False;
   FExtOutput := '';
   xLines := TStringList.Create;
   xOutXml := GetXmlDocument;
@@ -549,12 +554,45 @@ begin
           if AnsiUpperCase(xSplit[Low(xSplit)]) = '#NR OPER.' then begin
             xOperationsBlock := True;
           end;
+        end else begin
+          xOperationsBlock := False;
         end;
         Inc(xCount);
       end;
       Result := xValid and (xStartDate <> 0) and (xEndDate <> 0);
     end else begin
-      AError := 'Format nie obs³ugiwany';
+      xCount := 0;
+      xTitle := '';
+      xOperationsBlock := False;
+      xValid := True;
+      while (xCount <= xLines.Count - 1) and xValid do begin
+        xSplit := SplitToArray(xLines.Strings[xCount]);
+        if Length(xSplit) > 0 then begin
+          if AnsiUpperCase(xSplit[Low(xSplit)]) = 'ELEKTRONICZNE ZESTAWIENIE OPERACJI ZA' then begin
+            xY := StrToIntDef(Copy(xSplit[High(xSplit)], 1, 4), 0);
+            xM := StrToIntDef(Copy(xSplit[High(xSplit)], 6, 2), 0);
+            if (xY <> 0) and (xM <> 0) then begin
+              xStartDate := EncodeDateTime(xY, xM, 1, 0, 0, 0, 0);
+              xEndDate := EncodeDateTime(xY, xM, DaysInAMonth(xY, xM), 0, 0, 0, 0);
+            end;
+            xTitle := xSplit[Low(xSplit)] + ' ' + xSplit[High(xSplit)];
+          end;
+          if xOperationsBlock then begin
+            if Length(xSplit) = 9 then begin
+              xValid := AppendExtractionItem(xDocElement, xSplit, False, AError);
+            end else begin
+              xOperationsBlock := False;
+            end;
+          end;
+          if AnsiUpperCase(xSplit[Low(xSplit)]) = '#DATA OPERACJI' then begin
+            xOperationsBlock := True;
+          end;
+        end else begin
+          xOperationsBlock := False;
+        end;
+        Inc(xCount);
+      end;
+      Result := xValid and (xStartDate <> 0) and (xEndDate <> 0);
     end;
     if Result then begin
       SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));

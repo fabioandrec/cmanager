@@ -32,10 +32,11 @@ type
   end;
 
 function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
+function ShowList(AList: TStringList; var AGid: String; var AText: String; AMultipleChecks: Boolean): Boolean;
 
 implementation
 
-uses CFrameFormUnit, CConsts;
+uses CFrameFormUnit, CConsts, CDatatools, CTools;
 
 {$R *.dfm}
 
@@ -148,7 +149,7 @@ end;
 procedure TCListFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 begin
   if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := Node <> Nil;
+    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
   end;
 end;
 
@@ -168,6 +169,29 @@ begin
       end;
       xNode := xNode.NextSibling;
     end;
+  end;
+end;
+
+function ShowList(AList: TStringList; var AGid: String; var AText: String; AMultipleChecks: Boolean): Boolean;
+var xGid, xText: String;
+    xRect: TRect;
+    xMultiples: TStringList;
+begin
+  xGid := CEmptyDataGid;
+  xText := '';
+  xRect := Rect(10, 10, 300, 500);
+  if AMultipleChecks then begin
+    xMultiples := TStringList.Create;
+  end else begin
+    xMultiples := Nil;
+  end;
+  Result := TCFrameForm.ShowFrame(TCListFrame, xGid, xText, AList, @xRect, Nil, xMultiples);
+  if Result then begin
+    AGid := xGid;
+    AText := xText;
+  end;
+  if AMultipleChecks then begin
+    xMultiples.Free;
   end;
 end;
 

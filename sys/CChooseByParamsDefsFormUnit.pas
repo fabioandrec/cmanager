@@ -181,6 +181,16 @@ begin
       xControl := TCPeriod.Create(Self);
       xControl.Name := 'PeriodEdit' + IntToStr(xCount);
       TCPeriod(xControl).Parent := TGroupBox(xParent.control);
+    end else if xParam.paramType = CParamTypeBoolean then begin
+      xControl := TComboBox.Create(Self);
+      xControl.Name := 'BooleanEdit' + IntToStr(xCount);
+      TComboBox(xControl).Parent := TGroupBox(xParent.control);
+      TComboBox(xControl).BevelInner := bvNone;
+      TComboBox(xControl).BevelKind := bkTile;
+      TComboBox(xControl).Style := csDropDownList;
+      TComboBox(xControl).Items.Add('Tak');
+      TComboBox(xControl).Items.Add('Nie');
+      TComboBox(xControl).ItemIndex := 0;
     end else if xParam.paramType = CParamTypeDataobject then begin
       xControl := TCStatic.Create(Self);
       xControl.Name := 'StaticEdit' + IntToStr(xCount);
@@ -279,6 +289,8 @@ begin
       Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ równy zero', '');
     end else if Fparam.paramType = CParamTypePeriod then begin
       Result := '';
+    end else if Fparam.paramType = CParamTypeBoolean then begin
+      Result := '';
     end else if Fparam.paramType = CParamTypeDate then begin
       Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
     end else if Fparam.paramType = CParamTypeDataobject then begin
@@ -316,6 +328,9 @@ begin
       SetLength(Result, 1);
       Result[Low(Result)] := TCCurrEdit(control).Value;
     end;
+  end else if Fparam.paramType = CParamTypeBoolean then begin
+    SetLength(Result, 1);
+    Result[Low(Result)] := TComboBox(control).ItemIndex = 0;
   end else if Fparam.paramType = CParamTypeDate then begin
     SetLength(Result, 1);
     Result[Low(Result)] := TCDateTime(control).Value;

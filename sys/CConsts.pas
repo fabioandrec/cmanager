@@ -207,14 +207,16 @@ const
   CParamTypeDate = 'date';
   CParamTypePeriod = 'period';
   CParamTypeDataobject = 'dataobject';
+  CParamTypeBoolean = 'boolean';
 
-  CReportParamTypes: array[0..4, 0..1] of String =
+  CReportParamTypes: array[0..5, 0..1] of String =
     (
      ('tekst', CParamTypeText),
      ('liczba', CParamTypeDecimal),
      ('data', CParamTypeDate),
      ('zakres dat', CParamTypePeriod),
-     ('obiekt', CParamTypeDataobject)
+     ('obiekt', CParamTypeDataobject),
+     ('wybór tak/nie', CParamTypeBoolean)
     );
 
 implementation
