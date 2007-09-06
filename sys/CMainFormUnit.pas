@@ -788,7 +788,7 @@ begin
     xRes.SaveToFile(GetSystemPathname(CXSLReportFile));
     xRes.Free;
   end;
-  if FileExists(GetSystemPathname(CCSSReportFile)) then begin
+  if FileExists(GetSystemPathname(CXSLReportFile)) then begin
     ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CXSLReportFile)), Nil, SW_SHOWNORMAL);
   end else begin
     ShowInfo(itError, 'Nie odnaleziono pliku "' + CXSLReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');

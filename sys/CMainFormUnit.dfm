@@ -686,7 +686,7 @@ object CMainForm: TCMainForm
     end
     object ActionXsl: TAction
       Category = 'Narz'#281'dzia'
-      Caption = 'Domy'#347'lna transformcja raportow'
+      Caption = 'Domy'#347'lna transformcja raport'#243'w'
       OnExecute = ActionXslExecute
     end
   end

@@ -35,7 +35,7 @@ Name: "program"; Description: "Pliki programu"; Types: full custom; Flags: fixed
 Name: "plugins"; Description: "Wtyczki do programu"; Types: full
 Name: "plugins\mbank"; Description: "Import wyci¹gów z mBanku"; Types: full
 Name: "plugins\currency"; Description: "Import kursów walut z NBP"; Types: full
-Name: "advanced"; Description: "Zaawansowane sk³adniki systuemu"; Types: full
+Name: "advanced"; Description: "Zaawansowane sk³adniki systemu"; Types: full
 Name: "advanced\psql"; Description: "Konsola Sql"; Types: full
 
 [Files]
