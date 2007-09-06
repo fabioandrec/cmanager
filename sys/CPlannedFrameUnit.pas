@@ -42,10 +42,10 @@ type
   protected
     procedure WndProc(var Message: TMessage); override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetSelectedType: Integer; override;
     function GetSelectedId: ShortString; override;
   public
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
     procedure ReloadPlanned;
     constructor Create(AOwner: TComponent); override;

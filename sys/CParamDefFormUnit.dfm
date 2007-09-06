@@ -183,6 +183,17 @@ inherited CParamDefForm: TCParamDefForm
         TabOrder = 4
         Text = '2'
       end
+      object ComboBoxPropertyType: TComboBox
+        Left = 344
+        Top = 32
+        Width = 153
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        TabOrder = 5
+      end
     end
   end
   inherited PanelButtons: TPanel

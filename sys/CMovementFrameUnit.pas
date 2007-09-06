@@ -110,9 +110,9 @@ type
     function GetSelectedType: Integer; override;
     function GetSelectedId: ShortString; override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetSelectedText: String; override;
   public
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
     procedure ReloadToday;
     procedure ReloadSums;

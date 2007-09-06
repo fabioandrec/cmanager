@@ -51,6 +51,9 @@ begin
     FFrame.GetList.TabStop := True;
   end;
   FFrame.PrepareCheckStates;
+  if FFrame.GetList <> Nil then begin
+    FFrame.UpdateButtons(FFrame.GetList.FocusedNode <> Nil);
+  end;
   FFrame.Parent := PanelFrame;
   FFrame.EnableAlign;
   FFrame.ShowFrame;

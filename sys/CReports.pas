@@ -20,6 +20,7 @@ type
     FisRequired: Boolean;
     FisMultiple: Boolean;
     FframeType: Integer;
+    FpropertyType: Integer;
     FdecimalLen: Integer;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
@@ -47,6 +48,7 @@ type
     property isMultiple: Boolean read FisMultiple write FisMultiple;
     property frameType: Integer read FframeType write FframeType;
     property decimalLen: Integer read FdecimalLen write FdecimalLen;
+    property propertyType: Integer read FpropertyType write FpropertyType;
   end;
 
   TReportDialogParamsDefs = class(TObjectList)
@@ -606,6 +608,7 @@ type
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
+function GetReportPropertyItems: IXMLDOMDocument;
 
 implementation
 
@@ -621,7 +624,9 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
      CBaseFrameUnit;
 
-var LDefaultXsl: IXMLDOMDocument;
+var LDefaultXsl: IXMLDOMDocument = Nil;
+    LPropertyXml: IXMLDOMDocument = Nil;
+
 
 function TCHtmlReport.GetDefaultXsl(var AError: String): IXMLDOMDocument;
 var xRes: TResourceStream;
@@ -4567,6 +4572,7 @@ begin
   FisMultiple := False;
   FdecimalLen := 2;
   FframeType := CFRAMETYPE_UNKNOWN;
+  FparamType := 'O';
 end;
 
 function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
@@ -4630,6 +4636,24 @@ begin
     Result := DatetimeToDatabase(FparamValues[0], False)
   end else if FparamType = CParamTypeBoolean then begin
     Result := IntToStr(Integer(FparamValues[0]));
+  end else if FparamType = CParamTypeProperty then begin
+    if FisMultiple then begin
+      if (AIndex >= 0) and (AIndex <= paramValuesLength - 1) then begin
+        Result := QuotedStr(FparamValues[AIndex]);
+      end else begin
+        Result := '';
+        if paramValuesLength > 0 then begin
+          for xCount := 0 to paramValuesLength - 1 do begin
+            Result := Result + QuotedStr(FparamValues[xCount]);
+            if xCount <> paramValuesLength - 1 then begin
+              Result := Result + ', ';
+            end;
+          end;
+        end;
+      end;
+    end else begin
+      Result := QuotedStr(FparamValues[0]);
+    end;
   end else if FparamType = CParamTypePeriod then begin
     if AIndex = 0 then begin
       Result := DatetimeToDatabase(FparamValues[0], False)
@@ -4676,6 +4700,7 @@ begin
   FparamType := GetXmlAttribute('type', ANode, '');
   FframeType := GetXmlAttribute('frame', ANode, CFRAMETYPE_UNKNOWN);
   FdecimalLen := GetXmlAttribute('decimalLen', ANode, FdecimalLen);
+  FpropertyType := GetXmlAttribute('property', ANode, 0);
 end;
 
 procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
@@ -4688,6 +4713,7 @@ begin
   SetXmlAttribute('isMultiple', ANode, FisMultiple);
   SetXmlAttribute('frame', ANode, FframeType);
   SetXmlAttribute('decimalLen', ANode, FdecimalLen);
+  SetXmlAttribute('property', ANode, FpropertyType);
 end;
 
 procedure TReportDialogParamsDefs.SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
@@ -4727,10 +4753,19 @@ begin
   end;
 end;
 
+function GetReportPropertyItems: IXMLDOMDocument;
+begin
+  if LPropertyXml = Nil then begin
+    SaveToLog(CPropertyItems, 'c:\a.xml');
+    LPropertyXml := GetDocumentFromString(CPropertyItems);
+  end;
+  Result := LPropertyXml;
+end;
+
 initialization
-  LDefaultXsl := Nil;
 finalization
   LDefaultXsl := Nil;
+  LPropertyXml := Nil;
 end.
 
 

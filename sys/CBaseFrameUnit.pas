@@ -61,8 +61,8 @@ type
     procedure UpdateSelectedItemPlugins;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; virtual;
     procedure ExecuteSelectedPluginAction(ASender: TObject);
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
   public
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
     procedure HideFrame; virtual;
     procedure ShowFrame; virtual;
     procedure SaveColumns;

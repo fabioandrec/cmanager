@@ -12,10 +12,10 @@ type
     ActionAddSubcategory: TAction;
     procedure ActionAddSubcategoryExecute(Sender: TObject);
   protected
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
   public
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     class function GetTitle: String; override;
     function GetStaticFilter: TStringList; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;

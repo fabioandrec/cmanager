@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports, Contnrs,
-  CComponents, CTools;
+  CComponents, CTools, MsXml;
 
 type
   TDialogParamControl = class(TObjectList)
@@ -17,6 +17,7 @@ type
     function GetIsValid: String;
     function GetValues: TVariantDynArray;
     procedure ChooseDataobject(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ChooseProperty(var ADataGid, AText: String; var AAccepted: Boolean);
   public
     constructor Create(ADescLabel: TLabel; AParam: TReportDialgoParamDef; AControl: TWinControl);
     function FindChildByParamName(AParamName: String): TDialogParamControl;
@@ -63,7 +64,8 @@ function ChooseByParamsDefs(var AParams: TReportDialogParamsDefs): Boolean;
 implementation
 
 uses CConsts, CInfoFormUnit, StrUtils, CBaseFrameUnit, CFrameFormUnit,
-  CDatabase, CDataObjects, CDatatools, Types, DateUtils;
+     CDatabase, CDataObjects, CDatatools, Types, DateUtils, CXml,
+  CListFrameUnit;
 
 {$R *.dfm}
 
@@ -200,6 +202,15 @@ begin
       if xParam.isMultiple then begin
         TCStatic(xControl).TextOnEmpty := '<wszystkie elementy>';
       end;
+    end else if xParam.paramType = CParamTypeProperty then begin
+      xControl := TCStatic.Create(Self);
+      xControl.Name := 'StaticEdit' + IntToStr(xCount);
+      TCStatic(xControl).Parent := TGroupBox(xParent.control);
+      TCStatic(xControl).BevelKind := bkTile;
+      TCStatic(xControl).OnGetDataId := xCurrent.ChooseProperty;
+      if xParam.isMultiple then begin
+        TCStatic(xControl).TextOnEmpty := '<wszystkie>';
+      end;
     end else begin
       xControl := Nil;
     end;
@@ -291,6 +302,8 @@ begin
       Result := '';
     end else if Fparam.paramType = CParamTypeBoolean then begin
       Result := '';
+    end else if Fparam.paramType = CParamTypeProperty then begin
+      Result := '';
     end else if Fparam.paramType = CParamTypeDate then begin
       Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
     end else if Fparam.paramType = CParamTypeDataobject then begin
@@ -315,6 +328,9 @@ begin
 end;
 
 function TDialogParamControl.GetValues: TVariantDynArray;
+var xXml: IXMLDOMDocument;
+    xNode, xParent: IXMLDOMNode;
+    xCount: Integer;
 begin
   SetLength(Result, 0);
   if Fparam.paramType = CParamTypeText then begin
@@ -338,6 +354,26 @@ begin
     SetLength(Result, 2);
     Result[Low(Result)] := TCPeriod(control).FstartDateControl.Value;
     Result[High(Result)] := TCPeriod(control).FendDateControl.Value;
+  end else if Fparam.paramType = CParamTypeProperty then begin
+    if Fparam.isMultiple then begin
+      if TCStatic(control).DataId = '' then begin
+        SetLength(Result, 0);
+        xXml := GetReportPropertyItems;
+        if xXml.documentElement.childNodes.length > Fparam.propertyType then begin
+          xParent := xXml.documentElement.childNodes.item[Fparam.propertyType];
+          for xCount := 0 to xParent.childNodes.length - 1 do begin
+            xNode := xParent.childNodes.item[xCount];
+            SetLength(Result, Length(Result) + 1);
+            Result[High(Result)] := GetXmlAttribute('value', xNode, '');
+          end;
+        end;
+      end else begin
+        Result := StringToVariantArray(TCStatic(control).DataId, sLineBreak);
+      end;
+    end else begin
+      SetLength(Result, 1);
+      Result[Low(Result)] := TCStatic(control).DataId;
+    end;
   end else if Fparam.paramType = CParamTypeDataobject then begin
     if Fparam.isMultiple then begin
       Result := StringToVariantArray(TCStatic(control).DataId, sLineBreak);
@@ -513,6 +549,27 @@ begin
   end else if xId = 11 then begin
     ADateFrom := FstartDateControl.Value;
     ADateTo := FendDateControl.Value;
+  end;
+end;
+
+procedure TDialogParamControl.ChooseProperty(var ADataGid, AText: String; var AAccepted: Boolean);
+var xList: TStringList;
+    xXml: IXMLDOMDocument;
+    xParent: IXMLDOMNode;
+    xNode: IXMLDOMNode;
+    xCount: Integer;
+begin
+  xList := TStringList.Create;
+  xXml := GetReportPropertyItems;
+  if xXml.documentElement.childNodes.length > Fparam.propertyType then begin
+    xParent := xXml.documentElement.childNodes.item[Fparam.propertyType];
+    for xCount := 0 to xParent.childNodes.length - 1 do begin
+      xNode := xParent.childNodes.item[xCount];
+      xList.Add(GetXmlAttribute('value', xNode, '') + '=' + GetXmlAttribute('name', xNode, ''))
+    end;
+  end;
+  if xList.Count > 0 then begin
+    AAccepted := ShowList(xList, ADataGid, AText, Fparam.isMultiple);
   end;
 end;
 

@@ -51,7 +51,6 @@ type
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionHistoryExecute(Sender: TObject);
   protected
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     procedure WndProc(var Message: TMessage); override;
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
     procedure MessageMovementEdited(AId: TDataGid; AOptions: Integer); virtual;
@@ -61,6 +60,7 @@ type
     procedure DoCheckChanged; override;
   public
     Dataobjects: TDataObjectList;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     procedure RecreateTreeHelper; virtual;
     procedure ReloadDataobjects; virtual;
     procedure ClearDataobjects; virtual;

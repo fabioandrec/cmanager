@@ -105,7 +105,6 @@ const
   CLimitActive = '1';
   CLimitDisabled = '0';
 
-
   CLimitBoundaryTypeToday = 'T';
   CLimitBoundaryTypeWeek = 'W';
   CLimitBoundaryTypeMonth = 'M';
@@ -208,16 +207,66 @@ const
   CParamTypePeriod = 'period';
   CParamTypeDataobject = 'dataobject';
   CParamTypeBoolean = 'boolean';
+  CParamTypeProperty = 'property';
 
-  CReportParamTypes: array[0..5, 0..1] of String =
+  CReportParamTypes: array[0..6, 0..1] of String =
     (
      ('tekst', CParamTypeText),
      ('liczba', CParamTypeDecimal),
      ('data', CParamTypeDate),
      ('zakres dat', CParamTypePeriod),
      ('obiekt', CParamTypeDataobject),
-     ('wybór tak/nie', CParamTypeBoolean)
+     ('wybór tak/nie', CParamTypeBoolean),
+     ('cecha', CParamTypeProperty)
     );
+
+    CPropertyItems: String =
+     '<?xml version="1.0" encoding="Windows-1250"?>' + 
+     '<list>' +
+     '  <property name="rodzaj operacji">' +
+     '    <item name="przychód" value="' + CInMovement + '"/>' +
+     '    <item name="rozchód" value="' + COutMovement + '"/>' +
+     '    <item name="transfer" value="' + CTransferMovement + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj planowanej operacji">' +
+     '    <item name="przychód" value="' + CInMovement + '"/>' +
+     '    <item name="rozchód" value="' + COutMovement + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj harmonogramu">' +
+     '    <item name="jednorazowy" value="' + CScheduleTypeOnce + '"/>' +
+     '    <item name="cykliczny" value="' + CScheduleTypeCyclic + '"/>' +
+     '  </property>' +
+     '  <property name="sposób wykonania planu">' +
+     '    <item name="wykonana" value="' + CDoneOperation + '"/>' +
+     '    <item name="zaakceptowana" value="' + CDoneAccepted + '"/>' +
+     '    <item name="odrzucona" value="' + CDoneDeleted + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj kategorii">' +
+     '    <item name="przychód" value="' + CInProduct + '"/>' +
+     '    <item name="rozchód" value="' + COutProduct + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj konta">' +
+     '    <item name="bankowe" value="' + CBankAccount + '"/>' +
+     '    <item name="gotówkowe" value="' + CCashAccount + '"/>' +
+     '    <item name="inwestycyjne" value="' + CInvestmentAccount + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj kontrahenta">' +
+     '    <item name="dostępny wszędzie" value="' + CCashpointTypeAll + '"/>' +
+     '    <item name="tylko przychody" value="' + CCashpointTypeIn + '"/>' +
+     '    <item name="tylko rozchody" value="' + CCashpointTypeOut + '"/>' +
+     '    <item name="pozostałe" value="' + CCashpointTypeOther + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj kursu waluty">' +
+     '    <item name="kurs średni" value="' + CCurrencyRateTypeAverage + '"/>' +
+     '    <item name="kurs sprzedaży" value="' + CCurrencyRateTypeSell + '"/>' +
+     '    <item name="kurs kupna" value="' + CCurrencyRateTypeBuy + '"/>' +
+     '  </property>' +
+     '  <property name="status wyciągu">' +
+     '    <item name="otwrty" value="' + CExtractionStateOpen + '"/>' +
+     '    <item name="zamknięty" value="' + CExtractionStateClose + '"/>' +
+     '    <item name="uzgodniony" value="' + CExtractionStateStated + '"/>' +
+     '  </property>' +
+     '</list>';
 
 implementation
 

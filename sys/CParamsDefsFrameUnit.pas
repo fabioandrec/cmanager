@@ -30,9 +30,8 @@ type
     procedure ActionPreviewExecute(Sender: TObject);
     procedure ListDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
     procedure ListDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
-  protected
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
   public
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function MustFreeAdditionalData: Boolean; override;

@@ -22,6 +22,7 @@ type
   protected
     function GetSelectedId: TDataGid; override;
     function GetSelectedText: String; override;
+    procedure DoCheckChanged; override;
   public
     function GetList: TCList; override;
     procedure ReloadList(AItems: TStringList);
@@ -29,6 +30,7 @@ type
     destructor Destroy; override;
     class function GetTitle: String; override;
     function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
+    function FindNodeId(ANode: PVirtualNode): ShortString; override;
   end;
 
 function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
@@ -94,6 +96,7 @@ begin
   FGids := TStringList.Create;
   FNames := TStringList.Create;
   ReloadList(TStringList(AAdditionalData));
+  UpdateButtons(List.SelectedCount > 0);
 end;
 
 procedure TCListFrame.ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -143,14 +146,6 @@ begin
   List.BeginUpdate;
   List.RootNodeCount := FGids.Count;
   List.EndUpdate;
-  ListFocusChanged(List, List.FocusedNode, 0);
-end;
-
-procedure TCListFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
-begin
-  if Owner.InheritsFrom(TCFrameForm) then begin
-    TCFrameForm(Owner).BitBtnOk.Enabled := (Node <> Nil) or (MultipleChecks <> Nil);
-  end;
 end;
 
 function TCListFrame.FindNode(ADataId: ShortString; AList: TCList): PVirtualNode;
@@ -177,22 +172,49 @@ var xGid, xText: String;
     xRect: TRect;
     xMultiples: TStringList;
 begin
-  xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 300, 500);
   if AMultipleChecks then begin
     xMultiples := TStringList.Create;
+    xMultiples.Text := AGid;
+    xGid := '';
   end else begin
     xMultiples := Nil;
+    xGid := AGid;
   end;
   Result := TCFrameForm.ShowFrame(TCListFrame, xGid, xText, AList, @xRect, Nil, xMultiples);
   if Result then begin
-    AGid := xGid;
-    AText := xText;
+    if AMultipleChecks then begin
+      AGid := xMultiples.Text;
+      if xMultiples.Count = 0 then begin
+        AText := '<wszystkie>';
+      end else begin
+        AText := '<wybrano ' + IntToStr(xMultiples.Count) + '>';
+      end;
+    end else begin
+      AGid := xGid;
+      AText := xText;
+    end;
   end;
   if AMultipleChecks then begin
     xMultiples.Free;
   end;
+end;
+
+procedure TCListFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+begin
+  UpdateButtons(Node <> Nil);
+end;
+
+procedure TCListFrame.DoCheckChanged;
+begin
+  inherited DoCheckChanged;
+  UpdateButtons(List.SelectedCount > 0);
+end;
+
+function TCListFrame.FindNodeId(ANode: PVirtualNode): ShortString;
+begin
+  Result := FGids.Strings[ANode.Index];
 end;
 
 end.

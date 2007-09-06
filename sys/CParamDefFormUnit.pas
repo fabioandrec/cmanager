@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports,
-  CComponents;
+  CComponents, MsXml;
 
 type
   TCParamDefForm = class(TCConfigForm)
@@ -27,6 +27,7 @@ type
     ComboBoxMultiple: TComboBox;
     CIntDecimal: TCIntEdit;
     Label8: TLabel;
+    ComboBoxPropertyType: TComboBox;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -42,7 +43,7 @@ type
 
 implementation
 
-uses CInfoFormUnit, CConsts, Math, CBaseFrameUnit;
+uses CInfoFormUnit, CConsts, Math, CBaseFrameUnit, CXml;
 
 {$R *.dfm}
 
@@ -76,8 +77,10 @@ end;
 
 procedure TCParamDefForm.FillForm;
 var xCount: Integer;
-    xIndexType, xIndexFrame: Integer;
+    xIndexType, xIndexFrame, xIndexProperty: Integer;
     xRegs: TRegisteredFrameClass;
+    xXml: IXMLDOMDocument;
+    xNode: IXMLDOMNode;
 begin
   inherited FillForm;
   for xCount := 0 to FParamDef.parentParamsDefs.groups.Count - 1 do begin
@@ -95,6 +98,17 @@ begin
       end;
     end;
   end;
+  xIndexProperty := 0;
+  xXml := GetReportPropertyItems;
+  for xCount := 0 to xXml.documentElement.childNodes.length - 1 do begin
+    xNode := xXml.documentElement.childNodes.item[xCount];
+    ComboBoxPropertyType.Items.Add(GetXmlAttribute('name', xNode, ''));
+    if Operation = coEdit then begin
+      if FParamDef.propertyType = xCount then begin
+        xIndexProperty := xCount;
+      end;
+    end;
+  end;
   xIndexType := 0;
   for xCount := Low(CReportParamTypes) to High(CReportParamTypes) do begin
     ComboBoxType.Items.Add(CReportParamTypes[xCount][0]);
@@ -106,6 +120,7 @@ begin
   end;
   ComboBoxType.ItemIndex := xIndexType;
   ComboBoxFrameType.ItemIndex := xIndexFrame;
+  ComboBoxPropertyType.ItemIndex := xIndexProperty;
   if Operation = coEdit then begin
     EditName.Text := FParamDef.name;
     EditDesc.Text := FParamDef.desc;
@@ -129,6 +144,7 @@ begin
     isMultiple := ComboBoxMultiple.ItemIndex = 0;
     frameType := TRegisteredFrameClass(ComboBoxFrameType.Items.Objects[ComboBoxFrameType.ItemIndex]).frameType;
     decimalLen := CIntDecimal.Value;
+    propertyType := ComboBoxPropertyType.ItemIndex;
   end;
 end;
 
@@ -140,14 +156,22 @@ end;
 procedure TCParamDefForm.RefreshControls;
 var xWithDataobject: Boolean;
     xWithDecimal: Boolean;
+    xWithProperty: Boolean;
 begin
   xWithDataobject := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDataobject);
+  xWithProperty := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeProperty);
   xWithDecimal := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDecimal);
-  ComboBoxType.Width := IfThen(xWithDataobject, 153, 393);
+  ComboBoxType.Width := IfThen(xWithDataobject or xWithProperty, 153, 393);
   ComboBoxFrameType.Visible := xWithDataobject;
-  Label6.Visible := ComboBoxFrameType.Visible;
-  Label7.Visible := xWithDataobject;
-  ComboBoxMultiple.Visible := xWithDataobject;
+  ComboBoxPropertyType.Visible := xWithProperty;
+  Label6.Visible := ComboBoxFrameType.Visible or ComboBoxPropertyType.Visible;
+  ComboBoxMultiple.Visible := xWithDataobject or xWithProperty;
+  Label7.Visible := ComboBoxMultiple.Visible;
+  if xWithDataobject then begin
+    Label6.Caption := 'Klasa obiektu';
+  end else if xWithProperty then begin
+    Label6.Caption := 'Rodzaj cechy';
+  end;
   Label8.Visible := xWithDecimal;
   CIntDecimal.Visible := xWithDecimal
 end;
