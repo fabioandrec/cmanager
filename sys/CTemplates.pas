@@ -113,7 +113,7 @@ initialization
     AddTemplate('@miesiac@', 'aktualny miesiac w formacie MM');
     AddTemplate('@rok@', 'aktualny rok w formacie RRRR');
     AddTemplate('@rokkrotki@', 'aktualny rok w formacie RR');
-    AddTemplate('@dzientygodnia@', 'numer dnia w tygodni');
+    AddTemplate('@dzientygodnia@', 'numer dnia w tygodniu');
     AddTemplate('@nazwadnia@', 'nazwa dnia');
     AddTemplate('@nazwamiesiaca@', 'nazwa miesi¹ca');
     AddTemplate('@data@', 'aktualna data w formacie RRRR-MM-DD');
