@@ -94,7 +94,7 @@ OutputDir=..\..\..\..\Bin\Wtyczki
 UnitOutputDir=..\..\..\..\Trash
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=..\..\..\others\PngComponents\Source
+SearchPath=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
 Packages=vcl;rtl;vclx;indy;inet;xmlrtl;vclie;inetdbbde;inetdbxpress;dbrtl;dsnap;dsnapcon;vcldb;soaprtl;VclSmp;dbexpress;dbxcds;inetdb;bdertl;vcldbx;webdsnap;websnap;adortl;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;IntrawebDB_50_70;Intraweb_50_70;dclOfficeXP;Rave50CLX;Rave50VCL;Ksiup3;PNG_D7;PngComponentsD7;VirtualTreesD7;CComps
 Conditionals=
 DebugSourceDirs=
@@ -141,11 +141,12 @@ Item0=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=4
-Item0=..\..\..\others\PngComponents\Source
+Count=5
+Item0=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
 Item1=..\others\PngComponents\Source;..\others\Vtv\Source
 Item2=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item3=..\..\others\PngComponents\Source
+Item3=..\..\..\others\PngComponents\Source
+Item4=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
 Item0=..\..\..\..\Trash

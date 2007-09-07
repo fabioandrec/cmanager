@@ -111,12 +111,12 @@ inherited CParamDefForm: TCParamDefForm
         Caption = 'Multiselekcja'
       end
       object Label8: TLabel
-        Left = 250
+        Left = 274
         Top = 92
-        Width = 86
+        Width = 62
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Miejsca dziesi'#281'tne'
+        Caption = 'Po przecinku'
       end
       object ComboBoxType: TComboBox
         Left = 104
@@ -133,7 +133,7 @@ inherited CParamDefForm: TCParamDefForm
       object ComboBoxReq: TComboBox
         Left = 104
         Top = 72
-        Width = 49
+        Width = 153
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -193,6 +193,24 @@ inherited CParamDefForm: TCParamDefForm
         Style = csDropDownList
         ItemHeight = 13
         TabOrder = 5
+      end
+      object CStaticListvalues: TCStatic
+        Left = 344
+        Top = 32
+        Width = 153
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<zdefiniuj list'#281' warto'#347'ci>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 6
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<zdefiniuj list'#281' warto'#347'ci>'
+        OnGetDataId = CStaticListvaluesGetDataId
+        HotTrack = True
       end
     end
   end

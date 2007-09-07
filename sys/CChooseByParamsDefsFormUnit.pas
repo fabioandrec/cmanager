@@ -202,7 +202,7 @@ begin
       if xParam.isMultiple then begin
         TCStatic(xControl).TextOnEmpty := '<wszystkie elementy>';
       end;
-    end else if xParam.paramType = CParamTypeProperty then begin
+    end else if (xParam.paramType = CParamTypeProperty) or (xParam.paramType = CParamTypeList) then begin
       xControl := TCStatic.Create(Self);
       xControl.Name := 'StaticEdit' + IntToStr(xCount);
       TCStatic(xControl).Parent := TGroupBox(xParent.control);
@@ -302,7 +302,7 @@ begin
       Result := '';
     end else if Fparam.paramType = CParamTypeBoolean then begin
       Result := '';
-    end else if Fparam.paramType = CParamTypeProperty then begin
+    end else if (Fparam.paramType = CParamTypeProperty) or (Fparam.paramType = CParamTypeList) then begin
       Result := '';
     end else if Fparam.paramType = CParamTypeDate then begin
       Result := IfThen(values[Low(values)] = 0, 'Parametr "' + Fparam.desc + '" nie mo¿e byæ pusty', '');
@@ -331,6 +331,7 @@ function TDialogParamControl.GetValues: TVariantDynArray;
 var xXml: IXMLDOMDocument;
     xNode, xParent: IXMLDOMNode;
     xCount: Integer;
+    xType: Integer;
 begin
   SetLength(Result, 0);
   if Fparam.paramType = CParamTypeText then begin
@@ -354,13 +355,18 @@ begin
     SetLength(Result, 2);
     Result[Low(Result)] := TCPeriod(control).FstartDateControl.Value;
     Result[High(Result)] := TCPeriod(control).FendDateControl.Value;
-  end else if Fparam.paramType = CParamTypeProperty then begin
+  end else if (Fparam.paramType = CParamTypeProperty) or (Fparam.paramType = CParamTypeList) then begin
     if Fparam.isMultiple then begin
       if TCStatic(control).DataId = '' then begin
         SetLength(Result, 0);
-        xXml := GetReportPropertyItems;
-        if xXml.documentElement.childNodes.length > Fparam.propertyType then begin
-          xParent := xXml.documentElement.childNodes.item[Fparam.propertyType];
+        xXml := Fparam.propertyItems;
+        if Fparam.paramType = CParamTypeProperty then begin
+          xType := Fparam.propertyType;
+        end else begin
+          xType := 0;
+        end;
+        if xXml.documentElement.childNodes.length > xType then begin
+          xParent := xXml.documentElement.childNodes.item[xType];
           for xCount := 0 to xParent.childNodes.length - 1 do begin
             xNode := xParent.childNodes.item[xCount];
             SetLength(Result, Length(Result) + 1);
@@ -558,11 +564,17 @@ var xList: TStringList;
     xParent: IXMLDOMNode;
     xNode: IXMLDOMNode;
     xCount: Integer;
+    xType: Integer;
 begin
   xList := TStringList.Create;
-  xXml := GetReportPropertyItems;
-  if xXml.documentElement.childNodes.length > Fparam.propertyType then begin
-    xParent := xXml.documentElement.childNodes.item[Fparam.propertyType];
+  xXml := Fparam.propertyItems;
+  if Fparam.paramType = CParamTypeProperty then begin
+    xType := Fparam.propertyType;
+  end else begin
+    xType := 0;
+  end;
+  if xXml.documentElement.childNodes.length > xType then begin
+    xParent := xXml.documentElement.childNodes.item[xType];
     for xCount := 0 to xParent.childNodes.length - 1 do begin
       xNode := xParent.childNodes.item[xCount];
       xList.Add(GetXmlAttribute('value', xNode, '') + '=' + GetXmlAttribute('name', xNode, ''))

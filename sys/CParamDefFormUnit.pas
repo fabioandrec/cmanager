@@ -28,8 +28,10 @@ type
     CIntDecimal: TCIntEdit;
     Label8: TLabel;
     ComboBoxPropertyType: TComboBox;
+    CStaticListvalues: TCStatic;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure CStaticListvaluesGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FParamDef: TReportDialgoParamDef;
     procedure RefreshControls;
@@ -43,7 +45,8 @@ type
 
 implementation
 
-uses CInfoFormUnit, CConsts, Math, CBaseFrameUnit, CXml;
+uses CInfoFormUnit, CConsts, Math, CBaseFrameUnit, CXml,
+  CValuelistFormUnit;
 
 {$R *.dfm}
 
@@ -81,6 +84,7 @@ var xCount: Integer;
     xRegs: TRegisteredFrameClass;
     xXml: IXMLDOMDocument;
     xNode: IXMLDOMNode;
+    xStr: TStringList;
 begin
   inherited FillForm;
   for xCount := 0 to FParamDef.parentParamsDefs.groups.Count - 1 do begin
@@ -99,7 +103,7 @@ begin
     end;
   end;
   xIndexProperty := 0;
-  xXml := GetReportPropertyItems;
+  xXml := FParamDef.propertyItems;
   for xCount := 0 to xXml.documentElement.childNodes.length - 1 do begin
     xNode := xXml.documentElement.childNodes.item[xCount];
     ComboBoxPropertyType.Items.Add(GetXmlAttribute('name', xNode, ''));
@@ -128,6 +132,13 @@ begin
     ComboBoxReq.ItemIndex := IfThen(FParamDef.isRequired, 0, 1);
     ComboBoxMultiple.ItemIndex := IfThen(FParamDef.isMultiple, 0, 1);
     CIntDecimal.Text := IntToStr(FParamDef.decimalLen);
+    CStaticListvalues.DataId := FParamDef.propertyList;
+    xStr := TStringList.Create;
+    xStr.Text := FParamDef.propertyList;
+    if xStr.Count > 0 then begin
+      CStaticListValues.Caption := '<Zdefiniowano ' + IntToStr(xStr.Count) + '>';
+    end;
+    xStr.Free;
   end;
   RefreshControls;
 end;
@@ -145,6 +156,7 @@ begin
     frameType := TRegisteredFrameClass(ComboBoxFrameType.Items.Objects[ComboBoxFrameType.ItemIndex]).frameType;
     decimalLen := CIntDecimal.Value;
     propertyType := ComboBoxPropertyType.ItemIndex;
+    propertyList := CStaticListvalues.DataId;
   end;
 end;
 
@@ -157,20 +169,25 @@ procedure TCParamDefForm.RefreshControls;
 var xWithDataobject: Boolean;
     xWithDecimal: Boolean;
     xWithProperty: Boolean;
+    xWithList: Boolean;
 begin
   xWithDataobject := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDataobject);
   xWithProperty := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeProperty);
   xWithDecimal := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeDecimal);
-  ComboBoxType.Width := IfThen(xWithDataobject or xWithProperty, 153, 393);
+  xWithList := (CReportParamTypes[ComboBoxType.ItemIndex][1] = CParamTypeList);
+  ComboBoxType.Width := IfThen(xWithDataobject or xWithProperty or xWithList, 153, 393);
   ComboBoxFrameType.Visible := xWithDataobject;
   ComboBoxPropertyType.Visible := xWithProperty;
-  Label6.Visible := ComboBoxFrameType.Visible or ComboBoxPropertyType.Visible;
-  ComboBoxMultiple.Visible := xWithDataobject or xWithProperty;
+  CStaticListvalues.Visible := xWithList;
+  Label6.Visible := xWithDataobject or xWithProperty or xWithList;
+  ComboBoxMultiple.Visible := xWithDataobject or xWithProperty or xWithList;
   Label7.Visible := ComboBoxMultiple.Visible;
   if xWithDataobject then begin
     Label6.Caption := 'Klasa obiektu';
   end else if xWithProperty then begin
     Label6.Caption := 'Rodzaj cechy';
+  end else if xWithList then begin
+    Label6.Caption := 'Wartoœci';
   end;
   Label8.Visible := xWithDecimal;
   CIntDecimal.Visible := xWithDecimal
@@ -181,6 +198,21 @@ begin
   inherited;
   Label8.Top := Label7.Top;
   CIntDecimal.Top := ComboBoxMultiple.Top;
+end;
+
+procedure TCParamDefForm.CStaticListvaluesGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xList: TStringList;
+begin
+  xList := TStringList.Create;
+  xList.Text := ADataGid;
+  AAccepted := ShowValuelist(xList);
+  if AAccepted then begin
+    ADataGid := xList.Text;
+    if xList.Count > 0 then begin
+      AText := '<Zdefiniowano ' + IntToStr(xList.Count) + '>';
+    end;
+  end;
+  xList.Free;
 end;
 
 end.

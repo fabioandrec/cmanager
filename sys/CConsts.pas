@@ -208,8 +208,9 @@ const
   CParamTypeDataobject = 'dataobject';
   CParamTypeBoolean = 'boolean';
   CParamTypeProperty = 'property';
+  CParamTypeList = 'list';
 
-  CReportParamTypes: array[0..6, 0..1] of String =
+  CReportParamTypes: array[0..7, 0..1] of String =
     (
      ('tekst', CParamTypeText),
      ('liczba', CParamTypeDecimal),
@@ -217,7 +218,8 @@ const
      ('zakres dat', CParamTypePeriod),
      ('obiekt', CParamTypeDataobject),
      ('wybór tak/nie', CParamTypeBoolean),
-     ('cecha', CParamTypeProperty)
+     ('cecha', CParamTypeProperty),
+     ('lista wartoœci', CParamTypeList)
     );
 
     CPropertyItems: String =

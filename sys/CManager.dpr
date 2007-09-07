@@ -123,7 +123,8 @@ uses
   CBase64 in 'Shared\CBase64.pas',
   CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame},
   CParamDefFormUnit in 'CParamDefFormUnit.pas' {CParamDefForm},
-  CChooseByParamsDefsFormUnit in 'CChooseByParamsDefsFormUnit.pas' {CChooseByParamsDefsForm};
+  CChooseByParamsDefsFormUnit in 'CChooseByParamsDefsFormUnit.pas' {CChooseByParamsDefsForm},
+  CValuelistFormUnit in 'CValuelistFormUnit.pas' {CValuelistForm};
 
 {$R *.res}
 

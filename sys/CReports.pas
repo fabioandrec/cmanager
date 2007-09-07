@@ -22,10 +22,13 @@ type
     FframeType: Integer;
     FpropertyType: Integer;
     FdecimalLen: Integer;
+    FpropertyItems: IXMLDOMDocument;
+    FpropertyList: String;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
     function GetparamAsString(AParamOption: String): String;
     function GetvalueAsString(AIndex: Integer): String;
+    function GetPropertyItems: IXMLDOMDocument;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: IXMLDOMNode);
@@ -49,6 +52,8 @@ type
     property frameType: Integer read FframeType write FframeType;
     property decimalLen: Integer read FdecimalLen write FdecimalLen;
     property propertyType: Integer read FpropertyType write FpropertyType;
+    property propertyItems: IXMLDOMDocument read GetPropertyItems;
+    property propertyList: String read FpropertyList write FpropertyList;
   end;
 
   TReportDialogParamsDefs = class(TObjectList)
@@ -608,7 +613,6 @@ type
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
-function GetReportPropertyItems: IXMLDOMDocument;
 
 implementation
 
@@ -712,6 +716,14 @@ begin
   end else if AGroupType = CGroupByMonth then begin
     Result := GetFormattedDate(ADate, CMonthnameDateFormat);
   end;
+end;
+
+function GetReportPropertyItems: IXMLDOMDocument;
+begin
+  if LPropertyXml = Nil then begin
+    LPropertyXml := GetDocumentFromString(CPropertyItems);
+  end;
+  Result := LPropertyXml;
 end;
 
 function DayCount(AEndDay, AStartDay: TDateTime): Integer;
@@ -4619,6 +4631,36 @@ begin
   Result := Length(FparamValues);
 end;
 
+function TReportDialgoParamDef.GetPropertyItems: IXMLDOMDocument;
+var xStr: TStringList;
+    xCount: Integer;
+    xNode: IXMLDOMNode;
+    xProperty: IXMLDOMNode;
+begin
+  if FpropertyItems = Nil then begin
+    if FparamType = CParamTypeProperty then begin
+      FpropertyItems := GetReportPropertyItems;
+    end else if FparamType = CParamTypeList then begin
+      FpropertyItems := GetXmlDocument;
+      xStr := TStringList.Create;
+      xStr.Text := FpropertyList;
+      FpropertyItems.appendChild(FpropertyItems.createElement('list'));
+      xProperty := FpropertyItems.createElement('property');
+      FpropertyItems.documentElement.appendChild(xProperty);
+      for xCount := 0 to xStr.Count - 1 do begin
+        xNode := FpropertyItems.createElement('item');
+        SetXmlAttribute('name', xNode, xStr.Names[xCount]);
+        SetXmlAttribute('value', xNode, xStr.ValueFromIndex[xCount]);
+        xProperty.appendChild(xNode);
+      end;
+      xStr.Free;
+    end else begin
+      FpropertyItems := Nil;
+    end;
+  end;
+  Result := FpropertyItems;
+end;
+
 function TReportDialgoParamDef.GetvalueAsString(AIndex: Integer): String;
 var xCount: Integer;
     xTable: String;
@@ -4636,7 +4678,7 @@ begin
     Result := DatetimeToDatabase(FparamValues[0], False)
   end else if FparamType = CParamTypeBoolean then begin
     Result := IntToStr(Integer(FparamValues[0]));
-  end else if FparamType = CParamTypeProperty then begin
+  end else if (FparamType = CParamTypeProperty) or (FparamType = CParamTypeList) then begin
     if FisMultiple then begin
       if (AIndex >= 0) and (AIndex <= paramValuesLength - 1) then begin
         Result := QuotedStr(FparamValues[AIndex]);
@@ -4701,6 +4743,7 @@ begin
   FframeType := GetXmlAttribute('frame', ANode, CFRAMETYPE_UNKNOWN);
   FdecimalLen := GetXmlAttribute('decimalLen', ANode, FdecimalLen);
   FpropertyType := GetXmlAttribute('property', ANode, 0);
+  FpropertyList := GetXmlAttribute('list', ANode, '');
 end;
 
 procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
@@ -4714,6 +4757,7 @@ begin
   SetXmlAttribute('frame', ANode, FframeType);
   SetXmlAttribute('decimalLen', ANode, FdecimalLen);
   SetXmlAttribute('property', ANode, FpropertyType);
+  SetXmlAttribute('list', ANode, FpropertyList);
 end;
 
 procedure TReportDialogParamsDefs.SetItems(AIndex: Integer; const Value: TReportDialgoParamDef);
@@ -4751,15 +4795,6 @@ begin
   end else begin
     inherited SaveToFile(AFilename);
   end;
-end;
-
-function GetReportPropertyItems: IXMLDOMDocument;
-begin
-  if LPropertyXml = Nil then begin
-    SaveToLog(CPropertyItems, 'c:\a.xml');
-    LPropertyXml := GetDocumentFromString(CPropertyItems);
-  end;
-  Result := LPropertyXml;
 end;
 
 initialization
