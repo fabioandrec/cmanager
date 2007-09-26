@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 471
           Height = 422
-          ActivePage = TabSheetPlugins
+          ActivePage = TabSheetView
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -384,6 +384,36 @@ inherited CPreferencesForm: TCPreferencesForm
                 Framed = False
                 Action = Action7
                 Color = clBtnFace
+              end
+            end
+            object GroupBox7: TGroupBox
+              Left = 192
+              Top = 184
+              Width = 265
+              Height = 121
+              Caption = ' Wy'#347'wietlanie element'#243'w list '
+              TabOrder = 2
+              object Panel4: TPanel
+                Left = 24
+                Top = 32
+                Width = 217
+                Height = 25
+                Cursor = crHandPoint
+                BevelOuter = bvLowered
+                Caption = 'Elementy nieparzyste'
+                TabOrder = 0
+                OnClick = Panel4Click
+              end
+              object Panel5: TPanel
+                Left = 24
+                Top = 72
+                Width = 217
+                Height = 25
+                Cursor = crHandPoint
+                BevelOuter = bvLowered
+                Caption = 'Elementy parzyste'
+                TabOrder = 1
+                OnClick = Panel5Click
               end
             end
           end
@@ -1347,5 +1377,10 @@ inherited CPreferencesForm: TCPreferencesForm
       ImageIndex = 0
       OnExecute = ActionAddExecute
     end
+  end
+  object ColorDialog: TColorDialog
+    Options = [cdFullOpen]
+    Left = 222
+    Top = 268
   end
 end

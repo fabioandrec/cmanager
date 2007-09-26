@@ -96,6 +96,10 @@ type
     CheckBoxExtractions: TCheckBox;
     CButton11: TCButton;
     Action10: TAction;
+    GroupBox7: TGroupBox;
+    Panel4: TPanel;
+    Panel5: TPanel;
+    ColorDialog: TColorDialog;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -117,6 +121,8 @@ type
     procedure ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure Action10Execute(Sender: TObject);
+    procedure Panel4Click(Sender: TObject);
+    procedure Panel5Click(Sender: TObject);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -270,6 +276,8 @@ begin
     EditBackupName.Text := backupFileName;
     CheckBoxCanOverwrite.Checked := backupOverwrite;
     CheckBoxExtractions.Checked := startupUncheckedExtractions;
+    Panel5.Color := oddListColor;
+    Panel4.Color := evenListColor;
   end;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
@@ -336,6 +344,8 @@ begin
     backupFileName := EditBackupName.Text;
     backupOverwrite := CheckBoxCanOverwrite.Checked;
     startupUncheckedExtractions := CheckBoxExtractions.Checked;
+    oddListColor := Panel5.Color;
+    evenListColor := Panel4.Color;
     xReg := TRegistry.Create;
     try
       xReg.RootKey := HKEY_CURRENT_USER;
@@ -556,6 +566,22 @@ end;
 procedure TCPreferencesForm.Action10Execute(Sender: TObject);
 begin
   TCPlugin(List.SelectedElement.Data).About;
+end;
+
+procedure TCPreferencesForm.Panel4Click(Sender: TObject);
+begin
+  ColorDialog.Color := Panel4.Color;
+  if ColorDialog.Execute then begin
+    Panel4.Color := ColorDialog.Color;
+  end;
+end;
+
+procedure TCPreferencesForm.Panel5Click(Sender: TObject);
+begin
+  ColorDialog.Color := Panel5.Color;
+  if ColorDialog.Execute then begin
+    Panel5.Color := ColorDialog.Color;
+  end;
 end;
 
 end.

@@ -2,7 +2,7 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, MsXml, Math, Windows, CTemplates;
+uses Classes, Graphics, Contnrs, MsXml, Math, Windows, CTemplates, GraphUtil;
 
 type
   TPrefList = class;
@@ -187,6 +187,8 @@ type
     FbackupFileName: String;
     FbackupOverwrite: Boolean;
     FstartupUncheckedExtractions: Boolean;
+    FevenListColor: TColor;
+    FoddListColor: TColor;
   public
     function GetBackupfilename: String;
     procedure LoadFromXml(ANode: IXMLDOMNode); override;
@@ -222,6 +224,8 @@ type
     property backupDirectory: String read FbakupDirectory write FbakupDirectory;
     property backupFileName: String read FbackupFileName write FbackupFileName;
     property backupOverwrite: Boolean read FbackupOverwrite write FbackupOverwrite;
+    property evenListColor: TColor read FevenListColor write FevenListColor;
+    property oddListColor: TColor read FoddListColor write FoddListColor;
   end;
 
   TDescPatterns = class(TStringList)
@@ -545,6 +549,8 @@ begin
   FbackupFileName := TBasePref(APrefItem).backupFileName;
   FbackupOverwrite := TBasePref(APrefItem).backupOverwrite;
   FstartupUncheckedExtractions := TBasePref(APrefItem).startupUncheckedExtractions;
+  FevenListColor := TBasePref(APrefItem).evenListColor;
+  FoddListColor := TBasePref(APrefItem).oddListColor;
 end;
 
 function TBasePref.ExpandTemplate(ATemplate: String): String;
@@ -618,6 +624,8 @@ begin
   FbackupFileName := GetXmlAttribute('backupFilename', ANode, '@data@.cmb');
   FbackupOverwrite := GetXmlAttribute('backupOverwrite', ANode, False);
   FstartupUncheckedExtractions := GetXmlAttribute('startupUncheckedExtractions', ANode, False);
+  FevenListColor := GetXmlAttribute('evenListColor', ANode, clWindow);
+  FoddListColor := GetXmlAttribute('oddListColor', ANode, GetHighLightColor(FevenListColor, -10));
 end;
 
 function TBasePref.QueryInterface(const IID: TGUID; out Obj): HRESULT;
@@ -655,6 +663,8 @@ begin
   SetXmlAttribute('backupFilename', ANode, FbackupFileName);
   SetXmlAttribute('backupOverwrite', ANode, FbackupOverwrite);
   SetXmlAttribute('startupUncheckedExtractions', ANode, FstartupUncheckedExtractions);
+  SetXmlAttribute('evenListColor', ANode, FevenListColor);
+  SetXmlAttribute('oddListColor', ANode, FoddListColor);
 end;
 
 procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
