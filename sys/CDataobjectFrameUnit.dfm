@@ -87,7 +87,6 @@ inherited CDataobjectFrame: TCDataobjectFrame
     OnCompareNodes = ListCompareNodes
     OnDblClick = ListDblClick
     OnFocusChanged = ListFocusChanged
-    OddColor = 12437200
     AutoExpand = True
     OnCDataListReloadTree = ListCDataListReloadTree
     Columns = <>

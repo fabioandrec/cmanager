@@ -105,7 +105,6 @@ inherited CReportsFrame: TCReportsFrame
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnDblClick = ListDblClick
     OnFocusChanged = ListFocusChanged
-    OddColor = 12437200
     AutoExpand = False
     OnCDataListReloadTree = ListCDataListReloadTree
     Columns = <

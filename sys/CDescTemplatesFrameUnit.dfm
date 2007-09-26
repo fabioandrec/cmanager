@@ -38,7 +38,6 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
     OnGetNodeDataSize = TempListGetNodeDataSize
     OnInitChildren = TempListInitChildren
     OnInitNode = TempListInitNode
-    OddColor = 12437200
     AutoExpand = True
     Columns = <
       item

@@ -104,7 +104,6 @@ inherited CDoneFrame: TCDoneFrame
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
-      OddColor = 12437200
       AutoExpand = True
       Columns = <
         item
@@ -179,7 +178,6 @@ inherited CDoneFrame: TCDoneFrame
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
     OnInitNode = DoneListInitNode
-    OddColor = 12437200
     AutoExpand = True
     Columns = <
       item

@@ -39,7 +39,6 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     OnGetNodeDataSize = RepaymentListGetNodeDataSize
     OnInitChildren = RepaymentListInitChildren
     OnInitNode = RepaymentListInitNode
-    OddColor = 12437200
     AutoExpand = True
     Columns = <
       item

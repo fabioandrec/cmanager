@@ -44,7 +44,6 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     OnDragOver = ListDragOver
     OnDragDrop = ListDragDrop
     OnFocusChanged = ListFocusChanged
-    OddColor = 12437200
     AutoExpand = True
     OnCDataListReloadTree = ListCDataListReloadTree
     Columns = <

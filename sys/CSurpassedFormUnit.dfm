@@ -61,7 +61,6 @@ inherited CSurpassedForm: TCSurpassedForm
         TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect]
-        OddColor = 12437200
         AutoExpand = True
         OnCDataListReloadTree = SurpassedListCDataListReloadTree
         Columns = <

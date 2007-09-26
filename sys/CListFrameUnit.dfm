@@ -34,7 +34,6 @@ inherited CListFrame: TCListFrame
     OnGetText = ListGetText
     OnGetNodeDataSize = ListGetNodeDataSize
     OnInitNode = ListInitNode
-    OddColor = 12437200
     AutoExpand = True
     Columns = <
       item

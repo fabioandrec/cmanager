@@ -304,9 +304,7 @@ type
 
   TCList = class(TVirtualStringTree)
   private
-    FOddColor: TColor;
     FAutoExpand: Boolean;
-    procedure SetOddColor(const Value: TColor);
   protected
     procedure DoBeforeItemErase(Canvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var Color: TColor; var EraseAction: TItemEraseAction); override;
     procedure DoHeaderClick(Column: TColumnIndex; Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer); override;
@@ -314,8 +312,8 @@ type
     constructor Create(AOwner: TComponent); override;
     function GetVisibleIndex(ANode: PVirtualNode): Integer;
     function SumColumn(AColumnIndex: TColumnIndex; var ASum: Extended): Boolean;
+    destructor Destroy; override;
   published
-    property OddColor: TColor read FOddColor write SetOddColor;
     property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
   end;
 
@@ -394,8 +392,10 @@ type
 function GetCurrencySymbol: string;
 procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String; AComponentTag: Integer);
 function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
+procedure SetEvenListColors(AColorEven, AColorOdd: TColor);
 
 var CurrencyComponents: TObjectList;
+    ListComponents: TObjectList;
 
 procedure Register;
 
@@ -403,6 +403,9 @@ implementation
 
 uses Forms, CCalendarFormUnit, DateUtils, ComObj, CCalculatorFormUnit,
   Math, StrUtils;
+
+var LOddColor: TColor;
+    LEvenColor: TColor;
 
 procedure Register;
 begin
@@ -1482,9 +1485,23 @@ end;
 constructor TCList.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FOddColor := GetHighLightColor(clWindow, -10);
   FAutoExpand := True;
   DefaultText := '';
+  if not (csDesigning in ComponentState) then begin
+    if ListComponents <> Nil then begin
+      ListComponents.Add(Self);
+    end;
+  end;
+end;
+
+destructor TCList.Destroy;
+begin
+  if not (csDesigning in ComponentState) then begin
+    if ListComponents <> Nil then begin
+      ListComponents.Remove(Self);
+    end;
+  end;
+  inherited Destroy;
 end;
 
 procedure TCList.DoBeforeItemErase(Canvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var Color: TColor; var EraseAction: TItemEraseAction);
@@ -1493,9 +1510,9 @@ begin
   with Canvas do begin
     xIndex := GetVisibleIndex(Node);
     if not Odd(xIndex) then begin
-      Color := clWindow;
+      Color := LEvenColor;
     end else begin
-      Color := FOddColor;
+      Color := LOddColor;
     end;
     EraseAction := eaColor;
   end;
@@ -1548,14 +1565,6 @@ begin
   end;
   if not Result then begin
     ASum := 0;
-  end;
-end;
-
-procedure TCList.SetOddColor(const Value: TColor);
-begin
-  if FOddColor <> Value then begin
-    FOddColor := Value;
-    Refresh;
   end;
 end;
 
@@ -1994,9 +2003,33 @@ begin
   SendMessage(Handle, EM_AUTOURLDETECT, Integer(True), 0);
 end;
 
+procedure SetEvenListColors(AColorEven, AColorOdd: TColor);
+var xCount: Integer;
+    xRef: Boolean;
+begin
+  xRef := False;
+  if AColorEven <> LEvenColor then begin
+    LEvenColor := AColorEven;
+    xRef := True;
+  end;
+  if AColorOdd <> LOddColor then begin
+    LOddColor := AColorOdd;
+    xRef := True;
+  end;
+  if xRef then begin
+    for xCount := 0 to ListComponents.Count - 1 do begin
+      TCList(ListComponents.Items[xCount]).Refresh;
+    end;
+  end;
+end;
+
 initialization
   CurrencyComponents := TObjectList.Create(False);
+  ListComponents := TObjectList.Create(False);
+  LEvenColor := clWindow;
+  LOddColor := GetHighLightColor(LEvenColor, -10);
 finalization
   FreeAndNil(CurrencyComponents);
+  FreeAndNil(ListComponents);
 end.
 

@@ -311,7 +311,6 @@ inherited CExtractionForm: TCExtractionForm
           OnGetHint = MovementListGetHint
           OnGetNodeDataSize = MovementListGetNodeDataSize
           OnInitNode = MovementListInitNode
-          OddColor = 12437200
           AutoExpand = True
           Columns = <
             item

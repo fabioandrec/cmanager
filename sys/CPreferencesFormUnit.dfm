@@ -627,7 +627,6 @@ inherited CPreferencesForm: TCPreferencesForm
                 OnChecked = ListChecked
                 OnFocusChanged = ListFocusChanged
                 OnInitNode = ListInitNode
-                OddColor = 12437200
                 AutoExpand = True
                 OnCDataListReloadTree = ListCDataListReloadTree
                 Columns = <

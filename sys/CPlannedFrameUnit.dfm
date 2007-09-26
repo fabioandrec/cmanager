@@ -86,7 +86,6 @@ inherited CPlannedFrame: TCPlannedFrame
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
     OnInitNode = PlannedListInitNode
-    OddColor = 12437200
     AutoExpand = True
     Columns = <
       item

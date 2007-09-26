@@ -198,7 +198,6 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
           OnGetHint = RatesListGetHint
           OnGetNodeDataSize = RatesListGetNodeDataSize
           OnInitNode = RatesListInitNode
-          OddColor = 12437200
           AutoExpand = True
           Columns = <
             item

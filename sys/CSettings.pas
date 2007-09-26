@@ -25,7 +25,7 @@ function GetSettingsCharts: IXMLDOMNode;
 implementation
 
 uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts,
-  CPreferences, CXml, CTools;
+  CPreferences, CXml, CTools, CComponents;
 
 var GSettings: IXMLDOMDocument = Nil;
 
@@ -217,6 +217,7 @@ begin
       GPluginsPreferences.LoadAllFromParentNode(GetSettingsPlugins);
       GChartPreferences.LoadAllFromParentNode(GetSettingsCharts);
       GBasePreferences.LoadFromXml(GetSettingsPreferences);
+      SetEvenListColors(GBasePreferences.evenListColor, GBasePreferences.oddListColor);
     end;
   end else begin
     GetSettingsRoot;

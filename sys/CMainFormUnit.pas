@@ -423,6 +423,7 @@ begin
   end else if Message.Msg = WM_PREFERENCESCHANGED then begin
     ShortcutsVisible := GBasePreferences.showShortcutBar;
     StatusbarVisible := GBasePreferences.showStatusBar;
+    SetEvenListColors(GBasePreferences.evenListColor, GBasePreferences.oddListColor);
     Invalidate;
   end else if Message.Msg = WM_OPENCONNECTION then begin
   end else if Message.Msg = WM_CLOSECONNECTION then begin

@@ -128,7 +128,6 @@ inherited CMovementFrame: TCMovementFrame
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
-      OddColor = 12437200
       AutoExpand = True
       Columns = <
         item
@@ -205,7 +204,6 @@ inherited CMovementFrame: TCMovementFrame
     OnGetNodeDataSize = TodayListGetNodeDataSize
     OnInitChildren = TodayListInitChildren
     OnInitNode = TodayListInitNode
-    OddColor = 12437200
     AutoExpand = True
     Columns = <
       item
