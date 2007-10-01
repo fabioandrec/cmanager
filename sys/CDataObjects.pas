@@ -735,6 +735,9 @@ type
     procedure Setname(const Value: TBaseName);
     procedure SetinstrumentType(const Value: TBaseEnumeration);
   public
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
@@ -3657,6 +3660,34 @@ begin
     FidCashpoint := FieldByName('idCashpoint').AsString;
     FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
   end;
+end;
+
+function TInstrument.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := '';
+  if AColumnIndex = 0 then begin
+    Result := Fname;
+  end else if AColumnIndex = 1 then begin
+    if FinstrumentType = CInstrumentTypeIndex then begin
+      Result := CInstrumentTypeIndexDesc;
+    end else if FinstrumentType = CInstrumentTypeStock then begin
+      Result := CInstrumentTypeStockDesc;
+    end else if FinstrumentType = CInstrumentTypeBond then begin
+      Result := CInstrumentTypeBondDesc;
+    end else if FinstrumentType = CInstrumentTypeFund then begin
+      Result := CInstrumentTypeFundDesc;
+    end
+  end;
+end;
+
+function TInstrument.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TInstrument.GetElementText: String;
+begin
+  Result := Fname;
 end;
 
 procedure TInstrument.Setdescription(const Value: TBaseDescription);

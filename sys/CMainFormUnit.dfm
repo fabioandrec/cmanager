@@ -689,6 +689,10 @@ object CMainForm: TCMainForm
       Caption = 'Domy'#347'lna transformcja raport'#243'w'
       OnExecute = ActionXslExecute
     end
+    object ActionShortcutInstruments: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Instrumenty'
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

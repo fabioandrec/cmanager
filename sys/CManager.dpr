@@ -124,7 +124,9 @@ uses
   CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame},
   CParamDefFormUnit in 'CParamDefFormUnit.pas' {CParamDefForm},
   CChooseByParamsDefsFormUnit in 'CChooseByParamsDefsFormUnit.pas' {CChooseByParamsDefsForm},
-  CValuelistFormUnit in 'CValuelistFormUnit.pas' {CValuelistForm};
+  CValuelistFormUnit in 'CValuelistFormUnit.pas' {CValuelistForm},
+  CInstrumentFrameUnit in 'CInstrumentFrameUnit.pas' {CInstrumentFrame: TFrame},
+  CInstrumentFormUnit in 'CInstrumentFormUnit.pas' {CInstrumentForm};
 
 {$R *.res}
 

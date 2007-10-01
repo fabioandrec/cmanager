@@ -80,7 +80,7 @@ begin
     xDataobject := TProduct(Dataobjects.Items[xCount]);
     xElement := TCListDataElement.Create(MultipleChecks <> Nil, List, xDataobject);
     if xDataobject.idParentProduct = CEmptyDataGid then begin
-      xParent := List.RootElement;;
+      xParent := List.RootElement;
     end else begin
       xParent := List.RootElement.FindDataElement(xDataobject.idParentProduct, xDataobject.ClassName, True);
     end;
