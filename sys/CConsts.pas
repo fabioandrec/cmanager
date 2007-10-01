@@ -156,6 +156,11 @@ const
   CXsltTypeSystem = 'S';
   CXsltTypePrivate = 'P';
 
+  CInstrumentTypeIndex = 'I';
+  CInstrumentTypeStock = 'S';
+  CInstrumentTypeBond = 'B';
+  CInstrumentTypeFund = 'F';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

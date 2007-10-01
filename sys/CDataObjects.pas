@@ -722,6 +722,51 @@ type
     property xsltType: TBaseEnumeration read FxsltType write SetxsltType;
   end;
 
+  TInstrument = class(TDataObject)
+  private
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    FidCashpoint: TDataGid;
+    FidCurrencyDef: TDataGid;
+    FinstrumentType: TBaseEnumeration;
+    procedure SetidCashpoint(const Value: TDataGid);
+    procedure SetidCurrencyDef(const Value: TDataGid);
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: TBaseName);
+    procedure SetinstrumentType(const Value: TBaseEnumeration);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    constructor Create(AStatic: Boolean); override;
+  published
+    property name: TBaseName read Fname write Setname;
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property idCashpoint: TDataGid read FidCashpoint write SetidCashpoint;
+    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
+    property instrumentType: TBaseEnumeration read FinstrumentType write SetinstrumentType;
+  end;
+
+  TInstrumentValue = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    FidInstrument: TDataGid;
+    FregDateTime: TDateTime;
+    FvalueOf: Currency;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidInstrument(const Value: TDataGid);
+    procedure SetregDateTime(const Value: TDateTime);
+    procedure SetvalueOf(const Value: Currency);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    constructor Create(AStatic: Boolean); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property idInstrument: TDataGid read FidInstrument write SetidInstrument;
+    property regDateTime: TDateTime read FregDateTime write SetregDateTime;
+    property valueOf: Currency read FvalueOf write SetvalueOf;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -739,34 +784,38 @@ var CashPointProxy: TDataProxy;
     ExtractionItemProxy: TDataProxy;
     UnitDefProxy: TDataProxy;
     ReportDefProxy: TDataProxy;
+    InstrumentProxy: TDataProxy;
+    InstrumentValueProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
 
-const CDatafileTables: array[0..21] of string =
+const CDatafileTables: array[0..23] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
-             'accountCurrencyRule', 'reportDef');
+             'accountCurrencyRule', 'reportDef',
+             'instrument', 'intrumentValue');
 
-const CDatafileTablesExportConditions: array[0..21] of string =
+const CDatafileTablesExportConditions: array[0..23] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
-             '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')');
+             '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
+             '', '');
 
-const CDatafileDeletes: array[0..21] of string =
+const CDatafileDeletes: array[0..23] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '', '');
+             '', '', '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
@@ -864,6 +913,8 @@ begin
   ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
   UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef', Nil);
   ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef', Nil);
+  InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument', Nil);
+  InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', Nil);
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -3586,6 +3637,137 @@ begin
     AddField('paramsDefs', FparamsDefs, True, 'reportDef');
     AddField('xsltText', FxsltText, True, 'reportDef');
     AddField('xsltType', FxsltType, True, 'reportDef');
+  end;
+end;
+
+constructor TInstrument.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidCashpoint := CEmptyDataGid;
+  FidCurrencyDef := CEmptyDataGid;
+end;
+
+procedure TInstrument.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+    FinstrumentType := FieldByName('instrumentType').AsString;
+    FidCashpoint := FieldByName('idCashpoint').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+  end;
+end;
+
+procedure TInstrument.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrument.SetidCashpoint(const Value: TDataGid);
+begin
+  if FidCashpoint <> Value then begin
+    FidCashpoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrument.SetidCurrencyDef(const Value: TDataGid);
+begin
+  if FidCurrencyDef <> Value then begin
+    FidCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrument.SetinstrumentType(const Value: TBaseEnumeration);
+begin
+  if FinstrumentType <> Value then begin
+    FinstrumentType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrument.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrument.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('name', Fname, True, 'instrument');
+    AddField('instrumentType', FinstrumentType, True, 'instrument');
+    AddField('description', Fdescription, True, 'instrument');
+    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'instrument');
+    AddField('idCashpoint', DataGidToDatabase(FidCashpoint), False, 'instrument');
+  end;
+end;
+
+constructor TInstrumentValue.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidInstrument := CEmptyDataGid;
+end;
+
+procedure TInstrumentValue.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+    FidInstrument := FieldByName('idInstrument').AsString;
+    FregDateTime := FieldByName('regDateTime').AsDateTime;
+    FvalueOf := FieldByName('valueId').AsCurrency;
+  end;
+end;
+
+procedure TInstrumentValue.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrumentValue.SetidInstrument(const Value: TDataGid);
+begin
+  if FidInstrument <> Value then begin
+    FidInstrument := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrumentValue.SetregDateTime(const Value: TDateTime);
+begin
+  if FregDateTime <> Value then begin
+    FregDateTime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrumentValue.SetvalueOf(const Value: Currency);
+begin
+  if FvalueOf <> Value then begin
+    FvalueOf := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInstrumentValue.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('description', Fdescription, True, 'instrumentValue');
+    AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'instrumentValue');
+    AddField('regDateTime', DatetimeToDatabase(FregDateTime, True), False, 'instrumentValue');
+    AddField('valueOf', CurrencyToDatabase(FvalueOf), False, 'instrumentValue');
   end;
 end;
 

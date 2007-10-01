@@ -330,13 +330,40 @@ create table reportDef (
   created datetime not null,
   modified datetime,
   name varchar(40) not null,
-  description varchar(200),  
+  description varchar(200),
   queryText memo not null,
   paramsDefs memo,
   xsltText memo,
   xsltType varchar(1) not null,
   primary key (idreportDef),
   constraint ck_xsltType check (xsltType in ('D', 'S', 'P'))
+);
+
+create table instrument (
+  idInstrument uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  name varchar(40) not null,
+  description varchar(200),
+  instrumentType varchar(1) not null,
+  idCurrencyDef uniqueidentifier,
+  idCashpoint uniqueidentifier,
+  primary key (idInstrument),
+  constraint ck_instrumentType check (instrumentType in ('I', 'S', 'B', 'F')),
+  constraint fk_instrumentCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_instrumentCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint)
+);
+
+create table instrumentValue (
+  idInstrumentValue uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  description varchar(200),
+  idInstrument uniqueidentifier not null,
+  regDateTime datetime not null,
+  valueOf money not null,
+  primary key (idInstrumentValue),
+  constraint fk_instrumentValueInstrument foreign key (idInstrument) references instrument (idInstrument)
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');
