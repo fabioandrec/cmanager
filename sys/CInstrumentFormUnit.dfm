@@ -1,5 +1,169 @@
 inherited CInstrumentForm: TCInstrumentForm
-  Caption = 'CInstrumentForm'
+  Caption = 'Instrument inwestycyjny'
+  ClientHeight = 419
+  ClientWidth = 379
   PixelsPerInch = 96
   TextHeight = 13
+  inherited PanelConfig: TPanel
+    Width = 379
+    Height = 378
+    object GroupBoxAccountType: TGroupBox
+      Left = 16
+      Top = 16
+      Width = 345
+      Height = 225
+      Caption = ' Dane podstawowe  '
+      TabOrder = 0
+      object Label6: TLabel
+        Left = 15
+        Top = 36
+        Width = 33
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Rodzaj'
+      end
+      object CButton1: TCButton
+        Left = 175
+        Top = 70
+        Width = 154
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Color = clBtnFace
+      end
+      object Label1: TLabel
+        Left = 15
+        Top = 76
+        Width = 33
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Nazwa'
+      end
+      object Label2: TLabel
+        Left = 27
+        Top = 112
+        Width = 21
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Opis'
+      end
+      object ComboBoxType: TComboBox
+        Left = 56
+        Top = 32
+        Width = 265
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 0
+        Text = 'Indeks gie'#322'dowy'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          'Indeks gie'#322'dowy'
+          'Akcje'
+          'Obligacje'
+          'Fundusz inwestycyjny')
+      end
+      object EditName: TEdit
+        Left = 56
+        Top = 72
+        Width = 265
+        Height = 21
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        MaxLength = 40
+        TabOrder = 1
+      end
+      object RichEditDesc: TCRichedit
+        Left = 56
+        Top = 112
+        Width = 265
+        Height = 89
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        TabOrder = 2
+      end
+    end
+    object GroupBoxBank: TGroupBox
+      Left = 16
+      Top = 256
+      Width = 345
+      Height = 113
+      Caption = ' Dane dodatkowe '
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      object Label4: TLabel
+        Left = 33
+        Top = 31
+        Width = 63
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Notowany na'
+      end
+      object Label5: TLabel
+        Left = 18
+        Top = 72
+        Width = 78
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta notowa'#324
+      end
+      object CStaticBank: TCStatic
+        Left = 104
+        Top = 28
+        Width = 217
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz prowadz'#261'cego z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 0
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz prowadz'#261'cego z listy>'
+        OnGetDataId = CStaticBankGetDataId
+        HotTrack = True
+      end
+      object CStaticCurrency: TCStatic
+        Left = 104
+        Top = 68
+        Width = 217
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz walut'#281' z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 1
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz walut'#281' z listy>'
+        OnGetDataId = CStaticCurrencyGetDataId
+        HotTrack = True
+      end
+    end
+  end
+  inherited PanelButtons: TPanel
+    Top = 378
+    Width = 379
+    inherited BitBtnOk: TBitBtn
+      Left = 202
+    end
+    inherited BitBtnCancel: TBitBtn
+      Left = 290
+    end
+  end
 end

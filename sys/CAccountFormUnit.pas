@@ -72,6 +72,11 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano banku prowadz¹cego konto. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticBank.DoGetDataId;
     end;
+  end else if (CStaticCurrency.DataId = CEmptyDataGid) then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano waluty konta. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCurrency.DoGetDataId;
+    end;
   end;
 end;
 

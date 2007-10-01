@@ -741,6 +741,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
+    class function FindByName(AName: TBaseName): TInstrument;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -3728,6 +3729,11 @@ begin
     Fname := Value;
     SetState(msModified);
   end;
+end;
+
+class function TInstrument.FindByName(AName: TBaseName): TInstrument;
+begin
+  Result := TInstrument(TInstrument.FindByCondition(InstrumentProxy, 'select * from instrument where name = ''' + AName + '''', False));
 end;
 
 procedure TInstrument.UpdateFieldList;
