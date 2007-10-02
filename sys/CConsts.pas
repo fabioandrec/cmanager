@@ -127,11 +127,11 @@ const
   CLimitSumtypeInDescription = 'Przychody';
   CLimitSumtypeBalanceDescription = 'Saldo';
 
-  CCurrencyRateFilterToday = 'T';
-  CCurrencyRateFilterYesterday = 'Y';
-  CCurrencyRateFilterWeek = 'W';
-  CCurrencyRateFilterMonth = 'M';
-  CCurrencyRateFilterOther = 'O';
+  CFilterToday = 'T';
+  CFilterYesterday = 'Y';
+  CFilterWeek = 'W';
+  CFilterMonth = 'M';
+  CFilterOther = 'O';
 
   CCurrencyRateTypeAverage = 'A';
   CCurrencyRateTypeSell = 'S';

@@ -1,4 +1,4 @@
-unit CCurrencyRateFrameUnit;
+unit CInstrumentValueFrameUnit;
 
 interface
 
@@ -9,29 +9,7 @@ uses
   CDatabase, CImageListsUnit;
 
 type
-  TRateFrameAdditionalData = class(TCDataobjectFrameData)
-  private
-    FIdSource: String;
-    FIdDest: String;
-  public
-    constructor CreateRateData(AIdSource, AIdDest: String);
-  published
-    property idSource: String read FIdSource;
-    property idDesc: String read FIdDest;
-  end;
-
-  TRateFormAdditionalData = class(TAdditionalData)
-  private
-    FIdSource: String;
-    FIdDest: String;
-  public
-    constructor CreateRateData(AIdSource, AIdDest: String);
-  published
-    property idSource: String read FIdSource;
-    property idDesc: String read FIdDest;
-  end;
-
-  TCCurrencyRateFrame = class(TCDataobjectFrame)
+  TCInstrumentValueFrame = class(TCDataobjectFrame)
     CDateTimePerStart: TCDateTime;
     Label4: TLabel;
     CDateTimePerEnd: TCDateTime;
@@ -46,7 +24,6 @@ type
   protected
     procedure UpdateCustomPeriod;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
-    function GetAdditionalDataForObject: TAdditionalData; override;
     function GetSelectedType: Integer; override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
   public
@@ -63,28 +40,28 @@ type
 
 implementation
 
-uses CDataObjects, CCurrencyRateFormUnit, CConsts, DateUtils,
+uses CDataObjects, CConsts, DateUtils,
   CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit, CBaseFrameUnit,
   CPluginConsts, CTools;
 
 {$R *.dfm}
 
-class function TCCurrencyRateFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+class function TCInstrumentValueFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
-  Result := TCurrencyRate;
+  Result := TInstrumentValue;
 end;
 
-function TCCurrencyRateFrame.GetDataobjectForm(AOption: Integer): TCDataobjectFormClass;
+function TCInstrumentValueFrame.GetDataobjectForm(AOption: Integer): TCDataobjectFormClass;
 begin
-  Result := TCCurrencyRateForm;
+  Result := Nil;
 end;
 
-class function TCCurrencyRateFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+class function TCInstrumentValueFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
-  Result := CurrencyRateProxy;
+  Result := InstrumentValueProxy;
 end;
 
-procedure TCCurrencyRateFrame.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
+procedure TCInstrumentValueFrame.GetFilterDates(var ADateFrom, ADateTo: TDateTime);
 var xId: TDataGid;
 begin
   ADateFrom := 0;
@@ -106,25 +83,28 @@ begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
   end;
+  ADateFrom := StartOfTheDay(ADateFrom);
+  ADateTo := EndOfTheDay(ADateTo);
 end;
 
-function TCCurrencyRateFrame.GetStaticFilter: TStringList;
+function TCInstrumentValueFrame.GetStaticFilter: TStringList;
 begin
   Result := TStringList.Create;
   with Result do begin
     Add(CFilterAllElements + '=<wszystkie elementy>');
-    Add(CCurrencyRateTypeAverage + '=<kursy œrednie>');
-    Add(CCurrencyRateTypeSell + '=<kursy kupna>');
-    Add(CCurrencyRateTypeBuy + '=<kursy sprzeda¿y>');
+    Add(CInstrumentTypeIndex + '=<indeksy gie³dowe>');
+    Add(CInstrumentTypeStock + '=<akcje>');
+    Add(CInstrumentTypeBond + '=<obligacje>');
+    Add(CInstrumentTypeFund + '=<fundusze inwestycyjne>');
   end;
 end;
 
-class function TCCurrencyRateFrame.GetTitle: String;
+class function TCInstrumentValueFrame.GetTitle: String;
 begin
   Result := 'Kursy walut';
 end;
 
-procedure TCCurrencyRateFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
+procedure TCInstrumentValueFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   UpdateCustomPeriod;
@@ -137,20 +117,18 @@ begin
   Label5.Anchors := [akRight, akTop];
 end;
 
-function TCCurrencyRateFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
+function TCInstrumentValueFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 var xDf, xDt: TDateTime;
 begin
+  {
   GetFilterDates(xDf, xDt);
-  Result := ((inherited IsValidFilteredObject(AObject)) or (CStaticFilter.DataId = TCurrencyRate(AObject).rateType)) and
-            (xDf <= TCurrencyRate(AObject).bindingDate) and (TCurrencyRate(AObject).bindingDate <= xDt);
-  if Result and (AdditionalData <> Nil) then begin
-    with TRateFrameAdditionalData(AdditionalData) do begin
-      Result := (FIdSource = TCurrencyRate(AObject).idSourceCurrencyDef) and (FIdDest = TCurrencyRate(AObject).idTargetCurrencyDef);
-    end;
-  end;
+  Result := (inherited IsValidFilteredObject(AObject)) and
+            (xDf <= TInstrumentValue(AObject).regDateTime) and (TInstrumentValue(AObject).regDateTime <= xDt)
+            and ((CStaticFilter.DataId = CFilterAllElements) or (TInstrumentValue(AObject).instrumentType = CStaticFilter.DataId));
+  }
 end;
 
-procedure TCCurrencyRateFrame.ReloadDataobjects;
+procedure TCInstrumentValueFrame.ReloadDataobjects;
 var xCondition: String;
     xDf, xDt: TDateTime;
 begin
@@ -159,20 +137,15 @@ begin
     xCondition := '';
   end else begin
     GetFilterDates(xDf, xDt);
-    xCondition := Format(' where bindingDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+    xCondition := Format(' where v.regDateTime between %s and %s', [DatetimeToDatabase(xDf, True), DatetimeToDatabase(xDt, True)]);
   end;
   if CStaticFilter.DataId <> CFilterAllElements then begin
-    xCondition := xCondition + ' and rateType = ''' + CStaticFilter.DataId + '''';
+    xCondition := xCondition + ' and i.instrumentType = ''' + CStaticFilter.DataId + '''';
   end;
-  if AdditionalData <> Nil then begin
-    with TRateFrameAdditionalData(AdditionalData) do begin
-      xCondition := xCondition + Format(' and ((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))', [FIdSource, FIdDest, FIdDest, FIdSource]);
-    end;
-  end;
-  Dataobjects := TCurrencyRate.GetList(TCurrencyRate, CurrencyRateProxy, 'select * from currencyRate' + xCondition);
+  Dataobjects := TInstrumentValue.GetList(TInstrumentValue, InstrumentValueProxy, 'select v.* from instrumentValue v left join instrument i on i.idinstrument = v.idinstrument' + xCondition);
 end;
 
-procedure TCCurrencyRateFrame.UpdateCustomPeriod;
+procedure TCInstrumentValueFrame.UpdateCustomPeriod;
 var xF, xE: TDateTime;
 begin
   CDateTimePerStart.HotTrack := CStaticPeriod.DataId = CFilterOther;
@@ -184,28 +157,28 @@ begin
   end;
 end;
 
-procedure TCCurrencyRateFrame.CDateTimePerStartChanged(Sender: TObject);
+procedure TCInstrumentValueFrame.CDateTimePerStartChanged(Sender: TObject);
 begin
   RefreshData;
 end;
 
-procedure TCCurrencyRateFrame.CDateTimePerEndChanged(Sender: TObject);
+procedure TCInstrumentValueFrame.CDateTimePerEndChanged(Sender: TObject);
 begin
   RefreshData;
 end;
 
-function TCCurrencyRateFrame.GetInitialFilter: String;
+function TCInstrumentValueFrame.GetInitialFilter: String;
 begin
   Result := CFilterAllElements;
 end;
 
-procedure TCCurrencyRateFrame.CStaticPeriodChanged(Sender: TObject);
+procedure TCInstrumentValueFrame.CStaticPeriodChanged(Sender: TObject);
 begin
   UpdateCustomPeriod;
   RefreshData;
 end;
 
-procedure TCCurrencyRateFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+procedure TCInstrumentValueFrame.CStaticPeriodGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 var xList: TStringList;
     xGid, xText: String;
     xRect: TRect;
@@ -226,41 +199,18 @@ begin
   end;
 end;
 
-constructor TRateFrameAdditionalData.CreateRateData(AIdSource, AIdDest: String);
-begin
-  inherited CreateNew;
-  FIdSource := AIdSource;
-  FIdDest := AIdDest;
-end;
-
-function TCCurrencyRateFrame.GetAdditionalDataForObject: TAdditionalData;
-begin
-  if AdditionalData = Nil then begin
-    Result := inherited GetAdditionalDataForObject;
-  end else begin
-    Result := TRateFormAdditionalData.CreateRateData(TRateFrameAdditionalData(AdditionalData).idSource, TRateFrameAdditionalData(AdditionalData).idDesc);
-  end;
-end;
-
-constructor TRateFormAdditionalData.CreateRateData(AIdSource, AIdDest: String);
-begin
-  inherited Create;
-  FIdSource := AIdSource;
-  FIdDest := AIdDest;
-end;
-
-function TCCurrencyRateFrame.GetSelectedType: Integer;
+function TCInstrumentValueFrame.GetSelectedType: Integer;
 begin
   if List.FocusedNode <> Nil then begin
-    Result := CSELECTEDITEM_CURRENCYRATE;
+    Result := CSELECTEDITEM_INSTRUMENTVALUE;
   end else begin
     Result := CSELECTEDITEM_INCORRECT;
   end;
 end;
 
-function TCCurrencyRateFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
+function TCInstrumentValueFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
 begin
-  Result := (APluginSelectedItemTypes and CSELECTEDITEM_CURRENCYRATE) = CSELECTEDITEM_CURRENCYRATE;
+  Result := (APluginSelectedItemTypes and CSELECTEDITEM_INSTRUMENTVALUE) = CSELECTEDITEM_INSTRUMENTVALUE;
 end;
 
 end.

@@ -34,11 +34,13 @@ type
     CIntEdit7: TCIntEdit;
     Label10: TLabel;
     CIntEdit8: TCIntEdit;
+    Label11: TLabel;
+    CIntEdit9: TCIntEdit;
     procedure FormCreate(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
   public
-    procedure FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount, AUnitdefsCount: Integer);
+    procedure FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount, AUnitdefsCount, AInstrumentsCount: Integer);
   end;
 
 procedure FillDatabaseExampleData;
@@ -58,7 +60,7 @@ begin
   xForm.Free;
 end;
 
-procedure TCRandomForm.FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount, AUnitdefsCount: Integer);
+procedure TCRandomForm.FillDatabaseExampleData(ADateFrom, ADateTo: TDateTime; AOutCount, AInCount, ATransferCount, AAcountCount, ACashpointCount, AProductCount, ACurrenciesCount, AUnitdefsCount, AInstrumentsCount: Integer);
 var xCount: Integer;
     xDate: TDateTime;
     xAccounts: TDataObjectList;
@@ -66,6 +68,7 @@ var xCount: Integer;
     xInproducts: TDataObjectList;
     xOutproducts: TDataObjectList;
     xCurdefs: TDataObjectList;
+    xInstdefs: TDataObjectList;
     xUnitdefs: TDataObjectList;
     xProduct: TProduct;
     xAccount, xSourceAccount: TAccount;
@@ -76,12 +79,14 @@ var xCount: Integer;
     xSCurDef, xTCurDef, xMovementCurrency: TCurrencyDef;
     xRateCashpointId: TDataGid;
     xHelper: TCurrencyRateHelper;
+    xCurInst: TInstrument;
+    xInstValue: TInstrumentValue;
 begin
   BitBtnOk.Enabled := False;
   BitBtn1.Enabled := False;
   Application.ProcessMessages;
   GDataProvider.BeginTransaction;
-  ShowWaitForm(wtProgressbar, 'Trwa generowanie konfiguracji...', 0, ACurrenciesCount + ACashpointCount + AAcountCount + AProductCount + AUnitdefsCount);
+  ShowWaitForm(wtProgressbar, 'Trwa generowanie konfiguracji...', 0, ACurrenciesCount + ACashpointCount + AAcountCount + AProductCount + AUnitdefsCount + AInstrumentsCount);
   for xCount := 1 to ACurrenciesCount do begin
     with TCurrencyDef.CreateObject(CurrencyDefProxy, False) do begin
       name := 'Waluta ' + IntToStr(xCount);
@@ -120,6 +125,18 @@ begin
       name := 'kontrahent ' + IntToStr(xCount);
       description := name;
       cashpointType := CCashpointTypeAll;
+      StepWaitForm(1);
+    end;
+  end;
+  Randomize;
+  xCashpoints := TCashPoint.GetList(TCashPoint, CashPointProxy, 'select * from cashpoint');
+  for xCount := 1 to AInstrumentsCount do begin
+    with TInstrument.CreateObject(InstrumentProxy, False) do begin
+      name := 'instrument ' + IntToStr(xCount);
+      description := name;
+      instrumentType := RandomFrom(StringToStringArray(CInstrumentTypeIndex + '|' + CInstrumentTypeStock + '|' + CInstrumentTypeBond + '|' + CInstrumentTypeFund, '|'));
+      idCurrencyDef := xCurdefs.Items[Random(xCurdefs.Count)].id;
+      idCashpoint := xCashpoints.Items[Random(xCashpoints.Count)].id;
       StepWaitForm(1);
     end;
   end;
@@ -181,6 +198,24 @@ begin
           xDate := IncDay(xDate);
         end;
       end;
+    end;
+    GDataProvider.PostProxies;
+    StepWaitForm(1);
+  end;
+  xInstdefs := TInstrument.GetList(TInstrument, InstrumentProxy, 'select * from instrument');
+  InitWaitForm('Trwa generowanie notowañ...', 0, xCurdefs.Count);
+  for xA := 0 to xInstdefs.Count - 1 do begin
+    xDate := ADateFrom;
+    xCurInst := TInstrument(xInstdefs.Items[xA]);
+    while (xDate <= ADateTo) do begin
+      for xB := 0 to 23 do begin
+        xInstValue := TInstrumentValue.CreateObject(InstrumentValueProxy, False);
+        xInstValue.idInstrument := xCurInst.id;
+        xInstValue.description := xCurInst.name;
+        xInstValue.regDateTime := xDate + EncodeTime(xB, 0, 0, 0);
+        xInstValue.valueOf := 1 + RandomRange(1, 5) / RandomRange(1, 5);
+      end;
+      xDate := IncDay(xDate);
     end;
     GDataProvider.PostProxies;
     StepWaitForm(1);
@@ -350,7 +385,7 @@ end;
 procedure TCRandomForm.BitBtnOkClick(Sender: TObject);
 begin
   if ShowInfo(itQuestion, 'Czy rzeczywiœcie chcesz wype³niæ aktualny plik danych losowymi operacjami i innymi danymi konfiguracyjnymi?', '') then begin
-    FillDatabaseExampleData(CDateTime1.Value, CDateTime2.Value, CIntEdit1.Value, CIntEdit5.Value, CIntEdit6.Value, CIntEdit2.Value, CIntEdit3.Value, CIntEdit4.Value, CIntEdit7.Value, CIntEdit8.Value);
+    FillDatabaseExampleData(CDateTime1.Value, CDateTime2.Value, CIntEdit1.Value, CIntEdit5.Value, CIntEdit6.Value, CIntEdit2.Value, CIntEdit3.Value, CIntEdit4.Value, CIntEdit7.Value, CIntEdit8.Value, CIntEdit9.Value);
     CloseForm;
   end;
 end;

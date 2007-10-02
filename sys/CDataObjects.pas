@@ -756,11 +756,17 @@ type
     FidInstrument: TDataGid;
     FregDateTime: TDateTime;
     FvalueOf: Currency;
+    FidInstrumentCurrencyDef: TDataGid;
+    FinstrumentType: TBaseEnumeration;
+    FinstrumentName: TBaseName;
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetregDateTime(const Value: TDateTime);
     procedure SetvalueOf(const Value: Currency);
   public
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
@@ -900,25 +906,25 @@ end;
 
 procedure InitializeProxies;
 begin
-  CashPointProxy := TDataProxy.Create(GDataProvider, 'cashPoint', Nil);
-  AccountProxy := TDataProxy.Create(GDataProvider, 'account', Nil);
-  ProductProxy := TDataProxy.Create(GDataProvider, 'product', Nil);
-  MovementListProxy :=  TDataProxy.Create(GDataProvider, 'movementList', Nil);
-  BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement', Nil);
-  PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement', Nil);
-  PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone', Nil);
-  MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter', Nil);
-  ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile', Nil);
-  MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit', Nil);
-  CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef', Nil);
-  CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate', Nil);
-  AccountCurrencyRuleProxy := TDataProxy.Create(GDataProvider, 'accountCurrencyRule', Nil);
-  AccountExtractionProxy := TDataProxy.Create(GDataProvider, 'accountExtraction', Nil);
-  ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem', Nil);
-  UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef', Nil);
-  ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef', Nil);
-  InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument', Nil);
-  InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', Nil);
+  CashPointProxy := TDataProxy.Create(GDataProvider, 'cashPoint');
+  AccountProxy := TDataProxy.Create(GDataProvider, 'account');
+  ProductProxy := TDataProxy.Create(GDataProvider, 'product');
+  MovementListProxy :=  TDataProxy.Create(GDataProvider, 'movementList');
+  BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement');
+  PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement');
+  PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone');
+  MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter');
+  ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile');
+  MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit');
+  CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef');
+  CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate');
+  AccountCurrencyRuleProxy := TDataProxy.Create(GDataProvider, 'accountCurrencyRule');
+  AccountExtractionProxy := TDataProxy.Create(GDataProvider, 'accountExtraction');
+  ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem');
+  UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef');
+  ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef');
+  InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument');
+  InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -2915,11 +2921,12 @@ end;
 function TCurrCache.GetIso(AId: String): String;
 var xCur: TCurrCacheItem;
 begin
-  xCur := ById[AId];
-  if xCur <> Nil then begin
-    Result := xCur.CurrIso;
-  end else begin
-    Result := '';
+  Result := '';
+  if AId <> CEmptyDataGid then begin
+    xCur := ById[AId];
+    if xCur <> Nil then begin
+      Result := xCur.CurrIso;
+    end;
   end;
 end;
 
@@ -2931,11 +2938,12 @@ end;
 function TCurrCache.GetSymbol(AId: String): String;
 var xCur: TCurrCacheItem;
 begin
-  xCur := ById[AId];
-  if xCur <> Nil then begin
-    Result := xCur.CurrSymbol;
-  end else begin
-    Result := '';
+  Result := '';
+  if AId <> CEmptyDataGid then begin
+    xCur := ById[AId];
+    if xCur <> Nil then begin
+      Result := xCur.CurrSymbol;
+    end;
   end;
 end;
 
@@ -3752,6 +3760,7 @@ constructor TInstrumentValue.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
   FidInstrument := CEmptyDataGid;
+  FidInstrumentCurrencyDef := CEmptyDataGid;
 end;
 
 procedure TInstrumentValue.FromDataset(ADataset: TADOQuery);
@@ -3761,8 +3770,30 @@ begin
     Fdescription := FieldByName('description').AsString;
     FidInstrument := FieldByName('idInstrument').AsString;
     FregDateTime := FieldByName('regDateTime').AsDateTime;
-    FvalueOf := FieldByName('valueId').AsCurrency;
+    FvalueOf := FieldByName('valueOf').AsCurrency;
   end;
+end;
+
+function TInstrumentValue.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := '';
+  if AColumnIndex = 0 then begin
+    Result := DateTimeToStr(FregDateTime);
+  end else if AColumnIndex = 1 then begin
+    Result := GetDescText(Fdescription);
+  end else if AColumnIndex = 2 then begin
+    Result := CurrencyToString(FvalueOf, '', False);
+  end;
+end;
+
+function TInstrumentValue.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TInstrumentValue.GetElementText: String;
+begin
+  Result := Fdescription;
 end;
 
 procedure TInstrumentValue.Setdescription(const Value: TBaseDescription);

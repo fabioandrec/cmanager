@@ -693,6 +693,10 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Instrumenty'
     end
+    object ActionShortcutExch: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Notowania'
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

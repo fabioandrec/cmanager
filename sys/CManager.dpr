@@ -126,7 +126,8 @@ uses
   CChooseByParamsDefsFormUnit in 'CChooseByParamsDefsFormUnit.pas' {CChooseByParamsDefsForm},
   CValuelistFormUnit in 'CValuelistFormUnit.pas' {CValuelistForm},
   CInstrumentFrameUnit in 'CInstrumentFrameUnit.pas' {CInstrumentFrame: TFrame},
-  CInstrumentFormUnit in 'CInstrumentFormUnit.pas' {CInstrumentForm};
+  CInstrumentFormUnit in 'CInstrumentFormUnit.pas' {CInstrumentForm},
+  CInstrumentValueFrameUnit in 'CInstrumentValueFrameUnit.pas' {CInstrumentValueFrame: TFrame};
 
 {$R *.res}
 
@@ -172,7 +173,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
