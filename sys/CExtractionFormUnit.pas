@@ -510,7 +510,7 @@ begin
   if Column = 0 then begin
     CellText := IntToStr(Node.Index + 1);
   end else if Column = 1 then begin
-    CellText := DateToStr(xData.regTime);
+    CellText := Date2StrDate(xData.regTime);
   end else if Column = 2 then begin
     CellText := GetDescText(xData.description);
   end else if Column = 3 then begin

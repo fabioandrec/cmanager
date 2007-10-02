@@ -216,7 +216,7 @@ begin
       CellText := GetDescText(xData.done.description);
     end;
   end else if Column = 2 then begin
-    CellText := DateToStr(xData.triggerDate);
+    CellText := Date2StrDate(xData.triggerDate);
   end else if Column = 3 then begin
     if xData.done = Nil then begin
       CellText := CurrencyToString(xData.planned.cash, '', False);
@@ -584,9 +584,9 @@ begin
   if DoneList.FocusedNode <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
     if xData.planned.movementType = COutMovement then begin
-      Result := xData.planned.description + ' (p³atne do ' + DateToStr(xData.triggerDate) + ')';
+      Result := xData.planned.description + ' (p³atne do ' + Date2StrDate(xData.triggerDate) + ')';
     end else begin
-      Result := xData.planned.description + ' (wp³yw do ' + DateToStr(xData.triggerDate) + ')';
+      Result := xData.planned.description + ' (wp³yw do ' + Date2StrDate(xData.triggerDate) + ')';
     end;
   end;
 end;

@@ -52,7 +52,7 @@ function ShowLoanCalculator(ACanAccept: Boolean): TLoan;
 
 implementation
 
-uses CDatabase, CReports;
+uses CDatabase, CReports, CTools;
 
 {$R *.dfm}
 
@@ -165,7 +165,7 @@ begin
     CellText := xObj.caption;
   end else if Column = 1 then begin
     if Floan.IsSumObject(Floan.IndexOf(xObj)) then begin
-      CellText := DateToStr(xObj.date);
+      CellText := Date2StrDate(xObj.date);
     end else begin
       CellText := '';
     end;

@@ -13,8 +13,12 @@ program CManager;
 {%File 'CMandb_6_7.sql'}
 {%File 'CMandf.sql'}
 
+{$DEFINE FASTMM}
+
 uses
+  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
+  {$ENDIF}
   Forms,
   Windows,
   CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},

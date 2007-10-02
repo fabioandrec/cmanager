@@ -158,6 +158,7 @@ begin
   StepWaitForm(0, 'Zatwierdzanie zmian...');
   GDataProvider.CommitTransaction;
   xCurdefs.Free;
+  xCashpoints.Free;
   GDataProvider.BeginTransaction;
   xRateCashpointId := GDataProvider.GetSqlString('select idCashpoint from cashpoint where name = ''NBP''', CEmptyDataGid);
   if xRateCashpointId = CEmptyDataGid then begin
@@ -223,6 +224,7 @@ begin
   StepWaitForm(0, 'Zatwierdzanie zmian...');
   GDataProvider.CommitTransaction;
   xCurdefs.Free;
+  xInstdefs.Free;
   InitWaitForm('Trwa generowanie danych...', 0, DaysBetween(ADateFrom, ADateTo));
   xDate := ADateFrom;
   xAccounts := TAccount.GetList(TAccount, AccountProxy, 'select * from account');

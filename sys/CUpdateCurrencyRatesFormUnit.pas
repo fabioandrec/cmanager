@@ -236,7 +236,7 @@ begin
   if CStaticCashpoint.DataId <> CEmptyDataGid then begin
     if GDataProvider.GetSqlInteger(Format('select count(*) from currencyRate where bindingDate = %s and idCashpoint = %s',
       [DatetimeToDatabase(FBindingDate, False), DataGidToDatabase(CStaticCashpoint.DataId)]), 0) > 0 then begin
-      xProceed := ShowInfo(itQuestion, 'Istniej¹ ju¿ kursy walut w/g "' + FCashpointName + '" z dat¹ obowi¹zywania ' + DateToStr(FBindingDate) + '\n' + 
+      xProceed := ShowInfo(itQuestion, 'Istniej¹ ju¿ kursy walut w/g "' + FCashpointName + '" z dat¹ obowi¹zywania ' + Date2StrDate(FBindingDate) + '\n' +
                                        'Czy chcesz je uzupe³niæ ?', '');
     end else begin
       xProceed := True;

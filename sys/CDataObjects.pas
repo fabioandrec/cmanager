@@ -756,9 +756,8 @@ type
     FidInstrument: TDataGid;
     FregDateTime: TDateTime;
     FvalueOf: Currency;
-    FidInstrumentCurrencyDef: TDataGid;
     FinstrumentType: TBaseEnumeration;
-    FinstrumentName: TBaseName;
+    FidCurrencyDef: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetregDateTime(const Value: TDateTime);
@@ -775,6 +774,8 @@ type
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
     property regDateTime: TDateTime read FregDateTime write SetregDateTime;
     property valueOf: Currency read FvalueOf write SetvalueOf;
+    property instrumentType: TBaseEnumeration read FinstrumentType;
+    property idCurrencyDef: TDataGid read FidCurrencyDef;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -924,7 +925,7 @@ begin
   UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef');
   ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef');
   InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument');
-  InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue');
+  InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'StnInstrumentValue');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -2787,7 +2788,7 @@ end;
 function TCurrencyRate.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
   if AColumnIndex = 0 then begin
-    Result := DateToStr(FbindingDate);
+    Result := Date2StrDate(FbindingDate);
   end else if AColumnIndex = 1 then begin
     Result := GetDescText(Fdescription);
   end else if AColumnIndex = 3 then begin
@@ -3226,7 +3227,7 @@ end;
 function TExtractionItem.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
 begin
   if AColumnIndex = 1 then begin
-    Result := DateToStr(FregDate);
+    Result := Date2StrDate(FregDate);
   end else if AColumnIndex = 2 then begin
     Result := GetDescText(Fdescription);
   end else if AColumnIndex = 3 then begin
@@ -3365,13 +3366,13 @@ begin
       Result := CExtractionStateStatedDescription;
     end;
   end else if AColumnIndex = 3 then begin
-    Result := DateToStr(FendDate);
+    Result := Date2StrDate(FendDate);
   end else if AColumnIndex = 2 then begin
-    Result := DateToStr(FstartDate);
+    Result := Date2StrDate(FstartDate);
   end else if AColumnIndex = 1 then begin
     Result := GetDescText(Fdescription);
   end else begin
-    Result := DateToStr(FregDate);
+    Result := Date2StrDate(FregDate);
   end;
 end;
 
@@ -3760,7 +3761,6 @@ constructor TInstrumentValue.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
   FidInstrument := CEmptyDataGid;
-  FidInstrumentCurrencyDef := CEmptyDataGid;
 end;
 
 procedure TInstrumentValue.FromDataset(ADataset: TADOQuery);
@@ -3771,6 +3771,8 @@ begin
     FidInstrument := FieldByName('idInstrument').AsString;
     FregDateTime := FieldByName('regDateTime').AsDateTime;
     FvalueOf := FieldByName('valueOf').AsCurrency;
+    FinstrumentType := FieldByName('instrumentType').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
   end;
 end;
 
@@ -3778,11 +3780,13 @@ function TInstrumentValue.GetColumnText(AColumnIndex: Integer; AStatic: Boolean)
 begin
   Result := '';
   if AColumnIndex = 0 then begin
-    Result := DateTimeToStr(FregDateTime);
+    Result := Date2StrDate(FregDateTime, True);
   end else if AColumnIndex = 1 then begin
     Result := GetDescText(Fdescription);
   end else if AColumnIndex = 2 then begin
     Result := CurrencyToString(FvalueOf, '', False);
+  end else if AColumnIndex = 3 then begin
+    Result := GCurrencyCache.GetSymbol(idCurrencyDef);
   end;
 end;
 

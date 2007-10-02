@@ -94,6 +94,7 @@ function CurrencyToDatabase(ACurrency: Currency): String;
 function TrimStr(AStr: String; AUnwanted: String): String;
 function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
+function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
 
 implementation
 
@@ -671,6 +672,15 @@ begin
     Result := Result + xStr.Strings[xCount] + IfThen(xCount < xStr.Count - 1, sLineBreak, '');
   end;
   xStr.Free;
+end;
+
+function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
+begin
+  if AWithTime then begin
+    DateTimeToString(Result, ShortDateFormat + ' hh:nn', ADateTime);
+  end else begin
+    Result := DateToStr(ADateTime);
+  end;
 end;
 
 end.

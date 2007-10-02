@@ -120,12 +120,10 @@ end;
 function TCInstrumentValueFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 var xDf, xDt: TDateTime;
 begin
-  {
   GetFilterDates(xDf, xDt);
   Result := (inherited IsValidFilteredObject(AObject)) and
             (xDf <= TInstrumentValue(AObject).regDateTime) and (TInstrumentValue(AObject).regDateTime <= xDt)
             and ((CStaticFilter.DataId = CFilterAllElements) or (TInstrumentValue(AObject).instrumentType = CStaticFilter.DataId));
-  }
 end;
 
 procedure TCInstrumentValueFrame.ReloadDataobjects;
@@ -137,12 +135,12 @@ begin
     xCondition := '';
   end else begin
     GetFilterDates(xDf, xDt);
-    xCondition := Format(' where v.regDateTime between %s and %s', [DatetimeToDatabase(xDf, True), DatetimeToDatabase(xDt, True)]);
+    xCondition := Format(' where regDateTime between %s and %s', [DatetimeToDatabase(xDf, True), DatetimeToDatabase(xDt, True)]);
   end;
   if CStaticFilter.DataId <> CFilterAllElements then begin
-    xCondition := xCondition + ' and i.instrumentType = ''' + CStaticFilter.DataId + '''';
+    xCondition := xCondition + ' and instrumentType = ''' + CStaticFilter.DataId + '''';
   end;
-  Dataobjects := TInstrumentValue.GetList(TInstrumentValue, InstrumentValueProxy, 'select v.* from instrumentValue v left join instrument i on i.idinstrument = v.idinstrument' + xCondition);
+  Dataobjects := TInstrumentValue.GetList(TInstrumentValue, InstrumentValueProxy, 'select * from StnInstrumentValue ' + xCondition);
 end;
 
 procedure TCInstrumentValueFrame.UpdateCustomPeriod;

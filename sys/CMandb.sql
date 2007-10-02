@@ -413,6 +413,10 @@ create view filters as
     left join cashpointFilter c on c.idMovementFilter = m.idMovementFilter)
     left join productFilter p on p.idMovementFilter = m.idMovementFilter);
 
+create view StnInstrumentValue as
+  select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
+  left join instrument i on i.idInstrument = v.idInstrument;
+
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);
 create index ix_baseMovement_movementType on baseMovement (movementType);

@@ -266,10 +266,10 @@ begin
     xPlan := TPlannedMovement(xAdd.planned);
     if xPlan.movementType = CInMovement then begin
       ComboBoxType.ItemIndex := 4;
-      xText := xPlan.description + ' (wp造w do ' + DateToStr(xAdd.triggerDate) + ')'
+      xText := xPlan.description + ' (wp造w do ' + Date2StrDate(xAdd.triggerDate) + ')'
     end else if xPlan.movementType = COutMovement then begin
       ComboBoxType.ItemIndex := 3;
-      xText := xPlan.description + ' (p豉tne do ' + DateToStr(xAdd.triggerDate) + ')'
+      xText := xPlan.description + ' (p豉tne do ' + Date2StrDate(xAdd.triggerDate) + ')'
     end;
     CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
     CStaticInoutCyclic.Caption := xText;
@@ -566,9 +566,9 @@ begin
         xD := TPlannedDone(TPlannedDone.LoadObject(PlannedDoneProxy, idPlannedDone, False));
         xM := TPlannedMovement(TPlannedMovement.LoadObject(PlannedMovementProxy, xD.idPlannedMovement, False));
         if movementType = COutMovement then begin
-          CStaticInoutCyclic.Caption := xM.description + ' (p豉tne do ' + DateToStr(xD.triggerDate) + ')';
+          CStaticInoutCyclic.Caption := xM.description + ' (p豉tne do ' + Date2StrDate(xD.triggerDate) + ')';
         end else begin
-          CStaticInoutCyclic.Caption := xM.description + ' (wp造w do ' + DateToStr(xD.triggerDate) + ')'
+          CStaticInoutCyclic.Caption := xM.description + ' (wp造w do ' + Date2StrDate(xD.triggerDate) + ')'
         end;
         CStaticInOutCyclicCurrencyAccount.DataId := idAccountCurrencyDef;
         CStaticInOutCyclicCurrencyAccount.Caption := GCurrencyCache.GetIso(idAccountCurrencyDef);

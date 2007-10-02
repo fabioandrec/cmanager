@@ -162,7 +162,7 @@ const
   CInstrumentTypeFund = 'F';
 
   CInstrumentTypeIndexDesc = 'Indeks gie³dowy';
-  CInstrumentTypeStockDesc = 'akcje';
+  CInstrumentTypeStockDesc = 'Akcje';
   CInstrumentTypeBondDesc = 'Obligacje';
   CInstrumentTypeFundDesc = 'Fundusz inwestycyjny';
 

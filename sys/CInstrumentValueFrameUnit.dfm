@@ -102,8 +102,8 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
     Columns = <
       item
         Position = 0
-        Width = 250
-        WideText = 'Data/Czas notowania'
+        Width = 170
+        WideText = 'Data i czas'
       end
       item
         Position = 1
@@ -113,7 +113,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       item
         Alignment = taRightJustify
         Position = 2
-        Width = 10
+        Width = 150
         WideText = 'Warto'#347#263
       end
       item

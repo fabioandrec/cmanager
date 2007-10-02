@@ -155,7 +155,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts, CDataobjectFrameUnit,
   CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
-  CInstrumentValueFrameUnit;
+  CInstrumentValueFrameUnit, CTools;
 
 {$R *.dfm}
 
@@ -390,7 +390,7 @@ begin
   PanelNotconnected.Align := alClient;
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
-    Caption := 'CManager - obs³uga finansów (na dzieñ ' + DateToStr(GWorkDate) + ')';
+    Caption := 'CManager - obs³uga finansów (na dzieñ ' + Date2StrDate(GWorkDate) + ')';
     StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
   end else begin
     Caption := 'CManager - obs³uga finansów';

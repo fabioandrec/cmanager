@@ -934,7 +934,7 @@ begin
           xOut := '';
         end;
         Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
-        Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+        Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
         Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
         Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
         Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName(xFieldC).AsString) + '</td>');
@@ -1097,7 +1097,7 @@ begin
           xDate := xElement.triggerDate;
         end;
         Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
-        Add('<td class="text" width="15%">' + DateToStr(xDate) + '</td>');
+        Add('<td class="text" width="15%">' + Date2StrDate(xDate) + '</td>');
         Add('<td class="text" width="30%">' + xDesc + '</td>');
         Add('<td class="text" width="20%">' + xStat + '</td>');
         Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(xIdCurrency) + '</td>');
@@ -1277,7 +1277,7 @@ begin
     while not Eof do begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="25%">' + FieldByName('sourcename').AsString + '</td>');
       Add('<td class="text" width="25%">' + FieldByName('destname').AsString + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
@@ -1341,7 +1341,7 @@ begin
     Add('</table><hr><table class="base" colspan=6>');
     Add('<tr class="sum">');
     Add('<td class="sumtext" width="5%"></td>');
-    Add('<td class="sumtext" width="15%">' + DateToStr(FStartDate) + '</td>');
+    Add('<td class="sumtext" width="15%">' + Date2StrDate(FStartDate) + '</td>');
     Add('<td class="sumtext" width="40%">Stan pocz¹tkowy</td>');
     Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xAccountCurrencyDef) + '</td>');
     Add('<td class="sumtext" width="15%"></td>');
@@ -1351,7 +1351,7 @@ begin
     while not Eof do begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="40%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idMovementCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('movementCash').AsCurrency, '', False) + '</td>');
@@ -1363,7 +1363,7 @@ begin
     Add('</table><hr><table class="base" colspan=6>');
     Add('<tr class="sum">');
     Add('<td class="sumtext" width="5%"></td>');
-    Add('<td class="sumtext" width="15%">' + DateToStr(FEndDate) + '</td>');
+    Add('<td class="sumtext" width="15%">' + Date2StrDate(FEndDate) + '</td>');
     Add('<td class="sumtext" width="40%">Stan koñcowy</td>');
     Add('<td class="sumcash" width="10%">' + GCurrencyCache.GetSymbol(xAccountCurrencyDef) + '</td>');
     Add('<td class="sumtext" width="15%"></td>');
@@ -1729,7 +1729,7 @@ begin
       xCash := Abs(FieldByName(xFieldR).AsCurrency);
       xSums.AddSum(FieldByName(xFieldC).AsString, xCash, CEmptyDataGid);
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="40%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName(xFieldC).AsString) + '</td>');
@@ -3218,7 +3218,7 @@ begin
         Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
         Add('<td class="text" width="5%">' + IntToStr(xCount + 1) + '</td>');
         if xL.firstDay <> 0 then begin
-          Add('<td class="text" width="20%">' + DateToStr(xL.Items[xCount].date) + '</td>');
+          Add('<td class="text" width="20%">' + Date2StrDate(xL.Items[xCount].date) + '</td>');
         end;
         Add('<td class="cash" width="25%">' + CurrencyToString(xL.Items[xCount].payment, '', False) + '</td>');
         Add('<td class="cash" width="' + IntToStr(IfThen(xL.firstDay <> 0, 15, 20)) + '%">' + CurrencyToString(xL.Items[xCount].principal, '', False) + '</td>');
@@ -3614,7 +3614,7 @@ begin
     while not Eof do begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '30', '25') + '%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '25', '20') + '%">' + ReplaceLinebreaksBR(FieldByName('descriptionSecond').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
@@ -4029,8 +4029,8 @@ begin
       xCashStr := CurrencyToString(xCash, '', False);
       xSum.AddSum(FieldByName('idCurrencyDef').AsString, xCash, CEmptyDataGid);
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="15%">' + DateToStr(FieldByName('accountingDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
+      Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('accountingDate').AsDateTime) + '</td>');
       Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + xCashStr + '</td>');

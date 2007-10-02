@@ -25,3 +25,7 @@ create table instrumentValue (
   primary key (idInstrumentValue),
   constraint fk_instrumentValueInstrument foreign key (idInstrument) references instrument (idInstrument)
 );
+
+create view StnInstrumentValue as
+  select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
+  left join instrument i on i.idInstrument = v.idInstrument;

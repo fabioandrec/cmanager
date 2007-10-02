@@ -73,7 +73,7 @@ function GetSchedule(ASchedule: TSchedule): Boolean;
 
 implementation
 
-uses StrUtils, Math, DateUtils, CInfoFormUnit, CConsts;
+uses StrUtils, Math, DateUtils, CInfoFormUnit, CConsts, CTools;
 
 {$R *.dfm}
 
@@ -103,13 +103,13 @@ function TSchedule.GetAsString: String;
 var xDayNumber: Integer;
 begin
   if FscheduleType = CScheduleTypeOnce then begin
-    Result := 'Jednorazowo, ' + DateToStr(FscheduleDate);
+    Result := 'Jednorazowo, ' + Date2StrDate(FscheduleDate);
   end else begin
-    Result := 'Cyklicznie, od ' + DateToStr(FscheduleDate);
+    Result := 'Cyklicznie, od ' + Date2StrDate(FscheduleDate);
     if FendCondition = CEndConditionTimes then begin
       Result := Result + ', ' + IntToStr(FendCount) + ' raz/y';
     end else if FendCondition = CEndConditionDate then begin
-      Result := Result + ', do ' + DateToStr(FendDate);
+      Result := Result + ', do ' + Date2StrDate(FendDate);
     end;
     if FtriggerType = CTriggerTypeWeekly then begin
       xDayNumber := FtriggerDay + 2;

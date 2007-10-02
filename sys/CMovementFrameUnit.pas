@@ -327,7 +327,7 @@ begin
   end else if Column = 1 then begin
     CellText := GetDescText(xData.description);
   end else if Column = 2 then begin
-    CellText := DateToStr(xData.regDate);
+    CellText := Date2StrDate(xData.regDate);
   end else if Column = 3 then begin
     CellText := CurrencyToString(xData.cash, xData.idCurrencyDef, False);
   end else if Column = 4 then begin

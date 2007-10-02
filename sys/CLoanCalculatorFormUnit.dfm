@@ -160,6 +160,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         OnChange = CCurrEditCashChange
         Decimals = 2
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
@@ -173,6 +174,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         OnChange = CCurrEditCashChange
         Decimals = 2
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end

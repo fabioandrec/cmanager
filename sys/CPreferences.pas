@@ -1061,6 +1061,8 @@ initialization
     backupDirectory := ExpandFileName(ExtractFilePath(ParamStr(0)));
     backupFileName := '@data@ @godz@ @min@.cmb';
     backupOverwrite := False;
+    evenListColor := clWindow;
+    oddListColor := GetHighLightColor(FevenListColor, -10);
   end;
 finalization
   if GBackupThread <> Nil then begin
