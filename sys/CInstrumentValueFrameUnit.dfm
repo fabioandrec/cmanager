@@ -49,6 +49,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
+      Withtime = False
     end
     object CDateTimePerEnd: TCDateTime
       Left = 376
@@ -67,6 +68,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       Transparent = False
       OnChanged = CDateTimePerEndChanged
       HotTrack = True
+      Withtime = False
     end
     object CStaticPeriod: TCStatic
       Left = 291
@@ -123,6 +125,19 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       end>
     WideDefaultText = ''
   end
+  inherited ButtonPanel: TPanel
+    inherited CButtonAdd: TCButton
+      Width = 124
+    end
+    inherited CButtonEdit: TCButton
+      Left = 141
+      Width = 132
+    end
+    inherited CButtonDelete: TCButton
+      Left = 269
+      Width = 124
+    end
+  end
   inherited ListPopupMenu: TPopupMenu
     Left = 112
     Top = 88
@@ -130,13 +145,13 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
   inherited ActionListButtons: TActionList
     Images = CImageLists.CurrencyRateImageList24x24
     inherited ActionAdd: TAction
-      Caption = 'Dodaj kurs'
+      Caption = 'Dodaj notowanie'
     end
     inherited ActionEdit: TAction
-      Caption = 'Edytuj kurs'
+      Caption = 'Edytuj notowanie'
     end
     inherited ActionDelete: TAction
-      Caption = 'Usu'#324' kurs'
+      Caption = 'Usu'#324' notowanie'
     end
   end
 end

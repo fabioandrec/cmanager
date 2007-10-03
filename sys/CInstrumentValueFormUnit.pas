@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, Contnrs;
+  ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, Contnrs, CDataObjects,
+  CBaseFrameUnit, CDatabase;
 
 type
   TCInstrumentValueForm = class(TCDataobjectForm)
@@ -32,6 +33,11 @@ type
   private
     procedure UpdateDescription;
   protected
+    procedure ReadValues; override;
+    function GetDataobjectClass: TDataObjectClass; override;
+    procedure FillForm; override;
+    function CanAccept: Boolean; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure InitializeForm; override;
   public
     function ExpandTemplate(ATemplate: String): String; override;
@@ -40,8 +46,9 @@ type
 implementation
 
 uses CTemplates, CDescpatternFormUnit, CConsts, CPreferences, CRichtext,
-  CInstrumentFrameUnit, CFrameFormUnit, CDatabase, CTools, CDataObjects,
-  DateUtils;
+  CInstrumentFrameUnit, CFrameFormUnit, CTools, DateUtils,
+  CInstrumentValueFrameUnit, CInstrumentFormUnit, CInfoFormUnit, Math,
+  CConfigFormUnit;
 
 {$R *.dfm}
 
@@ -137,6 +144,53 @@ begin
       end;
       GDataProvider.RollbackTransaction;
     end;
+  end;
+end;
+
+function TCInstrumentValueForm.CanAccept: Boolean;
+begin
+  Result := inherited CanAccept;
+  if CStaticInstrument.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano instrumentu inswestycyjnego. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticInstrument.DoGetDataId;
+    end;
+  end;
+end;
+
+procedure TCInstrumentValueForm.FillForm;
+begin
+  with TInstrumentValue(Dataobject) do begin
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
+    CDateTime.Value := regDateTime;
+    CCurrEditValue.Value := valueOf;
+    CStaticInstrument.DataId := idInstrument;
+    CStaticInstrument.Caption := TInstrument(TInstrument.LoadObject(InstrumentProxy, idInstrument, False)).GetElementText;
+    if idCurrencyDef <> CEmptyDataGid then begin
+      CCurrEditValue.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
+    end;
+    SimpleRichText(description, RichEditDesc);
+  end;
+end;
+
+function TCInstrumentValueForm.GetDataobjectClass: TDataObjectClass;
+begin
+  Result := TInstrumentValue;
+end;
+
+function TCInstrumentValueForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCInstrumentValueFrame;
+end;
+
+procedure TCInstrumentValueForm.ReadValues;
+begin
+  inherited ReadValues;
+  with TInstrumentValue(Dataobject) do begin
+    description := RichEditDesc.Text;
+    idInstrument := CStaticInstrument.DataId;
+    regDateTime := CDateTime.Value;
+    valueOf := CCurrEditValue.Value;
   end;
 end;
 

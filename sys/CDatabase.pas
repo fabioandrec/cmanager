@@ -840,11 +840,11 @@ var xSelect: String;
     xProxy: TDataProxy;
 begin
   xSelect := FSelectTableName;
-  xWhere := FSelectTableName + '.id' + FSelectTableName + ' = ''' + AId + '''';
+  xWhere := FSelectTableName + '.id' + TableName + ' = ''' + AId + '''';
   xProxy := FParentDataProxy;
   while (xProxy <> Nil) do begin
     xSelect := xSelect + ', ' + xProxy.SelectTableName;
-    xWhere := xWhere + ' and ' + xProxy.SelectTableName + '.id' + xProxy.SelectTableName + ' = ''' + AId + '''';
+    xWhere := xWhere + ' and ' + xProxy.SelectTableName + '.id' + xProxy.TableName + ' = ''' + AId + '''';
     xProxy := xProxy.ParentDataProxy;
   end;
   Result := DataProvider.OpenSql('select * from ' + xSelect + ' where ' + xWhere);

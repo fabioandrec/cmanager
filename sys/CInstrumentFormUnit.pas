@@ -45,6 +45,7 @@ uses CConsts, CInstrumentFrameUnit, CRichtext, CInfoFormUnit,
 function TCInstrumentForm.CanAccept: Boolean;
 var xIns: TInstrument;
 begin
+  Result := inherited CanAccept;
   if Trim(EditName.Text) = '' then begin
     Result := False;
     ShowInfo(itError, 'Nazwa instrumentu inwestycyjnego nie mo¿e byæ pusta', '');

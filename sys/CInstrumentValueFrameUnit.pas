@@ -101,7 +101,7 @@ end;
 
 class function TCInstrumentValueFrame.GetTitle: String;
 begin
-  Result := 'Kursy walut';
+  Result := 'Notowania instrumentów inwestycyjnych';
 end;
 
 procedure TCInstrumentValueFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
