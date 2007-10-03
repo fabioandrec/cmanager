@@ -42,7 +42,7 @@ implementation
 
 uses CDataObjects, CConsts, DateUtils,
   CFrameFormUnit, CLimitsFrameUnit, CListFrameUnit, CBaseFrameUnit,
-  CPluginConsts, CTools;
+  CPluginConsts, CTools, CInstrumentValueFormUnit;
 
 {$R *.dfm}
 
@@ -53,7 +53,7 @@ end;
 
 function TCInstrumentValueFrame.GetDataobjectForm(AOption: Integer): TCDataobjectFormClass;
 begin
-  Result := Nil;
+  Result := TCInstrumentValueForm;
 end;
 
 class function TCInstrumentValueFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;

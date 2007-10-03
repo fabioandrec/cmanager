@@ -16,9 +16,7 @@ program CManager;
 {$DEFINE FASTMM}
 
 uses
-  {$IFDEF DEBUG}
   MemCheck in 'MemCheck.pas',
-  {$ENDIF}
   Forms,
   Windows,
   CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},
@@ -131,7 +129,8 @@ uses
   CValuelistFormUnit in 'CValuelistFormUnit.pas' {CValuelistForm},
   CInstrumentFrameUnit in 'CInstrumentFrameUnit.pas' {CInstrumentFrame: TFrame},
   CInstrumentFormUnit in 'CInstrumentFormUnit.pas' {CInstrumentForm},
-  CInstrumentValueFrameUnit in 'CInstrumentValueFrameUnit.pas' {CInstrumentValueFrame: TFrame};
+  CInstrumentValueFrameUnit in 'CInstrumentValueFrameUnit.pas' {CInstrumentValueFrame: TFrame},
+  CInstrumentValueFormUnit in 'CInstrumentValueFormUnit.pas' {CInstrumentValueForm};
 
 {$R *.res}
 
@@ -177,7 +176,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

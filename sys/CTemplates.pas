@@ -43,6 +43,7 @@ var GBaseTemlatesList: TDescTemplateList;
     GCurrencydefTemplatesList: TDescTemplateList;
     GAccountExtractionTemplatesList: TDescTemplateList;
     GExtractionItemTemplatesList: TDescTemplateList;
+    GInstrumentValueTemplatesList: TDescTemplateList;
 
 implementation
 
@@ -105,6 +106,7 @@ initialization
   GPlannedMovementTemplatesList := TDescTemplateList.Create('Mnemoniki planowanych operacji');
   GMovementListElementsTemplatesList := TDescTemplateList.Create('Mnemoniki elementów listy operacji');
   GCurrencydefTemplatesList := TDescTemplateList.Create('Mnemoniki kursów walut');
+  GInstrumentValueTemplatesList := TDescTemplateList.Create('Mnemoniki notowañ instrumentów inwestycyjnych');
   with GBaseTemlatesList do begin
     AddTemplate('@godz@', 'aktualna godzina w formacie HH');
     AddTemplate('@min@', 'aktualna minuta w formacie MM');
@@ -191,7 +193,14 @@ initialization
     AddTemplate('@konto@', 'nazwa konta, którego dotyczy wyci¹g');
     AddTemplate('@status@', 'status wyci¹gu');
   end;
+  with GInstrumentValueTemplatesList do begin
+    AddTemplate('@datanotowania@', 'data notowania w formacie RRRR-MM-DD');
+    AddTemplate('@dataczasnotowania@', 'data i czas notowania w formacie RRRR-MM-DD HH:MM');
+    AddTemplate('@instrument@', 'nazwa instrumentu inwestycyjnego');
+    AddTemplate('@rodzaj@', 'rodzaj instrumentu inwestycyjnego');
+  end;
 finalization
+  GInstrumentValueTemplatesList.Free;
   GMovementListElementsTemplatesList.Free;
   GBaseTemlatesList.Free;
   GPlannedMovementTemplatesList.Free;

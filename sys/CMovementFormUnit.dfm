@@ -1,6 +1,6 @@
 inherited CMovementForm: TCMovementForm
-  Left = 264
-  Top = 53
+  Left = 357
+  Top = 220
   Caption = 'Operacja'
   ClientHeight = 607
   ClientWidth = 536
@@ -68,6 +68,7 @@ inherited CMovementForm: TCMovementForm
         Transparent = False
         OnChanged = CDateTimeChanged
         HotTrack = True
+        Withtime = False
       end
     end
     object GroupBox2: TGroupBox
@@ -893,7 +894,7 @@ inherited CMovementForm: TCMovementForm
   object ActionManager: TActionManager
     Images = CImageLists.TemplateImageList16x16
     Left = 32
-    Top = 178
+    Top = 184
     StyleName = 'XP Style'
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'

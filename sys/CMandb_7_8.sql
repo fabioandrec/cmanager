@@ -29,3 +29,5 @@ create table instrumentValue (
 create view StnInstrumentValue as
   select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
   left join instrument i on i.idInstrument = v.idInstrument;
+  
+insert into cmanagerParams (paramName, paramValue) values ('InstrumentValue', '@instrument@');

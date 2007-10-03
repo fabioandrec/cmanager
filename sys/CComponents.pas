@@ -42,6 +42,7 @@ type
     property OnClick;
     property Color;
     property Font;
+    property OnMouseDown;
   end;
 
   TCImage = class(TGraphicControl)
@@ -113,8 +114,10 @@ type
     FOldColor: TColor;
     FInternalIsFocused: Boolean;
     FCanvas: TCanvas;
+    FWithtime: Boolean;
     procedure SetValue(const Value: TDateTime);
     procedure UpdateCaption;
+    procedure SetWithtime(const Value: Boolean);
   protected
     procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
     procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
@@ -131,6 +134,7 @@ type
     property Value: TDateTime read FValue write SetValue;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property HotTrack: Boolean read FHotTrack write FHotTrack;
+    property Withtime: Boolean read FWithtime write SetWithtime;
   end;
 
   TCEditError = class(Exception);
@@ -1196,9 +1200,9 @@ begin
   if HotTrack then begin
     xDate := FValue;
     if FValue = 0 then begin
-      xDate := Today;
+      xDate := Now;
     end;
-    if ShowCalendar(Self, xDate) then begin
+    if ShowCalendar(Self, xDate, FWithtime) then begin
       Value := xDate;
       if Assigned(FOnChanged) then begin
         FOnChanged(Self);
@@ -1238,6 +1242,7 @@ begin
   ParentColor := False;
   Color := clWindow;
   FValue := 0;
+  FWithtime := False;
   FOnChanged := Nil;
   UpdateCaption;
   FHotTrack := True;
@@ -1278,17 +1283,27 @@ end;
 procedure TCDateTime.SetValue(const Value: TDateTime);
 begin
   if FValue <> Value then begin
-    FValue := DateOf(Value);
+    if FWithtime then begin
+      FValue := Value;
+    end else begin
+      FValue := DateOf(Value);
+    end;
     UpdateCaption;
   end;
+end;
+
+procedure TCDateTime.SetWithtime(const Value: Boolean);
+begin
+  FWithtime := Value;
+  UpdateCaption;
 end;
 
 procedure TCDateTime.UpdateCaption;
 begin
   if FValue <> 0 then begin
-    Caption := FormatDateTime('yyyy-mm-dd', FValue);
+    Caption := FormatDateTime('yyyy-mm-dd' + IfThen(FWithtime, ' hh:nn', ''), FValue);
   end else begin
-    Caption := '<wybierz datê>';
+    Caption := '<wybierz datê ' + IfThen(FWithtime, ' i czas', '') + '>';
   end;
 end;
 

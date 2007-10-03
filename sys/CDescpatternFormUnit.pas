@@ -139,6 +139,8 @@ begin
     xData.Add(GAccountExtractionTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 6 then begin
     xData.Add(GExtractionItemTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 7 then begin
+    xData.Add(GInstrumentValueTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;
