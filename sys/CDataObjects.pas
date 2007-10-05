@@ -742,6 +742,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
     class function FindByName(AName: TBaseName): TInstrument;
+    class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -769,6 +770,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
+    class function FindValue(AIdInstrument: TDataGid; ADateTime: TDateTime): TInstrumentValue;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
@@ -932,6 +934,7 @@ class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlInteger('select count(*) from account where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim konta bankowe';
   end else if GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
@@ -942,6 +945,8 @@ begin
     xText := 'istniej¹ zwi¹zane z nim filtry';
   end else if GDataProvider.GetSqlInteger('select count(*) from profile where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim profile';
+  end else if GDataProvider.GetSqlInteger('select count(*) from instrument where idCashPoint = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim instrumenty inwestycyjne';
   end;
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ kontrahenta, gdy¿ ' + xText, '');
@@ -1074,6 +1079,7 @@ class function TProduct.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ zaplanowane operacje';
   end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idProduct = ' + DataGidToDatabase(AId), 0) <> 0 then begin
@@ -1376,6 +1382,7 @@ class function TPlannedMovement.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlInteger('select count(*) from plannedDone where idPlannedMovement = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ operacje wykonane';
   end;
@@ -1701,6 +1708,7 @@ class function TAccount.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim zaplanowane operacje';
   end else if GDataProvider.GetSqlInteger('select count(*) from baseMovement where idAccount = ' + DataGidToDatabase(AId), 0) <> 0 then begin
@@ -1741,6 +1749,7 @@ class function TMovementFilter.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlInteger('select count(*) from movementLimit where idmovementFilter = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z nim limity';
   end;
@@ -2587,6 +2596,7 @@ class function TCurrencyDef.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlBoolean('select isBase from currencyDef where idCurrencyDef = ' + DataGidToDatabase(AId), False) then begin
     xText := 'jest ona walut¹ podstawow¹';
   end else if GDataProvider.GetSqlInteger('select count(*) from currencyRate where ' +
@@ -2595,6 +2605,8 @@ begin
     xText := 'istniej¹ zwi¹zane z ni¹ kursy';
   end else if GDataProvider.GetSqlInteger('select count(*) from account where idCurrencyDef = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ konta';
+  end else if GDataProvider.GetSqlInteger('select count(*) from instrument where idCurrencyDef = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z ni¹ instrumenty inwestycyjne';
   end;
   if xText <> '' then begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ waluty, gdy¿ ' + xText, '');
@@ -3494,6 +3506,7 @@ class function TUnitDef.CanBeDeleted(AId: ShortString): Boolean;
 var xText: String;
 begin
   Result := True;
+  xText := '';
   if GDataProvider.GetSqlInteger('select count(*) from product where idUnitDef = ' + DataGidToDatabase(AId), 0) <> 0 then begin
     xText := 'istniej¹ zwi¹zane z ni¹ kategorie';
   end;
@@ -3763,6 +3776,15 @@ begin
   FidInstrument := CEmptyDataGid;
 end;
 
+class function TInstrumentValue.FindValue(AIdInstrument: TDataGid; ADateTime: TDateTime): TInstrumentValue;
+var xSql: String;
+begin
+  xSql := Format('select * from StnInstrumentValue where regDateTime = %s and idInstrument = %s',
+                 [DatetimeToDatabase(DateTimeUptoMinutes(ADateTime), True),
+                  DataGidToDatabase(AIdInstrument)]);
+  Result := TInstrumentValue(TInstrumentValue.FindByCondition(InstrumentValueProxy, xSql, False));
+end;
+
 procedure TInstrumentValue.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -3838,8 +3860,22 @@ begin
   with DataFieldList do begin
     AddField('description', Fdescription, True, 'instrumentValue');
     AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'instrumentValue');
-    AddField('regDateTime', DatetimeToDatabase(FregDateTime, True), False, 'instrumentValue');
+    AddField('regDateTime', DatetimeToDatabase(DateTimeUptoMinutes(FregDateTime), True), False, 'instrumentValue');
     AddField('valueOf', CurrencyToDatabase(FvalueOf), False, 'instrumentValue');
+  end;
+end;
+
+class function TInstrument.CanBeDeleted(AId: ShortString): Boolean;
+var xText: String;
+begin
+  Result := True;
+  xText := '';
+  if GDataProvider.GetSqlInteger('select count(*) from instrumentValue where idInstrument = ' + DataGidToDatabase(AId), 0) <> 0 then begin
+    xText := 'istniej¹ zwi¹zane z nim notowania';
+  end;
+  if xText <> '' then begin
+    ShowInfo(itError, 'Nie mo¿na usun¹æ instrumentu inwestycyjnego, gdy¿ ' + xText, '');
+    Result := False;
   end;
 end;
 

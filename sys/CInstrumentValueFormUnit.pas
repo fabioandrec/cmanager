@@ -31,6 +31,7 @@ type
     procedure CStaticInstrumentChanged(Sender: TObject);
     procedure CDateTimeChanged(Sender: TObject);
   private
+    FValueToReplaceId: TDataGid;
     procedure UpdateDescription;
   protected
     procedure ReadValues; override;
@@ -39,6 +40,7 @@ type
     function CanAccept: Boolean; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure InitializeForm; override;
+    procedure AfterCommitData; override;
   public
     function ExpandTemplate(ATemplate: String): String; override;
   end;
@@ -73,6 +75,7 @@ end;
 procedure TCInstrumentValueForm.InitializeForm;
 begin
   inherited InitializeForm;
+  FValueToReplaceId := CEmptyDataGid;
   CDateTime.Value := GWorkDate + TimeOf(Now);
   CCurrEditValue.SetCurrencyDef(CEmptyDataGid, '');
   UpdateDescription;
@@ -148,6 +151,8 @@ begin
 end;
 
 function TCInstrumentValueForm.CanAccept: Boolean;
+var xValue: TInstrumentValue;
+    xText: String;
 begin
   Result := inherited CanAccept;
   if CStaticInstrument.DataId = CEmptyDataGid then begin
@@ -155,6 +160,18 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano instrumentu inswestycyjnego. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticInstrument.DoGetDataId;
     end;
+  end else begin
+    GDataProvider.BeginTransaction;
+    xValue := TInstrumentValue.FindValue(CStaticInstrument.DataId, CDateTime.Value);
+    if xValue <> Nil then begin
+      xText := 'Istnieje ju¿ notowanie instrumentu "' + CStaticInstrument.Caption + '" z ' + Date2StrDate(CDateTime.Value, True) + '\n' +
+               'Czy chcesz je zast¹piæ ?';
+      Result := ShowInfo(itQuestion, xText, '');
+      if Result then begin
+        FValueToReplaceId := xValue.id;
+      end;
+    end;
+    GDataProvider.RollbackTransaction;
   end;
 end;
 
@@ -191,6 +208,18 @@ begin
     idInstrument := CStaticInstrument.DataId;
     regDateTime := CDateTime.Value;
     valueOf := CCurrEditValue.Value;
+  end;
+end;
+
+procedure TCInstrumentValueForm.AfterCommitData;
+var xValue: TInstrumentValue;
+begin
+  if FValueToReplaceId <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    xValue := TInstrumentValue(TInstrumentValue.LoadObject(InstrumentValueProxy, FValueToReplaceId, False));
+    xValue.DeleteObject;
+    GDataProvider.CommitTransaction;
+    SendMessageToFrames(TCInstrumentValueFrame, WM_DATAOBJECTDELETED, Integer(@FValueToReplaceId), 0);
   end;
 end;
 

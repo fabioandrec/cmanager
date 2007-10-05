@@ -95,10 +95,11 @@ function TrimStr(AStr: String; AUnwanted: String): String;
 function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
 function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
+function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
 
 implementation
 
-uses SysUtils, StrUtils;
+uses SysUtils, StrUtils, DateUtils;
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
@@ -681,6 +682,13 @@ begin
   end else begin
     Result := DateToStr(ADateTime);
   end;
+end;
+
+function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
+var xY, xM, xD, xH, xN, xS, xMs: Word;
+begin
+  DecodeDateTime(ADateTime, xY, xM, xD, xH, xN, xS, xMs);
+  Result := EncodeDateTime(xY, xM, xD, xH, xN, 0, 0);
 end;
 
 end.
