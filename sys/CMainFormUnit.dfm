@@ -172,6 +172,7 @@ object CMainForm: TCMainForm
         Value = 38949.000000000000000000
         OnChanged = CDateTimeChanged
         HotTrack = True
+        Withtime = False
       end
     end
     object PanelFrames: TPanel
@@ -435,6 +436,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionXsl
+                Caption = '&Domy'#347'lna transformcja raport'#243'w'
               end
               item
                 Caption = '-'
@@ -446,6 +448,9 @@ object CMainForm: TCMainForm
               item
                 Action = ActionImportExtraction
                 Caption = 'Wc&zytaj wyci'#261'g bankowy'
+              end
+              item
+                Action = ActionStockExchanges
               end
               item
                 Caption = '-'
@@ -696,6 +701,11 @@ object CMainForm: TCMainForm
     object ActionShortcutExch: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Notowania'
+    end
+    object ActionStockExchanges: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Wczytaj notowania'
+      OnExecute = ActionStockExchangesExecute
     end
   end
   object OpenDialog: TOpenDialog

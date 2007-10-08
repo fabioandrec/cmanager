@@ -103,12 +103,12 @@ inherited CInstrumentForm: TCInstrumentForm
       ParentFont = False
       TabOrder = 1
       object Label4: TLabel
-        Left = 33
+        Left = 16
         Top = 31
-        Width = 63
+        Width = 80
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Notowany na'
+        Caption = 'Miejsce notowa'#324
       end
       object Label5: TLabel
         Left = 18

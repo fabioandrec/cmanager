@@ -20,6 +20,7 @@ function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolea
 procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 procedure UpdateCurrencyRates(ARatesText: String);
+procedure UpdateExchanges(ARatesText: String);
 procedure UpdateExtractions(AExtractionText: String);
 procedure ReloadCaches;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
@@ -31,7 +32,7 @@ uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
   CTools, StrUtils, CPreferences, CXml, CUpdateCurrencyRatesFormUnit,
   CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
-  CExtractionItemFormUnit;
+  CExtractionItemFormUnit, CUpdateExchangesFormUnit;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -301,6 +302,50 @@ begin
   end;
   if xMustbackup then begin
     GBackupThread := TBackupThread.Create(GDatabaseName);
+  end;
+end;
+
+procedure UpdateExchanges(ARatesText: String);
+var xDoc: IXMLDOMDocument;
+    xRoot: IXMLDOMNode;
+    xList: IXMLDOMNodeList;
+    xValid: Boolean;
+    xError: String;
+    xCahpointName: String;
+    xForm: TCUpdateExchangesForm;
+begin
+  xValid := False;
+  xDoc := GetDocumentFromString(ARatesText);
+  if xDoc.parseError.errorCode = 0 then begin
+    xRoot := xDoc.selectSingleNode('exchanges');
+    if xRoot <> Nil then begin
+      xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
+      if xCahpointName <> '' then begin
+        xValid := True;
+        xList := xRoot.selectNodes('exchange');
+        if xList.length > 0 then begin
+          xForm := TCUpdateExchangesForm.Create(Application);
+          xForm.Xml := xDoc;
+          xForm.Root := xRoot;
+          xForm.Exchanges := xList;
+          xForm.CashpointName := xCahpointName;
+          xForm.InitializeForm;
+          xForm.ShowModal;
+          xForm.Free;
+        end else begin
+          ShowInfo(itInfo, 'Tabela nie zawiera ¿adnych notowañ instrumentów inwestycyjnych', xError);
+        end;
+      end else begin
+        xError := 'Brak okreœlenia kontrahenta - miejsca notowañ instrumentów inwestycyjnych';
+      end;
+    end else begin
+      xError := 'Brak elementu zbiorczego';
+    end;
+  end else begin
+    xError := GetParseErrorDescription(xDoc.parseError);
+  end;
+  if not xValid then begin
+    ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ notowañ', xError);
   end;
 end;
 

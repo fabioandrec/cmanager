@@ -71,6 +71,7 @@ type
     ActionXsl: TAction;
     ActionShortcutInstruments: TAction;
     ActionShortcutExch: TAction;
+    ActionStockExchanges: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -106,6 +107,7 @@ type
     procedure ActionCssExecute(Sender: TObject);
     procedure ActionImportExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
+    procedure ActionStockExchangesExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -800,6 +802,26 @@ begin
     ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CXSLReportFile)), Nil, SW_SHOWNORMAL);
   end else begin
     ShowInfo(itError, 'Nie odnaleziono pliku "' + CXSLReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+  end;
+end;
+
+procedure TCMainForm.ActionStockExchangesExecute(Sender: TObject);
+var xStr: TStringList;
+begin
+  if OpenDialogXml.Execute then begin
+    xStr := TStringList.Create;
+    try
+      try
+        xStr.LoadFromFile(OpenDialogXml.FileName);
+        UpdateExchanges(xStr.Text);
+      except
+        on E: Exception do begin
+          ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku ' + OpenDialogXml.FileName, E.Message);
+        end;
+      end;
+    finally
+      xStr.Free;
+    end;
   end;
 end;
 
