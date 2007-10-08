@@ -177,15 +177,14 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           AutoExpand = True
           Columns = <
             item
-              Alignment = taRightJustify
               Position = 0
-              Width = 70
+              Width = 150
               WideText = 'Data i czas'
             end
             item
               Position = 1
-              Width = 185
-              WideText = 'Opis'
+              Width = 190
+              WideText = 'Instrument'
             end
             item
               Alignment = taRightJustify

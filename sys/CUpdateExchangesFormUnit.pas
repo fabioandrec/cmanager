@@ -51,29 +51,23 @@ type
 
   TExchangeDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
   private
-    FRate: IXMLDOMNode;
-    FBindingDate: TDateTime;
+    FExchange: IXMLDOMNode;
     FCashpointName: String;
-    FQuantity: Integer;
-    FCurRate: Currency;
-    FrateType: TBaseEnumeration;
+    FValue: Currency;
   public
-    constructor Create(ARate: IXMLDOMNode; ARateType: TBaseEnumeration; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
+    constructor Create(AExchange: IXMLDOMNode; ACashpointName: String; AValue: Currency);
     function ExpandTemplate(ATemplate: String): String;
-    property Rate: IXMLDOMNode read FRate;
-    property BindingDate: TDateTime read FBindingDate;
+    property Exchange: IXMLDOMNode read FExchange;
     property CashpointName: String read FCashpointName;
-    property Quantity: Integer read FQuantity;
-    property CurRate: Currency read FCurRate;
-    property RateType: TBaseEnumeration read FrateType write FrateType;
+    property Value: Currency read FValue;
   end;
 
 implementation
 
 uses CDatabase, CXml, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
-  CBaseFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
-  CWaitFormUnit, CProgressFormUnit;
+  CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
+  CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit;
 
 {$R *.dfm}
 
@@ -96,24 +90,14 @@ end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 var xNode: IXMLDOMNode;
-    xExpander: IDescTemplateExpander;
-    xDesc: String;
 begin
   xNode := IXMLDOMNode(ExchangesList.GetNodeData(Node)^);
   if Column = 2 then begin
-    CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), '', False, 4);
+    CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('value', xNode, '')), '', False, 4);
   end else if Column = 1 then begin
-    CellText := '';
-    xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
-    if xDesc <> '' then begin
-      xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-      xExpander := TExchangeDescriptionHelper.Create(xNode, GetXmlAttribute('type', xNode, CCurrencyRateTypeAverage), FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')));
-      CellText := GCurrencydefTemplatesList.ExpandTemplates(xDesc, xExpander);
-    end;
+    CellText := GetXmlAttribute('instrumentName', xNode, '');
   end else if Column = 0 then begin
-    CellText := IntToStr(StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0));;
-  end else begin
-    CellText := TCurrencyRate.GetTypeDesc(GetXmlAttribute('type', xNode, CCurrencyRateTypeAverage));
+    CellText := Date2StrDate(YmdhnToDate(GetXmlAttribute('regDateTime', xNode, ''), 0), True);
   end;
 end;
 
@@ -131,10 +115,7 @@ procedure TCUpdateExchangesForm.ExchangesListGetHint(Sender: TBaseVirtualTree; N
 var xNode: IXMLDOMNode;
 begin
   xNode := IXMLDOMNode(ExchangesList.GetNodeData(Node)^);
-  HintText := IntToStr(StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0)) + ' ' +
-              GetXmlAttribute('sourceName', xNode, '') + ' kosztuje ' +
-              CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), '', False, 4) + ' ' +
-              GetXmlAttribute('targetName', xNode, '');
+  HintText := GetXmlAttribute('instrumentName', xNode, '');
   LineBreakStyle := hlbForceMultiLine;
 end;
 
@@ -143,36 +124,36 @@ begin
   AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCDataobjectFrameData.CreateWithFilter(CCashpointTypeOther));
 end;
 
-constructor TExchangeDescriptionHelper.Create(ARate: IXMLDOMNode; ARateType: TBaseEnumeration; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
+constructor TExchangeDescriptionHelper.Create(AExchange: IXMLDOMNode; ACashpointName: String; AValue: Currency);
 begin
   inherited Create;
-  FRate := ARate;
+  FExchange := AExchange;
   FCashpointName := ACashpointName;
-  FQuantity := AQuantity;
-  FCurRate := ACurRate;
-  FrateType := ARateType;
+  FValue := AValue;
 end;
 
 function TExchangeDescriptionHelper.ExpandTemplate(ATemplate: String): String;
+var xRegDateTime: TDateTime;
+    xType: TBaseEnumeration;
 begin
-  if ATemplate = '@datakursu@' then begin
-    Result := GetFormattedDate(FBindingDate, 'yyyy-MM-dd');
-  end else if ATemplate = '@isobazowej@' then begin
-    Result := GetXmlAttribute('sourceIso', FRate, '');
-  end else if ATemplate = '@isodocelowej@' then begin
-    Result := GetXmlAttribute('targetIso', FRate, '');
-  end else if ATemplate = '@symbolbazowej@' then begin
-    Result := GetXmlAttribute('sourceIso', FRate, '');
-  end else if ATemplate = '@symboldocelowej@' then begin
-    Result := GetXmlAttribute('targetIso', FRate, '');
-  end else if ATemplate = '@kontrahent@' then begin
+  xRegDateTime := YmdhnToDate(GetXmlAttribute('regDateTime', FExchange, ''), 0);
+  xType := GetXmlAttribute('instrumentType', FExchange, '');
+  if ATemplate = '@datanotowania@' then begin
+    Result := GetFormattedDate(xRegDateTime, 'yyyy-MM-dd');
+  end else if ATemplate = '@dataczasnotowania@' then begin
+    Result := GetFormattedDate(xRegDateTime, 'yyyy-MM-dd') + ' ' + GetFormattedTime(xRegDateTime, 'HH:mm');
+  end else if ATemplate = '@instrument@' then begin
     Result := FCashpointName;
-  end else if ATemplate = '@typ@' then begin
-    Result := TCurrencyRate.GetTypeDesc(FrateType);
-  end else if ATemplate = '@ilosc@' then begin
-    Result := IntToStr(FQuantity);
-  end else if ATemplate = '@kurs@' then begin
-    Result := CurrencyToString(FCurRate, '', False, 4);
+  end else if ATemplate = '@rodzaj@' then begin
+    if xType = CInstrumentTypeIndex then begin
+      Result := CInstrumentTypeIndexDesc;
+    end else if xType = CInstrumentTypeStock then begin
+      Result := CInstrumentTypeStockDesc;
+    end else if xType = CInstrumentTypeBond then begin
+      Result := CInstrumentTypeBondDesc;
+    end else if xType = CInstrumentTypeFund then begin
+      Result := CInstrumentTypeFundDesc;
+    end;
   end;
 end;
 
@@ -204,14 +185,15 @@ end;
 
 procedure TCUpdateExchangesForm.BitBtnOkClick(Sender: TObject);
 var xCashpoint: TCashPoint;
-    xProceed: Boolean;
     xNode: PVirtualNode;
     xXml: IXMLDOMNode;
-    xRate: TCurrencyRate;
-    xBaseCurrency: TCurrencyDef;
-    xTargetCurrency: TCurrencyDef;
+    xValue: TInstrumentValue;
+    xInstrument: TInstrument;
+    xRegDateTime: TDateTime;
     xDesc: String;
     xCashpointId: TDataGid;
+    xCurrencyId: TDataGid;
+    xCurrency: TCurrencyDef;
     xHelper: TExchangeDescriptionHelper;
 begin
   if CStaticCashpoint.DataId = CEmptyDataGid then begin
@@ -228,66 +210,56 @@ begin
     end;
   end;
   if CStaticCashpoint.DataId <> CEmptyDataGid then begin
-    {
-    if GDataProvider.GetSqlInteger(Format('select count(*) from currencyRate where bindingDate = %s and idCashpoint = %s',
-      [DatetimeToDatabase(FBindingDate, False), DataGidToDatabase(CStaticCashpoint.DataId)]), 0) > 0 then begin
-      xProceed := ShowInfo(itQuestion, 'Istniej¹ ju¿ kursy walut w/g "' + FCashpointName + '" z dat¹ obowi¹zywania ' + Date2StrDate(FBindingDate) + '\n' +
-                                       'Czy chcesz je uzupe³niæ ?', '');
-    end else begin
-      xProceed := True;
-    end;
-    }
-    if xProceed then begin
-      ShowWaitForm(wtProgressbar, 'Trwa zapisywanie tabeli kursów...', 0, ExchangesList.RootNodeCount);
-      GDataProvider.BeginTransaction;
-      xNode := ExchangesList.GetFirst;
-      while (xNode <> Nil) do begin
-        if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
-          xXml := IXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
-          xBaseCurrency := TCurrencyDef.FindByIso(GetXmlAttribute('sourceIso', xXml, ''));
-          if xBaseCurrency = Nil then begin
-            xBaseCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
-            xBaseCurrency.iso := GetXmlAttribute('sourceIso', xXml, '');
-            xBaseCurrency.symbol := xBaseCurrency.iso;
-            xBaseCurrency.name := GetXmlAttribute('sourceName', xXml, '');
-            xBaseCurrency.description := xBaseCurrency.name;
+    ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNodeCount);
+    GDataProvider.BeginTransaction;
+    xNode := ExchangesList.GetFirst;
+    while (xNode <> Nil) do begin
+      if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
+        xXml := IXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
+        xInstrument := TInstrument.FindByName(GetXmlAttribute('instrumentName', xXml, ''));
+        if xInstrument = Nil then begin
+          xInstrument := TInstrument.CreateObject(InstrumentProxy, False);
+          xInstrument.name := GetXmlAttribute('instrumentName', xXml, '');
+          xInstrument.description := GetXmlAttribute('instrumentDesc', xXml, '');
+          xInstrument.idCashpoint := xCashpointId;
+          xCurrency := TCurrencyDef(TCurrencyDef.FindByIso(GetXmlAttribute('instrumentCurrency', xXml, '')));
+          if xCurrency = Nil then begin
+            xCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
+            xCurrency.symbol := GetXmlAttribute('instrumentCurrency', xXml, '');
+            xCurrency.iso := xCurrency.symbol;
+            xCurrency.name := xCurrency.symbol;
+            xCurrency.description := '';
+            xCurrency.isBase := False;
           end;
-          xTargetCurrency := TCurrencyDef.FindByIso(GetXmlAttribute('targetIso', xXml, ''));
-          if xTargetCurrency = Nil then begin
-            xTargetCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
-            xTargetCurrency.iso := GetXmlAttribute('targetIso', xXml, '');
-            xTargetCurrency.symbol := xTargetCurrency.iso;
-            xTargetCurrency.name := GetXmlAttribute('targetName', xXml, '');
-            xTargetCurrency.description := xTargetCurrency.name;
-          end;
-          //xRate := TCurrencyRate.FindRate(GetXmlAttribute('type', xXml, CCurrencyRateTypeAverage), xBaseCurrency.id, xTargetCurrency.id, CStaticCashpoint.DataId);
-          if xRate = Nil then begin
-            xRate := TCurrencyRate.CreateObject(CurrencyRateProxy, False);
-            xRate.idSourceCurrencyDef := xBaseCurrency.id;
-            xRate.idTargetCurrencyDef := xTargetCurrency.id;
-            xRate.idCashpoint := CStaticCashpoint.DataId;
-            xRate.rateType := GetXmlAttribute('type', xXml, CCurrencyRateTypeAverage);
-          end;
-          xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
-          if xDesc <> '' then begin
-            xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-            xHelper := TExchangeDescriptionHelper.Create(xXml, GetXmlAttribute('type', xXml, CCurrencyRateTypeAverage), FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xXml, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xXml, '')));
-            xDesc := GCurrencydefTemplatesList.ExpandTemplates(xDesc, xHelper);
-          end;
-          xRate.description := xDesc;
-          xRate.rate := StrToCurrencyDecimalDot(GetXmlAttribute('rate', xXml, ''));
-          xRate.quantity := StrToIntDef(GetXmlAttribute('quantity', xXml, ''), 0);
+          xInstrument.idCurrencyDef := xCurrencyId;
+          xInstrument.instrumentType := GetXmlAttribute('instrumentType', xXml, '');
         end;
+        xRegDateTime := YmdhnToDate(GetXmlAttribute('regDateTime', xXml, ''), 0);
+        xValue := TInstrumentValue.FindValue(xInstrument.id, xRegDateTime);
+        if xValue = Nil then begin
+          xValue := TInstrumentValue.CreateObject(InstrumentValueProxy, False);
+          xValue.idInstrument := xInstrument.id;
+          xValue.regDateTime := xRegDateTime;
+        end;
+        xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[7][0], '');
+        if xDesc <> '' then begin
+          xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+          xHelper := TExchangeDescriptionHelper.Create(xXml, FCashpointName, StrToCurrencyDecimalDot(GetXmlAttribute('value', xXml, '')));
+          xDesc := GInstrumentValueTemplatesList.ExpandTemplates(xDesc, xHelper);
+        end;
+        xValue.description := xDesc;
+        xValue.valueOf := StrToCurrencyDecimalDot(GetXmlAttribute('value', xXml, ''));
         GDataProvider.PostProxies;
         xNode := ExchangesList.GetNext(xNode);
-        StepWaitForm(1);
       end;
-      GDataProvider.CommitTransaction;
-      HideWaitForm;
-      SendMessageToFrames(TCCurrencydefFrame, WM_DATAREFRESH, 0, 0);
-      SendMessageToFrames(TCCurrencyRateFrame, WM_DATAREFRESH, 0, 0);
-      CloseForm;
+      StepWaitForm(1);
     end;
+    GDataProvider.CommitTransaction;
+    HideWaitForm;
+    SendMessageToFrames(TCInstrumentValueFrame, WM_DATAREFRESH, 0, 0);
+    SendMessageToFrames(TCInstrumentFrame, WM_DATAREFRESH, 0, 0);
+    SendMessageToFrames(TCCurrencydefFrame, WM_DATAREFRESH, 0, 0);
+    CloseForm;
   end;
 end;
 

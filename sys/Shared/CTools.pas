@@ -79,6 +79,7 @@ function RPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 procedure SaveToLog(AText: String; ALogFilename: String);
 function YmdToDate(AString: String; ADefault: TDateTime): TDateTime;
+function YmdhnToDate(AString: String; ADefault: TDateTime): TDateTime;
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
@@ -474,6 +475,19 @@ begin
   if not TryEncodeDate(xY, xM, xD, Result) then begin
     Result := ADefault;
   end;
+end;
+
+function YmdhnToDate(AString: String; ADefault: TDateTime): TDateTime;
+var xH, xN: Word;
+    xStr: String;
+begin
+  xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+  Result := YmdToDate(Copy(xStr, 1, 8), ADefault);
+  xH := StrToIntDef(Copy(xStr, 9, 2), 0);
+  xN := StrToIntDef(Copy(xStr, 11, 2), 0);
+  Result := RecodeTime(Result, xH, xN, 0, 0);
 end;
 
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
