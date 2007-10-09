@@ -52,14 +52,10 @@ type
   TExchangeDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
   private
     FExchange: IXMLDOMNode;
-    FCashpointName: String;
-    FValue: Currency;
   public
-    constructor Create(AExchange: IXMLDOMNode; ACashpointName: String; AValue: Currency);
+    constructor Create(AExchange: IXMLDOMNode);
     function ExpandTemplate(ATemplate: String): String;
     property Exchange: IXMLDOMNode read FExchange;
-    property CashpointName: String read FCashpointName;
-    property Value: Currency read FValue;
   end;
 
 implementation
@@ -95,7 +91,7 @@ begin
   if Column = 2 then begin
     CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('value', xNode, '')), '', False, 4);
   end else if Column = 1 then begin
-    CellText := GetXmlAttribute('instrumentName', xNode, '');
+    CellText := GetXmlAttribute('name', xNode, '');
   end else if Column = 0 then begin
     CellText := Date2StrDate(YmdhnToDate(GetXmlAttribute('regDateTime', xNode, ''), 0), True);
   end;
@@ -115,7 +111,7 @@ procedure TCUpdateExchangesForm.ExchangesListGetHint(Sender: TBaseVirtualTree; N
 var xNode: IXMLDOMNode;
 begin
   xNode := IXMLDOMNode(ExchangesList.GetNodeData(Node)^);
-  HintText := GetXmlAttribute('instrumentName', xNode, '');
+  HintText := GetXmlAttribute('name', xNode, '');
   LineBreakStyle := hlbForceMultiLine;
 end;
 
@@ -124,12 +120,10 @@ begin
   AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCDataobjectFrameData.CreateWithFilter(CCashpointTypeOther));
 end;
 
-constructor TExchangeDescriptionHelper.Create(AExchange: IXMLDOMNode; ACashpointName: String; AValue: Currency);
+constructor TExchangeDescriptionHelper.Create(AExchange: IXMLDOMNode);
 begin
   inherited Create;
   FExchange := AExchange;
-  FCashpointName := ACashpointName;
-  FValue := AValue;
 end;
 
 function TExchangeDescriptionHelper.ExpandTemplate(ATemplate: String): String;
@@ -137,13 +131,13 @@ var xRegDateTime: TDateTime;
     xType: TBaseEnumeration;
 begin
   xRegDateTime := YmdhnToDate(GetXmlAttribute('regDateTime', FExchange, ''), 0);
-  xType := GetXmlAttribute('instrumentType', FExchange, '');
+  xType := GetXmlAttribute('type', FExchange, '');
   if ATemplate = '@datanotowania@' then begin
     Result := GetFormattedDate(xRegDateTime, 'yyyy-MM-dd');
   end else if ATemplate = '@dataczasnotowania@' then begin
     Result := GetFormattedDate(xRegDateTime, 'yyyy-MM-dd') + ' ' + GetFormattedTime(xRegDateTime, 'HH:mm');
   end else if ATemplate = '@instrument@' then begin
-    Result := FCashpointName;
+    Result := GetXmlAttribute('name', FExchange, '');
   end else if ATemplate = '@rodzaj@' then begin
     if xType = CInstrumentTypeIndex then begin
       Result := CInstrumentTypeIndexDesc;
@@ -201,7 +195,7 @@ begin
       GDataProvider.BeginTransaction;
       xCashpoint := TCashPoint.CreateObject(CashPointProxy, False);
       xCashpoint.name := Copy(FCashpointName, 1, 40);
-      xCashpoint.description := xCashpoint.name;
+      xCashpoint.description := GetXmlAttribute('cashpointDesc', FRoot, '');
       xCashpoint.cashpointType := CCashpointTypeOther;
       CStaticCashpoint.DataId := xCashpoint.id;
       xCashpointId := xCashpoint.id;
@@ -216,23 +210,28 @@ begin
     while (xNode <> Nil) do begin
       if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
         xXml := IXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
-        xInstrument := TInstrument.FindByName(GetXmlAttribute('instrumentName', xXml, ''));
+        xInstrument := TInstrument.FindByName(GetXmlAttribute('name', xXml, ''));
         if xInstrument = Nil then begin
           xInstrument := TInstrument.CreateObject(InstrumentProxy, False);
-          xInstrument.name := GetXmlAttribute('instrumentName', xXml, '');
-          xInstrument.description := GetXmlAttribute('instrumentDesc', xXml, '');
+          xInstrument.name := GetXmlAttribute('name', xXml, '');
+          xInstrument.description := GetXmlAttribute('desc', xXml, '');
           xInstrument.idCashpoint := xCashpointId;
-          xCurrency := TCurrencyDef(TCurrencyDef.FindByIso(GetXmlAttribute('instrumentCurrency', xXml, '')));
-          if xCurrency = Nil then begin
-            xCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
-            xCurrency.symbol := GetXmlAttribute('instrumentCurrency', xXml, '');
-            xCurrency.iso := xCurrency.symbol;
-            xCurrency.name := xCurrency.symbol;
-            xCurrency.description := '';
-            xCurrency.isBase := False;
+          if GetXmlAttribute('currency', xXml, '') <> '' then begin
+            xCurrency := TCurrencyDef(TCurrencyDef.FindByIso(GetXmlAttribute('currency', xXml, '')));
+            if xCurrency = Nil then begin
+              xCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
+              xCurrency.symbol := GetXmlAttribute('currency', xXml, '');
+              xCurrency.iso := xCurrency.symbol;
+              xCurrency.name := xCurrency.symbol;
+              xCurrency.description := '';
+              xCurrency.isBase := False;
+            end;
+            xCurrencyId := xCurrency.id;
+          end else begin
+            xCurrencyId := '';
           end;
           xInstrument.idCurrencyDef := xCurrencyId;
-          xInstrument.instrumentType := GetXmlAttribute('instrumentType', xXml, '');
+          xInstrument.instrumentType := GetXmlAttribute('type', xXml, '');
         end;
         xRegDateTime := YmdhnToDate(GetXmlAttribute('regDateTime', xXml, ''), 0);
         xValue := TInstrumentValue.FindValue(xInstrument.id, xRegDateTime);
@@ -244,7 +243,7 @@ begin
         xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[7][0], '');
         if xDesc <> '' then begin
           xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-          xHelper := TExchangeDescriptionHelper.Create(xXml, FCashpointName, StrToCurrencyDecimalDot(GetXmlAttribute('value', xXml, '')));
+          xHelper := TExchangeDescriptionHelper.Create(xXml);
           xDesc := GInstrumentValueTemplatesList.ExpandTemplates(xDesc, xHelper);
         end;
         xValue.description := xDesc;

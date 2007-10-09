@@ -3806,7 +3806,7 @@ begin
   end else if AColumnIndex = 1 then begin
     Result := GetDescText(Fdescription);
   end else if AColumnIndex = 2 then begin
-    Result := CurrencyToString(FvalueOf, '', False);
+    Result := CurrencyToString(FvalueOf, '', False, 4);
   end else if AColumnIndex = 3 then begin
     Result := GCurrencyCache.GetSymbol(idCurrencyDef);
   end;

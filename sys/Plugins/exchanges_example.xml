@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<exchanges cashpointName="GPW" cashpointDesc="Giełda Papierów Wartościowych w Warszawie">
+	<exchange name="S01" desc="opis instrumentu I01" type="S" regDateTime="200710091310" currency="PLN" value="1.9001"/>
+	<exchange name="S02" desc="opis instrumentu I02" type="S" regDateTime="200710091320" currency="PLN" value="1.9002"/>
+	<exchange name="S03" desc="opis instrumentu I03" type="S" regDateTime="200710091330" currency="PLN" value="1.9003"/>
+	<exchange name="S01" desc="opis instrumentu I01" type="S" regDateTime="200710091340" currency="PLN" value="1.9004"/>
+	<exchange name="S02" desc="opis instrumentu I02" type="S" regDateTime="200710091350" currency="PLN" value="1.9005"/>
+	<exchange name="S03" desc="opis instrumentu I03" type="S" regDateTime="200710091400" currency="PLN" value="1.9006"/>
+	<exchange name="S01" desc="opis instrumentu I01" type="S" regDateTime="200710091410" currency="PLN" value="1.9007"/>
+	<exchange name="S02" desc="opis instrumentu I02" type="S" regDateTime="200710091420" currency="PLN" value="1.9008"/>
+	<exchange name="S03" desc="opis instrumentu I03" type="S" regDateTime="200710091430" currency="PLN" value="1.9009"/>
+	<exchange name="I03" desc="opis instrumentu I03" type="I" regDateTime="200710091430" value="1.9009"/>
+	<exchange name="I03" desc="opis instrumentu I03" type="I" regDateTime="200710091430" value="1.9009"/>
+	<exchange name="I03" desc="opis instrumentu I03" type="I" regDateTime="200710091430" value="1.9009"/>
+	<exchange name="I03" desc="opis instrumentu I03" type="I" regDateTime="200710091430" value="1.9009"/>
+</exchanges>
