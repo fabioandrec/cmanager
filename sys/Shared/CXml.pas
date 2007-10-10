@@ -6,7 +6,8 @@ uses ActiveX, CXmlTlb, Classes;
 
 procedure SetXmlAttribute(AName: String; ANode: IXMLDOMNode; AValue: OleVariant);
 function GetXmlAttribute(AName: String; ANode: IXMLDOMNode; ADefault: OleVariant): OleVariant;
-function GetDocumentFromString(AString: String): IXMLDOMDocument2;
+function GetDocumentFromString(AString: String; AXsd: IXMLDOMDocument2 = Nil): IXMLDOMDocument2;
+function GetDocumentFromFile(AFilename: String; AXsd: IXMLDOMDocument2 = Nil): IXMLDOMDocument2;
 function GetStringFromDocument(ADocument: IXMLDOMDocument2): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: IXMLDOMNode; ADefault: String): String;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument2;
@@ -64,17 +65,44 @@ begin
   xNode.nodeValue := AValue;
 end;
 
-function GetDocumentFromString(AString: String): IXMLDOMDocument2;
+function GetDocumentFromFile(AFilename: String; AXsd: IXMLDOMDocument2 = Nil): IXMLDOMDocument2;
+var xStr: TStringList;
+begin
+  xStr := TStringList.Create;
+  try
+    try
+      xStr.LoadFromFile(AFilename);
+      Result := GetDocumentFromString(xStr.Text, AXsd);
+    except
+      Result := Nil;
+    end;
+  finally
+    xStr.Free;
+  end;
+end;
+
+function GetDocumentFromString(AString: String; AXsd: IXMLDOMDocument2 = Nil): IXMLDOMDocument2;
 var xStream: TStringStream;
     xHelper: TStreamAdapter;
+    xXsdCache: IXMLDOMSchemaCollection2;
 begin
   Result := GetXmlDocument;
-  Result.validateOnParse := True;
-  Result.resolveExternals := True;
-  xStream := TStringStream.Create(AString);
-  xHelper := TStreamAdapter.Create(xStream);
-  Result.load(xHelper as IStream);
-  xStream.Free;
+  if Result <> Nil then begin
+    Result.validateOnParse := True;
+    Result.resolveExternals := True;
+    if AXsd <> Nil then begin
+      xXsdCache := CoXMLSchemaCache40.Create;
+      xXsdCache.add('', AXsd);
+      Result.schemas := xXsdCache;
+    end;
+    xStream := TStringStream.Create(AString);
+    xHelper := TStreamAdapter.Create(xStream);
+    try
+      Result.load(xHelper as IStream);
+    finally
+      xStream.Free;
+    end;
+  end;
 end;
 
 function GetStringFromDocument(ADocument: IXMLDOMDocument2): String;
