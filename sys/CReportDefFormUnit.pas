@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
   CComponents, CDatabase, CBaseFrameUnit, ActnList, XPStyleActnCtrls,
-  ActnMan, Contnrs, MsXml, VirtualTrees, CReports;
+  ActnMan, Contnrs, CXmlTlb, VirtualTrees, CReports;
 
 type
   TCReportDefForm = class(TCDataobjectForm)
@@ -203,7 +203,7 @@ begin
   xXml := GetDocumentFromString(RicheditXslt.Text);
   Result := xXml.parseError.errorCode = 0;
   if not Result then begin
-    ShowInfo(itError, 'Zdefiniowany arkusz styli jest niepoprawny', GetParseErrorDescription(xXml.parseError));
+    ShowInfo(itError, 'Zdefiniowany arkusz styli jest niepoprawny', GetParseErrorDescription(xXml.parseError, True));
   end;
 end;
 

@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils, MsXml, AdoDb, VirtualTrees;
+     DateUtils, CXmlTlb, AdoDb, VirtualTrees;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -342,7 +342,7 @@ begin
       xError := 'Brak elementu zbiorczego';
     end;
   end else begin
-    xError := GetParseErrorDescription(xDoc.parseError);
+    xError := GetParseErrorDescription(xDoc.parseError, True);
   end;
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ notowañ', xError);
@@ -393,7 +393,7 @@ begin
       xError := 'Brak elementu zbiorczego';
     end;
   end else begin
-    xError := GetParseErrorDescription(xDoc.parseError);
+    xError := GetParseErrorDescription(xDoc.parseError, True);
   end;
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut', xError);
@@ -574,7 +574,7 @@ begin
       xError := 'Brak elementu zbiorczego';
     end;
   end else begin
-    xError := GetParseErrorDescription(xDoc.parseError);
+    xError := GetParseErrorDescription(xDoc.parseError, True);
   end;
   if not xValid then begin
     ShowInfo(itError, 'Otrzymane dane nie s¹ poprawnym wyci¹giem bankowym', xError);

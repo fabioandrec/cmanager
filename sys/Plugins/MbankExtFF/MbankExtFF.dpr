@@ -14,6 +14,7 @@ uses
   CPluginConsts in '..\CPluginConsts.pas',
   CTools in '..\..\Shared\CTools.pas',
   MbankExtFFFormUnit in 'MbankExtFFFormUnit.pas' {MbankExtFFForm},
+  CXmlTlb in '..\..\Shared\CXmlTlb.pas',
   CXml in '..\..\Shared\CXml.pas';
 
 var CManInterface: ICManagerInterface;

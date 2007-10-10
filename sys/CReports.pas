@@ -3,7 +3,7 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, MsXml,
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, CXmlTlb,
      CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects;
 
 type
@@ -652,7 +652,7 @@ begin
       xStr.Text := StringReplace(xStr.Text, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
       Result := GetDocumentFromString(xStr.Text);
       if Result.parseError.errorCode <> 0 then begin
-        AError := GetParseErrorDescription(Result.parseError);
+        AError := GetParseErrorDescription(Result.parseError, True);
         Result := Nil;
       end;
     except
@@ -686,7 +686,7 @@ begin
             LDefaultXsl := GetDocumentFromString(xStrStream.DataString);
             xStrStream.Free;
             if LDefaultXsl.parseError.errorCode <> 0 then begin
-              AError := GetParseErrorDescription(LDefaultXsl.parseError);
+              AError := GetParseErrorDescription(LDefaultXsl.parseError, True);
               LDefaultXsl := Nil;
             end else begin
               Result := LDefaultXsl;
@@ -3554,7 +3554,7 @@ begin
     FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self));
     Result := FXml.parseError.errorCode = 0;
     if not Result then begin
-      ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', GetParseErrorDescription(FXml.parseError));
+      ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', GetParseErrorDescription(FXml.parseError, True));
     end;
   end;
 end;
@@ -4293,7 +4293,7 @@ begin
     if DecodeBase64Buffer(FreportDef.xsltText, xBufferOut) then begin
       FxsltDoc := GetXmlDocument(xBufferOut);
       if FxsltDoc.parseError.errorCode <> 0 then begin
-        xError := GetParseErrorDescription(FxsltDoc.parseError);
+        xError := GetParseErrorDescription(FxsltDoc.parseError, True);
         FxsltDoc := Nil;
       end;
     end else begin
@@ -4328,7 +4328,7 @@ begin
                           'i nastêpnie kompaktowanie pliku danych.', '');
       end;
     end else begin
-      ShowInfo(itError, 'Zdefiniowany dla raportu arkusz styli jest niepoprawny', GetParseErrorDescription(FxsltDoc.parseError));
+      ShowInfo(itError, 'Zdefiniowany dla raportu arkusz styli jest niepoprawny', GetParseErrorDescription(FxsltDoc.parseError, True));
     end;
   end else begin
     if xError <> '' then begin

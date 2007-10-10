@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CBaseFormUnit, MsXml, CComponents, StdCtrls, Buttons, ExtCtrls,
+  Dialogs, CBaseFormUnit, CXmlTlb, CComponents, StdCtrls, Buttons, ExtCtrls,
   VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects;
 
 type

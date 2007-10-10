@@ -2,7 +2,7 @@ unit CAdotools;
 
 interface
 
-uses AdoInt, Contnrs, Classes, Variants, MsXml;
+uses AdoInt, Contnrs, Classes, Variants, CXmlTlb;
 
 function GetRowsAsObjectList(ARecordset: _Recordset): TObjectList;
 function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String): String;

@@ -2,7 +2,7 @@ unit CSettings;
 
 interface
 
-uses MsXml, Forms, Windows;
+uses CXmlTlb, Forms, Windows;
 
 const
   CSettingsFilename = 'CManager.cfg';
@@ -203,7 +203,7 @@ begin
     GSettings.resolveExternals := True;
     GSettings.load(AFileName);
     if GSettings.parseError.errorCode <> 0 then begin
-      ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GetParseErrorDescription(GSettings.parseError));
+      ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GetParseErrorDescription(GSettings.parseError, True));
       Result := False;
     end else begin
       if GSettings.firstChild <> Nil then begin

@@ -11,6 +11,7 @@ uses
   MemCheck in 'MemCheck.pas',
   {$ENDIF}
   CRichtext in '.\Shared\CRichtext.pas',
+  CXmlTlb in 'Shared\CXmlTlb.pas',  
   CXml in '.\Shared\CXml.pas',
   CTools in '.\Shared\CTools.pas',
   CHttpRequest in '.\Shared\CHttpRequest.pas';

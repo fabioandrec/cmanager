@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, MsXml, Types;
+  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, CXmlTlb, Types;
 
 type
   TMbankExtFFForm = class(TForm)

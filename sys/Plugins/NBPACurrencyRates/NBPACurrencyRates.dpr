@@ -3,7 +3,6 @@ library NBPACurrencyRates;
 {$R *.res}
 
 uses
-  MsXml,
   Windows,
   Controls,
   Messages,
@@ -11,6 +10,7 @@ uses
   SysUtils,
   CPluginConsts in '..\CPluginConsts.pas',
   CPluginTypes in '..\CPluginTypes.pas',
+  CXmlTlb in '..\..\Shared\CXmlTlb.pas',
   CXml in '..\..\Shared\CXml.pas',
   NBPACurrencyRatesConfigFormUnit in 'NBPACurrencyRatesConfigFormUnit.pas' {NBPACurrencyRatesConfigForm},
   NBPACurrencyRatesProgressFormUnit in 'NBPACurrencyRatesProgressFormUnit.pas' {NBPACurrencyRatesProgressForm},

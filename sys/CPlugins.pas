@@ -2,7 +2,7 @@ unit CPlugins;
 
 interface
 
-uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, MsXml, CComponents,
+uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, CXmlTlb, CComponents,
      Classes;
 
 type

@@ -4,7 +4,6 @@ library AccountChart;
 
 uses
   Windows,
-  MsXml,
   Dialogs,
   Forms,
   Variants,
@@ -15,6 +14,7 @@ uses
   Graphics,
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
+  CXmlTlb in '..\..\Shared\CXmlTlb.pas',
   CXml in '..\..\Shared\CXml.pas';
 
 var CManInterface: ICManagerInterface;

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports,
-  CComponents, MsXml;
+  CComponents, CXmlTlb;
 
 type
   TCParamDefForm = class(TCConfigForm)

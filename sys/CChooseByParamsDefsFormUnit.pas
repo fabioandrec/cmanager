@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports, Contnrs,
-  CComponents, CTools, MsXml;
+  CComponents, CTools, CXmlTlb;
 
 type
   TDialogParamControl = class(TObjectList)

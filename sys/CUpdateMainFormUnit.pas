@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CComponents, StdCtrls, ExtCtrls, WinInet, ShellApi, ComCtrls, ActiveX,
-  MsXml, CHttpRequest;
+  CXmlTlb, CHttpRequest;
 
 type
   TCUpdateMainForm = class(TForm)

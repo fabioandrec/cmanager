@@ -82,6 +82,7 @@ uses
   CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm},
   CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame},
   CRichtext in 'Shared\CRichtext.pas',
+  CXmlTlb in 'Shared\CXmlTlb.pas',  
   CXml in 'Shared\CXml.pas',
   CTools in 'Shared\CTools.pas',
   CHelp in 'CHelp.pas',

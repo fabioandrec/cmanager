@@ -11,7 +11,7 @@ uses
   Windows,
   Classes,
   ActiveX,
-  MsXml,
+  CXmlTlb in 'Shared\CXmlTlb.pas',
   CXml in 'Shared\CXml.pas',
   CTools in 'Shared\CTools.pas';
 
@@ -103,7 +103,7 @@ begin
                   xOutput.Free;
                 end;
               end else begin
-                xText := 'Plik ' + xXslFilename + ' nie jest poprawnym dokumentem xml, ' + GetParseErrorDescription(xXslDoc.parseError);
+                xText := 'Plik ' + xXslFilename + ' nie jest poprawnym dokumentem xml, ' + GetParseErrorDescription(xXslDoc.parseError, False);
               end;
             except
               on E: Exception do begin
@@ -111,7 +111,7 @@ begin
               end;
             end;
           end else begin
-            xText := 'Plik ' + xXmlFilename + ' nie jest poprawnym dokumentem xml, ' +  GetParseErrorDescription(xXmlDoc.parseError);
+            xText := 'Plik ' + xXmlFilename + ' nie jest poprawnym dokumentem xml, ' +  GetParseErrorDescription(xXmlDoc.parseError, False);
           end;
         except
           on E: Exception do begin

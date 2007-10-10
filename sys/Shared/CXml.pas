@@ -2,7 +2,7 @@ unit CXml;
 
 interface
 
-uses ActiveX, MsXml, Classes;
+uses ActiveX, CXmlTlb, Classes;
 
 procedure SetXmlAttribute(AName: String; ANode: IXMLDOMNode; AValue: OleVariant);
 function GetXmlAttribute(AName: String; ANode: IXMLDOMNode; ADefault: OleVariant): OleVariant;
@@ -11,7 +11,7 @@ function GetStringFromDocument(ADocument: IXMLDOMDocument): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: IXMLDOMNode; ADefault: String): String;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument;
 procedure AppendEncoding(var AXml: IXMLDOMDocument; AEncoding: String = 'Windows-1250');
-function GetParseErrorDescription(AError: IXMLDOMParseError): String;
+function GetParseErrorDescription(AError: IXMLDOMParseError; AWithLinebraks: Boolean): String;
 
 implementation
 
@@ -88,7 +88,7 @@ begin
   xStream.Free;
 end;
 
-function GetParseErrorDescription(AError: IXMLDOMParseError): String;
+function GetParseErrorDescription(AError: IXMLDOMParseError; AWithLinebraks: Boolean): String;
 begin
   Result := '';
   if AError <> Nil then begin
@@ -99,7 +99,7 @@ begin
       end;
       Result := Result + ' Linia ' + IntToStr(AError.line) +
                          ', wiersz ' + IntToStr(AError.linepos) +
-                         ',\nŸród³o b³êdu ' + Trim(AError.srcText);
+                         ',' + IfThen(AWithLinebraks, '\n', ' ') + 'Ÿród³o b³êdu ' + Trim(AError.srcText);
     end;
   end;
 end;

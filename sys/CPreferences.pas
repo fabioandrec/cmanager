@@ -2,7 +2,7 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, MsXml, Math, Windows, CTemplates, GraphUtil;
+uses Classes, Graphics, Contnrs, CXmlTlb, Math, Windows, CTemplates, GraphUtil;
 
 type
   TPrefList = class;

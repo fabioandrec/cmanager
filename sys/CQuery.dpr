@@ -15,6 +15,7 @@ uses
   MemCheck in 'MemCheck.pas',
   CTools in 'Shared\CTools.pas',
   CAdotools in 'Shared\CAdotools.pas',
+  CXmlTlb in 'Shared\CXmlTlb.pas',  
   CXml in 'Shared\CXml.pas';
 
 {$R *.res}
