@@ -82,7 +82,7 @@ procedure TCParamDefForm.FillForm;
 var xCount: Integer;
     xIndexType, xIndexFrame, xIndexProperty: Integer;
     xRegs: TRegisteredFrameClass;
-    xXml: IXMLDOMDocument;
+    xXml: IXMLDOMDocument2;
     xNode: IXMLDOMNode;
     xStr: TStringList;
 begin

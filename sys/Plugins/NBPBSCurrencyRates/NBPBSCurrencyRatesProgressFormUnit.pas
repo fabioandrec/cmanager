@@ -11,13 +11,13 @@ uses
 type
   TNBPBSCurrencyRatesThread = class(THttpRequest)
   private
-    FResponseXml: IXMLDOMDocument;
+    FResponseXml: IXMLDOMDocument2;
     FRootElement: IXMLDOMNode;
     procedure SetFinished;
   protected
     procedure AfterGetResponse; override;
   public
-    property ResponseXml: IXMLDOMDocument read FResponseXml write FResponseXml;
+    property ResponseXml: IXMLDOMDocument2 read FResponseXml write FResponseXml;
     property RootElement: IXMLDOMNode read FRootElement write FRootElement;
   end;
 
@@ -58,7 +58,7 @@ var xOutRoot: IXMLDOMNode;
     xCurrencyRate: Currency;
     xOldDecimal: Char;
     xLink: String;
-    xXml: IXMLDOMDocument;
+    xXml: IXMLDOMDocument2;
     xConfiguration: String;
     xProceed: Boolean;
 begin

@@ -81,7 +81,7 @@ begin
 end;
 
 function GetRowsAsXml(ARecordset: _Recordset): String;
-var xDoc: IXMLDOMDocument;
+var xDoc: IXMLDOMDocument2;
     xRoot: IXMLDOMNode;
     xHeader: IXMLDOMNode;
     xData: IXMLDOMNode;

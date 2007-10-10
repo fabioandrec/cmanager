@@ -27,7 +27,7 @@ implementation
 uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts,
   CPreferences, CXml, CTools, CComponents;
 
-var GSettings: IXMLDOMDocument = Nil;
+var GSettings: IXMLDOMDocument2 = Nil;
 
 function GetSettingsRoot: IXMLDOMNode;
 begin

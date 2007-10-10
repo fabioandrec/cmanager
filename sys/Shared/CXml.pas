@@ -6,18 +6,18 @@ uses ActiveX, CXmlTlb, Classes;
 
 procedure SetXmlAttribute(AName: String; ANode: IXMLDOMNode; AValue: OleVariant);
 function GetXmlAttribute(AName: String; ANode: IXMLDOMNode; ADefault: OleVariant): OleVariant;
-function GetDocumentFromString(AString: String): IXMLDOMDocument;
-function GetStringFromDocument(ADocument: IXMLDOMDocument): String;
+function GetDocumentFromString(AString: String): IXMLDOMDocument2;
+function GetStringFromDocument(ADocument: IXMLDOMDocument2): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: IXMLDOMNode; ADefault: String): String;
-function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument;
-procedure AppendEncoding(var AXml: IXMLDOMDocument; AEncoding: String = 'Windows-1250');
+function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument2;
+procedure AppendEncoding(var AXml: IXMLDOMDocument2; AEncoding: String = 'Windows-1250');
 function GetParseErrorDescription(AError: IXMLDOMParseError; AWithLinebraks: Boolean): String;
 
 implementation
 
 uses SysUtils, StrUtils;
 
-procedure AppendEncoding(var AXml: IXMLDOMDocument; AEncoding: String = 'Windows-1250');
+procedure AppendEncoding(var AXml: IXMLDOMDocument2; AEncoding: String = 'Windows-1250');
 var xProc: IXMLDOMProcessingInstruction;
 begin
   xProc := AXml.createProcessingInstruction('xml', 'version="1.0" encoding="' + AEncoding + '"');
@@ -28,9 +28,9 @@ begin
   end;
 end;
 
-function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument;
+function GetXmlDocument(AEncoding: String = 'Windows-1250'): IXMLDOMDocument2;
 begin
-  Result := CoDOMDocument.Create;
+  Result := CoDOMDocument40.Create;
   AppendEncoding(Result, AEncoding);
 end;
 
@@ -64,7 +64,7 @@ begin
   xNode.nodeValue := AValue;
 end;
 
-function GetDocumentFromString(AString: String): IXMLDOMDocument;
+function GetDocumentFromString(AString: String): IXMLDOMDocument2;
 var xStream: TStringStream;
     xHelper: TStreamAdapter;
 begin
@@ -77,7 +77,7 @@ begin
   xStream.Free;
 end;
 
-function GetStringFromDocument(ADocument: IXMLDOMDocument): String;
+function GetStringFromDocument(ADocument: IXMLDOMDocument2): String;
 var xStream: TStringStream;
     xHelper: TStreamAdapter;
 begin

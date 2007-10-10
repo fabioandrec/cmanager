@@ -38,7 +38,7 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
   private
-    FXml: IXMLDOMDocument;
+    FXml: IXMLDOMDocument2;
     FRoot: IXMLDOMNode;
     FRates: IXMLDOMNodeList;
     FBindingDate: TDateTime;
@@ -46,7 +46,7 @@ type
     procedure SetChecked(AChecked: Boolean);
   public
     procedure InitializeForm;
-    property Xml: IXMLDOMDocument read FXml write FXml;
+    property Xml: IXMLDOMDocument2 read FXml write FXml;
     property Root: IXMLDOMNode read FRoot write FRoot;
     property Rates: IXMLDOMNodeList read FRates write FRates;
     property BindingDate: TDateTime read FBindingDate write FBindingDate;

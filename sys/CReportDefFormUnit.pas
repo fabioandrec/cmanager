@@ -198,7 +198,7 @@ begin
 end;
 
 function TCReportDefForm.CheckValidXsl: Boolean;
-var xXml: IXMLDOMDocument;
+var xXml: IXMLDOMDocument2;
 begin
   xXml := GetDocumentFromString(RicheditXslt.Text);
   Result := xXml.parseError.errorCode = 0;

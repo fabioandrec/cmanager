@@ -115,7 +115,7 @@ begin
   end;
 end;
 
-function GetBasePluginXml: IXMLDOMDocument;
+function GetBasePluginXml: IXMLDOMDocument2;
 var xRoot: IXMLDOMNode;
 begin
   Result := GetXmlDocument;

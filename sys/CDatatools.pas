@@ -306,7 +306,7 @@ begin
 end;
 
 procedure UpdateExchanges(ARatesText: String);
-var xDoc: IXMLDOMDocument;
+var xDoc: IXMLDOMDocument2;
     xRoot: IXMLDOMNode;
     xList: IXMLDOMNodeList;
     xValid: Boolean;
@@ -350,7 +350,7 @@ begin
 end;
 
 procedure UpdateCurrencyRates(ARatesText: String);
-var xDoc: IXMLDOMDocument;
+var xDoc: IXMLDOMDocument2;
     xRoot: IXMLDOMNode;
     xList: IXMLDOMNodeList;
     xValid: Boolean;
@@ -494,7 +494,7 @@ begin
 end;
 
 procedure UpdateExtractions(AExtractionText: String);
-var xDoc: IXMLDOMDocument;
+var xDoc: IXMLDOMDocument2;
     xRoot: IXMLDOMNode;
     xList: IXMLDOMNodeList;
     xValid: Boolean;

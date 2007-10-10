@@ -33,7 +33,7 @@ begin
 end;
 
 function Plugin_Execute: OleVariant; stdcall; export;
-var xXml: IXMLDOMDocument;
+var xXml: IXMLDOMDocument2;
     xOutRoot: IXMLDOMNode;
     xCount: Integer;
     xChart, xSerie, xItem: IXMLDOMNode;

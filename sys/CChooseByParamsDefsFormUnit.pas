@@ -328,7 +328,7 @@ begin
 end;
 
 function TDialogParamControl.GetValues: TVariantDynArray;
-var xXml: IXMLDOMDocument;
+var xXml: IXMLDOMDocument2;
     xNode, xParent: IXMLDOMNode;
     xCount: Integer;
     xType: Integer;
@@ -560,7 +560,7 @@ end;
 
 procedure TDialogParamControl.ChooseProperty(var ADataGid, AText: String; var AAccepted: Boolean);
 var xList: TStringList;
-    xXml: IXMLDOMDocument;
+    xXml: IXMLDOMDocument2;
     xParent: IXMLDOMNode;
     xNode: IXMLDOMNode;
     xCount: Integer;

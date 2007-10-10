@@ -22,13 +22,13 @@ type
     FframeType: Integer;
     FpropertyType: Integer;
     FdecimalLen: Integer;
-    FpropertyItems: IXMLDOMDocument;
+    FpropertyItems: IXMLDOMDocument2;
     FpropertyList: String;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
     function GetparamAsString(AParamOption: String): String;
     function GetvalueAsString(AIndex: Integer): String;
-    function GetPropertyItems: IXMLDOMDocument;
+    function GetPropertyItems: IXMLDOMDocument2;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: IXMLDOMNode);
@@ -52,7 +52,7 @@ type
     property frameType: Integer read FframeType write FframeType;
     property decimalLen: Integer read FdecimalLen write FdecimalLen;
     property propertyType: Integer read FpropertyType write FpropertyType;
-    property propertyItems: IXMLDOMDocument read GetPropertyItems;
+    property propertyItems: IXMLDOMDocument2 read GetPropertyItems;
     property propertyList: String read FpropertyList write FpropertyList;
   end;
 
@@ -215,8 +215,8 @@ type
   private
     FreportText: TStringList;
     FreportStyle: TStringList;
-    function GetDefaultXsl(var AError: String): IXMLDOMDocument;
-    function GetSystemXsl(var AError: String): IXMLDOMDocument;
+    function GetDefaultXsl(var AError: String): IXMLDOMDocument2;
+    function GetSystemXsl(var AError: String): IXMLDOMDocument2;
   protected
     procedure PrepareReportPath; virtual;
     procedure PrepareReportContent; virtual;
@@ -555,7 +555,7 @@ type
 
   TPluginChartReport = class(TCChartReport)
   private
-    FXml: IXMLDOMDocument;
+    FXml: IXMLDOMDocument2;
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
@@ -596,8 +596,8 @@ type
   private
     FErrorText: String;
     FAddText: String;
-    FxsltDoc: IXMLDOMDocument;
-    FdataDoc: IXMLDOMDocument;
+    FxsltDoc: IXMLDOMDocument2;
+    FdataDoc: IXMLDOMDocument2;
     FqueryText: String;
     FreportDef: TReportDef;
     Fparams: TReportDialogParamsDefs;
@@ -628,11 +628,11 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
      CBaseFrameUnit;
 
-var LDefaultXsl: IXMLDOMDocument = Nil;
-    LPropertyXml: IXMLDOMDocument = Nil;
+var LDefaultXsl: IXMLDOMDocument2 = Nil;
+    LPropertyXml: IXMLDOMDocument2 = Nil;
 
 
-function TCHtmlReport.GetDefaultXsl(var AError: String): IXMLDOMDocument;
+function TCHtmlReport.GetDefaultXsl(var AError: String): IXMLDOMDocument2;
 var xRes: TResourceStream;
     xStr: TStringList;
 begin
@@ -665,7 +665,7 @@ begin
   end;
 end;
 
-function TCHtmlReport.GetSystemXsl(var AError: String): IXMLDOMDocument;
+function TCHtmlReport.GetSystemXsl(var AError: String): IXMLDOMDocument2;
 var xLibHandle: THandle;
     xResInfo: HRSRC;
     xResStream: TResourceStream;
@@ -718,7 +718,7 @@ begin
   end;
 end;
 
-function GetReportPropertyItems: IXMLDOMDocument;
+function GetReportPropertyItems: IXMLDOMDocument2;
 begin
   if LPropertyXml = Nil then begin
     LPropertyXml := GetDocumentFromString(CPropertyItems);
@@ -4230,7 +4230,7 @@ begin
 end;
 
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
-var xXml, xXslt: IXMLDOMDocument;
+var xXml, xXslt: IXMLDOMDocument2;
     xBody: String;
 begin
   xXml := GetDocumentFromString(AXmlText);
@@ -4418,7 +4418,7 @@ begin
 end;
 
 function TReportDialogParamsDefs.GetAsString: String;
-var xXml: IXMLDOMDocument;
+var xXml: IXMLDOMDocument2;
     xRoot: IXMLDOMNode;
     xNode: IXMLDOMNode;
     xCount: Integer;
@@ -4555,7 +4555,7 @@ begin
 end;
 
 procedure TReportDialogParamsDefs.SetAsString(const Value: String);
-var xXml: IXMLDOMDocument;
+var xXml: IXMLDOMDocument2;
     xCount: Integer;
     xParam: TReportDialgoParamDef;
 begin
@@ -4631,7 +4631,7 @@ begin
   Result := Length(FparamValues);
 end;
 
-function TReportDialgoParamDef.GetPropertyItems: IXMLDOMDocument;
+function TReportDialgoParamDef.GetPropertyItems: IXMLDOMDocument2;
 var xStr: TStringList;
     xCount: Integer;
     xNode: IXMLDOMNode;

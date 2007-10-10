@@ -149,7 +149,7 @@ begin
 end;
 
 procedure TUpdateHttpRequest.AfterGetResponse;
-var xDocument: IXMLDOMDocument;
+var xDocument: IXMLDOMDocument2;
     xCurrentVersion: String;
     xLatestVersion: String;
     xNode: IXMLDOMNode;

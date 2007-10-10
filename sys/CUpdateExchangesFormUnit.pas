@@ -36,14 +36,14 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
   private
-    FXml: IXMLDOMDocument;
+    FXml: IXMLDOMDocument2;
     FRoot: IXMLDOMNode;
     FExchanges: IXMLDOMNodeList;
     FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
   public
     procedure InitializeForm;
-    property Xml: IXMLDOMDocument read FXml write FXml;
+    property Xml: IXMLDOMDocument2 read FXml write FXml;
     property Root: IXMLDOMNode read FRoot write FRoot;
     property Exchanges: IXMLDOMNodeList read FExchanges write FExchanges;
     property CashpointName: String read FCashpointName write FCashpointName;
