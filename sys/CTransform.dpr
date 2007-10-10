@@ -60,11 +60,11 @@ begin
         xText := 'Plik o nazwie ' + xOutputFilename + ' ju¿ istnieje';
       end else begin
         try
-          xXmlDoc := CoDOMDocument.Create;
+          xXmlDoc := GetNewDocument;
           xXmlDoc.load(xXmlFilename);
           if xXmlDoc.parseError.errorCode = 0 then begin
             try
-              xXslDoc := CoDOMDocument.Create;
+              xXslDoc := GetNewDocument;
               xXslDoc.load(xXslFilename);
               if xXslDoc.parseError.errorCode = 0 then begin
                 xOutput := TStringList.Create;

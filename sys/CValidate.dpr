@@ -21,7 +21,7 @@ var xExitCode: Integer;
     xText: String;
     xXmlFilename, xXsdFilename: String;
     xXmlDoc, xXsdDoc: ICXMLDOMDocument;
-    xXsdSchema: XMLSchemaCache40;
+    xXsdSchema: ICXMLDOMSchemaCollection;
     xValid: Boolean;
 begin
   {$IFDEF DEBUG}
@@ -49,10 +49,10 @@ begin
         xValid := False;
         if xXsdFilename <> '' then begin
           try
-            xXsdDoc := CoDOMDocument40.Create;
+            xXsdDoc := GetNewDocument;
             xXsdDoc.load(xXsdFilename);
             if xXsdDoc.parseError.errorCode = 0 then begin
-              xXsdSchema := CoXMLSchemaCache40.Create;
+              xXsdSchema := GetNewSchema;
               xXsdSchema.add('', xXsdDoc);
               xValid := True;
             end else begin
@@ -68,7 +68,7 @@ begin
         end;
         if xValid then begin
           try
-            xXmlDoc := CoDOMDocument40.Create;
+            xXmlDoc := GetNewDocument;
             xXmlDoc.resolveExternals := True;
             xXmlDoc.validateOnParse := True;
             xXmlDoc.async := False;

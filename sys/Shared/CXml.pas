@@ -20,6 +20,8 @@ procedure SetXmlAttribute(AName: String; ANode: ICXMLDOMNode; AValue: OleVariant
 function GetXmlAttribute(AName: String; ANode: ICXMLDOMNode; ADefault: OleVariant): OleVariant;
 function GetDocumentFromString(AString: String; AXsd: ICXMLDOMDocument = Nil): ICXMLDOMDocument;
 function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument = Nil): ICXMLDOMDocument;
+function GetNewSchema: ICXMLDOMSchemaCollection;
+function GetNewDocument: ICXMLDOMDocument;
 function GetStringFromDocument(ADocument: ICXMLDOMDocument): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: ICXMLDOMNode; ADefault: String): String;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): ICXMLDOMDocument;
@@ -43,7 +45,7 @@ end;
 
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): ICXMLDOMDocument;
 begin
-  Result := CoDOMDocument26.Create;
+  Result := GetNewDocument;
   AppendEncoding(Result, AEncoding);
 end;
 
@@ -103,7 +105,7 @@ begin
     Result.validateOnParse := True;
     Result.resolveExternals := True;
     if AXsd <> Nil then begin
-      xXsdCache := CoXMLSchemaCache40.Create;
+      xXsdCache := GetNewSchema;
       xXsdCache.add('', AXsd);
       Result.schemas := xXsdCache;
     end;
@@ -142,6 +144,16 @@ begin
                          ',' + IfThen(AWithLinebraks, '\n', ' ') + 'Ÿród³o b³êdu ' + Trim(AError.srcText);
     end;
   end;
+end;
+
+function GetNewDocument: ICXMLDOMDocument;
+begin
+  Result := CoDOMDocument26.Create;
+end;
+
+function GetNewSchema: ICXMLDOMSchemaCollection;
+begin
+  Result := CoXMLSchemaCache26.Create;
 end;
 
 end.
