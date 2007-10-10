@@ -6,19 +6,19 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXmlTlb;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml;
 
 type
   TNBPBSCurrencyRatesThread = class(THttpRequest)
   private
-    FResponseXml: IXMLDOMDocument2;
-    FRootElement: IXMLDOMNode;
+    FResponseXml: ICXMLDOMDocument;
+    FRootElement: ICXMLDOMNode;
     procedure SetFinished;
   protected
     procedure AfterGetResponse; override;
   public
-    property ResponseXml: IXMLDOMDocument2 read FResponseXml write FResponseXml;
-    property RootElement: IXMLDOMNode read FRootElement write FRootElement;
+    property ResponseXml: ICXMLDOMDocument read FResponseXml write FResponseXml;
+    property RootElement: ICXMLDOMNode read FRootElement write FRootElement;
   end;
 
   TNBPBSCurrencyRatesProgressForm = class(TForm)
@@ -39,7 +39,7 @@ var NBPBSCurrencyRatesProgressForm: TNBPBSCurrencyRatesProgressForm;
 
 implementation
 
-uses CRichtext, StrUtils, CXml, NBPBSCurrencyRatesConfigFormUnit,
+uses CRichtext, StrUtils, NBPBSCurrencyRatesConfigFormUnit,
   CPluginConsts;
 
 {$R *.dfm}
@@ -49,16 +49,16 @@ const
   CENDTAG = '"';
 
 function TNBPBSCurrencyRatesProgressForm.RetriveCurrencyRates: OleVariant;
-var xOutRoot: IXMLDOMNode;
-    xPositions: IXMLDOMNodeList;
-    xPosition, xOut: IXMLDOMNode;
+var xOutRoot: ICXMLDOMNode;
+    xPositions: ICXMLDOMNodeList;
+    xPosition, xOut: ICXMLDOMNode;
     xCount: Integer;
     xCurrencyName, xCurrencyIso: String;
     xCurrencyQuantity: Integer;
     xCurrencyRate: Currency;
     xOldDecimal: Char;
     xLink: String;
-    xXml: IXMLDOMDocument2;
+    xXml: ICXMLDOMDocument;
     xConfiguration: String;
     xProceed: Boolean;
 begin

@@ -2,7 +2,7 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, CXmlTlb, Math, Windows, CTemplates, GraphUtil;
+uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml;
 
 type
   TPrefList = class;
@@ -11,13 +11,13 @@ type
   TPrefItem = class(TObject)
   private
     FPrefname: String;
-    function FindNode(AParentNode: IXMLDOMNode; ACanCreate: Boolean): IXMLDOMNode;
+    function FindNode(AParentNode: ICXMLDOMNode; ACanCreate: Boolean): ICXMLDOMNode;
   protected
-    procedure LoadFromParentNode(AParentNode: IXMLDOMNode);
-    procedure SaveToParentNode(AParentNode: IXMLDOMNode);
+    procedure LoadFromParentNode(AParentNode: ICXMLDOMNode);
+    procedure SaveToParentNode(AParentNode: ICXMLDOMNode);
   public
-    procedure LoadFromXml(ANode: IXMLDOMNode); virtual;
-    procedure SaveToXml(ANode: IXMLDOMNode); virtual;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); virtual;
+    procedure SaveToXml(ANode: ICXMLDOMNode); virtual;
     procedure Clone(APrefItem: TPrefItem); virtual;
     constructor Create(APrefname: String); virtual;
     function GetNodeName: String; virtual; abstract;
@@ -34,9 +34,9 @@ type
   public
     procedure Clone(APrefList: TPrefList);
     constructor Create(AItemClass: TPrefItemClass);
-    procedure LoadFromParentNode(AParentNode: IXMLDOMNode);
-    procedure LoadAllFromParentNode(AParentNode: IXMLDOMNode);
-    procedure SavetToParentNode(AParentNode: IXMLDOMNode);
+    procedure LoadFromParentNode(AParentNode: ICXMLDOMNode);
+    procedure LoadAllFromParentNode(AParentNode: ICXMLDOMNode);
+    procedure SavetToParentNode(AParentNode: ICXMLDOMNode);
     property Items[AIndex: Integer]: TPrefItem read GetItems write SetItems;
     property ByPrefname[APrefname: String]: TPrefItem read GetByPrefname;
   end;
@@ -46,8 +46,8 @@ type
     FlastBackup: TDateTime;
   public
     function GetNodeName: String; override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     constructor CreateBackupPref(AFilename: String; ALastBackup: TDateTime);
     property lastBackup: TDateTime read FlastBackup write FlastBackup;
   end;
@@ -59,8 +59,8 @@ type
     FisEnabled: Boolean;
   public
     function GetNodeName: String; override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     constructor CreatePluginPref(AFilename: String; AConfiguration: String);
     procedure Clone(APrefItem: TPrefItem); override;
     property configuration: String read Fconfiguration write Fconfiguration;
@@ -93,8 +93,8 @@ type
     FFont: TFont;
     FDesc: String;
   public
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
     procedure Clone(APrefItem: TPrefItem); override;
     function GetNodeName: String; override;
     property Font: TFont read FFont;
@@ -111,8 +111,8 @@ type
     Fwidth: Integer;
     Fvisible: Integer;
   public
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
     procedure Clone(APrefItem: TPrefItem); override;
     function GetNodeName: String; override;
   published
@@ -125,8 +125,8 @@ type
   private
     FFontprefs: TPrefList;
   public
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
     procedure Clone(APrefItem: TPrefItem); override;
     function GetNodeName: String; override;
     constructor Create(APrefname: String); override;
@@ -146,8 +146,8 @@ type
     Fperspective: Integer;
     Ftilt: Integer;
   public
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
     procedure Clone(APrefItem: TPrefItem); override;
     function GetNodeName: String; override;
   published
@@ -191,8 +191,8 @@ type
     FoddListColor: TColor;
   public
     function GetBackupfilename: String;
-    procedure LoadFromXml(ANode: IXMLDOMNode); override;
-    procedure SaveToXml(ANode: IXMLDOMNode); override;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
     function GetNodeName: String; override;
     procedure Clone(APrefItem: TPrefItem); override;
     function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
@@ -252,7 +252,7 @@ function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 
 implementation
 
-uses CSettings, CMovementFrameUnit, CConsts, CDatabase, CXml, SysUtils,
+uses CSettings, CMovementFrameUnit, CConsts, CDatabase, SysUtils,
      DateUtils, CBackups, CTools, Forms;
 
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
@@ -262,7 +262,7 @@ begin
   end;
 end;
 
-procedure SaveFontToXml(ANode: IXMLDOMNode; AFont: TFont);
+procedure SaveFontToXml(ANode: ICXMLDOMNode; AFont: TFont);
 begin
   SetXmlAttribute('FontName', ANode, AFont.Name);
   SetXmlAttribute('Size', ANode, AFont.Size);
@@ -273,7 +273,7 @@ begin
   SetXmlAttribute('IsStrikeout', ANode, fsStrikeOut in AFont.Style);
 end;
 
-procedure LoadFontFromXml(ANode: IXMLDOMNode; AFont: TFont);
+procedure LoadFontFromXml(ANode: ICXMLDOMNode; AFont: TFont);
 begin
   AFont.Name := GetXmlAttribute('FontName', ANode, 'MS Sans Serif');
   AFont.Size := GetXmlAttribute('Size', ANode, 8);
@@ -311,8 +311,8 @@ begin
   FPrefname := APrefname;
 end;
 
-function TPrefItem.FindNode(AParentNode: IXMLDOMNode; ACanCreate: Boolean): IXMLDOMNode;
-var xNode: IXMLDOMNode;
+function TPrefItem.FindNode(AParentNode: ICXMLDOMNode; ACanCreate: Boolean): ICXMLDOMNode;
+var xNode: ICXMLDOMNode;
 begin
   xNode := AParentNode.firstChild;
   Result := Nil;
@@ -331,8 +331,8 @@ begin
   end;
 end;
 
-procedure TPrefItem.LoadFromParentNode(AParentNode: IXMLDOMNode);
-var xNode: IXMLDOMNode;
+procedure TPrefItem.LoadFromParentNode(AParentNode: ICXMLDOMNode);
+var xNode: ICXMLDOMNode;
 begin
   xNode := FindNode(AParentNode, False);
   if xNode <> Nil then begin
@@ -340,12 +340,12 @@ begin
   end;
 end;
 
-procedure TPrefItem.LoadFromXml(ANode: IXMLDOMNode);
+procedure TPrefItem.LoadFromXml(ANode: ICXMLDOMNode);
 begin
 end;
 
-procedure TPrefItem.SaveToParentNode(AParentNode: IXMLDOMNode);
-var xNode: IXMLDOMNode;
+procedure TPrefItem.SaveToParentNode(AParentNode: ICXMLDOMNode);
+var xNode: ICXMLDOMNode;
 begin
   xNode := FindNode(AParentNode, True);
   SaveToXml(xNode);
@@ -391,8 +391,8 @@ begin
   Result := TPrefItem(inherited Items[AIndex]);
 end;
 
-procedure TPrefList.LoadAllFromParentNode(AParentNode: IXMLDOMNode);
-var xNode: IXMLDOMNode;
+procedure TPrefList.LoadAllFromParentNode(AParentNode: ICXMLDOMNode);
+var xNode: ICXMLDOMNode;
     xItem: TPrefItem;
 begin
   xNode := AParentNode.firstChild;
@@ -404,7 +404,7 @@ begin
   end;
 end;
 
-procedure TPrefList.LoadFromParentNode(AParentNode: IXMLDOMNode);
+procedure TPrefList.LoadFromParentNode(AParentNode: ICXMLDOMNode);
 var xCount: Integer;
 begin
   for xCount := 0 to Count - 1 do begin
@@ -412,7 +412,7 @@ begin
   end;
 end;
 
-procedure TPrefList.SavetToParentNode(AParentNode: IXMLDOMNode);
+procedure TPrefList.SavetToParentNode(AParentNode: ICXMLDOMNode);
 var xCount: Integer;
 begin
   for xCount := 0 to Count - 1 do begin
@@ -484,25 +484,25 @@ begin
   Result := 'fontpref';
 end;
 
-procedure TFontPref.LoadFromXml(ANode: IXMLDOMNode);
+procedure TFontPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   FBackground := GetXmlAttribute('background', ANode, FBackground);
   LoadFontFromXml(ANode, FFont);
 end;
 
-procedure TFontPref.SaveToXml(ANode: IXMLDOMNode);
+procedure TFontPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('background', ANode, FBackground);
   SaveFontToXml(ANode, FFont);
 end;
 
-procedure TPrefItem.SaveToXml(ANode: IXMLDOMNode);
+procedure TPrefItem.SaveToXml(ANode: ICXMLDOMNode);
 begin
 end;
 
-procedure TViewPref.LoadFromXml(ANode: IXMLDOMNode);
-var xFontprefs: IXMLDOMNode;
+procedure TViewPref.LoadFromXml(ANode: ICXMLDOMNode);
+var xFontprefs: ICXMLDOMNode;
 begin
   inherited LoadFromXml(ANode);
   xFontprefs := ANode.selectSingleNode('fontprefs');
@@ -511,8 +511,8 @@ begin
   end;
 end;
 
-procedure TViewPref.SaveToXml(ANode: IXMLDOMNode);
-var xFontprefs: IXMLDOMNode;
+procedure TViewPref.SaveToXml(ANode: ICXMLDOMNode);
+var xFontprefs: ICXMLDOMNode;
 begin
   inherited SaveToXml(ANode);
   xFontprefs := ANode.selectSingleNode('fontprefs');
@@ -595,7 +595,7 @@ begin
   Result := 'basepref';
 end;
 
-procedure TBasePref.LoadFromXml(ANode: IXMLDOMNode);
+procedure TBasePref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   FstartupDatafileMode := GetXmlAttribute('startupfilemode', ANode, CStartupFilemodeThisfile);
@@ -637,7 +637,7 @@ begin
   end;
 end;
 
-procedure TBasePref.SaveToXml(ANode: IXMLDOMNode);
+procedure TBasePref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('startupfilemode', ANode, FstartupDatafileMode);
@@ -680,7 +680,7 @@ begin
   Result := 'columnPref'; 
 end;
 
-procedure TViewColumnPref.LoadFromXml(ANode: IXMLDOMNode);
+procedure TViewColumnPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   Fposition := GetXmlAttribute('position', ANode, -1);
@@ -688,7 +688,7 @@ begin
   Fvisible := GetXmlAttribute('visible', ANode, -1);
 end;
 
-procedure TViewColumnPref.SaveToXml(ANode: IXMLDOMNode);
+procedure TViewColumnPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('position', ANode, Fposition);
@@ -765,7 +765,7 @@ begin
   Result := 'backuppref';
 end;
 
-procedure TBackupPref.LoadFromXml(ANode: IXMLDOMNode);
+procedure TBackupPref.LoadFromXml(ANode: ICXMLDOMNode);
 var xDateStr: String;
     xY, xM, xD, xH, xN, xS: Word;
     xTime: TDateTime;
@@ -786,7 +786,7 @@ begin
   end;
 end;
 
-procedure TBackupPref.SaveToXml(ANode: IXMLDOMNode);
+procedure TBackupPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('lastBackup', ANode, FormatDateTime('ddmmyyyyhhnnss', FlastBackup));
@@ -925,7 +925,7 @@ begin
   Result := 'pluginpref';
 end;
 
-procedure TPluginPref.LoadFromXml(ANode: IXMLDOMNode);
+procedure TPluginPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   Fconfiguration := GetXmlAttribute('configuration', ANode, '');
@@ -933,7 +933,7 @@ begin
   FisEnabled := GetXmlAttribute('isEnabeld', ANode, True);
 end;
 
-procedure TPluginPref.SaveToXml(ANode: IXMLDOMNode);
+procedure TPluginPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('configuration', ANode, Fconfiguration);
@@ -960,7 +960,7 @@ begin
   Result := 'chartpref';
 end;
 
-procedure TChartPref.LoadFromXml(ANode: IXMLDOMNode);
+procedure TChartPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   Fview := GetXmlAttribute('view', ANode, 0);
@@ -974,7 +974,7 @@ begin
   Ftilt := GetXmlAttribute('tilt', ANode, 0);
 end;
 
-procedure TChartPref.SaveToXml(ANode: IXMLDOMNode);
+procedure TChartPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('view', ANode, Fview);

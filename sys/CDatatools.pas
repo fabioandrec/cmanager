@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils, CXmlTlb, AdoDb, VirtualTrees;
+     DateUtils, AdoDb, VirtualTrees;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -306,9 +306,9 @@ begin
 end;
 
 procedure UpdateExchanges(ARatesText: String);
-var xDoc: IXMLDOMDocument2;
-    xRoot: IXMLDOMNode;
-    xList: IXMLDOMNodeList;
+var xDoc: ICXMLDOMDocument;
+    xRoot: ICXMLDOMNode;
+    xList: ICXMLDOMNodeList;
     xValid: Boolean;
     xError: String;
     xCahpointName: String;
@@ -350,9 +350,9 @@ begin
 end;
 
 procedure UpdateCurrencyRates(ARatesText: String);
-var xDoc: IXMLDOMDocument2;
-    xRoot: IXMLDOMNode;
-    xList: IXMLDOMNodeList;
+var xDoc: ICXMLDOMDocument;
+    xRoot: ICXMLDOMNode;
+    xList: ICXMLDOMNodeList;
     xValid: Boolean;
     xError: String;
     xBindingDate: TDateTime;
@@ -494,16 +494,16 @@ begin
 end;
 
 procedure UpdateExtractions(AExtractionText: String);
-var xDoc: IXMLDOMDocument2;
-    xRoot: IXMLDOMNode;
-    xList: IXMLDOMNodeList;
+var xDoc: ICXMLDOMDocument;
+    xRoot: ICXMLDOMNode;
+    xList: ICXMLDOMNodeList;
     xValid: Boolean;
     xError, xDesc: String;
     xCreationDate, xStartDate, xEndDate: TDateTime;
     xForm: TCDataobjectForm;
     xCount: Integer;
     xParams: TExtractionAdditionalData;
-    xNode: IXMLDOMNode;
+    xNode: ICXMLDOMNode;
     xRegDate, xAccountingDate: TDateTime;
     xCash: Currency;
     xMovementType, xCurrencyIso: String;

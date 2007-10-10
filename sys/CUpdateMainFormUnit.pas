@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CComponents, StdCtrls, ExtCtrls, WinInet, ShellApi, ComCtrls, ActiveX,
-  CXmlTlb, CHttpRequest;
+  CHttpRequest;
 
 type
   TCUpdateMainForm = class(TForm)
@@ -149,11 +149,11 @@ begin
 end;
 
 procedure TUpdateHttpRequest.AfterGetResponse;
-var xDocument: IXMLDOMDocument2;
+var xDocument: ICXMLDOMDocument;
     xCurrentVersion: String;
     xLatestVersion: String;
-    xNode: IXMLDOMNode;
-    xItem: IXMLDOMNode;
+    xNode: ICXMLDOMNode;
+    xItem: ICXMLDOMNode;
     xValid: Boolean;
     xDesc: String;
 begin

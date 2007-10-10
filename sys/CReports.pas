@@ -3,8 +3,9 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, CXmlTlb,
-     CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects;
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, 
+     CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects,
+     CXml;
 
 type
   TReportDialogParamsDefs = class;
@@ -22,17 +23,17 @@ type
     FframeType: Integer;
     FpropertyType: Integer;
     FdecimalLen: Integer;
-    FpropertyItems: IXMLDOMDocument2;
+    FpropertyItems: ICXMLDOMDocument;
     FpropertyList: String;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
     function GetparamAsString(AParamOption: String): String;
     function GetvalueAsString(AIndex: Integer): String;
-    function GetPropertyItems: IXMLDOMDocument2;
+    function GetPropertyItems: ICXMLDOMDocument;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
-    procedure LoadFromXml(ANode: IXMLDOMNode);
-    procedure SaveToXml(ANode: IXMLDOMNode);
+    procedure LoadFromXml(ANode: ICXMLDOMNode);
+    procedure SaveToXml(ANode: ICXMLDOMNode);
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementId: String; override;
     function GetElementType: String; override;
@@ -52,7 +53,7 @@ type
     property frameType: Integer read FframeType write FframeType;
     property decimalLen: Integer read FdecimalLen write FdecimalLen;
     property propertyType: Integer read FpropertyType write FpropertyType;
-    property propertyItems: IXMLDOMDocument2 read GetPropertyItems;
+    property propertyItems: ICXMLDOMDocument read GetPropertyItems;
     property propertyList: String read FpropertyList write FpropertyList;
   end;
 
@@ -215,8 +216,8 @@ type
   private
     FreportText: TStringList;
     FreportStyle: TStringList;
-    function GetDefaultXsl(var AError: String): IXMLDOMDocument2;
-    function GetSystemXsl(var AError: String): IXMLDOMDocument2;
+    function GetDefaultXsl(var AError: String): ICXMLDOMDocument;
+    function GetSystemXsl(var AError: String): ICXMLDOMDocument;
   protected
     procedure PrepareReportPath; virtual;
     procedure PrepareReportContent; virtual;
@@ -555,7 +556,7 @@ type
 
   TPluginChartReport = class(TCChartReport)
   private
-    FXml: IXMLDOMDocument2;
+    FXml: ICXMLDOMDocument;
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
@@ -596,8 +597,8 @@ type
   private
     FErrorText: String;
     FAddText: String;
-    FxsltDoc: IXMLDOMDocument2;
-    FdataDoc: IXMLDOMDocument2;
+    FxsltDoc: ICXMLDOMDocument;
+    FdataDoc: ICXMLDOMDocument;
     FqueryText: String;
     FreportDef: TReportDef;
     Fparams: TReportDialogParamsDefs;
@@ -623,16 +624,16 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChoosePeriodAcpListFormUnit, CChoosePeriodAcpListGroupFormUnit,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CChoosePeriodRatesHistoryFormUnit,
-     StrUtils, Variants, CPreferences, CXml, CInfoFormUnit, CPluginConsts,
+     StrUtils, Variants, CPreferences, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
      CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
      CBaseFrameUnit;
 
-var LDefaultXsl: IXMLDOMDocument2 = Nil;
-    LPropertyXml: IXMLDOMDocument2 = Nil;
+var LDefaultXsl: ICXMLDOMDocument = Nil;
+    LPropertyXml: ICXMLDOMDocument = Nil;
 
 
-function TCHtmlReport.GetDefaultXsl(var AError: String): IXMLDOMDocument2;
+function TCHtmlReport.GetDefaultXsl(var AError: String): ICXMLDOMDocument;
 var xRes: TResourceStream;
     xStr: TStringList;
 begin
@@ -665,7 +666,7 @@ begin
   end;
 end;
 
-function TCHtmlReport.GetSystemXsl(var AError: String): IXMLDOMDocument2;
+function TCHtmlReport.GetSystemXsl(var AError: String): ICXMLDOMDocument;
 var xLibHandle: THandle;
     xResInfo: HRSRC;
     xResStream: TResourceStream;
@@ -718,7 +719,7 @@ begin
   end;
 end;
 
-function GetReportPropertyItems: IXMLDOMDocument2;
+function GetReportPropertyItems: ICXMLDOMDocument;
 begin
   if LPropertyXml = Nil then begin
     LPropertyXml := GetDocumentFromString(CPropertyItems);
@@ -3482,9 +3483,9 @@ begin
 end;
 
 procedure TPluginChartReport.PrepareReportChart;
-var xSeries, xItems, xCharts: IXMLDOMNodeList;
+var xSeries, xItems, xCharts: ICXMLDOMNodeList;
     xCountS, xCountC, xCountI: Integer;
-    xChartNode, xSerieNode, xItemNode: IXMLDOMNode;
+    xChartNode, xSerieNode, xItemNode: ICXMLDOMNode;
     xSerieObject: TChartSeries;
     xSerieType: Integer;
     xX, xY: Double;
@@ -4230,7 +4231,7 @@ begin
 end;
 
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
-var xXml, xXslt: IXMLDOMDocument2;
+var xXml, xXslt: ICXMLDOMDocument;
     xBody: String;
 begin
   xXml := GetDocumentFromString(AXmlText);
@@ -4418,9 +4419,9 @@ begin
 end;
 
 function TReportDialogParamsDefs.GetAsString: String;
-var xXml: IXMLDOMDocument2;
-    xRoot: IXMLDOMNode;
-    xNode: IXMLDOMNode;
+var xXml: ICXMLDOMDocument;
+    xRoot: ICXMLDOMNode;
+    xNode: ICXMLDOMNode;
     xCount: Integer;
 begin
   xXml := GetXmlDocument;
@@ -4555,7 +4556,7 @@ begin
 end;
 
 procedure TReportDialogParamsDefs.SetAsString(const Value: String);
-var xXml: IXMLDOMDocument2;
+var xXml: ICXMLDOMDocument;
     xCount: Integer;
     xParam: TReportDialgoParamDef;
 begin
@@ -4631,11 +4632,11 @@ begin
   Result := Length(FparamValues);
 end;
 
-function TReportDialgoParamDef.GetPropertyItems: IXMLDOMDocument2;
+function TReportDialgoParamDef.GetPropertyItems: ICXMLDOMDocument;
 var xStr: TStringList;
     xCount: Integer;
-    xNode: IXMLDOMNode;
-    xProperty: IXMLDOMNode;
+    xNode: ICXMLDOMNode;
+    xProperty: ICXMLDOMNode;
 begin
   if FpropertyItems = Nil then begin
     if FparamType = CParamTypeProperty then begin
@@ -4732,7 +4733,7 @@ begin
   end;
 end;
 
-procedure TReportDialgoParamDef.LoadFromXml(ANode: IXMLDOMNode);
+procedure TReportDialgoParamDef.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   Fname := GetXmlAttribute('name', ANode, '');
   Fdesc := GetXmlAttribute('desc', ANode, '');
@@ -4746,7 +4747,7 @@ begin
   FpropertyList := GetXmlAttribute('list', ANode, '');
 end;
 
-procedure TReportDialgoParamDef.SaveToXml(ANode: IXMLDOMNode);
+procedure TReportDialgoParamDef.SaveToXml(ANode: ICXMLDOMNode);
 begin
   SetXmlAttribute('name', ANode, Fname);
   SetXmlAttribute('desc', ANode, Fdesc);

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CBaseFormUnit, CXmlTlb, CComponents, StdCtrls, Buttons, ExtCtrls,
+  Dialogs, CBaseFormUnit, CComponents, StdCtrls, Buttons, ExtCtrls, CXml,
   VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects;
 
 type
@@ -38,33 +38,33 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
   private
-    FXml: IXMLDOMDocument2;
-    FRoot: IXMLDOMNode;
-    FRates: IXMLDOMNodeList;
+    FXml: ICXMLDOMDocument;
+    FRoot: ICXMLDOMNode;
+    FRates: ICXMLDOMNodeList;
     FBindingDate: TDateTime;
     FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
   public
     procedure InitializeForm;
-    property Xml: IXMLDOMDocument2 read FXml write FXml;
-    property Root: IXMLDOMNode read FRoot write FRoot;
-    property Rates: IXMLDOMNodeList read FRates write FRates;
+    property Xml: ICXMLDOMDocument read FXml write FXml;
+    property Root: ICXMLDOMNode read FRoot write FRoot;
+    property Rates: ICXMLDOMNodeList read FRates write FRates;
     property BindingDate: TDateTime read FBindingDate write FBindingDate;
     property CashpointName: String read FCashpointName write FCashpointName;
   end;
 
   TCurrencyRateDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
   private
-    FRate: IXMLDOMNode;
+    FRate: ICXMLDOMNode;
     FBindingDate: TDateTime;
     FCashpointName: String;
     FQuantity: Integer;
     FCurRate: Currency;
     FrateType: TBaseEnumeration;
   public
-    constructor Create(ARate: IXMLDOMNode; ARateType: TBaseEnumeration; ABindingDate: TDateTime; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
+    constructor Create(ARate: ICXMLDOMNode; ARateType: TBaseEnumeration; ABindingDate: TDateTime; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
     function ExpandTemplate(ATemplate: String): String;
-    property Rate: IXMLDOMNode read FRate;
+    property Rate: ICXMLDOMNode read FRate;
     property BindingDate: TDateTime read FBindingDate;
     property CashpointName: String read FCashpointName;
     property Quantity: Integer read FQuantity;
@@ -74,7 +74,7 @@ type
 
 implementation
 
-uses CDatabase, CXml, CTools, CConsts, CFrameFormUnit,
+uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
   CWaitFormUnit, CProgressFormUnit;
@@ -88,22 +88,22 @@ end;
 
 procedure TCUpdateCurrencyRatesForm.RatesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
 begin
-  NodeDataSize := SizeOf(IXMLDOMNode);
+  NodeDataSize := SizeOf(ICXMLDOMNode);
 end;
 
 procedure TCUpdateCurrencyRatesForm.RatesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
-  IXMLDOMNode(RatesList.GetNodeData(Node)^) := FRates.item[Node.Index];
+  ICXMLDOMNode(RatesList.GetNodeData(Node)^) := FRates.item[Node.Index];
   Node.CheckState := csCheckedNormal;
   Node.CheckType := ctCheckBox
 end;
 
 procedure TCUpdateCurrencyRatesForm.RatesListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-var xNode: IXMLDOMNode;
+var xNode: ICXMLDOMNode;
     xExpander: IDescTemplateExpander;
     xDesc: String;
 begin
-  xNode := IXMLDOMNode(RatesList.GetNodeData(Node)^);
+  xNode := ICXMLDOMNode(RatesList.GetNodeData(Node)^);
   if Column = 2 then begin
     CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), '', False, 4);
   end else if Column = 1 then begin
@@ -133,9 +133,9 @@ begin
 end;
 
 procedure TCUpdateCurrencyRatesForm.RatesListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-var xNode: IXMLDOMNode;
+var xNode: ICXMLDOMNode;
 begin
-  xNode := IXMLDOMNode(RatesList.GetNodeData(Node)^);
+  xNode := ICXMLDOMNode(RatesList.GetNodeData(Node)^);
   HintText := IntToStr(StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0)) + ' ' +
               GetXmlAttribute('sourceName', xNode, '') + ' kosztuje ' +
               CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')), '', False, 4) + ' ' +
@@ -148,7 +148,7 @@ begin
   AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCDataobjectFrameData.CreateWithFilter(CCashpointTypeOther));
 end;
 
-constructor TCurrencyRateDescriptionHelper.Create(ARate: IXMLDOMNode; ARateType: TBaseEnumeration; ABindingDate: TDateTime; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
+constructor TCurrencyRateDescriptionHelper.Create(ARate: ICXMLDOMNode; ARateType: TBaseEnumeration; ABindingDate: TDateTime; ACashpointName: String; AQuantity: Integer; ACurRate: Currency);
 begin
   inherited Create;
   FRate := ARate;
@@ -212,7 +212,7 @@ procedure TCUpdateCurrencyRatesForm.BitBtnOkClick(Sender: TObject);
 var xCashpoint: TCashPoint;
     xProceed: Boolean;
     xNode: PVirtualNode;
-    xXml: IXMLDOMNode;
+    xXml: ICXMLDOMNode;
     xRate: TCurrencyRate;
     xBaseCurrency: TCurrencyDef;
     xTargetCurrency: TCurrencyDef;
@@ -247,7 +247,7 @@ begin
       xNode := RatesList.GetFirst;
       while (xNode <> Nil) do begin
         if RatesList.CheckState[xNode] = csCheckedNormal then begin
-          xXml := IXMLDOMNode(RatesList.GetNodeData(xNode)^);
+          xXml := ICXMLDOMNode(RatesList.GetNodeData(xNode)^);
           xBaseCurrency := TCurrencyDef.FindByIso(GetXmlAttribute('sourceIso', xXml, ''));
           if xBaseCurrency = Nil then begin
             xBaseCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);

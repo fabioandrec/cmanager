@@ -33,10 +33,10 @@ begin
 end;
 
 function Plugin_Execute: OleVariant; stdcall; export;
-var xXml: IXMLDOMDocument2;
-    xOutRoot: IXMLDOMNode;
+var xXml: ICXMLDOMDocument;
+    xOutRoot: ICXMLDOMNode;
     xCount: Integer;
-    xChart, xSerie, xItem: IXMLDOMNode;
+    xChart, xSerie, xItem: ICXMLDOMNode;
     xAccounts: _Recordset;
     xOut: OleVariant;
     xOldDecimal: Char;

@@ -17,7 +17,8 @@ uses
   SqlConsoleFormUnit in 'SqlConsoleFormUnit.pas' {SqlConsoleForm},
   CRichtext in '..\..\Shared\CRichtext.pas',
   CAdotools in '..\..\Shared\CAdotools.pas',
-  CXml in '..\..\Shared\CXml.pas';
+  CXml in '..\..\Shared\CXml.pas',
+  CXmlTlb in '..\..\Shared\CXmlTlb.pas';
 
 var CManInterface: ICManagerInterface;
     CConnection: _Connection;

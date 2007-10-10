@@ -2,7 +2,7 @@ unit CSettings;
 
 interface
 
-uses CXmlTlb, Forms, Windows;
+uses Forms, Windows, CXml;
 
 const
   CSettingsFilename = 'CManager.cfg';
@@ -13,23 +13,23 @@ procedure SaveSettings;
 procedure SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer); overload;
 procedure SaveFormPosition(AForm: TForm); overload;
 procedure LoadFormPosition(AForm: TForm);
-function GetSettingsRoot: IXMLDOMNode;
-function GetSettingsForms: IXMLDOMNode;
-function GetSettingsPreferences: IXMLDOMNode;
-function GetSettingsFonts: IXMLDOMNode;
-function GetSettingsColumns: IXMLDOMNode;
-function GetSettingsBackups: IXMLDOMNode;
-function GetSettingsPlugins: IXMLDOMNode;
-function GetSettingsCharts: IXMLDOMNode;
+function GetSettingsRoot: ICXMLDOMNode;
+function GetSettingsForms: ICXMLDOMNode;
+function GetSettingsPreferences: ICXMLDOMNode;
+function GetSettingsFonts: ICXMLDOMNode;
+function GetSettingsColumns: ICXMLDOMNode;
+function GetSettingsBackups: ICXMLDOMNode;
+function GetSettingsPlugins: ICXMLDOMNode;
+function GetSettingsCharts: ICXMLDOMNode;
 
 implementation
 
 uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts,
-  CPreferences, CXml, CTools, CComponents;
+  CPreferences, CTools, CComponents;
 
-var GSettings: IXMLDOMDocument2 = Nil;
+var GSettings: ICXMLDOMDocument = Nil;
 
-function GetSettingsRoot: IXMLDOMNode;
+function GetSettingsRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     Result := GSettings.selectSingleNode('cmanager');
@@ -40,8 +40,8 @@ begin
   end;
 end;
 
-function GetSettingsForms: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsForms: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsRoot;
@@ -53,8 +53,8 @@ begin
   end;
 end;
 
-function GetSettingsPreferences: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsPreferences: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsRoot;
@@ -66,8 +66,8 @@ begin
   end;
 end;
 
-function GetSettingsColumns: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsColumns: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsPreferences;
@@ -79,8 +79,8 @@ begin
   end;
 end;
 
-function GetSettingsBackups: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsBackups: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsPreferences;
@@ -92,8 +92,8 @@ begin
   end;
 end;
 
-function GetSettingsPlugins: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsPlugins: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsPreferences;
@@ -105,8 +105,8 @@ begin
   end;
 end;
 
-function GetSettingsCharts: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsCharts: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsPreferences;
@@ -118,8 +118,8 @@ begin
   end;
 end;
 
-function GetSettingsFonts: IXMLDOMNode;
-var xRoot: IXMLDOMNode;
+function GetSettingsFonts: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xRoot := GetSettingsPreferences;
@@ -153,8 +153,8 @@ begin
 end;
 
 procedure LoadFormPosition(AForm: TForm);
-var xForms: IXMLDOMNode;
-    xNode: IXMLDOMNode;
+var xForms: ICXMLDOMNode;
+    xNode: ICXMLDOMNode;
     xPlacement: TWindowPlacement;
     xS: Integer;
     xLoaded: Boolean;
@@ -207,7 +207,7 @@ begin
       Result := False;
     end else begin
       if GSettings.firstChild <> Nil then begin
-        if GSettings.firstChild.nodeType <> NODE_PROCESSING_INSTRUCTION then begin
+        if GSettings.firstChild.nodeType <> CNODE_PROCESSING_INSTRUCTION then begin
           AppendEncoding(GSettings);
         end;
       end;
@@ -247,8 +247,8 @@ begin
 end;
 
 procedure SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer);
-var xForms: IXMLDOMNode;
-    xNode: IXMLDOMNode;
+var xForms: ICXMLDOMNode;
+    xNode: ICXMLDOMNode;
 begin
   if GSettings <> Nil then begin
     xForms := GetSettingsForms;

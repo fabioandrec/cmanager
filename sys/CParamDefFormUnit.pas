@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports,
-  CComponents, CXmlTlb;
+  CComponents;
 
 type
   TCParamDefForm = class(TCConfigForm)
@@ -82,8 +82,8 @@ procedure TCParamDefForm.FillForm;
 var xCount: Integer;
     xIndexType, xIndexFrame, xIndexProperty: Integer;
     xRegs: TRegisteredFrameClass;
-    xXml: IXMLDOMDocument2;
-    xNode: IXMLDOMNode;
+    xXml: ICXMLDOMDocument;
+    xNode: ICXMLDOMNode;
     xStr: TStringList;
 begin
   inherited FillForm;

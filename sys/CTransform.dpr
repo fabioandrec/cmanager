@@ -21,7 +21,7 @@ var xExitCode: Integer;
     xText: String;
     xOutput: TStringList;
     xXmlFilename, xXslFilename, xOutputFilename: String;
-    xXmlDoc, xXslDoc: IXMLDOMDocument2;
+    xXmlDoc, xXslDoc: ICXMLDOMDocument;
     xAutorun, xOverride, xCanSave: Boolean;
 begin
   {$IFDEF DEBUG}

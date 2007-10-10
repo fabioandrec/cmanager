@@ -20,7 +20,7 @@ uses
 var xExitCode: Integer;
     xText: String;
     xXmlFilename, xXsdFilename: String;
-    xXmlDoc, xXsdDoc: IXMLDOMDocument2;
+    xXmlDoc, xXsdDoc: ICXMLDOMDocument;
     xXsdSchema: XMLSchemaCache40;
     xValid: Boolean;
 begin

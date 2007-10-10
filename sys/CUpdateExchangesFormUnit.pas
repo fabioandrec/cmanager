@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CBaseFormUnit, CXmlTlb, CComponents, StdCtrls, Buttons, ExtCtrls,
+  Dialogs, CBaseFormUnit, CComponents, StdCtrls, Buttons, ExtCtrls, CXml,
   VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects;
 
 type
@@ -36,31 +36,31 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
   private
-    FXml: IXMLDOMDocument2;
-    FRoot: IXMLDOMNode;
-    FExchanges: IXMLDOMNodeList;
+    FXml: ICXMLDOMDocument;
+    FRoot: ICXMLDOMNode;
+    FExchanges: ICXMLDOMNodeList;
     FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
   public
     procedure InitializeForm;
-    property Xml: IXMLDOMDocument2 read FXml write FXml;
-    property Root: IXMLDOMNode read FRoot write FRoot;
-    property Exchanges: IXMLDOMNodeList read FExchanges write FExchanges;
+    property Xml: ICXMLDOMDocument read FXml write FXml;
+    property Root: ICXMLDOMNode read FRoot write FRoot;
+    property Exchanges: ICXMLDOMNodeList read FExchanges write FExchanges;
     property CashpointName: String read FCashpointName write FCashpointName;
   end;
 
   TExchangeDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
   private
-    FExchange: IXMLDOMNode;
+    FExchange: ICXMLDOMNode;
   public
-    constructor Create(AExchange: IXMLDOMNode);
+    constructor Create(AExchange: ICXMLDOMNode);
     function ExpandTemplate(ATemplate: String): String;
-    property Exchange: IXMLDOMNode read FExchange;
+    property Exchange: ICXMLDOMNode read FExchange;
   end;
 
 implementation
 
-uses CDatabase, CXml, CTools, CConsts, CFrameFormUnit,
+uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
   CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit;
@@ -74,20 +74,20 @@ end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
 begin
-  NodeDataSize := SizeOf(IXMLDOMNode);
+  NodeDataSize := SizeOf(ICXMLDOMNode);
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
-  IXMLDOMNode(ExchangesList.GetNodeData(Node)^) := FExchanges.item[Node.Index];
+  ICXMLDOMNode(ExchangesList.GetNodeData(Node)^) := FExchanges.item[Node.Index];
   Node.CheckState := csCheckedNormal;
   Node.CheckType := ctCheckBox
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-var xNode: IXMLDOMNode;
+var xNode: ICXMLDOMNode;
 begin
-  xNode := IXMLDOMNode(ExchangesList.GetNodeData(Node)^);
+  xNode := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^);
   if Column = 2 then begin
     CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('value', xNode, '')), '', False, 4);
   end else if Column = 1 then begin
@@ -108,9 +108,9 @@ begin
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-var xNode: IXMLDOMNode;
+var xNode: ICXMLDOMNode;
 begin
-  xNode := IXMLDOMNode(ExchangesList.GetNodeData(Node)^);
+  xNode := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^);
   HintText := GetXmlAttribute('name', xNode, '');
   LineBreakStyle := hlbForceMultiLine;
 end;
@@ -120,7 +120,7 @@ begin
   AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCDataobjectFrameData.CreateWithFilter(CCashpointTypeOther));
 end;
 
-constructor TExchangeDescriptionHelper.Create(AExchange: IXMLDOMNode);
+constructor TExchangeDescriptionHelper.Create(AExchange: ICXMLDOMNode);
 begin
   inherited Create;
   FExchange := AExchange;
@@ -180,7 +180,7 @@ end;
 procedure TCUpdateExchangesForm.BitBtnOkClick(Sender: TObject);
 var xCashpoint: TCashPoint;
     xNode: PVirtualNode;
-    xXml: IXMLDOMNode;
+    xXml: ICXMLDOMNode;
     xValue: TInstrumentValue;
     xInstrument: TInstrument;
     xRegDateTime: TDateTime;
@@ -209,7 +209,7 @@ begin
     xNode := ExchangesList.GetFirst;
     while (xNode <> Nil) do begin
       if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
-        xXml := IXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
+        xXml := ICXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
         xInstrument := TInstrument.FindByName(GetXmlAttribute('name', xXml, ''));
         if xInstrument = Nil then begin
           xInstrument := TInstrument.CreateObject(InstrumentProxy, False);

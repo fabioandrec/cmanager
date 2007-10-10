@@ -2,7 +2,7 @@ unit CPlugins;
 
 interface
 
-uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, CXmlTlb, CComponents,
+uses Forms, Windows, CPluginConsts, CPluginTypes, Contnrs, CComponents,
      Classes;
 
 type
@@ -115,8 +115,8 @@ begin
   end;
 end;
 
-function GetBasePluginXml: IXMLDOMDocument2;
-var xRoot: IXMLDOMNode;
+function GetBasePluginXml: ICXMLDOMDocument;
+var xRoot: ICXMLDOMNode;
 begin
   Result := GetXmlDocument;
   xRoot := Result.createElement('plugin');

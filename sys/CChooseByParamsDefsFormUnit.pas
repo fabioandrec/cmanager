@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CReports, Contnrs,
-  CComponents, CTools, CXmlTlb;
+  CComponents, CTools;
 
 type
   TDialogParamControl = class(TObjectList)
@@ -328,8 +328,8 @@ begin
 end;
 
 function TDialogParamControl.GetValues: TVariantDynArray;
-var xXml: IXMLDOMDocument2;
-    xNode, xParent: IXMLDOMNode;
+var xXml: ICXMLDOMDocument;
+    xNode, xParent: ICXMLDOMNode;
     xCount: Integer;
     xType: Integer;
 begin
@@ -560,9 +560,9 @@ end;
 
 procedure TDialogParamControl.ChooseProperty(var ADataGid, AText: String; var AAccepted: Boolean);
 var xList: TStringList;
-    xXml: IXMLDOMDocument2;
-    xParent: IXMLDOMNode;
-    xNode: IXMLDOMNode;
+    xXml: ICXMLDOMDocument;
+    xParent: ICXMLDOMNode;
+    xNode: ICXMLDOMNode;
     xCount: Integer;
     xType: Integer;
 begin

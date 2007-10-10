@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
   CComponents, CDatabase, CBaseFrameUnit, ActnList, XPStyleActnCtrls,
-  ActnMan, Contnrs, CXmlTlb, VirtualTrees, CReports;
+  ActnMan, Contnrs, VirtualTrees, CReports;
 
 type
   TCReportDefForm = class(TCDataobjectForm)
@@ -198,7 +198,7 @@ begin
 end;
 
 function TCReportDefForm.CheckValidXsl: Boolean;
-var xXml: IXMLDOMDocument2;
+var xXml: ICXMLDOMDocument;
 begin
   xXml := GetDocumentFromString(RicheditXslt.Text);
   Result := xXml.parseError.errorCode = 0;

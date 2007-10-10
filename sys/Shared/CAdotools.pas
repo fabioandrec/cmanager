@@ -2,7 +2,7 @@ unit CAdotools;
 
 interface
 
-uses AdoInt, Contnrs, Classes, Variants, CXmlTlb;
+uses AdoInt, Contnrs, Classes, Variants;
 
 function GetRowsAsObjectList(ARecordset: _Recordset): TObjectList;
 function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String): String;
@@ -81,13 +81,13 @@ begin
 end;
 
 function GetRowsAsXml(ARecordset: _Recordset): String;
-var xDoc: IXMLDOMDocument2;
-    xRoot: IXMLDOMNode;
-    xHeader: IXMLDOMNode;
-    xData: IXMLDOMNode;
-    xRow: IXMLDOMNode;
+var xDoc: ICXMLDOMDocument;
+    xRoot: ICXMLDOMNode;
+    xHeader: ICXMLDOMNode;
+    xData: ICXMLDOMNode;
+    xRow: ICXMLDOMNode;
     xCf: Integer;
-    xColumn: IXMLDOMNode;
+    xColumn: ICXMLDOMNode;
     xValue: String;
 begin
   xDoc := GetXmlDocument;

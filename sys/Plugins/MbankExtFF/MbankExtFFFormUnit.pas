@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, CXmlTlb, Types;
+  Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, Types;
 
 type
   TMbankExtFFForm = class(TForm)
@@ -117,7 +117,7 @@ end;
 
 function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
 
-  function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: IHTMLElement; AIsCreditCard: Boolean; var AError: String): Boolean;
+  function AppendExtractionItem(ARootNode: ICXMLDOMNode; ARow: IHTMLElement; AIsCreditCard: Boolean; var AError: String): Boolean;
   var xAll: IHTMLElementCollection;
       xCount: Integer;
       xElement: IHTMLElement;
@@ -128,7 +128,7 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
       xRegDate, xAccountingDate: TDateTime;
       xCash: Currency;
       xCurrStr: String;
-      xExtractionNode: IXMLDOMNode;
+      xExtractionNode: ICXMLDOMNode;
       xAppenRow: Boolean;
   begin
     Result := True;
@@ -244,8 +244,8 @@ var xDoc: IHTMLDocument2;
     xBaseRow: IHTMLElement;
     xPeriodStr: String;
     xStartDate, xEndDate: TDateTime;
-    xOutXml: IXMLDOMDocument2;
-    xDocElement: IXMLDOMElement;
+    xOutXml: ICXMLDOMDocument;
+    xDocElement: ICXMLDOMElement;
     xIsCreditCard: Boolean;
     xStr: String;
 begin
@@ -413,11 +413,11 @@ end;
 
 function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
 
-  function AppendExtractionItem(ARootNode: IXMLDOMNode; ARow: TStringDynArray; AIsCreditCard: Boolean; var AError: String): Boolean;
+  function AppendExtractionItem(ARootNode: ICXMLDOMNode; ARow: TStringDynArray; AIsCreditCard: Boolean; var AError: String): Boolean;
   var xTitle, xCurrStr, xCashStr: String;
       xRegDate, xAccountingDate: TDateTime;
       xCash: Currency;
-      xExtractionNode: IXMLDOMNode;
+      xExtractionNode: ICXMLDOMNode;
   begin
     AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
     if AIsCreditCard then begin
@@ -492,8 +492,8 @@ var xIsCreditCard: Boolean;
     xCount: Integer;
     xSplit: TStringDynArray;
     xTitle: String;
-    xOutXml: IXMLDOMDocument2;
-    xDocElement: IXMLDOMNode;
+    xOutXml: ICXMLDOMDocument;
+    xDocElement: ICXMLDOMNode;
     xPeriodStr: String;
     xOperationsBlock: Boolean;
     xValid: Boolean;
