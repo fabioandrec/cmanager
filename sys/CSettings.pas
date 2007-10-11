@@ -223,6 +223,7 @@ begin
         ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', SysErrorMessage(GetLastError));
       end;
     end else begin
+      GSettings := GetNewDocument;
       GetSettingsRoot;
     end;
   end;

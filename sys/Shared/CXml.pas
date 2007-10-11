@@ -193,6 +193,7 @@ begin
   try
     xXml := CreateOleObject('MSXML2.DOMDocument.4.0');
     Result := True;
+    VarClear(xXml);
   except
     Result := False;
     if IsConsole then begin
