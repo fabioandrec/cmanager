@@ -111,7 +111,7 @@ begin
     xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[4][0], '');
     if xDesc <> '' then begin
       xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-      xExpander := TCurrencyRateDescriptionHelper.Create(xNode, GetXmlAttribute('type', xNode, CCurrencyRateTypeAverage), FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 0), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')));
+      xExpander := TCurrencyRateDescriptionHelper.Create(xNode, GetXmlAttribute('type', xNode, CCurrencyRateTypeAverage), FBindingDate, FCashpointName, StrToIntDef(GetXmlAttribute('quantity', xNode, ''), 1), StrToCurrencyDecimalDot(GetXmlAttribute('rate', xNode, '')));
       CellText := GCurrencydefTemplatesList.ExpandTemplates(xDesc, xExpander);
     end;
   end else if Column = 0 then begin

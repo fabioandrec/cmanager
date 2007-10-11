@@ -80,13 +80,14 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 0
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
       object CStaticCashpoint: TCStatic
         Left = 213

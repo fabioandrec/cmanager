@@ -196,31 +196,35 @@ end;
 
 function InitializeSettings(AFileName: String): Boolean;
 begin
-  Result := True;
-  GSettings := GetXmlDocument;
-  if (AFileName <> '') and FileExists(AFileName) then begin
-    GSettings.validateOnParse := True;
-    GSettings.resolveExternals := True;
-    GSettings.load(AFileName);
-    if GSettings.parseError.errorCode <> 0 then begin
-      ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GetParseErrorDescription(GSettings.parseError, True));
-      Result := False;
-    end else begin
-      if GSettings.firstChild <> Nil then begin
-        if GSettings.firstChild.nodeType <> CNODE_PROCESSING_INSTRUCTION then begin
-          AppendEncoding(GSettings);
+  Result := IsValidXmlparserInstalled(True);
+  if Result then begin
+    if (AFileName <> '') and FileExists(AFileName) then begin
+      GSettings := GetDocumentFromFile(AFileName, Nil);
+      if GSettings <> Nil then begin
+        if GSettings.parseError.errorCode <> 0 then begin
+          ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GetParseErrorDescription(GSettings.parseError, True));
+          Result := False;
+        end else begin
+          if GSettings.firstChild <> Nil then begin
+            if GSettings.firstChild.nodeType <> CNODE_PROCESSING_INSTRUCTION then begin
+              AppendEncoding(GSettings);
+            end;
+          end;
+          GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
+          GColumnsPreferences.LoadAllFromParentNode(GetSettingsColumns);
+          GBackupsPreferences.LoadAllFromParentNode(GetSettingsBackups);
+          GPluginsPreferences.LoadAllFromParentNode(GetSettingsPlugins);
+          GChartPreferences.LoadAllFromParentNode(GetSettingsCharts);
+          GBasePreferences.LoadFromXml(GetSettingsPreferences);
+          SetEvenListColors(GBasePreferences.evenListColor, GBasePreferences.oddListColor);
         end;
+      end else begin
+        Result := False;
+        ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', SysErrorMessage(GetLastError));
       end;
-      GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
-      GColumnsPreferences.LoadAllFromParentNode(GetSettingsColumns);
-      GBackupsPreferences.LoadAllFromParentNode(GetSettingsBackups);
-      GPluginsPreferences.LoadAllFromParentNode(GetSettingsPlugins);
-      GChartPreferences.LoadAllFromParentNode(GetSettingsCharts);
-      GBasePreferences.LoadFromXml(GetSettingsPreferences);
-      SetEvenListColors(GBasePreferences.evenListColor, GBasePreferences.oddListColor);
+    end else begin
+      GetSettingsRoot;
     end;
-  end else begin
-    GetSettingsRoot;
   end;
 end;
 

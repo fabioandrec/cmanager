@@ -2,7 +2,7 @@ unit CXml;
 
 interface
 
-uses ActiveX, CXmlTlb, Classes;
+uses Windows, ActiveX, CXmlTlb, Classes, ComObj;
 
 type
   ICXMLDOMNode = IXMLDOMNode;
@@ -18,15 +18,20 @@ const
 
 procedure SetXmlAttribute(AName: String; ANode: ICXMLDOMNode; AValue: OleVariant);
 function GetXmlAttribute(AName: String; ANode: ICXMLDOMNode; ADefault: OleVariant): OleVariant;
-function GetDocumentFromString(AString: String; AXsd: ICXMLDOMDocument = Nil): ICXMLDOMDocument;
-function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument = Nil): ICXMLDOMDocument;
+function GetDocumentFromString(AString: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
+function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
 function GetNewSchema: ICXMLDOMSchemaCollection;
 function GetNewDocument: ICXMLDOMDocument;
 function GetStringFromDocument(ADocument: ICXMLDOMDocument): String;
 function GetXmlNodeValue(ANodeName: String; ARootNode: ICXMLDOMNode; ADefault: String): String;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): ICXMLDOMDocument;
+function GetSchemaCacheFromXsd(AXsd: ICXMLDOMDocument): ICXMLDOMSchemaCollection;
 procedure AppendEncoding(var AXml: ICXMLDOMDocument; AEncoding: String = 'Windows-1250');
 function GetParseErrorDescription(AError: ICXMLDOMParseError; AWithLinebraks: Boolean): String;
+function IsValidXmlparserInstalled(AShowError: Boolean): Boolean;
+
+resourcestring
+  CNoValidMsxmlFound = 'Nie znaleziono bibliotek MSXML w wersji 4.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
 
 implementation
 
@@ -46,6 +51,9 @@ end;
 function GetXmlDocument(AEncoding: String = 'Windows-1250'): ICXMLDOMDocument;
 begin
   Result := GetNewDocument;
+  Result.validateOnParse := True;
+  Result.resolveExternals := True;
+  Result.async := false;
   AppendEncoding(Result, AEncoding);
 end;
 
@@ -79,7 +87,7 @@ begin
   xNode.nodeValue := AValue;
 end;
 
-function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument = Nil): ICXMLDOMDocument;
+function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
 var xStr: TStringList;
 begin
   xStr := TStringList.Create;
@@ -95,18 +103,39 @@ begin
   end;
 end;
 
-function GetDocumentFromString(AString: String; AXsd: ICXMLDOMDocument = Nil): ICXMLDOMDocument;
+function GetSchemaCacheFromXsd(AXsd: ICXMLDOMDocument): ICXMLDOMSchemaCollection;
+begin
+  Result := GetNewSchema;
+  try
+    Result.add('', AXsd);
+  except
+    on E: Exception do begin
+      Result := Nil;
+      if IsConsole then begin
+        Writeln(E.Message);
+      end;
+    end;
+  end;
+end;
+
+function GetDocumentFromString(AString: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
 var xStream: TStringStream;
     xHelper: TStreamAdapter;
     xXsdCache: ICXMLDOMSchemaCollection;
+    xValid: Boolean;
 begin
-  Result := GetXmlDocument;
-  if Result <> Nil then begin
-    Result.validateOnParse := True;
-    Result.resolveExternals := True;
-    if AXsd <> Nil then begin
-      xXsdCache := GetNewSchema;
-      xXsdCache.add('', AXsd);
+  xValid := False;
+  if AXsd <> Nil then begin
+    xXsdCache := GetSchemaCacheFromXsd(AXsd);
+    if xXsdCache <> Nil then begin
+      xValid := True;
+    end;
+  end else begin
+    xValid := True;
+  end;
+  if xValid then begin
+    Result := GetXmlDocument;
+    if xXsdCache <> Nil then begin
       Result.schemas := xXsdCache;
     end;
     xStream := TStringStream.Create(AString);
@@ -116,6 +145,8 @@ begin
     finally
       xStream.Free;
     end;
+  end else begin
+    Result := Nil;
   end;
 end;
 
@@ -148,12 +179,28 @@ end;
 
 function GetNewDocument: ICXMLDOMDocument;
 begin
-  Result := CoDOMDocument26.Create;
+  Result := CoDOMDocument40.Create;
 end;
 
 function GetNewSchema: ICXMLDOMSchemaCollection;
 begin
-  Result := CoXMLSchemaCache26.Create;
+  Result := CoXMLSchemaCache40.Create;
+end;
+
+function IsValidXmlparserInstalled(AShowError: Boolean): Boolean;
+var xXml: Variant;
+begin
+  try
+    xXml := CreateOleObject('MSXML2.DOMDocument.4.0');
+    Result := True;
+  except
+    Result := False;
+    if IsConsole then begin
+      Writeln(CNoValidMsxmlFound)
+    end else begin
+      MessageBox(0, PChar(CNoValidMsxmlFound), 'B³¹d', MB_OK + MB_ICONERROR);
+    end;
+  end;
 end;
 
 end.

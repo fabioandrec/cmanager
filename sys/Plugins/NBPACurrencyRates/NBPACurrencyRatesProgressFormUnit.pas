@@ -132,7 +132,7 @@ begin
   FResponseXml := Nil;
   FRootElement := Nil;
   if AnsiUpperCase(Copy(Url, 1, 7)) = 'FILE://' then begin
-    FResponseXml := GetDocumentFromString(Response);
+    FResponseXml := GetDocumentFromString(Response, Nil);
     if FResponseXml.parseError.errorCode = 0 then begin
       FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
       if FRootElement = Nil then begin
@@ -163,7 +163,7 @@ begin
       Url := xLocalization;
       RequestResult := GetResponse(xResponse);
       if RequestResult = 0 then begin
-        FResponseXml := GetDocumentFromString(xResponse);
+        FResponseXml := GetDocumentFromString(xResponse, Nil);
         if FResponseXml.parseError.errorCode = 0 then begin
           FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
           if FRootElement = Nil then begin

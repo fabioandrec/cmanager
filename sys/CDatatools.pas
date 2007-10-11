@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils, AdoDb, VirtualTrees;
+     DateUtils, AdoDb, VirtualTrees, CXml;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -25,12 +25,13 @@ procedure UpdateExtractions(AExtractionText: String);
 procedure ReloadCaches;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
 procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
+function GetRatesXsd: ICXMLDOMDocument;
 
 implementation
 
 uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
-  CTools, StrUtils, CPreferences, CXml, CUpdateCurrencyRatesFormUnit,
+  CTools, StrUtils, CPreferences, CUpdateCurrencyRatesFormUnit,
   CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
   CExtractionItemFormUnit, CUpdateExchangesFormUnit;
 
@@ -315,7 +316,7 @@ var xDoc: ICXMLDOMDocument;
     xForm: TCUpdateExchangesForm;
 begin
   xValid := False;
-  xDoc := GetDocumentFromString(ARatesText);
+  xDoc := GetDocumentFromString(ARatesText, Nil);
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('exchanges');
     if xRoot <> Nil then begin
@@ -360,7 +361,7 @@ var xDoc: ICXMLDOMDocument;
     xForm: TCUpdateCurrencyRatesForm;
 begin
   xValid := False;
-  xDoc := GetDocumentFromString(ARatesText);
+  xDoc := GetDocumentFromString(ARatesText, GetRatesXsd);
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('currencyRates');
     if xRoot <> Nil then begin
@@ -511,7 +512,7 @@ var xDoc: ICXMLDOMDocument;
     xCurrCache: TCurrCacheItem;
 begin
   xValid := False;
-  xDoc := GetDocumentFromString(AExtractionText);
+  xDoc := GetDocumentFromString(AExtractionText, Nil);
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('accountExtraction');
     if xRoot <> Nil then begin
@@ -592,6 +593,18 @@ begin
     AComponent.SetCurrencyDef(CEmptyDataGid, '');
     AComponent.Value := 1;
   end;
+end;
+
+function GetRatesXsd: ICXMLDOMDocument;
+var xResStr: TResourceStream;
+    xStrStr: TStringStream;
+begin
+  xResStr := TResourceStream.Create(HInstance, 'RATESXSD', RT_RCDATA);
+  xStrStr := TStringStream.Create('');
+  xStrStr.CopyFrom(xResStr, xResStr.Size);
+  Result := GetDocumentFromString(xStrStr.DataString, Nil);
+  xStrStr.Free;
+  xResStr.Free;
 end;
 
 end.

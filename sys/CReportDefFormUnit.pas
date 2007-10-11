@@ -200,7 +200,7 @@ end;
 function TCReportDefForm.CheckValidXsl: Boolean;
 var xXml: ICXMLDOMDocument;
 begin
-  xXml := GetDocumentFromString(RicheditXslt.Text);
+  xXml := GetDocumentFromString(RicheditXslt.Text, Nil);
   Result := xXml.parseError.errorCode = 0;
   if not Result then begin
     ShowInfo(itError, 'Zdefiniowany arkusz styli jest niepoprawny', GetParseErrorDescription(xXml.parseError, True));

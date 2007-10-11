@@ -159,7 +159,7 @@ var xDocument: ICXMLDOMDocument;
 begin
   if RequestResult = ERROR_SUCCESS then begin
     CoInitialize(Nil);
-    xDocument := GetDocumentFromString(Response);
+    xDocument := GetDocumentFromString(Response, Nil);
     xValid := False;
     if xDocument.parseError.errorCode = 0 then begin
       xCurrentVersion := FileVersion(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'cmanager.exe');

@@ -651,7 +651,7 @@ begin
       xStr.Text := StringReplace(xStr.Text, '[repstyle]', FreportStyle.Text, [rfReplaceAll, rfIgnoreCase]);
       xStr.Text := StringReplace(xStr.Text, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
       xStr.Text := StringReplace(xStr.Text, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
-      Result := GetDocumentFromString(xStr.Text);
+      Result := GetDocumentFromString(xStr.Text, Nil);
       if Result.parseError.errorCode <> 0 then begin
         AError := GetParseErrorDescription(Result.parseError, True);
         Result := Nil;
@@ -684,7 +684,7 @@ begin
             xStrStream := TStringStream.Create('');
             xResStream.SaveToStream(xStrStream);
             xResStream.Free;
-            LDefaultXsl := GetDocumentFromString(xStrStream.DataString);
+            LDefaultXsl := GetDocumentFromString(xStrStream.DataString, Nil);
             xStrStream.Free;
             if LDefaultXsl.parseError.errorCode <> 0 then begin
               AError := GetParseErrorDescription(LDefaultXsl.parseError, True);
@@ -722,7 +722,7 @@ end;
 function GetReportPropertyItems: ICXMLDOMDocument;
 begin
   if LPropertyXml = Nil then begin
-    LPropertyXml := GetDocumentFromString(CPropertyItems);
+    LPropertyXml := GetDocumentFromString(CPropertyItems, Nil);
   end;
   Result := LPropertyXml;
 end;
@@ -3552,7 +3552,7 @@ begin
   xOut := TCPluginReportParams(Params).plugin.Execute;
   Result := False;
   if not VarIsEmpty(xOut) then begin
-    FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self));
+    FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self), Nil);
     Result := FXml.parseError.errorCode = 0;
     if not Result then begin
       ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', GetParseErrorDescription(FXml.parseError, True));
@@ -4234,18 +4234,26 @@ procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String
 var xXml, xXslt: ICXMLDOMDocument;
     xBody: String;
 begin
-  xXml := GetDocumentFromString(AXmlText);
+  xXml := GetDocumentFromString(AXmlText, Nil);
   if xXml <> Nil then begin
-    xXslt := GetDocumentFromString(AXsltText);
-    if xXslt <> Nil then begin
-      try
-        xBody := xXml.transformNode(xXslt.documentElement);
-        ShowSimpleReport(AFormTitle, xBody);
-      except
-        on E: Exception do begin
-          ShowInfo(itError, E.Message, '');
+    if xXml.parseError.errorCode = 0 then begin
+      xXslt := GetDocumentFromString(AXsltText, Nil);
+      if xXslt <> Nil then begin
+        if xXslt.parseError.errorCode = 0 then begin
+          try
+            xBody := xXml.transformNode(xXslt.documentElement);
+            ShowSimpleReport(AFormTitle, xBody);
+          except
+            on E: Exception do begin
+              ShowInfo(itError, E.Message, '');
+            end;
+          end;
+        end else begin
+          ShowInfo(itError, 'Zawartoœæ tekstu nie jest poprawnym plikiem XML', GetParseErrorDescription(xXslt.parseError, True));
         end;
       end;
+    end else begin
+      ShowInfo(itError, 'Zawartoœæ tekstu nie jest poprawnym plikiem XML', GetParseErrorDescription(xXml.parseError, True));
     end;
   end;
 end;
@@ -4347,7 +4355,7 @@ begin
     xQuery := GDataProvider.OpenSql(xSql, False);
     if xQuery <> Nil then begin
       FreportText.Text := GetRowsAsXml(xQuery.Recordset);
-      FdataDoc := GetDocumentFromString(FreportText.Text);
+      FdataDoc := GetDocumentFromString(FreportText.Text, Nil);
       try
         FreportText.Text := FdataDoc.transformNode(FxsltDoc);
       except
@@ -4563,7 +4571,7 @@ begin
   Clear;
   FasString := Value;
   if FasString <> '' then begin
-    xXml := GetDocumentFromString(FasString);
+    xXml := GetDocumentFromString(FasString, Nil);
     if xXml.parseError.errorCode = 0 then begin
       if xXml.documentElement <> Nil then begin
         for xCount := 0 to xXml.documentElement.childNodes.length - 1 do begin

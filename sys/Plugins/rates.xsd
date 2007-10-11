@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="currencyRates">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="currencyRate">
+          <xs:complexType>
+            <xs:attribute name="sourceName" type="xs:string" use="required" />
+            <xs:attribute name="sourceIso" type="xs:string" use="required" />
+            <xs:attribute name="targetName" type="xs:string" use="required" />
+            <xs:attribute name="targetIso" type="xs:string" use="required" />
+            <xs:attribute name="quantity" type="xs:string" use="required" />
+            <xs:attribute name="rate" type="xs:double" use="required" />
+            <xs:attribute name="type">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="A"/>
+                  <xs:enumeration value="B"/>
+                  <xs:enumeration value="S"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="cashpointName" type="xs:string" use="required" />
+      <xs:attribute name="bindingDate" type="xs:date" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

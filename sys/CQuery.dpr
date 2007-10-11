@@ -91,79 +91,81 @@ begin
   MemChk;
   {$ENDIF}
   xExitCode := $FF;
-  xDelimeter := '';
-  CoInitialize(Nil);
-  if GetSwitch('-h') then begin
-    xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
-             '  -s wykonaj komendê sql [komenda]' + sLineBreak +
-             '  -f wykonaj skrypt sql [plik]' + sLineBreak +
-             '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
-             '  -x wynik w postaci xml-a' + sLineBreak +
-             '  -h wyœwietla ten ekran';
-  end else begin
-    xAction := 0;
-    if GetSwitch('-s') then begin
-      xAction := xAction or $01;
-      xSql := GetParamValue('-s');
-    end;
-    if GetSwitch('-f') then begin
-      xAction := xAction or $02;
-      xSql := GetParamValue('-f');
-    end;
-    xDelimeter := GetParamValue('-d');
-    if xDelimeter <> '' then begin
-      if AnsiLowerCase(Copy(xDelimeter, 1, 2)) = '0x' then begin
-        xCode := StrToInt64Def('$' + Copy(xDelimeter, 3, MaxInt), -1);
-        if xCode >= 0 then begin
-          xDelimeter := Chr(xCode);
-        end;
-      end;
-    end;
-    xToXml := GetSwitch('-x');
-    if (xAction <= 0) or (xAction >= 3) then begin
-      xText := 'Niepoprawne parametry wywo³ania. Spróbuj "CQuery -h"';
+  if IsValidXmlparserInstalled(True) then begin
+    xDelimeter := '';
+    CoInitialize(Nil);
+    if GetSwitch('-h') then begin
+      xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
+               '  -s wykonaj komendê sql [komenda]' + sLineBreak +
+               '  -f wykonaj skrypt sql [plik]' + sLineBreak +
+               '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
+               '  -x wynik w postaci xml-a' + sLineBreak +
+               '  -h wyœwietla ten ekran';
     end else begin
-      xFile := GetParamValue('-u');
-      if xFile = '' then begin
-        xText := 'Nie podano nazwy pliku danych';
-      end else if (xAction = $02) and (not FileExists(xSql)) then begin
-        xText := 'Nie mo¿na odnaleŸæ pliku ' + xSql;
-      end else begin
-        xText := '';
-        if xAction = $02 then begin
-          xScript := TStringList.Create;
-          try
-            try
-              xScript.LoadFromFile(xSql);
-              xSql := xScript.Text;
-            except
-              on E: Exception do begin
-                xText := E.Message;
-              end;
-            end;
-          finally
-            xScript.Free;
+      xAction := 0;
+      if GetSwitch('-s') then begin
+        xAction := xAction or $01;
+        xSql := GetParamValue('-s');
+      end;
+      if GetSwitch('-f') then begin
+        xAction := xAction or $02;
+        xSql := GetParamValue('-f');
+      end;
+      xDelimeter := GetParamValue('-d');
+      if xDelimeter <> '' then begin
+        if AnsiLowerCase(Copy(xDelimeter, 1, 2)) = '0x' then begin
+          xCode := StrToInt64Def('$' + Copy(xDelimeter, 3, MaxInt), -1);
+          if xCode >= 0 then begin
+            xDelimeter := Chr(xCode);
           end;
         end;
-        if xText = '' then begin
-          xDatabase := TADOConnection.Create(Nil);
-          try
-            if ConnectToDatabase(xFile, xDatabase, xText) then begin
-              if ExecuteSql(xDatabase, xSql, xText, xDelimeter, xToXml) then begin
-                xExitCode := $00;
+      end;
+      xToXml := GetSwitch('-x');
+      if (xAction <= 0) or (xAction >= 3) then begin
+        xText := 'Niepoprawne parametry wywo³ania. Spróbuj "CQuery -h"';
+      end else begin
+        xFile := GetParamValue('-u');
+        if xFile = '' then begin
+          xText := 'Nie podano nazwy pliku danych';
+        end else if (xAction = $02) and (not FileExists(xSql)) then begin
+          xText := 'Nie mo¿na odnaleŸæ pliku ' + xSql;
+        end else begin
+          xText := '';
+          if xAction = $02 then begin
+            xScript := TStringList.Create;
+            try
+              try
+                xScript.LoadFromFile(xSql);
+                xSql := xScript.Text;
+              except
+                on E: Exception do begin
+                  xText := E.Message;
+                end;
               end;
-              xDatabase.Close;
+            finally
+              xScript.Free;
             end;
-          finally
-            xDatabase.Free;
+          end;
+          if xText = '' then begin
+            xDatabase := TADOConnection.Create(Nil);
+            try
+              if ConnectToDatabase(xFile, xDatabase, xText) then begin
+                if ExecuteSql(xDatabase, xSql, xText, xDelimeter, xToXml) then begin
+                  xExitCode := $00;
+                end;
+                xDatabase.Close;
+              end;
+            finally
+              xDatabase.Free;
+            end;
           end;
         end;
       end;
     end;
+    if xExitCode <> $00 then begin
+      Writeln(xText);
+    end;
+    CoUninitialize;
   end;
-  if xExitCode <> $00 then begin
-    Writeln(xText);
-  end;
-  CoUninitialize;
   Halt(xExitCode);
 end.

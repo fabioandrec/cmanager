@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<currencyRates cashpointName="Narodowy Bank Polski" bindingDate="2007-10-11">
+  <currencyRate sourceName="dolar amerykański" sourceIso="USD" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="2.6375" type="A"/>
+	<currencyRate sourceName="dolar australijski" sourceIso="AUD" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="2.3841" type="A"/>
+	<currencyRate sourceName="dolar Hongkongu" sourceIso="HKD" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.3401" type="A"/>
+	<currencyRate sourceName="dolar kanadyjski" sourceIso="CAD" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="2.6981" type="A"/>
+	<currencyRate sourceName="euro" sourceIso="EUR" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="3.7474" type="A"/>
+	<currencyRate sourceName="forint (Węgry)" sourceIso="HUF" targetName="Polski złoty" targetIso="PLN" quantity="100" rate="1.5018" type="A"/>
+	<currencyRate sourceName="frank szwajcarski" sourceIso="CHF" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="2.2379" type="A"/>
+	<currencyRate sourceName="funt cypryjski" sourceIso="CYP" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="6.4135" type="A"/>
+	<currencyRate sourceName="funt szterling" sourceIso="GBP" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="5.3823" type="A"/>
+	<currencyRate sourceName="hrywna (Ukraina)" sourceIso="UAH" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.5257" type="A"/>
+	<currencyRate sourceName="jen (Japonia)" sourceIso="JPY" targetName="Polski złoty" targetIso="PLN" quantity="100" rate="2.2482" type="A"/>
+	<currencyRate sourceName="korona czeska" sourceIso="CZK" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.1363" type="A"/>
+	<currencyRate sourceName="korona duńska" sourceIso="DKK" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.5029" type="A"/>
+	<currencyRate sourceName="korona estońska" sourceIso="EEK" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.2395" type="A"/>
+	<currencyRate sourceName="korona norweska" sourceIso="NOK" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.4884" type="A"/>
+	<currencyRate sourceName="korona słowacka" sourceIso="SKK" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.1117" type="A"/>
+	<currencyRate sourceName="korona szwedzka" sourceIso="SEK" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.4112" type="A"/>
+	<currencyRate sourceName="lew bułgarski" sourceIso="BGN" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="1.9160" type="A"/>
+	<currencyRate sourceName="lira maltańska" sourceIso="MTL" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="8.7301" type="A"/>
+	<currencyRate sourceName="lit litewski" sourceIso="LTL" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="1.0853" type="A"/>
+	<currencyRate sourceName="łat łotewski" sourceIso="LVL" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="5.3223" type="A"/>
+	<currencyRate sourceName="nowy lej rumuński" sourceIso="RON" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="1.1233" type="A"/>
+	<currencyRate sourceName="rand (RPA)" sourceIso="ZAR" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.3854" type="A"/>
+	<currencyRate sourceName="rubel rosyjski" sourceIso="RUB" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="0.1059" type="A"/>
+	<currencyRate sourceName="SDR (MFW)" sourceIso="XDR" targetName="Polski złoty" targetIso="PLN" quantity="1" rate="4.1149" type="A"/>
+</currencyRates>
