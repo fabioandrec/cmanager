@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="accountExtraction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="extractionItem">
+          <xs:complexType>
+            <xs:attribute name="operationDate" type="xs:date" use="required" />
+            <xs:attribute name="accountingDate" type="xs:date" use="required" />
+            <xs:attribute name="type" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="I"/>
+                  <xs:enumeration value="O"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="cash" type="xs:double" use="required" />
+            <xs:attribute name="currency" type="xs:string" use="required" />
+            <xs:attribute name="description" type="xs:string" />	    
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="creationDate" type="xs:date" use="required" />
+      <xs:attribute name="startDate" type="xs:date" use="required" />
+      <xs:attribute name="endDate" type="xs:date" use="required" />
+      <xs:attribute name="description" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
+
+
+
+
+
+

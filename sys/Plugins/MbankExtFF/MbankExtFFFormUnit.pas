@@ -209,8 +209,8 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
           xTitle := xTitlesStr.Text;
           xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
           ARootNode.appendChild(xExtractionNode);
-          SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));
-          SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyymmdd', xAccountingDate));
+          SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyy-mm-dd', xRegDate));
+          SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyy-mm-dd', xAccountingDate));
           if xCash > 0 then begin
             SetXmlAttribute('type', xExtractionNode, CEXTRACTION_INMOVEMENT);
           end else begin
@@ -218,7 +218,7 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
           end;
           SetXmlAttribute('currency', xExtractionNode, xCurrStr);
           SetXmlAttribute('description', xExtractionNode, xTitle);
-          SetXmlAttribute('cash', xExtractionNode, Trim(Format('%-10.4f', [xCash])));
+          SetXmlAttribute('cash', xExtractionNode, StringReplace(Trim(Format('%-10.4f', [Abs(xCash)])), ',', '.', [rfReplaceAll, rfIgnoreCase]));
         end else begin
           Result := False;
         end;
@@ -301,9 +301,9 @@ begin
                     xOutXml := GetXmlDocument;
                     xDocElement := xOutXml.createElement('accountExtraction');
                     xOutXml.appendChild(xDocElement);
-                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
-                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
-                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
+                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyy-mm-dd', xStartDate));
+                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
                     SetXmlAttribute('description', xDocElement, PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText));
                     if xTabBase.rows.length >= 4 then begin
                       xBaseRow := (xTabHeader.rows.item(3, varEmpty) as IHTMLElement);
@@ -364,9 +364,9 @@ begin
                     xOutXml := GetXmlDocument;
                     xDocElement := xOutXml.createElement('accountExtraction');
                     xOutXml.appendChild(xDocElement);
-                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
-                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
-                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
+                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyy-mm-dd', xStartDate));
+                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
                     xStr := PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
                     SetXmlAttribute('description', xDocElement, TrimStr(xStr, sLineBreak));
                     if xTabBase.rows <> Nil then begin
@@ -444,8 +444,8 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
     if Result then begin
       xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');
       ARootNode.appendChild(xExtractionNode);
-      SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyymmdd', xRegDate));
-      SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyymmdd', xAccountingDate));
+      SetXmlAttribute('operationDate', xExtractionNode, FormatDateTime('yyyy-mm-dd', xRegDate));
+      SetXmlAttribute('accountingDate', xExtractionNode, FormatDateTime('yyyy-mm-dd', xAccountingDate));
       if xCash > 0 then begin
         SetXmlAttribute('type', xExtractionNode, CEXTRACTION_INMOVEMENT);
       end else begin
@@ -453,7 +453,7 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
       end;
       SetXmlAttribute('currency', xExtractionNode, xCurrStr);
       SetXmlAttribute('description', xExtractionNode, xTitle);
-      SetXmlAttribute('cash', xExtractionNode, Trim(Format('%-10.4f', [xCash])));
+      SetXmlAttribute('cash', xExtractionNode, StringReplace(Trim(Format('%-10.4f', [Abs(xCash)])), ',', '.', [rfReplaceAll, rfIgnoreCase]));
     end;
     if Result then begin
       AError := '';
@@ -595,9 +595,9 @@ begin
       Result := xValid and (xStartDate <> 0) and (xEndDate <> 0);
     end;
     if Result then begin
-      SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
-      SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyymmdd', xStartDate));
-      SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyymmdd', xEndDate));
+      SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
+      SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyy-mm-dd', xStartDate));
+      SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
       SetXmlAttribute('description', xDocElement, xTitle);
       FExtOutput := GetStringFromDocument(xOutXml);
     end;

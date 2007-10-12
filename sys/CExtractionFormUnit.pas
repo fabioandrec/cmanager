@@ -514,7 +514,7 @@ begin
   end else if Column = 2 then begin
     CellText := GetDescText(xData.description);
   end else if Column = 3 then begin
-    CellText := CurrencyToString(IfThen(xData.movementType = CInMovement, 1, -1) * xData.cash, '', False);
+    CellText := CurrencyToString(xData.cash, '', False);
   end else if Column = 4 then begin
     CellText := GCurrencyCache.GetSymbol(xData.idCurrencyDef);
   end else if Column = 5 then begin

@@ -97,6 +97,7 @@ function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
 function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
 function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
+function GetStringFromResources(AResName: String): String;
 
 implementation
 
@@ -703,6 +704,21 @@ var xY, xM, xD, xH, xN, xS, xMs: Word;
 begin
   DecodeDateTime(ADateTime, xY, xM, xD, xH, xN, xS, xMs);
   Result := EncodeDateTime(xY, xM, xD, xH, xN, 0, 0);
+end;
+
+function GetStringFromResources(AResName: String): String;
+var xResStr: TResourceStream;
+    xStrStr: TStringStream;
+begin
+  xStrStr := TStringStream.Create('');
+  try
+    xResStr := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+    xStrStr.CopyFrom(xResStr, xResStr.Size);
+    Result := xStrStr.DataString;
+    xResStr.Free;
+  finally
+    xStrStr.Free;
+  end;
 end;
 
 end.

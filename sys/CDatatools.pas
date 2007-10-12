@@ -20,12 +20,14 @@ function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolea
 procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 procedure UpdateCurrencyRates(ARatesText: String);
-procedure UpdateExchanges(ARatesText: String);
+procedure UpdateExchanges(AExchangesText: String);
 procedure UpdateExtractions(AExtractionText: String);
 procedure ReloadCaches;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
 procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
 function GetRatesXsd: ICXMLDOMDocument;
+function GetExchangesXsd: ICXMLDOMDocument;
+function GetExtractionsXsd: ICXMLDOMDocument;
 
 implementation
 
@@ -306,7 +308,7 @@ begin
   end;
 end;
 
-procedure UpdateExchanges(ARatesText: String);
+procedure UpdateExchanges(AExchangesText: String);
 var xDoc: ICXMLDOMDocument;
     xRoot: ICXMLDOMNode;
     xList: ICXMLDOMNodeList;
@@ -316,7 +318,7 @@ var xDoc: ICXMLDOMDocument;
     xForm: TCUpdateExchangesForm;
 begin
   xValid := False;
-  xDoc := GetDocumentFromString(ARatesText, Nil);
+  xDoc := GetDocumentFromString(AExchangesText, GetExchangesXsd);
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('exchanges');
     if xRoot <> Nil then begin
@@ -512,7 +514,7 @@ var xDoc: ICXMLDOMDocument;
     xCurrCache: TCurrCacheItem;
 begin
   xValid := False;
-  xDoc := GetDocumentFromString(AExtractionText, Nil);
+  xDoc := GetDocumentFromString(AExtractionText, GetExtractionsXsd);
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('accountExtraction');
     if xRoot <> Nil then begin
@@ -596,15 +598,18 @@ begin
 end;
 
 function GetRatesXsd: ICXMLDOMDocument;
-var xResStr: TResourceStream;
-    xStrStr: TStringStream;
 begin
-  xResStr := TResourceStream.Create(HInstance, 'RATESXSD', RT_RCDATA);
-  xStrStr := TStringStream.Create('');
-  xStrStr.CopyFrom(xResStr, xResStr.Size);
-  Result := GetDocumentFromString(xStrStr.DataString, Nil);
-  xStrStr.Free;
-  xResStr.Free;
+  Result := GetDocumentFromString(GetStringFromResources('RATESXSD'), Nil);
+end;
+
+function GetExchangesXsd: ICXMLDOMDocument;
+begin
+  Result := GetDocumentFromString(GetStringFromResources('EXCHANGESXSD'), Nil);
+end;
+
+function GetExtractionsXsd: ICXMLDOMDocument;
+begin
+  Result := GetDocumentFromString(GetStringFromResources('EXTRACTIONSXSD'), Nil);
 end;
 
 end.

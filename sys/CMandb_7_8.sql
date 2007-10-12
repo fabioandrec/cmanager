@@ -31,3 +31,4 @@ create view StnInstrumentValue as
   left join instrument i on i.idInstrument = v.idInstrument;
   
 insert into cmanagerParams (paramName, paramValue) values ('InstrumentValue', '@instrument@');
+update extractionItem set cash = abs(cash);
