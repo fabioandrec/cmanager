@@ -91,9 +91,9 @@ begin
   MemChk;
   {$ENDIF}
   xExitCode := $FF;
+  CoInitialize(Nil);
   if IsValidXmlparserInstalled(True) then begin
     xDelimeter := '';
-    CoInitialize(Nil);
     if GetSwitch('-h') then begin
       xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
                '  -s wykonaj komendê sql [komenda]' + sLineBreak +
@@ -165,7 +165,7 @@ begin
     if xExitCode <> $00 then begin
       Writeln(xText);
     end;
-    CoUninitialize;
   end;
+  CoUninitialize;
   Halt(xExitCode);
 end.

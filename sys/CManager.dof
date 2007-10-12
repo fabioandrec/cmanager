@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=8
 Release=1
-Build=16
+Build=17
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.8.1.16
+FileVersion=1.8.1.17
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -137,19 +137,15 @@ Comments=
 [HistoryLists\hlDebugSourcePath]
 Count=1
 Item0=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
-[HistoryLists\hlConditionals]
-Count=1
-Item0=DEBUG
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=5
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
-Item1=..\..\..\others\PngComponents\Source
-Item2=..\others\PngComponents\Source;..\others\Vtv\Source
-Item3=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item4=..\..\others\PngComponents\Source
+Count=4
+Item0=..\..\..\others\PngComponents\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
+Item2=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
+Item3=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
 Item0=..\..\..\..\Trash

@@ -28,8 +28,8 @@ begin
   MemChk;
   {$ENDIF}
   xExitCode := $FF;
+  CoInitialize(Nil);
   if IsValidXmlparserInstalled(True) then begin
-    CoInitialize(Nil);
     if GetSwitch('-h') then begin
       xText := 'CTransform -x [nazwa pliku xml] -t [nazwa pliku arkusza styli] [-f [nazwa pliku wyjœciowego]] [-a] [-o]' + sLineBreak +
                '  -x okreœla plik wejœciowy, który ma zostaæ przetworzony' + sLineBreak +
@@ -119,7 +119,7 @@ begin
     if xExitCode <> $00 then begin
       Writeln(xText);
     end;
-    CoUninitialize;
   end;
+  CoUninitialize;
   Halt(xExitCode);
 end.

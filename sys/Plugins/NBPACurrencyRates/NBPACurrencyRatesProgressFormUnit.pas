@@ -88,7 +88,7 @@ begin
       xOutRoot := xXml.createElement('currencyRates');
       xXml.appendChild(xOutRoot);
       SetXmlAttribute('cashpointName', xOutRoot, 'Narodowy Bank Polski');
-      SetXmlAttribute('bindingDate', xOutRoot, StringReplace(GetXmlNodeValue('data_publikacji', FRequestThread.RootElement, ''), '-', '', [rfReplaceAll, rfIgnoreCase]));
+      SetXmlAttribute('bindingDate', xOutRoot, GetXmlNodeValue('data_publikacji', FRequestThread.RootElement, ''));
       xPositions := FRequestThread.RootElement.selectNodes('pozycja');
       for xCount := 0 to xPositions.length - 1 do begin
         xPosition := xPositions.item[xCount];

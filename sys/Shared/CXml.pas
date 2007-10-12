@@ -6,7 +6,7 @@ uses Windows, ActiveX, CXmlTlb, Classes, ComObj;
 
 type
   ICXMLDOMNode = IXMLDOMNode;
-  ICXMLDOMDocument = IXMLDOMDocument2;
+  ICXMLDOMDocument = IXMLDOMDocument3;
   ICXMLDOMNodeList = IXMLDOMNodeList;
   ICXMLDOMElement = IXMLDOMElement;
   ICXMLDOMParseError = IXMLDOMParseError;
@@ -31,7 +31,8 @@ function GetParseErrorDescription(AError: ICXMLDOMParseError; AWithLinebraks: Bo
 function IsValidXmlparserInstalled(AShowError: Boolean): Boolean;
 
 resourcestring
-  CNoValidMsxmlFound = 'Nie znaleziono bibliotek MSXML w wersji 4.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
+  CNoValidMsxmlFound = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
+  CXmlDownloadLink = 'http://www.microsoft.com/downloads/details.aspx?familyid=993C0BCF-3BCF-4009-BE21-27E85E1857B1&displaylang=en';
 
 implementation
 
@@ -179,19 +180,19 @@ end;
 
 function GetNewDocument: ICXMLDOMDocument;
 begin
-  Result := CoDOMDocument40.Create;
+  Result := CoDOMDocument60.Create;
 end;
 
 function GetNewSchema: ICXMLDOMSchemaCollection;
 begin
-  Result := CoXMLSchemaCache40.Create;
+  Result := CoXMLSchemaCache60.Create;
 end;
 
 function IsValidXmlparserInstalled(AShowError: Boolean): Boolean;
 var xXml: Variant;
 begin
   try
-    xXml := CreateOleObject('MSXML2.DOMDocument.4.0');
+    xXml := CreateOleObject('MSXML2.DOMDocument.6.0');
     Result := True;
     VarClear(xXml);
   except
