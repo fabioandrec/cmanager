@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<accountExtraction creationDate="2007-09-17" startDate="2007-08-18" endDate="2007-09-17" description="WYCIĄG NR 49">
+  <extractionItem operationDate="2007-08-18" accountingDate="2007-08-18" type="O" currency="PLN" description="GWARANCJA SPŁATY" cash="3.5800"/>
+  <extractionItem operationDate="2007-08-25" accountingDate="2007-08-25" type="I" currency="PLN" description="SPŁATA - PRZELEW" cash="100.0000"/>
+  <extractionItem operationDate="2007-09-17" accountingDate="2007-09-18" type="O" currency="PLN" description="ODSETKI;" cash="24.5100"/>
+</accountExtraction>

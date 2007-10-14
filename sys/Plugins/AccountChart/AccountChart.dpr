@@ -86,6 +86,7 @@ begin
     end;
     xCurDefs.Free;
     xAccounts := Nil;
+    xXml.save('c:\a.xml');
     Result := GetStringFromDocument(xXml);
   end;
   DecimalSeparator := xOldDecimal;
