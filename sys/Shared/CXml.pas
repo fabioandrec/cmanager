@@ -2,7 +2,7 @@ unit CXml;
 
 interface
 
-uses Windows, ActiveX, CXmlTlb, Classes, ComObj;
+uses Windows, ActiveX, CXmlTlb, Classes, ComObj, ShellApi;
 
 type
   ICXMLDOMNode = IXMLDOMNode;
@@ -28,10 +28,13 @@ function GetXmlDocument(AEncoding: String = 'Windows-1250'): ICXMLDOMDocument;
 function GetSchemaCacheFromXsd(AXsd: ICXMLDOMDocument): ICXMLDOMSchemaCollection;
 procedure AppendEncoding(var AXml: ICXMLDOMDocument; AEncoding: String = 'Windows-1250');
 function GetParseErrorDescription(AError: ICXMLDOMParseError; AWithLinebraks: Boolean): String;
-function IsValidXmlparserInstalled(AShowError: Boolean): Boolean;
+function IsValidXmlparserInstalled(AShowError: Boolean; AShowQuestion: Boolean): Boolean;
 
 resourcestring
-  CNoValidMsxmlFound = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
+  CNoValidMsxmlFoundError = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
+  CNoValidMsxmlFoundQuestion = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.' + sLineBreak +
+                               'Zainstaluj najnowsze biblioteki MSXML. Czy chcesz otworzyæ w domyœlnej przegl¹darce stronê,' + sLineBreak +
+                               'z której bêdzisz móg³ pobraæ niezbêdne pakiety?';
   CXmlDownloadLink = 'http://www.microsoft.com/downloads/details.aspx?familyid=993C0BCF-3BCF-4009-BE21-27E85E1857B1&displaylang=en';
 
 implementation
@@ -136,6 +139,7 @@ begin
   end;
   if xValid then begin
     Result := GetXmlDocument;
+    Result.setProperty(WideString('ProhibitDTD'), False);
     if xXsdCache <> Nil then begin
       Result.schemas := xXsdCache;
     end;
@@ -188,7 +192,7 @@ begin
   Result := CoXMLSchemaCache60.Create;
 end;
 
-function IsValidXmlparserInstalled(AShowError: Boolean): Boolean;
+function IsValidXmlparserInstalled(AShowError: Boolean; AShowQuestion: Boolean): Boolean;
 var xXml: Variant;
 begin
   try
@@ -197,10 +201,18 @@ begin
     VarClear(xXml);
   except
     Result := False;
-    if IsConsole then begin
-      Writeln(CNoValidMsxmlFound)
-    end else begin
-      MessageBox(0, PChar(CNoValidMsxmlFound), 'B³¹d', MB_OK + MB_ICONERROR);
+    if AShowError then begin
+      if IsConsole then begin
+        Writeln(CNoValidMsxmlFoundError)
+      end else begin
+        if AShowQuestion then begin
+          if MessageBox(0, PChar(CNoValidMsxmlFoundQuestion), 'Uwaga', MB_YESNO + MB_ICONWARNING) = IDYES then begin
+            ShellExecute(0, nil, PChar(CXmlDownloadLink), nil, nil, SW_SHOWNORMAL);
+          end;
+        end else begin
+          MessageBox(0, PChar(CNoValidMsxmlFoundError), 'B³¹d', MB_OK + MB_ICONERROR);
+        end;
+      end;
     end;
   end;
 end;

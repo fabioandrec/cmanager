@@ -23,7 +23,7 @@ begin
   MemChk;
   {$ENDIF}
   Application.Initialize;
-  if IsValidXmlparserInstalled(True) then begin
+  if IsValidXmlparserInstalled(True, True) then begin
     Application.Icon.Handle := LoadIcon(HInstance, 'BASEICON');
     UpdateSystem;
   end;

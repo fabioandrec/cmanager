@@ -92,7 +92,7 @@ begin
   {$ENDIF}
   xExitCode := $FF;
   CoInitialize(Nil);
-  if IsValidXmlparserInstalled(True) then begin
+  if IsValidXmlparserInstalled(True, False) then begin
     xDelimeter := '';
     if GetSwitch('-h') then begin
       xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych]' + sLineBreak +

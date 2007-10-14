@@ -28,7 +28,7 @@ begin
   {$ENDIF}
   xExitCode := $FF;
   CoInitialize(Nil);
-  if IsValidXmlparserInstalled(True) then begin
+  if IsValidXmlparserInstalled(True, False) then begin
     if GetSwitch('-h') then begin
       xText := 'CValidate [-x nazwa schematu xsd] -f [nazwa pliku xml]' + sLineBreak +
                '  -f plik xml, który ma zostaæ sprawdzony' + sLineBreak +

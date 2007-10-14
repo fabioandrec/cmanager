@@ -29,7 +29,7 @@ begin
   {$ENDIF}
   xExitCode := $FF;
   CoInitialize(Nil);
-  if IsValidXmlparserInstalled(True) then begin
+  if IsValidXmlparserInstalled(True, False) then begin
     if GetSwitch('-h') then begin
       xText := 'CTransform -x [nazwa pliku xml] -t [nazwa pliku arkusza styli] [-f [nazwa pliku wyjœciowego]] [-a] [-o]' + sLineBreak +
                '  -x okreœla plik wejœciowy, który ma zostaæ przetworzony' + sLineBreak +

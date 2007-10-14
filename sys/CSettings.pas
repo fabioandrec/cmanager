@@ -196,7 +196,7 @@ end;
 
 function InitializeSettings(AFileName: String): Boolean;
 begin
-  Result := IsValidXmlparserInstalled(True);
+  Result := IsValidXmlparserInstalled(True, True);
   if Result then begin
     if (AFileName <> '') and FileExists(AFileName) then begin
       GSettings := GetDocumentFromFile(AFileName, Nil);
