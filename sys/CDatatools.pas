@@ -28,6 +28,7 @@ procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
 function GetRatesXsd: ICXMLDOMDocument;
 function GetExchangesXsd: ICXMLDOMDocument;
 function GetExtractionsXsd: ICXMLDOMDocument;
+function GetChartsXsd: ICXMLDOMDocument;
 
 implementation
 
@@ -610,6 +611,11 @@ end;
 function GetExtractionsXsd: ICXMLDOMDocument;
 begin
   Result := GetDocumentFromString(GetStringFromResources('EXTRACTIONSXSD'), Nil);
+end;
+
+function GetChartsXsd: ICXMLDOMDocument;
+begin
+  Result := GetDocumentFromString(GetStringFromResources('CHARTSXSD'), Nil);
 end;
 
 end.

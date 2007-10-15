@@ -470,6 +470,9 @@ var xY, xM, xD: Word;
     xStr: String;
 begin
   xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, 'T', '', [rfReplaceAll, rfIgnoreCase]);
   xY := StrToIntDef(Copy(xStr, 1, 4), 0);
   xM := StrToIntDef(Copy(xStr, 5, 2), 0);
   xD := StrToIntDef(Copy(xStr, 7, 2), 0);
@@ -485,6 +488,7 @@ begin
   xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
   xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
   xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, 'T', '', [rfReplaceAll, rfIgnoreCase]);
   Result := YmdToDate(Copy(xStr, 1, 8), ADefault);
   xH := StrToIntDef(Copy(xStr, 9, 2), 0);
   xN := StrToIntDef(Copy(xStr, 11, 2), 0);
@@ -496,6 +500,9 @@ var xY, xM, xD: Word;
     xStr: String;
 begin
   xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, 'T', '', [rfReplaceAll, rfIgnoreCase]);
   xD := StrToIntDef(Copy(xStr, 1, 2), 0);
   xM := StrToIntDef(Copy(xStr, 3, 2), 0);
   xY := StrToIntDef(Copy(xStr, 5, 4), 0);

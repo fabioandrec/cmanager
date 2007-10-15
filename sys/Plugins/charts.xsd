@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="charts">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="chart"  minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="serie">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="item">
+                      <xs:complexType>
+                        <xs:attribute name="domain" type="xs:string" />
+                        <xs:attribute name="value" type="xs:string" use="required" />
+                        <xs:attribute name="label" type="xs:string" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="type" type="xs:string" use="required" />
+                  <xs:attribute name="title" type="xs:string" />
+                  <xs:attribute name="domain" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="symbol" type="xs:string" use="required" />
+            <xs:attribute name="thumbTitle" type="xs:string" />
+            <xs:attribute name="chartTitle" type="xs:string" />
+            <xs:attribute name="chartFooter" type="xs:string" />
+            <xs:attribute name="axisx" type="xs:string" />
+            <xs:attribute name="axisy" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

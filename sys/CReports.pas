@@ -3552,7 +3552,7 @@ begin
   xOut := TCPluginReportParams(Params).plugin.Execute;
   Result := False;
   if not VarIsEmpty(xOut) then begin
-    FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self), Nil);
+    FXml := GetDocumentFromString(GBaseTemlatesList.ExpandTemplates(xOut, Self), GetChartsXsd);
     Result := FXml.parseError.errorCode = 0;
     if not Result then begin
       ShowInfo(itError, 'Nie uda³o siê wygenerowaæ wykresu', GetParseErrorDescription(FXml.parseError, True));

@@ -12,6 +12,7 @@ uses
   AdoInt,
   GraphUtil,
   Graphics,
+  DateUtils,
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
   CXmlTlb in '..\..\Shared\CXmlTlb.pas',
@@ -86,7 +87,38 @@ begin
     end;
     xCurDefs.Free;
     xAccounts := Nil;
-    xXml.save('c:\a.xml');
+    xChart := xXml.createElement('chart');
+    xOutRoot.appendChild(xChart);
+    SetXmlAttribute('symbol', xChart, 'LINIOWY');
+    SetXmlAttribute('thumbTitle', xChart, 'thumTitle');
+    SetXmlAttribute('chartTitle', xChart, 'Wykres liniowy posiadania z datami');
+    SetXmlAttribute('chartFooter', xChart, CManInterface.GetName + ' wer. ' + CManInterface.GetVersion + ', ' + DateTimeToStr(Now));
+    SetXmlAttribute('axisx', xChart, 'tytu³ osi x');
+    SetXmlAttribute('axisy', xChart, 'tytu³ osi y');
+    xSerie := xXml.createElement('serie');
+    xChart.appendChild(xSerie);
+    SetXmlAttribute('type', xSerie, CSERIESTYPE_LINE);
+    SetXmlAttribute('title', xSerie, 'Wszystkie dane');
+    SetXmlAttribute('domain', xSerie, CSERIESDOMAIN_DATETIME);
+    for xCount := 1 to 5 do begin
+      xItem := xXml.createElement('item');
+      xSerie.appendChild(xItem);
+      SetXmlAttribute('domain', xItem, FormatDateTime('yyyy-mm-dd', EncodeDate(YearOf(Now), MonthOf(Now), xCount)));
+      SetXmlAttribute('value', xItem, Trim(StringReplace(Format('%-10.4f', [Random(1000)/(1 + Random(10))]), ',', '.', [rfIgnoreCase, rfReplaceAll])));
+      SetXmlAttribute('label', xItem, '');
+    end;
+    xSerie := xXml.createElement('serie');
+    xChart.appendChild(xSerie);
+    SetXmlAttribute('type', xSerie, CSERIESTYPE_BAR);
+    SetXmlAttribute('title', xSerie, 'Wszystkie dane');
+    SetXmlAttribute('domain', xSerie, CSERIESDOMAIN_DATETIME);
+    for xCount := 1 to 5 do begin
+      xItem := xXml.createElement('item');
+      xSerie.appendChild(xItem);
+      SetXmlAttribute('domain', xItem, FormatDateTime('yyyy-mm-dd', EncodeDate(YearOf(Now), MonthOf(Now), xCount)));
+      SetXmlAttribute('value', xItem, Trim(StringReplace(Format('%-10.4f', [Random(1000)/(1 + Random(10))]), ',', '.', [rfIgnoreCase, rfReplaceAll])));
+      SetXmlAttribute('label', xItem, '');
+    end;
     Result := GetStringFromDocument(xXml);
   end;
   DecimalSeparator := xOldDecimal;
