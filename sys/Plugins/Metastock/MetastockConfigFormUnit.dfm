@@ -70,6 +70,7 @@ object MetastockConfigForm: TMetastockConfigForm
       Height = 25
       Caption = 'Usu'#324
       TabOrder = 3
+      OnClick = BitBtnDelClick
     end
   end
   object PanelButtons: TPanel

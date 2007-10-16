@@ -20,6 +20,7 @@ type
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure BitBtnDelClick(Sender: TObject);
   private
     FConfigXml: ICXMLDOMDocument;
     FSourceNodes: ICXMLDOMNodeList;
@@ -85,6 +86,14 @@ end;
 procedure TMetastockConfigForm.ListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
 begin
   UpdateButtons;
+end;
+
+procedure TMetastockConfigForm.BitBtnDelClick(Sender: TObject);
+begin
+  if ListView.Selected <> Nil then begin
+    ListView.DeleteSelected;
+    UpdateButtons;
+  end;
 end;
 
 end.
