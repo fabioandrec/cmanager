@@ -21,20 +21,21 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListViewSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure BitBtnDelClick(Sender: TObject);
+    procedure BitBtnEditClick(Sender: TObject);
+    procedure BitBtnAddClick(Sender: TObject);
   private
     FConfigXml: ICXMLDOMDocument;
-    FSourceNodes: ICXMLDOMNodeList;
-    procedure SetconfigXml(const Value: ICXMLDOMDocument);
     procedure UpdateButtons;
   public
-    property ConfigXml: ICXMLDOMDocument read FConfigXml write SetconfigXml;
+    procedure SetConfigXml(const Value: ICXMLDOMDocument);
+    function GetConfigXml: String;
   end;
 
 var GCManagerInterface: ICManagerInterface;
 
 implementation
 
-uses CXmlTlb;
+uses CXmlTlb, CBase64, MetastockEditFormUnit;
 
 {$R *.dfm}
 
@@ -55,10 +56,11 @@ begin
   end;
 end;
 
-procedure TMetastockConfigForm.SetconfigXml(const Value: ICXMLDOMDocument);
+procedure TMetastockConfigForm.SetConfigXml(const Value: ICXMLDOMDocument);
 var xNode: ICXMLDOMNode;
     xCount: Integer;
     xItem: TListItem;
+    xSourceNodes: ICXMLDOMNodeList;
 begin
   FConfigXml := Value;
   ListView.Items.BeginUpdate;
@@ -67,10 +69,11 @@ begin
     FConfigXml := GetXmlDocument;
     FConfigXml.appendChild(FConfigXml.createElement('sources'));
   end;
-  FSourceNodes := FConfigXml.documentElement.selectNodes('source');
-  for xCount := 0 to FSourceNodes.length - 1 do begin
-    xNode := FSourceNodes.item[xCount];
+  xSourceNodes := FConfigXml.documentElement.selectNodes('source');
+  for xCount := 0 to xSourceNodes.length - 1 do begin
+    xNode := xSourceNodes.item[xCount];
     xItem := ListView.Items.Add;
+    xItem.Data := @xNode;
     xItem.Caption := GetXmlAttribute('name', xNode, 'èrÛd≥o ' + IntToStr(xCount + 1));
   end;
   ListView.Items.EndUpdate;
@@ -89,11 +92,63 @@ begin
 end;
 
 procedure TMetastockConfigForm.BitBtnDelClick(Sender: TObject);
+var xIndex: Integer;
 begin
   if ListView.Selected <> Nil then begin
+    xIndex := ListView.Selected.Index;
     ListView.DeleteSelected;
+    FConfigXml.documentElement.removeChild(FConfigXml.documentElement.childNodes.item[xIndex]);
     UpdateButtons;
   end;
+end;
+
+procedure TMetastockConfigForm.BitBtnEditClick(Sender: TObject);
+var xName, xUrl, xCashpoint, xIso, xType: String;
+    xNode: IXMLDOMNode;
+begin
+  xNode := FConfigXml.documentElement.childNodes.item[ListView.Selected.Index];
+  xName := GetXmlAttribute('name', xNode, '');
+  xUrl := GetXmlAttribute('link', xNode, '');
+  xCashpoint := GetXmlAttribute('cashpointName', xNode, '');
+  xIso := GetXmlAttribute('currency', xNode, '');
+  xType := GetXmlAttribute('type', xNode, '');
+  if EditSource(xName, xUrl, xCashpoint, xIso, xType) then begin
+    SetXmlAttribute('name', xNode, xName);
+    SetXmlAttribute('link', xNode, xUrl);
+    SetXmlAttribute('cashpointName', xNode, xCashpoint);
+    SetXmlAttribute('currency', xNode, xIso);
+    SetXmlAttribute('type', xNode, xType);
+    ListView.Selected.Caption := xName;
+  end;
+end;
+
+procedure TMetastockConfigForm.BitBtnAddClick(Sender: TObject);
+var xName, xUrl, xCashpoint, xIso, xType: String;
+    xNode: IXMLDOMNode;
+    xItem: TListItem;
+begin
+  xName := '';
+  xUrl := '';
+  xCashpoint := '';
+  xIso := '';
+  xType := '';
+  if EditSource(xName, xUrl, xCashpoint, xIso, xType) then begin
+    xNode := FConfigXml.createElement('source');
+    FConfigXml.documentElement.appendChild(xNode);
+    SetXmlAttribute('name', xNode, xName);
+    SetXmlAttribute('link', xNode, xUrl);
+    SetXmlAttribute('cashpointName', xNode, xCashpoint);
+    SetXmlAttribute('currency', xNode, xIso);
+    SetXmlAttribute('type', xNode, xType);
+    xItem := ListView.Items.Add;
+    xItem.Caption := xName;
+    ListView.Selected := xItem;
+  end;
+end;
+
+function TMetastockConfigForm.GetConfigXml: String;
+begin
+  Result := GetStringFromDocument(FConfigXml);
 end;
 
 end.

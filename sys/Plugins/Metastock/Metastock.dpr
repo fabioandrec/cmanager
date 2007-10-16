@@ -17,7 +17,8 @@ uses
   CTools in '..\..\Shared\CTools.pas',
   CRichtext in '..\..\Shared\CRichtext.pas',
   MetastockConfigFormUnit in 'MetastockConfigFormUnit.pas' {MetastockConfigForm},
-  CBase64 in '..\..\Shared\CBase64.pas';
+  CBase64 in '..\..\Shared\CBase64.pas',
+  MetastockEditFormUnit in 'MetastockEditFormUnit.pas' {MetastockEditForm};
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
@@ -70,9 +71,9 @@ begin
       xXml := Nil;
     end;
   end;
-  xForm.ConfigXml := xXml;
+  xForm.SetConfigXml(xXml);
   if xForm.ShowModal = mrOk then begin
-    xConfigurationDecoded := GetStringFromDocument(xForm.ConfigXml);
+    xConfigurationDecoded := xForm.GetConfigXml;
     EncodeBase64Buffer(xConfigurationDecoded, xConfigurationEncoded);
     GCManagerInterface.SetConfiguration(xConfigurationEncoded);
     Result := True;

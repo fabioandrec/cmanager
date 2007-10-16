@@ -54,6 +54,7 @@ object MetastockConfigForm: TMetastockConfigForm
       Height = 25
       Caption = 'Dodaj'
       TabOrder = 1
+      OnClick = BitBtnAddClick
     end
     object BitBtnEdit: TBitBtn
       Left = 98
@@ -62,6 +63,7 @@ object MetastockConfigForm: TMetastockConfigForm
       Height = 25
       Caption = 'Edytuj'
       TabOrder = 2
+      OnClick = BitBtnEditClick
     end
     object BitBtnDel: TBitBtn
       Left = 186
