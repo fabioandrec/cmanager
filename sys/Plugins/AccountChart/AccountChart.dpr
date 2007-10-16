@@ -79,7 +79,6 @@ begin
       while not xAccounts.EOF do begin
         xItem := xXml.createElement('item');
         xSerie.appendChild(xItem);
-        SetXmlAttribute('domain', xItem, '');
         SetXmlAttribute('value', xItem, StringReplace(xAccounts.Fields.Item['cash'].Value, ',', '.', [rfIgnoreCase, rfReplaceAll]));
         SetXmlAttribute('label', xItem, xAccounts.Fields.Item['name'].Value);
         xAccounts.MoveNext;

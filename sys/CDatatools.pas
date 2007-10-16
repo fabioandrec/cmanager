@@ -22,6 +22,7 @@ procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataE
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExchanges(AExchangesText: String);
 procedure UpdateExtractions(AExtractionText: String);
+procedure UpdateInvestments(AInvestmentsText: String);
 procedure ReloadCaches;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
 procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
@@ -616,6 +617,10 @@ end;
 function GetChartsXsd: ICXMLDOMDocument;
 begin
   Result := GetDocumentFromString(GetStringFromResources('CHARTSXSD'), Nil);
+end;
+
+procedure UpdateInvestments(AInvestmentsText: String);
+begin
 end;
 
 end.
