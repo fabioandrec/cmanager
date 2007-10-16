@@ -368,7 +368,7 @@ begin
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('currencyRates');
     if xRoot <> Nil then begin
-      xBindingDate := YmdToDate(GetXmlAttribute('bindingDate', xRoot, ''), 0);
+      xBindingDate := XsdToDateTime(GetXmlAttribute('bindingDate', xRoot, ''));
       if xBindingDate <> 0 then begin
         xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
         if xCahpointName <> '' then begin
@@ -519,10 +519,10 @@ begin
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('accountExtraction');
     if xRoot <> Nil then begin
-      xCreationDate := YmdToDate(GetXmlAttribute('creationDate', xRoot, ''), 0);
+      xCreationDate := XsdToDateTime(GetXmlAttribute('creationDate', xRoot, ''));
       if xCreationDate <> 0 then begin
-        xStartDate := YmdToDate(GetXmlAttribute('startDate', xRoot, ''), 0);
-        xEndDate := YmdToDate(GetXmlAttribute('endDate', xRoot, ''), 0);
+        xStartDate := XsdToDateTime(GetXmlAttribute('startDate', xRoot, ''));
+        xEndDate := XsdToDateTime(GetXmlAttribute('endDate', xRoot, ''));
         if (xStartDate <> 0) and (xEndDate <> 0) then begin
           xValid := True;
           xDesc := GetXmlAttribute('description', xRoot, '');
@@ -531,8 +531,8 @@ begin
           xParams := TExtractionAdditionalData.Create(xCreationDate, xStartDate, xEndDate, xDesc);
           while xValid and (xCount <= xList.length - 1) do begin
             xNode := xList.item[xCount];
-            xRegDate := YmdToDate(GetXmlAttribute('operationDate', xNode, ''), 0);
-            xAccountingDate := YmdToDate(GetXmlAttribute('accountingDate', xNode, ''), 0);
+            xRegDate := XsdToDateTime(GetXmlAttribute('operationDate', xNode, ''));
+            xAccountingDate := XsdToDateTime(GetXmlAttribute('accountingDate', xNode, ''));
             if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
               xCash := StrToCurrencyDecimalDot(GetXmlAttribute('cash', xNode, ''));
               xMovementType := GetXmlAttribute('type', xNode, '');

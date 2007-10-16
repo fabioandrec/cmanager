@@ -10,10 +10,10 @@
             <xs:attribute name="type" use="required">
               <xs:simpleType>
                 <xs:restriction base="xs:string">
-                  <xs:enumeration value="I"/>
-                  <xs:enumeration value="S"/>
-                  <xs:enumeration value="B"/>
-                  <xs:enumeration value="F"/>
+                  <xs:enumeration value="I"/>  <!--indeks gie³dowy-->
+                  <xs:enumeration value="S"/>  <!--akcje-->
+                  <xs:enumeration value="B"/>  <!--obligacje-->
+                  <xs:enumeration value="F"/>  <!--fundusz inwestycyjny-->
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>

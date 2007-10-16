@@ -78,9 +78,6 @@ function LPad(AString: String; AChar: Char; ALength: Integer): String;
 function RPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 procedure SaveToLog(AText: String; ALogFilename: String);
-function YmdToDate(AString: String; ADefault: TDateTime): TDateTime;
-function YmdhnToDate(AString: String; ADefault: TDateTime): TDateTime;
-function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 function StrToCurrencyDecimalDot(AStr: String): Currency;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
@@ -98,6 +95,8 @@ function GetMonthNumber(AMonthName: String): Integer;
 function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
 function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
 function GetStringFromResources(AResName: String): String;
+function XsdToDateTime(ADateTimeStr: String; AYearFirst: Boolean = True): TDateTime;
+function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
 
 implementation
 
@@ -465,36 +464,6 @@ begin
   end;
 end;
 
-function YmdToDate(AString: String; ADefault: TDateTime): TDateTime;
-var xY, xM, xD: Word;
-    xStr: String;
-begin
-  xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
-  xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
-  xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
-  xStr := StringReplace(xStr, 'T', '', [rfReplaceAll, rfIgnoreCase]);
-  xY := StrToIntDef(Copy(xStr, 1, 4), 0);
-  xM := StrToIntDef(Copy(xStr, 5, 2), 0);
-  xD := StrToIntDef(Copy(xStr, 7, 2), 0);
-  if not TryEncodeDate(xY, xM, xD, Result) then begin
-    Result := ADefault;
-  end;
-end;
-
-function YmdhnToDate(AString: String; ADefault: TDateTime): TDateTime;
-var xH, xN: Word;
-    xStr: String;
-begin
-  xStr := StringReplace(AString, '-', '', [rfReplaceAll, rfIgnoreCase]);
-  xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
-  xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
-  xStr := StringReplace(xStr, 'T', '', [rfReplaceAll, rfIgnoreCase]);
-  Result := YmdToDate(Copy(xStr, 1, 8), ADefault);
-  xH := StrToIntDef(Copy(xStr, 9, 2), 0);
-  xN := StrToIntDef(Copy(xStr, 11, 2), 0);
-  Result := RecodeTime(Result, xH, xN, 0, 0);
-end;
-
 function DmyToDate(AString: String; ADefault: TDateTime): TDateTime;
 var xY, xM, xD: Word;
     xStr: String;
@@ -725,6 +694,160 @@ begin
     xResStr.Free;
   finally
     xStrStr.Free;
+  end;
+end;
+
+function GetTimeZoneBias : Longint;
+var xTzinfo: TTimeZoneInformation;
+begin
+  Result:= 0;
+  case GetTimeZoneInformation(xTzinfo) of
+    TIME_ZONE_ID_STANDARD: begin
+      Result := xTzinfo.StandardBias + xTzinfo.Bias;
+    end;
+    TIME_ZONE_ID_DAYLIGHT: begin
+      Result := xTzinfo.DaylightBias + xTzinfo.Bias;
+    end;
+  end;
+end;
+
+function GetTimeZoneAdjustment : String;
+var xBias: Longint;
+begin
+  xBias := GetTimeZoneBias;
+  if (xBias = 0) then begin
+    Result := 'GMT'
+  end else if (xBias < 0) then begin
+    Result := '+' + LPad(IntToStr(Abs(xBias) div 60), '0', 2) + ':'
+                             + LPad(IntToStr(Abs(xBias) mod 60), '0', 2)
+  end else if (xBias > 0) then begin
+    Result := '-' + LPad(IntToStr(xBias div 60), '0', 2) + ':'
+                             + LPad(IntToStr(xBias mod 60), '0', 2);
+  end;
+end;
+
+function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
+begin
+  Result := FormatDateTime(IfThen(AYearFirst, 'yyyy-mm-dd', 'dd-mm-yyyy') + IfThen(AWithTime, 'Thh:nn:ss.zzz' + GetTimeZoneAdjustment, ''), ADateTime);
+end;
+
+procedure AddTimeBias(var ADateTime: TDateTime; ABias: Longint);
+var xH, xM: Word;
+    xT : TDateTime;
+begin
+  if (ABias <> 0) then begin
+    xH := (Abs(ABias) div 60);
+    xM := (Abs(ABias) mod 60);
+    xT := EncodeTime(xH, xM, 0, 0);
+    if (ABias > 0) then begin
+      ADateTime := ADateTime + xT;
+    end else begin
+      ADateTime := ADateTime - xT;
+    end;
+  end;
+end;
+
+function XsdToDateTime(ADateTimeStr: String; AYearFirst: Boolean = True): TDateTime;
+var xYear, xMonth, xDay, xHour, xMin, xSec, xMilli, xBHour, xBMinute : Word;
+    xTime, xDate : TDateTime;
+    xBias: Longint;
+    xLen: Integer;
+begin
+  xLen := Length(ADateTimeStr);
+  if AYearFirst then begin
+    xYear := StrToIntDef(Copy(ADateTimeStr, 1, 4), 0);
+    xMonth := StrToIntDef(Copy(ADateTimeStr, 6, 2), 0);
+    xDay := StrToIntDef(Copy(ADateTimeStr, 9, 2), 0);
+  end else begin
+    xDay := StrToIntDef(Copy(ADateTimeStr, 1, 2), 0);
+    xMonth := StrToIntDef(Copy(ADateTimeStr, 4, 2), 0);
+    xYear := StrToIntDef(Copy(ADateTimeStr, 7, 4), 0);
+  end;
+  if xLen = 10 then begin
+    //"yyyy-mm-dd"
+    Result := EncodeDate(xYear, xMonth, xDay);
+  end else if xLen = 19 then begin
+    //"yyyy-mm-ddThh:nn:ss"
+    xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
+    xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
+    xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+    Result := EncodeDateTime(xYear, xMonth, xDay, xHour, xMin, xSec, 0);
+  end else if xLen = 22 then begin
+    //"yyyy-mm-ddThh:nn:ssZ"
+    xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
+    xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
+    xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+    xMilli := 0;
+    if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
+      if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
+        xDate := xDate + xTime;
+        Result := xDate;
+      end else begin
+        Result := 0;
+      end;
+    end else begin
+      Result := 0;
+    end;
+  end else if xLen = 25 then begin
+    //"yyyy-mm-ddThh:nn:ss+hh:nn"
+    xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
+    xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
+    xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+    xMilli := 0;
+    if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
+      if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
+        xDate := xDate + xTime;
+        xBHour := StrToIntDef(Copy(ADateTimeStr, 21, 2), 0);
+        xBMinute := StrToIntDef(Copy(ADateTimeStr, 24, 2), 0);
+        xBias := (xBHour * 60) + xBMinute;
+        if (ADateTimeStr[20] = '-') then xBias := 0 - xBias;
+        AddTimeBias(xDate, 0 - xBias);
+        xBias := GetTimeZoneBias;
+        AddTimeBias(xDate, 0 - xBias);
+        Result := xDate;
+      end else begin
+        Result := 0;
+      end;
+    end else begin
+      Result := 0;
+    end;
+  end else if (xLen = 26) or (xLen = 29) then begin
+    //"yyyy-mm-ddThh:nn:ss.zzzZ"
+    //"yyyy-mm-ddThh:nn:ss.zzz+hh:nn"
+    if (xLen = 29) or (xLen = 26) then begin
+      xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
+      xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
+      xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+      xMilli := StrToIntDef(Copy(ADateTimeStr, 21, 3), 0);
+    end else begin
+      xHour := 0;
+      xMin := 0;
+      xSec := 0;
+      xMilli := 0;
+    end;
+    if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
+      if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
+        xDate := xDate + xTime;
+        if (Length(ADateTimeStr) = 29) then begin
+          xBHour := StrToIntDef(Copy(ADateTimeStr, 25, 2), 0);
+          xBMinute := StrToIntDef(Copy(ADateTimeStr, 28, 2), 0);
+          xBias := (xBHour * 60) + xBMinute;
+          if (ADateTimeStr[24] = '-') then xBias := 0 - xBias;
+        end else begin
+          xBias := 0;
+        end;
+        AddTimeBias(xDate, 0 - xBias);
+        xBias := GetTimeZoneBias;
+        AddTimeBias(xDate, 0 - xBias);
+        Result := xDate;
+      end else begin
+        Result := 0;
+      end;
+    end else begin
+      Result := 0;
+    end;
+  end else begin
+    Result := 0;
   end;
 end;
 

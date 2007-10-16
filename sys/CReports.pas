@@ -667,39 +667,27 @@ begin
 end;
 
 function TCHtmlReport.GetSystemXsl(var AError: String): ICXMLDOMDocument;
-var xLibHandle: THandle;
-    xResInfo: HRSRC;
-    xResStream: TResourceStream;
+var xResStream: TResourceStream;
     xStrStream: TStringStream;
 begin
   if LDefaultXsl = Nil then begin
     Result := Nil;
-    xLibHandle := LoadLibrary(CMSXmlLibraryName);
-    if xLibHandle > HINSTANCE_ERROR then begin
-      try
-        xResinfo := FindResource(xLibHandle, CXSLDefaultTransformResname, CXSLDefaultTransforRestype);
-        if xResInfo <> 0 then begin
-          try
-            xResStream := TResourceStream.Create(xLibHandle, CXSLDefaultTransformResname, CXSLDefaultTransforRestype);
-            xStrStream := TStringStream.Create('');
-            xResStream.SaveToStream(xStrStream);
-            xResStream.Free;
-            LDefaultXsl := GetDocumentFromString(xStrStream.DataString, Nil);
-            xStrStream.Free;
-            if LDefaultXsl.parseError.errorCode <> 0 then begin
-              AError := GetParseErrorDescription(LDefaultXsl.parseError, True);
-              LDefaultXsl := Nil;
-            end else begin
-              Result := LDefaultXsl;
-            end;
-          except
-            on E: Exception do begin
-              AError := E.Message;
-            end;
-          end;
-        end;
-      finally
-        FreeLibrary(xLibHandle);
+    try
+      xResStream := TResourceStream.Create(HInstance, CXSLDefaultTransformResname, RT_RCDATA);
+      xStrStream := TStringStream.Create('');
+      xResStream.SaveToStream(xStrStream);
+      xResStream.Free;
+      LDefaultXsl := GetDocumentFromString(xStrStream.DataString, Nil);
+      xStrStream.Free;
+      if LDefaultXsl.parseError.errorCode <> 0 then begin
+        AError := GetParseErrorDescription(LDefaultXsl.parseError, True);
+        LDefaultXsl := Nil;
+      end else begin
+        Result := LDefaultXsl;
+      end;
+    except
+      on E: Exception do begin
+        AError := E.Message;
       end;
     end;
   end else begin
@@ -3521,7 +3509,7 @@ begin
           xItemNode := xItems.item[xCountI];
           xLabel := GetXmlAttribute('label', xItemNode, '');
           if xSerieObject.XValues.DateTime then begin
-            xX := YmdToDate(GetXmlAttribute('domain', xItemNode, ''), 0);
+            xX := XsdToDateTime(GetXmlAttribute('domain', xItemNode, ''));
           end else begin
             xX := StrToCurrencyDecimalDot(GetXmlAttribute('domain', xItemNode, ''));
           end;

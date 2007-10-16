@@ -61,6 +61,9 @@ begin
           if xRes then begin
             ModalResult := mrOk;
           end else begin
+            if xError = '' then begin
+              xError := 'Plik nie zawiera danych o wyci¹gach z mBanku';
+            end;
             MessageBox(Handle, PChar(xError), 'B³¹d', MB_OK + MB_ICONERROR);
           end;
         except
@@ -98,8 +101,8 @@ begin
   AEnd := 0;
   Result := False;
   if AIsCreditCard then begin
-    AStart := YmdToDate(Copy(AStr, 1, 10), 0);
-    AEnd := YmdToDate(Copy(AStr, Length(AStr) - 9, 10), 0);
+    AStart := XsdToDateTime(Copy(AStr, 1, 10));
+    AEnd := XsdToDateTime(Copy(AStr, Length(AStr) - 9, 10));
     Result := (AStart <> 0) and (AEnd <> 0);
   end else begin
     xMonth := GetMonthNumber(Copy(AStr, 1, Length(AStr) - 5));
@@ -188,18 +191,18 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
       if (xDatesStr.Text <> '') and (xTitlesStr.Text <> '') and (xCashStr <> '') then begin
         if xDatesStr.Count > 0 then begin
           if AIsCreditCard then begin
-            xRegDate := YmdToDate(xDatesStr.Strings[0], 0);
+            xRegDate := XsdToDateTime(xDatesStr.Strings[0]);
           end else begin
-            xRegDate := DmyToDate(xDatesStr.Strings[0], 0);
+            xRegDate := XsdToDateTime(xDatesStr.Strings[0], False);
           end;
         end else begin
           xRegDate := 0;
         end;
         if xDatesStr.Count > 1 then begin
           if AIsCreditCard then begin
-            xAccountingDate := YmdToDate(xDatesStr.Strings[1], 0);
+            xAccountingDate := XsdToDateTime(xDatesStr.Strings[1]);
           end else begin
-            xAccountingDate := DmyToDate(xDatesStr.Strings[1], 0);
+            xAccountingDate := XsdToDateTime(xDatesStr.Strings[1], False);
           end;
         end else begin
           xAccountingDate := 0;
@@ -421,8 +424,8 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
   begin
     AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
     if AIsCreditCard then begin
-      xRegDate := YmdToDate(ARow[Low(ARow) + 1], 0);
-      xAccountingDate := YmdToDate(ARow[Low(ARow) + 2], 0);
+      xRegDate := XsdToDateTime(ARow[Low(ARow) + 1]);
+      xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 2]);
       xTitle := Trim(ARow[Low(ARow) + 3]) + sLineBreak + Trim(ARow[Low(ARow) + 4]);
       xCashStr := StringReplace(Trim(ARow[Low(ARow) + 5]), '.', '', [rfReplaceAll, rfIgnoreCase]);
       xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
@@ -430,8 +433,8 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
       xCurrStr := Trim(ARow[Low(ARow) + 6]);
       Result := (xRegDate <> 0) and (xAccountingDate <> 0);
     end else begin
-      xRegDate := DmyToDate(ARow[Low(ARow)], 0);
-      xAccountingDate := YmdToDate(ARow[Low(ARow) + 1], 0);
+      xRegDate := XsdToDateTime(ARow[Low(ARow)], False);
+      xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 1]);
       xCashStr := StringReplace(Trim(ARow[Low(ARow) + 7]), '.', '', [rfReplaceAll, rfIgnoreCase]);
       xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
       xCash := StrToCurrencyDecimalDot(xCashStr);

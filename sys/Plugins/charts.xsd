@@ -11,15 +11,44 @@
                   <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="item">
                       <xs:complexType>
-                        <xs:attribute name="domain" type="xs:string" />
+                        <xs:attribute name="domain">
+			  <xs:simpleType>
+			    <xs:union>
+     			      <xs:simpleType>
+                                <xs:restriction base="xs:float"/>
+			      </xs:simpleType>	
+			      <xs:simpleType>
+                                <xs:restriction base="xs:date"/>			
+			      </xs:simpleType>
+			      <xs:simpleType>
+                                <xs:restriction base="xs:dateTime"/>			
+			      </xs:simpleType>
+			    </xs:union>
+			  </xs:simpleType>
+			</xs:attribute>
                         <xs:attribute name="value" type="xs:string" use="required" />
                         <xs:attribute name="label" type="xs:string" />
                       </xs:complexType>
                     </xs:element>
                   </xs:sequence>
-                  <xs:attribute name="type" type="xs:string" use="required" />
+                  <xs:attribute name="type" use ="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:integer">
+                      <xs:enumeration value="1"/>  <!--seria ko³owa-->
+                      <xs:enumeration value="2"/>  <!--seria liniwa-->
+                      <xs:enumeration value="3"/>  <!--seria s³upkowa-->
+                    </xs:restriction>
+		  </xs:simpleType>
+		  </xs:attribute>
                   <xs:attribute name="title" type="xs:string" />
-                  <xs:attribute name="domain" type="xs:string" use="required" />
+                  <xs:attribute name="domain" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:integer">
+                        <xs:enumeration value="0"/> <!--na osi x wartoœciami s¹ daty-->
+                        <xs:enumeration value="1"/> <!--na osi x wartoœciami s¹ liczby-->
+                      </xs:restriction>
+		    </xs:simpleType>
+		  </xs:attribute>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>

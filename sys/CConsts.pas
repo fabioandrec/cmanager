@@ -31,9 +31,7 @@ const
   CCSSReportFile = 'report.css';
   CXSLReportFile = 'transform.xml';
   CHTMReportFile = 'report.htm';
-  CXSLDefaultTransformResname = 'DEFAULTSS.XSL';
-  CXSLDefaultTransforRestype = MAKEINTRESOURCE(23);
-  CMSXmlLibraryName = 'msxml.dll';
+  CXSLDefaultTransformResname = 'DEFAULTXSL';
 
 const
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';

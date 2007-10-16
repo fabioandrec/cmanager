@@ -93,7 +93,7 @@ begin
   end else if Column = 1 then begin
     CellText := GetXmlAttribute('name', xNode, '');
   end else if Column = 0 then begin
-    CellText := Date2StrDate(YmdhnToDate(GetXmlAttribute('regDateTime', xNode, ''), 0), True);
+    CellText := Date2StrDate(XsdToDateTime(GetXmlAttribute('regDateTime', xNode, '')), True);
   end;
 end;
 
@@ -130,7 +130,7 @@ function TExchangeDescriptionHelper.ExpandTemplate(ATemplate: String): String;
 var xRegDateTime: TDateTime;
     xType: TBaseEnumeration;
 begin
-  xRegDateTime := YmdhnToDate(GetXmlAttribute('regDateTime', FExchange, ''), 0);
+  xRegDateTime := XsdToDateTime(GetXmlAttribute('regDateTime', FExchange, ''));
   xType := GetXmlAttribute('type', FExchange, '');
   if ATemplate = '@datanotowania@' then begin
     Result := GetFormattedDate(xRegDateTime, 'yyyy-MM-dd');
@@ -233,7 +233,7 @@ begin
           xInstrument.idCurrencyDef := xCurrencyId;
           xInstrument.instrumentType := GetXmlAttribute('type', xXml, '');
         end;
-        xRegDateTime := YmdhnToDate(GetXmlAttribute('regDateTime', xXml, ''), 0);
+        xRegDateTime := XsdToDateTime(GetXmlAttribute('regDateTime', xXml, ''));
         xValue := TInstrumentValue.FindValue(xInstrument.id, xRegDateTime);
         if xValue = Nil then begin
           xValue := TInstrumentValue.CreateObject(InstrumentValueProxy, False);

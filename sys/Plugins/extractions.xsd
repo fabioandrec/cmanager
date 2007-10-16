@@ -10,8 +10,8 @@
             <xs:attribute name="type" use="required">
               <xs:simpleType>
                 <xs:restriction base="xs:string">
-                  <xs:enumeration value="I"/>
-                  <xs:enumeration value="O"/>
+                  <xs:enumeration value="I"/>  <!--operacja przychodowa-->
+                  <xs:enumeration value="O"/>  <!--operacja rozchodowa-->
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>

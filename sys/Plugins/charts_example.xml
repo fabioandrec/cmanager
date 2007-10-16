@@ -2,8 +2,8 @@
 <charts>
   <chart symbol="{00000000-0000-0000-0000-000000000001}" thumbTitle="PLN" chartTitle="Wykres stanu posiadania" chartFooter="CManager wer. 1.8.1.19, 2007-10-15 11:12:21" axisx="tytu³ osi x" axisy="tytu³ osi y">
     <serie type="1" title="Wszystkie dane" domain="0">
-      <item domain="" value="0" label="Twój portfel"/>
-      <item domain="" value="-123" label="Twoje konto bankowe"/>
+      <item value="0" label="Twój portfel"/>
+      <item value="-123" label="Twoje konto bankowe"/>
     </serie>
   </chart>
   <chart symbol="LINIOWY" thumbTitle="thumTitle" chartTitle="Wykres liniowy posiadania z datami" chartFooter="CManager wer. 1.8.1.19, 2007-10-15 11:12:21" axisx="tytu³ osi x" axisy="tytu³ osi y">

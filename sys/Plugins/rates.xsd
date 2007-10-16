@@ -14,9 +14,9 @@
             <xs:attribute name="type">
               <xs:simpleType>
                 <xs:restriction base="xs:string">
-                  <xs:enumeration value="A"/>
-                  <xs:enumeration value="B"/>
-                  <xs:enumeration value="S"/>
+                  <xs:enumeration value="A"/>  <!--kurs œredni-->
+                  <xs:enumeration value="B"/>  <!--kurs sprzeda¿y-->
+                  <xs:enumeration value="S"/>  <!--kurs kupna-->
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
