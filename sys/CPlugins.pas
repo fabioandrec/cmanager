@@ -38,6 +38,8 @@ type
     function GetShutdownEvent: Cardinal;
     procedure SendFrameMessage(AMessage: OleVariant; AFrameType: OleVariant; ADataGid: OleVariant; AOptParam: OleVariant);
     function GetState: Integer;
+    procedure SaveToLog(AText: OleVariant; ALogFilename: OleVariant);
+    function DebugMode: Boolean;
   end;
 
   TCPlugin = class(TCDataListElementObject)
@@ -92,6 +94,7 @@ type
 var GPlugins: TCPluginList;
     GPluginlogfile: String = '';
     GCmanagerState: Integer;
+    GDebugMode: Boolean;
 
 implementation
 
@@ -556,6 +559,16 @@ end;
 function TCManagerInterfaceObject.GetState: Integer;
 begin
   Result := GCmanagerState;
+end;
+
+procedure TCManagerInterfaceObject.SaveToLog(AText, ALogFilename: OleVariant);
+begin
+  CTools.SaveToLog(AText, ALogFilename);
+end;
+
+function TCManagerInterfaceObject.DebugMode: Boolean;
+begin
+  Result := GDebugMode;
 end;
 
 initialization

@@ -217,7 +217,7 @@ begin
       AddToReport('B³¹d, ' + GetErrorDesc(Result));
     end;
   end;
-  if (Result = ERROR_SUCCESS) then begin
+  if (Result <> ERROR_SUCCESS) then begin
     AResponse := IntToStr(Result) + ' ' + GetErrorDesc(Result);
   end;
 end;

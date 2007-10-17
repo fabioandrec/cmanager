@@ -28,6 +28,8 @@ type
     function GetSelectedId: OleVariant;
     function GetShutdownEvent: Cardinal;
     procedure SendFrameMessage(AMessage: OleVariant; AFrameType: OleVariant; ADataGid: OleVariant; AOptParam: OleVariant);
+    procedure SaveToLog(AText, ALogFilename: OleVariant);
+    function DebugMode: Boolean;
   end;
 
   TCPlugin_Configure = function: Boolean; stdcall;

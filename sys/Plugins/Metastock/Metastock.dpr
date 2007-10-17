@@ -18,7 +18,8 @@ uses
   CRichtext in '..\..\Shared\CRichtext.pas',
   MetastockConfigFormUnit in 'MetastockConfigFormUnit.pas' {MetastockConfigForm},
   CBase64 in '..\..\Shared\CBase64.pas',
-  MetastockEditFormUnit in 'MetastockEditFormUnit.pas' {MetastockEditForm};
+  MetastockEditFormUnit in 'MetastockEditFormUnit.pas' {MetastockEditForm},
+  CBasics in '..\..\Shared\CBasics.pas';
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin

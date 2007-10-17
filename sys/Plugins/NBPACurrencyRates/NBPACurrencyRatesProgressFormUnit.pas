@@ -212,7 +212,11 @@ end;
 procedure TNBPACurrencyRatesBaseThread.ThreadFinished;
 begin
   if ExitCode = ERROR_SUCCESS then begin
-    PostMessage(NBPACurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
+    if FIsValidResponse then begin
+      PostMessage(NBPACurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
+    end else begin
+      NBPACurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
+    end;
   end else if ExitCode = ERROR_CANCELLED then begin
     PostMessage(NBPACurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
   end else begin

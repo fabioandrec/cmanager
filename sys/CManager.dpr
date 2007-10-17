@@ -13,8 +13,6 @@ program CManager;
 {%File 'CMandb_6_7.sql'}
 {%File 'CMandf.sql'}
 
-{$DEFINE FASTMM}
-
 uses
   MemCheck in 'MemCheck.pas',
   Forms,
@@ -141,13 +139,16 @@ var xError, xDesc, xFilename: String;
     xProceed: Boolean;
 
 begin
-  {$IFDEF DEBUG}
-  MemChk;
+  GCmanagerState := CMANAGERSTATE_STARTING;
+  GDebugMode := GetSwitch('/debug');
+  {$IFOPT W+}
+  if GDebugMode then begin
+    MemChk;
+  end;
   {$ENDIF}
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   InitializeFrameGlobals;
-  GCmanagerState := CMANAGERSTATE_STARTING;
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     InitializeProxies;
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
@@ -179,7 +180,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
