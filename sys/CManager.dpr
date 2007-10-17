@@ -82,7 +82,7 @@ uses
   CStartupInfoFormUnit in 'CStartupInfoFormUnit.pas' {CStartupInfoForm},
   CStartupInfoFrameUnit in 'CStartupInfoFrameUnit.pas' {CStartupInfoFrame: TFrame},
   CRichtext in 'Shared\CRichtext.pas',
-  CXmlTlb in 'Shared\CXmlTlb.pas',  
+  CXmlTlb in 'Shared\CXmlTlb.pas',
   CXml in 'Shared\CXml.pas',
   CTools in 'Shared\CTools.pas',
   CHelp in 'CHelp.pas',
@@ -132,7 +132,8 @@ uses
   CInstrumentFormUnit in 'CInstrumentFormUnit.pas' {CInstrumentForm},
   CInstrumentValueFrameUnit in 'CInstrumentValueFrameUnit.pas' {CInstrumentValueFrame: TFrame},
   CInstrumentValueFormUnit in 'CInstrumentValueFormUnit.pas' {CInstrumentValueForm},
-  CUpdateExchangesFormUnit in 'CUpdateExchangesFormUnit.pas' {CUpdateExchangesForm};
+  CUpdateExchangesFormUnit in 'CUpdateExchangesFormUnit.pas' {CUpdateExchangesForm},
+  CBasics in 'Shared\CBasics.pas';
 
 {$R *.res}
 
@@ -178,7 +179,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

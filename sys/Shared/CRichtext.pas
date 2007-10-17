@@ -20,6 +20,14 @@ const
 procedure AssignRichText(AText: String; ARichEdit: TRichEdit);
 procedure SimpleRichText(AText: String; ARichEdit: TRichEdit);
 procedure AddRichText(AText: String; ARichEdit: TRichEdit);
+procedure AddThreadRichText(AParentFormHandle: HWND; AText: String);
+procedure PerformAddThreadRichText(ARichEdit: TRichEdit; APointerToText: Integer);
+
+var WMC_RICHEDITADDTEXT: Cardinal;
+
+type
+  TThreadRichTextMessage = string[255];
+  PThreadRichTextMessage = ^TThreadRichTextMessage;
 
 implementation
 
@@ -174,7 +182,6 @@ var xCount_2: Integer;
     xRtfStyle: TFontStyles;
 begin
   SendMessage(ARichEdit.Handle, $400 + 120, 0, 0);
-  ARichEdit.Lines.BeginUpdate;
   xCurPos := Length(ARichEdit.Text);
   SetLength(xArrayOfAttributes, 0);
   xCurLine := PrepareRichTextLine(AText, xArrayOfAttributes);
@@ -202,7 +209,6 @@ begin
       ARichEdit.Paragraph.Alignment := TheAlignment;
     end;
   end;
-  ARichEdit.Lines.EndUpdate;
   ARichEdit.SelStart := 0;
   ARichEdit.SelLength := 0;
 end;
@@ -210,10 +216,8 @@ end;
 procedure SimpleRichText(AText: String; ARichEdit: TRichEdit);
 begin
   SendMessage(ARichEdit.Handle, $400 + 120, 0, 0);
-  ARichEdit.Lines.BeginUpdate;
   ARichEdit.Lines.Clear;
   ARichEdit.Text := AText;
-  ARichEdit.Lines.EndUpdate;
   ARichEdit.SelStart := Length(ARichEdit.Text) + 1;
   ARichEdit.SelLength := 0;
 end;
@@ -228,7 +232,6 @@ var xLines: TStringList;
     xRtfStyle: TFontStyles;
 begin
   SendMessage(ARichEdit.Handle, $400 + 120, 0, 0);
-  ARichEdit.Lines.BeginUpdate;
   ARichEdit.Lines.Clear;
   if Pos('{\rtf1', AText) = 0 then begin
     xLines := TStringList.Create;
@@ -267,9 +270,26 @@ begin
   end else begin
     ARichEdit.Text := AText;
   end;
-  ARichEdit.Lines.EndUpdate;
   ARichEdit.SelStart := Length(ARichEdit.Text) + 1;
   ARichEdit.SelLength := 0;
 end;
 
+procedure AddThreadRichText(AParentFormHandle: HWND; AText: String);
+var xMessage: PChar;
+begin
+  GetMem(xMessage, Length(AText) + 1);
+  StrPCopy(xMessage, AText);
+  PostMessage(AParentFormHandle, WMC_RICHEDITADDTEXT, Integer(xMessage), 0);
+end;
+
+procedure PerformAddThreadRichText(ARichEdit: TRichEdit; APointerToText: Integer);
+var xMessage: PChar;
+begin
+  xMessage := PChar(APointerToText);
+  AddRichText(xMessage, ARichEdit);
+  FreeMem(xMessage);
+end;
+
+initialization
+  WMC_RICHEDITADDTEXT := RegisterWindowMessage('WMC_RICHEDITADDTEXT');
 end.

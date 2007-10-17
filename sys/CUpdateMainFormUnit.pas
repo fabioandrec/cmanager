@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CComponents, StdCtrls, ExtCtrls, WinInet, ShellApi, ComCtrls, ActiveX,
-  CHttpRequest;
+  CHttpRequest, CBasics;
 
 type
   TCUpdateMainForm = class(TForm)
@@ -22,9 +22,10 @@ type
     procedure WndProc(var Message: TMessage); override;
   end;
 
-  TUpdateHttpRequest = class(THttpRequest)
+  TUpdateHttpRequest = class(TBaseHttpRequest)
   protected
-    procedure AfterGetResponse; override;
+    function AfterGetResponse(ARequestIdentifier: String): Cardinal; override;
+    procedure ThreadFinished; override;
   end;
 
 var
@@ -66,8 +67,8 @@ begin
   if CUpdateLink = '' then begin
     CUpdateLink := 'http://cmanager.sourceforge.net/update.xml';  
   end;
-  CUpdateThread := TUpdateHttpRequest.Create(CUpdateLink, '', '', '', hctPreconfig, CUpdateMainForm.RichEdit, 'CUpdate');
-  CUpdateThread.Resume;
+  CUpdateThread := TUpdateHttpRequest.Create(CUpdateMainForm.Handle, CUpdateLink, '', '', '', hctPreconfig, 'CUpdate');
+  CUpdateThread.InitThread;
   repeat
     xFinished := WaitForSingleObject(CUpdateThread.Handle, 10) <> WAIT_TIMEOUT;
     if not xFinished then begin
@@ -76,12 +77,14 @@ begin
   until xFinished;
   if (not CIsQuiet) or CFoundNewVersion then begin
     CUpdateMainForm.Button1.Caption := '&Zamknij';
-    if CUpdateThread.RequestResult = 0 then begin
+    if CUpdateThread.ExitCode = ERROR_SUCCESS then begin
       if CFoundNewVersion then begin
         CUpdateMainForm.Label2.Caption := ' - Zakoñczono sprawdzanie aktualizacji';
       end else begin
         CUpdateMainForm.Label2.Caption := ' - Zakoñczono sprawdzanie aktualizacji';
       end;
+    end else if CUpdateThread.ExitCode = ERROR_CANCELLED then begin
+      CUpdateMainForm.Label2.Caption := ' - Przerwano sprawdzanie aktualizacji';
     end else begin
       CUpdateMainForm.Label2.Caption := ' - Sprawdzenie aktualizacji nie powiod³o siê';
     end;
@@ -113,11 +116,8 @@ end;
 
 procedure TCUpdateMainForm.Button1Click(Sender: TObject);
 begin
-  if CUpdateThread.IsRunning then begin
-    CUpdateThread.CancelRequest;
-    CUpdateThread.Terminate;
-    WaitForSingleObject(CUpdateThread.Handle, INFINITE);
-    Label2.Caption := 'Przerwano sprawdzanie aktualizacji';
+  if CUpdateThread.Status = tsRunning then begin
+    CUpdateThread.CancelThread;
     Button1.Caption := '&Zamknij';
   end else begin
     Close;
@@ -138,7 +138,10 @@ begin
       end
     end
   end;
-  inherited;
+  inherited WndProc(Message);
+  if Message.Msg = WMC_RICHEDITADDTEXT then begin
+    PerformAddThreadRichText(RichEdit, Message.WParam);
+  end;
 end;
 
 procedure TCUpdateMainForm.Button2Click(Sender: TObject);
@@ -148,7 +151,7 @@ begin
   end;
 end;
 
-procedure TUpdateHttpRequest.AfterGetResponse;
+function TUpdateHttpRequest.AfterGetResponse(ARequestIdentifier: String): Cardinal;
 var xDocument: ICXMLDOMDocument;
     xCurrentVersion: String;
     xLatestVersion: String;
@@ -157,51 +160,58 @@ var xDocument: ICXMLDOMDocument;
     xValid: Boolean;
     xDesc: String;
 begin
-  if RequestResult = ERROR_SUCCESS then begin
-    CoInitialize(Nil);
-    xDocument := GetDocumentFromString(Response, Nil);
-    xValid := False;
-    if xDocument.parseError.errorCode = 0 then begin
-      xCurrentVersion := FileVersion(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'cmanager.exe');
-      xNode := xDocument.selectSingleNode('update');
-      if xNode <> Nil then begin
-        xLatestVersion := GetXmlAttribute('version', xNode, '');
-        if xLatestVersion <> '' then begin
-          xValid := True;
-          if CompareVersions(xLatestVersion, xCurrentVersion) then begin
-            CFoundNewVersion := True;
-            AddToReport('Znaleziono now¹ wersjê CManager-a ' + CRtfSB + GetXmlAttribute('name', xNode, '') + CRtfEB);
-            AddToReport('Wydanie z dnia ' + GetXmlAttribute('date', xNode, ''));
-            xDesc := StringReplace(GetXmlAttribute('desc', xNode, ''), '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
-            if xDesc <> '' then begin
-              AddToReport('');
-              AddToReport(xDesc);
-            end;
+  Result := inherited AfterGetResponse(ARequestIdentifier);
+  CoInitialize(Nil);
+  xDocument := GetDocumentFromString(ResponseBuffer, Nil);
+  xValid := False;
+  if xDocument.parseError.errorCode = 0 then begin
+    xCurrentVersion := FileVersion(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'cmanager.exe');
+    xNode := xDocument.selectSingleNode('update');
+    if xNode <> Nil then begin
+      xLatestVersion := GetXmlAttribute('version', xNode, '');
+      if xLatestVersion <> '' then begin
+        xValid := True;
+        if CompareVersions(xLatestVersion, xCurrentVersion) then begin
+          CFoundNewVersion := True;
+          AddToReport('Znaleziono now¹ wersjê CManager-a ' + CRtfSB + GetXmlAttribute('name', xNode, '') + CRtfEB);
+          AddToReport('Wydanie z dnia ' + GetXmlAttribute('date', xNode, ''));
+          xDesc := StringReplace(GetXmlAttribute('desc', xNode, ''), '\n', sLineBreak, [rfReplaceAll, rfIgnoreCase]);
+          if xDesc <> '' then begin
             AddToReport('');
-            CDownloadLink := GetXmlAttribute('direct', xNode, '');
-            AddToReport('Pobierz aktualizacjê z ' + GetXmlAttribute('direct', xNode, ''));
-            AddToReport('Otwórz stronê domow¹ ' + GetXmlAttribute('homepage', xNode, ''));
-            AddToReport('');
-            xItem := xNode.firstChild;
-            if xItem <> Nil then begin
-              AddToReport('Zmiany w tej wersji:');
-            end;
-            while (xItem <> Nil) do begin
-              AddToReport('   [' + GetXmlAttribute('type', xItem, '') + '] ' + GetXmlAttribute('info', xItem, ''));
-              xItem := xItem.nextSibling;
-            end;
-          end else begin
-            AddToReport('Nie znaleziono nowych aktualizacji CManager-a');
+            AddToReport(xDesc);
           end;
+          AddToReport('');
+          CDownloadLink := GetXmlAttribute('direct', xNode, '');
+          AddToReport('Pobierz aktualizacjê z ' + GetXmlAttribute('direct', xNode, ''));
+          AddToReport('Otwórz stronê domow¹ ' + GetXmlAttribute('homepage', xNode, ''));
+          AddToReport('');
+          xItem := xNode.firstChild;
+          if xItem <> Nil then begin
+            AddToReport('Zmiany w tej wersji:');
+          end;
+          while (xItem <> Nil) do begin
+            AddToReport('   [' + GetXmlAttribute('type', xItem, '') + '] ' + GetXmlAttribute('info', xItem, ''));
+            xItem := xItem.nextSibling;
+          end;
+        end else begin
+          AddToReport('Nie znaleziono nowych aktualizacji CManager-a');
         end;
       end;
     end;
-    if not xValid then begin
-      AddToReport('Odczytany plik nie zawiera danych o uaktualnieniach.');
-      AddToReport('Sprawdz czy masz dostêp do ' + CUpdateLink);
-    end;
-    xDocument := Nil;
-    CoUninitialize;
+  end;
+  if not xValid then begin
+    AddToReport('Odczytany plik nie zawiera danych o uaktualnieniach.');
+    AddToReport('Sprawdz czy masz dostêp do ' + CUpdateLink);
+  end;
+  xDocument := Nil;
+  CoUninitialize;
+end;
+
+procedure TUpdateHttpRequest.ThreadFinished;
+begin
+  inherited ThreadFinished;
+  if ExitCode = ERROR_CANCELLED then begin
+    AddToReport('Operacja zosta³a przerwana na ¿¹danie u¿ytkownika');
   end;
 end;
 

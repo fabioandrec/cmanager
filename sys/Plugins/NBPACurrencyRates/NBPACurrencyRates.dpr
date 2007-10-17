@@ -15,7 +15,8 @@ uses
   NBPACurrencyRatesConfigFormUnit in 'NBPACurrencyRatesConfigFormUnit.pas' {NBPACurrencyRatesConfigForm},
   NBPACurrencyRatesProgressFormUnit in 'NBPACurrencyRatesProgressFormUnit.pas' {NBPACurrencyRatesProgressForm},
   CHttpRequest in '..\..\Shared\CHttpRequest.pas',
-  CRichtext in '..\..\Shared\CRichtext.pas';
+  CRichtext in '..\..\Shared\CRichtext.pas',
+  CBasics in '..\..\Shared\CBasics.pas';
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin

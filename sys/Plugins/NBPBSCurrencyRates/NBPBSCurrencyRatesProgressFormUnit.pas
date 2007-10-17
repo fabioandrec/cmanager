@@ -6,19 +6,22 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml, WinInet;
 
 type
-  TNBPBSCurrencyRatesThread = class(THttpRequest)
+  TNBPBSCurrencyRatesBaseThread = class(TBaseHttpRequest)
   private
     FResponseXml: ICXMLDOMDocument;
     FRootElement: ICXMLDOMNode;
-    procedure SetFinished;
+    FIsValidResponse: Boolean;
   protected
-    procedure AfterGetResponse; override;
+    function AfterGetResponse(ARequestIdentifier: String): Cardinal; override;
+    procedure ThreadFinished; override;
   public
     property ResponseXml: ICXMLDOMDocument read FResponseXml write FResponseXml;
     property RootElement: ICXMLDOMNode read FRootElement write FRootElement;
+    property IsValidResponse: Boolean read FIsValidResponse;
+    constructor Create(ALogWindow: HWND; AUrl: String; AProxy: String; AProxyUser: String; AProxyPass: String; AConnectionType: THttpConnectType; AAgentName: String); override;
   end;
 
   TNBPBSCurrencyRatesProgressForm = class(TForm)
@@ -30,7 +33,9 @@ type
     procedure FormActivate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
   private
-    FRequestThread: TNBPBSCurrencyRatesThread;
+    FRequestThread: TNBPBSCurrencyRatesBaseThread;
+  protected
+    procedure WndProc(var Message: TMessage); override;
   public
     function RetriveCurrencyRates: OleVariant;
   end;
@@ -40,7 +45,7 @@ var NBPBSCurrencyRatesProgressForm: TNBPBSCurrencyRatesProgressForm;
 implementation
 
 uses CRichtext, StrUtils, NBPBSCurrencyRatesConfigFormUnit,
-  CPluginConsts;
+  CPluginConsts, CBasics;
 
 {$R *.dfm}
 
@@ -81,48 +86,50 @@ begin
     xLink := 'http://www.nbp.org.pl/Kursy/KursyC.html';
   end;
   if xProceed then begin
-    FRequestThread := TNBPBSCurrencyRatesThread.Create(xLink, '', '', '', hctPreconfig, RichEdit, 'MSIE');
+    FRequestThread := TNBPBSCurrencyRatesBaseThread.Create(Handle, xLink, '', '', '', hctPreconfig, 'MSIE');
     ShowModal;
-    if FRequestThread.RequestResult = 0 then begin
-      xXml := GetXmlDocument;
-      xOutRoot := xXml.createElement('currencyRates');
-      xXml.appendChild(xOutRoot);
-      SetXmlAttribute('cashpointName', xOutRoot, 'Narodowy Bank Polski');
-      SetXmlAttribute('bindingDate', xOutRoot, GetXmlNodeValue('data_publikacji', FRequestThread.RootElement, ''));
-      xPositions := FRequestThread.RootElement.selectNodes('pozycja');
-      for xCount := 0 to xPositions.length - 1 do begin
-        xPosition := xPositions.item[xCount];
-        xCurrencyName := GetXmlNodeValue('nazwa_waluty', xPosition, '');
-        xCurrencyIso := GetXmlNodeValue('kod_waluty', xPosition, '');
-        xCurrencyQuantity := StrToIntDef(GetXmlNodeValue('przelicznik', xPosition, ''), -1);
-        if (xCurrencyName <> '') and (xCurrencyIso <> '') and (xCurrencyQuantity <> -1) then begin
-          xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_kupna', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
-          if (xCurrencyRate <> -1) then begin
-            xOut := xXml.createElement('currencyRate');
-            xOutRoot.appendChild(xOut);
-            SetXmlAttribute('sourceName', xOut, xCurrencyName);
-            SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
-            SetXmlAttribute('targetName', xOut, 'Polski z³oty');
-            SetXmlAttribute('targetIso', xOut, 'PLN');
-            SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
-            SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
-            SetXmlAttribute('type', xOut, CCURRENCYRATE_BUY);
-          end;
-          xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_sprzedazy', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
-          if (xCurrencyRate <> -1) then begin
-            xOut := xXml.createElement('currencyRate');
-            xOutRoot.appendChild(xOut);
-            SetXmlAttribute('sourceName', xOut, xCurrencyName);
-            SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
-            SetXmlAttribute('targetName', xOut, 'Polski z³oty');
-            SetXmlAttribute('targetIso', xOut, 'PLN');
-            SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
-            SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
-            SetXmlAttribute('type', xOut, CCURRENCYRATE_SELL);
+    if FRequestThread.ExitCode = ERROR_SUCCESS then begin
+      if FRequestThread.IsValidResponse then begin
+        xXml := GetXmlDocument;
+        xOutRoot := xXml.createElement('currencyRates');
+        xXml.appendChild(xOutRoot);
+        SetXmlAttribute('cashpointName', xOutRoot, 'Narodowy Bank Polski');
+        SetXmlAttribute('bindingDate', xOutRoot, GetXmlNodeValue('data_publikacji', FRequestThread.RootElement, ''));
+        xPositions := FRequestThread.RootElement.selectNodes('pozycja');
+        for xCount := 0 to xPositions.length - 1 do begin
+          xPosition := xPositions.item[xCount];
+          xCurrencyName := GetXmlNodeValue('nazwa_waluty', xPosition, '');
+          xCurrencyIso := GetXmlNodeValue('kod_waluty', xPosition, '');
+          xCurrencyQuantity := StrToIntDef(GetXmlNodeValue('przelicznik', xPosition, ''), -1);
+          if (xCurrencyName <> '') and (xCurrencyIso <> '') and (xCurrencyQuantity <> -1) then begin
+            xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_kupna', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
+            if (xCurrencyRate <> -1) then begin
+              xOut := xXml.createElement('currencyRate');
+              xOutRoot.appendChild(xOut);
+              SetXmlAttribute('sourceName', xOut, xCurrencyName);
+              SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
+              SetXmlAttribute('targetName', xOut, 'Polski z³oty');
+              SetXmlAttribute('targetIso', xOut, 'PLN');
+              SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
+              SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+              SetXmlAttribute('type', xOut, CCURRENCYRATE_BUY);
+            end;
+            xCurrencyRate := StrToFloatDef(StringReplace(GetXmlNodeValue('kurs_sprzedazy', xPosition, ''), ',', '.', [rfIgnoreCase, rfReplaceAll]), -1);
+            if (xCurrencyRate <> -1) then begin
+              xOut := xXml.createElement('currencyRate');
+              xOutRoot.appendChild(xOut);
+              SetXmlAttribute('sourceName', xOut, xCurrencyName);
+              SetXmlAttribute('sourceIso', xOut, xCurrencyIso);
+              SetXmlAttribute('targetName', xOut, 'Polski z³oty');
+              SetXmlAttribute('targetIso', xOut, 'PLN');
+              SetXmlAttribute('quantity', xOut, xCurrencyQuantity);
+              SetXmlAttribute('rate', xOut, Trim(Format('%-10.4f', [xCurrencyRate])));
+              SetXmlAttribute('type', xOut, CCURRENCYRATE_SELL);
+            end;
           end;
         end;
+        Result := GetStringFromDocument(xXml);
       end;
-      Result := GetStringFromDocument(xXml);
     end;
     FRequestThread.Free;
   end;
@@ -131,92 +138,107 @@ end;
 
 procedure TNBPBSCurrencyRatesProgressForm.FormActivate(Sender: TObject);
 begin
-  if not FRequestThread.Finished then begin
-    FRequestThread.Resume;
+  if FRequestThread.Status = tsSuspended then begin
+    FRequestThread.InitThread;
   end;
 end;
 
-procedure TNBPBSCurrencyRatesThread.AfterGetResponse;
+procedure TNBPBSCurrencyRatesProgressForm.Button1Click(Sender: TObject);
+begin
+  if FRequestThread.Status = tsRunning then begin
+    FRequestThread.CancelThread;
+  end else begin
+    Close;
+  end;
+end;
+
+function TNBPBSCurrencyRatesBaseThread.AfterGetResponse(ARequestIdentifier: String): Cardinal;
 var xLocalization: String;
     xResponse: String;
     xHtml: String;
     xStag, xEtag: Integer;
     xPath: String;
 begin
-  FResponseXml := Nil;
-  FRootElement := Nil;
-  if AnsiUpperCase(Copy(Url, 1, 7)) = 'FILE://' then begin
-    FResponseXml := GetDocumentFromString(Response, Nil);
-    if FResponseXml.parseError.errorCode = 0 then begin
-      FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
-      if FRootElement = Nil then begin
-        FResponseXml := Nil;
-        AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
-        RequestResult := ERROR_BAD_FORMAT;
-      end;
-    end else begin
-      FResponseXml := Nil;
-      AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
-      RequestResult := ERROR_BAD_FORMAT;
-    end;
-  end else begin
-    xHtml := Response;
-    xLocalization := '';
-    xStag := LastDelimiter('/', Url);
-    xPath := Copy(Url, 1, xStag);
-    xStag := Pos(CSTARTTAG, xHtml);
-    if xStag > 0 then begin
-      xStag := xStag + Length(CSTARTTAG);
-      xEtag := PosEx(CENDTAG, xHtml, xStag);
-      if xEtag > xStag then begin
-        xLocalization := xPath + Copy(xHtml, xStag, xEtag - xStag);
-      end;
-    end;
-    if xLocalization <> '' then begin
-      AddToReport('Rozpoczêcie pobierania tabeli kursów walut...');
-      Url := xLocalization;
-      RequestResult := GetResponse(xResponse);
-      if RequestResult = 0 then begin
-        FResponseXml := GetDocumentFromString(xResponse, Nil);
-        if FResponseXml.parseError.errorCode = 0 then begin
-          FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
-          if FRootElement = Nil then begin
-            FResponseXml := Nil;
-            AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
-            RequestResult := ERROR_BAD_FORMAT;
-          end;
-        end else begin
+  Result := inherited AfterGetResponse(ARequestIdentifier);
+  if ARequestIdentifier = '' then begin
+    FResponseXml := Nil;
+    FRootElement := Nil;
+    if AnsiUpperCase(Copy(Url, 1, 7)) = 'FILE://' then begin
+      FResponseXml := GetDocumentFromString(ResponseBuffer, Nil);
+      if FResponseXml.parseError.errorCode = 0 then begin
+        FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
+        if FRootElement = Nil then begin
           FResponseXml := Nil;
           AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
-          RequestResult := ERROR_BAD_FORMAT;
         end;
+      end else begin
+        FResponseXml := Nil;
+        AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
       end;
     end else begin
-      AddToReport('Otrzymane dane nie zawieraj¹ lokalizacji tabeli kursów walut');
-      RequestResult := ERROR_BAD_FORMAT;
+      xHtml := ResponseBuffer;
+      xLocalization := '';
+      xStag := LastDelimiter('/', Url);
+      xPath := Copy(Url, 1, xStag);
+      xStag := Pos(CSTARTTAG, xHtml);
+      if xStag > 0 then begin
+        xStag := xStag + Length(CSTARTTAG);
+        xEtag := PosEx(CENDTAG, xHtml, xStag);
+        if xEtag > xStag then begin
+          xLocalization := xPath + Copy(xHtml, xStag, xEtag - xStag);
+        end;
+      end;
+      if xLocalization <> '' then begin
+        AddToReport('Rozpoczêcie pobierania tabeli kursów walut...');
+        Url := xLocalization;
+        InternetCloseHandle(FRequestHandle);
+        InternetCloseHandle(FConnectHandle);
+        InternetCloseHandle(FInternetHandle);
+        Result := GetResponse('xml', xResponse);
+        if Result = 0 then begin
+          FResponseXml := GetDocumentFromString(xResponse, Nil);
+          if FResponseXml.parseError.errorCode = 0 then begin
+            FRootElement := FResponseXml.selectSingleNode('tabela_kursow');
+            if FRootElement = Nil then begin
+              FResponseXml := Nil;
+              AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
+            end else begin
+              FIsValidResponse := True;
+            end;
+          end else begin
+            FResponseXml := Nil;
+            AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
+          end;
+        end;
+      end else begin
+        AddToReport('Otrzymane dane nie zawieraj¹ lokalizacji tabeli kursów walut');
+      end;
     end;
   end;
-  Synchronize(SetFinished);
 end;
 
-procedure TNBPBSCurrencyRatesProgressForm.Button1Click(Sender: TObject);
+constructor TNBPBSCurrencyRatesBaseThread.Create(ALogWindow: HWND; AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AAgentName: String);
 begin
-  if FRequestThread.IsRunning then begin
-    FRequestThread.CancelRequest;
-    FRequestThread.Terminate;
-    WaitForSingleObject(FRequestThread.Handle, INFINITE);
+  inherited Create(ALogWindow, AUrl, AProxy, AProxyUser, AProxyPass, AConnectionType, AAgentName);
+  FIsValidResponse := False;
+end;
+
+procedure TNBPBSCurrencyRatesBaseThread.ThreadFinished;
+begin
+  if ExitCode = ERROR_SUCCESS then begin
+    PostMessage(NBPBSCurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
+  end else if ExitCode = ERROR_CANCELLED then begin
+    PostMessage(NBPBSCurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
+  end else begin
+    NBPBSCurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
   end;
-  Close;
 end;
 
-procedure TNBPBSCurrencyRatesThread.SetFinished;
+procedure TNBPBSCurrencyRatesProgressForm.WndProc(var Message: TMessage);
 begin
-  if IsRunning then begin
-    if RequestResult <> 0 then begin
-      NBPBSCurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
-    end else begin
-      NBPBSCurrencyRatesProgressForm.Close;
-    end;
+  inherited WndProc(Message);
+  if Message.Msg = WMC_RICHEDITADDTEXT then begin
+    PerformAddThreadRichText(RichEdit, Message.WParam);
   end;
 end;
 

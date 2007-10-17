@@ -2,42 +2,35 @@ unit CHttpRequest;
 
 interface
 
-uses Classes, WinInet, SysUtils, Windows, ComCtrls;
+uses Classes, WinInet, SysUtils, Windows, ComCtrls, CBasics;
 
 type
   THttpConnectType = (hctDirect, hctPreconfig, hctProxy);
 
-  THttpRequest = class(TThread)
+  TBaseHttpRequest = class(TBaseThread)
   private
     FUrl: String;
     FProxy: String;
     FProxyUser: String;
     FProxyPass: String;
-    FInternetHandle: HINTERNET;
-    FConnectHandle: HINTERNET;
-    FRequestHandle: HINTERNET;
     FHttpConnectType: THttpConnectType;
-    FResponse: String;
-    FRequestResult: Cardinal;
-    FIsRunning: Boolean;
-    FIsCancelled: Boolean;
-    FTextToReport: String;
-    FRichEdit: TRichEdit;
     FAgentName: String;
-    FFinished: Boolean;
-    function GetErrorDesc(AErrorCode: Cardinal): String;
+    FResponseBuffer: String;
+    FLogWindow: HWND;
     function GetHostname: String;
     function GetPathname: String;
     function RemoveProto(AUrl: String): String;
-    procedure AddToReportInternal;
+    function GetErrorDesc(AErrorCode: Cardinal): String;
   protected
-    function GetResponse(var AResponse: String): Cardinal;
+    FInternetHandle: HINTERNET;
+    FConnectHandle: HINTERNET;
+    FRequestHandle: HINTERNET;
     procedure AddToReport(AText: String);
-    procedure Execute; override;
-    procedure AfterGetResponse; virtual; abstract;
+    function MainThreadProcedure: Cardinal; override;
+    function GetResponse(ARequestIdentifier: String; var AResponse: String): Cardinal;
+    function AfterGetResponse(ARequestIdentifier: String): Cardinal; virtual;
   public
-    constructor Create(AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AReportRichedit: TRichEdit; AAgentName: String);
-    procedure CancelRequest;
+    constructor Create(ALogWindow: HWND; AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AAgentName: String); virtual;
     property Hostname: String read GetHostname;
     property Pathname: String read GetPathname;
     property Url: String read FUrl write FUrl;
@@ -45,36 +38,74 @@ type
     property ProxyUser: String read FProxyUser;
     property ProxyPass: String read FProxyPass;
     property HttpRequestType: THttpConnectType read FHttpConnectType;
-    property Response: String read FResponse write FResponse;
-    property RequestResult: Cardinal read FRequestResult write FRequestResult;
-    property IsRunning: Boolean read FIsRunning write FIsRunning;
-    property IsCancelled: Boolean read FIsCancelled;
-    property Finished: Boolean read FFinished write FFinished;
+    property ResponseBuffer: String read FResponseBuffer;
+    procedure CancelThread; override;
   end;
 
 implementation
 
 uses CRichtext;
 
-constructor THttpRequest.Create(AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AReportRichedit: TRichEdit; AAgentName: String);
+function GetModuleErrorDesc(AErrorCode: Cardinal; AModuleName: String): String;
+var xErrorStr: PChar;
+    xInet: THandle;
 begin
-  inherited Create(True);
-  FIsCancelled := False;
+  xInet := LoadLibrary(PChar(AModuleName));
+  Result := '';
+  if xInet >= 32 then begin
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER or FORMAT_MESSAGE_IGNORE_INSERTS or FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE, Pointer(xInet), AErrorCode, Lang_neutral, @xErrorStr, 1, nil);
+    Result := xErrorStr;
+    LocalFree(HLocal(xErrorStr));
+    FreeLibrary(xInet);
+  end;
+end;
+
+procedure TBaseHttpRequest.AddToReport(AText: String);
+begin
+  AddThreadRichText(FLogWindow, AText);
+end;
+
+function TBaseHttpRequest.AfterGetResponse(ARequestIdentifier: String): Cardinal;
+begin
+  Result := ERROR_SUCCESS;
+end;
+
+procedure TBaseHttpRequest.CancelThread;
+begin
+  AddToReport('¯¹danie przerwania bie¿¹cej operacji');
+  inherited CancelThread;
+  if FRequestHandle <> Nil then begin
+    InternetCloseHandle(FRequestHandle);
+  end;
+  if FConnectHandle <> Nil then begin
+    InternetCloseHandle(FConnectHandle);
+  end;
+  if FInternetHandle <> Nil then begin
+    InternetCloseHandle(FInternetHandle);
+  end;
+end;
+
+constructor TBaseHttpRequest.Create(ALogWindow: HWND; AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AAgentName: String);
+begin
+  inherited Create(False);
+  FLogWindow := ALogWindow;
   FUrl := AUrl;
   FProxy := AProxy;
   FProxyPass := AProxyPass;
   FProxyUser := FProxyUser;
   FHttpConnectType := AConnectionType;
-  FResponse := '';
-  FRequestResult := 0;
-  FreeOnTerminate := False;
-  FIsRunning := False;
-  FRichEdit := AReportRichedit;
   FAgentName := AAgentName;
-  FFinished := False;
 end;
 
-function THttpRequest.GetHostname: String;
+function TBaseHttpRequest.GetErrorDesc(AErrorCode: Cardinal): String;
+begin
+  Result := SysErrorMessage(AErrorCode);
+  if (Result = '') and (AErrorCode >= INTERNET_ERROR_BASE) then begin
+    Result := GetModuleErrorDesc(AErrorCode, 'wininet.dll');
+  end;
+end;
+
+function TBaseHttpRequest.GetHostname: String;
 var xDel: Integer;
 begin
   Result := RemoveProto(FUrl);
@@ -84,7 +115,7 @@ begin
   end;
 end;
 
-function THttpRequest.GetPathname: String;
+function TBaseHttpRequest.GetPathname: String;
 var xDel: Integer;
 begin
   Result := RemoveProto(FUrl);
@@ -94,15 +125,7 @@ begin
   end;
 end;
 
-function THttpRequest.RemoveProto(AUrl: String): String;
-begin
-  Result := AUrl;
-  if Copy(AnsiUpperCase(Result), 1, 7) = 'HTTP://' then begin
-    Result := Copy(Result, 8, Length(Result) - 7);
-  end;
-end;
-
-function THttpRequest.GetResponse(var AResponse: String): Cardinal;
+function TBaseHttpRequest.GetResponse(ARequestIdentifier: String; var AResponse: String): Cardinal;
 var xBytesCount: Cardinal;
     xContentBuffer: PChar;
     xContentString: String;
@@ -136,46 +159,57 @@ begin
       else FInternetHandle := InternetOpen(PChar(FAgentName), INTERNET_OPEN_TYPE_DIRECT, Nil, Nil, 0);
     end;
     if FInternetHandle <> Nil then begin
-      if (FHttpConnectType = hctProxy) and (FProxyUser <> '') then begin
-        InternetSetOption(FInternetHandle, INTERNET_OPTION_PROXY_USERNAME, PChar(ProxyUser), Length(ProxyUser) + 1);
-      end;
-      if (FHttpConnectType = hctProxy) and (FProxyPass <> '') then begin
-        InternetSetOption(FInternetHandle, INTERNET_OPTION_PROXY_PASSWORD, PChar(ProxyPass), Length(ProxyPass) + 1);
-      end;
-      FConnectHandle := InternetConnect(FInternetHandle, PChar(Hostname), INTERNET_DEFAULT_HTTP_PORT, Nil, Nil, INTERNET_SERVICE_HTTP, 0, 0);
-      if FConnectHandle <> Nil then begin
-        FRequestHandle := HttpOpenRequest(FConnectHandle, Nil, PChar(Pathname), Nil, Nil, Nil, INTERNET_FLAG_RELOAD, 0);
-        if FRequestHandle <> Nil then begin
-          if HttpSendRequest(FRequestHandle, Nil, 0, Nil, 0) then begin
-            AddToReport('Sprawdzanie ¿¹dania...');
-            GetMem(xContentBuffer, $FFFF);
-            repeat
-              xBytesCount := 0;
-              if InternetReadFile(FRequestHandle, xContentBuffer, $FFFF, xBytesCount) then begin
-                if xBytesCount > 0 then begin
-                  SetLength(xContentString, xBytesCount);
-                  CopyMemory(@xContentString[1], xContentBuffer, xBytesCount);
-                  AResponse := AResponse + xContentString;
+      if not IsCancelled then begin
+        if (FHttpConnectType = hctProxy) and (FProxyUser <> '') then begin
+          InternetSetOption(FInternetHandle, INTERNET_OPTION_PROXY_USERNAME, PChar(ProxyUser), Length(ProxyUser) + 1);
+        end;
+        if (FHttpConnectType = hctProxy) and (FProxyPass <> '') then begin
+          InternetSetOption(FInternetHandle, INTERNET_OPTION_PROXY_PASSWORD, PChar(ProxyPass), Length(ProxyPass) + 1);
+        end;
+        FConnectHandle := InternetConnect(FInternetHandle, PChar(Hostname), INTERNET_DEFAULT_HTTP_PORT, Nil, Nil, INTERNET_SERVICE_HTTP, 0, 0);
+        if FConnectHandle <> Nil then begin
+          if not IsCancelled then begin
+            FRequestHandle := HttpOpenRequest(FConnectHandle, Nil, PChar(Pathname), Nil, Nil, Nil, INTERNET_FLAG_RELOAD, 0);
+            if FRequestHandle <> Nil then begin
+              if not IsCancelled then begin
+                if HttpSendRequest(FRequestHandle, Nil, 0, Nil, 0) then begin
+                  if not IsCancelled then begin
+                    AddToReport('Sprawdzanie ¿¹dania...');
+                    GetMem(xContentBuffer, $FFFF);
+                    repeat
+                      xBytesCount := 0;
+                      if InternetReadFile(FRequestHandle, xContentBuffer, $FFFF, xBytesCount) then begin
+                        if xBytesCount > 0 then begin
+                          SetLength(xContentString, xBytesCount);
+                          CopyMemory(@xContentString[1], xContentBuffer, xBytesCount);
+                          AResponse := AResponse + xContentString;
+                        end;
+                      end else begin
+                        Result := GetLastError;
+                        AddToReport('B³¹d, ' + GetErrorDesc(Result));
+                      end;
+                    until (xBytesCount = 0) or (Result <> ERROR_SUCCESS) or IsCancelled;
+                    FreeMem(xContentBuffer);
+                    if (not IsCancelled) and (Result = ERROR_SUCCESS) then begin
+                      Result := AfterGetResponse(ARequestIdentifier);
+                    end;
+                  end;
+                end else begin
+                  Result := GetLastError;
+                  AddToReport('B³¹d, ' + GetErrorDesc(Result));
                 end;
-              end else begin
-                Result := GetLastError;
-                AddToReport('B³¹d, ' + GetErrorDesc(Result));
               end;
-            until (xBytesCount = 0) or (Result <> ERROR_SUCCESS);
-            FreeMem(xContentBuffer);
-          end else begin
-            Result := GetLastError;
-            AddToReport('B³¹d, ' + GetErrorDesc(Result));
+              InternetCloseHandle(FRequestHandle);
+            end else begin
+              Result := GetLastError;
+              AddToReport('B³¹d, ' + GetErrorDesc(Result));
+            end;
+            InternetCloseHandle(FConnectHandle);
           end;
-          InternetCloseHandle(FRequestHandle);
         end else begin
           Result := GetLastError;
           AddToReport('B³¹d, ' + GetErrorDesc(Result));
         end;
-        InternetCloseHandle(FConnectHandle);
-      end else begin
-        Result := GetLastError;
-        AddToReport('B³¹d, ' + GetErrorDesc(Result));
       end;
       InternetCloseHandle(FInternetHandle);
     end else begin
@@ -183,59 +217,22 @@ begin
       AddToReport('B³¹d, ' + GetErrorDesc(Result));
     end;
   end;
-  if Result <> ERROR_SUCCESS then begin
+  if (Result = ERROR_SUCCESS) then begin
     AResponse := IntToStr(Result) + ' ' + GetErrorDesc(Result);
   end;
 end;
 
-function GetModuleErrorDesc(AErrorCode: Cardinal; AModuleName: String): String;
-var xErrorStr: PChar;
-    xInet: THandle;
+function TBaseHttpRequest.MainThreadProcedure: Cardinal;
 begin
-  xInet := LoadLibrary(PChar(AModuleName));
-  Result := '';
-  if xInet >= 32 then begin
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER or FORMAT_MESSAGE_IGNORE_INSERTS or FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE, Pointer(xInet), AErrorCode, Lang_neutral, @xErrorStr, 1, nil);
-    Result := xErrorStr;
-    LocalFree(HLocal(xErrorStr));
-    FreeLibrary(xInet);
+  Result := GetResponse('', FResponseBuffer);
+end;
+
+function TBaseHttpRequest.RemoveProto(AUrl: String): String;
+begin
+  Result := AUrl;
+  if Copy(AnsiUpperCase(Result), 1, 7) = 'HTTP://' then begin
+    Result := Copy(Result, 8, Length(Result) - 7);
   end;
-end;
-
-function THttpRequest.GetErrorDesc(AErrorCode: Cardinal): String;
-begin
-  Result := SysErrorMessage(AErrorCode);
-  if (Result = '') and (AErrorCode >= INTERNET_ERROR_BASE) then begin
-    Result := GetModuleErrorDesc(AErrorCode, 'wininet.dll');
-  end;
-end;
-
-procedure THttpRequest.AddToReportInternal;
-begin
-  AddRichText(FTextToReport, FRichEdit);
-end;
-
-procedure THttpRequest.AddToReport(AText: String);
-begin
-  FTextToReport := AText;
-  Synchronize(AddToReportInternal);
-end;
-
-procedure THttpRequest.CancelRequest;
-begin
-  FIsCancelled := True;
-  if FRequestHandle <> Nil then begin
-    InternetCloseHandle(FRequestHandle);
-  end;
-end;
-
-procedure THttpRequest.Execute;
-begin
-  FIsRunning := True;
-  FRequestResult := GetResponse(FResponse);
-  AfterGetResponse;
-  FIsRunning := False;
-  FFinished := True;
 end;
 
 end.
