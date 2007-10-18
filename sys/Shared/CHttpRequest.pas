@@ -38,7 +38,7 @@ type
     property ProxyUser: String read FProxyUser;
     property ProxyPass: String read FProxyPass;
     property HttpRequestType: THttpConnectType read FHttpConnectType;
-    property ResponseBuffer: String read FResponseBuffer;
+    property ResponseBuffer: String read FResponseBuffer write FResponseBuffer;
     procedure CancelThread; override;
   end;
 
@@ -172,9 +172,10 @@ begin
             FRequestHandle := HttpOpenRequest(FConnectHandle, Nil, PChar(Pathname), Nil, Nil, Nil, INTERNET_FLAG_RELOAD, 0);
             if FRequestHandle <> Nil then begin
               if not IsCancelled then begin
+                AddToReport('Wysy³anie ¿¹dania...');
                 if HttpSendRequest(FRequestHandle, Nil, 0, Nil, 0) then begin
                   if not IsCancelled then begin
-                    AddToReport('Sprawdzanie ¿¹dania...');
+                    AddToReport('Odbieranie odpowiedzi na ¿¹danie...');
                     GetMem(xContentBuffer, $FFFF);
                     repeat
                       xBytesCount := 0;

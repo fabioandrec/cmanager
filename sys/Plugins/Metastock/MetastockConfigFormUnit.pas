@@ -29,13 +29,14 @@ type
   public
     procedure SetConfigXml(const Value: ICXMLDOMDocument);
     function GetConfigXml: String;
+    class function GetConfigurationAsXml(AConfiguration: String; var AErrorText: String): ICXMLDOMDocument;
   end;
 
 var GCManagerInterface: ICManagerInterface;
 
 implementation
 
-uses CXmlTlb, CBase64, MetastockEditFormUnit;
+uses CXmlTlb, CBase64, MetastockEditFormUnit, CTools;
 
 {$R *.dfm}
 
@@ -149,6 +150,38 @@ end;
 function TMetastockConfigForm.GetConfigXml: String;
 begin
   Result := GetStringFromDocument(FConfigXml);
+end;
+
+class function TMetastockConfigForm.GetConfigurationAsXml(AConfiguration: String; var AErrorText: String): ICXMLDOMDocument;
+var xConfigurationEncoded, xConfigurationDecoded: String;
+begin
+  Result := Nil;
+  AErrorText := '';
+  xConfigurationEncoded := AConfiguration;
+  if xConfigurationEncoded <> '' then begin
+    if not DecodeBase64Buffer(xConfigurationEncoded, xConfigurationDecoded) then begin
+      xConfigurationDecoded := '';
+      AErrorText := 'Nie uda³o siê odczytaæ konfiguracji wtyczki. Przyjêto konfiguracjê domyœln¹';
+    end else begin
+      Result := GetDocumentFromString(xConfigurationDecoded, Nil);
+      if Result <> Nil then begin
+        if Result.parseError.errorCode <> 0 then begin
+          AErrorText := 'Konfiguracja wtyczki jest niepoprawna. Przyjêto konfiguracjê domyœln¹';
+          Result := Nil;
+        end;
+      end else begin
+        AErrorText := 'Konfiguracja wtyczki jest niepoprawna. Przyjêto konfiguracjê domyœln¹';
+      end;
+    end;
+  end;
+  if (xConfigurationDecoded = '') or (Result = Nil) then begin
+    xConfigurationDecoded := GetStringFromResources('DEFAULTXML');
+    Result := GetDocumentFromString(xConfigurationDecoded, Nil);
+    if Result.parseError.errorCode <> 0 then begin
+      AErrorText := 'Konfiguracja wtyczki jest niepoprawna';
+      Result := Nil;
+    end;
+  end;
 end;
 
 end.
