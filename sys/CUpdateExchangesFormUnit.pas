@@ -147,6 +147,8 @@ begin
       Result := CInstrumentTypeBondDesc;
     end else if xType = CInstrumentTypeFund then begin
       Result := CInstrumentTypeFundDesc;
+    end else if xType = CInstrumentTypeUndefined then begin
+      Result := CInstrumentTypeUndefinedDesc;
     end;
   end;
 end;

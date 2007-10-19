@@ -158,12 +158,13 @@ const
   CInstrumentTypeStock = 'S';
   CInstrumentTypeBond = 'B';
   CInstrumentTypeFund = 'F';
+  CInstrumentTypeUndefined = 'U';
 
   CInstrumentTypeIndexDesc = 'Indeks gie³dowy';
   CInstrumentTypeStockDesc = 'Akcje';
   CInstrumentTypeBondDesc = 'Obligacje';
   CInstrumentTypeFundDesc = 'Fundusz inwestycyjny';
-
+  CInstrumentTypeUndefinedDesc = 'Nieokreœlony';
 
 const
   CInMovementDescription = 'Przychód';

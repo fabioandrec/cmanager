@@ -65,7 +65,7 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano instytucji prowadz¹cej notowania. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticBank.DoGetDataId;
     end;
-  end else if (CStaticCurrency.DataId = CEmptyDataGid) and (ComboBoxType.ItemIndex <> 0) then begin
+  end else if (CStaticCurrency.DataId = CEmptyDataGid) and (ComboBoxType.ItemIndex <> 0) and ((ComboBoxType.ItemIndex <> 4)) then begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano waluty konta. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCurrency.DoGetDataId;
@@ -113,6 +113,8 @@ begin
       ComboBoxType.ItemIndex := 2;
     end else if instrumentType = CInstrumentTypeFund then begin
       ComboBoxType.ItemIndex := 3;
+    end else if instrumentType = CInstrumentTypeUndefined then begin
+      ComboBoxType.ItemIndex := 4;
     end;
     CStaticCurrency.DataId := idCurrencyDef;
     if idCurrencyDef <> CEmptyDataGid then begin
@@ -120,6 +122,7 @@ begin
     end;
     CStaticBank.DataId := idCashpoint;
     CStaticBank.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashpoint, False)).GetElementText;
+    ComboBoxTypeChange(Nil);
   end;
 end;
 
@@ -158,6 +161,8 @@ begin
       instrumentType := CInstrumentTypeBond;
     end else if ComboBoxType.ItemIndex = 3 then begin
       instrumentType := CInstrumentTypeFund;
+    end else if ComboBoxType.ItemIndex = 4 then begin
+      instrumentType := CInstrumentTypeUndefined;
     end;
     idCashpoint := CStaticBank.DataId;
     idCurrencyDef := CStaticCurrency.DataId;

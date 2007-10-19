@@ -5,26 +5,21 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="exchange">
           <xs:complexType>
-            <xs:attribute name="name" type="xs:string" use="required" />
-            <xs:attribute name="desc" type="xs:string" />
-            <xs:attribute name="type" use="required">
-              <xs:simpleType>
-                <xs:restriction base="xs:string">
-                  <xs:enumeration value="I"/>  <!--indeks gie³dowy-->
-                  <xs:enumeration value="S"/>  <!--akcje-->
-                  <xs:enumeration value="B"/>  <!--obligacje-->
-                  <xs:enumeration value="F"/>  <!--fundusz inwestycyjny-->
-                </xs:restriction>
-              </xs:simpleType>
-            </xs:attribute>
+            <xs:attribute name="identifier" type="xs:string" use="required" />
             <xs:attribute name="regDateTime" type="xs:dateTime" use="required" />
-            <xs:attribute name="currency" type="xs:string" />
             <xs:attribute name="value" type="xs:double" use="required" />
           </xs:complexType>
         </xs:element>
       </xs:sequence>
       <xs:attribute name="cashpointName" type="xs:string" use="required" />
-      <xs:attribute name="cashpointDesc" type="xs:string" />
-    </xs:complexType>
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="S"/>  <!--wyszukiwanie po symbolu-->
+            <xs:enumeration value="N"/>  <!--wyszukiwanie po nazwie-->
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+  </xs:complexType>
   </xs:element>
 </xs:schema>

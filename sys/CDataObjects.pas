@@ -3706,6 +3706,8 @@ begin
       Result := CInstrumentTypeBondDesc;
     end else if FinstrumentType = CInstrumentTypeFund then begin
       Result := CInstrumentTypeFundDesc;
+    end else if FinstrumentType = CInstrumentTypeUndefined then begin
+      Result := CInstrumentTypeUndefinedDesc;
     end
   end;
 end;

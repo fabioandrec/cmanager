@@ -58,6 +58,7 @@ begin
     Add(CInstrumentTypeStock + '=<akcje>');
     Add(CInstrumentTypeBond + '=<obligacje>');
     Add(CInstrumentTypeFund + '=<fundusze inwestycyjne>');
+    Add(CInstrumentTypeUndefined + '=<nieokreœlone>');
   end;
 end;
 

@@ -75,7 +75,8 @@ inherited CInstrumentForm: TCInstrumentForm
           'Indeks gie'#322'dowy'
           'Akcje'
           'Obligacje'
-          'Fundusz inwestycyjny')
+          'Fundusz inwestycyjny'
+          'Nieokre'#347'lony')
       end
       object EditName: TEdit
         Left = 56

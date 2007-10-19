@@ -350,7 +350,7 @@ create table instrument (
   idCurrencyDef uniqueidentifier,
   idCashpoint uniqueidentifier,
   primary key (idInstrument),
-  constraint ck_instrumentType check (instrumentType in ('I', 'S', 'B', 'F')),
+  constraint ck_instrumentType check (instrumentType in ('I', 'S', 'B', 'F', 'U')),
   constraint uq_instrumentSymbol unique (symbol),
   constraint uq_instrumentName unique (name),
   constraint fk_instrumentCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),
