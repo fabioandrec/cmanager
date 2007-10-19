@@ -22,6 +22,8 @@ type
     RichEditDesc: TCRichedit;
     Label5: TLabel;
     CStaticCurrency: TCStatic;
+    Label3: TLabel;
+    EditSymbol: TEdit;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -45,7 +47,11 @@ uses CConsts, CInstrumentFrameUnit, CRichtext, CInfoFormUnit,
 function TCInstrumentForm.CanAccept: Boolean;
 var xIns: TInstrument;
 begin
-  if Trim(EditName.Text) = '' then begin
+  if Trim(EditSymbol.Text) = '' then begin
+    Result := False;
+    ShowInfo(itError, 'Symbol instrumentu inwestycyjnego nie mo¿e byæ pusty', '');
+    EditSymbol.SetFocus;
+  end else if Trim(EditName.Text) = '' then begin
     Result := False;
     ShowInfo(itError, 'Nazwa instrumentu inwestycyjnego nie mo¿e byæ pusta', '');
     EditName.SetFocus;
@@ -59,20 +65,30 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano instytucji prowadz¹cej notowania. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticBank.DoGetDataId;
     end;
-  end else if (CStaticCurrency.DataId = CEmptyDataGid) then begin
+  end else if (CStaticCurrency.DataId = CEmptyDataGid) and (ComboBoxType.ItemIndex <> 0) then begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano waluty konta. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCurrency.DoGetDataId;
     end;
   end else begin
-    xIns := TInstrument.FindByName(EditName.Text);
+    xIns := TInstrument.FindBySymbol(EditSymbol.Text);
     Result := xIns = Nil;
     if (not Result) and (Operation = coEdit) then begin
       Result := xIns.id = Dataobject.id;
     end;
     if not Result then begin
-      ShowInfo(itError, 'Istnieje ju¿ instrument inwestycyjny o nazwie "' + EditName.Text + '"', '');
-      EditName.SetFocus;
+      ShowInfo(itError, 'Istnieje ju¿ instrument inwestycyjny o symbolu "' + EditSymbol.Text + '"', '');
+      EditSymbol.SetFocus;
+    end else begin
+      xIns := TInstrument.FindByName(EditName.Text);
+      Result := xIns = Nil;
+      if (not Result) and (Operation = coEdit) then begin
+        Result := xIns.id = Dataobject.id;
+      end;
+      if not Result then begin
+        ShowInfo(itError, 'Istnieje ju¿ instrument inwestycyjny o nazwie "' + EditName.Text + '"', '');
+        EditName.SetFocus;
+      end;
     end;
   end;
 end;
@@ -87,6 +103,7 @@ procedure TCInstrumentForm.FillForm;
 begin
   with TInstrument(Dataobject) do begin
     EditName.Text := name;
+    EditSymbol.Text := symbol;
     SimpleRichText(description, RichEditDesc);
     if instrumentType = CInstrumentTypeIndex then begin
       ComboBoxType.ItemIndex := 0;
@@ -98,7 +115,9 @@ begin
       ComboBoxType.ItemIndex := 3;
     end;
     CStaticCurrency.DataId := idCurrencyDef;
-    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
+    if idCurrencyDef <> CEmptyDataGid then begin
+      CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
+    end;
     CStaticBank.DataId := idCashpoint;
     CStaticBank.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashpoint, False)).GetElementText;
   end;
@@ -128,6 +147,7 @@ procedure TCInstrumentForm.ReadValues;
 begin
   inherited ReadValues;
   with TInstrument(Dataobject) do begin
+    symbol := EditSymbol.Text;
     name := EditName.Text;
     description := RichEditDesc.Text;
     if ComboBoxType.ItemIndex = 0 then begin

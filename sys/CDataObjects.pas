@@ -724,6 +724,7 @@ type
 
   TInstrument = class(TDataObject)
   private
+    Fsymbol: TBaseName;
     Fname: TBaseName;
     Fdescription: TBaseDescription;
     FidCashpoint: TDataGid;
@@ -734,6 +735,7 @@ type
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure SetinstrumentType(const Value: TBaseEnumeration);
+    procedure Setsymbol(const Value: TBaseName);
   public
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
@@ -742,8 +744,10 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
     class function FindByName(AName: TBaseName): TInstrument;
+    class function FindBySymbol(ASymbol: TBaseName): TInstrument;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
   published
+    property symbol: TBaseName read Fsymbol write Setsymbol;
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
     property idCashpoint: TDataGid read FidCashpoint write SetidCashpoint;
@@ -3678,6 +3682,7 @@ begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     Fname := FieldByName('name').AsString;
+    Fsymbol := FieldByName('symbol').AsString;
     Fdescription := FieldByName('description').AsString;
     FinstrumentType := FieldByName('instrumentType').AsString;
     FidCashpoint := FieldByName('idCashpoint').AsString;
@@ -3689,8 +3694,10 @@ function TInstrument.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): Str
 begin
   Result := '';
   if AColumnIndex = 0 then begin
-    Result := Fname;
+    Result := Fsymbol;
   end else if AColumnIndex = 1 then begin
+    Result := Fname;
+  end else if AColumnIndex = 2 then begin
     if FinstrumentType = CInstrumentTypeIndex then begin
       Result := CInstrumentTypeIndexDesc;
     end else if FinstrumentType = CInstrumentTypeStock then begin
@@ -3763,6 +3770,7 @@ begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('name', Fname, True, 'instrument');
+    AddField('symbol', Fsymbol, True, 'instrument');
     AddField('instrumentType', FinstrumentType, True, 'instrument');
     AddField('description', Fdescription, True, 'instrument');
     AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'instrument');
@@ -3877,6 +3885,19 @@ begin
     ShowInfo(itError, 'Nie mo¿na usun¹æ instrumentu inwestycyjnego, gdy¿ ' + xText, '');
     Result := False;
   end;
+end;
+
+procedure TInstrument.Setsymbol(const Value: TBaseName);
+begin
+  if Fsymbol <> Value then begin
+    Fsymbol := Value;
+    SetState(msModified);
+  end;
+end;
+
+class function TInstrument.FindBySymbol(ASymbol: TBaseName): TInstrument;
+begin
+  Result := TInstrument(TInstrument.FindByCondition(InstrumentProxy, 'select * from instrument where symbol = ''' + ASymbol + '''', False));
 end;
 
 initialization

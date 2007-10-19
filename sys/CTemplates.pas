@@ -196,6 +196,7 @@ initialization
   with GInstrumentValueTemplatesList do begin
     AddTemplate('@datanotowania@', 'data notowania w formacie RRRR-MM-DD');
     AddTemplate('@dataczasnotowania@', 'data i czas notowania w formacie RRRR-MM-DD HH:MM');
+    AddTemplate('@symbol@', 'symbol instrumentu inwestycyjnego');
     AddTemplate('@instrument@', 'nazwa instrumentu inwestycyjnego');
     AddTemplate('@rodzaj@', 'rodzaj instrumentu inwestycyjnego');
   end;

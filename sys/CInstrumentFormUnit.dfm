@@ -1,17 +1,17 @@
 inherited CInstrumentForm: TCInstrumentForm
   Caption = 'Instrument inwestycyjny'
-  ClientHeight = 419
-  ClientWidth = 379
+  ClientHeight = 458
+  ClientWidth = 380
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 379
-    Height = 378
+    Width = 380
+    Height = 417
     object GroupBoxAccountType: TGroupBox
       Left = 16
       Top = 16
       Width = 345
-      Height = 225
+      Height = 265
       Caption = ' Dane podstawowe  '
       TabOrder = 0
       object Label6: TLabel
@@ -36,7 +36,7 @@ inherited CInstrumentForm: TCInstrumentForm
       end
       object Label1: TLabel
         Left = 15
-        Top = 76
+        Top = 116
         Width = 33
         Height = 13
         Alignment = taRightJustify
@@ -44,11 +44,19 @@ inherited CInstrumentForm: TCInstrumentForm
       end
       object Label2: TLabel
         Left = 27
-        Top = 112
+        Top = 152
         Width = 21
         Height = 13
         Alignment = taRightJustify
         Caption = 'Opis'
+      end
+      object Label3: TLabel
+        Left = 14
+        Top = 76
+        Width = 34
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Symbol'
       end
       object ComboBoxType: TComboBox
         Left = 56
@@ -71,6 +79,25 @@ inherited CInstrumentForm: TCInstrumentForm
       end
       object EditName: TEdit
         Left = 56
+        Top = 112
+        Width = 265
+        Height = 21
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        MaxLength = 40
+        TabOrder = 2
+      end
+      object RichEditDesc: TCRichedit
+        Left = 56
+        Top = 152
+        Width = 265
+        Height = 89
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        TabOrder = 3
+      end
+      object EditSymbol: TEdit
+        Left = 56
         Top = 72
         Width = 265
         Height = 21
@@ -79,19 +106,10 @@ inherited CInstrumentForm: TCInstrumentForm
         MaxLength = 40
         TabOrder = 1
       end
-      object RichEditDesc: TCRichedit
-        Left = 56
-        Top = 112
-        Width = 265
-        Height = 89
-        BevelKind = bkTile
-        BorderStyle = bsNone
-        TabOrder = 2
-      end
     end
     object GroupBoxBank: TGroupBox
       Left = 16
-      Top = 256
+      Top = 296
       Width = 345
       Height = 113
       Caption = ' Dane dodatkowe '
@@ -157,13 +175,13 @@ inherited CInstrumentForm: TCInstrumentForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 378
-    Width = 379
+    Top = 417
+    Width = 380
     inherited BitBtnOk: TBitBtn
-      Left = 202
+      Left = 203
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 290
+      Left = 291
     end
   end
 end

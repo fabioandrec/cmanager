@@ -343,6 +343,7 @@ create table instrument (
   idInstrument uniqueidentifier not null,
   created datetime not null,
   modified datetime,
+  symbol varchar(40) not null,
   name varchar(40) not null,
   description varchar(200),
   instrumentType varchar(1) not null,
@@ -350,6 +351,7 @@ create table instrument (
   idCashpoint uniqueidentifier,
   primary key (idInstrument),
   constraint ck_instrumentType check (instrumentType in ('I', 'S', 'B', 'F')),
+  constraint uq_instrumentSymbol unique (symbol),
   constraint uq_instrumentName unique (name),
   constraint fk_instrumentCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_instrumentCashpoint foreign key (idCashpoint) references cashpoint (idCashpoint)
