@@ -12,7 +12,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="cashpointName" type="xs:string" use="required" />
-      <xs:attribute name="type" use="required">
+      <xs:attribute name="searchType" use="required">
         <xs:simpleType>
           <xs:restriction base="xs:string">
             <xs:enumeration value="S"/>  <!--wyszukiwanie po symbolu-->

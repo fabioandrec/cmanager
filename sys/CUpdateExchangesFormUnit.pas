@@ -52,8 +52,9 @@ type
   TExchangeDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
   private
     FExchange: ICXMLDOMNode;
+    FInstrument: TInstrument;
   public
-    constructor Create(AExchange: ICXMLDOMNode);
+    constructor Create(AExchange: ICXMLDOMNode; AInstrument: TInstrument);
     function ExpandTemplate(ATemplate: String): String;
     property Exchange: ICXMLDOMNode read FExchange;
   end;
@@ -63,7 +64,8 @@ implementation
 uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
-  CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit;
+  CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit,
+  CPluginConsts;
 
 {$R *.dfm}
 
@@ -91,7 +93,7 @@ begin
   if Column = 2 then begin
     CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('value', xNode, '')), '', False, 4);
   end else if Column = 1 then begin
-    CellText := GetXmlAttribute('name', xNode, '');
+    CellText := GetXmlAttribute('identifier', xNode, '');
   end else if Column = 0 then begin
     CellText := Date2StrDate(XsdToDateTime(GetXmlAttribute('regDateTime', xNode, '')), True);
   end;
@@ -111,7 +113,7 @@ procedure TCUpdateExchangesForm.ExchangesListGetHint(Sender: TBaseVirtualTree; N
 var xNode: ICXMLDOMNode;
 begin
   xNode := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^);
-  HintText := GetXmlAttribute('name', xNode, '');
+  HintText := GetXmlAttribute('identifier', xNode, '');
   LineBreakStyle := hlbForceMultiLine;
 end;
 
@@ -120,10 +122,11 @@ begin
   AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText, TCDataobjectFrameData.CreateWithFilter(CCashpointTypeOther));
 end;
 
-constructor TExchangeDescriptionHelper.Create(AExchange: ICXMLDOMNode);
+constructor TExchangeDescriptionHelper.Create(AExchange: ICXMLDOMNode; AInstrument: TInstrument);
 begin
   inherited Create;
   FExchange := AExchange;
+  FInstrument := AInstrument;
 end;
 
 function TExchangeDescriptionHelper.ExpandTemplate(ATemplate: String): String;
@@ -137,7 +140,9 @@ begin
   end else if ATemplate = '@dataczasnotowania@' then begin
     Result := GetFormattedDate(xRegDateTime, 'yyyy-MM-dd') + ' ' + GetFormattedTime(xRegDateTime, 'HH:mm');
   end else if ATemplate = '@instrument@' then begin
-    Result := GetXmlAttribute('name', FExchange, '');
+    Result := FInstrument.name;
+  end else if ATemplate = '@symbol@' then begin
+    Result := FInstrument.symbol;
   end else if ATemplate = '@rodzaj@' then begin
     if xType = CInstrumentTypeIndex then begin
       Result := CInstrumentTypeIndexDesc;
@@ -188,9 +193,8 @@ var xCashpoint: TCashPoint;
     xRegDateTime: TDateTime;
     xDesc: String;
     xCashpointId: TDataGid;
-    xCurrencyId: TDataGid;
-    xCurrency: TCurrencyDef;
     xHelper: TExchangeDescriptionHelper;
+    xSearchType: TBaseEnumeration;
 begin
   if CStaticCashpoint.DataId = CEmptyDataGid then begin
     if ShowInfo(itQuestion, 'Nie znaleziono kontrahenta o nazwie "' + FCashpointName + '", czy chcesz go utworzyæ teraz ?', '') then begin
@@ -206,34 +210,26 @@ begin
     end;
   end;
   if CStaticCashpoint.DataId <> CEmptyDataGid then begin
+    xSearchType := GetXmlAttribute('searchType', FRoot, CINSTRUMENTSEARCHTYPE_BYNAME);
     ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNodeCount);
     GDataProvider.BeginTransaction;
     xNode := ExchangesList.GetFirst;
     while (xNode <> Nil) do begin
       if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
         xXml := ICXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
-        xInstrument := TInstrument.FindByName(GetXmlAttribute('name', xXml, ''));
+        if xSearchType = CINSTRUMENTSEARCHTYPE_BYSYMBOL then begin
+          xInstrument := TInstrument.FindBySymbol(GetXmlAttribute('identifier', xXml, ''));
+        end else begin
+          xInstrument := TInstrument.FindByName(GetXmlAttribute('identifier', xXml, ''));
+        end;
         if xInstrument = Nil then begin
           xInstrument := TInstrument.CreateObject(InstrumentProxy, False);
-          xInstrument.name := GetXmlAttribute('name', xXml, '');
+          xInstrument.name := GetXmlAttribute('identifier', xXml, '');
+          xInstrument.symbol := xInstrument.name;
           xInstrument.description := GetXmlAttribute('desc', xXml, '');
           xInstrument.idCashpoint := xCashpointId;
-          if GetXmlAttribute('currency', xXml, '') <> '' then begin
-            xCurrency := TCurrencyDef(TCurrencyDef.FindByIso(GetXmlAttribute('currency', xXml, '')));
-            if xCurrency = Nil then begin
-              xCurrency := TCurrencyDef.CreateObject(CurrencyDefProxy, False);
-              xCurrency.symbol := GetXmlAttribute('currency', xXml, '');
-              xCurrency.iso := xCurrency.symbol;
-              xCurrency.name := xCurrency.symbol;
-              xCurrency.description := '';
-              xCurrency.isBase := False;
-            end;
-            xCurrencyId := xCurrency.id;
-          end else begin
-            xCurrencyId := '';
-          end;
-          xInstrument.idCurrencyDef := xCurrencyId;
-          xInstrument.instrumentType := GetXmlAttribute('type', xXml, '');
+          xInstrument.idCurrencyDef := CEmptyDataGid;
+          xInstrument.instrumentType := CInstrumentTypeUndefined;
         end;
         xRegDateTime := XsdToDateTime(GetXmlAttribute('regDateTime', xXml, ''));
         xValue := TInstrumentValue.FindValue(xInstrument.id, xRegDateTime);
@@ -245,7 +241,7 @@ begin
         xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[7][0], '');
         if xDesc <> '' then begin
           xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
-          xHelper := TExchangeDescriptionHelper.Create(xXml);
+          xHelper := TExchangeDescriptionHelper.Create(xXml, xInstrument);
           xDesc := GInstrumentValueTemplatesList.ExpandTemplates(xDesc, xHelper);
         end;
         xValue.description := xDesc;

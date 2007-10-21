@@ -131,6 +131,13 @@ begin
     if CStaticInstrument.DataId <> CEmptyDataGid then begin
       Result := CStaticInstrument.Caption;
     end;
+  end else if ATemplate = '@symbol@' then begin
+    Result := '<symbol instrumentu>';
+    if CStaticInstrument.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TInstrument(TInstrument.LoadObject(InstrumentProxy, CStaticInstrument.DataId, False)).symbol;
+      GDataProvider.RollbackTransaction;
+    end;
   end else if ATemplate = '@rodzaj@' then begin
     Result := '<rodzaj instrumentu inwestycyjnego>';
     if CStaticInstrument.DataId <> CEmptyDataGid then begin

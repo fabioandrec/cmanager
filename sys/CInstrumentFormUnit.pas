@@ -60,14 +60,9 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano instytucji prowadz¹cej notowania. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticBank.DoGetDataId;
     end;
-  end else if CStaticBank.DataId = CEmptyDataGid then begin
-    Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano instytucji prowadz¹cej notowania. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticBank.DoGetDataId;
-    end;
   end else if (CStaticCurrency.DataId = CEmptyDataGid) and (ComboBoxType.ItemIndex <> 0) and ((ComboBoxType.ItemIndex <> 4)) then begin
     Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano waluty konta. Czy wyœwietliæ listê teraz ?', '') then begin
+    if ShowInfo(itQuestion, 'Nie wybrano waluty notowañ. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCurrency.DoGetDataId;
     end;
   end else begin
@@ -140,10 +135,6 @@ procedure TCInstrumentForm.InitializeForm;
 begin
   inherited InitializeForm;
   ComboBoxTypeChange(Nil);
-  if Operation = coAdd then begin
-    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
-    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CStaticCurrency.DataId, False)).GetElementText;
-  end;
 end;
 
 procedure TCInstrumentForm.ReadValues;

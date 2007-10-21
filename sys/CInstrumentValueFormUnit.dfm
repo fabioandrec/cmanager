@@ -85,6 +85,7 @@ inherited CInstrumentValueForm: TCInstrumentValueForm
         TabOrder = 2
         Decimals = 4
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end

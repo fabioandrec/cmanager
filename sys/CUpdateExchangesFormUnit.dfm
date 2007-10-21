@@ -184,7 +184,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
             item
               Position = 1
               Width = 190
-              WideText = 'Instrument'
+              WideText = 'Identyfikator'
             end
             item
               Alignment = taRightJustify
