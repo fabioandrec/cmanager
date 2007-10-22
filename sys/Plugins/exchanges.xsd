@@ -3,23 +3,45 @@
   <xs:element name="exchanges">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" name="exchange">
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="stockExchange">
           <xs:complexType>
-            <xs:attribute name="identifier" type="xs:string" use="required" />
-            <xs:attribute name="regDateTime" type="xs:dateTime" use="required" />
-            <xs:attribute name="value" type="xs:double" use="required" />
+	    <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="exchange">
+                <xs:complexType>
+                  <xs:attribute name="identifier" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="40"/>
+                        <xs:whiteSpace value="collapse"/>
+                      </xs:restriction>
+                    </xs:simpleType>	    
+	          </xs:attribute>		  
+                  <xs:attribute name="regDateTime" type="xs:dateTime" use="required" />
+                  <xs:attribute name="value" type="xs:double" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="cashpointName" use="required" >
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:minLength value="1"/>
+                  <xs:maxLength value="40"/>
+                  <xs:whiteSpace value="collapse"/>
+                </xs:restriction>
+              </xs:simpleType>	    
+	    </xs:attribute>
+            <xs:attribute name="searchType" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="S"/>  <!--wyszukiwanie po symbolu-->
+                  <xs:enumeration value="N"/>  <!--wyszukiwanie po nazwie-->
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute name="cashpointName" type="xs:string" use="required" />
-      <xs:attribute name="searchType" use="required">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="S"/>  <!--wyszukiwanie po symbolu-->
-            <xs:enumeration value="N"/>  <!--wyszukiwanie po nazwie-->
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-  </xs:complexType>
+    </xs:complexType>
   </xs:element>
 </xs:schema>

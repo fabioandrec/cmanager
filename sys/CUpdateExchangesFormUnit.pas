@@ -13,9 +13,6 @@ type
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
     PanelConfig: TPanel;
-    GroupBox4: TGroupBox;
-    Label2: TLabel;
-    CStaticCashpoint: TCStatic;
     GroupBox1: TGroupBox;
     Panel1: TPanel;
     Bevel1: TBevel;
@@ -35,18 +32,15 @@ type
     procedure Action1Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
+    procedure ExchangesListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
   private
     FXml: ICXMLDOMDocument;
     FRoot: ICXMLDOMNode;
-    FExchanges: ICXMLDOMNodeList;
-    FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
   public
     procedure InitializeForm;
     property Xml: ICXMLDOMDocument read FXml write FXml;
     property Root: ICXMLDOMNode read FRoot write FRoot;
-    property Exchanges: ICXMLDOMNodeList read FExchanges write FExchanges;
-    property CashpointName: String read FCashpointName write FCashpointName;
   end;
 
   TExchangeDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
@@ -65,7 +59,7 @@ uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
   CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit,
-  CPluginConsts;
+  CPluginConsts, CXmlTlb;
 
 {$R *.dfm}
 
@@ -80,40 +74,59 @@ begin
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+var xParentNode: ICXMLDOMNode;
 begin
-  ICXMLDOMNode(ExchangesList.GetNodeData(Node)^) := FExchanges.item[Node.Index];
-  Node.CheckState := csCheckedNormal;
-  Node.CheckType := ctCheckBox
+  if ParentNode = Nil then begin
+    ICXMLDOMNode(ExchangesList.GetNodeData(Node)^) := FRoot.childNodes.item[Node.Index];
+    Node.CheckType := ctNone;
+    if FRoot.childNodes.item[Node.Index].childNodes.length > 0 then begin
+      InitialStates := InitialStates + [ivsHasChildren, ivsExpanded]
+    end;
+  end else begin
+    xParentNode := ICXMLDOMNode(ExchangesList.GetNodeData(ParentNode)^);
+    ICXMLDOMNode(ExchangesList.GetNodeData(Node)^) := xParentNode.childNodes.item[Node.Index];
+    Node.CheckState := csCheckedNormal;
+    Node.CheckType := ctCheckBox
+  end;
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
 var xNode: ICXMLDOMNode;
+    xParent: PVirtualNode;
 begin
+  xParent := ExchangesList.NodeParent[Node];
   xNode := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^);
-  if Column = 2 then begin
-    CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('value', xNode, '')), '', False, 4);
-  end else if Column = 1 then begin
-    CellText := GetXmlAttribute('identifier', xNode, '');
-  end else if Column = 0 then begin
-    CellText := Date2StrDate(XsdToDateTime(GetXmlAttribute('regDateTime', xNode, '')), True);
+  if xParent = Nil then begin
+    if Column = 0 then begin
+      CellText := GetXmlAttribute('cashpointName', xNode, '');
+    end else begin
+      CellText := '';;
+    end;
+  end else begin
+    if Column = 2 then begin
+      CellText := CurrencyToString(StrToCurrencyDecimalDot(GetXmlAttribute('value', xNode, '')), '', False, 4);
+    end else if Column = 0 then begin
+      CellText := GetXmlAttribute('identifier', xNode, '');
+    end else if Column = 1 then begin
+      CellText := Date2StrDate(XsdToDateTime(GetXmlAttribute('regDateTime', xNode, '')), True);
+    end;
   end;
 end;
 
 procedure TCUpdateExchangesForm.InitializeForm;
 begin
-  CStaticCashpoint.TextOnEmpty := FCashpointName;
-  CStaticCashpoint.Caption := FCashpointName;
-  GDataProvider.BeginTransaction;
-  CStaticCashpoint.DataId := GDataProvider.GetSqlString('select idCashpoint from cashpoint where name = ''' + FCashpointName + '''', CEmptyDataGid);
-  GDataProvider.RollbackTransaction;
-  ExchangesList.RootNodeCount := FExchanges.length;
+  ExchangesList.RootNodeCount := FRoot.childNodes.length;
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
 var xNode: ICXMLDOMNode;
 begin
   xNode := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^);
-  HintText := GetXmlAttribute('identifier', xNode, '');
+  if ExchangesList.NodeParent[Node] <> Nil then begin
+    HintText := GetXmlAttribute('identifier', xNode, '');
+  end else begin
+    HintText := GetXmlAttribute('cashpointName', xNode, '');
+  end;
   LineBreakStyle := hlbForceMultiLine;
 end;
 
@@ -185,48 +198,54 @@ begin
 end;
 
 procedure TCUpdateExchangesForm.BitBtnOkClick(Sender: TObject);
-var xCashpoint: TCashPoint;
-    xNode: PVirtualNode;
+var xNode: PVirtualNode;
     xXml: ICXMLDOMNode;
     xValue: TInstrumentValue;
     xInstrument: TInstrument;
     xRegDateTime: TDateTime;
     xDesc: String;
-    xCashpointId: TDataGid;
+    xCashpointName, xCashpointId: TDataGid;
+    xCashpoint: TCashPoint;
+    xAnyCashpointAdded, xAnyInstrumentAdded, xAnyValueAdded: Boolean;
     xHelper: TExchangeDescriptionHelper;
     xSearchType: TBaseEnumeration;
 begin
-  if CStaticCashpoint.DataId = CEmptyDataGid then begin
-    if ShowInfo(itQuestion, 'Nie znaleziono kontrahenta o nazwie "' + FCashpointName + '", czy chcesz go utworzyæ teraz ?', '') then begin
-      GDataProvider.BeginTransaction;
-      xCashpoint := TCashPoint.CreateObject(CashPointProxy, False);
-      xCashpoint.name := Copy(FCashpointName, 1, 40);
-      xCashpoint.description := GetXmlAttribute('cashpointDesc', FRoot, '');
-      xCashpoint.cashpointType := CCashpointTypeOther;
-      CStaticCashpoint.DataId := xCashpoint.id;
-      xCashpointId := xCashpoint.id;
-      GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCCashpointsFrame, WM_DATAOBJECTADDED, Integer(@xCashpointId), WMOPT_NONE);
-    end;
-  end;
-  if CStaticCashpoint.DataId <> CEmptyDataGid then begin
-    xSearchType := GetXmlAttribute('searchType', FRoot, CINSTRUMENTSEARCHTYPE_BYNAME);
-    ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNodeCount);
-    GDataProvider.BeginTransaction;
-    xNode := ExchangesList.GetFirst;
-    while (xNode <> Nil) do begin
+  ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNode.TotalCount);
+  GDataProvider.BeginTransaction;
+  xNode := ExchangesList.GetFirst;
+  xCashpointName := '';
+  xCashpointId := CEmptyDataGid;
+  xAnyCashpointAdded := False;
+  xAnyInstrumentAdded := False;
+  xAnyValueAdded := False;
+  while (xNode <> Nil) do begin
+    xXml := ICXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
+    if ExchangesList.NodeParent[xNode] = Nil then begin
+      xCashpointName := GetXmlAttribute('cashpointName', xXml, '');
+      xCashpointId := CEmptyDataGid;
+      xSearchType := GetXmlAttribute('searchType', xXml, CINSTRUMENTSEARCHTYPE_BYNAME);
+    end else begin
       if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
-        xXml := ICXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
         if xSearchType = CINSTRUMENTSEARCHTYPE_BYSYMBOL then begin
           xInstrument := TInstrument.FindBySymbol(GetXmlAttribute('identifier', xXml, ''));
         end else begin
           xInstrument := TInstrument.FindByName(GetXmlAttribute('identifier', xXml, ''));
         end;
         if xInstrument = Nil then begin
+          xAnyInstrumentAdded := True;
           xInstrument := TInstrument.CreateObject(InstrumentProxy, False);
           xInstrument.name := GetXmlAttribute('identifier', xXml, '');
           xInstrument.symbol := xInstrument.name;
           xInstrument.description := GetXmlAttribute('desc', xXml, '');
+          xCashpointId := GDataProvider.GetSqlString('select idCashpoint from cashpoint where name = ''' + xCashpointName + '''', CEmptyDataGid);
+          if xCashpointId = CEmptyDataGid then begin
+            xAnyCashpointAdded := True;
+            xCashpoint := TCashPoint.CreateObject(CashPointProxy, False);
+            xCashpoint.name := xCashpointName;
+            xCashpoint.description := name;
+            xCashpoint.cashpointType := CCashpointTypeOther;
+            xCashpointId := xCashpoint.id;
+          end;
           xInstrument.idCashpoint := xCashpointId;
           xInstrument.idCurrencyDef := CEmptyDataGid;
           xInstrument.instrumentType := CInstrumentTypeUndefined;
@@ -246,18 +265,30 @@ begin
         end;
         xValue.description := xDesc;
         xValue.valueOf := StrToCurrencyDecimalDot(GetXmlAttribute('value', xXml, ''));
+        xAnyValueAdded := True;
         GDataProvider.PostProxies;
-        xNode := ExchangesList.GetNext(xNode);
       end;
-      StepWaitForm(1);
     end;
-    GDataProvider.CommitTransaction;
-    HideWaitForm;
-    SendMessageToFrames(TCInstrumentValueFrame, WM_DATAREFRESH, 0, 0);
-    SendMessageToFrames(TCInstrumentFrame, WM_DATAREFRESH, 0, 0);
-    SendMessageToFrames(TCCurrencydefFrame, WM_DATAREFRESH, 0, 0);
-    CloseForm;
+    xNode := ExchangesList.GetNext(xNode);
+    StepWaitForm(1);
   end;
+  GDataProvider.CommitTransaction;
+  HideWaitForm;
+  if xAnyValueAdded then begin
+    SendMessageToFrames(TCInstrumentValueFrame, WM_DATAREFRESH, 0, 0);
+  end;
+  if xAnyInstrumentAdded then begin
+    SendMessageToFrames(TCInstrumentFrame, WM_DATAREFRESH, 0, 0);
+  end;
+  if xAnyCashpointAdded then begin
+    SendMessageToFrames(TCCashpointsFrame, WM_DATAREFRESH, 0, 0);
+  end;
+  CloseForm;
+end;
+
+procedure TCUpdateExchangesForm.ExchangesListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+begin
+  ChildCount := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^).childNodes.length;
 end;
 
 end.

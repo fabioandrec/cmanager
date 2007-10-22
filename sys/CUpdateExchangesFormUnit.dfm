@@ -3,24 +3,24 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
   Top = 210
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Tabela kurs'#243'w walut'
-  ClientHeight = 463
-  ClientWidth = 536
+  Caption = 'Tabela notowa'#324
+  ClientHeight = 466
+  ClientWidth = 656
   PixelsPerInch = 96
   TextHeight = 13
   object PanelButtons: TPanel
     Left = 0
-    Top = 422
-    Width = 536
+    Top = 425
+    Width = 656
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      536
+      656
       41)
     object BitBtnOk: TBitBtn
-      Left = 359
+      Left = 479
       Top = 8
       Width = 75
       Height = 25
@@ -31,7 +31,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
       OnClick = BitBtnOkClick
     end
     object BitBtnCancel: TBitBtn
-      Left = 447
+      Left = 567
       Top = 8
       Width = 75
       Height = 25
@@ -44,79 +44,45 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
   object PanelConfig: TPanel
     Left = 0
     Top = 0
-    Width = 536
-    Height = 422
+    Width = 656
+    Height = 425
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
-    object GroupBox4: TGroupBox
-      Left = 16
-      Top = 16
-      Width = 505
-      Height = 65
-      Caption = ' Dane podstawowe '
-      TabOrder = 0
-      object Label2: TLabel
-        Left = 21
-        Top = 29
-        Width = 80
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Miejsce notowa'#324
-      end
-      object CStaticCashpoint: TCStatic
-        Left = 109
-        Top = 25
-        Width = 372
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz kontrahenta z listy>'
-        Color = clWindow
-        ParentColor = False
-        TabOrder = 0
-        TabStop = True
-        Transparent = False
-        TextOnEmpty = '<wybierz kontrahenta z listy>'
-        OnGetDataId = CStaticCashpointGetDataId
-        HotTrack = True
-      end
-    end
     object GroupBox1: TGroupBox
       Left = 16
-      Top = 97
-      Width = 505
-      Height = 320
-      Caption = ' Kursy walut '
-      TabOrder = 1
+      Top = 16
+      Width = 625
+      Height = 401
+      Caption = ' Notowania '
+      TabOrder = 0
       object Panel1: TPanel
         Left = 24
         Top = 32
-        Width = 457
-        Height = 265
+        Width = 577
+        Height = 345
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
         object Bevel1: TBevel
           Left = 1
-          Top = 220
-          Width = 455
+          Top = 300
+          Width = 575
           Height = 2
           Align = alBottom
           Shape = bsBottomLine
         end
         object Panel2: TPanel
           Left = 1
-          Top = 222
-          Width = 455
+          Top = 302
+          Width = 575
           Height = 42
           Align = alBottom
           BevelOuter = bvNone
           Color = clWindow
           TabOrder = 0
           object CButtonOut: TCButton
-            Left = 173
+            Left = 293
             Top = 4
             Width = 140
             Height = 33
@@ -128,7 +94,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
             Action = Action1
           end
           object CButtonEdit: TCButton
-            Left = 308
+            Left = 428
             Top = 4
             Width = 141
             Height = 33
@@ -143,8 +109,8 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
         object ExchangesList: TCList
           Left = 1
           Top = 1
-          Width = 455
-          Height = 219
+          Width = 575
+          Height = 299
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -173,18 +139,19 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           OnGetText = ExchangesListGetText
           OnGetHint = ExchangesListGetHint
           OnGetNodeDataSize = ExchangesListGetNodeDataSize
+          OnInitChildren = ExchangesListInitChildren
           OnInitNode = ExchangesListInitNode
           AutoExpand = True
           Columns = <
             item
               Position = 0
-              Width = 150
-              WideText = 'Data i czas'
+              Width = 300
+              WideText = #377'r'#243'd'#322'o/Instrument'
             end
             item
               Position = 1
-              Width = 190
-              WideText = 'Identyfikator'
+              Width = 150
+              WideText = 'Data i czas'
             end
             item
               Alignment = taRightJustify

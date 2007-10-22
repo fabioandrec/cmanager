@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="Windows-1250"?>
-<exchanges cashpointName="GPW" searchType="S">
-  <exchange identifier="S01" regDateTime="2007-10-09T13:10:10" value="1.900"/>
-  <exchange identifier="S02" regDateTime="2007-10-09T13:10:11" value="2.900"/>
-  <exchange identifier="S03" regDateTime="2007-10-09T13:10:12" value="3.900"/>
-  <exchange identifier="S04" regDateTime="2007-10-09T13:10:13" value="4.900"/>
-  <exchange identifier="S05" regDateTime="2007-10-09T13:10:14" value="5.900"/>
+<exchanges>
+  <stockExchange cashpointName="GPW" searchType="S">
+    <exchange identifier="S01" regDateTime="2007-10-09T13:10:10" value="1.900"/>
+    <exchange identifier="S02" regDateTime="2007-10-09T13:10:11" value="2.900"/>
+    <exchange identifier="S03" regDateTime="2007-10-09T13:10:12" value="3.900"/>
+    <exchange identifier="S04" regDateTime="2007-10-09T13:10:13" value="4.900"/>
+    <exchange identifier="S05" regDateTime="2007-10-09T13:10:14" value="5.900"/>
+  </stockExchange>
+  <stockExchange cashpointName="NYSE" searchType="S">
+    <exchange identifier="X01" regDateTime="2007-10-09T13:10:10" value="1.900"/>
+    <exchange identifier="X02" regDateTime="2007-10-09T13:10:11" value="2.900"/>
+    <exchange identifier="X03" regDateTime="2007-10-09T13:10:12" value="3.900"/>
+    <exchange identifier="X04" regDateTime="2007-10-09T13:10:13" value="4.900"/>
+    <exchange identifier="X05" regDateTime="2007-10-09T13:10:14" value="5.900"/>
+  </stockExchange>
 </exchanges>

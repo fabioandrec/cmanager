@@ -15,6 +15,7 @@ type
     FIsValidResponse: Boolean;
     FValidCount, FInvalidCount: Integer;
     FSourceList: ICXMLDOMNodeList;
+    FOutputXml: ICXMLDOMDocument;
   protected
     function MainThreadProcedure: Cardinal; override;
     procedure ThreadFinished; override;
@@ -22,6 +23,7 @@ type
     constructor Create(ALogWindow: HWND; AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AAgentName: String); override;
   published
     property SourceList: ICXMLDOMNodeList read FSourceList write FSourceList;
+    property OutputXml: ICXMLDOMDocument read FOutputXml;
   end;
 
   TMetastockProgressForm = class(TForm)
@@ -60,7 +62,8 @@ begin
     FMetastockBaseThread := TMetastockBaseThread.Create(Handle, '', '', '', '', hctPreconfig, 'MSIE');
     FMetastockBaseThread.SourceList := FConfigXml.documentElement.selectNodes('source');
     ShowModal;
-    if FMetastockBaseThread.ExitCode = ERROR_SUCCESS then begin
+    if FMetastockBaseThread.OutputXml <> Nil then begin
+      Result := GetStringFromDocument(FMetastockBaseThread.OutputXml);
     end;
     FMetastockBaseThread.Free;
   end;
@@ -79,6 +82,8 @@ var xResponse: String;
     xCount: Integer;
     xNode: ICXMLDOMNode;
     xRes: Cardinal;
+    xRoot: ICXMLDOMNode;
+    xResStr: TStringList;
 begin
   xCount := 0;
   FValidCount := 0;
@@ -92,14 +97,36 @@ begin
       xRes := GetResponse('', xResponse);
       if xRes = ERROR_SUCCESS then begin
         SetXmlAttribute('response', xNode, xResponse);
-        Inc(FValidCount);
+        SetXmlAttribute('isValid', xNode, True);
       end else begin
         SetXmlAttribute('error', xNode, xRes);
-        Inc(FInvalidCount);
+        SetXmlAttribute('isValid', xNode, False);
       end;
       FIsValidResponse := FIsValidResponse and (xRes = ERROR_SUCCESS);
     end;
     Inc(xCount);
+  end;
+  if not IsCancelled then begin
+    FOutputXml := GetXmlDocument;
+    xRoot := FOutputXml.createElement('exchanges');
+    FOutputXml.appendChild(xNode);
+    xCount := 0;
+    while (xCount <= FSourceList.length - 1) and (not IsCancelled) do begin
+      xNode := FSourceList.item[xCount];
+      if GetXmlAttribute('isValid', xNode, False) then begin
+        xResStr := TStringList.Create;
+        xResStr.Text := GetXmlAttribute('response', xNode, '');
+        Inc(FValidCount);
+
+        xResStr.Free
+      end else begin
+        Inc(FInvalidCount);
+      end;
+      Inc(xCount);
+    end;
+  end;
+  if IsCancelled then begin
+    FOutputXml := Nil;
   end;
 end;
 
@@ -138,6 +165,7 @@ constructor TMetastockBaseThread.Create(ALogWindow: HWND; AUrl, AProxy, AProxyUs
 begin
   inherited Create(ALogWindow, AUrl, AProxy, AProxyUser, AProxyPass, AConnectionType, AAgentName);
   FIsValidResponse := True;
+  FOutputXml := Nil;
 end;
 
 end.

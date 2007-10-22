@@ -313,10 +313,8 @@ end;
 procedure UpdateExchanges(AExchangesText: String);
 var xDoc: ICXMLDOMDocument;
     xRoot: ICXMLDOMNode;
-    xList: ICXMLDOMNodeList;
     xValid: Boolean;
     xError: String;
-    xCahpointName: String;
     xForm: TCUpdateExchangesForm;
 begin
   xValid := False;
@@ -324,25 +322,13 @@ begin
   if xDoc.parseError.errorCode = 0 then begin
     xRoot := xDoc.selectSingleNode('exchanges');
     if xRoot <> Nil then begin
-      xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
-      if xCahpointName <> '' then begin
-        xValid := True;
-        xList := xRoot.selectNodes('exchange');
-        if xList.length > 0 then begin
-          xForm := TCUpdateExchangesForm.Create(Application);
-          xForm.Xml := xDoc;
-          xForm.Root := xRoot;
-          xForm.Exchanges := xList;
-          xForm.CashpointName := xCahpointName;
-          xForm.InitializeForm;
-          xForm.ShowModal;
-          xForm.Free;
-        end else begin
-          ShowInfo(itInfo, 'Tabela nie zawiera ¿adnych notowañ instrumentów inwestycyjnych', xError);
-        end;
-      end else begin
-        xError := 'Brak okreœlenia kontrahenta - miejsca notowañ instrumentów inwestycyjnych';
-      end;
+      xValid := True;
+      xForm := TCUpdateExchangesForm.Create(Application);
+      xForm.Xml := xDoc;
+      xForm.Root := xRoot;
+      xForm.InitializeForm;
+      xForm.ShowModal;
+      xForm.Free;
     end else begin
       xError := 'Brak elementu zbiorczego';
     end;
