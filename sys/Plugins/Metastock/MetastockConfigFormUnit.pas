@@ -105,6 +105,8 @@ end;
 
 procedure TMetastockConfigForm.BitBtnEditClick(Sender: TObject);
 var xName, xUrl, xCashpoint, xIso, xType: String;
+    xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
+    xIdentColumn, xRegDatetimeColumn, xValueColumn: Integer;
     xNode: IXMLDOMNode;
 begin
   xNode := FConfigXml.documentElement.childNodes.item[ListView.Selected.Index];
@@ -113,18 +115,39 @@ begin
   xCashpoint := GetXmlAttribute('cashpointName', xNode, '');
   xIso := GetXmlAttribute('currency', xNode, '');
   xType := GetXmlAttribute('type', xNode, '');
-  if EditSource(xName, xUrl, xCashpoint, xIso, xType) then begin
+  xFieldSeparator := GetXmlAttribute('fieldSeparator', xNode, ',');
+  xDecimalSeparator := GetXmlAttribute('decimalSeparator', xNode, '.');
+  xDateSeparator := GetXmlAttribute('dateSeparator', xNode, '');
+  xTimeSeparator := GetXmlAttribute('timeSeparator', xNode, '');
+  xDateFormat := GetXmlAttribute('dateFormat', xNode, 'RMD');
+  xTimeFormat := GetXmlAttribute('timeFormat', xNode, 'HN');
+  xIdentColumn := GetXmlAttribute('identColumn', xNode, 1);
+  xRegDatetimeColumn := GetXmlAttribute('regDatetimeColumn', xNode, 2);
+  xValueColumn := GetXmlAttribute('valueColumn', xNode, 3);
+  if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
+                xDateFormat, xTimeFormat, xIdentColumn, xRegDatetimeColumn, xValueColumn) then begin
     SetXmlAttribute('name', xNode, xName);
     SetXmlAttribute('link', xNode, xUrl);
     SetXmlAttribute('cashpointName', xNode, xCashpoint);
     SetXmlAttribute('currency', xNode, xIso);
     SetXmlAttribute('type', xNode, xType);
+    SetXmlAttribute('fieldSeparator', xNode, xFieldSeparator);
+    SetXmlAttribute('decimalSeparator', xNode, xDecimalSeparator);
+    SetXmlAttribute('dateSeparator', xNode, xDateSeparator);
+    SetXmlAttribute('timeSeparator', xNode, xTimeSeparator);
+    SetXmlAttribute('dateFormat', xNode, xDateFormat);
+    SetXmlAttribute('timeFormat', xNode, xTimeFormat);
+    SetXmlAttribute('identColumn', xNode, xIdentColumn);
+    SetXmlAttribute('regDatetimeColumn', xNode, xRegDatetimeColumn);
+    SetXmlAttribute('valueColumn', xNode, xValueColumn);
     ListView.Selected.Caption := xName;
   end;
 end;
 
 procedure TMetastockConfigForm.BitBtnAddClick(Sender: TObject);
 var xName, xUrl, xCashpoint, xIso, xType: String;
+    xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
+    xIdentColumn, xRegDatetimeColumn, xValueColumn: Integer;
     xNode: IXMLDOMNode;
     xItem: TListItem;
 begin
@@ -133,7 +156,17 @@ begin
   xCashpoint := '';
   xIso := '';
   xType := '';
-  if EditSource(xName, xUrl, xCashpoint, xIso, xType) then begin
+  xFieldSeparator := ',';
+  xDecimalSeparator := '.';
+  xDateSeparator := '';
+  xTimeSeparator := '';
+  xDateFormat := 'RMD';
+  xTimeFormat := 'HN';
+  xIdentColumn := 1;
+  xRegDatetimeColumn := 2;
+  xValueColumn := 3;
+  if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
+                xDateFormat, xTimeFormat, xIdentColumn, xRegDatetimeColumn, xValueColumn) then begin
     xNode := FConfigXml.createElement('source');
     FConfigXml.documentElement.appendChild(xNode);
     SetXmlAttribute('name', xNode, xName);
@@ -141,6 +174,15 @@ begin
     SetXmlAttribute('cashpointName', xNode, xCashpoint);
     SetXmlAttribute('currency', xNode, xIso);
     SetXmlAttribute('type', xNode, xType);
+    SetXmlAttribute('fieldSeparator', xNode, xFieldSeparator);
+    SetXmlAttribute('decimalSeparator', xNode, xDecimalSeparator);
+    SetXmlAttribute('dateSeparator', xNode, xDateSeparator);
+    SetXmlAttribute('timeSeparator', xNode, xTimeSeparator);
+    SetXmlAttribute('dateFormat', xNode, xDateFormat);
+    SetXmlAttribute('timeFormat', xNode, xTimeFormat);
+    SetXmlAttribute('identColumn', xNode, xIdentColumn);
+    SetXmlAttribute('regDatetimeColumn', xNode, xRegDatetimeColumn);
+    SetXmlAttribute('valueColumn', xNode, xValueColumn);
     xItem := ListView.Items.Add;
     xItem.Caption := xName;
     ListView.Selected := xItem;

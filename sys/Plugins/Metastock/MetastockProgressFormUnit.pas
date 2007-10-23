@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml, WinInet,
-  CPluginTypes;
+  CPluginTypes, Types;
 
 type
   TMetastockBaseThread = class(TBaseHttpRequest)
@@ -47,7 +47,8 @@ var MetastockProgressForm: TMetastockProgressForm;
 
 implementation
 
-uses CRichtext, StrUtils, CPluginConsts, CBasics, MetastockConfigFormUnit;
+uses CRichtext, StrUtils, CPluginConsts, CBasics, MetastockConfigFormUnit,
+  CTools;
 
 {$R *.dfm}
 
@@ -84,6 +85,9 @@ var xResponse: String;
     xRes: Cardinal;
     xRoot: ICXMLDOMNode;
     xResStr: TStringList;
+    xLineNum: Integer;
+    xResValid: Boolean;
+    xArray: TStringDynArray;
 begin
   xCount := 0;
   FValidCount := 0;
@@ -116,8 +120,17 @@ begin
       if GetXmlAttribute('isValid', xNode, False) then begin
         xResStr := TStringList.Create;
         xResStr.Text := GetXmlAttribute('response', xNode, '');
-        Inc(FValidCount);
-
+        xResValid := True;
+        xLineNum := 0;
+        while (xLineNum <= xResStr.Count - 1) and xResValid and (not IsCancelled) do begin
+          xArray := StringToStringArray(xResStr.Strings[xLineNum], ',');
+          Inc(xLineNum);
+        end;
+        if xResValid then begin
+          Inc(FValidCount);
+        end else begin
+          Inc(FInvalidCount);
+        end;
         xResStr.Free
       end else begin
         Inc(FInvalidCount);
