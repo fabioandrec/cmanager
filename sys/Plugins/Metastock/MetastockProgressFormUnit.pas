@@ -129,7 +129,7 @@ begin
   if not IsCancelled then begin
     FOutputXml := GetXmlDocument;
     xRoot := FOutputXml.createElement('exchanges');
-    FOutputXml.appendChild(xNode);
+    FOutputXml.appendChild(xRoot);
     xCount := 0;
     while (xCount <= FSourceList.length - 1) and (not IsCancelled) do begin
       xNode := FSourceList.item[xCount];

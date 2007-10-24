@@ -248,7 +248,7 @@ begin
       if Result then begin
         Result := isTypeof[CPLUGINTYPE_CURRENCYRATE] or
                   isTypeof[CPLUGINTYPE_EXTRACTION] or
-                  isTypeof[CPLUGINTYPE_INVESTMENT] or
+                  isTypeof[CPLUGINTYPE_STOCKEXCHANGE] or
                   isTypeof[CPLUGINTYPE_JUSTEXECUTE] or
                   isTypeof[CPLUGINTYPE_HTMLREPORT] or
                   isTypeof[CPLUGINTYPE_CHARTREPORT] or

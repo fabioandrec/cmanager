@@ -106,7 +106,7 @@ end;
 procedure TMetastockConfigForm.BitBtnEditClick(Sender: TObject);
 var xName, xUrl, xCashpoint, xIso, xType: String;
     xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
-    xIdentColumn, xRegDatetimeColumn, xValueColumn: Integer;
+    xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn: Integer;
     xNode: IXMLDOMNode;
 begin
   xNode := FConfigXml.documentElement.childNodes.item[ListView.Selected.Index];
@@ -122,10 +122,11 @@ begin
   xDateFormat := GetXmlAttribute('dateFormat', xNode, 'RMD');
   xTimeFormat := GetXmlAttribute('timeFormat', xNode, 'HN');
   xIdentColumn := GetXmlAttribute('identColumn', xNode, 1);
-  xRegDatetimeColumn := GetXmlAttribute('regDatetimeColumn', xNode, 2);
-  xValueColumn := GetXmlAttribute('valueColumn', xNode, 3);
+  xRegDateColumn := GetXmlAttribute('regDateColumn', xNode, 2);
+  xRegTimeColumn := GetXmlAttribute('regTimeColumn', xNode, 3);
+  xValueColumn := GetXmlAttribute('valueColumn', xNode, 4);
   if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
-                xDateFormat, xTimeFormat, xIdentColumn, xRegDatetimeColumn, xValueColumn) then begin
+                xDateFormat, xTimeFormat, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
     SetXmlAttribute('name', xNode, xName);
     SetXmlAttribute('link', xNode, xUrl);
     SetXmlAttribute('cashpointName', xNode, xCashpoint);
@@ -138,7 +139,8 @@ begin
     SetXmlAttribute('dateFormat', xNode, xDateFormat);
     SetXmlAttribute('timeFormat', xNode, xTimeFormat);
     SetXmlAttribute('identColumn', xNode, xIdentColumn);
-    SetXmlAttribute('regDatetimeColumn', xNode, xRegDatetimeColumn);
+    SetXmlAttribute('regDateColumn', xNode, xRegDateColumn);
+    SetXmlAttribute('regTimeColumn', xNode, xRegTimeColumn);
     SetXmlAttribute('valueColumn', xNode, xValueColumn);
     ListView.Selected.Caption := xName;
   end;
@@ -147,7 +149,7 @@ end;
 procedure TMetastockConfigForm.BitBtnAddClick(Sender: TObject);
 var xName, xUrl, xCashpoint, xIso, xType: String;
     xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
-    xIdentColumn, xRegDatetimeColumn, xValueColumn: Integer;
+    xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn: Integer;
     xNode: IXMLDOMNode;
     xItem: TListItem;
 begin
@@ -163,10 +165,11 @@ begin
   xDateFormat := 'RMD';
   xTimeFormat := 'HN';
   xIdentColumn := 1;
-  xRegDatetimeColumn := 2;
-  xValueColumn := 3;
+  xRegDateColumn := 2;
+  xRegTimeColumn := 3;
+  xValueColumn := 4;
   if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
-                xDateFormat, xTimeFormat, xIdentColumn, xRegDatetimeColumn, xValueColumn) then begin
+                xDateFormat, xTimeFormat, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
     xNode := FConfigXml.createElement('source');
     FConfigXml.documentElement.appendChild(xNode);
     SetXmlAttribute('name', xNode, xName);
@@ -181,7 +184,8 @@ begin
     SetXmlAttribute('dateFormat', xNode, xDateFormat);
     SetXmlAttribute('timeFormat', xNode, xTimeFormat);
     SetXmlAttribute('identColumn', xNode, xIdentColumn);
-    SetXmlAttribute('regDatetimeColumn', xNode, xRegDatetimeColumn);
+    SetXmlAttribute('regDateColumn', xNode, xRegDateColumn);
+    SetXmlAttribute('regTimeColumn', xNode, xRegTimeColumn);
     SetXmlAttribute('valueColumn', xNode, xValueColumn);
     xItem := ListView.Items.Add;
     xItem.Caption := xName;

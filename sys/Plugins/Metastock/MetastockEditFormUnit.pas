@@ -49,7 +49,8 @@ type
     FDateSeparator: String;
     FTimeSeparator: String;
     FIdentColumn: String;
-    FRegDatetimeColumn: String;
+    FRegDateColumn: String;
+    FRegTimeColumn: String;
     FValueColumn: String;
   end;
 
@@ -57,7 +58,7 @@ function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
                         ADateFormat, ATimeFormat: String;
-                    var AIdentColumn, ARegDatetimeColumn, AValueColumn: Integer): Boolean;
+                    var AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 
 implementation
 
@@ -94,16 +95,22 @@ begin
     ComboBoxField.ItemIndex := 0;
     ComboBoxFieldChange(Nil);
     ComboBoxColumn.SetFocus;
-  end else if StrToIntDef(FRegDatetimeColumn, -1) < 1 then begin
-    MessageBox(0, 'Kolumna dla daty i czasu notowania musi byæ liczb¹ wiêksz¹ od 0', 'B³¹d', MB_OK + MB_ICONERROR);
+  end else if StrToIntDef(FRegDateColumn, -1) < 1 then begin
+    MessageBox(0, 'Kolumna dla daty notowania musi byæ liczb¹ wiêksz¹ od 0', 'B³¹d', MB_OK + MB_ICONERROR);
     ComboBoxField.ItemIndex := 1;
     ComboBoxFieldChange(Nil);
     ComboBoxColumn.SetFocus;
   end else if StrToIntDef(FValueColumn, -1) < 1 then begin
     MessageBox(0, 'Kolumna dla wartoœci notowania musi byæ liczb¹ wiêksz¹ od 0', 'B³¹d', MB_OK + MB_ICONERROR);
-    ComboBoxField.ItemIndex := 2;
+    ComboBoxField.ItemIndex := 3;
     ComboBoxFieldChange(Nil);
     ComboBoxColumn.SetFocus;
+  end else if FIdentColumn = FValueColumn then begin
+    MessageBox(0, 'Kolumna dla wartoœci musi byæ inna ni¿ kolumna dla identyfikatora', 'B³¹d', MB_OK + MB_ICONERROR);
+  end else if FIdentColumn = FRegDateColumn then begin
+  end else if FIdentColumn = FRegTimeColumn then begin
+  end else if FRegDateColumn = FValueColumn then begin
+  end else if FRegTimeColumn = FValueColumn then begin
   end else begin
     ModalResult := mrOk;
   end;
@@ -125,7 +132,7 @@ function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
                         ADateFormat, ATimeFormat: String;
-                    var AIdentColumn, ARegDatetimeColumn, AValueColumn: Integer): Boolean;
+                    var AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 var xForm: TMetastockEditForm;
 begin
   xForm := TMetastockEditForm.Create(Nil);
@@ -149,7 +156,8 @@ begin
     FDateSeparator := ADateSeparator;
     FTimeSeparator := ATimeSeparator;
     FIdentColumn := IntToStr(AIdentColumn);
-    FRegDatetimeColumn := IntToStr(ARegDatetimeColumn);
+    FRegDateColumn := IntToStr(ARegDateColumn);
+    FRegTimeColumn := IntToStr(ARegTimeColumn);
     FValueColumn := IntToStr(AValueColumn);
     ComboBoxDate.ItemIndex := ComboBoxDate.Items.IndexOf(ADateFormat);
     ComboBoxTime.ItemIndex := ComboBoxTime.Items.IndexOf(ATimeFormat);
@@ -176,7 +184,8 @@ begin
       ADateSeparator := FDateSeparator;
       ATimeSeparator := FTimeSeparator;
       AIdentColumn := StrToIntDef(FIdentColumn, 1);
-      ARegDatetimeColumn := StrToIntDef(FRegDatetimeColumn, 2);
+      ARegDateColumn := StrToIntDef(FRegDateColumn, 2);
+      ARegTimeColumn := StrToIntDef(FRegTimeColumn, 0);
       AValueColumn := StrToIntDef(FValueColumn, 3);
       ADateFormat := ComboBoxDate.Text;
       ATimeFormat := ComboBoxTime.Text;
@@ -203,8 +212,10 @@ begin
   if ComboBoxField.ItemIndex = 0 then begin
     FIdentColumn := ComboBoxColumn.Text;
   end else if ComboBoxField.ItemIndex = 1 then begin
-    FRegDatetimeColumn := ComboBoxColumn.Text;
+    FRegDateColumn := ComboBoxColumn.Text;
   end else if ComboBoxField.ItemIndex = 2 then begin
+    FRegTimeColumn := ComboBoxColumn.Text;
+  end else if ComboBoxField.ItemIndex = 3 then begin
     FValueColumn := ComboBoxColumn.Text;
   end;
 end;
@@ -227,8 +238,10 @@ begin
   if ComboBoxField.ItemIndex = 0 then begin
     ComboBoxColumn.Text := FIdentColumn;
   end else if ComboBoxField.ItemIndex = 1 then begin
-    ComboBoxColumn.Text := FRegDatetimeColumn;
+    ComboBoxColumn.Text := FRegDateColumn;
   end else if ComboBoxField.ItemIndex = 2 then begin
+    ComboBoxColumn.Text := FRegTimeColumn;
+  end else if ComboBoxField.ItemIndex = 3 then begin
     ComboBoxColumn.Text := FValueColumn;
   end;
 end;

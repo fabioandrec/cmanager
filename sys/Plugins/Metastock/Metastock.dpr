@@ -26,7 +26,7 @@ function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; std
 begin
   GCManagerInterface := ACManagerInterface;
   with GCManagerInterface do begin
-    SetType(CPLUGINTYPE_CURRENCYRATE);
+    SetType(CPLUGINTYPE_STOCKEXCHANGE);
     SetCaption('Pobierz notowania GPW');
     SetDescription('Pobieranie notowañ GPW w formacie Metastock');
     Application.Handle := GetAppHandle;

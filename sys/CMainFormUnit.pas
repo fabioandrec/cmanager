@@ -620,7 +620,7 @@ begin
   xMax := GPlugins.GetCountOfType(CPLUGINTYPE_CURRENCYRATE) +
           GPlugins.GetCountOfType(CPLUGINTYPE_JUSTEXECUTE) +
           GPlugins.GetCountOfType(CPLUGINTYPE_EXTRACTION) +
-          GPlugins.GetCountOfType(CPLUGINTYPE_INVESTMENT);
+          GPlugins.GetCountOfType(CPLUGINTYPE_STOCKEXCHANGE);
   if xMax > 0 then begin
     xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
     if xPluginBand <> Nil then begin
@@ -629,7 +629,7 @@ begin
         if (xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] or
            (xPlugin.isTypeof[CPLUGINTYPE_JUSTEXECUTE] and ((xPlugin.pluginType and CJUSTEXECUTE_DISABLEONDEMAND) = 0)) or
            xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION] or
-           xPlugin.isTypeof[CPLUGINTYPE_INVESTMENT]) and xPlugin.pluginIsEnabled then begin
+           xPlugin.isTypeof[CPLUGINTYPE_STOCKEXCHANGE]) and xPlugin.pluginIsEnabled then begin
           xAction := TAction.Create(Self);
           xAction.ActionList := ActionManager;
           xAction.Caption := xPlugin.pluginMenu;
@@ -655,8 +655,8 @@ begin
       UpdateCurrencyRates(xOutput);
     end else if xPlugin.isTypeof[CPLUGINTYPE_EXTRACTION] then begin
       UpdateExtractions(xOutput);
-    end else if xPlugin.isTypeof[CPLUGINTYPE_INVESTMENT] then begin
-      UpdateInvestments(xOutput);
+    end else if xPlugin.isTypeof[CPLUGINTYPE_STOCKEXCHANGE] then begin
+      UpdateExchanges(xOutput);
     end;
   end;
 end;
