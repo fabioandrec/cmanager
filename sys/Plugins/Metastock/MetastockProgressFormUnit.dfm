@@ -99,8 +99,17 @@ object MetastockProgressForm: TMetastockProgressForm
     Width = 75
     Height = 25
     Caption = '&Przerwij'
-    TabOrder = 1
+    TabOrder = 2
     OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 240
+    Top = 240
+    Width = 75
+    Height = 25
+    Caption = '&Importuj'
+    TabOrder = 1
+    OnClick = Button2Click
   end
   object OpenDialogXml: TOpenDialog
     DefaultExt = 'dat'

@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml, WinInet,
-  CPluginTypes, Types;
+  CPluginTypes, Types, Math;
 
 type
   TMetastockBaseThread = class(TBaseHttpRequest)
@@ -23,7 +23,7 @@ type
     constructor Create(ALogWindow: HWND; AUrl, AProxy, AProxyUser, AProxyPass: String; AConnectionType: THttpConnectType; AAgentName: String); override;
   published
     property SourceList: ICXMLDOMNodeList read FSourceList write FSourceList;
-    property OutputXml: ICXMLDOMDocument read FOutputXml;
+    property OutputXml: ICXMLDOMDocument read FOutputXml write FOutputXml;
   end;
 
   TMetastockProgressForm = class(TForm)
@@ -32,8 +32,10 @@ type
     Button1: TButton;
     Image: TImage;
     OpenDialogXml: TOpenDialog;
+    Button2: TButton;
     procedure FormActivate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     FMetastockBaseThread: TMetastockBaseThread;
     FConfigXml: ICXMLDOMDocument;
@@ -44,6 +46,8 @@ type
   end;
 
 var MetastockProgressForm: TMetastockProgressForm;
+
+const WM_SHOWIMPORTBUTTON = WM_USER + 1;
 
 implementation
 
@@ -60,6 +64,7 @@ begin
   if (FConfigXml = Nil) or (xError <> '') then begin
     GCManagerInterface.ShowDialogBox(xError, CDIALOGBOX_ERROR);
   end else begin
+    Button2.Visible := False;
     FMetastockBaseThread := TMetastockBaseThread.Create(Handle, '', '', '', '', hctPreconfig, 'MSIE');
     FMetastockBaseThread.SourceList := FConfigXml.documentElement.selectNodes('source');
     ShowModal;
@@ -75,6 +80,8 @@ begin
   inherited WndProc(Message);
   if Message.Msg = WMC_RICHEDITADDTEXT then begin
     PerformAddThreadRichText(RichEdit, Message.WParam);
+  end else if Message.Msg = WM_SHOWIMPORTBUTTON then begin
+    Button2.Visible := True;
   end;
 end;
 
@@ -88,6 +95,15 @@ var xResponse: String;
     xLineNum: Integer;
     xResValid: Boolean;
     xArray: TStringDynArray;
+    xFieldSeparator: String;
+    xDecimalSeparator: String;
+    xDateSeparator: String;
+    xTimeSeparator: String;
+    xIdentColumn: Integer;
+    xRegDatetimeColumn: Integer;
+    xValueColumn: Integer;
+    xDateFormat: String;
+    xTimeFormat: String;
 begin
   xCount := 0;
   FValidCount := 0;
@@ -117,13 +133,30 @@ begin
     xCount := 0;
     while (xCount <= FSourceList.length - 1) and (not IsCancelled) do begin
       xNode := FSourceList.item[xCount];
+      xFieldSeparator := GetXmlAttribute('fieldSeparator', xNode, ',');
+      xDecimalSeparator := GetXmlAttribute('decimalSeparator', xNode, '.');
+      xDateSeparator := GetXmlAttribute('dateSeparator', xNode, '');
+      xTimeSeparator := GetXmlAttribute('timeSeparator', xNode, '');
+      xDateFormat := GetXmlAttribute('dateFormat', xNode, 'RMD');
+      xTimeFormat := GetXmlAttribute('timeFormat', xNode, 'HN');
+      xIdentColumn := GetXmlAttribute('identColumn', xNode, 1);
+      xRegDatetimeColumn := GetXmlAttribute('regDatetimeColumn', xNode, 2);
+      xValueColumn := GetXmlAttribute('valueColumn', xNode, 3);
       if GetXmlAttribute('isValid', xNode, False) then begin
         xResStr := TStringList.Create;
         xResStr.Text := GetXmlAttribute('response', xNode, '');
         xResValid := True;
         xLineNum := 0;
         while (xLineNum <= xResStr.Count - 1) and xResValid and (not IsCancelled) do begin
-          xArray := StringToStringArray(xResStr.Strings[xLineNum], ',');
+          if Trim(xResStr.Strings[xLineNum]) <> '' then begin
+            xArray := StringToStringArray(xResStr.Strings[xLineNum], xFieldSeparator);
+            if Length(xArray) >= Max(Max(xIdentColumn, xRegDatetimeColumn), xValueColumn) then begin
+
+            end else begin
+              xResValid := False;
+              AddToReport('Dane odebrane z ' + GetXmlAttribute('name', xNode, '') + ' nie s¹ zgodne z definicj¹ pliku importu');
+            end;
+          end;
           Inc(xLineNum);
         end;
         if xResValid then begin
@@ -155,6 +188,9 @@ begin
   if FMetastockBaseThread.Status = tsRunning then begin
     FMetastockBaseThread.CancelThread;
   end else begin
+    if (not FMetastockBaseThread.FIsValidResponse) or (FMetastockBaseThread.FInvalidCount <> 0) then begin
+      FMetastockBaseThread.OutputXml := Nil;
+    end;
     Close;
   end;
 end;
@@ -162,10 +198,11 @@ end;
 procedure TMetastockBaseThread.ThreadFinished;
 begin
   if ExitCode = ERROR_SUCCESS then begin
-    if FIsValidResponse then begin
+    if FIsValidResponse and (FInvalidCount = 0) then begin
       PostMessage(MetastockProgressForm.Handle, WM_CLOSE, 0, 0);
     end else begin
-      MetastockProgressForm.Button1.Caption := '&Zamknij';
+      PostMessage(MetastockProgressForm.Handle, WM_SHOWIMPORTBUTTON, 0, 0);
+      MetastockProgressForm.Button1.Caption := '&Anuluj';
     end;
   end else if ExitCode = ERROR_CANCELLED then begin
     PostMessage(MetastockProgressForm.Handle, WM_CLOSE, 0, 0);
@@ -179,6 +216,11 @@ begin
   inherited Create(ALogWindow, AUrl, AProxy, AProxyUser, AProxyPass, AConnectionType, AAgentName);
   FIsValidResponse := True;
   FOutputXml := Nil;
+end;
+
+procedure TMetastockProgressForm.Button2Click(Sender: TObject);
+begin
+  Close;
 end;
 
 end.

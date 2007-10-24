@@ -274,7 +274,8 @@ object MetastockEditForm: TMetastockEditForm
         OnChange = ComboBoxFieldChange
         Items.Strings = (
           'Identyfikator'
-          'Data i czas'
+          'Data'
+          'Czas'
           'Warto'#347#263)
       end
       object ComboBoxColumn: TComboBox

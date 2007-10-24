@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1250"?>
 <sources>
-  <source name="Notowania akcji z GPW" cashpointName="GPW" currency="PLN" type="S" link="http://bossa.pl/notowania/migawki/?rk=x&amp;gr=akc"/>
-  <source name="Notowania indeksów z GPW" cashpointName="GPW" type="I" link="http://bossa.pl/notowania/migawki/?rk=x&amp;gr=ind"/>
-  <source name="Obligacje z GPW" cashpointName="GPW" currency="PLN" type="B" link="http://bossa.pl/notowania/migawki/?rk=x&amp;gr=obl"/>
+  <source name="Notowania akcji z GPW" cashpointName="GPW" currency="PLN" type="S" link="http://bossa.pl/notowania/migawki/?rk=x&amp;gr=akc&amp;pr=1"/>
+  <source name="Notowania indeksów z GPW" cashpointName="GPW" type="I" link="http://bossa.pl/notowania/migawki/?rk=x&amp;gr=ind&amp;pr=1"/>
+  <source name="Obligacje z GPW" cashpointName="GPW" currency="PLN" type="B" link="http://bossa.pl/notowania/migawki/?rk=x&amp;gr=obl&amp;pr=1"/>
   <source name="Fundusze inwestycyjne" cashpointName="GPW" currency="PLN" type="F" link="http://bossa.pl/pub/fundinwest/mstock/sesjafun/sesjafun.prn"/>
 </sources>
