@@ -88,7 +88,7 @@ end;
 function TMetastockBaseThread.MainThreadProcedure: Cardinal;
 var xResponse: String;
     xCount: Integer;
-    xNode: ICXMLDOMNode;
+    xNode, xStockNode, xExNode: ICXMLDOMNode;
     xRes: Cardinal;
     xRoot: ICXMLDOMNode;
     xResStr: TStringList;
@@ -100,11 +100,19 @@ var xResponse: String;
     xDateSeparator: String;
     xTimeSeparator: String;
     xIdentColumn: Integer;
-    xRegDatetimeColumn: Integer;
+    xRegDateColumn, xRegTimeColumn: Integer;
     xValueColumn: Integer;
     xDateFormat: String;
     xTimeFormat: String;
+    xDateTimeStr: String;
+    xValueStr: String;
+    xIdentifierStr: String;
+    xOldDecimalSep: Char;
+    xValueOf: Currency;
+    xRegDatetime: TDateTime;
 begin
+  xOldDecimalSep := DecimalSeparator;
+  DecimalSeparator := '.';
   xCount := 0;
   FValidCount := 0;
   FInvalidCount := 0;
@@ -140,18 +148,46 @@ begin
       xDateFormat := GetXmlAttribute('dateFormat', xNode, 'RMD');
       xTimeFormat := GetXmlAttribute('timeFormat', xNode, 'HN');
       xIdentColumn := GetXmlAttribute('identColumn', xNode, 1);
-      xRegDatetimeColumn := GetXmlAttribute('regDatetimeColumn', xNode, 2);
-      xValueColumn := GetXmlAttribute('valueColumn', xNode, 3);
+      xRegDateColumn := GetXmlAttribute('regDateColumn', xNode, 2);
+      xRegTimeColumn := GetXmlAttribute('regTimeColumn', xNode, 3);
+      xValueColumn := GetXmlAttribute('valueColumn', xNode, 4);
       if GetXmlAttribute('isValid', xNode, False) then begin
         xResStr := TStringList.Create;
         xResStr.Text := GetXmlAttribute('response', xNode, '');
         xResValid := True;
         xLineNum := 0;
+        xStockNode := FOutputXml.createElement('stockExchange');
         while (xLineNum <= xResStr.Count - 1) and xResValid and (not IsCancelled) do begin
           if Trim(xResStr.Strings[xLineNum]) <> '' then begin
             xArray := StringToStringArray(xResStr.Strings[xLineNum], xFieldSeparator);
-            if Length(xArray) >= Max(Max(xIdentColumn, xRegDatetimeColumn), xValueColumn) then begin
-
+            if Length(xArray) >= Max(Max(xIdentColumn, Max(xRegDateColumn, xRegTimeColumn)), xValueColumn) then begin
+              xIdentifierStr := Trim(xArray[xIdentColumn - 1]);
+              xValueStr := Trim(xArray[xValueColumn - 1]);
+              if xRegDateColumn = xRegTimeColumn then begin
+                xDateTimeStr := Trim(xArray[xRegTimeColumn]);
+              end else begin
+                xDateTimeStr := Trim(xArray[xRegDateColumn] + ' ' + xArray[xRegTimeColumn]);
+              end;
+              if xIdentifierStr <> '' then begin
+                if StrToCurrencyDecimalDot(StringReplace(xValueStr, xDecimalSeparator, '.', [rfReplaceAll, rfIgnoreCase]), xValueOf) then begin
+                  if StrToDatetime(xDateTimeStr, xDateFormat, xTimeFormat, xDateSeparator, xTimeSeparator, xRegDatetime) then begin
+                    xExNode := FOutputXml.createElement('exchange');
+                    xStockNode.appendChild(xExNode);
+                    SetXmlAttribute('identifier', xExNode, xIdentifierStr);
+                    SetXmlAttribute('regDateTime', xExNode, DateTimeToXsd(xRegDatetime));
+                    SetXmlAttribute('value', xExNode, Trim(Format('%-10.4f', [xValueOf])));
+                  end else begin
+                    xResValid := False;
+                    AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano niepoprawn¹ wartoœæ daty lub czasu notowania');
+                  end;
+                end else begin
+                  xResValid := False;
+                  AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano niepoprawn¹ wartoœæ intstrumentu');
+                end;
+              end else begin
+                xResValid := False;
+                AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano pusty identyfikator');
+              end;
             end else begin
               xResValid := False;
               AddToReport('Dane odebrane z ' + GetXmlAttribute('name', xNode, '') + ' nie s¹ zgodne z definicj¹ pliku importu');
@@ -160,9 +196,13 @@ begin
           Inc(xLineNum);
         end;
         if xResValid then begin
+          SetXmlAttribute('cashpointName', xStockNode, GetXmlAttribute('cashpointName', xNode, ''));
+          SetXmlAttribute('searchType', xStockNode, GetXmlAttribute('searchType', xNode, ''));
+          xRoot.appendChild(xStockNode);
           Inc(FValidCount);
         end else begin
           Inc(FInvalidCount);
+          xStockNode := Nil;
         end;
         xResStr.Free
       end else begin
@@ -174,6 +214,7 @@ begin
   if IsCancelled then begin
     FOutputXml := Nil;
   end;
+  DecimalSeparator := xOldDecimalSep;
 end;
 
 procedure TMetastockProgressForm.FormActivate(Sender: TObject);

@@ -36,7 +36,7 @@ var GCManagerInterface: ICManagerInterface;
 
 implementation
 
-uses CXmlTlb, CBase64, MetastockEditFormUnit, CTools;
+uses CXmlTlb, CBase64, MetastockEditFormUnit, CTools, CPluginConsts;
 
 {$R *.dfm}
 
@@ -104,7 +104,7 @@ begin
 end;
 
 procedure TMetastockConfigForm.BitBtnEditClick(Sender: TObject);
-var xName, xUrl, xCashpoint, xIso, xType: String;
+var xName, xUrl, xCashpoint, xIso, xType, xSearchType: String;
     xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
     xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn: Integer;
     xNode: IXMLDOMNode;
@@ -125,8 +125,9 @@ begin
   xRegDateColumn := GetXmlAttribute('regDateColumn', xNode, 2);
   xRegTimeColumn := GetXmlAttribute('regTimeColumn', xNode, 3);
   xValueColumn := GetXmlAttribute('valueColumn', xNode, 4);
+  xSearchType :=  GetXmlAttribute('searchType', xNode, CINSTRUMENTSEARCHTYPE_BYSYMBOL);
   if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
-                xDateFormat, xTimeFormat, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
+                xDateFormat, xTimeFormat, xSearchType, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
     SetXmlAttribute('name', xNode, xName);
     SetXmlAttribute('link', xNode, xUrl);
     SetXmlAttribute('cashpointName', xNode, xCashpoint);
@@ -142,12 +143,13 @@ begin
     SetXmlAttribute('regDateColumn', xNode, xRegDateColumn);
     SetXmlAttribute('regTimeColumn', xNode, xRegTimeColumn);
     SetXmlAttribute('valueColumn', xNode, xValueColumn);
+    SetXmlAttribute('searchType', xNode, xSearchType);
     ListView.Selected.Caption := xName;
   end;
 end;
 
 procedure TMetastockConfigForm.BitBtnAddClick(Sender: TObject);
-var xName, xUrl, xCashpoint, xIso, xType: String;
+var xName, xUrl, xCashpoint, xIso, xType, xSearchType: String;
     xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
     xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn: Integer;
     xNode: IXMLDOMNode;
@@ -168,8 +170,9 @@ begin
   xRegDateColumn := 2;
   xRegTimeColumn := 3;
   xValueColumn := 4;
+  xSearchType := CINSTRUMENTSEARCHTYPE_BYSYMBOL;
   if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
-                xDateFormat, xTimeFormat, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
+                xDateFormat, xTimeFormat, xSearchType, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
     xNode := FConfigXml.createElement('source');
     FConfigXml.documentElement.appendChild(xNode);
     SetXmlAttribute('name', xNode, xName);
@@ -187,6 +190,7 @@ begin
     SetXmlAttribute('regDateColumn', xNode, xRegDateColumn);
     SetXmlAttribute('regTimeColumn', xNode, xRegTimeColumn);
     SetXmlAttribute('valueColumn', xNode, xValueColumn);
+    SetXmlAttribute('searchType', xNode, xSearchType);
     xItem := ListView.Items.Add;
     xItem.Caption := xName;
     ListView.Selected := xItem;

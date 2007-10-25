@@ -78,7 +78,9 @@ function LPad(AString: String; AChar: Char; ALength: Integer): String;
 function RPad(AString: String; AChar: Char; ALength: Integer): String;
 function RunApplication(ACmdline, AParams: String; var AOutputInfo: String): Boolean;
 procedure SaveToLog(AText: String; ALogFilename: String);
-function StrToCurrencyDecimalDot(AStr: String): Currency;
+function StrToCurrencyDecimalDot(AStr: String): Currency; overload;
+function StrToCurrencyDecimalDot(AStr: String; var AOut: Currency): Boolean; overload;
+function StrToDatetime(ADateTime: String; ADateFormat, ATimeFormat, ADateSeparator, ATimeSeparator: String; var AOutput: TDateTime): Boolean;
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
 function GetDescText(ADescription: String; ALineNo: Integer = 0; AWithInfo: Boolean = True): String;
@@ -488,6 +490,19 @@ begin
   Result := StrToFloatDef(xStr, 0);
 end;
 
+function StrToCurrencyDecimalDot(AStr: String; var AOut: Currency): Boolean; overload;
+var xStr: String;
+begin
+  xStr := StringReplace(AStr, '.', DecimalSeparator, [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ',', DecimalSeparator, [rfReplaceAll, rfIgnoreCase]);
+  try
+    AOut := StrToFloat(xStr);
+    Result := True;
+  except
+    Result := False;
+  end;
+end;
+
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 var xCount: Integer;
 begin
@@ -728,7 +743,9 @@ end;
 
 function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
 begin
-  Result := FormatDateTime(IfThen(AYearFirst, 'yyyy-mm-dd', 'dd-mm-yyyy') + IfThen(AWithTime, 'Thh:nn:ss.zzz' + GetTimeZoneAdjustment, ''), ADateTime);
+  Result := FormatDateTime(IfThen(AYearFirst, 'yyyy-mm-dd', 'dd-mm-yyyy'), ADateTime) +
+            IfThen(AWithTime, 'T', '') + IfThen(AWithTime, FormatDateTime('hh:nn:ss.zzz', ADateTime)) +
+            IfThen(AWithTime, GetTimeZoneAdjustment, '');
 end;
 
 procedure AddTimeBias(var ADateTime: TDateTime; ABias: Longint);
@@ -848,6 +865,109 @@ begin
     end;
   end else begin
     Result := 0;
+  end;
+end;
+
+function StrToDatetime(ADateTime: String; ADateFormat, ATimeFormat, ADateSeparator, ATimeSeparator: String; var AOutput: TDateTime): Boolean;
+var xStr: String;
+    xYs, xMs, xDs, xHs, xNs, xSs: Integer;
+    xYi, xMi, xDi, xHi, xNi, xSi: Integer;
+begin
+  Result := False;
+  AOutput := 0;
+  xStr := StringReplace(Trim(ADateTime), '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ':', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, 'T', '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ADateSeparator, '', [rfReplaceAll, rfIgnoreCase]);
+  xStr := StringReplace(xStr, ATimeSeparator, '', [rfReplaceAll, rfIgnoreCase]);
+  if ADateFormat = 'MDR' then begin
+    xMs := 1;
+    xDs := 3;
+    xYs := 5;
+  end else if ADateFormat = 'DMR' then begin
+    xDs := 1;
+    xMs := 3;
+    xYs := 5;
+  end else if ADateFormat = 'RMD' then begin
+    xYs := 1;
+    xMs := 5;
+    xDs := 7;
+  end else if ADateFormat = 'MRD' then begin
+    xMs := 1;
+    xYs := 3;
+    xDs := 7;
+  end else if ADateFormat = 'DRM' then begin
+    xDs := 1;
+    xYs := 3;
+    xMs := 7;
+  end else if ADateFormat = 'RDM' then begin
+    xYs := 1;
+    xDs := 5;
+    xMs := 7;
+  end else begin
+    xYs := -1;
+    xDs := -1;
+    xMs := -1;
+  end;
+  if (xYs <> -1) and (xMs <> -1) and (xDs <> -1) then begin
+    xYi := StrToIntDef(Copy(xStr, xYs, 4), -1);
+    xMi := StrToIntDef(Copy(xStr, xMs, 2), -1);
+    xDi := StrToIntDef(Copy(xStr, xDs, 2), -1);
+    Result := TryEncodeDate(xYi, xMi, xDi, AOutput);
+    if Result and (ATimeFormat <> '--') then begin
+      Delete(xStr, 1, 8);
+      if ATimeFormat = 'HN' then begin
+        xHs := 1;
+        xNs := 3;
+        xSs := -1;
+      end else if ATimeFormat = 'NH' then begin
+        xNs := 1;
+        xHs := 3;
+        xSs := -1;
+      end else if ATimeFormat = 'HNS' then begin
+        xHs := 1;
+        xNs := 3;
+        xSs := 5;
+      end else if ATimeFormat = 'NHS' then begin
+        xNs := 1;
+        xHs := 3;
+        xSs := 5;
+      end else if ATimeFormat = 'SHN' then begin
+        xSs := 1;
+        xHs := 3;
+        xNs := 5;
+      end else if ATimeFormat = 'HSN' then begin
+        xHs := 1;
+        xSs := 3;
+        xNs := 5;
+      end else if ATimeFormat = 'NSH' then begin
+        xNs := 1;
+        xSs := 3;
+        xHs := 5;
+      end else if ATimeFormat = 'SNH' then begin
+        xSs := 1;
+        xNs := 3;
+        xHs := 5;
+      end else begin
+        xSs := -1;
+        xHs := -1;
+        xNs := -1;
+      end;
+      if (xHs <> -1) and (xNs <> -1) then begin
+        xHi := StrToIntDef(Copy(xStr, xHs, 2), -1);
+        xNi := StrToIntDef(Copy(xStr, xNs, 2), -1);
+        if xSs > 0 then begin
+          xSi := StrToIntDef(Copy(xStr, xSs, 2), -1);
+        end else begin
+          xSi := 0;
+        end;
+        Result := TryEncodeDateTime(xYi, xMi, xDi, xHi, xNi, xSi, 0, AOutput);
+      end else begin
+        Result := False;
+        AOutput := 0;
+      end;
+    end;
   end;
 end;
 

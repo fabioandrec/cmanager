@@ -36,6 +36,9 @@ type
     Label9: TLabel;
     Label10: TLabel;
     Label11: TLabel;
+    ComboBoxSearchType: TComboBox;
+    Label12: TLabel;
+    Label13: TLabel;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -52,12 +55,13 @@ type
     FRegDateColumn: String;
     FRegTimeColumn: String;
     FValueColumn: String;
+    FSearchType: String;
   end;
 
 function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
-                        ADateFormat, ATimeFormat: String;
+                        ADateFormat, ATimeFormat, ASearchType: String;
                     var AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 
 implementation
@@ -107,10 +111,29 @@ begin
     ComboBoxColumn.SetFocus;
   end else if FIdentColumn = FValueColumn then begin
     MessageBox(0, 'Kolumna dla wartoœci musi byæ inna ni¿ kolumna dla identyfikatora', 'B³¹d', MB_OK + MB_ICONERROR);
+    ComboBoxField.ItemIndex := 3;
+    ComboBoxFieldChange(Nil);
+    ComboBoxColumn.SetFocus;
   end else if FIdentColumn = FRegDateColumn then begin
+    MessageBox(0, 'Kolumna dla daty musi byæ inna ni¿ kolumna dla identyfikatora', 'B³¹d', MB_OK + MB_ICONERROR);
+    ComboBoxField.ItemIndex := 1;
+    ComboBoxFieldChange(Nil);
+    ComboBoxColumn.SetFocus;
   end else if FIdentColumn = FRegTimeColumn then begin
+    MessageBox(0, 'Kolumna dla czasu musi byæ inna ni¿ kolumna dla identyfikatora', 'B³¹d', MB_OK + MB_ICONERROR);
+    ComboBoxField.ItemIndex := 2;
+    ComboBoxFieldChange(Nil);
+    ComboBoxColumn.SetFocus;
   end else if FRegDateColumn = FValueColumn then begin
+    MessageBox(0, 'Kolumna dla wartoœci musi byæ inna ni¿ kolumna dla daty', 'B³¹d', MB_OK + MB_ICONERROR);
+    ComboBoxField.ItemIndex := 3;
+    ComboBoxFieldChange(Nil);
+    ComboBoxColumn.SetFocus;
   end else if FRegTimeColumn = FValueColumn then begin
+    MessageBox(0, 'Kolumna dla wartoœci musi byæ inna ni¿ kolumna dla czasu', 'B³¹d', MB_OK + MB_ICONERROR);
+    ComboBoxField.ItemIndex := 3;
+    ComboBoxFieldChange(Nil);
+    ComboBoxColumn.SetFocus;
   end else begin
     ModalResult := mrOk;
   end;
@@ -131,7 +154,7 @@ end;
 function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
-                        ADateFormat, ATimeFormat: String;
+                        ADateFormat, ATimeFormat, ASearchType: String;
                     var AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 var xForm: TMetastockEditForm;
 begin
@@ -150,6 +173,11 @@ begin
       ComboBoxType.ItemIndex := 2;
     end else if AType = CINSTRUMENTTYPE_FUND then begin
       ComboBoxType.ItemIndex := 3;
+    end;
+    if FSearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
+      ComboBoxSearchType.ItemIndex := 1;
+    end else begin
+      ComboBoxSearchType.ItemIndex := 0;
     end;
     FFieldSeparator := AFieldSeparator;
     FDecimalSeparator := ADecimalSeparator;
@@ -189,6 +217,11 @@ begin
       AValueColumn := StrToIntDef(FValueColumn, 3);
       ADateFormat := ComboBoxDate.Text;
       ATimeFormat := ComboBoxTime.Text;
+      if ComboBoxSearchType.ItemIndex = 1 then begin
+        ASearchType := CINSTRUMENTSEARCHTYPE_BYNAME;
+      end else begin
+        ASearchType := CINSTRUMENTSEARCHTYPE_BYSYMBOL;
+      end;
     end;
   end;
   xForm.Free;
