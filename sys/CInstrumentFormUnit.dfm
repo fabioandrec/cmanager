@@ -76,6 +76,7 @@ inherited CInstrumentForm: TCInstrumentForm
           'Akcje'
           'Obligacje'
           'Fundusz inwestycyjny'
+          'Fundusz emerytalny'
           'Nieokre'#347'lony')
       end
       object EditName: TEdit

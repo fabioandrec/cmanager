@@ -41,7 +41,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '2006-01-01'
+      Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 1
@@ -60,7 +60,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '2006-01-01'
+      Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2

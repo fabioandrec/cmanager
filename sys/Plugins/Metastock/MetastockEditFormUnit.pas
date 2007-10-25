@@ -6,6 +6,13 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ExtCtrls, CPluginTypes, ComCtrls, CXml;
 
+const
+  CINSTRUMENTTYPE_INDEX = 'I';
+  CINSTRUMENTTYPE_STOCK = 'S';
+  CINSTRUMENTTYPE_BOND = 'B';
+  CINSTRUMENTTYPE_FUNDINV = 'F';
+  CINSTRUMENTTYPE_FUNDRET = 'R';
+
 type
   TMetastockEditForm = class(TForm)
     PanelConfig: TPanel;
@@ -171,8 +178,10 @@ begin
       ComboBoxType.ItemIndex := 1;
     end else if AType = CINSTRUMENTTYPE_BOND then begin
       ComboBoxType.ItemIndex := 2;
-    end else if AType = CINSTRUMENTTYPE_FUND then begin
+    end else if AType = CINSTRUMENTTYPE_FUNDINV then begin
       ComboBoxType.ItemIndex := 3;
+    end else if AType = CINSTRUMENTTYPE_FUNDRET then begin
+      ComboBoxType.ItemIndex := 4;
     end;
     if FSearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
       ComboBoxSearchType.ItemIndex := 1;
@@ -205,7 +214,9 @@ begin
       end else if ComboBoxType.ItemIndex = 2 then begin
         AType := CINSTRUMENTTYPE_BOND;
       end else if ComboBoxType.ItemIndex = 3 then begin
-        AType := CINSTRUMENTTYPE_FUND;
+        AType := CINSTRUMENTTYPE_FUNDINV;
+      end else if ComboBoxType.ItemIndex = 4 then begin
+        AType := CINSTRUMENTTYPE_FUNDRET;
       end;
       AFieldSeparator := FFieldSeparator;
       ADecimalSeparator := FDecimalSeparator;

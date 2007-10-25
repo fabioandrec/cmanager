@@ -3709,8 +3709,10 @@ begin
       Result := CInstrumentTypeStockDesc;
     end else if FinstrumentType = CInstrumentTypeBond then begin
       Result := CInstrumentTypeBondDesc;
-    end else if FinstrumentType = CInstrumentTypeFund then begin
-      Result := CInstrumentTypeFundDesc;
+    end else if FinstrumentType = CInstrumentTypeFundinv then begin
+      Result := CInstrumentTypeFundinvDesc;
+    end else if FinstrumentType = CInstrumentTypeFundret then begin
+      Result := CInstrumentTypeFundretDesc;
     end else if FinstrumentType = CInstrumentTypeUndefined then begin
       Result := CInstrumentTypeUndefinedDesc;
     end

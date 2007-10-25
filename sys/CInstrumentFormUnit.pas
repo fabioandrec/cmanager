@@ -106,10 +106,12 @@ begin
       ComboBoxType.ItemIndex := 1;
     end else if instrumentType = CInstrumentTypeBond then begin
       ComboBoxType.ItemIndex := 2;
-    end else if instrumentType = CInstrumentTypeFund then begin
+    end else if instrumentType = CInstrumentTypeFundinv then begin
       ComboBoxType.ItemIndex := 3;
-    end else if instrumentType = CInstrumentTypeUndefined then begin
+    end else if instrumentType = CInstrumentTypeFundret then begin
       ComboBoxType.ItemIndex := 4;
+    end else if instrumentType = CInstrumentTypeUndefined then begin
+      ComboBoxType.ItemIndex := 5;
     end;
     CStaticCurrency.DataId := idCurrencyDef;
     if idCurrencyDef <> CEmptyDataGid then begin
@@ -151,8 +153,10 @@ begin
     end else if ComboBoxType.ItemIndex = 2 then begin
       instrumentType := CInstrumentTypeBond;
     end else if ComboBoxType.ItemIndex = 3 then begin
-      instrumentType := CInstrumentTypeFund;
+      instrumentType := CInstrumentTypeFundinv;
     end else if ComboBoxType.ItemIndex = 4 then begin
+      instrumentType := CInstrumentTypeFundret;
+    end else if ComboBoxType.ItemIndex = 5 then begin
       instrumentType := CInstrumentTypeUndefined;
     end;
     idCashpoint := CStaticBank.DataId;

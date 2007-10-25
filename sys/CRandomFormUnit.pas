@@ -134,7 +134,12 @@ begin
     with TInstrument.CreateObject(InstrumentProxy, False) do begin
       name := 'instrument ' + IntToStr(xCount);
       description := name;
-      instrumentType := RandomFrom(StringToStringArray(CInstrumentTypeIndex + '|' + CInstrumentTypeStock + '|' + CInstrumentTypeBond + '|' + CInstrumentTypeFund + '|' + CInstrumentTypeUndefined, '|'));
+      instrumentType := RandomFrom(StringToStringArray(CInstrumentTypeIndex + '|' +
+                                                       CInstrumentTypeStock + '|' +
+                                                       CInstrumentTypeBond + '|' +
+                                                       CInstrumentTypeFundinv + '|' +
+                                                       CInstrumentTypeFundret + '|' +
+                                                       CInstrumentTypeUndefined, '|'));
       idCurrencyDef := xCurdefs.Items[Random(xCurdefs.Count)].id;
       idCashpoint := xCashpoints.Items[Random(xCashpoints.Count)].id;
       StepWaitForm(1);

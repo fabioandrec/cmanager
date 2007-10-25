@@ -42,12 +42,12 @@ object MetastockEditForm: TMetastockEditForm
         Caption = 'Nazwa '#378'r'#243'd'#322'a'
       end
       object Label2: TLabel
-        Left = 28
+        Left = 25
         Top = 68
-        Width = 76
+        Width = 79
         Height = 13
         Alignment = taRightJustify
-        Caption = #377'r'#243'd'#322'o notowa'#324
+        Caption = 'Link do notowa'#324
       end
       object Label3: TLabel
         Left = 24
@@ -90,7 +90,6 @@ object MetastockEditForm: TMetastockEditForm
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
-        MaxLength = 40
         TabOrder = 1
       end
       object EditCashpoint: TEdit
@@ -129,7 +128,8 @@ object MetastockEditForm: TMetastockEditForm
           'Indeksy'
           'Akcje'
           'Obligacje'
-          'Fundusze inwestycyjne')
+          'Fundusze inwestycyjne'
+          'Fundusze emerytalne')
       end
     end
     object GroupBox2: TGroupBox

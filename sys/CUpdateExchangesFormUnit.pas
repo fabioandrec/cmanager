@@ -163,8 +163,10 @@ begin
       Result := CInstrumentTypeStockDesc;
     end else if xType = CInstrumentTypeBond then begin
       Result := CInstrumentTypeBondDesc;
-    end else if xType = CInstrumentTypeFund then begin
-      Result := CInstrumentTypeFundDesc;
+    end else if xType = CInstrumentTypeFundinv then begin
+      Result := CInstrumentTypeFundinvDesc;
+    end else if xType = CInstrumentTypeFundret then begin
+      Result := CInstrumentTypeFundretDesc;
     end else if xType = CInstrumentTypeUndefined then begin
       Result := CInstrumentTypeUndefinedDesc;
     end;

@@ -95,7 +95,8 @@ begin
     Add(CInstrumentTypeIndex + '=<indeksy gie³dowe>');
     Add(CInstrumentTypeStock + '=<akcje>');
     Add(CInstrumentTypeBond + '=<obligacje>');
-    Add(CInstrumentTypeFund + '=<fundusze inwestycyjne>');
+    Add(CInstrumentTypeFundinv + '=<fundusze inwestycyjne>');
+    Add(CInstrumentTypeFundret + '=<fundusze emerytalne>');
     Add(CInstrumentTypeUndefined + '=<nieokreœlone>');
   end;
 end;
