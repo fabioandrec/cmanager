@@ -736,6 +736,8 @@ type
     procedure Setname(const Value: TBaseName);
     procedure SetinstrumentType(const Value: TBaseEnumeration);
     procedure Setsymbol(const Value: TBaseName);
+  protected
+    function GetHash(AHashId: Integer): String; override;
   public
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
@@ -807,6 +809,9 @@ var CashPointProxy: TDataProxy;
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
+
+const CHASH_INSTRUMENT_SYMBOL = 0;
+      CHASH_INSTRUMENT_NAME = 1;
 
 const CDatafileTables: array[0..23] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
@@ -3900,6 +3905,17 @@ end;
 class function TInstrument.FindBySymbol(ASymbol: TBaseName): TInstrument;
 begin
   Result := TInstrument(TInstrument.FindByCondition(InstrumentProxy, 'select * from instrument where symbol = ''' + ASymbol + '''', False));
+end;
+
+function TInstrument.GetHash(AHashId: Integer): String;
+begin
+  if AHashId = CHASH_INSTRUMENT_NAME then begin
+    Result := Fname;
+  end else if AHashId = CHASH_INSTRUMENT_SYMBOL then begin
+    Result := Fsymbol;
+  end else begin
+    Result := inherited GetHash(AHashId);
+  end;
 end;
 
 initialization

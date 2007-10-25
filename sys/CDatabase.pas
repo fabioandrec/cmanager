@@ -62,9 +62,11 @@ type
     function GetItems(AIndex: Integer): TDataObject;
     procedure SetItems(AIndex: Integer; const Value: TDataObject);
     function GetobjectById(AGid: TDataGid): TDataObject;
+    function GetObjectByHash(AHash: String; AHashId: Integer): TDataObject;
   public
     property Items[AIndex: Integer]: TDataObject read GetItems write SetItems;
     property ObjectById[AGid: TDataGid]: TDataObject read GetobjectById;
+    property ObjectByHash[AHash: String; AHashId: Integer]: TDataObject read GetObjectByHash;
   end;
 
   TDataProxy = class(TObject)
@@ -134,6 +136,7 @@ type
     FDataFieldList: TDataFieldList;
     FIsRegistered: Boolean;
   protected
+    function GetHash(AHashId: Integer): String; virtual;
     function OnDeleteObject(AProxy: TDataProxy): Boolean; virtual;
     function OnUpdateObject(AProxy: TDataProxy): Boolean; virtual;
     function OnInsertObject(AProxy: TDataProxy): Boolean; virtual;
@@ -163,6 +166,7 @@ type
     procedure GetElementReload; override;
     function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    property Hash[AHashId: Integer]: String read GetHash;
   published
     property id: TDataGid read FId write Fid;
     property created: TDateTime read Fcreated;
@@ -1017,6 +1021,11 @@ begin
   Result := ClassName;
 end;
 
+function TDataObject.GetHash(AHashId: Integer): String;
+begin
+  Result := '';
+end;
+
 class function TDataObject.GetList(AClass: TDataObjectClass; ADataProxy: TDataProxy; ASql: String): TDataObjectList;
 var xDataset: TADOQuery;
     xObj: TDataObject;
@@ -1099,6 +1108,19 @@ end;
 function TDataObjectList.GetItems(AIndex: Integer): TDataObject;
 begin
   Result := TDataObject(inherited Items[AIndex]);
+end;
+
+function TDataObjectList.GetObjectByHash(AHash: String; AHashId: Integer): TDataObject;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= Count - 1) and (Result = Nil) do begin
+    if Items[xCount].Hash[AHashId] = AHash then begin
+      Result := Items[xCount];
+    end;
+    Inc(xCount);
+  end;
 end;
 
 function TDataObjectList.GetobjectById(AGid: TDataGid): TDataObject;

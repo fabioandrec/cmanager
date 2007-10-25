@@ -199,6 +199,7 @@ end;
 
 procedure TCUpdateExchangesForm.BitBtnOkClick(Sender: TObject);
 var xNode: PVirtualNode;
+    xInstrumentList: TDataObjectList;
     xXml: ICXMLDOMNode;
     xValue: TInstrumentValue;
     xInstrument: TInstrument;
@@ -212,6 +213,7 @@ var xNode: PVirtualNode;
 begin
   ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNode.TotalCount);
   GDataProvider.BeginTransaction;
+  xInstrumentList := TInstrument.GetAllObjects(InstrumentProxy);
   xNode := ExchangesList.GetFirst;
   xCashpointName := '';
   xCashpointId := CEmptyDataGid;
@@ -226,10 +228,10 @@ begin
       xSearchType := GetXmlAttribute('searchType', xXml, CINSTRUMENTSEARCHTYPE_BYNAME);
     end else begin
       if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
-        if xSearchType = CINSTRUMENTSEARCHTYPE_BYSYMBOL then begin
-          xInstrument := TInstrument.FindBySymbol(GetXmlAttribute('identifier', xXml, ''));
+        if xSearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
+          xInstrument := TInstrument(xInstrumentList.ObjectByHash[GetXmlAttribute('identifier', xXml, ''), CHASH_INSTRUMENT_NAME]);
         end else begin
-          xInstrument := TInstrument.FindByName(GetXmlAttribute('identifier', xXml, ''));
+          xInstrument := TInstrument(xInstrumentList.ObjectByHash[GetXmlAttribute('identifier', xXml, ''), CHASH_INSTRUMENT_SYMBOL]);
         end;
         if xInstrument = Nil then begin
           xAnyInstrumentAdded := True;
@@ -249,6 +251,7 @@ begin
           xInstrument.idCashpoint := xCashpointId;
           xInstrument.idCurrencyDef := CEmptyDataGid;
           xInstrument.instrumentType := CInstrumentTypeUndefined;
+          xInstrumentList.Add(xInstrument);
         end;
         xRegDateTime := XsdToDateTime(GetXmlAttribute('regDateTime', xXml, ''));
         xValue := TInstrumentValue.FindValue(xInstrument.id, xRegDateTime);
@@ -272,6 +275,7 @@ begin
     xNode := ExchangesList.GetNext(xNode);
     StepWaitForm(1);
   end;
+  xInstrumentList.Free;
   GDataProvider.CommitTransaction;
   HideWaitForm;
   if xAnyValueAdded then begin
