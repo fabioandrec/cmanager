@@ -718,10 +718,10 @@ begin
   Result:= 0;
   case GetTimeZoneInformation(xTzinfo) of
     TIME_ZONE_ID_STANDARD: begin
-      Result := xTzinfo.StandardBias + xTzinfo.Bias;
+      Result := xTzinfo.Bias;
     end;
     TIME_ZONE_ID_DAYLIGHT: begin
-      Result := xTzinfo.DaylightBias + xTzinfo.Bias;
+      Result := xTzinfo.Bias;
     end;
   end;
 end;
