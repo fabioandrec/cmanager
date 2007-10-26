@@ -46,6 +46,10 @@ type
     ComboBoxSearchType: TComboBox;
     Label12: TLabel;
     Label13: TLabel;
+    Label14: TLabel;
+    ComboBoxIgnore: TComboBox;
+    Label15: TLabel;
+    EditChars: TEdit;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -68,8 +72,8 @@ type
 function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
-                        ADateFormat, ATimeFormat, ASearchType: String;
-                    var AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
+                        ADateFormat, ATimeFormat, ASearchType, AIgnoreChars: String;
+                    var AIgnoreLines, AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 
 implementation
 
@@ -101,6 +105,9 @@ begin
     ComboBoxSepType.ItemIndex := 1;
     ComboBoxSepTypeChange(Nil);
     EditSep.SetFocus;
+  end else if StrToIntDef(ComboBoxIgnore.Text, -1) < 0 then begin
+    MessageBox(0, 'Iloœæ ignorowanych pocz¹tkowych linii musi byæ liczb¹ wiêksz¹ lub równ¹ 0', 'B³¹d', MB_OK + MB_ICONERROR);
+    ComboBoxIgnore.SetFocus;
   end else if StrToIntDef(FIdentColumn, -1) < 1 then begin
     MessageBox(0, 'Kolumna dla identyfikatora musi byæ liczb¹ wiêksz¹ od 0', 'B³¹d', MB_OK + MB_ICONERROR);
     ComboBoxField.ItemIndex := 0;
@@ -161,8 +168,8 @@ end;
 function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
-                        ADateFormat, ATimeFormat, ASearchType: String;
-                    var AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
+                        ADateFormat, ATimeFormat, ASearchType, AIgnoreChars: String;
+                    var AIgnoreLines, AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 var xForm: TMetastockEditForm;
 begin
   xForm := TMetastockEditForm.Create(Nil);
@@ -196,6 +203,8 @@ begin
     FRegDateColumn := IntToStr(ARegDateColumn);
     FRegTimeColumn := IntToStr(ARegTimeColumn);
     FValueColumn := IntToStr(AValueColumn);
+    ComboBoxIgnore.Text := IntToStr(AIgnoreLines);
+    EditChars.Text := AIgnoreChars;
     ComboBoxDate.ItemIndex := ComboBoxDate.Items.IndexOf(ADateFormat);
     ComboBoxTime.ItemIndex := ComboBoxTime.Items.IndexOf(ATimeFormat);
     ComboBoxColumnChange(Nil);
@@ -228,6 +237,8 @@ begin
       AValueColumn := StrToIntDef(FValueColumn, 3);
       ADateFormat := ComboBoxDate.Text;
       ATimeFormat := ComboBoxTime.Text;
+      AIgnoreLines := StrToIntDef(ComboBoxIgnore.Text, 0);
+      AIgnoreChars := EditChars.Text;
       if ComboBoxSearchType.ItemIndex = 1 then begin
         ASearchType := CINSTRUMENTSEARCHTYPE_BYNAME;
       end else begin

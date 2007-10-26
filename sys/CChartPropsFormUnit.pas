@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, Chart,
-  CBaseFormUnit, ComCtrls, TeEngine, CPreferences;
+  CBaseFormUnit, ComCtrls, TeEngine, CPreferences, CChartReportFormUnit;
 
 type
   TMarksStyle = (msHidden, msValues, msLabels);
@@ -35,6 +35,9 @@ type
     Label12: TLabel;
     GroupBoxMarks: TGroupBox;
     ComboBoxMarks: TComboBox;
+    GroupBox3: TGroupBox;
+    CheckBoxReg: TCheckBox;
+    CheckBoxAvg: TCheckBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxLegendPosChange(Sender: TObject);
@@ -46,8 +49,10 @@ type
     procedure TrackBarDepthChange(Sender: TObject);
     procedure TrackBarZoomChange(Sender: TObject);
     procedure ComboBoxMarksChange(Sender: TObject);
+    procedure CheckBoxRegClick(Sender: TObject);
+    procedure CheckBoxAvgClick(Sender: TObject);
   private
-    Fchart: TChart;
+    Fchart: TCChart;
     Fprefs: TChartPref;
     FprefName: String;
     function GetmarksStyle: TMarksStyle;
@@ -58,8 +63,8 @@ type
     procedure UpdateLabelPos(ALabel: TLabel; ATrackbar: TTrackBar);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure SetChart(AChart: TChart; APrefName: String);
-    property chart: TChart read Fchart write Fchart;
+    procedure SetChart(AChart: TCChart; APrefName: String);
+    property chart: TCChart read Fchart write Fchart;
     property marksStyle: TMarksStyle read GetmarksStyle write SetmarksStyle;
   end;
 
@@ -257,7 +262,7 @@ begin
   end;
 end;
 
-procedure TCChartPropsForm.SetChart(AChart: TChart; APrefName: String);
+procedure TCChartPropsForm.SetChart(AChart: TCChart; APrefName: String);
 begin
   FprefName := APrefName;
   if AChart <> Nil then begin
@@ -272,6 +277,8 @@ begin
     end else begin
       ComboBox.ItemIndex := 0;
     end;
+    CheckBoxReg.Enabled := not AChart.isPie;
+    CheckBoxAvg.Enabled := not AChart.isPie;
     ComboBoxMarks.ItemIndex := Ord(marksStyle);
     TrackBarRotate.Position := chart.View3DOptions.Rotation;
     TrackBarElevation.Position := chart.View3DOptions.Elevation;
@@ -295,6 +302,16 @@ begin
   end else begin
     UpdateTrackbars;
   end;
+end;
+
+procedure TCChartPropsForm.CheckBoxRegClick(Sender: TObject);
+begin
+//
+end;
+
+procedure TCChartPropsForm.CheckBoxAvgClick(Sender: TObject);
+begin
+//
 end;
 
 end.

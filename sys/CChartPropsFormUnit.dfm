@@ -1,10 +1,10 @@
 inherited CChartPropsForm: TCChartPropsForm
-  Left = 268
-  Top = 15
+  Left = 364
+  Top = 230
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Wygl'#261'd wykresu'
-  ClientHeight = 426
+  ClientHeight = 538
   ClientWidth = 340
   OnClose = FormClose
   OnCreate = FormCreate
@@ -247,6 +247,32 @@ inherited CChartPropsForm: TCChartPropsForm
         'ukryte'
         'warto'#347'ci'
         'nazwy')
+    end
+  end
+  object GroupBox3: TGroupBox
+    Left = 16
+    Top = 424
+    Width = 305
+    Height = 97
+    Caption = ' Informacje dodatkowe '
+    TabOrder = 3
+    object CheckBoxReg: TCheckBox
+      Left = 32
+      Top = 28
+      Width = 241
+      Height = 17
+      Caption = 'Do ka'#380'dej serii dodaj lini'#281' trendu'
+      TabOrder = 0
+      OnClick = CheckBoxRegClick
+    end
+    object CheckBoxAvg: TCheckBox
+      Left = 32
+      Top = 60
+      Width = 241
+      Height = 17
+      Caption = 'Do ka'#380'dej serii dodaj '#347'redni'#261' arytmetyczn'#261
+      TabOrder = 1
+      OnClick = CheckBoxAvgClick
     end
   end
 end

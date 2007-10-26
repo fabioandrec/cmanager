@@ -511,7 +511,7 @@ var xCount: Integer;
     xElement: TCListDataElement;
 begin
   for xCount := 0 to GPlugins.Count - 1 do begin
-    xElement := TCListDataElement.Create(False, Sender, TCDataListElementObject(GPlugins.Items[xCount]), False);
+    xElement := TCListDataElement.Create(True, Sender, TCDataListElementObject(GPlugins.Items[xCount]), False);
     ARootElement.Add(xElement);
   end;
 end;

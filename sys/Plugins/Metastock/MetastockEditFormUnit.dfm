@@ -1,11 +1,11 @@
 object MetastockEditForm: TMetastockEditForm
-  Left = 352
-  Top = 120
+  Left = 327
+  Top = 64
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = #377'r'#243'd'#322'o notowa'#324
-  ClientHeight = 577
-  ClientWidth = 417
+  ClientHeight = 655
+  ClientWidth = 418
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,8 +21,8 @@ object MetastockEditForm: TMetastockEditForm
   object PanelConfig: TPanel
     Left = 0
     Top = 0
-    Width = 417
-    Height = 536
+    Width = 418
+    Height = 614
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -136,7 +136,7 @@ object MetastockEditForm: TMetastockEditForm
       Left = 16
       Top = 256
       Width = 385
-      Height = 273
+      Height = 353
       Caption = ' Format pliku '
       TabOrder = 1
       object Label5: TLabel
@@ -157,7 +157,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object Label7: TLabel
         Left = 37
-        Top = 108
+        Top = 188
         Width = 43
         Height = 13
         Alignment = taRightJustify
@@ -173,7 +173,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object Label10: TLabel
         Left = 210
-        Top = 108
+        Top = 188
         Width = 44
         Height = 13
         Alignment = taRightJustify
@@ -189,7 +189,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object Label12: TLabel
         Left = 22
-        Top = 148
+        Top = 228
         Width = 58
         Height = 13
         Alignment = taRightJustify
@@ -197,7 +197,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object Label13: TLabel
         Left = 16
-        Top = 184
+        Top = 264
         Width = 347
         Height = 65
         Caption = 
@@ -206,6 +206,22 @@ object MetastockEditForm: TMetastockEditForm
           'era dat'#281' i czas, '#13#10'przy czym zak'#322'ada si'#281', '#380'e czas jest drugim sk' +
           #322'adnikem pola. Kolumna dla '#13#10'czasu mo'#380'e by'#263' r'#243'wnie'#380' r'#243'wna 0, co ' +
           'oznacza, '#380'e dla notownia nie ma'#13#10'zdefiniowanego czasu.'
+      end
+      object Label14: TLabel
+        Left = 48
+        Top = 108
+        Width = 206
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Ignoruj nast'#281'puj'#261'c'#261' ilo'#347#263' pocz'#261'tkowych linii'
+      end
+      object Label15: TLabel
+        Left = 32
+        Top = 148
+        Width = 224
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Ignoruj linie rozpoczynaj'#261'ce si'#281' od tych znak'#243'w'
       end
       object EditSep: TEdit
         Left = 264
@@ -280,7 +296,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object ComboBoxField: TComboBox
         Left = 88
-        Top = 104
+        Top = 184
         Width = 113
         Height = 21
         BevelInner = bvNone
@@ -288,7 +304,7 @@ object MetastockEditForm: TMetastockEditForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 4
+        TabOrder = 6
         Text = 'Identyfikator'
         OnChange = ComboBoxFieldChange
         Items.Strings = (
@@ -299,14 +315,14 @@ object MetastockEditForm: TMetastockEditForm
       end
       object ComboBoxColumn: TComboBox
         Left = 264
-        Top = 104
+        Top = 184
         Width = 97
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 5
+        TabOrder = 7
         Text = '1'
         OnChange = ComboBoxColumnChange
         Items.Strings = (
@@ -322,7 +338,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object ComboBoxSearchType: TComboBox
         Left = 88
-        Top = 144
+        Top = 224
         Width = 273
         Height = 21
         BevelInner = bvNone
@@ -330,28 +346,62 @@ object MetastockEditForm: TMetastockEditForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 1
-        TabOrder = 6
+        TabOrder = 8
         Text = 'to NAZWA instrumentu'
         OnChange = ComboBoxFieldChange
         Items.Strings = (
           'to SYMBOL instrumentu'
           'to NAZWA instrumentu')
       end
+      object ComboBoxIgnore: TComboBox
+        Left = 264
+        Top = 104
+        Width = 97
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 4
+        Text = '0'
+        Items.Strings = (
+          '0'
+          '1'
+          '2'
+          '3'
+          '4'
+          '5'
+          '6'
+          '7'
+          '8'
+          '9')
+      end
+      object EditChars: TEdit
+        Left = 264
+        Top = 144
+        Width = 97
+        Height = 21
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        MaxLength = 40
+        TabOrder = 5
+      end
     end
   end
   object PanelButtons: TPanel
     Left = 0
-    Top = 536
-    Width = 417
+    Top = 614
+    Width = 418
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      417
+      418
       41)
     object BitBtnOk: TBitBtn
-      Left = 240
+      Left = 241
       Top = 8
       Width = 75
       Height = 25
@@ -362,7 +412,7 @@ object MetastockEditForm: TMetastockEditForm
       OnClick = BitBtnOkClick
     end
     object BitBtnCancel: TBitBtn
-      Left = 328
+      Left = 329
       Top = 8
       Width = 75
       Height = 25

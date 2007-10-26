@@ -14,9 +14,15 @@ type
     Fsymbol: String;
     Ftitle: String;
     Fimage: Integer;
+    FregSeries: TObjectList;
+    FavgSeries: TObjectList;
     function GetIsPie: Boolean;
     function GetIsBar: Boolean;
     function GetIsLin: Boolean;
+    function GetIsavgVisible: Boolean;
+    function GetIsregVisible: Boolean;
+    procedure SetIsavgVisible(const Value: Boolean);
+    procedure SetIsregVisible(const Value: Boolean);
   public
     constructor CreateNew(AOwner: TComponent; ASymbol: String);
     property symbol: String read Fsymbol write Fsymbol;
@@ -24,7 +30,10 @@ type
     property isPie: Boolean read GetIsPie;
     property isBar: Boolean read GetIsBar;
     property isLin: Boolean read GetIsLin;
+    property isAvgVisible: Boolean read GetIsavgVisible write SetIsavgVisible;
+    property isRegVisible: Boolean read GetIsregVisible write SetIsregVisible;
     property image: Integer read Fimage write Fimage;
+    destructor Destroy; override;
   end;
 
   TChartList = class(TObjectList)
@@ -79,6 +88,14 @@ uses CChartPropsFormUnit, CReports, CConfigFormUnit, Math;
 
 {$R *.dfm}
 
+procedure PrepareAvgSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+begin
+end;
+
+procedure PrepareRegSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+begin
+end;
+
 procedure TCChartReportForm.DoPrint;
 begin
   if ActiveChartIndex <> -1 then begin
@@ -124,6 +141,8 @@ end;
 constructor TCChart.CreateNew(AOwner: TComponent; ASymbol: String);
 begin
   inherited Create(AOwner);
+  FregSeries := TObjectList.Create(True);
+  FavgSeries := TObjectList.Create(True);
   Fsymbol := ASymbol;
   Ftitle := '';
   Fimage := -1;
@@ -341,6 +360,18 @@ begin
   end;
 end;
 
+destructor TCChart.Destroy;
+begin
+  FregSeries.Free;
+  FavgSeries.Free;
+  inherited Destroy;
+end;
+
+function TCChart.GetIsavgVisible: Boolean;
+begin
+  Result := FavgSeries.Count > 0;
+end;
+
 function TCChart.GetIsBar: Boolean;
 var xCount: Integer;
     xTemp: TBarSeries;
@@ -418,6 +449,53 @@ begin
     end;
   end else begin
     ActiveChartIndex := -1;
+  end;
+end;
+
+function TCChart.GetIsregVisible: Boolean;
+begin
+  Result := FregSeries.Count > 0;
+end;
+
+procedure TCChart.SetIsavgVisible(const Value: Boolean);
+var xCount: Integer;
+    xSerie: TLineSeries;
+begin
+  if Value <> isAvgVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xSerie := TLineSeries.Create(Self);
+        FavgSeries.Add(xSerie);
+        PrepareAvgSerie(Series[xCount], xSerie);
+        AddSeries(xSerie);
+      end;
+    end else begin
+      for xCount := 0 to FavgSeries.Count - 1 do begin
+        SeriesList.Remove(FavgSeries.Items[xCount]);
+        FavgSeries.Delete(xCount);
+      end;
+    end;
+  end;
+end;
+
+procedure TCChart.SetIsregVisible(const Value: Boolean);
+var xCount: Integer;
+    xSerie: TLineSeries;
+begin
+  if Value <> isRegVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xSerie := TLineSeries.Create(Self);
+        FregSeries.Add(xSerie);
+        PrepareRegSerie(Series[xCount], xSerie);
+        AddSeries(xSerie);
+      end;
+    end else begin
+      for xCount := 0 to FregSeries.Count - 1 do begin
+        SeriesList.Remove(FregSeries.Items[xCount]);
+        FregSeries.Delete(xCount);
+      end;
+    end;
   end;
 end;
 

@@ -105,8 +105,8 @@ end;
 
 procedure TMetastockConfigForm.BitBtnEditClick(Sender: TObject);
 var xName, xUrl, xCashpoint, xIso, xType, xSearchType: String;
-    xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
-    xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn: Integer;
+    xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat, xIgnoreChars: String;
+    xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn, xIgnoreLines: Integer;
     xNode: IXMLDOMNode;
 begin
   xNode := FConfigXml.documentElement.childNodes.item[ListView.Selected.Index];
@@ -125,9 +125,11 @@ begin
   xRegDateColumn := GetXmlAttribute('regDateColumn', xNode, 2);
   xRegTimeColumn := GetXmlAttribute('regTimeColumn', xNode, 3);
   xValueColumn := GetXmlAttribute('valueColumn', xNode, 4);
+  xIgnoreChars := GetXmlAttribute('ignoreChars', xNode, '');
+  xIgnoreLines := GetXmlAttribute('ignoreLines', xNode, 0);
   xSearchType :=  GetXmlAttribute('searchType', xNode, CINSTRUMENTSEARCHTYPE_BYSYMBOL);
   if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
-                xDateFormat, xTimeFormat, xSearchType, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
+                xDateFormat, xTimeFormat, xSearchType, xIgnoreChars, xIgnoreLines, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
     SetXmlAttribute('name', xNode, xName);
     SetXmlAttribute('link', xNode, xUrl);
     SetXmlAttribute('cashpointName', xNode, xCashpoint);
@@ -144,14 +146,16 @@ begin
     SetXmlAttribute('regTimeColumn', xNode, xRegTimeColumn);
     SetXmlAttribute('valueColumn', xNode, xValueColumn);
     SetXmlAttribute('searchType', xNode, xSearchType);
+    SetXmlAttribute('ignoreChars', xNode, xIgnoreChars);
+    SetXmlAttribute('ignoreLines', xNode, xIgnoreLines);
     ListView.Selected.Caption := xName;
   end;
 end;
 
 procedure TMetastockConfigForm.BitBtnAddClick(Sender: TObject);
 var xName, xUrl, xCashpoint, xIso, xType, xSearchType: String;
-    xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat: String;
-    xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn: Integer;
+    xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator, xDateFormat, xTimeFormat, xIgnoreChars: String;
+    xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn, xIgnoreLines: Integer;
     xNode: IXMLDOMNode;
     xItem: TListItem;
 begin
@@ -170,9 +174,11 @@ begin
   xRegDateColumn := 2;
   xRegTimeColumn := 3;
   xValueColumn := 4;
+  xIgnoreChars := '';
+  xIgnoreLines := 0;
   xSearchType := CINSTRUMENTSEARCHTYPE_BYSYMBOL;
   if EditSource(xName, xUrl, xCashpoint, xIso, xType, xFieldSeparator, xDecimalSeparator, xDateSeparator, xTimeSeparator,
-                xDateFormat, xTimeFormat, xSearchType, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
+                xDateFormat, xTimeFormat, xSearchType, xIgnoreChars, xIgnoreLines, xIdentColumn, xRegDateColumn, xRegTimeColumn, xValueColumn) then begin
     xNode := FConfigXml.createElement('source');
     FConfigXml.documentElement.appendChild(xNode);
     SetXmlAttribute('name', xNode, xName);
@@ -191,6 +197,8 @@ begin
     SetXmlAttribute('regTimeColumn', xNode, xRegTimeColumn);
     SetXmlAttribute('valueColumn', xNode, xValueColumn);
     SetXmlAttribute('searchType', xNode, xSearchType);
+    SetXmlAttribute('ignoreChars', xNode, xIgnoreChars);
+    SetXmlAttribute('ignoreLines', xNode, xIgnoreLines);
     xItem := ListView.Items.Add;
     xItem.Caption := xName;
     ListView.Selected := xItem;
