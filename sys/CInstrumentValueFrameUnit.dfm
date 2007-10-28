@@ -143,7 +143,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
     Top = 88
   end
   inherited ActionListButtons: TActionList
-    Images = CImageLists.CurrencyRateImageList24x24
+    Images = CImageLists.ExchangesImageList24x24
     inherited ActionAdd: TAction
       Caption = 'Dodaj notowanie'
     end

@@ -89,11 +89,39 @@ uses CChartPropsFormUnit, CReports, CConfigFormUnit, Math;
 {$R *.dfm}
 
 procedure PrepareAvgSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xCount: Integer;
+    xSum: Double;
 begin
+  xSum := 0;
+  for xCount := 0 to ASourceSerie.Count - 1 do begin
+    xSum := xSum + ASourceSerie.YValue[xCount];
+  end;
+  xSum := xSum / ASourceSerie.Count;
+  for xCount := 0 to ASourceSerie.Count - 1 do begin
+    ADestserie.AddXY(ASourceSerie.XValue[xCount], xSum, ASourceSerie.ValueMarkText[xCount]);
+  end;
+  ADestserie.Title := ASourceSerie.Title + ' (Œrednie)';
+  ADestserie.Marks.Assign(ASourceSerie.Marks);
 end;
 
 procedure PrepareRegSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xXVals: array of Double;
+    xYVals: array of Double;
+    xA, xB: Double;
+    xCount: Integer;
 begin
+  SetLength(xXVals, ASourceSerie.Count);
+  SetLength(xYVals, ASourceSerie.Count);
+  for xCount := 0 to ASourceSerie.Count - 1 do begin
+    xXVals[xCount] := ASourceSerie.XValue[xCount];
+    xYVals[xCount] := ASourceSerie.YValue[xCount];
+  end;
+  RegLin(xXVals, xYVals, xA, xB);
+  for xCount := 0 to ASourceSerie.Count - 1 do begin
+    ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB, ASourceSerie.ValueMarkText[xCount]);
+  end;
+  ADestserie.Title := ASourceSerie.Title + ' (Linia trendu)';
+  ADestserie.Marks.Assign(ASourceSerie.Marks);
 end;
 
 procedure TCChartReportForm.DoPrint;
@@ -459,20 +487,24 @@ end;
 
 procedure TCChart.SetIsavgVisible(const Value: Boolean);
 var xCount: Integer;
-    xSerie: TLineSeries;
+    xAvgSerie: TLineSeries;
+    xCurSerie: TChartSeries;
 begin
   if Value <> isAvgVisible then begin
     if Value then begin
       for xCount := 0 to SeriesCount - 1 do begin
-        xSerie := TLineSeries.Create(Self);
-        FavgSeries.Add(xSerie);
-        PrepareAvgSerie(Series[xCount], xSerie);
-        AddSeries(xSerie);
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) then begin
+          xAvgSerie := TLineSeries.Create(Self);
+          FavgSeries.Add(xAvgSerie);
+          PrepareAvgSerie(xCurSerie, xAvgSerie);
+          AddSeries(xAvgSerie);
+        end;
       end;
     end else begin
-      for xCount := 0 to FavgSeries.Count - 1 do begin
-        SeriesList.Remove(FavgSeries.Items[xCount]);
-        FavgSeries.Delete(xCount);
+      while (FavgSeries.Count <> 0) do begin
+        SeriesList.Remove(FavgSeries.Items[0]);
+        FavgSeries.Delete(0);
       end;
     end;
   end;
@@ -480,20 +512,24 @@ end;
 
 procedure TCChart.SetIsregVisible(const Value: Boolean);
 var xCount: Integer;
-    xSerie: TLineSeries;
+    xRegSerie: TLineSeries;
+    xCurSerie: TChartSeries;
 begin
   if Value <> isRegVisible then begin
     if Value then begin
       for xCount := 0 to SeriesCount - 1 do begin
-        xSerie := TLineSeries.Create(Self);
-        FregSeries.Add(xSerie);
-        PrepareRegSerie(Series[xCount], xSerie);
-        AddSeries(xSerie);
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) then begin
+          xRegSerie := TLineSeries.Create(Self);
+          FregSeries.Add(xRegSerie);
+          PrepareRegSerie(xCurSerie, xRegSerie);
+          AddSeries(xRegSerie);
+        end;
       end;
     end else begin
-      for xCount := 0 to FregSeries.Count - 1 do begin
-        SeriesList.Remove(FregSeries.Items[xCount]);
-        FregSeries.Delete(xCount);
+      while (FregSeries.Count <> 0) do begin
+        SeriesList.Remove(FregSeries.Items[0]);
+        FregSeries.Delete(0);
       end;
     end;
   end;

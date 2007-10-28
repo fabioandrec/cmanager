@@ -405,6 +405,15 @@ object CMainForm: TCMainForm
                 Action = ActionShortcutExtractions
                 Caption = 'W&yci'#261'gi'
                 ImageIndex = 13
+              end
+              item
+                Action = ActionShortcutInstruments
+                Caption = '&Instrumenty'
+                ImageIndex = 14
+              end
+              item
+                Action = ActionShortcutExch
+                ImageIndex = 15
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -451,6 +460,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionStockExchanges
+                Caption = 'Wcz&ytaj notowania'
               end
               item
                 Caption = '-'
@@ -560,7 +570,7 @@ object CMainForm: TCMainForm
     object ActionCheckUpdates: TAction
       Category = 'Pomoc'
       Caption = 'Sprawd'#378' aktualizacje'
-      ImageIndex = 14
+      ImageIndex = 17
       OnExecute = ActionCheckUpdatesExecute
     end
     object ActionAbout: TAction
@@ -656,7 +666,7 @@ object CMainForm: TCMainForm
     object ActionBug: TAction
       Category = 'Pomoc'
       Caption = 'Zg'#322'o'#347' b'#322#261'd'
-      ImageIndex = 13
+      ImageIndex = 16
       OnExecute = ActionBugExecute
     end
     object ActionFutureRequest: TAction
@@ -697,10 +707,12 @@ object CMainForm: TCMainForm
     object ActionShortcutInstruments: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Instrumenty'
+      ImageIndex = 14
     end
     object ActionShortcutExch: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Notowania'
+      ImageIndex = 15
     end
     object ActionStockExchanges: TAction
       Category = 'Narz'#281'dzia'

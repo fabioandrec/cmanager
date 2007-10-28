@@ -145,6 +145,8 @@ type
     Felevation: Integer;
     Fperspective: Integer;
     Ftilt: Integer;
+    FisAvg: Boolean;
+    FisReg: Boolean;
   public
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     procedure SaveToXml(ANode: ICXMLDOMNode); override;
@@ -160,6 +162,8 @@ type
     property elevation: Integer read Felevation write Felevation;
     property perspective: Integer read Fperspective write Fperspective;
     property tilt: Integer read Ftilt write Ftilt;
+    property isAvg: Boolean read FisAvg write FisAvg;
+    property isReg: Boolean read FisReg write FisReg;
   end;
 
   TBasePref = class(TPrefItem, IDescTemplateExpander)
@@ -953,6 +957,8 @@ begin
   Felevation := TChartPref(APrefItem).elevation;
   Fperspective := TChartPref(APrefItem).perspective;
   Ftilt := TChartPref(APrefItem).tilt;
+  FisAvg := TChartPref(APrefItem).isAvg;
+  FisReg := TChartPref(APrefItem).isReg;
 end;
 
 function TChartPref.GetNodeName: String;
@@ -972,6 +978,8 @@ begin
   Felevation := GetXmlAttribute('elevation', ANode, 0);
   Fperspective := GetXmlAttribute('perspective', ANode, 0);
   Ftilt := GetXmlAttribute('tilt', ANode, 0);
+  FisAvg := GetXmlAttribute('isAvg', ANode, False);
+  FisReg := GetXmlAttribute('isReg', ANode, False);
 end;
 
 procedure TChartPref.SaveToXml(ANode: ICXMLDOMNode);
@@ -986,6 +994,8 @@ begin
   SetXmlAttribute('elevation', ANode, Felevation);
   SetXmlAttribute('perspective', ANode, Fperspective);
   SetXmlAttribute('tilt', ANode, Ftilt);
+  SetXmlAttribute('isAvg', ANode, FisAvg);
+  SetXmlAttribute('isReg', ANode, FisReg);
 end;
 
 initialization

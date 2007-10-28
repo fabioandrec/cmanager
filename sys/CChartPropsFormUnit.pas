@@ -259,6 +259,8 @@ begin
     elevation := TrackBarElevation.Position;
     perspective := TrackBarPerspective.Position;
     tilt := TrackBarTilt.Position;
+    isAvg := CheckBoxAvg.Checked;
+    isReg := CheckBoxReg.Checked;
   end;
 end;
 
@@ -286,6 +288,8 @@ begin
     TrackBarTilt.Position := chart.View3DOptions.Tilt;
     TrackBarDepth.Position := chart.Chart3DPercent;
     TrackBarZoom.Position := chart.View3DOptions.Zoom;
+    CheckBoxReg.Checked := chart.isRegVisible;
+    CheckBoxAvg.Checked := chart.isAvgVisible;
     UpdateLabelPos(Label2, TrackBarRotate);
     UpdateLabelPos(Label4, TrackBarElevation);
     UpdateLabelPos(Label6, TrackBarPerspective);
@@ -306,12 +310,14 @@ end;
 
 procedure TCChartPropsForm.CheckBoxRegClick(Sender: TObject);
 begin
-//
+  Fchart.isRegVisible := CheckBoxReg.Checked;
+  UpdatePrefs;
 end;
 
 procedure TCChartPropsForm.CheckBoxAvgClick(Sender: TObject);
 begin
-//
+  Fchart.isAvgVisible := CheckBoxAvg.Checked;
+  UpdatePrefs;
 end;
 
 end.

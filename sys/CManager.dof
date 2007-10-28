@@ -100,7 +100,7 @@ Conditionals=DEBUG
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=/saveplugin plugin.txt /savequery queries.txt
+RunParams=/saveplugin plugin.txt /savequery queries.txt /debug
 HostApplication=
 Launcher=
 UseLauncher=0
@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=8
 Release=1
-Build=22
+Build=24
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.8.1.22
+FileVersion=1.8.1.24
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=

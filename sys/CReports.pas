@@ -614,6 +614,7 @@ type
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
+procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
 
 implementation
 
@@ -3420,6 +3421,8 @@ begin
         marks := xPref.values;
         Legend.LegendStyle := lsSeries;
         Legend.ShadowSize := 0;
+        isAvgVisible := xPref.isAvg;
+        isRegVisible := xPref.isReg;
       end else begin
         Legend.LegendStyle := lsSeries;
         Legend.Visible := False;

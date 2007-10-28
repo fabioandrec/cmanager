@@ -35,6 +35,8 @@ type
     MovstatusImageList16x16: TPngImageList;
     ParamsDefsImageList: TPngImageList;
     UnitedefsImageList24x24: TPngImageList;
+    InstrumentImageList24x24: TPngImageList;
+    ExchangesImageList24x24: TPngImageList;
   private
     { Private declarations }
   public

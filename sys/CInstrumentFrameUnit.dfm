@@ -27,4 +27,7 @@ inherited CInstrumentFrame: TCInstrumentFrame
     Left = 144
     Top = 128
   end
+  inherited ActionListButtons: TActionList
+    Images = CImageLists.InstrumentImageList24x24
+  end
 end

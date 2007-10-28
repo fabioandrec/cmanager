@@ -1,6 +1,6 @@
 inherited CChartPropsForm: TCChartPropsForm
-  Left = 364
-  Top = 230
+  Left = 193
+  Top = 74
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Wygl'#261'd wykresu'
