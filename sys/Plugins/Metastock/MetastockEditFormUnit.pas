@@ -66,7 +66,6 @@ type
     FRegDateColumn: String;
     FRegTimeColumn: String;
     FValueColumn: String;
-    FSearchType: String;
   end;
 
 function EditSource(var AName, AUrl, ACashpoint,
@@ -190,7 +189,7 @@ begin
     end else if AType = CINSTRUMENTTYPE_FUNDRET then begin
       ComboBoxType.ItemIndex := 4;
     end;
-    if FSearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
+    if ASearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
       ComboBoxSearchType.ItemIndex := 1;
     end else begin
       ComboBoxSearchType.ItemIndex := 0;
