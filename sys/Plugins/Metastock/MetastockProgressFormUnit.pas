@@ -242,8 +242,12 @@ begin
     if FIsValidResponse and (FInvalidCount = 0) then begin
       PostMessage(MetastockProgressForm.Handle, WM_CLOSE, 0, 0);
     end else begin
-      PostMessage(MetastockProgressForm.Handle, WM_SHOWIMPORTBUTTON, 0, 0);
-      MetastockProgressForm.Button1.Caption := '&Anuluj';
+      if FValidCount > 0 then begin
+        PostMessage(MetastockProgressForm.Handle, WM_SHOWIMPORTBUTTON, 0, 0);
+        MetastockProgressForm.Button1.Caption := '&Anuluj';
+      end else begin
+        MetastockProgressForm.Button1.Caption := '&Zamknij';
+      end;
     end;
   end else if ExitCode = ERROR_CANCELLED then begin
     PostMessage(MetastockProgressForm.Handle, WM_CLOSE, 0, 0);

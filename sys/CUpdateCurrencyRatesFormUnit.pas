@@ -28,6 +28,8 @@ type
     Action3: TAction;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
+    ComboBoxType: TComboBox;
+    Label1: TLabel;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure RatesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure RatesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -37,18 +39,21 @@ type
     procedure Action1Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
+    procedure ComboBoxTypeChange(Sender: TObject);
   private
     FXml: ICXMLDOMDocument;
     FRoot: ICXMLDOMNode;
-    FRates: ICXMLDOMNodeList;
+    FSourceRates: ICXMLDOMNodeList;
+    FTreeDocument: ICXMLDOMDocument;
     FBindingDate: TDateTime;
     FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
+    procedure RecreateTreeRates;
   public
     procedure InitializeForm;
     property Xml: ICXMLDOMDocument read FXml write FXml;
     property Root: ICXMLDOMNode read FRoot write FRoot;
-    property Rates: ICXMLDOMNodeList read FRates write FRates;
+    property SourceRates: ICXMLDOMNodeList read FSourceRates write FSourceRates;
     property BindingDate: TDateTime read FBindingDate write FBindingDate;
     property CashpointName: String read FCashpointName write FCashpointName;
   end;
@@ -93,7 +98,7 @@ end;
 
 procedure TCUpdateCurrencyRatesForm.RatesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
 begin
-  ICXMLDOMNode(RatesList.GetNodeData(Node)^) := FRates.item[Node.Index];
+  ICXMLDOMNode(RatesList.GetNodeData(Node)^) := FTreeDocument.documentElement.childNodes.item[Node.Index];
   Node.CheckState := csCheckedNormal;
   Node.CheckType := ctCheckBox
 end;
@@ -129,7 +134,7 @@ begin
   CStaticCashpoint.DataId := GDataProvider.GetSqlString('select idCashpoint from cashpoint where name = ''' + FCashpointName + '''', CEmptyDataGid);
   GDataProvider.RollbackTransaction;
   CDateTime.Value := FBindingDate;
-  RatesList.RootNodeCount := FRates.length;
+  RecreateTreeRates;
 end;
 
 procedure TCUpdateCurrencyRatesForm.RatesListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
@@ -294,6 +299,36 @@ begin
       CloseForm;
     end;
   end;
+end;
+
+procedure TCUpdateCurrencyRatesForm.RecreateTreeRates;
+var xRoot: ICXMLDOMNode;
+    xCount: Integer;
+    xNode: ICXMLDOMNode;
+begin
+  RatesList.BeginUpdate;
+  RatesList.Clear;
+  FTreeDocument := GetXmlDocument;
+  xRoot := FTreeDocument.createElement('root');
+  FTreeDocument.appendChild(xRoot);
+  for xCount := 0 to FSourceRates.length - 1 do begin
+    if ComboBoxType.ItemIndex = 1 then begin
+      xNode := FSourceRates.item[xCount].cloneNode(True);
+      xRoot.appendChild(xNode);
+    end else begin
+      xNode := FSourceRates.item[xCount].cloneNode(True);
+      if (GCurrencyCache.ByIso[GetXmlAttribute('sourceIso', xNode, '')] <> Nil) and (GCurrencyCache.ByIso[GetXmlAttribute('targetIso', xNode, '')] <> Nil) then begin
+        xRoot.appendChild(xNode);
+      end;
+    end;
+  end;
+  RatesList.RootNodeCount := FTreeDocument.documentElement.childNodes.length;
+  RatesList.EndUpdate;
+end;
+
+procedure TCUpdateCurrencyRatesForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  RecreateTreeRates;
 end;
 
 end.

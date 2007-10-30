@@ -911,10 +911,14 @@ begin
     xMs := -1;
   end;
   if (xYs <> -1) and (xMs <> -1) and (xDs <> -1) then begin
-    xYi := StrToIntDef(Copy(xStr, xYs, 4), -1);
-    xMi := StrToIntDef(Copy(xStr, xMs, 2), -1);
-    xDi := StrToIntDef(Copy(xStr, xDs, 2), -1);
-    Result := TryEncodeDate(xYi, xMi, xDi, AOutput);
+    xYi := StrToIntDef(Copy(xStr, xYs, 4), 0);
+    xMi := StrToIntDef(Copy(xStr, xMs, 2), 0);
+    xDi := StrToIntDef(Copy(xStr, xDs, 2), 0);
+    try
+      Result := TryEncodeDate(xYi, xMi, xDi, AOutput);
+    except
+      Result := False;
+    end;
     if Result and (ATimeFormat <> '--') then begin
       Delete(xStr, 1, 8);
       if ATimeFormat = 'HN' then begin
@@ -962,10 +966,17 @@ begin
         end else begin
           xSi := 0;
         end;
-        Result := TryEncodeDateTime(xYi, xMi, xDi, xHi, xNi, xSi, 0, AOutput);
+        if (xHi >= 0) and (xNi >= 0) and (xSi >= 0) then begin
+          try
+            Result := TryEncodeDateTime(xYi, xMi, xDi, xHi, xNi, xSi, 0, AOutput);
+          except
+            Result := False;
+          end;
+        end else begin
+          Result := False;
+        end;
       end else begin
         Result := False;
-        AOutput := 0;
       end;
     end;
   end;

@@ -364,7 +364,7 @@ begin
             xForm := TCUpdateCurrencyRatesForm.Create(Application);
             xForm.Xml := xDoc;
             xForm.Root := xRoot;
-            xForm.Rates := xList;
+            xForm.SourceRates := xList;
             xForm.BindingDate := xBindingDate;
             xForm.CashpointName := xCahpointName;
             xForm.InitializeForm;

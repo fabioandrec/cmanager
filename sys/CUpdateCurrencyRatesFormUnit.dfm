@@ -1,16 +1,16 @@
 inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
-  Left = 328
-  Top = 210
+  Left = 342
+  Top = 233
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Tabela kurs'#243'w walut'
-  ClientHeight = 463
+  ClientHeight = 497
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
   object PanelButtons: TPanel
     Left = 0
-    Top = 422
+    Top = 456
     Width = 536
     Height = 41
     Align = alBottom
@@ -45,7 +45,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
     Left = 0
     Top = 0
     Width = 536
-    Height = 422
+    Height = 456
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
@@ -112,12 +112,20 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
       Left = 16
       Top = 97
       Width = 505
-      Height = 320
+      Height = 352
       Caption = ' Kursy walut '
       TabOrder = 1
+      object Label1: TLabel
+        Left = 26
+        Top = 32
+        Width = 86
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Tryb importu walut'
+      end
       object Panel1: TPanel
         Left = 24
-        Top = 32
+        Top = 64
         Width = 457
         Height = 265
         BevelOuter = bvLowered
@@ -225,6 +233,27 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
             end>
           WideDefaultText = ''
         end
+      end
+      object ComboBoxType: TComboBox
+        Left = 120
+        Top = 28
+        Width = 361
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 1
+        Text = 
+          'Importuj kursy tylko tych walut, kt'#243're znajduj'#261' si'#281' w bazie dany' +
+          'ch'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          
+            'Importuj kursy tylko tych walut, kt'#243're znajduj'#261' si'#281' w bazie dany' +
+            'ch'
+          'Podczas importu utw'#243'rz waluty, kt'#243'rych brak w bazie danych')
       end
     end
   end
