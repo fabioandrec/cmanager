@@ -1,6 +1,6 @@
 inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
-  Left = 342
-  Top = 233
+  Left = 256
+  Top = 114
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Tabela kurs'#243'w walut'
@@ -244,6 +244,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
+        MaxLength = 1
         TabOrder = 1
         Text = 
           'Importuj kursy tylko tych walut, kt'#243're znajduj'#261' si'#281' w bazie dany' +

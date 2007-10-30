@@ -323,8 +323,8 @@ begin
     if xRoot <> Nil then begin
       xValid := True;
       xForm := TCUpdateExchangesForm.Create(Application);
-      xForm.Xml := xDoc;
-      xForm.Root := xRoot;
+      xForm.SourceXml := xDoc;
+      xForm.SourceRoot := xRoot;
       xForm.InitializeForm;
       xForm.ShowModal;
       xForm.Free;

@@ -324,6 +324,7 @@ begin
   end;
   RatesList.RootNodeCount := FTreeDocument.documentElement.childNodes.length;
   RatesList.EndUpdate;
+  RatesList.UpdateScrollBars(False);
 end;
 
 procedure TCUpdateCurrencyRatesForm.ComboBoxTypeChange(Sender: TObject);

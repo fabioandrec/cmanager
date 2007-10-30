@@ -34,3 +34,6 @@ create view StnInstrumentValue as
   
 insert into cmanagerParams (paramName, paramValue) values ('InstrumentValue', '@instrument@');
 update extractionItem set cash = abs(cash);
+
+create index ix_instrumentValue_regDatetimeinstrument on instrumentValue (idInstrument, regDateTime);
+create index ix_currencyRate_regDatecurrency on currencyRate (idSourceCurrencyDef, idTargetCurrencyDef, bindingDate);

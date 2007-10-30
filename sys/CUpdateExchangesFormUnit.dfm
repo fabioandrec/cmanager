@@ -1,6 +1,6 @@
 inherited CUpdateExchangesForm: TCUpdateExchangesForm
-  Left = 328
-  Top = 210
+  Left = 201
+  Top = 177
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Tabela notowa'#324
@@ -56,17 +56,25 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
       Height = 401
       Caption = ' Notowania '
       TabOrder = 0
+      object Label1: TLabel
+        Left = 26
+        Top = 32
+        Width = 86
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Tryb importu walut'
+      end
       object Panel1: TPanel
         Left = 24
-        Top = 32
+        Top = 64
         Width = 577
-        Height = 345
+        Height = 313
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
         object Bevel1: TBevel
           Left = 1
-          Top = 300
+          Top = 268
           Width = 575
           Height = 2
           Align = alBottom
@@ -74,7 +82,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
         end
         object Panel2: TPanel
           Left = 1
-          Top = 302
+          Top = 270
           Width = 575
           Height = 42
           Align = alBottom
@@ -110,7 +118,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           Left = 1
           Top = 1
           Width = 575
-          Height = 299
+          Height = 267
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -161,6 +169,26 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
             end>
           WideDefaultText = ''
         end
+      end
+      object ComboBoxType: TComboBox
+        Left = 120
+        Top = 28
+        Width = 481
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 1
+        MaxLength = 1
+        TabOrder = 1
+        Text = 'Podczas importu utw'#243'rz instrumenty, kt'#243'rych brak w bazie danych'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          
+            'Importuj notowania tylko tych instrument'#243'w, kt'#243're znajduj'#261' si'#281' w' +
+            ' bazie danych'
+          'Podczas importu utw'#243'rz instrumenty, kt'#243'rych brak w bazie danych')
       end
     end
   end

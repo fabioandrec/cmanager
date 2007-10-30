@@ -23,6 +23,8 @@ type
     Action3: TAction;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
+    Label1: TLabel;
+    ComboBoxType: TComboBox;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure ExchangesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ExchangesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -33,14 +35,20 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
     procedure ExchangesListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+    procedure ComboBoxTypeChange(Sender: TObject);
   private
-    FXml: ICXMLDOMDocument;
-    FRoot: ICXMLDOMNode;
+    FSourceXml: ICXMLDOMDocument;
+    FSourceRoot: ICXMLDOMNode;
+    FTreeDocument: ICXMLDOMDocument;
+    FByNamesList: TStringList;
+    FBySymbolList: TStringList;
     procedure SetChecked(AChecked: Boolean);
+    procedure RecreateTreeExchanges;
   public
     procedure InitializeForm;
-    property Xml: ICXMLDOMDocument read FXml write FXml;
-    property Root: ICXMLDOMNode read FRoot write FRoot;
+    property SourceXml: ICXMLDOMDocument read FSourceXml write FSourceXml;
+    property SourceRoot: ICXMLDOMNode read FSourceRoot write FSourceRoot;
+    destructor Destroy; override;
   end;
 
   TExchangeDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
@@ -77,9 +85,9 @@ procedure TCUpdateExchangesForm.ExchangesListInitNode(Sender: TBaseVirtualTree; 
 var xParentNode: ICXMLDOMNode;
 begin
   if ParentNode = Nil then begin
-    ICXMLDOMNode(ExchangesList.GetNodeData(Node)^) := FRoot.childNodes.item[Node.Index];
+    ICXMLDOMNode(ExchangesList.GetNodeData(Node)^) := FTreeDocument.documentElement.childNodes.item[Node.Index];
     Node.CheckType := ctNone;
-    if FRoot.childNodes.item[Node.Index].childNodes.length > 0 then begin
+    if FTreeDocument.documentElement.childNodes.item[Node.Index].childNodes.length > 0 then begin
       InitialStates := InitialStates + [ivsHasChildren, ivsExpanded]
     end;
   end else begin
@@ -114,8 +122,20 @@ begin
 end;
 
 procedure TCUpdateExchangesForm.InitializeForm;
+var xList: TDataObjectList;
+    xCount: Integer;
 begin
-  ExchangesList.RootNodeCount := FRoot.childNodes.length;
+  FByNamesList := TStringList.Create;
+  FBySymbolList := TStringList.Create;
+  GDataProvider.BeginTransaction;
+  xList := TInstrument.GetAllObjects(InstrumentProxy);
+  for xCount := 0 to xList.Count - 1 do begin
+    FByNamesList.Values[TInstrument(xList.Items[xCount]).name] := xList.Items[xCount].id;
+    FBySymbolList.Values[TInstrument(xList.Items[xCount]).symbol] := xList.Items[xCount].id;
+  end;
+  GDataProvider.RollbackTransaction;
+  xList.Free;
+  RecreateTreeExchanges;
 end;
 
 procedure TCUpdateExchangesForm.ExchangesListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
@@ -295,6 +315,62 @@ end;
 procedure TCUpdateExchangesForm.ExchangesListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
 begin
   ChildCount := ICXMLDOMNode(ExchangesList.GetNodeData(Node)^).childNodes.length;
+end;
+
+procedure TCUpdateExchangesForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  RecreateTreeExchanges;
+end;
+
+procedure TCUpdateExchangesForm.RecreateTreeExchanges;
+var xRoot: ICXMLDOMNode;
+    xCountCashpoint, xCountExchange: Integer;
+    xNodeCashpoint: ICXMLDOMNode;
+    xNodeExchange: ICXMLDOMNode;
+    xNodeSourceCashpoint: ICXMLDOMNode;
+    xNodeSourceExchange: ICXMLDOMNode;
+    xFound: Boolean;
+    xSearchType: String;
+begin
+  ExchangesList.BeginUpdate;
+  ExchangesList.Clear;
+  FTreeDocument := GetXmlDocument;
+  xRoot := FTreeDocument.createElement('root');
+  FTreeDocument.appendChild(xRoot);
+  for xCountCashpoint := 0 to FSourceRoot.childNodes.length - 1 do begin
+    xNodeSourceCashpoint := FSourceRoot.childNodes.item[xCountCashpoint];
+    xNodeCashpoint := xNodeSourceCashpoint.cloneNode(False);
+    xSearchType := GetXmlAttribute('searchType', xNodeSourceCashpoint, CINSTRUMENTSEARCHTYPE_BYNAME);
+    for xCountExchange := 0 to xNodeSourceCashpoint.childNodes.length - 1 do begin
+      xNodeSourceExchange := xNodeSourceCashpoint.childNodes.item[xCountExchange];
+      xNodeExchange := xNodeSourceExchange.cloneNode(True);
+      if ComboBoxType.ItemIndex = 1 then begin
+        xFound := True;
+      end else begin
+        if xSearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
+          xFound := FByNamesList.IndexOfName(GetXmlAttribute('identifier', xNodeExchange, '')) <> -1;
+        end else begin
+          xFound := FBySymbolList.IndexOfName(GetXmlAttribute('identifier', xNodeExchange, '')) <> -1;
+        end;
+      end;
+      if xFound then begin
+        xNodeCashpoint.appendChild(xNodeExchange);
+      end;
+    end;
+    if xNodeCashpoint.childNodes.length > 0 then begin
+      FTreeDocument.documentElement.appendChild(xNodeCashpoint);
+    end;
+  end;
+  ExchangesList.RootNodeCount := FTreeDocument.documentElement.childNodes.length;
+  ExchangesList.EndUpdate;
+  ExchangesList.UpdateScrollBars(False);
+end;
+
+destructor TCUpdateExchangesForm.Destroy;
+begin
+  FByNamesList.Free;
+  FBySymbolList.Free;
+  inherited Destroy;
 end;
 
 end.

@@ -430,3 +430,5 @@ create index ix_baseMovement_idSourceAccount on baseMovement (idSourceAccount);
 create index ix_baseMovement_idProduct on baseMovement (idProduct);
 create index ix_baseMovement_idCashpoint on baseMovement (idCashPoint);
 create index ix_baseMovement_idMovementList on baseMovement (idMovementList);
+create index ix_instrumentValue_regDatetimeinstrument on instrumentValue (idInstrument, regDateTime);
+create index ix_currencyRate_regDatecurrency on currencyRate (idSourceCurrencyDef, idTargetCurrencyDef, bindingDate);
