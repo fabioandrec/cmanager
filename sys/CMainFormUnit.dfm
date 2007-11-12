@@ -486,7 +486,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionBug
                 Caption = '&Zg'#322'o'#347' b'#322#261'd'
-                ImageIndex = 14
+                ImageIndex = 16
               end
               item
                 Action = ActionFutureRequest
@@ -498,7 +498,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCheckUpdates
                 Caption = 'S&prawd'#378' aktualizacje'
-                ImageIndex = 15
+                ImageIndex = 17
               end
               item
                 Action = ActionAbout
