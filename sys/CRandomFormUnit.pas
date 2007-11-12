@@ -88,7 +88,7 @@ begin
   Application.ProcessMessages;
   GDataProvider.BeginTransaction;
   ShowWaitForm(wtProgressbar, 'Trwa generowanie konfiguracji...', 0, ACurrenciesCount + ACashpointCount + AAcountCount + AProductCount + AUnitdefsCount + AInstrumentsCount);
-  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from currencyDef', 0) + 1;
+  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from currencyDef', 0);
   for xCount := 1 to ACurrenciesCount do begin
     with TCurrencyDef.CreateObject(CurrencyDefProxy, False) do begin
       name := 'Waluta ' + IntToStr(xStartIndex + xCount);
@@ -99,7 +99,7 @@ begin
       StepWaitForm(1);
     end;
   end;
-  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from unitDef', 0) + 1;
+  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from unitDef', 0);
   for xCount := 1 to AUnitdefsCount do begin
     with TUnitDef.CreateObject(UnitDefProxy, False) do begin
       name := 'Jednostka ' + IntToStr(xStartIndex + xCount);
@@ -112,7 +112,7 @@ begin
   Randomize;
   xCurdefs := TCurrencyDef.GetList(TCurrencyDef, CurrencyDefProxy, 'select * from currencyDef');
   xUnitdefs := TUnitDef.GetList(TUnitDef, UnitDefProxy, 'select * from unitDef');
-  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from account', 0) + 1;
+  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from account', 0);
   for xCount := 1 to AAcountCount do begin
     with TAccount.CreateObject(AccountProxy, False) do begin
       accountType := CCashAccount;
@@ -124,7 +124,7 @@ begin
       StepWaitForm(1);
     end;
   end;
-  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from cashpoint', 0) + 1;
+  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from cashpoint', 0);
   for xCount := 1 to ACashpointCount do begin
     with TCashPoint.CreateObject(CashPointProxy, False) do begin
       name := 'kontrahent ' + IntToStr(xStartIndex + xCount);
@@ -136,7 +136,7 @@ begin
   GDataProvider.PostProxies;
   Randomize;
   xCashpoints := TCashPoint.GetList(TCashPoint, CashPointProxy, 'select * from cashpoint');
-  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from instrument', 0) + 1;
+  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from instrument', 0);
   for xCount := 1 to AInstrumentsCount do begin
     with TInstrument.CreateObject(InstrumentProxy, False) do begin
       name := 'instrument ' + IntToStr(xStartIndex + xCount);
@@ -154,7 +154,7 @@ begin
     end;
   end;
   Randomize;
-  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from product', 0) + 1;
+  xStartIndex := GDataProvider.GetSqlInteger('select count(*) from product', 0);
   for xCount := 1 to AProductCount do begin
     with TProduct.CreateObject(ProductProxy, False) do begin
       name := 'Produkt ' + IntToStr(xStartIndex + xCount);
