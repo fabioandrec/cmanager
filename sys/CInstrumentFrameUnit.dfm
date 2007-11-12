@@ -19,6 +19,17 @@ inherited CInstrumentFrame: TCInstrumentFrame
       end>
     WideDefaultText = ''
   end
+  inherited ButtonPanel: TPanel
+    inherited CButtonAdd: TCButton
+      Width = 124
+    end
+    inherited CButtonEdit: TCButton
+      Width = 140
+    end
+    inherited CButtonDelete: TCButton
+      Width = 164
+    end
+  end
   inherited ImageList: TPngImageList
     Left = 24
     Top = 80
@@ -29,5 +40,14 @@ inherited CInstrumentFrame: TCInstrumentFrame
   end
   inherited ActionListButtons: TActionList
     Images = CImageLists.InstrumentImageList24x24
+    inherited ActionAdd: TAction
+      Caption = 'Dodaj instrument'
+    end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj instrument'
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' instrument'
+    end
   end
 end

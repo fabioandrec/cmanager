@@ -80,10 +80,10 @@ UnsafeType=0
 UnsafeCode=0
 UnsafeCast=0
 [Linker]
-MapFile=3
+MapFile=0
 OutputObjs=0
 ConsoleApp=1
-DebugInfo=1
+DebugInfo=0
 RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=8
 Release=1
-Build=26
+Build=27
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.8.1.26
+FileVersion=1.8.1.27
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -144,17 +144,18 @@ Item0=DEBUG
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=5
+Count=6
 Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
-Item1=..\..\..\others\PngComponents\Source
+Item1=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
 Item2=..\others\PngComponents\Source;..\others\Vtv\Source
-Item3=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item4=..\..\others\PngComponents\Source
+Item3=..\..\..\others\PngComponents\Source
+Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
+Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\..\..\Trash
-Item1=..\..\Trash
+Item0=..\..\Trash
+Item1=..\..\..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\Bin
+Item0=..\..\Bin
+Item1=..\..\..\..\Bin\Wtyczki

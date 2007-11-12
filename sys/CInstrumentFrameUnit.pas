@@ -21,6 +21,8 @@ type
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
   end;
 
 implementation
@@ -42,6 +44,11 @@ end;
 class function TCInstrumentFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := InstrumentProxy;
+end;
+
+function TCInstrumentFrame.GetHistoryText: String;
+begin
+  Result := 'Wykres notowañ';
 end;
 
 function TCInstrumentFrame.GetSelectedType: Integer;
@@ -89,6 +96,11 @@ begin
     xCondition := ' where instrumentType = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TDataObject.GetList(TInstrument, InstrumentProxy, 'select * from instrument' + xCondition);
+end;
+
+procedure TCInstrumentFrame.ShowHistory(AGid: ShortString);
+begin
+  //
 end;
 
 end.
