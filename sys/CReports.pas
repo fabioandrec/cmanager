@@ -3291,9 +3291,13 @@ begin
   end else begin
     xTypeCondition := 'rateType in (' + '''' + FrateTypes[1] + ''', ''' + FrateTypes[2]  + ''', ''' +  FrateTypes[3] + ''')';
   end;
-  xSql := Format('select * from currencyRate where bindingDate between %s and %s and idSourceCurrencyDef = %s and idTargetCurrencyDef = %s and idCashpoint = %s and %s order by bindingDate',
+  xSql := Format('select * from currencyRate where bindingDate between %s and %s and ' +
+                     ' ((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or ((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))) ' +
+                     ' and idCashpoint = %s and %s order by bindingDate',
                  [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
-                  DataGidToDatabase(FSourceId), DataGidToDatabase(FTargetId), DataGidToDatabase(FCashpointId),
+                  DataGidToDatabase(FSourceId), DataGidToDatabase(FTargetId),
+                  DataGidToDatabase(FTargetId), DataGidToDatabase(FSourceId),
+                  DataGidToDatabase(FCashpointId),
                   xTypeCondition]);
   xRates := TDataObject.GetList(TCurrencyRate, CurrencyRateProxy, xSql);
   xMaxQuantity := 1;
@@ -3327,7 +3331,11 @@ begin
     while xCurDate <= FEndDate do begin
       xRate := FindCurrencyRate(xRates, xCurDate, FrateTypes[xCount]);
       if xRate <> Nil then begin
-        xCurValue := xMaxQuantity * xRate.rate / xRate.quantity;
+        if (xRate.idSourceCurrencyDef = FSourceId) and (xRate.idTargetCurrencyDef = FTargetId) then begin
+          xCurValue := xMaxQuantity * (xRate.rate / xRate.quantity);
+        end else begin
+          xCurValue := xMaxQuantity * (xRate.quantity / xRate.rate);
+        end;
       end;
       if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
         if xPrevValue <> -1 then begin
