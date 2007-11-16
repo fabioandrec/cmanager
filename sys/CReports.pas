@@ -546,6 +546,36 @@ type
     function GetReportTitle: String; override;
   end;
 
+  TCurrencyRatesListReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FSourceId: TDataGid;
+    FTargetId: TDataGid;
+    FSourceIso: TDataGid;
+    FTargetIso: TDataGid;
+    FCashpointId: TDataGid;
+    FrateTypes: String;
+  protected
+    function PrepareReportConditions: Boolean; override;
+    function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
+  TInstrumentValueListReport = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FInstrumentId: TDataGid;
+    FCurrText: String;
+  protected
+    function PrepareReportConditions: Boolean; override;
+    function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
   TPluginHtmlReport = class(TCHtmlReport)
   private
     FBody: OleVariant;
@@ -628,7 +658,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      StrUtils, Variants, CPreferences, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
      CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
-     CBaseFrameUnit;
+     CBaseFrameUnit, CChoosePeriodInstrumentValueFormUnit;
 
 var LDefaultXsl: ICXMLDOMDocument = Nil;
     LPropertyXml: ICXMLDOMDocument = Nil;
@@ -3250,25 +3280,25 @@ begin
   end else begin
     xCashpoint := '';
   end;
+  GDataProvider.RollbackTransaction;
   Result := Format('Kurs waluty %s wzglêdem %s %s (%s - %s)', [FSourceIso, FTargetIso, xCashpoint, GetFormattedDate(FStartDate, CLongDateFormat), GetFormattedDate(FEndDate, CLongDateFormat)]);
   FAxisName := FSourceIso + '/' + FTargetIso;
 end;
 
-procedure TCurrencyRatesHistoryReport.PrepareReportChart;
-
-  function FindCurrencyRate(AInlist: TDataObjectList; ABindingDate: TDateTime; ArateType: TBaseEnumeration): TCurrencyRate;
-  var xCount: Integer;
-  begin
-    Result := Nil;
-    xCount := 0;
-    while (Result = Nil) and (xCount <= AInlist.Count - 1) do begin
-      if (TCurrencyRate(AInlist.Items[xCount]).bindingDate = ABindingDate) and ((TCurrencyRate(AInlist.Items[xCount]).rateType = ArateType)) then begin
-        Result := TCurrencyRate(AInlist.Items[xCount]);
-      end;
-      Inc(xCount);
+function FindCurrencyRate(AInlist: TDataObjectList; ABindingDate: TDateTime; ArateType: TBaseEnumeration): TCurrencyRate;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (Result = Nil) and (xCount <= AInlist.Count - 1) do begin
+    if (TCurrencyRate(AInlist.Items[xCount]).bindingDate = ABindingDate) and ((TCurrencyRate(AInlist.Items[xCount]).rateType = ArateType)) then begin
+      Result := TCurrencyRate(AInlist.Items[xCount]);
     end;
+    Inc(xCount);
   end;
+end;
 
+procedure TCurrencyRatesHistoryReport.PrepareReportChart;
 var xChart: TChart;
     xRates: TDataObjectList;
     xMaxDate: TDateTime;
@@ -3340,6 +3370,8 @@ begin
       if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
         if xPrevValue <> -1 then begin
           xPercentage := CurrencyToString(xCurValue, '', False, 4) + ' (' + CurrencyToString((xCurValue/xPrevValue - 1) * 100, '', False, 4) + '%)';
+        end else begin
+          xPercentage := '';
         end;
         xSerie.AddXY(xCurDate, xCurValue, xPercentage);
         xPrevValue := xCurValue;
@@ -4803,6 +4835,207 @@ begin
   end else begin
     inherited SaveToFile(AFilename);
   end;
+end;
+
+function TCurrencyRatesListReport.GetReportBody: String;
+var xRates: TDataObjectList;
+    xBody: TStringList;
+    xTypeCondition, xSql: String;
+    xMaxQuantity, xCount, xRecNo: Integer;
+    xMaxDate, xCurDate: TDateTime;
+    xCurValue, xPrevValue, xPercentage: Currency;
+    xTitle: String;
+    xRate: TCurrencyRate;
+begin
+
+  if Length(FrateTypes) = 1 then begin
+    xTypeCondition := 'rateType = ''' + FrateTypes + '''';
+  end else if Length(FrateTypes) = 2 then begin
+    xTypeCondition := 'rateType in (' + '''' + FrateTypes[1] + ''', ''' + FrateTypes[2] + ''')';
+  end else begin
+    xTypeCondition := 'rateType in (' + '''' + FrateTypes[1] + ''', ''' + FrateTypes[2]  + ''', ''' +  FrateTypes[3] + ''')';
+  end;
+  xSql := Format('select * from currencyRate where bindingDate between %s and %s and ' +
+                     ' ((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or ((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))) ' +
+                     ' and idCashpoint = %s and %s order by bindingDate',
+                 [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                  DataGidToDatabase(FSourceId), DataGidToDatabase(FTargetId),
+                  DataGidToDatabase(FTargetId), DataGidToDatabase(FSourceId),
+                  DataGidToDatabase(FCashpointId),
+                  xTypeCondition]);
+  xRates := TDataObject.GetList(TCurrencyRate, CurrencyRateProxy, xSql);
+  xMaxQuantity := 1;
+  xMaxDate := FStartDate;
+  for xCount := 0 to xRates.Count - 1 do begin
+    if xMaxQuantity < TCurrencyRate(xRates.Items[xCount]).quantity then begin
+      xMaxQuantity := TCurrencyRate(xRates.Items[xCount]).quantity;
+    end;
+    if xMaxDate < TCurrencyRate(xRates.Items[xCount]).bindingDate then begin
+      xMaxDate := TCurrencyRate(xRates.Items[xCount]).bindingDate;
+    end;
+  end;
+  xBody := TStringList.Create;
+  with xBody do begin
+    Add('<table class="base" colspan=3>');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="45%">Data kursu</td>');
+    Add('<td class="headcash" width="30%">Kurs</td>');
+    Add('<td class="headcash" width="25%">Zmiana [%]</td>');
+    Add('</tr>');
+    Add('</table><hr>');
+    for xCount := 1 to Length(FrateTypes) do begin
+      xCurDate := FStartDate;
+      xCurValue := -1;
+      if FrateTypes[xCount] = CCurrencyRateTypeAverage then begin
+        xTitle := CCurrencyRateTypeAverageDesc;
+      end else if FrateTypes[xCount] = CCurrencyRateTypeSell then begin
+        xTitle := CCurrencyRateTypeSellDesc;
+      end else if FrateTypes[xCount] = CCurrencyRateTypeBuy then begin
+        xTitle := CCurrencyRateTypeBuyDesc;
+      end;
+      xPrevValue := -1;
+      xRecNo := 0;
+      Add('<table class="base" colspan=1>');
+      Add('<tr class="subhead">');
+      Add('<td class="subheadtext" width="100%">[' + xTitle + ']' + '</td>');
+      Add('</tr>');
+      Add('</table><hr>');
+      Add('<table class="base" colspan=3>');
+      while xCurDate <= FEndDate do begin
+        xRate := FindCurrencyRate(xRates, xCurDate, FrateTypes[xCount]);
+        if xRate <> Nil then begin
+          if (xRate.idSourceCurrencyDef = FSourceId) and (xRate.idTargetCurrencyDef = FTargetId) then begin
+            xCurValue := xMaxQuantity * (xRate.rate / xRate.quantity);
+          end else begin
+            xCurValue := xMaxQuantity * (xRate.quantity / xRate.rate);
+          end;
+        end;
+        Add('<tr class="' + IsEvenToStr(xRecNo) + 'base">');
+        Add('<td class="text" width="45%">' + Date2StrDate(xCurDate) + '</td>');
+        if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
+          if xPrevValue <> -1 then begin
+            xPercentage := (xCurValue/xPrevValue - 1) * 100;
+          end else begin
+            xPercentage := -1;
+          end;
+          Add('<td class="cash" width="30%">' + CurrencyToString(xCurValue, '', False, 4) + '</td>');
+          if xPercentage <> -1 then begin
+            Add('<td class="cash" width="25%">' + IfThen(xPercentage > 0, '+', '') + CurrencyToString(xPercentage, '', False, 4) + '</td>');
+          end else begin
+            Add('<td class="cash" width="25%"></td>');
+          end;
+          xPrevValue := xCurValue;
+        end else begin
+          Add('<td class="cash" width="30%"></td>');
+          Add('<td class="cash" width="25%"></td>');
+        end;
+        Add('</tr>');
+        xCurDate := IncDay(xCurDate);
+        Inc(xRecNo);
+      end;
+      Add('</table>');
+      if xCount <> Length(FrateTypes) then begin
+        Add('<hr>');
+      end;
+    end;
+  end;
+  xRates.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TCurrencyRatesListReport.GetReportTitle: String;
+var xCashpoint: String;
+begin
+  GDataProvider.BeginTransaction;
+  FSourceIso := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FSourceId, False)).iso;
+  FTargetIso := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, FTargetId, False)).iso;
+  if FCashpointId <> CEmptyDataGid then begin
+    xCashpoint := 'w/g ' + TCashPoint(TCashPoint.LoadObject(CashPointProxy, FCashpointId, False)).name;
+  end else begin
+    xCashpoint := '';
+  end;
+  GDataProvider.RollbackTransaction;
+  Result := Format('Kurs waluty %s wzglêdem %s %s (%s - %s)', [FSourceIso, FTargetIso, xCashpoint, GetFormattedDate(FStartDate, CLongDateFormat), GetFormattedDate(FEndDate, CLongDateFormat)]);
+end;
+
+function TCurrencyRatesListReport.PrepareReportConditions: Boolean;
+begin
+  if Params <> Nil then begin
+    FSourceId := TCWithGidParams(Params).id;
+  end;
+  Result := ChoosePeriodRatesHistory(FStartDate, FEndDate, FSourceId, FTargetId, FCashpointId, FrateTypes);
+end;
+
+function TInstrumentValueListReport.GetReportBody: String;
+var xValues: TADOQuery;
+    xBody: TStringList;
+    xSql: String;
+    xPrevValue, xPercentage: Currency;
+begin
+  xSql := Format('select * from instrumentValue where regDateTime between %s and %s and idInstrument = %s order by regDateTime',
+                 [DatetimeToDatabase(FStartDate, True), DatetimeToDatabase(FEndDate, True), DataGidToDatabase(FInstrumentId)]);
+  xValues := GDataProvider.OpenSql(xSql);
+  xBody := TStringList.Create;
+  with xBody, xValues do begin
+    Add('<table class="base" colspan=3>');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="45%">Data i czas notowania</td>');
+    Add('<td class="headcash" width="30%">Wartoœæ ' + FCurrText + '</td>');
+    Add('<td class="headcash" width="25%">Zmiana [%]</td>');
+    Add('</tr>');
+    Add('</table><hr>');
+    xPrevValue := -1;
+    Add('<table class="base" colspan=3>');
+    while not xValues.Eof do begin
+      Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
+      Add('<td class="text" width="45%">' + Date2StrDate(FieldByName('regDateTime').AsDateTime, True) + '</td>');
+      if xPrevValue <> -1 then begin
+        xPercentage := (FieldByName('valueOf').AsCurrency/xPrevValue - 1) * 100;
+      end else begin
+        xPercentage := -1;
+      end;
+      Add('<td class="cash" width="30%">' + CurrencyToString(FieldByName('valueOf').AsCurrency, '', False, 4) + '</td>');
+      if xPercentage <> -1 then begin
+        Add('<td class="cash" width="25%">' + IfThen(xPercentage > 0, '+', '') + CurrencyToString(xPercentage, '', False, 4) + '</td>');
+      end else begin
+        Add('<td class="cash" width="25%"></td>');
+      end;
+      xPrevValue := FieldByName('valueOf').AsCurrency;
+      Add('</tr>');
+      Next;
+    end;
+    Add('</table>');
+  end;
+  xValues.Free;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TInstrumentValueListReport.GetReportTitle: String;
+var xInstrumentText: String;
+    xInstrument: TInstrument;
+begin
+  GDataProvider.BeginTransaction;
+  xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, FInstrumentId, False));
+  xInstrumentText := xInstrument.name;
+  if xInstrument.idCurrencyDef <> CEmptyDataGid then begin
+    FCurrText := '[' + GCurrencyCache.GetIso(xInstrument.idCurrencyDef) + ']';
+  end else begin
+    FCurrText := '';
+  end;
+  GDataProvider.RollbackTransaction;
+  Result := Format('Notowania instrumentu %s (%s - %s)', [xInstrumentText,
+                          GetFormattedDate(FStartDate, CLongDateFormat) + ' ' + GetFormattedTime(FStartDate, CLongTimeFormat),
+                          GetFormattedDate(FEndDate, CLongDateFormat) + ' ' + GetFormattedTime(FEndDate, CLongTimeFormat)]);
+end;
+
+function TInstrumentValueListReport.PrepareReportConditions: Boolean;
+begin
+  if Params <> Nil then begin
+    FInstrumentId := TCWithGidParams(Params).id;
+  end;
+  Result := ChoosePeriodInstrumentValueHistory(FStartDate, FEndDate, FInstrumentId);
 end;
 
 initialization

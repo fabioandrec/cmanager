@@ -264,6 +264,8 @@ begin
   xOthers := TCListDataElement.Create(False, List, TReportListElement.CreateGroup('Ró¿ne', '', CNoImage), True);
   ARootElement.Add(xOthers);
   xOthers.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Historia wybranej waluty' , TCurrencyRatesHistoryReport, Nil, 'Pokazuje historiê waluty w/g wybranego kontrahenta w zadanym okresis', CLineReportImage), True));
+  xOthers.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Lista kursów wybranej waluty' , TCurrencyRatesListReport, Nil, 'Pokazuje historiê waluty w/g wybranego kontrahenta w zadanym okresis', CHtmlReportImage), True));
+  xOthers.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Lista notowañ wybranego instrumentu inwestycyjnego' , TInstrumentValueListReport, Nil, 'Pokazuje historiê instrumentu w zadanym okresis', CHtmlReportImage), True));
   for xCount := 0 to GPlugins.Count - 1 do begin
     xPlugin := TCPlugin(GPlugins.Items[xCount]);
     if xPlugin.isTypeof[CPLUGINTYPE_HTMLREPORT] then begin

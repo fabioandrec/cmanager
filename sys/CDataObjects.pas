@@ -114,7 +114,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
-    class function FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
+    class function FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime; AExactlyAtBindingdate: Boolean = True): TCurrencyRate;
     class function GetTypeDesc(AType: TBaseEnumeration): String;
   published
     property idSourceCurrencyDef: TDataGid read FidSourceCurrencyDef write SetidSourceCurrencyDef;
@@ -2829,17 +2829,28 @@ begin
   Result := Fdescription;
 end;
 
-class function TCurrencyRate.FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime): TCurrencyRate;
+class function TCurrencyRate.FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime; AExactlyAtBindingdate: Boolean = True): TCurrencyRate;
 var xSql: String;
 begin
-  xSql := Format('select * from currencyRate where rateType = ''%s'' and bindingDate = %s and ' +
-    '((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))' +
-    ' and idCashpoint = %s',
-                 [ARateType,
-                  DatetimeToDatabase(ABindingDate, False),
-                  DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetId),
-                  DataGidToDatabase(ATargetId), DataGidToDatabase(ASourceId),
-                  DataGidToDatabase(ACashpointId)]);
+  if AExactlyAtBindingdate then begin
+    xSql := Format('select * from currencyRate where rateType = ''%s'' and bindingDate = %s and ' +
+      '((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))' +
+      ' and idCashpoint = %s',
+                   [ARateType,
+                    DatetimeToDatabase(ABindingDate, False),
+                    DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetId),
+                    DataGidToDatabase(ATargetId), DataGidToDatabase(ASourceId),
+                    DataGidToDatabase(ACashpointId)]);
+  end else begin
+    xSql := Format('select top 1 * from currencyRate where rateType = ''%s'' and bindingDate = %s and ' +
+      '((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))' +
+      ' and idCashpoint = %s order by bindingDate desc',
+                   [ARateType,
+                    DatetimeToDatabase(ABindingDate, False),
+                    DataGidToDatabase(ASourceId), DataGidToDatabase(ATargetId),
+                    DataGidToDatabase(ATargetId), DataGidToDatabase(ASourceId),
+                    DataGidToDatabase(ACashpointId)]);
+  end;
   Result := TCurrencyRate(TCurrencyRate.FindByCondition(CurrencyRateProxy, xSql, False));
 end;
 

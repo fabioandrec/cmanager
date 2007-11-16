@@ -21,6 +21,7 @@ type
     procedure ComboBoxPredefinedChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CStaticCurrencyViewGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure FormShow(Sender: TObject);
   private
     procedure GetFilterDates(var AStartDate, AEndDate: TDateTime);
   end;
@@ -70,7 +71,13 @@ begin
   CDateTime2.Enabled := ComboBoxPredefined.ItemIndex = 0;
   GetFilterDates(xDf, xDe);
   CDateTime1.Value := xDf;
+  if CDateTime1.Withtime then begin
+    CDateTime1.Value := StartOfTheDay(CDateTime1.Value);
+  end;
   CDateTime2.Value := xDe;
+  if CDateTime2.Withtime then begin
+    CDateTime2.Value := EndOfTheDay(CDateTime2.Value);
+  end;
 end;
 
 procedure TCChoosePeriodForm.GetFilterDates(var AStartDate, AEndDate: TDateTime);
@@ -114,12 +121,17 @@ procedure TCChoosePeriodForm.FormCreate(Sender: TObject);
 begin
   inherited;
   Caption := 'Parametry raportu';
-  ComboBoxPredefinedChange(ComboBoxPredefined);
 end;
 
 procedure TCChoosePeriodForm.CStaticCurrencyViewGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := ShowCurrencyViewType(ADataGid, AText);
+end;
+
+procedure TCChoosePeriodForm.FormShow(Sender: TObject);
+begin
+  inherited;
+  ComboBoxPredefinedChange(ComboBoxPredefined);
 end;
 
 end.

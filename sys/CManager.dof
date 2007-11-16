@@ -100,7 +100,7 @@ Conditionals=DEBUG
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=/saveplugin plugin.txt /savequery queries.txt /debug
+RunParams=
 HostApplication=
 Launcher=
 UseLauncher=0
@@ -145,17 +145,17 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=6
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
-Item1=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
-Item2=..\others\PngComponents\Source;..\others\Vtv\Source
+Item0=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
+Item2=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
 Item3=..\..\..\others\PngComponents\Source
 Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\Trash
-Item1=..\..\..\..\Trash
+Item0=..\..\..\..\Trash
+Item1=..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\Bin
-Item1=..\..\..\..\Bin\Wtyczki
+Item0=..\..\..\..\Bin\Wtyczki
+Item1=..\..\Bin

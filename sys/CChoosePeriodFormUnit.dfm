@@ -80,6 +80,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
       object CDateTime2: TCDateTime
         Left = 219
@@ -95,6 +96,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
     end
     object GroupBoxView: TGroupBox

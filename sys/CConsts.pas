@@ -81,6 +81,7 @@ const
   CBaseDateFormat = 'yyyy-MM-dd';
   CDayNameDateFormat = 'ddd';
   CMonthnameDateFormat = 'MMMM yyyy';
+  CLongTimeFormat = 'HH:mm:ss';
 
   CStartupFilemodeLastOpened = 0;
   CStartupFilemodeThisfile = 1;
