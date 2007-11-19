@@ -233,7 +233,7 @@ var xNode: PVirtualNode;
     xHelper: TExchangeDescriptionHelper;
     xSearchType: TBaseEnumeration;
 begin
-  ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNode.TotalCount);
+  ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNodeCount);
   GDataProvider.BeginTransaction;
   xInstrumentList := TInstrument.GetAllObjects(InstrumentProxy);
   xNode := ExchangesList.GetFirst;
