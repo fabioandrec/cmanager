@@ -232,8 +232,9 @@ var xNode: PVirtualNode;
     xAnyCashpointAdded, xAnyInstrumentAdded, xAnyValueAdded: Boolean;
     xHelper: TExchangeDescriptionHelper;
     xSearchType: TBaseEnumeration;
+    xCurMark, xCurNode, xTotalNodes: Integer;
 begin
-  ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, ExchangesList.RootNodeCount);
+  ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, 100);
   GDataProvider.BeginTransaction;
   xInstrumentList := TInstrument.GetAllObjects(InstrumentProxy);
   xNode := ExchangesList.GetFirst;
@@ -242,6 +243,9 @@ begin
   xAnyCashpointAdded := False;
   xAnyInstrumentAdded := False;
   xAnyValueAdded := False;
+  xCurMark := 10;
+  xCurNode := 0;
+  xTotalNodes := ExchangesList.RootNode.TotalCount;
   while (xNode <> Nil) do begin
     xXml := ICXMLDOMNode(ExchangesList.GetNodeData(xNode)^);
     if ExchangesList.NodeParent[xNode] = Nil then begin
@@ -295,7 +299,11 @@ begin
       end;
     end;
     xNode := ExchangesList.GetNext(xNode);
-    StepWaitForm(1);
+    Inc(xCurNode);
+    if (xCurNode / xTotalNodes) * 100 > xCurMark then begin
+      StepWaitForm(10);
+      xCurMark := xCurMark + 10;
+    end;
   end;
   xInstrumentList.Free;
   GDataProvider.CommitTransaction;
