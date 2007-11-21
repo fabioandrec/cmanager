@@ -27,7 +27,7 @@ type
 
 implementation
 
-uses CConsts, CPluginConsts, CInstrumentFormUnit;
+uses CConsts, CPluginConsts, CInstrumentFormUnit, CReports;
 
 {$R *.dfm}
 
@@ -100,7 +100,7 @@ end;
 
 procedure TCInstrumentFrame.ShowHistory(AGid: ShortString);
 begin
-  //
+  //TODO
 end;
 
 end.
