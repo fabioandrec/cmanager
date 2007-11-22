@@ -99,8 +99,14 @@ begin
 end;
 
 procedure TCInstrumentFrame.ShowHistory(AGid: ShortString);
+var xReport: TInstrumentValueChartReport;
+    xParams: TCReportParams;
 begin
-  //TODO
+  xParams := TCWithGidParams.Create(AGid);
+  xReport := TInstrumentValueChartReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

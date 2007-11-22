@@ -576,6 +576,20 @@ type
     function GetReportTitle: String; override;
   end;
 
+  TInstrumentValueChartReport = class(TCChartReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+    FInstrumentId: TDataGid;
+    FCurrText: String;
+    FInstrumentName: String;
+  protected
+    function PrepareReportConditions: Boolean; override;
+    procedure PrepareReportChart; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
   TPluginHtmlReport = class(TCHtmlReport)
   private
     FBody: OleVariant;
@@ -5031,6 +5045,87 @@ begin
 end;
 
 function TInstrumentValueListReport.PrepareReportConditions: Boolean;
+begin
+  if Params <> Nil then begin
+    FInstrumentId := TCWithGidParams(Params).id;
+  end;
+  Result := ChoosePeriodInstrumentValueHistory(FStartDate, FEndDate, FInstrumentId);
+end;
+
+function TInstrumentValueChartReport.GetReportTitle: String;
+var xInstrument: TInstrument;
+begin
+  GDataProvider.BeginTransaction;
+  xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, FInstrumentId, False));
+  FInstrumentName := xInstrument.name;
+  if xInstrument.idCurrencyDef <> CEmptyDataGid then begin
+    FCurrText := '[' + GCurrencyCache.GetIso(xInstrument.idCurrencyDef) + ']';
+  end else begin
+    FCurrText := '';
+  end;
+  GDataProvider.RollbackTransaction;
+  Result := Format('Notowania instrumentu %s (%s - %s)', [FInstrumentName,
+                          GetFormattedDate(FStartDate, CLongDateFormat) + ' ' + GetFormattedTime(FStartDate, CLongTimeFormat),
+                          GetFormattedDate(FEndDate, CLongDateFormat) + ' ' + GetFormattedTime(FEndDate, CLongTimeFormat)]);
+end;
+
+procedure TInstrumentValueChartReport.PrepareReportChart;
+var xValues: TADOQuery;
+    xSql: String;
+    xPrevValue, xPercentage: Currency;
+    xSerie: TLineSeries;
+    xChart: TCChart;
+begin
+  xSql := Format('select * from instrumentValue where regDateTime between %s and %s and idInstrument = %s order by regDateTime',
+                 [DatetimeToDatabase(FStartDate, True), DatetimeToDatabase(FEndDate, True), DataGidToDatabase(FInstrumentId)]);
+  xValues := GDataProvider.OpenSql(xSql);
+  xChart := GetChart;
+  with xValues do begin
+    xSerie := TLineSeries.Create(xChart);
+    TLineSeries(xSerie).Pointer.Visible := True;
+    TLineSeries(xSerie).Pointer.InflateMargins := True;
+    with xSerie do begin
+      Title := FInstrumentName + ' ' + FCurrText;
+      HorizAxis := aBottomAxis;
+      XValues.DateTime := True;
+    end;
+    xPrevValue := -1;
+    while not xValues.Eof do begin
+      if xPrevValue <> -1 then begin
+        xPercentage := (FieldByName('valueOf').AsCurrency/xPrevValue - 1) * 100;
+      end else begin
+        xPercentage := -1;
+      end;
+      if xPercentage <> -1 then begin
+        //brak poprzedniego
+      end else begin
+        //jest poprzedni
+      end;
+      xSerie.AddXY(FieldByName('regDateTime').AsDateTime, FieldByName('valueOf').AsCurrency);
+      xPrevValue := FieldByName('valueOf').AsCurrency;
+      Next;
+    end;
+    xChart.AddSeries(xSerie);
+  end;
+  xValues.Free;
+  with xChart.BottomAxis do begin
+    DateTimeFormat := 'yyyy-mm-dd hh:mm:ss';
+    ExactDateTime := True;
+    Automatic := False;
+    AutomaticMaximum := True;
+    AutomaticMinimum := True;
+    LabelsAngle := 90;
+    MinorTickCount := 0;
+    Title.Caption := '[Data/Czas]';
+  end;
+  with xChart.LeftAxis do begin
+    MinorTickCount := 0;
+    Title.Caption := 'Wartoœæ ' + FCurrText;
+    Title.Angle := 90;
+  end;
+end;
+
+function TInstrumentValueChartReport.PrepareReportConditions: Boolean;
 begin
   if Params <> Nil then begin
     FInstrumentId := TCWithGidParams(Params).id;
