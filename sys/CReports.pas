@@ -5,7 +5,7 @@ interface
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, 
      CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects,
-     CXml;
+     CXml, TeEngine;
 
 type
   TReportDialogParamsDefs = class;
@@ -242,8 +242,10 @@ type
     function GetFormClass: TCReportFormClass; override;
     procedure PrepareReportChart; virtual; abstract;
     procedure PrepareReportData; override;
+    procedure GetMarkText(ASender: TChartSeries; AValueIndex: Longint; var AMarkText: String); virtual;
     function GetChart(ASymbol: String = ''): TCChart;
     function CanShowReport: Boolean; override;
+    function GetSerie(AChart: TCChart; AClass: TChartSeriesClass): TChartSeries;
   public
     procedure SetChartProps; virtual;
     function GetReportFooter: String; override;
@@ -312,6 +314,7 @@ type
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
+    procedure GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String); override;
   public
     function GetReportTitle: String; override;
   end;
@@ -462,6 +465,7 @@ type
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
+    procedure GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String); override;
   public
     function GetReportTitle: String; override;
   end;
@@ -542,6 +546,7 @@ type
   protected
     procedure PrepareReportChart; override;
     function PrepareReportConditions: Boolean; override;
+    procedure GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String); override;
   public
     function GetReportTitle: String; override;
   end;
@@ -586,6 +591,7 @@ type
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
+    procedure GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String); override;
   public
     function GetReportTitle: String; override;
   end;
@@ -601,14 +607,18 @@ type
   TPluginChartReport = class(TCChartReport)
   private
     FXml: ICXMLDOMDocument;
+    FMarks: TStringList;
   protected
     function PrepareReportConditions: Boolean; override;
     procedure PrepareReportChart; override;
     function CanShowReport: Boolean; override;
+    procedure GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String); override;
   public
     function GetReportFooter: String; override;
     function GetReportTitle: String; override;
     function GetPrefname: String; override;
+    destructor Destroy; override;
+    constructor CreateReport(AParams: TCReportParams); override;
   end;
 
   TAccountExtractionReport = class(TCHtmlReport)
@@ -665,8 +675,7 @@ implementation
 uses Forms, Adodb, CConfigFormUnit, Math,
      CChooseDateFormUnit, CChoosePeriodFormUnit, CConsts,
      DateUtils, CSchedules, CChoosePeriodAcpFormUnit, CHtmlReportFormUnit,
-     TeeProcs, TeCanvas, TeEngine,
-     CChoosePeriodAcpListFormUnit, CChoosePeriodAcpListGroupFormUnit,
+     TeeProcs, TeCanvas, CChoosePeriodAcpListFormUnit, CChoosePeriodAcpListGroupFormUnit,
      CChooseDateAccountListFormUnit, CChoosePeriodFilterFormUnit, CDatatools,
      CChooseFutureFilterFormUnit, CChoosePeriodRatesHistoryFormUnit,
      StrUtils, Variants, CPreferences, CInfoFormUnit, CPluginConsts,
@@ -1585,6 +1594,10 @@ begin
   Result := TCChartReportForm;
 end;
 
+procedure TCChartReport.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
+begin
+end;
+
 function TCChartReport.GetPrefname: String;
 begin
   Result := ClassName;
@@ -1599,6 +1612,12 @@ procedure TCChartReport.GetSaveDialogProperties(var AFilter, AExtension: String)
 begin
   AFilter := 'pliki BMP|*.bmp';
   AExtension := '.bmp';
+end;
+
+function TCChartReport.GetSerie(AChart: TCChart; AClass: TChartSeriesClass): TChartSeries;
+begin
+  Result := AClass.Create(AChart);
+  Result.OnGetMarkText := GetMarkText;
 end;
 
 procedure TCChartReport.PrepareReportData;
@@ -1641,7 +1660,7 @@ var xSums: TADOQuery;
     xCount: Integer;
     xAccounts: TDataObjectList;
     xAccount: TAccount;
-    xChart: TChart;
+    xChart: TCChart;
     xSerie: TChartSeries;
     xDate: TDateTime;
     xBalance: Currency;
@@ -1653,7 +1672,7 @@ begin
     xAccount := TAccount(xAccounts.Items[xCount]);
     if IsValidGid(xAccount.id, FIds) then begin
       xBalance := xAccount.cash;
-      xSerie := TLineSeries.Create(xChart);
+      xSerie := GetSerie(xChart, TLineSeries);
       TLineSeries(xSerie).Pointer.Visible := True;
       TLineSeries(xSerie).Pointer.InflateMargins := True;
       with xSerie do begin
@@ -1668,13 +1687,13 @@ begin
         if (xSums.RecNo = 1) and (xSums.FieldByName('regDate').AsDateTime < FEndDate) then begin
           xDate := FEndDate;
           while (xDate > xSums.FieldByName('regDate').AsDateTime) do begin
-            xSerie.AddXY(xDate, xBalance, '');
+            xSerie.AddXY(xDate, xBalance);
             xDate := IncDay(xDate, -1);
           end;
         end;
         xDate := xSums.FieldByName('regDate').AsDateTime;
         if (FStartDate <= xDate) and (xDate <= FEndDate) then begin
-          xSerie.AddXY(xDate, xBalance, '');
+          xSerie.AddXY(xDate, xBalance);
         end;
         xBalance := xBalance - xSums.FieldByName('cash').AsCurrency;
         xSums.Next;
@@ -1686,7 +1705,7 @@ begin
             xEnd := xDate < FStartDate;
           end;
           if not xEnd then begin
-            xSerie.AddXY(xDate, xBalance, '');
+            xSerie.AddXY(xDate, xBalance);
           end;
         until xEnd;
       end;
@@ -1827,7 +1846,7 @@ end;
 
 procedure TOperationsBySomethingChart.PrepareReportChart;
 var xSums: TADOQuery;
-    xSerie: TPieSeries;
+    xSerie: TChartSeries;
     xChart: TCChart;
     xCash: Currency;
     xLabel: String;
@@ -1841,7 +1860,7 @@ begin
   for xCount := 0 to xCurDefs.Count - 1 do begin
     xChart := GetChart(xCurDefs.Strings[xCount]);
     xChart.thumbTitle := '[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCount]) + ']';
-    xSerie := TPieSeries.Create(xChart);
+    xSerie := GetSerie(xChart, TPieSeries);
     xSerie.Title := 'Wszystkie dane';
     xSum := 0;
     xSums.Filter := 'idCurrencyDef = ' + DataGidToDatabase(xCurDefs.Strings[xCount]);
@@ -2188,6 +2207,13 @@ begin
   Result := ChoosePeriodAcpListGroupByForm(FParams.acp, FStartDate, FEndDate, FAcps, FIdFilter, FGroupBy, @CurrencyView);
 end;
 
+procedure TCashSumReportChart.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
+begin
+  if ASender.Marks.Style = smsLabel then begin
+    AMarkText := GetDescription(FGroupBy, ASender.XValue[AValueIndex]);
+  end;
+end;
+
 function TCashSumReportChart.GetReportTitle: String;
 begin
   Result := 'Sumy ';
@@ -2214,7 +2240,7 @@ var xInOperations, xOutOperations: TADOQuery;
     xGbSum: Currency;
     xName: String;
     xCurDate: TDateTime;
-    xInSerie, xOutSerie: TBarSeries;
+    xInSerie, xOutSerie: TChartSeries;
     xInMovements: Boolean;
     xOutMovements: Boolean;
     xInCurDefs, xOutCurDefs, xOverallCurDefs: TDataGids;
@@ -2274,7 +2300,7 @@ begin
       end else begin
         xCurDate := FStartDate;
       end;
-      xInSerie := TBarSeries.Create(xChart);
+      xInSerie := GetSerie(xChart, TBarSeries);
       with TBarSeries(xInSerie) do begin
         Title := xName;
         Marks.ArrowLength := 0;
@@ -2294,7 +2320,7 @@ begin
           end;
           xInOperations.Next;
         end;
-        xInSerie.AddXY(xCurDate, xGbSum, GetDescription(FGroupBy, xCurDate));
+        xInSerie.AddXY(xCurDate, xGbSum);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
         end else if FGroupBy = CGroupByMonth then begin
@@ -2312,7 +2338,7 @@ begin
       end else begin
         xCurDate := FStartDate;
       end;
-      xOutSerie := TBarSeries.Create(xChart);
+      xOutSerie := GetSerie(xChart, TBarSeries);
       with TBarSeries(xOutSerie) do begin
         Title := xName;
         Marks.ArrowLength := 0;
@@ -2332,7 +2358,7 @@ begin
           end;
           xOutOperations.Next;
         end;
-        xOutSerie.AddXY(xCurDate, xGbSum, GetDescription(FGroupBy, xCurDate));
+        xOutSerie.AddXY(xCurDate, xGbSum);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
         end else if FGroupBy = CGroupByMonth then begin
@@ -3283,6 +3309,20 @@ begin
   Result := 'Informacje o kredycie';
 end;
 
+procedure TCurrencyRatesHistoryReport.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
+var xCurValue, xPrevValue: Currency;
+begin
+  if ASender.Marks.Style = smsLabel then begin
+    if AValueIndex > 0 then begin
+      xCurValue := ASender.YValue[AValueIndex];
+      xPrevValue := ASender.YValue[AValueIndex - 1];
+      if xPrevValue <> 0 then begin
+        AMarkText := AMarkText + ' (' + CurrencyToString((xCurValue/xPrevValue - 1) * 100, '', False, 4) + '%)';
+      end;
+    end;
+  end;
+end;
+
 function TCurrencyRatesHistoryReport.GetReportTitle: String;
 var xCashpoint: String;
 begin
@@ -3313,7 +3353,7 @@ begin
 end;
 
 procedure TCurrencyRatesHistoryReport.PrepareReportChart;
-var xChart: TChart;
+var xChart: TCChart;
     xRates: TDataObjectList;
     xMaxDate: TDateTime;
     xCurDate: TDateTime;
@@ -3324,8 +3364,6 @@ var xChart: TChart;
     xCount: Integer;
     xSerie: TChartSeries;
     xTypeCondition: String;
-    xPrevValue: Currency;
-    xPercentage: String;
 begin
   xChart := GetChart;
   if Length(FrateTypes) = 1 then begin
@@ -3357,7 +3395,7 @@ begin
   for xCount := 1 to Length(FrateTypes) do begin
     xCurDate := FStartDate;
     xCurValue := -1;
-    xSerie := TLineSeries.Create(xChart);
+    xSerie := GetSerie(xChart, TLineSeries);
     TLineSeries(xSerie).Pointer.Visible := True;
     TLineSeries(xSerie).Pointer.InflateMargins := True;
     with xSerie do begin
@@ -3371,7 +3409,6 @@ begin
       HorizAxis := aBottomAxis;
       XValues.DateTime := True;
     end;
-    xPrevValue := -1;
     while xCurDate <= FEndDate do begin
       xRate := FindCurrencyRate(xRates, xCurDate, FrateTypes[xCount]);
       if xRate <> Nil then begin
@@ -3382,13 +3419,7 @@ begin
         end;
       end;
       if (xCurValue <> -1) and (xCurDate <= xMaxDate) then begin
-        if xPrevValue <> -1 then begin
-          xPercentage := CurrencyToString(xCurValue, '', False, 4) + ' (' + CurrencyToString((xCurValue/xPrevValue - 1) * 100, '', False, 4) + '%)';
-        end else begin
-          xPercentage := '';
-        end;
-        xSerie.AddXY(xCurDate, xCurValue, xPercentage);
-        xPrevValue := xCurValue;
+        xSerie.AddXY(xCurDate, xCurValue);
       end else begin
         xSerie.AddNullXY(xCurDate, 0, '');
       end;
@@ -3495,6 +3526,31 @@ begin
   TCChartReportForm(FForm).PanelNoData.Caption := 'Wtyczka nie zwróci³a ¿adnego wykresu do wyœwietlenie';
 end;
 
+constructor TPluginChartReport.CreateReport(AParams: TCReportParams);
+begin
+  inherited CreateReport(AParams);
+  FMarks := TStringList.Create;
+  FMarks.Duplicates := dupIgnore;
+  FMarks.Sorted := True;
+end;
+
+destructor TPluginChartReport.Destroy;
+begin
+  FMarks.Free;
+  inherited Destroy;
+end;
+
+procedure TPluginChartReport.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
+var xText: String;
+begin
+  if ASender.Marks.Style = smsLabel then begin
+    xText := FMarks.Values[ASender.Title + IntToStr(AValueIndex)];
+    if xText <> '' then begin
+      AMarkText := xText;
+    end;
+  end;
+end;
+
 function TPluginChartReport.GetPrefname: String;
 begin
   Result := TCPluginReportParams(Params).plugin.fileName;
@@ -3537,6 +3593,7 @@ var xSeries, xItems, xCharts: ICXMLDOMNodeList;
     xLabel: String;
     xChart: TCChart;
 begin
+  FMarks.BeginUpdate;
   xCharts := FXml.documentElement.selectNodes('chart');
   for xCountC := 0 to xCharts.length - 1 do begin
     xChartNode := xCharts.item[xCountC];
@@ -3549,11 +3606,11 @@ begin
       xSerieNode := xSeries.item[xCountS];
       xSerieType := StrToIntDef(GetXmlAttribute('type', xSerieNode, ''), 0);
       if xSerieType = CSERIESTYPE_PIE then begin
-        xSerieObject := TPieSeries.Create(xChart);
+        xSerieObject := GetSerie(xChart, TPieSeries);
       end else if xSerieType = CSERIESTYPE_LINE then begin
-        xSerieObject := TLineSeries.Create(xChart);
+        xSerieObject := GetSerie(xChart, TLineSeries);
       end else if xSerieType = CSERIESTYPE_BAR then begin
-        xSerieObject := TBarSeries.Create(xChart);
+        xSerieObject := GetSerie(xChart, TBarSeries);
       end else begin
         xSerieObject := Nil;
       end;
@@ -3572,6 +3629,7 @@ begin
           end;
           xY := StrToCurrencyDecimalDot(GetXmlAttribute('value', xItemNode, ''));
           xSerieObject.AddXY(xX, xY, xLabel);
+          FMarks.Add(xSerieObject.Title + IntToStr(xCountI) + '=' + GetXmlAttribute('mark', xItemNode, ''));
         end;
         if xSerieObject.ValuesLists.Count > 0 then begin
           xChart.AddSeries(xSerieObject);
@@ -3589,6 +3647,7 @@ begin
       end;
     end;
   end;
+  FMarks.EndUpdate;
 end;
 
 function TPluginChartReport.PrepareReportConditions: Boolean;
@@ -3730,6 +3789,13 @@ begin
   Facp := AAcp;
 end;
 
+procedure TSumBySomethingChart.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
+begin
+  if ASender.Marks.Style = smsLabel then begin
+    AMarkText := GetDescription(FGroupBy, ASender.XValue[AValueIndex]);
+  end;
+end;
+
 function TSumBySomethingChart.GetReportTitle: String;
 begin
   Result := 'Sumy ';
@@ -3758,7 +3824,7 @@ var xGbDate, xNameDate, xCashField, xCurrencyField: String;
     xCountCur, xCountAcp: Integer;
     xChart: TCChart;
     xCurDate: TDateTime;
-    xSerie: TBarSeries;
+    xSerie: TChartSeries;
     xBalance: Currency;
 begin
   xGbDate := 'regDate';
@@ -3809,7 +3875,7 @@ begin
     xChart := GetChart(xCurDefs.Strings[xCountCur]);
     xChart.thumbTitle := '[' + GCurrencyCache.GetIso(xCurDefs.Strings[xCountCur]) + ']';
     for xCountAcp := 0 to xAcpDefs.Count - 1 do begin
-      xSerie := TBarSeries.Create(xChart);
+      xSerie := GetSerie(xChart, TBarSeries);
       with TBarSeries(xSerie) do begin
         Title := xAcpDefs.Values[xAcpDefs.Names[xCountAcp]];
         Marks.ArrowLength := 0;
@@ -3835,7 +3901,7 @@ begin
         end else begin
           xBalance := 0;
         end;
-        xSerie.AddXY(xCurDate, xBalance, GetDescription(FGroupBy, xCurDate));
+        xSerie.AddXY(xCurDate, xBalance);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
         end else if FGroupBy = CGroupByMonth then begin
@@ -5052,6 +5118,20 @@ begin
   Result := ChoosePeriodInstrumentValueHistory(FStartDate, FEndDate, FInstrumentId);
 end;
 
+procedure TInstrumentValueChartReport.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
+var xCurValue, xPrevValue: Currency;
+begin
+  if ASender.Marks.Style = smsLabel then begin
+    if AValueIndex > 0 then begin
+      xCurValue := ASender.YValue[AValueIndex];
+      xPrevValue := ASender.YValue[AValueIndex - 1];
+      if xPrevValue <> 0 then begin
+        AMarkText := AMarkText + ' (' + CurrencyToString((xCurValue/xPrevValue - 1) * 100, '', False, 4) + '%)';
+      end;
+    end;
+  end;
+end;
+
 function TInstrumentValueChartReport.GetReportTitle: String;
 var xInstrument: TInstrument;
 begin
@@ -5059,7 +5139,7 @@ begin
   xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, FInstrumentId, False));
   FInstrumentName := xInstrument.name;
   if xInstrument.idCurrencyDef <> CEmptyDataGid then begin
-    FCurrText := '[' + GCurrencyCache.GetIso(xInstrument.idCurrencyDef) + ']';
+    FCurrText := GCurrencyCache.GetIso(xInstrument.idCurrencyDef);
   end else begin
     FCurrText := '';
   end;
@@ -5072,8 +5152,7 @@ end;
 procedure TInstrumentValueChartReport.PrepareReportChart;
 var xValues: TADOQuery;
     xSql: String;
-    xPrevValue, xPercentage: Currency;
-    xSerie: TLineSeries;
+    xSerie: TChartSeries;
     xChart: TCChart;
 begin
   xSql := Format('select * from instrumentValue where regDateTime between %s and %s and idInstrument = %s order by regDateTime',
@@ -5081,7 +5160,7 @@ begin
   xValues := GDataProvider.OpenSql(xSql);
   xChart := GetChart;
   with xValues do begin
-    xSerie := TLineSeries.Create(xChart);
+    xSerie := GetSerie(xChart, TLineSeries);
     TLineSeries(xSerie).Pointer.Visible := True;
     TLineSeries(xSerie).Pointer.InflateMargins := True;
     with xSerie do begin
@@ -5089,38 +5168,28 @@ begin
       HorizAxis := aBottomAxis;
       XValues.DateTime := True;
     end;
-    xPrevValue := -1;
     while not xValues.Eof do begin
-      if xPrevValue <> -1 then begin
-        xPercentage := (FieldByName('valueOf').AsCurrency/xPrevValue - 1) * 100;
-      end else begin
-        xPercentage := -1;
-      end;
-      if xPercentage <> -1 then begin
-        //brak poprzedniego
-      end else begin
-        //jest poprzedni
-      end;
       xSerie.AddXY(FieldByName('regDateTime').AsDateTime, FieldByName('valueOf').AsCurrency);
-      xPrevValue := FieldByName('valueOf').AsCurrency;
       Next;
     end;
     xChart.AddSeries(xSerie);
   end;
   xValues.Free;
   with xChart.BottomAxis do begin
-    DateTimeFormat := 'yyyy-mm-dd hh:mm:ss';
+    DateTimeFormat := 'yyyy-mm-dd hh:nn:ss';
     ExactDateTime := True;
     Automatic := False;
-    AutomaticMaximum := True;
-    AutomaticMinimum := True;
+    AutomaticMaximum := False;
+    AutomaticMinimum := False;
+    Maximum := FEndDate;
+    Minimum := FStartDate;
     LabelsAngle := 90;
     MinorTickCount := 0;
-    Title.Caption := '[Data/Czas]';
+    Title.Caption := '[Data i czas notowania]';
   end;
   with xChart.LeftAxis do begin
     MinorTickCount := 0;
-    Title.Caption := 'Wartoœæ ' + FCurrText;
+    Title.Caption := '[Wartoœæ' + IfThen(FCurrText = '', ']', ' w ' + FCurrText + ']');
     Title.Angle := 90;
   end;
 end;

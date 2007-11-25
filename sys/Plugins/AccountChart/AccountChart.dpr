@@ -72,7 +72,7 @@ begin
       xSerie := xXml.createElement('serie');
       xChart.appendChild(xSerie);
       SetXmlAttribute('type', xSerie, CSERIESTYPE_PIE);
-      SetXmlAttribute('title', xSerie, 'Wszystkie dane');
+      SetXmlAttribute('title', xSerie, 'Seria 1');
       SetXmlAttribute('domain', xSerie, CSERIESDOMAIN_FLOAT);
       xAccounts.Filter := 'idCurrencyDef = ''' + xCurDefs.Strings[xCount] + '''';
       xAccounts.MoveFirst;
@@ -89,7 +89,7 @@ begin
     xChart := xXml.createElement('chart');
     xOutRoot.appendChild(xChart);
     SetXmlAttribute('symbol', xChart, 'LINIOWY');
-    SetXmlAttribute('thumbTitle', xChart, 'thumTitle');
+    SetXmlAttribute('thumbTitle', xChart, 'thumbTitle');
     SetXmlAttribute('chartTitle', xChart, 'Wykres liniowy posiadania z datami');
     SetXmlAttribute('chartFooter', xChart, CManInterface.GetName + ' wer. ' + CManInterface.GetVersion + ', ' + DateTimeToStr(Now));
     SetXmlAttribute('axisx', xChart, 'tytu³ osi x');
@@ -97,19 +97,19 @@ begin
     xSerie := xXml.createElement('serie');
     xChart.appendChild(xSerie);
     SetXmlAttribute('type', xSerie, CSERIESTYPE_LINE);
-    SetXmlAttribute('title', xSerie, 'Wszystkie dane');
+    SetXmlAttribute('title', xSerie, 'Seria 2');
     SetXmlAttribute('domain', xSerie, CSERIESDOMAIN_DATETIME);
     for xCount := 1 to 5 do begin
       xItem := xXml.createElement('item');
       xSerie.appendChild(xItem);
       SetXmlAttribute('domain', xItem, FormatDateTime('yyyy-mm-dd', EncodeDate(YearOf(Now), MonthOf(Now), xCount)));
       SetXmlAttribute('value', xItem, Trim(StringReplace(Format('%-10.4f', [Random(1000)/(1 + Random(10))]), ',', '.', [rfIgnoreCase, rfReplaceAll])));
-      SetXmlAttribute('label', xItem, '');
+      SetXmlAttribute('label', xItem, 'item ' + IntToStr(xCount));
     end;
     xSerie := xXml.createElement('serie');
     xChart.appendChild(xSerie);
     SetXmlAttribute('type', xSerie, CSERIESTYPE_BAR);
-    SetXmlAttribute('title', xSerie, 'Wszystkie dane');
+    SetXmlAttribute('title', xSerie, 'Seria 3');
     SetXmlAttribute('domain', xSerie, CSERIESDOMAIN_DATETIME);
     for xCount := 1 to 5 do begin
       xItem := xXml.createElement('item');
@@ -117,6 +117,7 @@ begin
       SetXmlAttribute('domain', xItem, FormatDateTime('yyyy-mm-dd', EncodeDate(YearOf(Now), MonthOf(Now), xCount)));
       SetXmlAttribute('value', xItem, Trim(StringReplace(Format('%-10.4f', [Random(1000)/(1 + Random(10))]), ',', '.', [rfIgnoreCase, rfReplaceAll])));
       SetXmlAttribute('label', xItem, '');
+      SetXmlAttribute('mark', xItem, 'opis znacznika ' + IntToStr(xCount));
     end;
     Result := GetStringFromDocument(xXml);
   end;

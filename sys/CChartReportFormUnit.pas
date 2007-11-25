@@ -98,7 +98,7 @@ begin
   end;
   xSum := xSum / ASourceSerie.Count;
   for xCount := 0 to ASourceSerie.Count - 1 do begin
-    ADestserie.AddXY(ASourceSerie.XValue[xCount], xSum, ASourceSerie.ValueMarkText[xCount]);
+    ADestserie.AddXY(ASourceSerie.XValue[xCount], xSum);
   end;
   ADestserie.Title := ASourceSerie.Title + ' (Œrednie)';
   ADestserie.Marks.Assign(ASourceSerie.Marks);
@@ -118,7 +118,7 @@ begin
   end;
   RegLin(xXVals, xYVals, xA, xB);
   for xCount := 0 to ASourceSerie.Count - 1 do begin
-    ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB, ASourceSerie.ValueMarkText[xCount]);
+    ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
   end;
   ADestserie.Title := ASourceSerie.Title + ' (Linia trendu)';
   ADestserie.Marks.Assign(ASourceSerie.Marks);
@@ -498,6 +498,7 @@ begin
           xAvgSerie := TLineSeries.Create(Self);
           FavgSeries.Add(xAvgSerie);
           PrepareAvgSerie(xCurSerie, xAvgSerie);
+          xAvgSerie.XValues.DateTime := BottomAxis.ExactDateTime;
           AddSeries(xAvgSerie);
         end;
       end;
@@ -523,6 +524,7 @@ begin
           xRegSerie := TLineSeries.Create(Self);
           FregSeries.Add(xRegSerie);
           PrepareRegSerie(xCurSerie, xRegSerie);
+          xRegSerie.XValues.DateTime := BottomAxis.ExactDateTime;
           AddSeries(xRegSerie);
         end;
       end;
