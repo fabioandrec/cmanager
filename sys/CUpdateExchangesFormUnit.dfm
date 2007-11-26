@@ -59,10 +59,10 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
       object Label1: TLabel
         Left = 26
         Top = 32
-        Width = 86
+        Width = 102
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Tryb importu walut'
+        Caption = 'Tryb importu notowa'#324
       end
       object Panel1: TPanel
         Left = 24
@@ -171,18 +171,20 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
         end
       end
       object ComboBoxType: TComboBox
-        Left = 120
+        Left = 136
         Top = 28
-        Width = 481
+        Width = 465
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
-        ItemIndex = 1
+        ItemIndex = 0
         MaxLength = 1
         TabOrder = 1
-        Text = 'Podczas importu utw'#243'rz instrumenty, kt'#243'rych brak w bazie danych'
+        Text = 
+          'Importuj notowania tylko tych instrument'#243'w, kt'#243're znajduj'#261' si'#281' w' +
+          ' bazie danych'
         OnChange = ComboBoxTypeChange
         Items.Strings = (
           
