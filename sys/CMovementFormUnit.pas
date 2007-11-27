@@ -1103,8 +1103,6 @@ begin
       end;
       GDataProvider.RollbackTransaction;
     end;
-
-
     if AUpdateCurEdit then begin
       UpdateAccountCurEdit(CStaticTransRate, CCurrEditTransMovement, CCurrEditTransAccount, FTransferRateHelper);
     end;

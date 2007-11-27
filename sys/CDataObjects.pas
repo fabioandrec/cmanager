@@ -2845,7 +2845,7 @@ begin
                     DataGidToDatabase(ATargetId), DataGidToDatabase(ASourceId),
                     DataGidToDatabase(ACashpointId)]);
   end else begin
-    xSql := Format('select top 1 * from currencyRate where rateType = ''%s'' and bindingDate = %s and ' +
+    xSql := Format('select top 1 * from currencyRate where rateType = ''%s'' and bindingDate <= %s and ' +
       '((idSourceCurrencyDef = %s and idTargetCurrencyDef = %s) or (idSourceCurrencyDef = %s and idTargetCurrencyDef = %s))' +
       ' and idCashpoint = %s order by bindingDate desc',
                    [ARateType,
