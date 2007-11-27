@@ -678,10 +678,12 @@ type
     FrateType: TBaseEnumeration;
     FidAccount: TDataGid;
     FidCashPoint: TDataGid;
+    FuseOldRates: Boolean;
     procedure SetidAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetmovementType(const Value: TBaseEnumeration);
     procedure SetrateType(const Value: TBaseEnumeration);
+    procedure SetuseOldRates(const Value: Boolean);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -694,6 +696,7 @@ type
     property rateType: TBaseEnumeration read FrateType write SetrateType;
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+    property useOldRates: Boolean read FuseOldRates write SetuseOldRates;
   end;
 
   TReportDef = class(TDataObject)
@@ -3099,7 +3102,7 @@ begin
   end;
   xRule := FindRule(AmovementType, AIdAccount);
   if xRule <> Nil then begin
-    Result := TCurrencyRate.FindRate(xRule.rateType, TAccount.GetCurrencyDefinition(AIdAccount), ASourceCurrency, xRule.idCashPoint, ADate);
+    Result := TCurrencyRate.FindRate(xRule.rateType, TAccount.GetCurrencyDefinition(AIdAccount), ASourceCurrency, xRule.idCashPoint, ADate, not xRule.FuseOldRates);
   end;
   if not xTr then begin
     GDataProvider.RollbackTransaction;
@@ -3135,6 +3138,7 @@ begin
     FidAccount := FieldByName('idAccount').AsString;
     FrateType := FieldByName('rateType').AsString;
     FmovementType := FieldByName('movementType').AsString;
+    FuseOldRates := FieldByName('useOldRates').AsBoolean;
   end;
 end;
 
@@ -3170,6 +3174,14 @@ begin
   end;
 end;
 
+procedure TAccountCurrencyRule.SetuseOldRates(const Value: Boolean);
+begin
+  if FuseOldRates <> Value then begin
+    FuseOldRates := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TAccountCurrencyRule.UpdateFieldList;
 begin
   inherited UpdateFieldList;
@@ -3178,6 +3190,7 @@ begin
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'accountCurrencyRule');
     AddField('rateType', FrateType, True, 'accountCurrencyRule');
     AddField('movementType', FmovementType, True, 'accountCurrencyRule');
+    AddField('useOldRates', IntToStr(Integer(FuseOldRates)), False, 'accountCurrencyRule');
   end;
 end;
 

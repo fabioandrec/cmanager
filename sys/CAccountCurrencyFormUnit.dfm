@@ -1,13 +1,15 @@
 inherited CAccountCurrencyForm: TCAccountCurrencyForm
+  Left = 290
+  Top = 174
   Caption = 'Regu'#322'y przelicze'#324' walut'
-  ClientHeight = 231
+  ClientHeight = 283
   ClientWidth = 477
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 477
-    Height = 190
+    Height = 242
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -45,7 +47,7 @@ inherited CAccountCurrencyForm: TCAccountCurrencyForm
       Left = 16
       Top = 108
       Width = 441
-      Height = 73
+      Height = 109
       Caption = ' Przeliczaj waluty za pomoc'#261' '
       TabOrder = 1
       object Label1: TLabel
@@ -63,6 +65,14 @@ inherited CAccountCurrencyForm: TCAccountCurrencyForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'w/g'
+      end
+      object Label2: TLabel
+        Left = 28
+        Top = 72
+        Width = 20
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'U'#380'yj'
       end
       object ComboBoxRate: TComboBox
         Left = 56
@@ -101,10 +111,27 @@ inherited CAccountCurrencyForm: TCAccountCurrencyForm
         OnChanged = CStaticBankChanged
         HotTrack = True
       end
+      object ComboBoxUseOld: TComboBox
+        Left = 56
+        Top = 68
+        Width = 361
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 2
+        Text = 'Kurs obowi'#261'zuj'#261'cy dla dnia operacji'
+        OnChange = ComboBoxUseOldChange
+        Items.Strings = (
+          'Kurs obowi'#261'zuj'#261'cy dla dnia operacji'
+          'Kurs z dowolnego wcze'#347'niejszego dnia')
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 190
+    Top = 242
     Width = 477
     inherited BitBtnOk: TBitBtn
       Left = 300

@@ -318,6 +318,7 @@ create table accountCurrencyRule (
   rateType varchar(1) not null,
   idAccount uniqueidentifier not null,
   idCashPoint uniqueidentifier,
+  useOldRates bit not null,
   primary key (idaccountCurrencyRule),
   constraint ck_accountCurrencymovementType check (movementType in ('I', 'O', 'T')),
   constraint ck_accountCurrencyrateType check (rateType in ('B', 'S', 'A')),

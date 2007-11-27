@@ -37,3 +37,6 @@ update extractionItem set cash = abs(cash);
 
 create index ix_instrumentValue_regDatetimeinstrument on instrumentValue (idInstrument, regDateTime);
 create index ix_currencyRate_regDatecurrency on currencyRate (idSourceCurrencyDef, idTargetCurrencyDef, bindingDate);
+
+alter table accountCurrencyRule add useOldRates bit not null;
+update accountCurrencyRule set useOldRates = 0;

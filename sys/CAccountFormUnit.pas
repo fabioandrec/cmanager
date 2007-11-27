@@ -56,7 +56,7 @@ implementation
 uses CDataObjects, CInfoFormUnit, CConfigFormUnit, CFrameFormUnit,
   CCashpointsFrameUnit, CConsts, CAccountsFrameUnit, CRichtext,
   CCurrencydefFormUnit, CCurrencydefFrameUnit, CAccountCurrencyFormUnit,
-  CTools;
+  CTools, StrUtils;
 
 {$R *.dfm}
 
@@ -122,7 +122,7 @@ begin
     xRules := TAccountCurrencyRule.FindRules(id);
     for xCount := 0 to xRules.Count - 1 do begin
       xRule := TAccountCurrencyRule(xRules.Items[xCount]);
-      Frules.Values[xRule.movementType] := xRule.rateType + xRule.idCashPoint;
+      Frules.Values[xRule.movementType] := xRule.rateType + IfThen(xRule.useOldRates, 'T', 'N') + xRule.idCashPoint;
     end;
     xRules.Free;
     ComboBoxTypeChange(Nil);
@@ -219,7 +219,8 @@ begin
     xRule.idAccount := Dataobject.id;
     xRule.movementType := Frules.Names[xCount];
     xRule.rateType := Copy(Frules.ValueFromIndex[xCount], 1, 1);
-    xRule.idCashPoint := Copy(Frules.ValueFromIndex[xCount], 2, MaxInt);
+    xRule.useOldRates := Copy(Frules.ValueFromIndex[xCount], 2, 1) = 'T';
+    xRule.idCashPoint := Copy(Frules.ValueFromIndex[xCount], 3, MaxInt);
   end;
   GDataProvider.CommitTransaction;
   inherited AfterCommitData;
