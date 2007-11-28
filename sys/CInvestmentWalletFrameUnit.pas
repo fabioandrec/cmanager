@@ -10,14 +10,27 @@ uses
 type
   TCInvestmentWalletFrame = class(TCDataobjectFrame)
   private
-    { Private declarations }
   public
-    { Public declarations }
+    class function GetTitle: String; override;
+    procedure ReloadDataobjects; override;
   end;
 
 implementation
 
+uses CDataObjects, CDatabase;
+
 {$R *.dfm}
+
+class function TCInvestmentWalletFrame.GetTitle: String;
+begin
+  Result := 'Portfele inwestycyjne';
+end;
+
+procedure TCInvestmentWalletFrame.ReloadDataobjects;
+begin
+  inherited ReloadDataobjects;
+  Dataobjects := TInvestmentWallet.GetAllObjects(InvestmentWalletProxy);
+end;
 
 end.
  

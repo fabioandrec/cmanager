@@ -791,13 +791,23 @@ type
 
   TInvestmentWallet = class(TDataObject)
   private
+    Fname: String;
     Fdescription: TBaseDescription;
+    FidAccount: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
+    procedure Setname(const Value: string);
+    procedure SetidAccount(const Value: TDataGid);
   public
+    function GetElementText: String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    constructor Create(AStatic: Boolean); override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
+    property name: string read Fname write Setname;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
   end;
 
   TInvestmentWalletItem = class(TDataObject)
@@ -974,8 +984,8 @@ begin
   ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef');
   InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument');
   InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'StnInstrumentValue');
-  InvestmentWalletProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'investmentWallet');
-  InvestmentWalletItemProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'investmentWalletItem');
+  InvestmentWalletProxy := TDataProxy.Create(GDataProvider, 'investmentWallet');
+  InvestmentWalletItemProxy := TDataProxy.Create(GDataProvider, 'investmentWalletItem');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -3980,12 +3990,35 @@ begin
   end;
 end;
 
+constructor TInvestmentWallet.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidAccount := CEmptyDataGid;
+end;
+
 procedure TInvestmentWallet.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     Fdescription := FieldByName('description').AsString;
+    Fname := FieldByName('name').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
   end;
+end;
+
+function TInvestmentWallet.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+begin
+  Result := Fname;
+end;
+
+function TInvestmentWallet.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TInvestmentWallet.GetElementText: String;
+begin
+  Result := Fname;
 end;
 
 procedure TInvestmentWallet.Setdescription(const Value: TBaseDescription);
@@ -4046,11 +4079,29 @@ begin
   end;
 end;
 
+procedure TInvestmentWallet.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentWallet.Setname(const Value: string);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TInvestmentWallet.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('description', Fdescription, True, 'investmentWallet');
+    AddField('name', Fname, True, 'investmentWallet');
+    AddField('idAccount', FidAccount, True, 'investmentWallet');
   end;
 end;
 

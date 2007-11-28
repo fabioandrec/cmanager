@@ -45,8 +45,11 @@ create table investmentWallet (
   idInvestmentWallet uniqueidentifier not null,
   created datetime not null,
   modified datetime,
+  name varchar(40) not null,
+  idAccount uniqueidentifier not null,
   description varchar(200),
-  primary key (idInvestmentWallet)
+  primary key (idInvestmentWallet),
+  constraint fk_investmentWalletAccount foreign key (idAccount) references account (idAccount)  
 );
 
 create table investmentWalletItem (
