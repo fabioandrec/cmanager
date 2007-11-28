@@ -719,6 +719,10 @@ object CMainForm: TCMainForm
       Caption = 'Wczytaj notowania'
       OnExecute = ActionStockExchangesExecute
     end
+    object ActionShortcutInvestment: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Inwestycje'
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

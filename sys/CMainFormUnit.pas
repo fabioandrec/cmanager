@@ -72,6 +72,7 @@ type
     ActionShortcutInstruments: TAction;
     ActionShortcutExch: TAction;
     ActionStockExchanges: TAction;
+    ActionShortcutInvestment: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -157,7 +158,7 @@ uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
      CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts, CDataobjectFrameUnit,
   CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
-  CInstrumentValueFrameUnit, CTools;
+  CInstrumentValueFrameUnit, CTools, CInvestmentWalletFrameUnit;
 
 {$R *.dfm}
 
@@ -270,6 +271,8 @@ begin
       xClass := TCInstrumentFrame;
     end else if AAction = ActionShortcutExch then begin
       xClass := TCInstrumentValueFrame;
+    end else if AAction = ActionShortcutInvestment then begin
+      xClass := TCInvestmentWalletFrame;
     end else begin
       xClass := TCBaseFrame;
     end;

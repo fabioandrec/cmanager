@@ -273,9 +273,11 @@ procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataE
 var xCount: Integer;
     xElement: TCListDataElement;
 begin
-  for xCount := 0 to AList.Count - 1 do begin
-    xElement := TCListDataElement.Create(ACheckSupport, ARootElement.ParentList, AList.Items[xCount]);
-    ARootElement.Add(xElement);
+  if AList <> Nil then begin
+    for xCount := 0 to AList.Count - 1 do begin
+      xElement := TCListDataElement.Create(ACheckSupport, ARootElement.ParentList, AList.Items[xCount]);
+      ARootElement.Add(xElement);
+    end;
   end;
 end;
 

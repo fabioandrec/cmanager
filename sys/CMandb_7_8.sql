@@ -40,3 +40,24 @@ create index ix_currencyRate_regDatecurrency on currencyRate (idSourceCurrencyDe
 
 alter table accountCurrencyRule add useOldRates bit not null;
 update accountCurrencyRule set useOldRates = 0;
+
+create table investmentWallet (
+  idInvestmentWallet uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  description varchar(200),
+  primary key (idInvestmentWallet)
+);
+
+create table investmentWalletItem (
+  idInvestmentWalletItem uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  idInvestmentWallet uniqueidentifier not null,
+  idInstrument uniqueidentifier not null,
+  quantity int not null,
+  buyPrice money not null,
+  primary key (idInvestmentWalletItem),
+  constraint fk_investmentWalletItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
+  constraint fk_investmentWalletItem_Wallet foreign key (idInvestmentWallet) references investmentWallet (idInvestmentWallet)
+);

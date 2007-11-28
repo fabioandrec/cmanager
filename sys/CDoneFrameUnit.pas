@@ -123,14 +123,15 @@ begin
   end;
   GetFilterDates(xDf, xDt);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
-                        '  (scheduleType = ''O'' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
-                        '  (scheduleType = ''C'' and scheduleDate <= %s)' +
-                        ' )', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), DatetimeToDatabase(xDt, False)]);
+                        '  (scheduleType = ''%s'' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
+                        '  (scheduleType = ''%s'' and scheduleDate <= %s)' +
+                        ' )', [CScheduleTypeOnce, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False),
+                               CScheduleTypeCyclic, DatetimeToDatabase(xDt, False)]);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
-                        '  (endCondition = ''N'') or ' +
-                        '  (endCondition = ''D'' and endDate >= %s) or ' +
-                        '  (endCondition = ''T'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
-                        ' )', [DatetimeToDatabase(xDf, False)]);
+                        '  (endCondition = ''%s'') or ' +
+                        '  (endCondition = ''%s'' and endDate >= %s) or ' +
+                        '  (endCondition = ''%s'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
+                        ' )', [CEndConditionNever, CEndConditionDate, DatetimeToDatabase(xDf, False), CEndConditionTimes]);
   xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if FPlannedObjects <> Nil then begin
     FreeAndNil(FPlannedObjects);

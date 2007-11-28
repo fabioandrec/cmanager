@@ -1058,13 +1058,13 @@ var xSqlPlanned, xSqlDone: String;
 begin
   xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
   xSqlPlanned := xSqlPlanned + Format(' and (' +
-                        '  (scheduleType = ''O'' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
-                        '  (scheduleType = ''C'' and scheduleDate <= %s)' +
+                        '  (scheduleType = ''' + CScheduleTypeOnce + ''' and scheduleDate between %s and %s and (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement) = 0) or ' +
+                        '  (scheduleType = ''' + CScheduleTypeCyclic + ''' and scheduleDate <= %s)' +
                         ' )', [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False), DatetimeToDatabase(FEndDate, False)]);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
-                        '  (endCondition = ''N'') or ' +
-                        '  (endCondition = ''D'' and endDate >= %s) or ' +
-                        '  (endCondition = ''T'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
+                        '  (endCondition = ''' + CEndConditionNever + ''') or ' +
+                        '  (endCondition = ''' + CEndConditionDate + ''' and endDate >= %s) or ' +
+                        '  (endCondition = ''' + CEndConditionTimes + ''' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
                         ' )', [DatetimeToDatabase(FStartDate, False)]);
   xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
   xPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);

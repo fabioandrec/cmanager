@@ -789,6 +789,38 @@ type
     property idCurrencyDef: TDataGid read FidCurrencyDef;
   end;
 
+  TInvestmentWallet = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    procedure Setdescription(const Value: TBaseDescription);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+  end;
+
+  TInvestmentWalletItem = class(TDataObject)
+  private
+    FidInvestmentWallet: TDataGid;
+    FidInstrument: TDataGid;
+    Fquantity: Integer;
+    FbuyPrice: Currency;
+    procedure SetbuyPrice(const Value: Currency);
+    procedure SetidInstrument(const Value: TDataGid);
+    procedure SetidInvestmentWallet(const Value: TDataGid);
+    procedure Setquantity(const Value: Integer);
+  public
+    constructor Create(AStatic: Boolean); override;
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property idInvestmentWallet: TDataGid read FidInvestmentWallet write SetidInvestmentWallet;
+    property idInstrument: TDataGid read FidInstrument write SetidInstrument;
+    property quantity: Integer read Fquantity write Setquantity;
+    property buyPrice: Currency read FbuyPrice write SetbuyPrice;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -808,6 +840,8 @@ var CashPointProxy: TDataProxy;
     ReportDefProxy: TDataProxy;
     InstrumentProxy: TDataProxy;
     InstrumentValueProxy: TDataProxy;
+    InvestmentWalletProxy: TDataProxy;
+    InvestmentWalletItemProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
@@ -816,31 +850,31 @@ var GActiveProfileId: TDataGid = CEmptyDataGid;
 const CHASH_INSTRUMENT_SYMBOL = 0;
       CHASH_INSTRUMENT_NAME = 1;
 
-const CDatafileTables: array[0..23] of string =
+const CDatafileTables: array[0..25] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
              'accountCurrencyRule', 'reportDef',
-             'instrument', 'intrumentValue');
+             'instrument', 'intrumentValue', 'investmentWallet', 'investmentWalletItem');
 
-const CDatafileTablesExportConditions: array[0..23] of string =
+const CDatafileTablesExportConditions: array[0..25] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
              '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
-             '', '');
+             '', '', '', '');
 
-const CDatafileDeletes: array[0..23] of string =
+const CDatafileDeletes: array[0..25] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '', '', '', '');
+             '', '', '', '', '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
@@ -940,6 +974,8 @@ begin
   ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef');
   InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument');
   InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'StnInstrumentValue');
+  InvestmentWalletProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'investmentWallet');
+  InvestmentWalletItemProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'investmentWalletItem');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -3941,6 +3977,91 @@ begin
     Result := Fsymbol;
   end else begin
     Result := inherited GetHash(AHashId);
+  end;
+end;
+
+procedure TInvestmentWallet.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+  end;
+end;
+
+procedure TInvestmentWallet.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+constructor TInvestmentWalletItem.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidInvestmentWallet := CEmptyDataGid;
+  FidInstrument := CEmptyDataGid;
+end;
+
+procedure TInvestmentWalletItem.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidInvestmentWallet := FieldByName('idInvestmentWallet').AsString;
+    FidInstrument := FieldByName('idInstrument').AsString;
+    Fquantity := FieldByName('quantity').AsInteger;
+    FbuyPrice := FieldByName('buyPrice').AsCurrency;
+  end;
+end;
+
+procedure TInvestmentWalletItem.SetbuyPrice(const Value: Currency);
+begin
+  if FbuyPrice <> Value then begin
+    FbuyPrice := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentWalletItem.SetidInstrument(const Value: TDataGid);
+begin
+  if FidInstrument <> Value then begin
+    FidInstrument := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentWalletItem.SetidInvestmentWallet(const Value: TDataGid);
+begin
+  if FidInvestmentWallet <> Value then begin
+    FidInvestmentWallet := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentWalletItem.Setquantity(const Value: Integer);
+begin
+  if Fquantity <> Value then begin
+    Fquantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentWallet.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('description', Fdescription, True, 'investmentWallet');
+  end;
+end;
+
+procedure TInvestmentWalletItem.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('idInvestmentWallet', DataGidToDatabase(FidInvestmentWallet), False, 'investmentWalletItem');
+    AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'investmentWalletItem');
+    AddField('quantity', IntToStr(Fquantity), False, 'investmentWalletItem');
+    AddField('buyPrice', CurrencyToDatabase(FbuyPrice), False, 'investmentWalletItem');
   end;
 end;
 
