@@ -4101,7 +4101,7 @@ begin
   with DataFieldList do begin
     AddField('description', Fdescription, True, 'investmentWallet');
     AddField('name', Fname, True, 'investmentWallet');
-    AddField('idAccount', FidAccount, True, 'investmentWallet');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'investmentWallet');
   end;
 end;
 

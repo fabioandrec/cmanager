@@ -14,20 +14,23 @@ type
     Label1: TLabel;
     RichEditDesc: TCRichEdit;
     Label2: TLabel;
-    ComboBoxType: TComboBox;
-    Label3: TLabel;
+    GroupBox1: TGroupBox;
+    Label4: TLabel;
+    CStaticAccount: TCStatic;
+    procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
+    procedure InitializeForm; override;
   end;
 
 implementation
 
-uses CDataObjects, CInfoFormUnit, CCashpointsFrameUnit, CConsts, CRichtext,
-  CLimitsFrameUnit, CInvestmentWalletFrameUnit;
+uses CDataObjects, CInfoFormUnit, CConsts, CRichtext, CInvestmentWalletFrameUnit,
+  CDatatools, CTools, CFrameFormUnit, CAccountsFrameUnit;
 
 {$R *.dfm}
 
@@ -36,31 +39,28 @@ begin
   Result := inherited CanAccept;
   if Trim(EditName.Text) = '' then begin
     Result := False;
-    ShowInfo(itError, 'Nazwa kontrahenta nie mo¿e byæ pusta', '');
+    ShowInfo(itError, 'Nazwa portfela inwestycyjnego nie mo¿e byæ pusta', '');
     EditName.SetFocus;
   end;
 end;
 
 procedure TCInvestmentWalletForm.FillForm;
 begin
-  with TCashPoint(Dataobject) do begin
+  with TInvestmentWallet(Dataobject) do begin
     EditName.Text := name;
     SimpleRichText(description, RichEditDesc);
-    if cashpointType = CCashpointTypeAll then begin
-      ComboBoxType.ItemIndex := 0;
-    end else if cashpointType = CCashpointTypeOut then begin
-      ComboBoxType.ItemIndex := 1;
-    end else if cashpointType = CCashpointTypeIn then begin
-      ComboBoxType.ItemIndex := 2;
-    end else if cashpointType = CCashpointTypeOther then begin
-      ComboBoxType.ItemIndex := 3;
+    if idAccount <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      CStaticAccount.DataId := idAccount;
+      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+      GDataProvider.RollbackTransaction;
     end;
   end;
 end;
 
 function TCInvestmentWalletForm.GetDataobjectClass: TDataObjectClass;
 begin
-  Result := TCashpoint;
+  Result := TInvestmentWallet;
 end;
 
 function TCInvestmentWalletForm.GetUpdateFrameClass: TCBaseFrameClass;
@@ -68,22 +68,25 @@ begin
   Result := TCInvestmentWalletFrame;
 end;
 
+procedure TCInvestmentWalletForm.InitializeForm;
+begin
+  inherited InitializeForm;
+  CStaticAccount.DataId := CEmptyDataGid;
+end;
+
 procedure TCInvestmentWalletForm.ReadValues;
 begin
   inherited ReadValues;
-  with TCashPoint(Dataobject) do begin
+  with TInvestmentWallet(Dataobject) do begin
     name := EditName.Text;
     description := RichEditDesc.Text;
-    if ComboBoxType.ItemIndex = 0 then begin
-      cashpointType := CCashpointTypeAll;
-    end else if ComboBoxType.ItemIndex = 1 then begin
-      cashpointType := CCashpointTypeOut;
-    end else if ComboBoxType.ItemIndex = 2 then begin
-      cashpointType := CCashpointTypeIn;
-    end else if ComboBoxType.ItemIndex = 3 then begin
-      cashpointType := CCashpointTypeOther;
-    end;
+    idAccount := CStaticAccount.DataId;
   end;
+end;
+
+procedure TCInvestmentWalletForm.CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
 end;
 
 end.

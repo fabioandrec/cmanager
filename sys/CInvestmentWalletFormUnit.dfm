@@ -1,20 +1,20 @@
 inherited CInvestmentWalletForm: TCInvestmentWalletForm
-  Left = 280
-  Top = 107
-  Caption = 'Kontrahent'
-  ClientHeight = 273
+  Left = 249
+  Top = 177
+  Caption = 'Portfel inwestycyjny'
+  ClientHeight = 330
   ClientWidth = 370
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 370
-    Height = 232
+    Height = 289
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
       Width = 337
-      Height = 209
-      Caption = ' Dane kontrahenta '
+      Height = 177
+      Caption = ' Dane podstawowe  '
       TabOrder = 0
       object Label1: TLabel
         Left = 15
@@ -31,14 +31,6 @@ inherited CInvestmentWalletForm: TCInvestmentWalletForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Opis'
-      end
-      object Label3: TLabel
-        Left = 15
-        Top = 172
-        Width = 33
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Rodzaj'
       end
       object EditName: TEdit
         Left = 56
@@ -59,28 +51,44 @@ inherited CInvestmentWalletForm: TCInvestmentWalletForm
         BorderStyle = bsNone
         TabOrder = 1
       end
-      object ComboBoxType: TComboBox
+    end
+    object GroupBox1: TGroupBox
+      Left = 16
+      Top = 208
+      Width = 337
+      Height = 73
+      Caption = ' Konto powi'#261'zane '
+      TabOrder = 1
+      object Label4: TLabel
+        Left = 15
+        Top = 33
+        Width = 33
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Nazwa'
+      end
+      object CStaticAccount: TCStatic
         Left = 56
-        Top = 168
+        Top = 29
         Width = 257
         Height = 21
-        BevelInner = bvNone
+        Cursor = crHandPoint
+        AutoSize = False
         BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 0
-        TabOrder = 2
-        Text = 'Dost'#281'pny wsz'#281'dzie'
-        Items.Strings = (
-          'Dost'#281'pny wsz'#281'dzie'
-          'Tylko rozchody'
-          'Tylko przychody'
-          'Pozosta'#322'e')
+        Caption = '<wybierz konto zwi'#261'zne z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 0
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz konto zwi'#261'zne z listy>'
+        OnGetDataId = CStaticAccountGetDataId
+        HotTrack = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 232
+    Top = 289
     Width = 370
     inherited BitBtnOk: TBitBtn
       Left = 193
