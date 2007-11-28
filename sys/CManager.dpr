@@ -133,7 +133,8 @@ uses
   CUpdateExchangesFormUnit in 'CUpdateExchangesFormUnit.pas' {CUpdateExchangesForm},
   CBasics in 'Shared\CBasics.pas',
   CChoosePeriodInstrumentValueFormUnit in 'CChoosePeriodInstrumentValueFormUnit.pas' {CChoosePeriodInstrumentValueForm},
-  CInvestmentWalletFrameUnit in 'CInvestmentWalletFrameUnit.pas' {CInvestmentWalletFrame: TFrame};
+  CInvestmentWalletFrameUnit in 'CInvestmentWalletFrameUnit.pas' {CInvestmentWalletFrame: TFrame},
+  CInvestmentWalletFormUnit in 'CInvestmentWalletFormUnit.pas' {CInvestmentWalletForm};
 
 {$R *.res}
 
@@ -182,7 +183,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

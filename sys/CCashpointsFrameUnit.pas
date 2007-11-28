@@ -53,7 +53,11 @@ end;
 
 function TCCashpointsFrame.GetSelectedType: Integer;
 begin
-  Result := CSELECTEDITEM_CASHPOINT;
+  if List.FocusedNode <> Nil then begin
+    Result := CSELECTEDITEM_CASHPOINT;
+  end else begin
+    Result := CSELECTEDITEM_INCORRECT;
+  end;
 end;
 
 function TCCashpointsFrame.GetStaticFilter: TStringList;
