@@ -7,7 +7,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
   CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList,
-  PngSpeedButton, ShellApi;
+  PngSpeedButton, ShellApi, CBaseFrameUnit;
 
 type
   TCMainForm = class(TForm)
@@ -67,11 +67,11 @@ type
     ActionShortcutExtractions: TAction;
     ActionImportExtraction: TAction;
     ActionCss: TAction;
-    ActionImport: TAction;
+    ActionImportDatafile: TAction;
     ActionXsl: TAction;
     ActionShortcutInstruments: TAction;
     ActionShortcutExch: TAction;
-    ActionStockExchanges: TAction;
+    ActionImportStockExchanges: TAction;
     ActionShortcutInvestment: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
@@ -106,9 +106,9 @@ type
     procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ActionImportExtractionExecute(Sender: TObject);
     procedure ActionCssExecute(Sender: TObject);
-    procedure ActionImportExecute(Sender: TObject);
+    procedure ActionImportDatafileExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
-    procedure ActionStockExchangesExecute(Sender: TObject);
+    procedure ActionImportStockExchangesExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -116,7 +116,9 @@ type
     function GetShortcutsVisible: Boolean;
     procedure SetShortcutsVisible(const Value: Boolean);
     procedure PerformShortcutAction(AAction: TAction);
+    procedure PerformDictionaryAction(AAction: TAction);
     procedure UpdateShortcutList;
+    procedure UpdateDictionaryList;
     function GetStatusbarVisible: Boolean;
     procedure SetStatusbarVisible(const Value: Boolean);
     procedure UnhandledException(Sender: TObject; E: Exception);
@@ -125,8 +127,10 @@ type
     function GetSelectedType: Integer;
   protected
     procedure WndProc(var Message: TMessage); override;
+    function GetFrameClassForAction(AAction: TAction): TCBaseFrameClass;
   public
     procedure ActionShortcutExecute(ASender: TObject);
+    procedure ActionDictionaryExecute(ASender: TObject);
     procedure ActionPluginsExecute(ASender: TObject);
     procedure UpdateStatusbar;
     procedure UpdatePluginsMenu;
@@ -145,8 +149,7 @@ var
 
 implementation
 
-uses CDataObjects, CDatabase, Math, CBaseFrameUnit,
-     CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
+uses CDataObjects, CDatabase, Math, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
      CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
@@ -196,6 +199,7 @@ begin
   ActionRandom.Visible := False;
   {$ENDIF}
   UpdateShortcutList;
+  UpdateDictionaryList;
   UpdateStatusbar;
   ShortcutList.RootNodeCount := FShortcutList.Count;
   PerformShortcutAction(ActionShortcutStart);
@@ -239,43 +243,7 @@ var xFrame: TCBaseFrame;
 begin
   xIndex := FShortcutsFrames.IndexOf(AAction.Caption);
   if xIndex = -1 then begin
-    if AAction = ActionShortcutStart then begin
-      xClass := TCHomeFrame;
-    end else if AAction = ActionShorcutOperations then begin
-      xClass := TCMovementFrame;
-    end else if AAction = ActionShortcutPlanned then begin
-      xClass := TCPlannedFrame;
-    end else if AAction = ActionShortcutPlannedDone then begin
-      xClass := TCDoneFrame;
-    end else if AAction = ActionShortcutCashpoints then begin
-      xClass := TCCashpointsFrame;
-    end else if AAction = ActionShortcutAccounts then begin
-      xClass := TCAccountsFrame;
-    end else if AAction = ActionShortcutProducts then begin
-      xClass := TCProductsFrame;
-    end else if AAction = ActionShortcutReports then begin
-      xClass := TCReportsFrame;
-    end else if AAction = ActionShortcutFilters then begin
-      xClass := TCFilterFrame;
-    end else if AAction = ActionShortcutProfiles then begin
-      xClass := TCProfileFrame;
-    end else if AAction = ActionShortcutLimits then begin
-      xClass := TCLimitsFrame;
-    end else if AAction = ActionShortcutCurrencydef then begin
-      xClass := TCCurrencydefFrame;
-    end else if AAction = ActionShortcutCurrencyRate then begin
-      xClass := TCCurrencyRateFrame;
-    end else if AAction = ActionShortcutExtractions then begin
-      xClass := TCExtractionsFrame;
-    end else if AAction = ActionShortcutInstruments then begin
-      xClass := TCInstrumentFrame;
-    end else if AAction = ActionShortcutExch then begin
-      xClass := TCInstrumentValueFrame;
-    end else if AAction = ActionShortcutInvestment then begin
-      xClass := TCInvestmentWalletFrame;
-    end else begin
-      xClass := TCBaseFrame;
-    end;
+    xClass := GetFrameClassForAction(AAction);
     xFrame := xClass.Create(Self);
     xFrame.Name := AAction.Name + 'Frame';
     xFrame.Width := PanelFrames.Width;
@@ -349,12 +317,22 @@ end;
 procedure TCMainForm.UpdateShortcutList;
 var xCount: Integer;
     xAction: TAction;
+    xShortcutBand: TActionClient;
 begin
+  xShortcutBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Skróty');
+  if xShortcutBand <> Nil then begin
+    xShortcutBand.Items.Clear;
+  end;
   for xCount := 0 to ActionManager.ActionCount - 1 do begin
     xAction := TAction(ActionManager.Actions[xCount]);
     if xAction.Category = 'Skróty' then begin
       FShortcutList.AddObject(xAction.Caption, xAction);
       xAction.OnExecute := ActionShortcutExecute;
+      if xShortcutBand <> Nil then begin
+        with xShortcutBand.Items.Add do begin
+          Action := xAction;
+        end;
+      end;
     end;
   end;
 end;
@@ -403,11 +381,15 @@ begin
   end;
   for xCount := 0 to ActionManager.ActionCount - 1 do begin
     xAction := TAction(ActionManager.Actions[xCount]);
-    if xAction.Category = 'Skróty' then begin
+    if (xAction.Category = 'Skróty') or (xAction.Category = 'S³owniki') then begin
       xAction.Visible := GDataProvider.IsConnected;
     end;
   end;
-  TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[2]).Visible := GDataProvider.IsConnected;
+  ActionImportCurrencyRates.Enabled := GDataProvider.IsConnected;
+  ActionImportExtraction.Enabled := GDataProvider.IsConnected;
+  ActionImportStockExchanges.Enabled := GDataProvider.IsConnected;
+  TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[1]).Visible := GDataProvider.IsConnected;
+  TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[3]).Visible := GDataProvider.IsConnected;
   ActionShortcuts.Visible := GDataProvider.IsConnected;
   ActionCloseConnection.Enabled := GDataProvider.IsConnected;
   ActionOpenConnection.Enabled := not GDataProvider.IsConnected;
@@ -792,7 +774,7 @@ begin
 end;
 
 
-procedure TCMainForm.ActionImportExecute(Sender: TObject);
+procedure TCMainForm.ActionImportDatafileExecute(Sender: TObject);
 begin
   ShowProgressForm(TCImportDatafileForm);
 end;
@@ -812,7 +794,7 @@ begin
   end;
 end;
 
-procedure TCMainForm.ActionStockExchangesExecute(Sender: TObject);
+procedure TCMainForm.ActionImportStockExchangesExecute(Sender: TObject);
 var xStr: TStringList;
 begin
   if OpenDialogXml.Execute then begin
@@ -830,6 +812,80 @@ begin
       xStr.Free;
     end;
   end;
+end;
+
+procedure TCMainForm.UpdateDictionaryList;
+var xCount: Integer;
+    xAction: TAction;
+    xDictBand: TActionClient;
+begin
+  xDictBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'S³owniki');
+  if xDictBand <> Nil then begin
+    xDictBand.Items.Clear;
+    for xCount := 0 to ActionManager.ActionCount - 1 do begin
+      xAction := TAction(ActionManager.Actions[xCount]);
+      if xAction.Category = 'S³owniki' then begin
+        xAction.OnExecute := ActionDictionaryExecute;
+        with xDictBand.Items.Add do begin
+          Action := xAction;
+        end;
+      end;
+    end;
+  end;
+end;
+
+function TCMainForm.GetFrameClassForAction(AAction: TAction): TCBaseFrameClass;
+begin
+  if AAction = ActionShortcutStart then begin
+    Result := TCHomeFrame;
+  end else if AAction = ActionShorcutOperations then begin
+    Result := TCMovementFrame;
+  end else if AAction = ActionShortcutPlanned then begin
+    Result := TCPlannedFrame;
+  end else if AAction = ActionShortcutPlannedDone then begin
+    Result := TCDoneFrame;
+  end else if AAction = ActionShortcutCashpoints then begin
+    Result := TCCashpointsFrame;
+  end else if AAction = ActionShortcutAccounts then begin
+    Result := TCAccountsFrame;
+  end else if AAction = ActionShortcutProducts then begin
+    Result := TCProductsFrame;
+  end else if AAction = ActionShortcutReports then begin
+    Result := TCReportsFrame;
+  end else if AAction = ActionShortcutFilters then begin
+    Result := TCFilterFrame;
+  end else if AAction = ActionShortcutProfiles then begin
+    Result := TCProfileFrame;
+  end else if AAction = ActionShortcutLimits then begin
+    Result := TCLimitsFrame;
+  end else if AAction = ActionShortcutCurrencydef then begin
+    Result := TCCurrencydefFrame;
+  end else if AAction = ActionShortcutCurrencyRate then begin
+    Result := TCCurrencyRateFrame;
+  end else if AAction = ActionShortcutExtractions then begin
+    Result := TCExtractionsFrame;
+  end else if AAction = ActionShortcutInstruments then begin
+    Result := TCInstrumentFrame;
+  end else if AAction = ActionShortcutExch then begin
+    Result := TCInstrumentValueFrame;
+  end else if AAction = ActionShortcutInvestment then begin
+    Result := TCInvestmentWalletFrame;
+  end else begin
+    Result := TCBaseFrame;
+  end;
+end;
+
+procedure TCMainForm.PerformDictionaryAction(AAction: TAction);
+var xClass: TCBaseFrameClass;
+    xGid, xText: String;
+begin
+  xClass := GetFrameClassForAction(AAction);
+  TCFrameForm.ShowFrame(xClass, xGid, xText, nil, nil, nil, nil, False);
+end;
+
+procedure TCMainForm.ActionDictionaryExecute(ASender: TObject);
+begin
+  PerformDictionaryAction(TAction(ASender));
 end;
 
 end.

@@ -318,26 +318,30 @@ var xDoc: ICXMLDOMDocument;
     xError: String;
     xForm: TCUpdateExchangesForm;
 begin
-  xValid := False;
-  xDoc := GetDocumentFromString(AExchangesText, GetExchangesXsd);
-  if xDoc.parseError.errorCode = 0 then begin
-    xRoot := xDoc.selectSingleNode('exchanges');
-    if xRoot <> Nil then begin
-      xValid := True;
-      xForm := TCUpdateExchangesForm.Create(Application);
-      xForm.SourceXml := xDoc;
-      xForm.SourceRoot := xRoot;
-      xForm.InitializeForm;
-      xForm.ShowModal;
-      xForm.Free;
+  if GDataProvider.IsConnected then begin
+    xValid := False;
+    xDoc := GetDocumentFromString(AExchangesText, GetExchangesXsd);
+    if xDoc.parseError.errorCode = 0 then begin
+      xRoot := xDoc.selectSingleNode('exchanges');
+      if xRoot <> Nil then begin
+        xValid := True;
+        xForm := TCUpdateExchangesForm.Create(Application);
+        xForm.SourceXml := xDoc;
+        xForm.SourceRoot := xRoot;
+        xForm.InitializeForm;
+        xForm.ShowModal;
+        xForm.Free;
+      end else begin
+        xError := 'Brak elementu zbiorczego';
+      end;
     end else begin
-      xError := 'Brak elementu zbiorczego';
+      xError := GetParseErrorDescription(xDoc.parseError, True);
+    end;
+    if not xValid then begin
+      ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ notowañ', xError);
     end;
   end else begin
-    xError := GetParseErrorDescription(xDoc.parseError, True);
-  end;
-  if not xValid then begin
-    ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ notowañ', xError);
+    ShowInfo(itError, 'Nie mo¿na wczytaæ tabeli notowañ poniewa¿ ¿aden plik danych nie jest otwarty', '');
   end;
 end;
 
@@ -351,44 +355,48 @@ var xDoc: ICXMLDOMDocument;
     xCahpointName: String;
     xForm: TCUpdateCurrencyRatesForm;
 begin
-  xValid := False;
-  xDoc := GetDocumentFromString(ARatesText, GetRatesXsd);
-  if xDoc.parseError.errorCode = 0 then begin
-    xRoot := xDoc.selectSingleNode('currencyRates');
-    if xRoot <> Nil then begin
-      xBindingDate := XsdToDateTime(GetXmlAttribute('bindingDate', xRoot, ''));
-      if xBindingDate <> 0 then begin
-        xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
-        if xCahpointName <> '' then begin
-          xValid := True;
-          xList := xRoot.selectNodes('currencyRate');
-          if xList.length > 0 then begin
-            xForm := TCUpdateCurrencyRatesForm.Create(Application);
-            xForm.Xml := xDoc;
-            xForm.Root := xRoot;
-            xForm.SourceRates := xList;
-            xForm.BindingDate := xBindingDate;
-            xForm.CashpointName := xCahpointName;
-            xForm.InitializeForm;
-            xForm.ShowModal;
-            xForm.Free;
+  if GDataProvider.IsConnected then begin
+    xValid := False;
+    xDoc := GetDocumentFromString(ARatesText, GetRatesXsd);
+    if xDoc.parseError.errorCode = 0 then begin
+      xRoot := xDoc.selectSingleNode('currencyRates');
+      if xRoot <> Nil then begin
+        xBindingDate := XsdToDateTime(GetXmlAttribute('bindingDate', xRoot, ''));
+        if xBindingDate <> 0 then begin
+          xCahpointName := GetXmlAttribute('cashpointName', xRoot, '');
+          if xCahpointName <> '' then begin
+            xValid := True;
+            xList := xRoot.selectNodes('currencyRate');
+            if xList.length > 0 then begin
+              xForm := TCUpdateCurrencyRatesForm.Create(Application);
+              xForm.Xml := xDoc;
+              xForm.Root := xRoot;
+              xForm.SourceRates := xList;
+              xForm.BindingDate := xBindingDate;
+              xForm.CashpointName := xCahpointName;
+              xForm.InitializeForm;
+              xForm.ShowModal;
+              xForm.Free;
+            end else begin
+              ShowInfo(itInfo, 'Tabela nie zawiera ¿adnych kursów walut', xError);
+            end;
           end else begin
-            ShowInfo(itInfo, 'Tabela nie zawiera ¿adnych kursów walut', xError);
+            xError := 'Brak okreœlenia kontrahenta - dostawcy tabeli kursów';
           end;
         end else begin
-          xError := 'Brak okreœlenia kontrahenta - dostawcy tabeli kursów';
+          xError := 'Brak okreœlenia daty wa¿noœci tabeli kursów';
         end;
       end else begin
-        xError := 'Brak okreœlenia daty wa¿noœci tabeli kursów';
+        xError := 'Brak elementu zbiorczego';
       end;
     end else begin
-      xError := 'Brak elementu zbiorczego';
+      xError := GetParseErrorDescription(xDoc.parseError, True);
+    end;
+    if not xValid then begin
+      ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut', xError);
     end;
   end else begin
-    xError := GetParseErrorDescription(xDoc.parseError, True);
-  end;
-  if not xValid then begin
-    ShowInfo(itError, 'Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut', xError);
+    ShowInfo(itError, 'Nie mo¿na wczytaæ tabeli kursów walut poniewa¿ ¿aden plik danych nie jest otwarty', '');
   end;
 end;
 
@@ -502,74 +510,78 @@ var xDoc: ICXMLDOMDocument;
     xItem: TExtractionListElement;
     xCurrCache: TCurrCacheItem;
 begin
-  xValid := False;
-  xDoc := GetDocumentFromString(AExtractionText, GetExtractionsXsd);
-  if xDoc.parseError.errorCode = 0 then begin
-    xRoot := xDoc.selectSingleNode('accountExtraction');
-    if xRoot <> Nil then begin
-      xCreationDate := XsdToDateTime(GetXmlAttribute('creationDate', xRoot, ''));
-      if xCreationDate <> 0 then begin
-        xStartDate := XsdToDateTime(GetXmlAttribute('startDate', xRoot, ''));
-        xEndDate := XsdToDateTime(GetXmlAttribute('endDate', xRoot, ''));
-        if (xStartDate <> 0) and (xEndDate <> 0) then begin
-          xValid := True;
-          xDesc := GetXmlAttribute('description', xRoot, '');
-          xList := xRoot.selectNodes('extractionItem');
-          xCount := 0;
-          xParams := TExtractionAdditionalData.Create(xCreationDate, xStartDate, xEndDate, xDesc);
-          while xValid and (xCount <= xList.length - 1) do begin
-            xNode := xList.item[xCount];
-            xRegDate := XsdToDateTime(GetXmlAttribute('operationDate', xNode, ''));
-            xAccountingDate := XsdToDateTime(GetXmlAttribute('accountingDate', xNode, ''));
-            if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
-              xCash := StrToCurrencyDecimalDot(GetXmlAttribute('cash', xNode, ''));
-              xMovementType := GetXmlAttribute('type', xNode, '');
-              if (xMovementType = CInMovement) or (xMovementType = COutMovement) then begin
-                xCurrencyIso := GetXmlAttribute('currency', xNode, '');
-                xCurrCache := GCurrencyCache.ByIso[xCurrencyIso];
-                if xCurrCache <> Nil then begin
-                  xItem := TExtractionListElement.Create;
-                  xItem.movementType := xMovementType;
-                  xItem.cash := xCash;
-                  xItem.description := GetXmlAttribute('description', xNode, '');
-                  xItem.regTime := xRegDate;
-                  xItem.accountingDate := xAccountingDate;
-                  xItem.idAccount := CEmptyDataGid;
-                  xItem.idCurrencyDef := xCurrCache.CurrId;
-                  xParams.movements.Add(xItem);
+  if GDataProvider.IsConnected then begin
+    xValid := False;
+    xDoc := GetDocumentFromString(AExtractionText, GetExtractionsXsd);
+    if xDoc.parseError.errorCode = 0 then begin
+      xRoot := xDoc.selectSingleNode('accountExtraction');
+      if xRoot <> Nil then begin
+        xCreationDate := XsdToDateTime(GetXmlAttribute('creationDate', xRoot, ''));
+        if xCreationDate <> 0 then begin
+          xStartDate := XsdToDateTime(GetXmlAttribute('startDate', xRoot, ''));
+          xEndDate := XsdToDateTime(GetXmlAttribute('endDate', xRoot, ''));
+          if (xStartDate <> 0) and (xEndDate <> 0) then begin
+            xValid := True;
+            xDesc := GetXmlAttribute('description', xRoot, '');
+            xList := xRoot.selectNodes('extractionItem');
+            xCount := 0;
+            xParams := TExtractionAdditionalData.Create(xCreationDate, xStartDate, xEndDate, xDesc);
+            while xValid and (xCount <= xList.length - 1) do begin
+              xNode := xList.item[xCount];
+              xRegDate := XsdToDateTime(GetXmlAttribute('operationDate', xNode, ''));
+              xAccountingDate := XsdToDateTime(GetXmlAttribute('accountingDate', xNode, ''));
+              if (xRegDate <> 0) and (xAccountingDate <> 0) then begin
+                xCash := StrToCurrencyDecimalDot(GetXmlAttribute('cash', xNode, ''));
+                xMovementType := GetXmlAttribute('type', xNode, '');
+                if (xMovementType = CInMovement) or (xMovementType = COutMovement) then begin
+                  xCurrencyIso := GetXmlAttribute('currency', xNode, '');
+                  xCurrCache := GCurrencyCache.ByIso[xCurrencyIso];
+                  if xCurrCache <> Nil then begin
+                    xItem := TExtractionListElement.Create;
+                    xItem.movementType := xMovementType;
+                    xItem.cash := xCash;
+                    xItem.description := GetXmlAttribute('description', xNode, '');
+                    xItem.regTime := xRegDate;
+                    xItem.accountingDate := xAccountingDate;
+                    xItem.idAccount := CEmptyDataGid;
+                    xItem.idCurrencyDef := xCurrCache.CurrId;
+                    xParams.movements.Add(xItem);
+                  end else begin
+                    xValid := False;
+                    xError := 'Brak waluty o symbolu Iso "' + xCurrencyIso + '". Zdefiniuj walutê o takim symbolu i spróbuj ponownie';
+                  end;
                 end else begin
                   xValid := False;
-                  xError := 'Brak waluty o symbolu Iso "' + xCurrencyIso + '". Zdefiniuj walutê o takim symbolu i spróbuj ponownie';
+                  xError := 'Brak okreœlenia typu operacji wyci¹gu dla elementu numer ' + IntToStr(xCount);
                 end;
               end else begin
                 xValid := False;
-                xError := 'Brak okreœlenia typu operacji wyci¹gu dla elementu numer ' + IntToStr(xCount);
+                xError := 'Brak okreœlenia daty operacji lub daty ksiêgowania dla elementu numer ' + IntToStr(xCount);
               end;
-            end else begin
-              xValid := False;
-              xError := 'Brak okreœlenia daty operacji lub daty ksiêgowania dla elementu numer ' + IntToStr(xCount);
+              Inc(xCount);
             end;
-            Inc(xCount);
-          end;
-          if xValid then begin
-            xForm :=  TCExtractionForm.Create(Nil);
-            xForm.ShowDataobject(coAdd, AccountExtractionProxy, Nil, True, xParams);
-            xForm.Free;
+            if xValid then begin
+              xForm :=  TCExtractionForm.Create(Nil);
+              xForm.ShowDataobject(coAdd, AccountExtractionProxy, Nil, True, xParams);
+              xForm.Free;
+            end;
+          end else begin
+            xError := 'Brak okreœlenia daty pocz¹tku lub daty koñca wyci¹gu';
           end;
         end else begin
-          xError := 'Brak okreœlenia daty pocz¹tku lub daty koñca wyci¹gu';
+          xError := 'Brak okreœlenia daty utworzenia wyci¹gu';
         end;
       end else begin
-        xError := 'Brak okreœlenia daty utworzenia wyci¹gu';
+        xError := 'Brak elementu zbiorczego';
       end;
     end else begin
-      xError := 'Brak elementu zbiorczego';
+      xError := GetParseErrorDescription(xDoc.parseError, True);
+    end;
+    if not xValid then begin
+      ShowInfo(itError, 'Otrzymane dane nie s¹ poprawnym wyci¹giem bankowym', xError);
     end;
   end else begin
-    xError := GetParseErrorDescription(xDoc.parseError, True);
-  end;
-  if not xValid then begin
-    ShowInfo(itError, 'Otrzymane dane nie s¹ poprawnym wyci¹giem bankowym', xError);
+    ShowInfo(itError, 'Nie mo¿na wczytaæ wyci¹gu poniewa¿ ¿aden plik danych nie jest otwarty', '');
   end;
 end;
 

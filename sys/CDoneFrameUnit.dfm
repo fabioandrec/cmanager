@@ -328,7 +328,7 @@ inherited CDoneFrame: TCDoneFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '2006-01-01'
+      Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2
@@ -336,6 +336,7 @@ inherited CDoneFrame: TCDoneFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
+      Withtime = False
     end
     object CDateTimePerEnd: TCDateTime
       Left = 376
@@ -346,7 +347,7 @@ inherited CDoneFrame: TCDoneFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '2006-01-01'
+      Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 3
@@ -354,6 +355,7 @@ inherited CDoneFrame: TCDoneFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
+      Withtime = False
     end
   end
   inherited ImageList: TPngImageList

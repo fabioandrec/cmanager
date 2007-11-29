@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 132
-  Top = 68
+  Left = 377
+  Top = 92
   Width = 860
   Height = 633
   Caption = 'CManager'
@@ -311,7 +311,7 @@ object CMainForm: TCMainForm
                     Caption = '&Eksportuj plik danych'
                   end
                   item
-                    Action = ActionImport
+                    Action = ActionImportDatafile
                     Caption = '&Importuj plik danych'
                   end
                   item
@@ -337,83 +337,7 @@ object CMainForm: TCMainForm
           item
             Items = <
               item
-                Action = ActionShortcutStart
-                Caption = '&Start'
-                ImageIndex = 0
-              end
-              item
-                Action = ActionShorcutOperations
-                Caption = '&Operacje'
-                ImageIndex = 1
-              end
-              item
-                Action = ActionShortcutPlannedDone
-                Caption = 'P&lany'
-                ImageIndex = 2
-              end
-              item
-                Action = ActionShortcutPlanned
-                Caption = '&Harmonogramy'
-                ImageIndex = 3
-              end
-              item
-                Action = ActionShortcutAccounts
-                Caption = '&Konta'
-                ImageIndex = 4
-              end
-              item
-                Action = ActionShortcutProducts
-                Caption = 'K&ategorie'
-                ImageIndex = 5
-              end
-              item
-                Action = ActionShortcutCashpoints
-                Caption = 'Ko&ntrahenci'
-                ImageIndex = 6
-              end
-              item
-                Action = ActionShortcutReports
-                Caption = '&Raporty'
-                ImageIndex = 7
-              end
-              item
-                Action = ActionShortcutFilters
-                Caption = '&Filtry'
-                ImageIndex = 8
-              end
-              item
-                Action = ActionShortcutProfiles
-                Caption = '&Profile'
-                ImageIndex = 9
-              end
-              item
-                Action = ActionShortcutLimits
-                Caption = 'Li&mity'
-                ImageIndex = 10
-              end
-              item
-                Action = ActionShortcutCurrencydef
-                Caption = '&Waluty'
-                ImageIndex = 11
-              end
-              item
-                Action = ActionShortcutCurrencyRate
-                Caption = 'K&ursy'
-                ImageIndex = 12
-              end
-              item
-                Action = ActionShortcutExtractions
-                Caption = 'W&yci'#261'gi'
-                ImageIndex = 13
-              end
-              item
-                Action = ActionShortcutInstruments
-                Caption = '&Instrumenty'
-                ImageIndex = 14
-              end
-              item
-                Action = ActionShortcutExch
-                ImageIndex = 15
+                Caption = '&ActionClientItem0'
               end>
             Caption = '&Skr'#243'ty'
           end
@@ -428,6 +352,13 @@ object CMainForm: TCMainForm
                 Caption = 'P&asek stanu'
               end>
             Caption = '&Widok'
+          end
+          item
+            Items = <
+              item
+                Caption = '&ActionClientItem0'
+              end>
+            Caption = 'S'#322'&owniki'
           end
           item
             Items = <
@@ -459,7 +390,7 @@ object CMainForm: TCMainForm
                 Caption = 'Wc&zytaj wyci'#261'g bankowy'
               end
               item
-                Action = ActionStockExchanges
+                Action = ActionImportStockExchanges
                 Caption = 'Wcz&ytaj notowania'
               end
               item
@@ -543,19 +474,14 @@ object CMainForm: TCMainForm
       ImageIndex = 4
     end
     object ActionShortcutProducts: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Kategorie'
       ImageIndex = 5
     end
     object ActionShortcutCashpoints: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Kontrahenci'
       ImageIndex = 6
-    end
-    object ActionShortcutReports: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Raporty'
-      ImageIndex = 7
     end
     object ActionStatusbar: TAction
       Category = 'Widok'
@@ -594,7 +520,7 @@ object CMainForm: TCMainForm
       OnExecute = ActionCloseConnectionExecute
     end
     object ActionShortcutFilters: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Filtry'
       ImageIndex = 8
     end
@@ -629,7 +555,7 @@ object CMainForm: TCMainForm
       OnExecute = ActionPreferencesExecute
     end
     object ActionShortcutProfiles: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Profile'
       ImageIndex = 9
     end
@@ -644,14 +570,19 @@ object CMainForm: TCMainForm
       OnExecute = ActionRandomExecute
     end
     object ActionShortcutLimits: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Limity'
       ImageIndex = 10
     end
     object ActionShortcutCurrencydef: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Waluty'
       ImageIndex = 11
+    end
+    object ActionShortcutExtractions: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Wyci'#261'gi'
+      ImageIndex = 13
     end
     object ActionShortcutCurrencyRate: TAction
       Category = 'Skr'#243'ty'
@@ -679,11 +610,6 @@ object CMainForm: TCMainForm
       Caption = 'Historia'
       OnExecute = ActionHistoryExecute
     end
-    object ActionShortcutExtractions: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Wyci'#261'gi'
-      ImageIndex = 13
-    end
     object ActionImportExtraction: TAction
       Category = 'Narz'#281'dzia'
       Caption = 'Wczytaj wyci'#261'g bankowy'
@@ -694,10 +620,10 @@ object CMainForm: TCMainForm
       Caption = 'Arkusz styli raport'#243'w'
       OnExecute = ActionCssExecute
     end
-    object ActionImport: TAction
+    object ActionImportDatafile: TAction
       Category = 'Plik'
       Caption = 'Importuj plik danych'
-      OnExecute = ActionImportExecute
+      OnExecute = ActionImportDatafileExecute
     end
     object ActionXsl: TAction
       Category = 'Narz'#281'dzia'
@@ -705,7 +631,7 @@ object CMainForm: TCMainForm
       OnExecute = ActionXslExecute
     end
     object ActionShortcutInstruments: TAction
-      Category = 'Skr'#243'ty'
+      Category = 'S'#322'owniki'
       Caption = 'Instrumenty'
       ImageIndex = 14
     end
@@ -714,14 +640,19 @@ object CMainForm: TCMainForm
       Caption = 'Notowania'
       ImageIndex = 15
     end
-    object ActionStockExchanges: TAction
+    object ActionShortcutReports: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Raporty'
+      ImageIndex = 7
+    end
+    object ActionImportStockExchanges: TAction
       Category = 'Narz'#281'dzia'
       Caption = 'Wczytaj notowania'
-      OnExecute = ActionStockExchangesExecute
+      OnExecute = ActionImportStockExchangesExecute
     end
     object ActionShortcutInvestment: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Inwestycje'
+      Category = 'S'#322'owniki'
+      Caption = 'Portfele inwestycyjne'
     end
   end
   object OpenDialog: TOpenDialog

@@ -313,7 +313,7 @@ end;
 procedure TCDataobjectFrame.ListDblClick(Sender: TObject);
 begin
   if List.FocusedNode <> Nil then begin
-    if Owner.InheritsFrom(TCFrameForm) then begin
+    if Owner.InheritsFrom(TCFrameForm) and (TCFrameForm(Owner).BitBtnOk.Visible) then begin
       TCFrameForm(Owner).BitBtnOkClick(Nil);
     end else begin
       ActionEdit.Execute;

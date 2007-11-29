@@ -96,7 +96,7 @@ implementation
 uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit, CTools,
-  CPluginConsts;
+  CPluginConsts, CMainFormUnit;
 
 {$R *.dfm}
 
