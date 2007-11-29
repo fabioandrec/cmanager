@@ -5,8 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
-  ActnCtrls, ActnMenus, ImgList, StdCtrls, Buttons, Dialogs, CommCtrl,
-  CComponents, VirtualTrees, ActnColorMaps, CConfigFormUnit, PngImageList,
+  ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, 
+  CComponents, VirtualTrees, PngImageList,
   PngSpeedButton, ShellApi, CBaseFrameUnit;
 
 type
@@ -149,17 +149,17 @@ var
 
 implementation
 
-uses CDataObjects, CDatabase, Math, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
-     CProductsFrameUnit, CMovementFrameUnit, CListFrameUnit, DateUtils,
-     CReportsFrameUnit, CReports, CPlannedFrameUnit, CDoneFrameUnit,
+uses CDataObjects, CDatabase, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
+     CProductsFrameUnit, CMovementFrameUnit, 
+     CReportsFrameUnit, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
-     CInfoFormUnit, CWaitFormUnit, CCompactDatafileFormUnit,
+     CInfoFormUnit, CCompactDatafileFormUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
      CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
      CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
-     CReportFormUnit, CMemoFormUnit, CCurrencydefFrameUnit,
-     CCurrencyRateFrameUnit, CPlugins, CPluginConsts, CDataobjectFrameUnit,
+     CMemoFormUnit, CCurrencydefFrameUnit,
+     CCurrencyRateFrameUnit, CPlugins, CPluginConsts, 
   CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
   CInstrumentValueFrameUnit, CTools, CInvestmentWalletFrameUnit;
 

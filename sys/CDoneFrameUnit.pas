@@ -93,10 +93,10 @@ type
 
 implementation
 
-uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
-  CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit, CConsts, CPreferences, CMovementFrameUnit, CTools,
-  CPluginConsts, CMainFormUnit;
+uses CFrameFormUnit, CConfigFormUnit, CDataobjectFormUnit,
+  DateUtils, CListFrameUnit, DB, CMovementFormUnit,
+  Math, CDoneFormUnit, CConsts, CPreferences, CTools,
+  CPluginConsts;
 
 {$R *.dfm}
 
