@@ -13,4 +13,15 @@ inherited CInvestmentWalletFrame: TCInvestmentWalletFrame
     Left = 64
     Top = 64
   end
+  inherited ActionListButtons: TActionList
+    inherited ActionAdd: TAction
+      Caption = 'Dodaj portfel'
+    end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj portfel'
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' portfel'
+    end
+  end
 end
