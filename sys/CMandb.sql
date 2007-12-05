@@ -389,6 +389,7 @@ create table investmentWalletItem (
   idInstrument uniqueidentifier not null,
   quantity int not null,
   buyPrice money not null,
+  regDateTime datetime not null,  
   primary key (idInvestmentWalletItem),
   constraint fk_investmentWalletItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentWalletItem_Wallet foreign key (idInvestmentWallet) references investmentWallet (idInvestmentWallet)
@@ -444,7 +445,7 @@ create view filters as
 create view StnInstrumentValue as
   select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
   left join instrument i on i.idInstrument = v.idInstrument;
-
+  
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);
 create index ix_baseMovement_movementType on baseMovement (movementType);

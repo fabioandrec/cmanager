@@ -816,10 +816,12 @@ type
     FidInstrument: TDataGid;
     Fquantity: Integer;
     FbuyPrice: Currency;
+    FregDateTime: TDateTime;
     procedure SetbuyPrice(const Value: Currency);
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetidInvestmentWallet(const Value: TDataGid);
     procedure Setquantity(const Value: Integer);
+    procedure SetregDateTime(const Value: TDateTime);
   public
     constructor Create(AStatic: Boolean); override;
     procedure UpdateFieldList; override;
@@ -829,6 +831,7 @@ type
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
     property quantity: Integer read Fquantity write Setquantity;
     property buyPrice: Currency read FbuyPrice write SetbuyPrice;
+    property regDateTime: TDateTime read FregDateTime write SetregDateTime;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -4044,6 +4047,7 @@ begin
     FidInstrument := FieldByName('idInstrument').AsString;
     Fquantity := FieldByName('quantity').AsInteger;
     FbuyPrice := FieldByName('buyPrice').AsCurrency;
+    FregDateTime := FieldByName('regDateTime').AsDateTime;
   end;
 end;
 
@@ -4105,6 +4109,14 @@ begin
   end;
 end;
 
+procedure TInvestmentWalletItem.SetregDateTime(const Value: TDateTime);
+begin
+  if FregDateTime <> Value then begin
+    FregDateTime := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TInvestmentWalletItem.UpdateFieldList;
 begin
   inherited UpdateFieldList;
@@ -4113,6 +4125,7 @@ begin
     AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'investmentWalletItem');
     AddField('quantity', IntToStr(Fquantity), False, 'investmentWalletItem');
     AddField('buyPrice', CurrencyToDatabase(FbuyPrice), False, 'investmentWalletItem');
+    AddField('regDateTime', DatetimeToDatabase(DateTimeUptoMinutes(FregDateTime), True), False, 'investmentWalletItem');
   end;
 end;
 

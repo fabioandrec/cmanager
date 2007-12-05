@@ -60,6 +60,7 @@ create table investmentWalletItem (
   idInstrument uniqueidentifier not null,
   quantity int not null,
   buyPrice money not null,
+  regDateTime datetime not null,
   primary key (idInvestmentWalletItem),
   constraint fk_investmentWalletItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentWalletItem_Wallet foreign key (idInvestmentWallet) references investmentWallet (idInvestmentWallet)
