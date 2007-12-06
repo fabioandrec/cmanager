@@ -132,8 +132,7 @@ uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
   CExtractionsFrameUnit, CFilterFrameUnit, CLimitsFrameUnit,
   CMovementFrameUnit, CPlannedFrameUnit, CProductsFrameUnit,
   CProfileFrameUnit, CUnitdefFormUnit, CUpdateCurrencyRatesFormUnit,
-  CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
-  CInvestmentWalletFrameUnit;
+  CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit;
 
 {$R *.dfm}
 
@@ -721,7 +720,6 @@ begin
   GRegisteredClasses.AddClass(TCUnitDefFrame, CFRAMETYPE_UNITDEFFRAME, True);
   GRegisteredClasses.AddClass(TCInstrumentFrame, CFRAMETYPE_INSTRUMENT, True);
   GRegisteredClasses.AddClass(TCInstrumentValueFrame, CFRAMETYPE_INSTRUMENTVALUE, True);
-  GRegisteredClasses.AddClass(TCInvestmentWalletFrame, CFRAMETYPE_INVESTMENTWALLET, True);
 end;
 
 procedure FinalizeFrameGlobals;

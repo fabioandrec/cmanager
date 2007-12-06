@@ -370,29 +370,18 @@ create table instrumentValue (
   constraint fk_instrumentValueInstrument foreign key (idInstrument) references instrument (idInstrument)
 );
 
-create table investmentWallet (
-  idInvestmentWallet uniqueidentifier not null,
+create table investmentItem (
+  idInvestmentItem uniqueidentifier not null,
   created datetime not null,
   modified datetime,
-  name varchar(40) not null,
-  idAccount uniqueidentifier,
-  description varchar(200),
-  primary key (idInvestmentWallet),
-  constraint fk_investmentWalletAccount foreign key (idAccount) references account (idAccount)  
-);
-
-create table investmentWalletItem (
-  idInvestmentWalletItem uniqueidentifier not null,
-  created datetime not null,
-  modified datetime,
-  idInvestmentWallet uniqueidentifier not null,
+  idAccount uniqueidentifier not null,
   idInstrument uniqueidentifier not null,
   quantity int not null,
   buyPrice money not null,
-  regDateTime datetime not null,  
-  primary key (idInvestmentWalletItem),
-  constraint fk_investmentWalletItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
-  constraint fk_investmentWalletItem_Wallet foreign key (idInvestmentWallet) references investmentWallet (idInvestmentWallet)
+  regDateTime datetime not null,
+  primary key (idInvestmentItem),
+  constraint fk_investmentItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
+  constraint fk_investmentItem_Account foreign key (idAccount) references account (idAccount)
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementOut', '@kategoria@');

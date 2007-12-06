@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=8
 Release=1
-Build=31
+Build=32
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.8.1.31
+FileVersion=1.8.1.32
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -144,19 +144,18 @@ Item0=DEBUG
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=7
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
-Item1=$(DELPHI)\Lib\Debug;..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
-Item2=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
-Item3=..\others\PngComponents\Source;..\others\Vtv\Source
-Item4=..\..\..\others\PngComponents\Source
-Item5=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
-Item6=..\..\others\PngComponents\Source
+Count=6
+Item0=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
+Item2=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item3=..\..\..\others\PngComponents\Source
+Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
+Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\Trash
-Item1=..\..\..\..\Trash
+Item0=..\..\..\..\Trash
+Item1=..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\Bin
-Item1=..\..\..\..\Bin\Wtyczki
+Item0=..\..\..\..\Bin\Wtyczki
+Item1=..\..\Bin

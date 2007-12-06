@@ -132,9 +132,7 @@ uses
   CInstrumentValueFormUnit in 'CInstrumentValueFormUnit.pas' {CInstrumentValueForm},
   CUpdateExchangesFormUnit in 'CUpdateExchangesFormUnit.pas' {CUpdateExchangesForm},
   CBasics in 'Shared\CBasics.pas',
-  CChoosePeriodInstrumentValueFormUnit in 'CChoosePeriodInstrumentValueFormUnit.pas' {CChoosePeriodInstrumentValueForm},
-  CInvestmentWalletFrameUnit in 'CInvestmentWalletFrameUnit.pas' {CInvestmentWalletFrame: TFrame},
-  CInvestmentWalletFormUnit in 'CInvestmentWalletFormUnit.pas' {CInvestmentWalletForm};
+  CChoosePeriodInstrumentValueFormUnit in 'CChoosePeriodInstrumentValueFormUnit.pas' {CChoosePeriodInstrumentValueForm};
 
 {$R *.res}
 
