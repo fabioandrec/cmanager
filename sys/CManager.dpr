@@ -132,7 +132,9 @@ uses
   CInstrumentValueFormUnit in 'CInstrumentValueFormUnit.pas' {CInstrumentValueForm},
   CUpdateExchangesFormUnit in 'CUpdateExchangesFormUnit.pas' {CUpdateExchangesForm},
   CBasics in 'Shared\CBasics.pas',
-  CChoosePeriodInstrumentValueFormUnit in 'CChoosePeriodInstrumentValueFormUnit.pas' {CChoosePeriodInstrumentValueForm};
+  CChoosePeriodInstrumentValueFormUnit in 'CChoosePeriodInstrumentValueFormUnit.pas' {CChoosePeriodInstrumentValueForm},
+  CInvestmentMovementFrameUnit in 'CInvestmentMovementFrameUnit.pas' {CInvestmentMovementFrame: TFrame},
+  CInvestmentMovementFormUnit in 'CInvestmentMovementFormUnit.pas' {CInvestmentMovementForm};
 
 {$R *.res}
 
@@ -181,7 +183,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
