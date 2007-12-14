@@ -54,3 +54,45 @@ create table investmentItem (
   constraint fk_investmentItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentItem_Account foreign key (idAccount) references account (idAccount)
 );
+
+create table investmentMovement (
+  idInvestmentMovement uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  description varchar(200),
+  movementType varchar(1) not null,
+  regDateTime datetime not null,
+  weekDate datetime not null,
+  monthDate datetime not null,
+  yearDate datetime not null,
+  idInstrument uniqueidentifier not null,
+  idInstrumentCurrencyDef uniqueidentifier not null,
+  quantity integer not null,
+  idInstrumentValue uniqueidentifier,
+  valueOf money not null,
+  summaryOf money not null,
+  idAccount uniqueidentifier not null,  
+  idAccountCurrencyDef uniqueidentifier not null,
+  valueOfAccount money not null,
+  summaryOfAccount money not null,
+  idProduct uniqueidentifier,
+  idCurrencyRate uniqueidentifier,
+  idInvestmentItem uniqueidentifier not null,
+  idBaseMovement uniqueidentifier ,
+  primary key (idInvestmentMovement),
+  constraint ck_investmentMovementmovementType check (movementType in ('I', 'O')),
+  constraint fk_investmentMovementInstrument foreign key (idInstrument) references instrument (idInstrument),
+  constraint fk_investmentMovementInstrumentCurrency foreign key (idInstrumentCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_investmentMovementInstrumentValue foreign key (idInstrumentValue) references instrumentValue (idInstrumentValue),
+  constraint fk_investmentMovementaccount foreign key (idAccount) references account (idAccount),
+  constraint fk_investmentMovementAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_investmentMovementProduct foreign key (idProduct) references product (idProduct),
+  constraint fk_investmentMovementRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),  
+  constraint fk_investmentMovementInvestmentItem foreign key (idInvestmentItem) references investmentItem (idInvestmentItem),
+  constraint fk_investmentMovementBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement)
+);
+
+create index ix_investmentMovement_regDatetime on investmentMovement (regDateTime);
+create index ix_currencyRate_regDate on currencyRate (bindingDate);
+create index ix_instrumentValue_regDatetime on instrumentValue (regDateTime);
+create index ix_investmentItemInstrument on investmentItem (idInstrument, idAccount);

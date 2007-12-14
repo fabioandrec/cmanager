@@ -813,6 +813,75 @@ type
     property regDateTime: TDateTime read FregDateTime write SetregDateTime;
   end;
 
+  TInvestmentMovement = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    FmovementType: TBaseEnumeration;
+    FregDateTime: TDateTime;
+    FweekDate: TDateTime;
+    FmonthDate: TDateTime;
+    FyearDate: TDateTime;
+    FidInstrument: TDataGid;
+    FidInstrumentCurrencyDef: TDataGid;
+    Fquantity: Integer;
+    FidInstrumentValue: TDataGid;
+    FvalueOf: Currency;
+    FsummaryOf: Currency;
+    FidAccount: TDataGid;
+    FidAccountCurrencyDef: TDataGid;
+    FvalueOfAccount: Currency;
+    FsummaryOfAccount: Currency;
+    FidProduct: TDataGid;
+    FidCurrencyRate: TDataGid;
+    FidInvestmentItem: TDataGid;
+    FidBaseMovement: TDataGid;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetidAccountCurrencyDef(const Value: TDataGid);
+    procedure SetidBaseMovement(const Value: TDataGid);
+    procedure SetidCurrencyRate(const Value: TDataGid);
+    procedure SetidInstrument(const Value: TDataGid);
+    procedure SetidInstrumentCurrencyDef(const Value: TDataGid);
+    procedure SetidInstrumentValue(const Value: TDataGid);
+    procedure SetidInvestmentItem(const Value: TDataGid);
+    procedure SetidProduct(const Value: TDataGid);
+    procedure SetmonthDate(const Value: TDateTime);
+    procedure SetmovementType(const Value: TBaseEnumeration);
+    procedure Setquantity(const Value: Integer);
+    procedure SetregDateTime(const Value: TDateTime);
+    procedure SetsummaryOf(const Value: Currency);
+    procedure SetsummaryOfAccount(const Value: Currency);
+    procedure SetvalueOf(const Value: Currency);
+    procedure SetvalueOfAccount(const Value: Currency);
+    procedure SetweekDate(const Value: TDateTime);
+    procedure SetyearDate(const Value: TDateTime);
+  public
+    constructor Create(AStatic: Boolean); override;
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property regDateTime: TDateTime read FregDateTime write SetregDateTime;
+    property weekDate: TDateTime read FweekDate write SetweekDate;
+    property monthDate: TDateTime read FmonthDate write SetmonthDate;
+    property yearDate: TDateTime read FyearDate write SetyearDate;
+    property idInstrument: TDataGid read FidInstrument write SetidInstrument;
+    property idInstrumentCurrencyDef: TDataGid read FidInstrumentCurrencyDef write SetidInstrumentCurrencyDef;
+    property quantity: Integer read Fquantity write Setquantity;
+    property idInstrumentValue: TDataGid read FidInstrumentValue write SetidInstrumentValue;
+    property valueOf: Currency read FvalueOf write SetvalueOf;
+    property summaryOf: Currency read FsummaryOf write SetsummaryOf;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write SetidAccountCurrencyDef;
+    property valueOfAccount: Currency read FvalueOfAccount write SetvalueOfAccount;
+    property summaryOfAccount: Currency read FsummaryOfAccount write SetsummaryOfAccount;
+    property idProduct: TDataGid read FidProduct write SetidProduct;
+    property idCurrencyRate: TDataGid read FidCurrencyRate write SetidCurrencyRate;
+    property idInvestmentItem: TDataGid read FidInvestmentItem write SetidInvestmentItem;
+    property idBaseMovement: TDataGid read FidBaseMovement write SetidBaseMovement;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -833,6 +902,7 @@ var CashPointProxy: TDataProxy;
     InstrumentProxy: TDataProxy;
     InstrumentValueProxy: TDataProxy;
     InvestmentItemProxy: TDataProxy;
+    InvestmentMovementProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
@@ -841,31 +911,31 @@ var GActiveProfileId: TDataGid = CEmptyDataGid;
 const CHASH_INSTRUMENT_SYMBOL = 0;
       CHASH_INSTRUMENT_NAME = 1;
 
-const CDatafileTables: array[0..24] of string =
+const CDatafileTables: array[0..25] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
              'accountCurrencyRule', 'reportDef',
-             'instrument', 'intrumentValue', 'investmentItem');
+             'instrument', 'intrumentValue', 'investmentItem', 'investmentMovement');
 
-const CDatafileTablesExportConditions: array[0..24] of string =
+const CDatafileTablesExportConditions: array[0..25] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
              '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
-             '', '', '');
+             '', '', '', '');
 
-const CDatafileDeletes: array[0..24] of string =
+const CDatafileDeletes: array[0..25] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '', '', '', '', '');
+             '', '', '', '', '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
@@ -966,6 +1036,7 @@ begin
   InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument');
   InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'StnInstrumentValue');
   InvestmentItemProxy := TDataProxy.Create(GDataProvider, 'investmentItem');
+  InvestmentMovementProxy := TDataProxy.Create(GDataProvider, 'investmentMovement');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -4038,6 +4109,234 @@ begin
     AddField('quantity', IntToStr(Fquantity), False, 'investmentItem');
     AddField('buyPrice', CurrencyToDatabase(FbuyPrice), False, 'investmentItem');
     AddField('regDateTime', DatetimeToDatabase(DateTimeUptoMinutes(FregDateTime), True), False, 'investmentItem');
+  end;
+end;
+
+constructor TInvestmentMovement.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidInstrument := CEmptyDataGid;
+  FidInstrumentCurrencyDef := CEmptyDataGid;
+  FidInstrumentValue := CEmptyDataGid;
+  FidAccount := CEmptyDataGid;
+  FidAccountCurrencyDef := CEmptyDataGid;
+  FidProduct := CEmptyDataGid;
+  FidCurrencyRate := CEmptyDataGid;
+  FidInvestmentItem := CEmptyDataGid;
+  FidBaseMovement := CEmptyDataGid;
+end;
+
+procedure TInvestmentMovement.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+    FmovementType := FieldByName('movementType').AsString;
+    FregDateTime := FieldByName('regDateTime').AsDateTime;
+    FweekDate := FieldByName('weekDate').AsDateTime;
+    FmonthDate := FieldByName('monthDate').AsDateTime;
+    FyearDate := FieldByName('yearDate').AsDateTime;
+    FidInstrument := FieldByName('idInstrument').AsString;
+    FidInstrumentCurrencyDef := FieldByName('idInstrumentCurrencyDef').AsString;
+    Fquantity := FieldByName('quantity').AsInteger;
+    FidInstrumentValue := FieldByName('idInstrumentValue').AsString;
+    FvalueOf := FieldByName('valueOf').AsCurrency;
+    FsummaryOf := FieldByName('summaryOf').AsCurrency;
+    FidAccount := FieldByName('idAccount').AsString;
+    FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
+    FvalueOfAccount := FieldByName('valueOfAccount').AsCurrency;
+    FsummaryOfAccount := FieldByName('summaryOfAccount').AsCurrency;
+    FidProduct := FieldByName('idProduct').AsString;
+    FidCurrencyRate := FieldByName('idCurrencyRate').AsString;
+    FidInvestmentItem := FieldByName('idInvestmentItem').AsString;
+    FidBaseMovement := FieldByName('idBaseMovement').AsString;
+  end;
+end;
+
+procedure TInvestmentMovement.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidAccountCurrencyDef(const Value: TDataGid);
+begin
+  if FidAccountCurrencyDef <> Value then begin
+    FidAccountCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidBaseMovement(const Value: TDataGid);
+begin
+  if FidBaseMovement <> Value then begin
+    FidBaseMovement := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidCurrencyRate(const Value: TDataGid);
+begin
+  if FidCurrencyRate <> Value then begin
+    FidCurrencyRate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidInstrument(const Value: TDataGid);
+begin
+  if FidInstrument <> Value then begin
+    FidInstrument := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidInstrumentCurrencyDef(const Value: TDataGid);
+begin
+  if FidInstrumentCurrencyDef <> Value then begin
+    FidInstrumentCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidInstrumentValue(const Value: TDataGid);
+begin
+  if FidInstrumentValue <> Value then begin
+    FidInstrumentValue := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidInvestmentItem(const Value: TDataGid);
+begin
+  if FidInvestmentItem <> Value then begin
+    FidInvestmentItem := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetidProduct(const Value: TDataGid);
+begin
+  if FidProduct <> Value then begin
+    FidProduct := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetmonthDate(const Value: TDateTime);
+begin
+  if FmonthDate <> Value then begin
+    FmonthDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetmovementType(const Value: TBaseEnumeration);
+begin
+  if FmovementType <> Value then begin
+    FmovementType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.Setquantity(const Value: Integer);
+begin
+  if Fquantity <> Value then begin
+    Fquantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetregDateTime(const Value: TDateTime);
+begin
+  if FregDateTime <> Value then begin
+    FregDateTime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetsummaryOf(const Value: Currency);
+begin
+  if FsummaryOf <> Value then begin
+    FsummaryOf := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetsummaryOfAccount(const Value: Currency);
+begin
+  if FsummaryOfAccount <> Value then begin
+    FsummaryOfAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetvalueOf(const Value: Currency);
+begin
+  if FvalueOf <> Value then begin
+    FvalueOf := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetvalueOfAccount(const Value: Currency);
+begin
+  if FvalueOfAccount <> Value then begin
+    FvalueOfAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetweekDate(const Value: TDateTime);
+begin
+  if FweekDate <> Value then begin
+    FweekDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetyearDate(const Value: TDateTime);
+begin
+  if FyearDate <> Value then begin
+    FyearDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('description', Fdescription, True, 'investmentMovement');
+    AddField('movementType', FmovementType, True, 'investmentMovement');
+    AddField('regDateTime', DatetimeToDatabase(FregDateTime, True), False, 'investmentMovement');
+    AddField('weekDate', DatetimeToDatabase(FweekDate, False), False, 'investmentMovement');
+    AddField('monthDate', DatetimeToDatabase(FmonthDate, False), False, 'investmentMovement');
+    AddField('yearDate', DatetimeToDatabase(FyearDate, False), False, 'investmentMovement');
+    AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'investmentMovement');
+    AddField('idInstrumentCurrencyDef', DataGidToDatabase(FidInstrumentCurrencyDef), False, 'investmentMovement');
+    AddField('quantity', IntToStr(Fquantity), False, 'investmentMovement');
+    AddField('idInstrumentValue', DataGidToDatabase(FidInstrumentValue), False, 'investmentMovement');
+    AddField('valueOf', CurrencyToDatabase(FvalueOf), False, 'investmentMovement');
+    AddField('summaryOf', CurrencyToDatabase(FsummaryOf), False, 'investmentMovement');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'investmentMovement');
+    AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'investmentMovement');
+    AddField('valueOfAccount', CurrencyToDatabase(FvalueOfAccount), False, 'investmentMovement');
+    AddField('summaryOfAccount', CurrencyToDatabase(FsummaryOfAccount), False, 'investmentMovement');
+    AddField('idProduct', DataGidToDatabase(FidProduct), False, 'investmentMovement');
+    AddField('idCurrencyRate', DataGidToDatabase(FidCurrencyRate), False, 'investmentMovement');
+    AddField('idInvestmentItem', DataGidToDatabase(FidInvestmentItem), False, 'investmentMovement');
+    AddField('idBaseMovement', DataGidToDatabase(FidBaseMovement), False, 'investmentMovement');
   end;
 end;
 

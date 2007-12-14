@@ -1,23 +1,23 @@
 inherited CInvestmentMovementForm: TCInvestmentMovementForm
-  Left = 338
+  Left = 324
   Top = 58
   Caption = 'CInvestmentMovementForm'
-  ClientHeight = 549
-  ClientWidth = 538
+  ClientHeight = 660
+  ClientWidth = 554
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 538
-    Height = 508
+    Width = 554
+    Height = 619
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 505
+      Width = 521
       Height = 65
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label5: TLabel
-        Left = 247
+        Left = 263
         Top = 28
         Width = 33
         Height = 13
@@ -25,7 +25,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Rodzaj'
       end
       object Label3: TLabel
-        Left = 19
+        Left = 35
         Top = 28
         Width = 53
         Height = 13
@@ -33,7 +33,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Data i czas'
       end
       object ComboBoxType: TComboBox
-        Left = 288
+        Left = 304
         Top = 24
         Width = 193
         Height = 21
@@ -49,7 +49,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
           'Sprzeda'#380)
       end
       object CDateTime: TCDateTime
-        Left = 80
+        Left = 96
         Top = 24
         Width = 145
         Height = 21
@@ -68,13 +68,13 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 328
-      Width = 505
+      Top = 440
+      Width = 521
       Height = 169
       Caption = ' Opis '
       TabOrder = 2
       object CButton1: TCButton
-        Left = 238
+        Left = 254
         Top = 126
         Width = 115
         Height = 25
@@ -87,7 +87,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Color = clBtnFace
       end
       object CButton2: TCButton
-        Left = 356
+        Left = 372
         Top = 126
         Width = 129
         Height = 25
@@ -102,7 +102,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
-        Width = 457
+        Width = 473
         Height = 89
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -128,20 +128,20 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
     object GroupBox3: TGroupBox
       Left = 16
       Top = 96
-      Width = 505
-      Height = 217
+      Width = 521
+      Height = 329
       Caption = ' Szczeg'#243#322'y operacji '
       TabOrder = 1
       object Label4: TLabel
         Left = 36
-        Top = 33
+        Top = 177
         Width = 76
         Height = 13
         Alignment = taRightJustify
         Caption = 'Konto inwestycji'
       end
       object Label1: TLabel
-        Left = 279
+        Left = 39
         Top = 33
         Width = 49
         Height = 13
@@ -149,7 +149,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Instrument'
       end
       object Label15: TLabel
-        Left = 306
+        Left = 322
         Top = 69
         Width = 22
         Height = 13
@@ -157,7 +157,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Ilo'#347#263
       end
       object Label2: TLabel
-        Left = 38
+        Left = 14
         Top = 69
         Width = 74
         Height = 13
@@ -165,7 +165,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'W/g notowania'
       end
       object Label6: TLabel
-        Left = 258
+        Left = 274
         Top = 105
         Width = 71
         Height = 13
@@ -173,7 +173,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Warto'#347#263' jednej'
       end
       object Label9: TLabel
-        Left = 234
+        Left = 250
         Top = 141
         Width = 94
         Height = 13
@@ -182,16 +182,48 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       end
       object Label8: TLabel
         Left = 19
-        Top = 177
+        Top = 289
         Width = 93
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kategoria inwestycji'
       end
+      object Label20: TLabel
+        Left = 266
+        Top = 32
+        Width = 78
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta notowa'#324
+      end
+      object Label22: TLabel
+        Left = 62
+        Top = 213
+        Width = 50
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Przelicznik'
+      end
+      object Label17: TLabel
+        Left = 48
+        Top = 248
+        Width = 64
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta konta'
+      end
+      object Label21: TLabel
+        Left = 264
+        Top = 249
+        Width = 80
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'W walucie konta'
+      end
       object CStaticAccount: TCStatic
         Left = 120
-        Top = 29
-        Width = 145
+        Top = 173
+        Width = 377
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -199,14 +231,16 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = '<wybierz konto z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 0
+        TabOrder = 6
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto z listy>'
+        OnGetDataId = CStaticAccountGetDataId
+        OnChanged = CStaticAccountChanged
         HotTrack = True
       end
       object CStaticInstrument: TCStatic
-        Left = 336
+        Left = 96
         Top = 29
         Width = 145
         Height = 21
@@ -216,28 +250,29 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = '<wybierz z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 1
+        TabOrder = 0
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz z listy>'
+        OnGetDataId = CStaticInstrumentGetDataId
         HotTrack = True
       end
       object CCurrEditOnceQuantity: TCCurrEdit
         Tag = 1
-        Left = 336
+        Left = 352
         Top = 65
         Width = 145
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 2
+        TabOrder = 3
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
-      object CStatic1: TCStatic
-        Left = 120
+      object CStaticInstrumentValue: TCStatic
+        Left = 96
         Top = 65
         Width = 145
         Height = 21
@@ -247,15 +282,16 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = '<wybierz z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 3
+        TabOrder = 2
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz z listy>'
+        OnGetDataId = CStaticInstrumentValueGetDataId
         HotTrack = True
       end
       object CCurrEditValue: TCCurrEdit
         Tag = 1
-        Left = 336
+        Left = 352
         Top = 101
         Width = 145
         Height = 21
@@ -268,7 +304,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         WithCalculator = True
       end
       object CCurrEditInoutOnceMovement: TCCurrEdit
-        Left = 336
+        Left = 352
         Top = 137
         Width = 145
         Height = 21
@@ -280,10 +316,10 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         BevelKind = bkTile
         WithCalculator = True
       end
-      object CStaticInoutOnceCategory: TCStatic
+      object CStaticCategory: TCStatic
         Left = 120
-        Top = 173
-        Width = 361
+        Top = 285
+        Width = 377
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -291,22 +327,91 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = '<wybierz kategori'#281' z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 6
+        TabOrder = 10
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
+        OnGetDataId = CStaticCategoryGetDataId
         HotTrack = True
+      end
+      object CStaticInstrumentCurrency: TCStatic
+        Left = 352
+        Top = 29
+        Width = 145
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<brak instrumentu>'
+        Color = clWindow
+        Enabled = False
+        ParentColor = False
+        TabOrder = 1
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<brak instrumentu>'
+        HotTrack = True
+      end
+      object CStaticCurrencyRate: TCStatic
+        Left = 120
+        Top = 209
+        Width = 377
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz przelicznik kursu z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 7
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz przelicznik kursu z listy>'
+        OnGetDataId = CStaticCurrencyRateGetDataId
+        HotTrack = True
+      end
+      object CStaticAccountCurrency: TCStatic
+        Left = 120
+        Top = 245
+        Width = 121
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<brak konta>'
+        Color = clWindow
+        Enabled = False
+        ParentColor = False
+        TabOrder = 8
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<brak konta>'
+        HotTrack = False
+      end
+      object CCurrEditAccount: TCCurrEdit
+        Left = 352
+        Top = 245
+        Width = 145
+        Height = 21
+        BorderStyle = bsNone
+        Enabled = False
+        TabOrder = 9
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 508
-    Width = 538
+    Top = 619
+    Width = 554
     inherited BitBtnOk: TBitBtn
-      Left = 361
+      Left = 377
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 449
+      Left = 465
     end
   end
   object ActionManager: TActionManager

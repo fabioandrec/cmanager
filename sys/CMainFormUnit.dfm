@@ -640,6 +640,10 @@ object CMainForm: TCMainForm
       Caption = 'Notowania'
       ImageIndex = 15
     end
+    object ActionShortcutInvestments: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Inwestycje'
+    end
     object ActionShortcutReports: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Raporty'
