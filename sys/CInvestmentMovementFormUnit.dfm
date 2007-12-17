@@ -44,6 +44,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         ItemIndex = 0
         TabOrder = 0
         Text = 'Zakup'
+        OnChange = ComboBoxTypeChange
         Items.Strings = (
           'Zakup'
           'Sprzeda'#380)
@@ -255,9 +256,10 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Transparent = False
         TextOnEmpty = '<wybierz z listy>'
         OnGetDataId = CStaticInstrumentGetDataId
+        OnChanged = CStaticInstrumentChanged
         HotTrack = True
       end
-      object CCurrEditOnceQuantity: TCCurrEdit
+      object CCurrEditQuantity: TCCurrEdit
         Tag = 1
         Left = 352
         Top = 65
@@ -265,9 +267,9 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Height = 21
         BorderStyle = bsNone
         TabOrder = 3
+        OnChange = CCurrEditQuantityChange
         Decimals = 2
         ThousandSep = True
-        CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
@@ -287,6 +289,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Transparent = False
         TextOnEmpty = '<wybierz z listy>'
         OnGetDataId = CStaticInstrumentValueGetDataId
+        OnChanged = CStaticInstrumentValueChanged
         HotTrack = True
       end
       object CCurrEditValue: TCCurrEdit
@@ -297,18 +300,20 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Height = 21
         BorderStyle = bsNone
         TabOrder = 4
+        OnChange = CCurrEditValueChange
         Decimals = 4
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
-      object CCurrEditInoutOnceMovement: TCCurrEdit
+      object CCurrMovement: TCCurrEdit
         Left = 352
         Top = 137
         Width = 145
         Height = 21
         BorderStyle = bsNone
+        Enabled = False
         TabOrder = 5
         Decimals = 2
         ThousandSep = True
@@ -368,6 +373,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Transparent = False
         TextOnEmpty = '<wybierz przelicznik kursu z listy>'
         OnGetDataId = CStaticCurrencyRateGetDataId
+        OnChanged = CStaticCurrencyRateChanged
         HotTrack = True
       end
       object CStaticAccountCurrency: TCStatic

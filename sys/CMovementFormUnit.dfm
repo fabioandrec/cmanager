@@ -798,6 +798,7 @@ inherited CMovementForm: TCMovementForm
             Width = 89
             Height = 21
             BorderStyle = bsNone
+            Enabled = False
             TabOrder = 5
             OnChange = CCurrEditInoutOnceMovementChange
             Decimals = 2

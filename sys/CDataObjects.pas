@@ -751,6 +751,7 @@ type
     class function FindByName(AName: TBaseName): TInstrument;
     class function FindBySymbol(ASymbol: TBaseName): TInstrument;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
+    class function GetCurrencyDefinition(AIdInstrument: TDataGid): TDataGid;
   published
     property symbol: TBaseName read Fsymbol write Setsymbol;
     property name: TBaseName read Fname write Setname;
@@ -4338,6 +4339,11 @@ begin
     AddField('idInvestmentItem', DataGidToDatabase(FidInvestmentItem), False, 'investmentMovement');
     AddField('idBaseMovement', DataGidToDatabase(FidBaseMovement), False, 'investmentMovement');
   end;
+end;
+
+class function TInstrument.GetCurrencyDefinition(AIdInstrument: TDataGid): TDataGid;
+begin
+  Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from instrument where idInstrument = %s', [DataGidToDatabase(AIdInstrument)]), '');
 end;
 
 initialization

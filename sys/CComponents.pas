@@ -1089,16 +1089,15 @@ begin
 end;
 
 procedure TCCurrEdit.SetValue(Value: Currency);
-var
-  test: string;
+var xTest: string;
 begin
   try
-    test := FormatCurr('0.00', Value);
+    xTest := FormatCurr('0.00', Value);
+    FValue := Value;
   except
     FValue := 0;
     raise TCEditError.Create('"' + FloatToStr(Value) + '" is not valid for Value');
   end;
-  FValue := Value;
   Update;
 end;
 
@@ -1110,8 +1109,6 @@ begin
     Text := FormatIt(FValue, True) + ' ' + FCurrencyStr;
   end;
 end;
-
-//Special Public-Methods
 
 function TCCurrEdit.AsCurrency: Currency;
 begin
