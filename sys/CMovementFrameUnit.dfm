@@ -269,35 +269,35 @@ inherited CMovementFrame: TCMovementFrame
       Caption = 'Okres wykonania:'
     end
     object Label3: TLabel
-      Left = 289
+      Left = 417
       Top = 4
       Width = 15
       Height = 13
       Caption = '(od'
     end
     object Label4: TLabel
-      Left = 362
+      Left = 490
       Top = 4
       Width = 12
       Height = 13
       Caption = 'do'
     end
     object Label5: TLabel
-      Left = 430
+      Left = 558
       Top = 4
       Width = 3
       Height = 13
       Caption = ')'
     end
     object Label6: TLabel
-      Left = 240
+      Left = 288
       Top = 4
       Width = 32
       Height = 13
       Caption = 'Kwoty:'
     end
     object CStaticPeriod: TCStatic
-      Left = 235
+      Left = 211
       Top = 4
       Width = 90
       Height = 15
@@ -353,7 +353,7 @@ inherited CMovementFrame: TCMovementFrame
       HotTrack = True
     end
     object CDateTimePerStart: TCDateTime
-      Left = 306
+      Left = 434
       Top = 4
       Width = 56
       Height = 14
@@ -361,7 +361,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '2006-01-01'
+      Caption = '<wybierz dat'#281'  i czas>'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2
@@ -369,9 +369,10 @@ inherited CMovementFrame: TCMovementFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
+      Withtime = True
     end
     object CDateTimePerEnd: TCDateTime
-      Left = 376
+      Left = 504
       Top = 4
       Width = 55
       Height = 14
@@ -379,7 +380,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '2006-01-01'
+      Caption = '<wybierz dat'#281'  i czas>'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 3
@@ -387,9 +388,10 @@ inherited CMovementFrame: TCMovementFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
+      Withtime = True
     end
     object CStaticViewCurrency: TCStatic
-      Left = 265
+      Left = 321
       Top = 4
       Width = 88
       Height = 15

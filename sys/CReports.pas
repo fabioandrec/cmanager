@@ -34,7 +34,7 @@ type
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: ICXMLDOMNode);
     procedure SaveToXml(ANode: ICXMLDOMNode);
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementId: String; override;
     function GetElementType: String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
@@ -924,7 +924,7 @@ var xOperations: TADOQuery;
     xIS, xOS: String;
     xFieldI, xFieldO, xFieldC: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldI := 'movementIncome';
     xFieldO := 'movementExpense';
     xFieldC := 'idMovementCurrencyDef';
@@ -1272,7 +1272,7 @@ var xOperations: TADOQuery;
     xCount: Integer;
     xFieldC, xFieldR: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldC := 'idMovementCurrencyDef';
     xFieldR := 'movementCash';
   end else begin
@@ -1441,7 +1441,7 @@ begin
   inherited Create;
   FParams := AParams;
   FIdFilter := CEmptyDataGid;
-  CurrencyView := CCurrencyViewMovements;
+  CurrencyView := CCurrencyViewBaseMovements;
   FAcps := TStringList.Create;
 end;
 
@@ -1752,7 +1752,7 @@ var xOperations: TADOQuery;
     xCount: Integer;
     xFieldC, xFieldR: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldC := 'idMovementCurrencyDef';
     xFieldR := 'movementCash';
   end else begin
@@ -1828,7 +1828,7 @@ end;
 
 function TOperationsBySomethingChart.GetCashField: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     Result := 'movementCash';
   end else begin
     Result := 'cash';
@@ -1837,7 +1837,7 @@ end;
 
 function TOperationsBySomethingChart.GetCurrencyField: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     Result := 'idMovementCurrencyDef';
   end else begin
     Result := 'idAccountCurrencyDef';
@@ -1934,7 +1934,7 @@ end;
 
 function TOperationsBySomethingList.GetCashField: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     Result := 'movementCash';
   end else begin
     Result := 'cash';
@@ -1943,7 +1943,7 @@ end;
 
 function TOperationsBySomethingList.GetCurrencyField: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     Result := 'idMovementCurrencyDef';
   end else begin
     Result := 'idAccountCurrencyDef';
@@ -2084,7 +2084,7 @@ var xOperations: TADOQuery;
     xRec, xCount: Integer;
     xFieldC, xFieldR, xFilter: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldC := 'idMovementCurrencyDef';
     xFieldR := 'movementCash';
   end else begin
@@ -2249,7 +2249,7 @@ var xInOperations, xOutOperations: TADOQuery;
     xFieldR, xFieldC: String;
     xFilter: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldR := 'movementCash';
     xFieldC := 'idMovementCurrencyDef';
   end else begin
@@ -2504,7 +2504,7 @@ var xBody: TStringList;
     xIsMultiCurrency: Boolean;
     xFieldI, xFieldO, xFieldC: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldI := 'movementIncome';
     xFieldO := 'movementExpense';
     xFieldC := 'idMovementCurrencyDef';
@@ -2718,7 +2718,7 @@ var xBody: TStringList;
     xIsMultiCurrency: Boolean;
     xFieldI, xFieldO, xFieldC: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldI := 'movementIncome';
     xFieldO := 'movementExpense';
     xFieldC := 'idMovementCurrencyDef';
@@ -2860,7 +2860,7 @@ var xBody: TStringList;
     xFuturePeriodsIn, xFuturePeriodsOut: TObjectList;
     xFieldI, xFieldO, xFieldC: String;
 begin
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldI := 'movementIncome';
     xFieldO := 'movementExpense';
     xFieldC := 'idMovementCurrencyDef';
@@ -3678,7 +3678,7 @@ var xOperations: TADOQuery;
     xQuantitySum: Currency;
 begin
   xSums := TSumList.Create(True);
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldC := 'idMovementCurrencyDef';
     xFieldR := 'movementCash';
   end else begin
@@ -3836,7 +3836,7 @@ begin
     xGbDate := 'monthDate';
     xNameDate := 'Miesi¹c';
   end;
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xCashField := 'movementCash';
     xCurrencyField := 'idMovementCurrencyDef';
   end else begin
@@ -3969,7 +3969,7 @@ begin
     xGbDate := 'monthDate';
     xNameDate := 'Miesi¹c';
   end;
-  if CurrencyView = CCurrencyViewMovements then begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
     xCashField := 'movementCash';
     xCurrencyField := 'idMovementCurrencyDef';
   end else begin
@@ -4707,7 +4707,7 @@ begin
   FparamType := 'O';
 end;
 
-function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 0 then begin
     Result := Fgroup;

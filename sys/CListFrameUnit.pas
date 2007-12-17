@@ -33,7 +33,8 @@ type
     function FindNodeId(ANode: PVirtualNode): ShortString; override;
   end;
 
-function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
+function ShowCurrencyViewTypeBaseMovement(var ACurrencType: String; var AText: String): Boolean;
+function ShowCurrencyViewTypeInvestmentMovement(var ACurrencType: String; var AText: String): Boolean;
 function ShowList(AList: TStringList; var AGid: String; var AText: String; AMultipleChecks: Boolean): Boolean;
 
 implementation
@@ -42,13 +43,24 @@ uses CFrameFormUnit, CConsts, CDatatools, CTools;
 
 {$R *.dfm}
 
-function ShowCurrencyViewType(var ACurrencType: String; var AText: String): Boolean;
+function ShowCurrencyViewTypeBaseMovement(var ACurrencType: String; var AText: String): Boolean;
 var xList: TStringList;
     xRect: TRect;
 begin
   xList := TStringList.Create;
-  xList.Add(CCurrencyViewMovements + '=<waluta operacji>');
-  xList.Add(CCurrencyViewAccounts + '=<waluta konta>');
+  xList.Add(CCurrencyViewBaseMovements + '=<waluta operacji>');
+  xList.Add(CCurrencyViewBaseAccounts + '=<waluta konta>');
+  xRect := Rect(10, 10, 200, 300);
+  Result := TCFrameForm.ShowFrame(TCListFrame, ACurrencType, AText, xList, @xRect);
+end;
+
+function ShowCurrencyViewTypeInvestmentMovement(var ACurrencType: String; var AText: String): Boolean;
+var xList: TStringList;
+    xRect: TRect;
+begin
+  xList := TStringList.Create;
+  xList.Add(CCurrencyViewInvestmentMovements + '=<waluta instrumentu>');
+  xList.Add(CCurrencyViewInvestmentAccounts + '=<waluta konta>');
   xRect := Rect(10, 10, 200, 300);
   Result := TCFrameForm.ShowFrame(TCListFrame, ACurrencType, AText, xList, @xRect);
 end;

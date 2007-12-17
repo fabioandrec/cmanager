@@ -15,7 +15,7 @@ type
   public
     constructor Create(AMovementLimit: TMovementLimit; ACash: Currency);
     function GetElementHint(AColumnIndex: Integer): String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
   end;
 
@@ -195,7 +195,7 @@ begin
   end;
 end;
 
-function TSurpassedLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TSurpassedLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 0 then begin
     Result := Flimit.name;

@@ -25,12 +25,12 @@ type
     constructor CreateGroup(AName: String; ADesc: String; AImage: Integer);
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementId: String; override;
     function GetElementType: String; override;
     function GetElementText: String; override;
     procedure GetElementReload; override;
-    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer; override;
     destructor Destroy; override;
   published
     property isReport: Boolean read FisReport;
@@ -183,14 +183,14 @@ begin
   Result := Fimage;
 end;
 
-function TReportListElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TReportListElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := Fname;
 end;
 
-function TReportListElement.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+function TReportListElement.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer;
 begin
-  Result := AnsiCompareStr(GetColumnText(AColumnIndex, False), ACompareWith.GetColumnText(AColumnIndex, False));
+  Result := AnsiCompareStr(GetColumnText(AColumnIndex, False, AViewTextSelector), ACompareWith.GetColumnText(AColumnIndex, False, AViewTextSelector));
 end;
 
 function TReportListElement.GetElementHint(AColumnIndex: Integer): String;

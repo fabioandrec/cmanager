@@ -125,7 +125,7 @@ end;
 
 procedure TCChoosePeriodForm.CStaticCurrencyViewGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := ShowCurrencyViewType(ADataGid, AText);
+  AAccepted := ShowCurrencyViewTypeBaseMovement(ADataGid, AText);
 end;
 
 procedure TCChoosePeriodForm.FormShow(Sender: TObject);

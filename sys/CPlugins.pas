@@ -69,7 +69,7 @@ type
     destructor Destroy; override;
     function Configure: Boolean;
     function Execute: OleVariant;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     property isTypeof[AType: Integer]: Boolean read GetisTypeOf;
   published
     property fileName: String read FFilename;
@@ -201,7 +201,7 @@ begin
   end;
 end;
 
-function TCPlugin.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TCPlugin.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 1 then begin
     Result := ExtractFileName(FFilename);

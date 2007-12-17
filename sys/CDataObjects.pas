@@ -26,7 +26,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
@@ -51,7 +51,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class function FindByIso(AIso: TBaseName): TCurrencyDef;
@@ -79,7 +79,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     procedure AfterPost; override;
   published
@@ -112,7 +112,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     class function FindRate(ARateType: TBaseEnumeration; ASourceId, ATargetId, ACashpointId: TDataGid; ABindingDate: TDateTime; AExactlyAtBindingdate: Boolean = True): TCurrencyRate;
     class function GetTypeDesc(AType: TBaseEnumeration): String;
@@ -172,8 +172,8 @@ type
     class function GetMovementCount(AIdAccount: TDataGid): Integer;
     class function GetCurrencyDefinition(AIdAccount: TDataGid): TDataGid;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
-    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
@@ -205,7 +205,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetMovements: TDataObjectList;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
     function GetElementText: String; override;
@@ -240,7 +240,7 @@ type
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
     function GetElementText: String; override;
   published
@@ -274,7 +274,7 @@ type
     class function HasSubcategory(AId: TDataGid): Boolean;
     class function HasQuantity(AId: TDataGid): TDataGid;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
@@ -551,7 +551,7 @@ type
     procedure DeleteObject; override;
     function IsValid(AAccountId, ACashpointId, AProductId: TDataGid): Boolean;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     class function CanBeDeleted(AId: ShortString): Boolean; override;
     class procedure DeleteIfTemporary(AId: TDataGid);
@@ -581,7 +581,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure DeleteObject; override;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property name: TBaseName read Fname write Setname;
@@ -620,7 +620,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     function IsSurpassed(ACurrentValue: Currency): Boolean;
     function GetCurrentAmount(ADate: TDateTime; AMustRecalculate: Boolean): Currency;
@@ -743,7 +743,7 @@ type
     function GetHash(AHashId: Integer): String; override;
   public
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -774,7 +774,7 @@ type
     procedure SetvalueOf(const Value: Currency);
   public
     function GetElementText: String; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -1073,7 +1073,7 @@ begin
   end;
 end;
 
-function TCashPoint.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TCashPoint.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := Fname;
 end;
@@ -1224,7 +1224,7 @@ begin
   end;
 end;
 
-function TProduct.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TProduct.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := Fname;
 end;
@@ -1928,7 +1928,7 @@ begin
   end;
 end;
 
-function TMovementFilter.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TMovementFilter.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := Fname;
 end;
@@ -2123,7 +2123,7 @@ begin
   end;
 end;
 
-function TProfile.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TProfile.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := Fname;
 end;
@@ -2418,7 +2418,7 @@ begin
   end;
 end;
 
-function TAccount.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TAccount.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 3 then begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
@@ -2436,12 +2436,12 @@ begin
   Result := Fname;
 end;
 
-function TAccount.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+function TAccount.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer;
 begin
   if AColumnIndex = 2 then begin
     Result := Sign(Fcash - TAccount(ACompareWith).cash);
   end else begin
-    Result := inherited GetElementCompare(AColumnIndex, ACompareWith);
+    Result := inherited GetElementCompare(AColumnIndex, ACompareWith, AViewTextSelector);
   end;
 end;
 
@@ -2489,7 +2489,7 @@ begin
   end;
 end;
 
-function TMovementLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TMovementLimit.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 2 then begin
     if FsumType = CLimitSumtypeOut then begin
@@ -2747,7 +2747,7 @@ begin
   end;
 end;
 
-function TCurrencyDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TCurrencyDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 1 then begin
     Result := Fsymbol;
@@ -2906,7 +2906,7 @@ begin
   end;
 end;
 
-function TCurrencyRate.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TCurrencyRate.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 0 then begin
     Result := Date2StrDate(FbindingDate);
@@ -3366,7 +3366,7 @@ begin
   end;
 end;
 
-function TExtractionItem.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TExtractionItem.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 1 then begin
     Result := Date2StrDate(FregDate);
@@ -3497,7 +3497,7 @@ begin
   end;
 end;
 
-function TAccountExtraction.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TAccountExtraction.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 4 then begin
     if FextractionState = CExtractionStateOpen then begin
@@ -3657,7 +3657,7 @@ begin
   end;
 end;
 
-function TUnitDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TUnitDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := Fname;
 end;
@@ -3816,7 +3816,7 @@ begin
   end;
 end;
 
-function TInstrument.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TInstrument.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := '';
   if AColumnIndex = 0 then begin
@@ -3936,7 +3936,7 @@ begin
   end;
 end;
 
-function TInstrumentValue.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TInstrumentValue.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := '';
   if AColumnIndex = 0 then begin

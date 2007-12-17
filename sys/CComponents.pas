@@ -274,9 +274,9 @@ type
     function GetElementId: String; virtual;
     function GetElementText: String; virtual;
     function GetElementHint(AColumnIndex: Integer): String; virtual;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; virtual; abstract;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; virtual; abstract;
     function GetColumnImage(AColumnIndex: Integer): Integer; virtual;
-    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; virtual;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer; virtual;
     procedure GetElementReload; virtual; 
   end;
 
@@ -327,9 +327,11 @@ type
   private
     FCOnReloadTree: TCDataListOnReloadTree;
     FRootElement: TCListDataElement;
+    FViewTextSelector: String;
     function GetSelectedId: String;
     function GetSelectedText: String;
     function GetSelectedElement: TCListDataElement;
+    procedure SetViewTextSelector(const Value: String);
   protected
     procedure ValidateNodeDataSize(var Size: Integer); override;
     procedure DoInitNode(Parent, Node: PVirtualNode; var InitStates: TVirtualNodeInitStates); override;
@@ -348,6 +350,7 @@ type
     property SelectedElement: TCListDataElement read GetSelectedElement;
   published
     property OnCDataListReloadTree: TCDataListOnReloadTree read FCOnReloadTree write FCOnReloadTree;
+    property ViewTextSelector: String read FViewTextSelector write SetViewTextSelector;
   end;
 
   TCStatusPanel = class(TStatusPanel)
@@ -1675,6 +1678,7 @@ begin
   inherited Create(AOwner);
   FRootElement := TCListDataElement.Create(False, Self, Nil);
   FCOnReloadTree := Nil;
+  FViewTextSelector := '';
 end;
 
 destructor TCDataList.Destroy;
@@ -1761,7 +1765,7 @@ begin
       if Header.Columns.Items[Column].Text = 'Lp' then begin
         Text := IntToStr(Node.Index + 1);
       end else begin
-        Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic);
+        Text := GetTreeElement(Node).Data.GetColumnText(Column, TextType = ttStatic, FViewTextSelector);
       end;
     end;
   end;
@@ -1806,9 +1810,9 @@ begin
   Result := -1;
 end;
 
-function TCDataListElementObject.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+function TCDataListElementObject.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer;
 begin
-  Result := AnsiCompareStr(GetColumnText(AColumnIndex, False), ACompareWith.GetColumnText(AColumnIndex, False));
+  Result := AnsiCompareStr(GetColumnText(AColumnIndex, False, AViewTextSelector), ACompareWith.GetColumnText(AColumnIndex, False, AViewTextSelector));
 end;
 
 function TCDataListElementObject.GetElementHint(AColumnIndex: Integer): String;
@@ -2035,6 +2039,14 @@ begin
     for xCount := 0 to ListComponents.Count - 1 do begin
       TCList(ListComponents.Items[xCount]).Refresh;
     end;
+  end;
+end;
+
+procedure TCDataList.SetViewTextSelector(const Value: String);
+begin
+  if FViewTextSelector <> Value then begin
+    FViewTextSelector := Value;
+    Refresh;
   end;
 end;
 

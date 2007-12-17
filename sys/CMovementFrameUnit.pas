@@ -616,7 +616,7 @@ var xDs: TADOQuery;
     xIs, xEs, xCs: String;
 begin
   GetFilterDates(xDf, xDt);
-  if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
+  if CStaticViewCurrency.DataId = CCurrencyViewBaseMovements then begin
     xIs := 'movementIncome';
     xEs := 'movementExpense';
     xCs := 'idMovementCurrencyDef';
@@ -962,7 +962,7 @@ end;
 function TMovementTreeElement.Getcash: Currency;
 begin
   if FelementType = mtObject then begin
-    if FcurrencyView = CCurrencyViewMovements then begin
+    if FcurrencyView = CCurrencyViewBaseMovements then begin
       Result := TBaseMovement(Dataobject).movementCash;
     end else begin
       Result := TBaseMovement(Dataobject).cash;
@@ -989,7 +989,7 @@ end;
 function TMovementTreeElement.GetidCurrencyDef: TDataGid;
 begin
   if FelementType = mtObject then begin
-    if FcurrencyView = CCurrencyViewMovements then begin
+    if FcurrencyView = CCurrencyViewBaseMovements then begin
       Result := TBaseMovement(Dataobject).idMovementCurrencyDef;
     end else begin
       Result := TBaseMovement(Dataobject).idAccountCurrencyDef;
@@ -1077,7 +1077,7 @@ end;
 
 procedure TCMovementFrame.CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := ShowCurrencyViewType(ADataGid, AText);
+  AAccepted := ShowCurrencyViewTypeBaseMovement(ADataGid, AText);
 end;
 
 procedure TCMovementFrame.CStaticViewCurrencyChanged(Sender: TObject);

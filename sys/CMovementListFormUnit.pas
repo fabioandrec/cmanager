@@ -311,13 +311,13 @@ begin
   end else if Column = 1 then begin
     CellText := GetDescText(xData.description);
   end else if Column = 2 then begin
-    if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
+    if CStaticViewCurrency.DataId = CCurrencyViewBaseMovements then begin
       CellText := CurrencyToString(xData.movementCash, '', False);
     end else begin
       CellText := CurrencyToString(xData.cash, '', False);
     end;
   end else if Column = 3 then begin
-    if CStaticViewCurrency.DataId = CCurrencyViewMovements then begin
+    if CStaticViewCurrency.DataId = CCurrencyViewBaseMovements then begin
       CellText := GCurrencyCache.GetSymbol(xData.idMovementCurrencyDef);
     end else begin
       CellText := GCurrencyCache.GetSymbol(xData.idAccountCurrencyDef);
@@ -809,7 +809,7 @@ end;
 
 procedure TCMovementListForm.CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := ShowCurrencyViewType(ADataGid, AText);
+  AAccepted := ShowCurrencyViewTypeBaseMovement(ADataGid, AText);
 end;
 
 procedure TCMovementListForm.CStaticViewCurrencyChanged(Sender: TObject);

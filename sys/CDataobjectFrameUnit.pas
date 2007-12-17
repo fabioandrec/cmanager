@@ -346,7 +346,7 @@ begin
   if Column <> -1 then begin
     xFirst := List.GetTreeElement(Node1).Data;
     xSecond := List.GetTreeElement(Node2).Data;
-    Result := xFirst.GetElementCompare(Column, xSecond);
+    Result := xFirst.GetElementCompare(Column, xSecond, List.ViewTextSelector);
   end;
 end;
 

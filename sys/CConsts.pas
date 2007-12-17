@@ -140,8 +140,11 @@ const
   CCurrencyRateTypeSellDesc = 'kurs sprzeda¿y';
   CCurrencyRateTypeBuyDesc = 'kurs kupna';
 
-  CCurrencyViewMovements = 'M';
-  CCurrencyViewAccounts = 'A';
+  CCurrencyViewBaseMovements = 'M';
+  CCurrencyViewBaseAccounts = 'A';
+
+  CCurrencyViewInvestmentMovements = 'M';
+  CCurrencyViewInvestmentAccounts = 'A';
 
   CExtractionStateOpen = 'O';
   CExtractionStateClose = 'C';

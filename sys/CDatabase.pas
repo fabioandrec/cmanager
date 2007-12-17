@@ -162,9 +162,9 @@ type
     function GetElementType: String; override;
     function GetElementText: String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
-    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     procedure GetElementReload; override;
-    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer; override;
+    function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     property Hash[AHashId: Integer]: String read GetHash;
   published
@@ -983,16 +983,16 @@ begin
   Result := -1;
 end;
 
-function TDataObject.GetColumnText(AColumnIndex: Integer; AStatic: Boolean): String;
+function TDataObject.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   Result := '';
 end;
 
-function TDataObject.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject): Integer;
+function TDataObject.GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer;
 var xV1, xV2: String;
 begin
-  xV1 := GetColumnText(AColumnIndex, False);
-  xV2 := ACompareWith.GetColumnText(AColumnIndex, False);
+  xV1 := GetColumnText(AColumnIndex, False, AViewTextSelector);
+  xV2 := ACompareWith.GetColumnText(AColumnIndex, False, AViewTextSelector);
   Result := AnsiCompareStr(xV1, xV2);
 end;
 
