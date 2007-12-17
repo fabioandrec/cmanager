@@ -193,7 +193,7 @@ const
   CSimpleMovementTypes: array[0..2] of String = ('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer');
   CSimpleMovementSymbols: array[0..2] of String = ('O', 'I', 'T');
 
-  CDescPatternsKeys: array[0..7, 0..4] of string =
+  CDescPatternsKeys: array[0..8, 0..4] of string =
     (('BaseMovementOut', 'BaseMovementIn', 'BaseMovementTr', 'BaseMovementPlannedOut', 'BaseMovementPlannedIn'),
      ('MovementListOut', 'MovementListIn', '', '', ''),
      ('PlannedMovementOut', 'PlannedMovementIn', '', '', ''),
@@ -201,9 +201,10 @@ const
      ('Currencyrate', '', '', '', ''),
      ('AccountExctraction', '', '', '', ''),
      ('ExctractionItem', 'ExtractionItemIn', 'ExtractionItemOut', '', ''),
-     ('InstrumentValue', '', '', '', ''));
+     ('InstrumentValue', '', '', '', ''),
+     ('InvestmentMovementOut', 'InvestmentMovementIn', '', '', ''));
 
-  CDescPatternsNames: array[0..7, 0..4] of string =
+  CDescPatternsNames: array[0..8, 0..4] of string =
     (('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód'),
      ('Rozchód', 'Przychód', '', '', ''),
      ('Rozchód', 'Przychód', '', '', ''),
@@ -211,7 +212,8 @@ const
      ('Wszystkie elementy', '', '', '', ''),
      ('Wszystkie elementy', '', '', '', ''),
      ('Uznanie', 'Obci¹¿enie', '', '', ''),
-     ('Wszystkie elementy', '', '', '', ''));
+     ('Wszystkie elementy', '', '', '', ''),
+     ('Zakup', 'Sprzeda¿', '', '', ''));
 
 
   CBackupActionOnce = 0;

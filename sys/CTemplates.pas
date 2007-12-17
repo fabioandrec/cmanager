@@ -44,6 +44,7 @@ var GBaseTemlatesList: TDescTemplateList;
     GAccountExtractionTemplatesList: TDescTemplateList;
     GExtractionItemTemplatesList: TDescTemplateList;
     GInstrumentValueTemplatesList: TDescTemplateList;
+    GInvestmentMovementTemplatesList: TDescTemplateList;
 
 implementation
 
@@ -200,6 +201,16 @@ initialization
     AddTemplate('@instrument@', 'nazwa instrumentu inwestycyjnego');
     AddTemplate('@rodzaj@', 'rodzaj instrumentu inwestycyjnego');
   end;
+  with GInstrumentValueTemplatesList do begin
+    AddTemplate('@dataoperacji@', 'data notowania w formacie RRRR-MM-DD');
+    AddTemplate('@dataczasoperacji@', 'data i czas notowania w formacie RRRR-MM-DD HH:MM');
+    AddTemplate('@symbol@', 'symbol instrumentu inwestycyjnego');
+    AddTemplate('@instrument@', 'nazwa instrumentu inwestycyjnego');
+    AddTemplate('@rodzaj@', 'rodzaj operacji');
+    AddTemplate('@konto@', 'nazwa konta Ÿród³owego dla operacji');
+    AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
+    AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
+  end;
 finalization
   GInstrumentValueTemplatesList.Free;
   GMovementListElementsTemplatesList.Free;
@@ -210,4 +221,5 @@ finalization
   GCurrencydefTemplatesList.Free;
   GAccountExtractionTemplatesList.Free;
   GExtractionItemTemplatesList.Free;
+  GInvestmentMovementTemplatesList.Free
 end.

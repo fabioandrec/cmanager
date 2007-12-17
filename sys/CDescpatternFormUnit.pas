@@ -141,6 +141,8 @@ begin
     xData.Add(GExtractionItemTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 7 then begin
     xData.Add(GInstrumentValueTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 8 then begin
+    xData.Add(GInvestmentMovementTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;

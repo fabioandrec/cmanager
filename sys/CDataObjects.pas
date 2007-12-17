@@ -846,7 +846,6 @@ type
     procedure SetidInstrumentValue(const Value: TDataGid);
     procedure SetidInvestmentItem(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
-    procedure SetmonthDate(const Value: TDateTime);
     procedure SetmovementType(const Value: TBaseEnumeration);
     procedure Setquantity(const Value: Integer);
     procedure SetregDateTime(const Value: TDateTime);
@@ -854,8 +853,6 @@ type
     procedure SetsummaryOfAccount(const Value: Currency);
     procedure SetvalueOf(const Value: Currency);
     procedure SetvalueOfAccount(const Value: Currency);
-    procedure SetweekDate(const Value: TDateTime);
-    procedure SetyearDate(const Value: TDateTime);
   public
     constructor Create(AStatic: Boolean); override;
     procedure UpdateFieldList; override;
@@ -864,9 +861,9 @@ type
     property description: TBaseDescription read Fdescription write Setdescription;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property regDateTime: TDateTime read FregDateTime write SetregDateTime;
-    property weekDate: TDateTime read FweekDate write SetweekDate;
-    property monthDate: TDateTime read FmonthDate write SetmonthDate;
-    property yearDate: TDateTime read FyearDate write SetyearDate;
+    property weekDate: TDateTime read FweekDate;
+    property monthDate: TDateTime read FmonthDate;
+    property yearDate: TDateTime read FyearDate;
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
     property idInstrumentCurrencyDef: TDataGid read FidInstrumentCurrencyDef write SetidInstrumentCurrencyDef;
     property quantity: Integer read Fquantity write Setquantity;
@@ -4234,14 +4231,6 @@ begin
   end;
 end;
 
-procedure TInvestmentMovement.SetmonthDate(const Value: TDateTime);
-begin
-  if FmonthDate <> Value then begin
-    FmonthDate := Value;
-    SetState(msModified);
-  end;
-end;
-
 procedure TInvestmentMovement.SetmovementType(const Value: TBaseEnumeration);
 begin
   if FmovementType <> Value then begin
@@ -4262,6 +4251,9 @@ procedure TInvestmentMovement.SetregDateTime(const Value: TDateTime);
 begin
   if FregDateTime <> Value then begin
     FregDateTime := Value;
+    FyearDate := StartOfTheYear(FregDateTime);
+    FmonthDate := StartOfTheMonth(FregDateTime);
+    FweekDate := StartOfTheWeek(FregDateTime);
     SetState(msModified);
   end;
 end;
@@ -4294,22 +4286,6 @@ procedure TInvestmentMovement.SetvalueOfAccount(const Value: Currency);
 begin
   if FvalueOfAccount <> Value then begin
     FvalueOfAccount := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TInvestmentMovement.SetweekDate(const Value: TDateTime);
-begin
-  if FweekDate <> Value then begin
-    FweekDate := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TInvestmentMovement.SetyearDate(const Value: TDateTime);
-begin
-  if FyearDate <> Value then begin
-    FyearDate := Value;
     SetState(msModified);
   end;
 end;

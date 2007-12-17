@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, Math, StrUtils, CDataObjects;
+  ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, Math, StrUtils, CDataObjects,
+  CDatabase, CBaseFrameUnit, Contnrs;
 
 type
   TCInvestmentMovementForm = class(TCDataobjectForm)
@@ -57,6 +58,12 @@ type
     procedure CCurrEditValueChange(Sender: TObject);
     procedure CStaticCurrencyRateChanged(Sender: TObject);
     procedure CStaticInstrumentValueChanged(Sender: TObject);
+    procedure CDateTimeChanged(Sender: TObject);
+    procedure CStaticInstrumentCurrencyChanged(Sender: TObject);
+    procedure CStaticAccountCurrencyChanged(Sender: TObject);
+    procedure CStaticCategoryChanged(Sender: TObject);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure ActionTemplateExecute(Sender: TObject);
   private
     FRateHelper: TCurrencyRateHelper;
     procedure UpdateCurrencyInstrument;
@@ -65,6 +72,10 @@ type
     procedure UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
   protected
     procedure InitializeForm; override;
+    procedure ReadValues; override;
+    function GetDataobjectClass: TDataObjectClass; override;
+    function GetUpdateFrameClass: TCBaseFrameClass; override;
+    procedure UpdateDescription;
   public
     destructor Destroy; override;
   end;
@@ -72,8 +83,9 @@ type
 implementation
 
 uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
-  CAccountsFrameUnit, CCurrencyRateFrameUnit, CProductsFrameUnit, CDatabase,
-  CTools, CConsts;
+  CAccountsFrameUnit, CCurrencyRateFrameUnit, CProductsFrameUnit, CTools,
+  CConsts, CInvestmentMovementFrameUnit, CConfigFormUnit,
+  CDescpatternFormUnit, CPreferences, CTemplates, CRichtext;
 
 {$R *.dfm}
 
@@ -125,6 +137,7 @@ begin
   end;
   CStaticCurrencyRate.DataId := CEmptyDataGid;
   UpdateCurrencyRates;
+  UpdateDescription;
 end;
 
 procedure TCInvestmentMovementForm.InitializeForm;
@@ -145,6 +158,7 @@ begin
   UpdateCurrencyInstrument;
   CStaticCurrencyRate.DataId := CEmptyDataGid;
   UpdateCurrencyRates;
+  UpdateDescription;
 end;
 
 procedure TCInvestmentMovementForm.UpdateCurrencyInstrument;
@@ -216,6 +230,7 @@ end;
 procedure TCInvestmentMovementForm.ComboBoxTypeChange(Sender: TObject);
 begin
   UpdateCurrencyRates;
+  UpdateDescription;
 end;
 
 procedure TCInvestmentMovementForm.CCurrEditQuantityChange(Sender: TObject);
@@ -243,6 +258,7 @@ end;
 procedure TCInvestmentMovementForm.CStaticCurrencyRateChanged(Sender: TObject);
 begin
   UpdateCurrencyRates;
+  UpdateDescription;
 end;
 
 destructor TCInvestmentMovementForm.Destroy;
@@ -265,6 +281,102 @@ begin
     CCurrEditValue.Value := 0;
   end;
   UpdateOverallSum;
+  UpdateDescription;  
+end;
+
+procedure TCInvestmentMovementForm.ReadValues;
+var xInvestmentItem: TInvestmentItem;
+begin
+  with TInvestmentMovement(Dataobject) do begin
+    description := RichEditDesc.Text;
+    movementType := IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement);
+    regDateTime := CDateTime.Value;
+    idInstrument := CStaticInstrument.DataId;
+    idInstrumentCurrencyDef := CStaticInstrumentCurrency.DataId;
+    quantity := Trunc(CCurrEditQuantity.Value);
+    idInstrumentValue := CStaticInstrumentValue.DataId;
+    valueOf := CCurrEditValue.Value;
+    summaryOf := CCurrMovement.Value;
+    idAccount := CStaticAccount.DataId;
+    idAccountCurrencyDef := CStaticAccountCurrency.DataId;
+    summaryOfAccount := CCurrEditAccount.Value;
+    valueOfAccount := SimpleRoundTo(summaryOfAccount / quantity, -4);
+    idProduct := CStaticCategory.DataId;
+    idCurrencyRate := CStaticCurrencyRate.DataId;
+    if Operation = coAdd then begin
+      xInvestmentItem := TInvestmentItem.CreateObject(InvestmentItemProxy, False);
+      idInvestmentItem := xInvestmentItem.id;
+    end else begin
+      xInvestmentItem := TInvestmentItem(TInvestmentItem.LoadObject(InvestmentItemProxy, idInvestmentItem, False));
+    end;
+    xInvestmentItem.idAccount := idAccount;
+    xInvestmentItem.idInstrument := idInstrument;
+    xInvestmentItem.quantity := quantity;
+    xInvestmentItem.buyPrice := valueOf;
+    xInvestmentItem.regDateTime := regDateTime;
+    idBaseMovement := CEmptyDataGid;
+  end;
+end;
+
+function TCInvestmentMovementForm.GetDataobjectClass: TDataObjectClass;
+begin
+  Result := TInvestmentMovement;
+end;
+
+function TCInvestmentMovementForm.GetUpdateFrameClass: TCBaseFrameClass;
+begin
+  Result := TCInvestmentMovementFrame;
+end;
+
+procedure TCInvestmentMovementForm.CDateTimeChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCInvestmentMovementForm.UpdateDescription;
+var xDesc: String;
+begin
+  if ComboBoxTemplate.ItemIndex = 1 then begin
+    xDesc := GDescPatterns.GetPattern(CDescPatternsKeys[8][ComboBoxType.ItemIndex], '');
+    if xDesc <> '' then begin
+      xDesc := GBaseTemlatesList.ExpandTemplates(xDesc, Self);
+      xDesc := GInvestmentMovementTemplatesList.ExpandTemplates(xDesc, Self);
+      SimpleRichText(xDesc, RichEditDesc);
+    end;
+  end;
+end;
+
+procedure TCInvestmentMovementForm.CStaticInstrumentCurrencyChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCInvestmentMovementForm.CStaticAccountCurrencyChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCInvestmentMovementForm.CStaticCategoryChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCInvestmentMovementForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GInvestmentMovementTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc, True);
+  xData.Free;
+end;
+
+procedure TCInvestmentMovementForm.ActionTemplateExecute(Sender: TObject);
+var xPattern: String;
+begin
+  if EditDescPattern(CDescPatternsKeys[8][ComboBoxType.ItemIndex], xPattern) then begin
+    UpdateDescription;
+  end;
 end;
 
 end.

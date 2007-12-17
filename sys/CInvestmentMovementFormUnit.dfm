@@ -63,6 +63,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         TabOrder = 1
         TabStop = True
         Transparent = False
+        OnChanged = CDateTimeChanged
         HotTrack = True
         Withtime = True
       end
@@ -270,6 +271,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         OnChange = CCurrEditQuantityChange
         Decimals = 2
         ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
@@ -337,6 +339,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
         OnGetDataId = CStaticCategoryGetDataId
+        OnChanged = CStaticCategoryChanged
         HotTrack = True
       end
       object CStaticInstrumentCurrency: TCStatic
@@ -355,6 +358,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<brak instrumentu>'
+        OnChanged = CStaticInstrumentCurrencyChanged
         HotTrack = True
       end
       object CStaticCurrencyRate: TCStatic
@@ -392,6 +396,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<brak konta>'
+        OnChanged = CStaticAccountCurrencyChanged
         HotTrack = False
       end
       object CCurrEditAccount: TCCurrEdit
@@ -428,10 +433,12 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'
       ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
 end
