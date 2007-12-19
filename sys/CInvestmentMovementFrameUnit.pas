@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDatabase,
-  CDataObjectFormUnit, DateUtils;
+  CDataObjectFormUnit, DateUtils, CImageListsUnit;
 
 type
   TCInvestmentMovementFrame = class(TCDataobjectFrame)
@@ -114,8 +114,8 @@ begin
   Result := TStringList.Create;
   with Result do begin
     Add(CFilterAllElements + '=<wszystkie elementy>');
-    Add(COutMovement + '=<tylko zakupy>');
-    Add(CInMovement + '=<tylko sprzeda¿>');
+    Add(CInvestmentBuyMovement + '=<tylko zakupy>');
+    Add(CInvestmentSellMovement + '=<tylko sprzeda¿>');
   end;
 end;
 
@@ -159,10 +159,10 @@ var xCondition: String;
 begin
   GetFilterDates(xDf, xDt);
   xCondition := Format('regDateTime between %s and %s', [DatetimeToDatabase(xDf, True), DatetimeToDatabase(xDt, True)]);
-  if CStaticFilter.DataId = COutMovement then begin
-    xCondition := xCondition + Format(' and movementType = ''%s''', [COutMovement]);
-  end else if CStaticFilter.DataId = CInMovement then begin
-    xCondition := xCondition + Format(' and movementType = ''%s''', [CInMovement]);
+  if CStaticFilter.DataId = CInvestmentSellMovement then begin
+    xCondition := xCondition + Format(' and movementType = ''%s''', [CInvestmentSellMovement]);
+  end else if CStaticFilter.DataId = CInvestmentBuyMovement then begin
+    xCondition := xCondition + Format(' and movementType = ''%s''', [CInvestmentBuyMovement]);
   end;
   Dataobjects := TDataObject.GetList(TInvestmentMovement, InvestmentMovementProxy, 'select * from investmentMovement where ' + xCondition + ' order by created');
 end;

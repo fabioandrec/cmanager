@@ -222,6 +222,7 @@ create table baseMovement (
   isSourceStated bit not null,
   quantity money not null,
   idUnitdef uniqueidentifier,
+  isInvestmentMovement bit not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -406,10 +407,13 @@ create table investmentMovement (
   summaryOfAccount money not null,
   idProduct uniqueidentifier,
   idCurrencyRate uniqueidentifier,
+  currencyQuantity int,
+  currencyRate money null,
+  rateDescription varchar(200),
   idInvestmentItem uniqueidentifier not null,
   idBaseMovement uniqueidentifier ,
   primary key (idInvestmentMovement),
-  constraint ck_investmentMovementmovementType check (movementType in ('I', 'O')),
+  constraint ck_investmentMovementmovementType check (movementType in ('B', 'S')),
   constraint fk_investmentMovementInstrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentMovementInstrumentCurrency foreign key (idInstrumentCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_investmentMovementInstrumentValue foreign key (idInstrumentValue) references instrumentValue (idInstrumentValue),
@@ -434,6 +438,8 @@ insert into cmanagerParams (paramName, paramValue) values ('MovementListElement'
 insert into cmanagerParams (paramName, paramValue) values ('Currencyrate', '@isobazowej@/@isodocelowej@');
 insert into cmanagerParams (paramName, paramValue) values ('AccountExctraction', '@konto@ - wyci¹g z dnia @datawyciagu@');
 insert into cmanagerParams (paramName, paramValue) values ('InstrumentValue', '@instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementOut', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementIn', '@rodzaj@ - @instrument@');
 
 insert into currencyDef (idcurrencyDef, created, modified, name, symbol, iso, description, isBase) values ('{00000000-0000-0000-0000-000000000001}', #2007-04-18 10:33:02#, #2007-04-18 10:33:02#, 'z³oty polski', 'z³', 'PLN', 'z³oty polski', 1);
 insert into reportDef (idreportDef, created, modified, name, description, queryText, paramsDefs, xsltText, xsltType) values ('{00000000-0000-0000-0000-000000000001}', #2007-09-02 12:13:53#, #2007-09-03 21:10:41#, 'Lista kont - raport w³asny', 'Jest to przyk³ad definiowalnego raportu z wykorzystaniem prezentacji wyników raportu w postaci dokumentu XML', 'eNorTs1JTS5R0FJIK8rPVUhMTs4vzSsBAFJRB6w=', 'eNqzsa/IzVEoSy0qzszPs1Uy1DNQUkjNS85PycxLt1UKz8xLyS8v1jU0MjVQsrfj5bIpSCxKzC12SU0r1gdyAXd2EyU=', '', 'S');

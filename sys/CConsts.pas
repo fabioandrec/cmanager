@@ -43,6 +43,9 @@ const
   COutMovement = 'O';
   CTransferMovement = 'T';
 
+  CInvestmentSellMovement = 'S';
+  CInvestmentBuyMovement = 'B';
+
   CInProduct = 'I';
   COutProduct = 'O';
 

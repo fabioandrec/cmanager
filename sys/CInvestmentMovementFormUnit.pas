@@ -76,8 +76,11 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure UpdateDescription;
+    procedure FillForm; override;
+    function CanAccept: Boolean; override;
   public
     destructor Destroy; override;
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
@@ -85,7 +88,7 @@ implementation
 uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
   CAccountsFrameUnit, CCurrencyRateFrameUnit, CProductsFrameUnit, CTools,
   CConsts, CInvestmentMovementFrameUnit, CConfigFormUnit,
-  CDescpatternFormUnit, CPreferences, CTemplates, CRichtext;
+  CDescpatternFormUnit, CPreferences, CTemplates, CRichtext, CInfoFormUnit;
 
 {$R *.dfm}
 
@@ -151,6 +154,7 @@ begin
   UpdateCurrencyInstrument;
   UpdateCurrencyRates;
   CDateTime.Value := Now;
+  UpdateDescription;
 end;
 
 procedure TCInvestmentMovementForm.CStaticInstrumentChanged(Sender: TObject);
@@ -167,7 +171,7 @@ begin
   if CStaticInstrument.DataId <> CEmptyDataGid then begin
     xCurrencyId := TInstrument.GetCurrencyDefinition(CStaticInstrument.DataId);
     CStaticInstrumentCurrency.DataId := xCurrencyId;
-    CStaticInstrumentCurrency.Caption := GCurrencyCache.GetIso(xCurrencyId);
+    CStaticInstrumentCurrency.Caption := GCurrencyCache.GetSymbol(xCurrencyId);
     CCurrEditValue.SetCurrencyDef(xCurrencyId, GCurrencyCache.GetSymbol(xCurrencyId));
     CCurrMovement.SetCurrencyDef(xCurrencyId, GCurrencyCache.GetSymbol(xCurrencyId));
   end else begin
@@ -191,7 +195,9 @@ begin
     Label21.Enabled := CStaticCurrencyRate.Enabled;
     if CStaticCurrencyRate.Enabled then begin
       GDataProvider.BeginTransaction;
-      xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CStaticInstrumentCurrency.DataId, CStaticAccountCurrency.DataId);
+      xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate,
+                                                   IfThen(ComboBoxType.ItemIndex in [0, 2], CInvestmentBuyMovement, CInvestmentSellMovement),
+                                                   CStaticInstrumentCurrency.DataId, CStaticAccountCurrency.DataId);
       if xRate <> Nil then begin
         if FRateHelper = Nil then begin
           FRateHelper := TCurrencyRateHelper.Create(0, 0, '', '', '');
@@ -229,6 +235,12 @@ end;
 
 procedure TCInvestmentMovementForm.ComboBoxTypeChange(Sender: TObject);
 begin
+  CStaticCategory.Enabled := ComboBoxType.ItemIndex <= 1;
+  CStaticCategory.HotTrack := CStaticCategory.Enabled;
+  Label8.Enabled := CStaticCategory.Enabled;
+  if not CStaticCategory.Enabled then begin
+    CStaticCategory.DataId := CEmptyDataGid;
+  end;
   UpdateCurrencyRates;
   UpdateDescription;
 end;
@@ -281,7 +293,7 @@ begin
     CCurrEditValue.Value := 0;
   end;
   UpdateOverallSum;
-  UpdateDescription;  
+  UpdateDescription;
 end;
 
 procedure TCInvestmentMovementForm.ReadValues;
@@ -289,7 +301,7 @@ var xInvestmentItem: TInvestmentItem;
 begin
   with TInvestmentMovement(Dataobject) do begin
     description := RichEditDesc.Text;
-    movementType := IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement);
+    movementType := IfThen(ComboBoxType.ItemIndex in [0, 2], CInvestmentBuyMovement, CInvestmentSellMovement);
     regDateTime := CDateTime.Value;
     idInstrument := CStaticInstrument.DataId;
     idInstrumentCurrencyDef := CStaticInstrumentCurrency.DataId;
@@ -302,7 +314,17 @@ begin
     summaryOfAccount := CCurrEditAccount.Value;
     valueOfAccount := SimpleRoundTo(summaryOfAccount / quantity, -4);
     idProduct := CStaticCategory.DataId;
-    idCurrencyRate := CStaticCurrencyRate.DataId;
+    if CStaticCurrencyRate.Enabled then begin
+      idCurrencyRate := CStaticCurrencyRate.DataId;
+      rateDescription := FRateHelper.desc;
+      currencyQuantity := FRateHelper.quantity;
+      currencyRate := FRateHelper.rate;
+    end else begin
+      idCurrencyRate := CEmptyDataGid;
+      rateDescription := '';
+      currencyQuantity := 1;
+      currencyRate := 1;
+    end;
     if Operation = coAdd then begin
       xInvestmentItem := TInvestmentItem.CreateObject(InvestmentItemProxy, False);
       idInvestmentItem := xInvestmentItem.id;
@@ -315,7 +337,7 @@ begin
     xInvestmentItem.buyPrice := valueOf;
     xInvestmentItem.regDateTime := regDateTime;
     idBaseMovement := CEmptyDataGid;
-  end;
+ end;
 end;
 
 function TCInvestmentMovementForm.GetDataobjectClass: TDataObjectClass;
@@ -376,6 +398,120 @@ var xPattern: String;
 begin
   if EditDescPattern(CDescPatternsKeys[8][ComboBoxType.ItemIndex], xPattern) then begin
     UpdateDescription;
+  end;
+end;
+
+function TCInvestmentMovementForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@dataoperacji@' then begin
+    Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@rodzaj@' then begin
+    Result := ComboBoxType.Text;
+  end else if ATemplate = '@symbol@' then begin
+    Result := '<symbol instrumentu>';
+    if CStaticInstrument.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TInstrument(TInstrument.LoadObject(InstrumentProxy, CStaticInstrument.DataId, False)).symbol;
+      GDataProvider.RollbackTransaction;
+    end;
+  end else if ATemplate = '@instrument@' then begin
+    Result := '<instrument inwestycyjny>';
+    if CStaticInstrument.DataId <> CEmptyDataGid then begin
+      Result := CStaticInstrument.Caption;
+    end;
+  end else if ATemplate = '@dataczasoperacji@' then begin
+    Result := GetFormattedDate(Now, 'yyyy-MM-dd') + ' ' + GetFormattedTime(Now, 'HH:mm');
+  end else if ATemplate = '@konto@' then begin
+    Result := '<konto>';
+    if CStaticAccount.DataId <> CEmptyDataGid then begin
+      Result := CStaticAccount.Caption;
+    end;
+  end else if ATemplate = '@kategoria@' then begin
+    Result := '<kategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      Result := CStaticCategory.Caption;
+    end;
+  end else if ATemplate = '@pelnakategoria@' then begin
+    Result := '<pelnakategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).treeDesc;
+      GDataProvider.RollbackTransaction;
+    end;
+  end;
+end;
+
+procedure TCInvestmentMovementForm.FillForm;
+begin
+  with TInvestmentMovement(Dataobject) do begin
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
+    CDateTime.Value := regDateTime;
+    if idProduct <> CEmptyDataGid then begin
+      ComboBoxType.ItemIndex := IfThen(movementType = CInvestmentBuyMovement, 0, 1);
+    end else begin
+      ComboBoxType.ItemIndex := IfThen(movementType = CInvestmentBuyMovement, 2, 3);
+    end;
+    ComboBoxType.Enabled := False;
+    SimpleRichText(description, RichEditDesc);
+    CCurrEditQuantity.Value := quantity;
+    CCurrEditValue.Value := valueOf;
+    CCurrMovement.Value := summaryOf;
+    CCurrEditAccount.Value := summaryOfAccount;
+    GDataProvider.BeginTransaction;
+    CStaticInstrument.DataId := idInstrument;
+    CStaticInstrument.Caption := TInstrument(TInstrument.LoadObject(InstrumentProxy, idInstrument, False)).GetElementText;
+    CStaticInstrumentCurrency.DataId := idInstrumentCurrencyDef;
+    CStaticInstrumentCurrency.Caption := GCurrencyCache.GetIso(idInstrumentCurrencyDef);
+    CCurrEditValue.SetCurrencyDef(idInstrumentCurrencyDef, GCurrencyCache.GetSymbol(idInstrumentCurrencyDef));
+    CCurrMovement.SetCurrencyDef(idInstrumentCurrencyDef, GCurrencyCache.GetSymbol(idInstrumentCurrencyDef));
+    CStaticAccount.DataId := idAccount;
+    CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).GetElementText;
+    CStaticAccountCurrency.DataId := idAccountCurrencyDef;
+    CStaticAccountCurrency.Caption := GCurrencyCache.GetIso(idAccountCurrencyDef);
+    CCurrEditAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
+    CStaticCategory.DataId := idProduct;
+    if idProduct <> CEmptyDataGid then begin
+      CStaticCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).GetElementText;
+    end;
+    if idCurrencyRate <> CEmptyDataGid then begin
+      CStaticCurrencyRate.DataId := idCurrencyRate;
+      CStaticCurrencyRate.Caption := rateDescription;
+      CStaticCurrencyRate.Enabled := True;
+      Label22.Enabled := True;
+    end;
+    FRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idAccountCurrencyDef, idInstrumentCurrencyDef);
+    CStaticInstrumentValue.DataId := idInstrumentValue;
+    if idInstrumentValue <> CEmptyDataGid then begin
+      CStaticInstrumentValue.Caption := TInstrumentValue(TInstrumentValue.LoadObject(InstrumentValueProxy, idInstrumentValue, False)).GetElementText;
+    end;
+    GDataProvider.RollbackTransaction;
+    ComboBoxTypeChange(Nil);
+  end;
+end;
+
+function TCInvestmentMovementForm.CanAccept: Boolean;
+begin
+  Result := True;
+  if CStaticInstrument.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano instrumentu inwestycyjnego. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticInstrument.DoGetDataId;
+    end;
+  end else if CStaticAccount.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano konta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticAccount.DoGetDataId;
+    end;
+  end else if (CStaticCurrencyRate.DataId = CEmptyDataGid) and (CStaticCurrencyRate.Enabled) then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano przelicznika waluty. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCurrencyRate.DoGetDataId;
+    end;
+  end else if CCurrEditQuantity.Value = 0 then begin
+    Result := False;
+    ShowInfo(itError, 'Iloœæ nie mo¿e byæ zerowa', '');
+    CCurrEditQuantity.SetFocus;
   end;
 end;
 

@@ -133,6 +133,7 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
   inherited List: TCDataList
     Header.AutoSizeIndex = 1
     Header.MainColumn = 0
+    Images = CImageLists.MovementIcons16x16
     Columns = <
       item
         Alignment = taRightJustify
@@ -170,7 +171,7 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       item
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
         Position = 6
-        Width = 10
+        Width = 100
         WideText = 'Rodzaj'
       end>
     WideDefaultText = ''

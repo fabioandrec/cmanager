@@ -77,10 +77,13 @@ create table investmentMovement (
   summaryOfAccount money not null,
   idProduct uniqueidentifier,
   idCurrencyRate uniqueidentifier,
+  currencyQuantity int,
+  currencyRate money null,
+  rateDescription varchar(200),  
   idInvestmentItem uniqueidentifier not null,
-  idBaseMovement uniqueidentifier ,
+  idBaseMovement uniqueidentifier,  
   primary key (idInvestmentMovement),
-  constraint ck_investmentMovementmovementType check (movementType in ('I', 'O')),
+  constraint ck_investmentMovementmovementType check (movementType in ('B', 'S')),
   constraint fk_investmentMovementInstrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentMovementInstrumentCurrency foreign key (idInstrumentCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_investmentMovementInstrumentValue foreign key (idInstrumentValue) references instrumentValue (idInstrumentValue),
@@ -96,3 +99,9 @@ create index ix_investmentMovement_regDatetime on investmentMovement (regDateTim
 create index ix_currencyRate_regDate on currencyRate (bindingDate);
 create index ix_instrumentValue_regDatetime on instrumentValue (regDateTime);
 create index ix_investmentItemInstrument on investmentItem (idInstrument, idAccount);
+
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementOut', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementIn', '@rodzaj@ - @instrument@');
+
+alter table baseMovement add isInvestmentMovement bit not null;
+update baseMovement set isInvestmentMovement = 0;

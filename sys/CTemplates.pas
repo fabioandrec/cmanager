@@ -108,6 +108,7 @@ initialization
   GMovementListElementsTemplatesList := TDescTemplateList.Create('Mnemoniki elementów listy operacji');
   GCurrencydefTemplatesList := TDescTemplateList.Create('Mnemoniki kursów walut');
   GInstrumentValueTemplatesList := TDescTemplateList.Create('Mnemoniki notowañ instrumentów inwestycyjnych');
+  GInvestmentMovementTemplatesList := TDescTemplateList.Create('Mnemoniki operacji inwestycyjnych');
   with GBaseTemlatesList do begin
     AddTemplate('@godz@', 'aktualna godzina w formacie HH');
     AddTemplate('@min@', 'aktualna minuta w formacie MM');
@@ -201,7 +202,7 @@ initialization
     AddTemplate('@instrument@', 'nazwa instrumentu inwestycyjnego');
     AddTemplate('@rodzaj@', 'rodzaj instrumentu inwestycyjnego');
   end;
-  with GInstrumentValueTemplatesList do begin
+  with GInvestmentMovementTemplatesList do begin
     AddTemplate('@dataoperacji@', 'data notowania w formacie RRRR-MM-DD');
     AddTemplate('@dataczasoperacji@', 'data i czas notowania w formacie RRRR-MM-DD HH:MM');
     AddTemplate('@symbol@', 'symbol instrumentu inwestycyjnego');

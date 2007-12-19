@@ -364,6 +364,7 @@ type
     FisSourceStated: Boolean;
     Fquantity: Currency;
     FidUnitDef: TDataGid;
+    FisInvestmentMovement: Boolean;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -387,6 +388,7 @@ type
     procedure SetisSourceStated(const Value: Boolean);
     procedure Setquantity(const Value: Currency);
     procedure SetidUnitDef(const Value: TDataGid);
+    procedure SetisInvestmentMovement(const Value: Boolean);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -422,6 +424,7 @@ type
     property isSourceStated: Boolean read FisSourceStated write SetisSourceStated;
     property quantity: Currency read Fquantity write Setquantity;
     property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
+    property isInvestmentMovement: Boolean read FisInvestmentMovement write SetisInvestmentMovement;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -825,6 +828,7 @@ type
     FidInstrument: TDataGid;
     FidInstrumentCurrencyDef: TDataGid;
     Fquantity: Integer;
+    FprevQuantity: Integer;
     FidInstrumentValue: TDataGid;
     FvalueOf: Currency;
     FsummaryOf: Currency;
@@ -834,6 +838,9 @@ type
     FsummaryOfAccount: Currency;
     FidProduct: TDataGid;
     FidCurrencyRate: TDataGid;
+    FcurrencyQuantity: Integer;
+    FcurrencyRate: Currency;
+    FrateDescription: TBaseDescription;
     FidInvestmentItem: TDataGid;
     FidBaseMovement: TDataGid;
     procedure Setdescription(const Value: TBaseDescription);
@@ -853,10 +860,15 @@ type
     procedure SetsummaryOfAccount(const Value: Currency);
     procedure SetvalueOf(const Value: Currency);
     procedure SetvalueOfAccount(const Value: Currency);
+    procedure SetcurrencyQuantity(const Value: Integer);
+    procedure SetcurrencyRate(const Value: Currency);
+    procedure SetrateDescription(const Value: TBaseDescription);
   public
     constructor Create(AStatic: Boolean); override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
@@ -878,6 +890,9 @@ type
     property idCurrencyRate: TDataGid read FidCurrencyRate write SetidCurrencyRate;
     property idInvestmentItem: TDataGid read FidInvestmentItem write SetidInvestmentItem;
     property idBaseMovement: TDataGid read FidBaseMovement write SetidBaseMovement;
+    property currencyQuantity: Integer read FcurrencyQuantity write SetcurrencyQuantity;
+    property currencyRate: Currency read FcurrencyRate write SetcurrencyRate;
+    property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -1357,6 +1372,7 @@ begin
     FisSourceStated := FieldByName('isSourceStated').AsBoolean;
     FidUnitDef := FieldByName('idUnitDef').AsString;
     Fquantity := FieldByName('quantity').AsCurrency;
+    FisInvestmentMovement := FieldByName('isInvestmentMovement').AsBoolean;
     FprevmovementCash := FmovementCash;
   end;
 end;
@@ -1442,6 +1458,7 @@ begin
     AddField('isSourceStated', IntToStr(Integer(FisSourceStated)), False, 'baseMovement');
     AddField('quantity', CurrencyToDatabase(Fquantity), False, 'baseMovement');
     AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'baseMovement');
+    AddField('isInvestmentMovement', IntToStr(Integer(FisInvestmentMovement)), False, 'baseMovement');
   end;
 end;
 
@@ -4137,6 +4154,7 @@ begin
     FidInstrument := FieldByName('idInstrument').AsString;
     FidInstrumentCurrencyDef := FieldByName('idInstrumentCurrencyDef').AsString;
     Fquantity := FieldByName('quantity').AsInteger;
+    FprevQuantity := Fquantity;
     FidInstrumentValue := FieldByName('idInstrumentValue').AsString;
     FvalueOf := FieldByName('valueOf').AsCurrency;
     FsummaryOf := FieldByName('summaryOf').AsCurrency;
@@ -4146,8 +4164,77 @@ begin
     FsummaryOfAccount := FieldByName('summaryOfAccount').AsCurrency;
     FidProduct := FieldByName('idProduct').AsString;
     FidCurrencyRate := FieldByName('idCurrencyRate').AsString;
+    FcurrencyQuantity := FieldByName('currencyQuantity').AsInteger;
+    FcurrencyRate := FieldByName('currencyRate').AsCurrency;
+    FrateDescription := FieldByName('rateDescription').AsString;
     FidInvestmentItem := FieldByName('idInvestmentItem').AsString;
     FidBaseMovement := FieldByName('idBaseMovement').AsString;
+  end;
+end;
+
+function TInvestmentMovement.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  if AColumnIndex = 6 then begin
+    if FmovementType = CInvestmentSellMovement then begin
+      Result := 0;
+    end else begin
+      Result := 1;
+    end;
+  end else begin
+    Result := -1;
+  end;
+end;
+
+function TInvestmentMovement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  if AColumnIndex = 1 then begin
+    Result := GetDescText(Fdescription);
+  end else if AColumnIndex = 2 then begin
+    Result := Date2StrDate(FregDateTime, True);
+  end else if AColumnIndex = 3 then begin
+    Result := IntToStr(Fquantity);
+  end else if AColumnIndex = 4 then begin
+    if AViewTextSelector = CCurrencyViewInvestmentAccounts then begin
+      Result := CurrencyToString(FsummaryOfAccount, FidAccountCurrencyDef, False);
+    end else begin
+      Result := CurrencyToString(FsummaryOf, FidInstrumentCurrencyDef, False);
+    end;
+  end else if AColumnIndex = 5 then begin
+    if AViewTextSelector = CCurrencyViewInvestmentAccounts then begin
+      Result := GCurrencyCache.GetSymbol(FidAccountCurrencyDef);
+    end else begin
+      Result := GCurrencyCache.GetSymbol(FidInstrumentCurrencyDef);
+    end;
+  end else if AColumnIndex = 6 then begin
+    if idProduct <> CEmptyDataGid then begin
+      if FmovementType = CInvestmentSellMovement then begin
+        Result := 'Sprzeda¿';
+      end else begin
+        Result := 'Zakup';
+      end;
+    end else begin
+      if FmovementType = CInvestmentSellMovement then begin
+        Result := 'Wydanie z portfela';
+      end else begin
+        Result := 'Przyjêcie do portfela';
+      end;
+    end;
+  end;;
+end;
+
+procedure TInvestmentMovement.SetcurrencyQuantity(const Value: Integer);
+begin
+  if FcurrencyQuantity <> Value then begin
+    FcurrencyQuantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TInvestmentMovement.SetcurrencyRate(const Value: Currency);
+begin
+  if FcurrencyRate <> Value then begin
+    FcurrencyRate := Value;
+    SetState(msModified);
   end;
 end;
 
@@ -4247,6 +4334,14 @@ begin
   end;
 end;
 
+procedure TInvestmentMovement.SetrateDescription(const Value: TBaseDescription);
+begin
+  if FrateDescription <> Value then begin
+    FrateDescription := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TInvestmentMovement.SetregDateTime(const Value: TDateTime);
 begin
   if FregDateTime <> Value then begin
@@ -4312,6 +4407,9 @@ begin
     AddField('summaryOfAccount', CurrencyToDatabase(FsummaryOfAccount), False, 'investmentMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'investmentMovement');
     AddField('idCurrencyRate', DataGidToDatabase(FidCurrencyRate), False, 'investmentMovement');
+    AddField('currencyQuantity', IntToStr(FcurrencyQuantity), False, 'investmentMovement');
+    AddField('currencyRate', CurrencyToDatabase(FcurrencyRate), False, 'investmentMovement');
+    AddField('rateDescription', FrateDescription, True, 'investmentMovement');
     AddField('idInvestmentItem', DataGidToDatabase(FidInvestmentItem), False, 'investmentMovement');
     AddField('idBaseMovement', DataGidToDatabase(FidBaseMovement), False, 'investmentMovement');
   end;
@@ -4320,6 +4418,14 @@ end;
 class function TInstrument.GetCurrencyDefinition(AIdInstrument: TDataGid): TDataGid;
 begin
   Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from instrument where idInstrument = %s', [DataGidToDatabase(AIdInstrument)]), '');
+end;
+
+procedure TBaseMovement.SetisInvestmentMovement(const Value: Boolean);
+begin
+  if FisInvestmentMovement <> Value then begin
+    FisInvestmentMovement := Value;
+    SetState(msModified);
+  end;
 end;
 
 initialization

@@ -1,7 +1,7 @@
 inherited CInvestmentMovementForm: TCInvestmentMovementForm
   Left = 324
   Top = 58
-  Caption = 'CInvestmentMovementForm'
+  Caption = 'Inwestycja'
   ClientHeight = 660
   ClientWidth = 554
   PixelsPerInch = 96
@@ -47,7 +47,9 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         OnChange = ComboBoxTypeChange
         Items.Strings = (
           'Zakup'
-          'Sprzeda'#380)
+          'Sprzeda'#380
+          'Przyj'#281'cie do portfela'
+          'Wydanie z portfela')
       end
       object CDateTime: TCDateTime
         Left = 96
