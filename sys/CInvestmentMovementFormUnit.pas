@@ -297,7 +297,6 @@ begin
 end;
 
 procedure TCInvestmentMovementForm.ReadValues;
-var xInvestmentItem: TInvestmentItem;
 begin
   with TInvestmentMovement(Dataobject) do begin
     description := RichEditDesc.Text;
@@ -325,17 +324,6 @@ begin
       currencyQuantity := 1;
       currencyRate := 1;
     end;
-    if Operation = coAdd then begin
-      xInvestmentItem := TInvestmentItem.CreateObject(InvestmentItemProxy, False);
-      idInvestmentItem := xInvestmentItem.id;
-    end else begin
-      xInvestmentItem := TInvestmentItem(TInvestmentItem.LoadObject(InvestmentItemProxy, idInvestmentItem, False));
-    end;
-    xInvestmentItem.idAccount := idAccount;
-    xInvestmentItem.idInstrument := idInstrument;
-    xInvestmentItem.quantity := quantity;
-    xInvestmentItem.buyPrice := valueOf;
-    xInvestmentItem.regDateTime := regDateTime;
     idBaseMovement := CEmptyDataGid;
  end;
 end;

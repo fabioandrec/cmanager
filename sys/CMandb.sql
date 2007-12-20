@@ -378,8 +378,6 @@ create table investmentItem (
   idAccount uniqueidentifier not null,
   idInstrument uniqueidentifier not null,
   quantity int not null,
-  buyPrice money not null,
-  regDateTime datetime not null,
   primary key (idInvestmentItem),
   constraint fk_investmentItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentItem_Account foreign key (idAccount) references account (idAccount)
@@ -410,7 +408,6 @@ create table investmentMovement (
   currencyQuantity int,
   currencyRate money null,
   rateDescription varchar(200),
-  idInvestmentItem uniqueidentifier not null,
   idBaseMovement uniqueidentifier ,
   primary key (idInvestmentMovement),
   constraint ck_investmentMovementmovementType check (movementType in ('B', 'S')),
@@ -421,7 +418,6 @@ create table investmentMovement (
   constraint fk_investmentMovementAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_investmentMovementProduct foreign key (idProduct) references product (idProduct),
   constraint fk_investmentMovementRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),  
-  constraint fk_investmentMovementInvestmentItem foreign key (idInvestmentItem) references investmentItem (idInvestmentItem),
   constraint fk_investmentMovementBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement)
 );
 
