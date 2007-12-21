@@ -99,6 +99,7 @@ function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
 function GetStringFromResources(AResName: String): String;
 function XsdToDateTime(ADateTimeStr: String; AYearFirst: Boolean = True): TDateTime;
 function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
+function IntToStrWithSign(AInteger: Integer): String;
 
 implementation
 
@@ -979,6 +980,14 @@ begin
         Result := False;
       end;
     end;
+  end;
+end;
+
+function IntToStrWithSign(AInteger: Integer): String;
+begin
+  Result := IntToStr(AInteger);
+  if AInteger >= 0 then begin
+    Result := '+' + Result;
   end;
 end;
 

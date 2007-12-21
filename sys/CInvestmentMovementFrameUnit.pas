@@ -149,8 +149,11 @@ begin
 end;
 
 function TCInvestmentMovementFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
+var xDf, xDt: TDateTime;
 begin
-  Result := (inherited IsValidFilteredObject(AObject));
+  GetFilterDates(xDf, xDt);
+  Result := ((inherited IsValidFilteredObject(AObject)) or (CStaticFilter.DataId = TInvestmentMovement(AObject).movementType)) and
+            (xDf <= TInvestmentMovement(AObject).regDateTime) and (TInvestmentMovement(AObject).regDateTime <= xDt);
 end;
 
 procedure TCInvestmentMovementFrame.ReloadDataobjects;
