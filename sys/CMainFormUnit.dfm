@@ -91,7 +91,7 @@ object CMainForm: TCMainForm
       Shape = bsSpacer
     end
     object Splitter: TSplitter
-      Left = 154
+      Left = 195
       Top = 24
       Width = 2
       Height = 498
@@ -176,9 +176,9 @@ object CMainForm: TCMainForm
       end
     end
     object PanelFrames: TPanel
-      Left = 156
+      Left = 197
       Top = 24
-      Width = 696
+      Width = 655
       Height = 498
       Align = alClient
       BevelOuter = bvLowered
@@ -188,7 +188,7 @@ object CMainForm: TCMainForm
     object PanelShortcuts: TPanel
       Left = 0
       Top = 24
-      Width = 154
+      Width = 195
       Height = 498
       Align = alLeft
       BevelOuter = bvLowered
@@ -197,7 +197,7 @@ object CMainForm: TCMainForm
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
-        Width = 152
+        Width = 193
         Height = 21
         Align = alTop
         Alignment = taLeftJustify
@@ -210,10 +210,10 @@ object CMainForm: TCMainForm
         ParentFont = False
         TabOrder = 0
         DesignSize = (
-          152
+          193
           21)
         object SpeedButtonCloseShortcuts: TSpeedButton
-          Left = 135
+          Left = 176
           Top = 5
           Width = 13
           Height = 13
@@ -232,7 +232,7 @@ object CMainForm: TCMainForm
       object ShortcutList: TVirtualStringTree
         Left = 1
         Top = 22
-        Width = 152
+        Width = 193
         Height = 475
         Align = alClient
         BevelEdges = []
@@ -273,7 +273,7 @@ object CMainForm: TCMainForm
           item
             Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
-            Width = 152
+            Width = 193
           end>
       end
     end
@@ -417,7 +417,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionBug
                 Caption = '&Zg'#322'o'#347' b'#322#261'd'
-                ImageIndex = 16
+                ImageIndex = 17
               end
               item
                 Action = ActionFutureRequest
@@ -429,7 +429,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCheckUpdates
                 Caption = 'S&prawd'#378' aktualizacje'
-                ImageIndex = 17
+                ImageIndex = 18
               end
               item
                 Action = ActionAbout
@@ -455,8 +455,13 @@ object CMainForm: TCMainForm
     end
     object ActionShorcutOperations: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Operacje'
+      Caption = 'Operacje finansowe'
       ImageIndex = 1
+    end
+    object ActionShortcutInvestments: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Operacje inwestycyjne'
+      ImageIndex = 16
     end
     object ActionShortcutPlannedDone: TAction
       Category = 'Skr'#243'ty'
@@ -496,7 +501,7 @@ object CMainForm: TCMainForm
     object ActionCheckUpdates: TAction
       Category = 'Pomoc'
       Caption = 'Sprawd'#378' aktualizacje'
-      ImageIndex = 17
+      ImageIndex = 18
       OnExecute = ActionCheckUpdatesExecute
     end
     object ActionAbout: TAction
@@ -597,7 +602,7 @@ object CMainForm: TCMainForm
     object ActionBug: TAction
       Category = 'Pomoc'
       Caption = 'Zg'#322'o'#347' b'#322#261'd'
-      ImageIndex = 16
+      ImageIndex = 17
       OnExecute = ActionBugExecute
     end
     object ActionFutureRequest: TAction
@@ -639,10 +644,6 @@ object CMainForm: TCMainForm
       Category = 'Skr'#243'ty'
       Caption = 'Notowania'
       ImageIndex = 15
-    end
-    object ActionShortcutInvestments: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Inwestycje'
     end
     object ActionShortcutReports: TAction
       Category = 'Skr'#243'ty'

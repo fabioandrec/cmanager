@@ -72,6 +72,7 @@ type
   TDataProxy = class(TObject)
   private
     FDataProvider: TDataProvider;
+    FIdFieldName: String;
     FTableName: String;
     FSelectTableName: String;
     FDataObjects: TDataObjectList;
@@ -84,13 +85,14 @@ type
     function GetLoadObjectDataset(AId: TDataGid): TADOQuery;
   public
     function FindInCache(AId: TDataGid): TDataObject;
-    constructor Create(ADataProvider: TDataProvider; ATableName: String; ASelectTableName: String = ''; AParentDataProxy: TDataProxy = Nil);
+    constructor Create(ADataProvider: TDataProvider; ATableName: String; ASelectTableName: String = ''; AIdFieldName: String = ''; AParentDataProxy: TDataProxy = Nil);
     procedure AddDataObject(ADataObject: TDataObject);
     procedure DelDataObject(ADataObject: TDataObject);
     destructor Destroy; override;
   published
     property DataProvider: TDataProvider read FDataProvider;
     property TableName: String read FTableName;
+    property IdFieldName: String read FIdFieldName;
     property SelectTableName: String read FTableName;
     property RootTableName: String read GetRootTableName;
     property ParentDataProxy: TDataProxy read FParentDataProxy;
@@ -118,9 +120,9 @@ type
     procedure SetItems(AIndex: Integer; const Value: TDataField);
   public
     procedure AddField(AName: String; AValue: String; AIsQuoted: Boolean; ATableName: String);
-    function GetInsertSql(AId: TDataGid; ATableName: String): String;
-    function GetUpdateSql(AId: TDataGid; ATableName: String): String;
-    function GetDeleteSql(AId: TDataGid; ATableName: String): String;
+    function GetInsertSql(AId: TDataGid; ATableName: String; AIdFieldName: String): String;
+    function GetUpdateSql(AId: TDataGid; ATableName: String; AIdFieldName: String): String;
+    function GetDeleteSql(AId: TDataGid; ATableName: String; AIdFieldName: String): String;
     property Items[AIndex: Integer]: TDataField read GetItems write SetItems;
   end;
 
@@ -371,12 +373,13 @@ begin
   FDataObjects.Add(ADataObject);
 end;
 
-constructor TDataProxy.Create(ADataProvider: TDataProvider; ATableName: String; ASelectTableName: String = ''; AParentDataProxy: TDataProxy = Nil);
+constructor TDataProxy.Create(ADataProvider: TDataProvider; ATableName: String; ASelectTableName: String = ''; AIdFieldName: String = ''; AParentDataProxy: TDataProxy = Nil);
 begin
   inherited Create;
   FDataProvider := ADataProvider;
   FTableName := ATableName;
   FSelectTableName := IfThen(ASelectTableName = '', FTableName, ASelectTableName);
+  FIdFieldName := IfThen(AIdFieldName = '', 'id' + FTableName, AIdFieldName);
   FParentDataProxy := AParentDataProxy;
   FDataObjects := TDataObjectList.Create(False);
   FDataProvider.DataProxyList.Add(Self);
@@ -396,12 +399,12 @@ begin
   Add(TDataField.Create(AName, AValue, AIsQuoted, AnsiUpperCase(ATableName)));
 end;
 
-function TDataFieldList.GetDeleteSql(AId: TDataGid; ATableName: String): String;
+function TDataFieldList.GetDeleteSql(AId: TDataGid; ATableName: String; AIdFieldName: String): String;
 begin
   Result := 'delete from ' + ATableName + ' where id' + ATableName + ' = ''' + AId + '''';
 end;
 
-function TDataFieldList.GetInsertSql(AId: TDataGid; ATableName: String): String;
+function TDataFieldList.GetInsertSql(AId: TDataGid; ATableName: String; AIdFieldName: String): String;
 var xCount: Integer;
     xTableName: String;
 begin
@@ -412,7 +415,7 @@ begin
       Result := Result + Items[xCount].Name + ', ';
     end;
   end;
-  Result := Result + 'id' + ATableName + ') values (';
+  Result := Result + AIdFieldName + ') values (';
   for xCount := 0 to Count - 1 do begin
     if (Items[xCount].TableName = xTableName) then begin
       if Items[xCount].IsQuoted then begin
@@ -430,7 +433,7 @@ begin
   Result := TDataField(inherited Items[AIndex]);
 end;
 
-function TDataFieldList.GetUpdateSql(AId: TDataGid; ATableName: String): String;
+function TDataFieldList.GetUpdateSql(AId: TDataGid; ATableName: String; AIdFieldName: String): String;
 var xCount: Integer;
     xTableName: String;
 begin
@@ -515,33 +518,39 @@ var xCount: Integer;
     xSql: String;
     xProxy: TDataProxy;
     xTableNames: TStringList;
+    xIdFieldNames: TStringList;
     xCountSql: Integer;
 begin
   Result := True;
-  xCount := 0;
-  while Result and (xCount <= FDataObjects.Count - 1) do begin
-    xObj := FDataObjects.Items[xCount];
-    if not xObj.IsReadonly then begin
-      if (xObj.CreationMode = cmLoaded) and (xObj.MemoryState = msDeleted) and ((AOnlyThisGid = '') or (AOnlyThisGid = xObj.id)) then begin
-        xObj.UpdateFieldList;
-        xTableNames := TStringList.Create;
-        xProxy := Self;
-        repeat
-          xTableNames.Add(xProxy.TableName);
-          xProxy := xProxy.ParentDataProxy;
-        until (xProxy = Nil);
-        xCountSql := 0;
-        while Result and (xCountSql <= xTableNames.Count - 1) do begin
-          Result := xObj.OnDeleteObject(Self);
-          if Result then begin
-            xSql := xObj.DataFieldList.GetDeleteSql(xObj.Id, xTableNames.Strings[xCountSql]);
-            Result := FDataProvider.ExecuteSql(xSql);
+  if FTableName <> '' then begin
+    xCount := 0;
+    while Result and (xCount <= FDataObjects.Count - 1) do begin
+      xObj := FDataObjects.Items[xCount];
+      if not xObj.IsReadonly then begin
+        if (xObj.CreationMode = cmLoaded) and (xObj.MemoryState = msDeleted) and ((AOnlyThisGid = '') or (AOnlyThisGid = xObj.id)) then begin
+          xObj.UpdateFieldList;
+          xTableNames := TStringList.Create;
+          xIdFieldNames := TStringList.Create;
+          xProxy := Self;
+          repeat
+            xTableNames.Add(xProxy.TableName);
+            xIdFieldNames.Add(xProxy.IdFieldName);
+            xProxy := xProxy.ParentDataProxy;
+          until (xProxy = Nil);
+          xCountSql := 0;
+          while Result and (xCountSql <= xTableNames.Count - 1) do begin
+            Result := xObj.OnDeleteObject(Self);
+            if Result then begin
+              xSql := xObj.DataFieldList.GetDeleteSql(xObj.Id, xTableNames.Strings[xCountSql], xIdFieldNames.Strings[xCountSql]);
+              Result := FDataProvider.ExecuteSql(xSql);
+            end;
+            Inc(xCountSql);
           end;
-          Inc(xCountSql);
+          xTableNames.Free;
+          xIdFieldNames.Free;
         end;
-        xTableNames.Free;
+        Inc(xCount);
       end;
-      Inc(xCount);
     end;
   end;
 end;
@@ -844,11 +853,11 @@ var xSelect: String;
     xProxy: TDataProxy;
 begin
   xSelect := FSelectTableName;
-  xWhere := FSelectTableName + '.id' + TableName + ' = ''' + AId + '''';
+  xWhere := FSelectTableName + '.' + FIdFieldName + ' = ''' + AId + '''';
   xProxy := FParentDataProxy;
   while (xProxy <> Nil) do begin
     xSelect := xSelect + ', ' + xProxy.SelectTableName;
-    xWhere := xWhere + ' and ' + xProxy.SelectTableName + '.id' + xProxy.TableName + ' = ''' + AId + '''';
+    xWhere := xWhere + ' and ' + xProxy.SelectTableName + '.' + xProxy.idFieldName + ' = ''' + AId + '''';
     xProxy := xProxy.ParentDataProxy;
   end;
   Result := DataProvider.OpenSql('select * from ' + xSelect + ' where ' + xWhere);
@@ -870,38 +879,44 @@ var xCount: Integer;
     xSql: String;
     xProxy: TDataProxy;
     xTableNames: TStringList;
+    xIdFieldNames: TStringList;
     xCountSql: Integer;
 begin
   Result := True;
-  xCount := 0;
-  while Result and (xCount <= FDataObjects.Count - 1) do begin
-    xObj := FDataObjects.Items[xCount];
-    if not xObj.IsReadonly then begin
-      if (xObj.CreationMode = cmCreated) and (xObj.MemoryState <> msDeleted) and ((AOnlyThisGid = '') or (AOnlyThisGid = xObj.id)) then begin
-        xObj.UpdateFieldList;
-        xTableNames := TStringList.Create;
-        xProxy := Self;
-        repeat
-          xTableNames.Add(xProxy.TableName);
-          xProxy := xProxy.ParentDataProxy;
-        until (xProxy = Nil);
-        xCountSql := xTableNames.Count - 1;
-        while Result and (xCountSql >= 0) do begin
-          Result := xObj.OnInsertObject(Self);
-          if Result then begin
-            xSql := xObj.DataFieldList.GetInsertSql(xObj.Id, xTableNames.Strings[xCountSql]);
-            Result := FDataProvider.ExecuteSql(xSql);
+  if FTableName <> '' then begin
+    xCount := 0;
+    while Result and (xCount <= FDataObjects.Count - 1) do begin
+      xObj := FDataObjects.Items[xCount];
+      if not xObj.IsReadonly then begin
+        if (xObj.CreationMode = cmCreated) and (xObj.MemoryState <> msDeleted) and ((AOnlyThisGid = '') or (AOnlyThisGid = xObj.id)) then begin
+          xObj.UpdateFieldList;
+          xTableNames := TStringList.Create;
+          xIdFieldNames := TStringList.Create;
+          xProxy := Self;
+          repeat
+            xTableNames.Add(xProxy.TableName);
+            xIdFieldNames.Add(xProxy.IdFieldName);
+            xProxy := xProxy.ParentDataProxy;
+          until (xProxy = Nil);
+          xCountSql := xTableNames.Count - 1;
+          while Result and (xCountSql >= 0) do begin
+            Result := xObj.OnInsertObject(Self);
+            if Result then begin
+              xSql := xObj.DataFieldList.GetInsertSql(xObj.Id, xTableNames.Strings[xCountSql], xIdFieldNames.Strings[xCountSql]);
+              Result := FDataProvider.ExecuteSql(xSql);
+            end;
+            if Result then begin
+              xObj.AfterPost;
+            end;
+            Dec(xCountSql);
           end;
-          if Result then begin
-            xObj.AfterPost;
-          end;
-          Dec(xCountSql);
+          xTableNames.Free;
+          xIdFieldNames.Free;
+          xObj.SetMode(cmLoaded);
         end;
-        xTableNames.Free;
-        xObj.SetMode(cmLoaded);
       end;
+      Inc(xCount);
     end;
-    Inc(xCount);
   end;
 end;
 
@@ -911,37 +926,43 @@ var xCount: Integer;
     xSql: String;
     xProxy: TDataProxy;
     xTableNames: TStringList;
+    xIdFieldNames: TStringList;
     xCountSql: Integer;
 begin
   Result := True;
-  xCount := 0;
-  while Result and (xCount <= FDataObjects.Count - 1) do begin
-    xObj := FDataObjects.Items[xCount];
-    if not xObj.IsReadonly then begin
-      if (xObj.CreationMode = cmLoaded) and (xObj.MemoryState = msModified) and ((AOnlyThisGid = '') or (AOnlyThisGid = xObj.id)) then begin
-        xObj.UpdateFieldList;
-        xTableNames := TStringList.Create;
-        xProxy := Self;
-        repeat
-          xTableNames.Add(xProxy.TableName);
-          xProxy := xProxy.ParentDataProxy;
-        until (xProxy = Nil);
-        xCountSql := xTableNames.Count - 1;
-        while Result and (xCountSql >= 0) do begin
-          Result := xObj.OnUpdateObject(Self);
-          if Result then begin
-            xSql := xObj.DataFieldList.GetUpdateSql(xObj.Id, xTableNames.Strings[xCountSql]);
-            Result := FDataProvider.ExecuteSql(xSql);
+  if FTableName <> '' then begin
+    xCount := 0;
+    while Result and (xCount <= FDataObjects.Count - 1) do begin
+      xObj := FDataObjects.Items[xCount];
+      if not xObj.IsReadonly then begin
+        if (xObj.CreationMode = cmLoaded) and (xObj.MemoryState = msModified) and ((AOnlyThisGid = '') or (AOnlyThisGid = xObj.id)) then begin
+          xObj.UpdateFieldList;
+          xTableNames := TStringList.Create;
+          xIdFieldNames := TStringList.Create;
+          xProxy := Self;
+          repeat
+            xTableNames.Add(xProxy.TableName);
+            xIdFieldNames.Add(xProxy.IdFieldName);
+            xProxy := xProxy.ParentDataProxy;
+          until (xProxy = Nil);
+          xCountSql := xTableNames.Count - 1;
+          while Result and (xCountSql >= 0) do begin
+            Result := xObj.OnUpdateObject(Self);
+            if Result then begin
+              xSql := xObj.DataFieldList.GetUpdateSql(xObj.Id, xTableNames.Strings[xCountSql], xIdFieldNames.Strings[xCountSql]);
+              Result := FDataProvider.ExecuteSql(xSql);
+            end;
+            if Result then begin
+              xObj.AfterPost;
+            end;
+            Dec(xCountSql);
           end;
-          if Result then begin
-            xObj.AfterPost;
-          end;
-          Dec(xCountSql);
+          xTableNames.Free;
+          xIdFieldNames.Free;
         end;
-        xTableNames.Free;
       end;
+      Inc(xCount);
     end;
-    Inc(xCount);
   end;
 end;
 
@@ -967,7 +988,7 @@ begin
   FMemoryState := msValid;
   FCreationMode := cmLoaded;
   with ADataset do begin
-    Fid := FieldByName('id' + FDataProxy.TableName).AsString;
+    Fid := FieldByName(FDataProxy.IdFieldName).AsString;
     Fcreated := FieldByName('created').AsDateTime;
     Fmodified := FieldByName('modified').AsDateTime;
   end;
@@ -975,7 +996,7 @@ end;
 
 class function TDataObject.GetAllObjects(ADataProxy: TDataProxy): TDataObjectList;
 begin
-  Result := GetList(Self, ADataProxy, 'select * from ' + ADataProxy.TableName)
+  Result := GetList(Self, ADataProxy, 'select * from ' + ADataProxy.SelectTableName)
 end;
 
 function TDataObject.GetColumnImage(AColumnIndex: Integer): Integer;

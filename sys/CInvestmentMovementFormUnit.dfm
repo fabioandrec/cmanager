@@ -169,20 +169,20 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'W/g notowania'
       end
       object Label6: TLabel
-        Left = 274
+        Left = 242
         Top = 105
-        Width = 71
+        Width = 103
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Warto'#347#263' jednej'
+        Caption = 'Warto'#347#263' jednostkowa'
       end
       object Label9: TLabel
-        Left = 250
+        Left = 256
         Top = 141
-        Width = 94
+        Width = 88
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Warto'#347#263' wszystkich'
+        Caption = 'Warto'#347#263' transakcji'
       end
       object Label8: TLabel
         Left = 19

@@ -893,6 +893,31 @@ type
     property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
   end;
 
+  TInvestmentPortfolio = class(TDataObject)
+  private
+    FidInstrument: TDataGid;
+    FidCurrencyDef: TDataGid;
+    FidAccount: TDataGid;
+    FinstrumentName: TBaseName;
+    FaccountName: TBaseName;
+    FinstrumentType: TBaseEnumeration;
+    Fquantity: Integer;
+    FvalueOf: Currency;
+    function GetoverallValue: Currency;
+  public
+    procedure FromDataset(ADataset: TADOQuery); override;
+  published
+    property idInstrument: TDataGid read FidInstrument;
+    property idCurrencyDef: TDataGid read FIdCurrencyDef;
+    property idAccount: TDataGid read FidAccount;
+    property instrumentName: TBaseName read FinstrumentName;
+    property accountName: TBaseName read FaccountName;
+    property instrumentType: TBaseEnumeration read FinstrumentType;
+    property quantity: Integer read Fquantity;
+    property valueOf: Currency read FvalueOf;
+    property overallValue: Currency read GetoverallValue;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -914,6 +939,7 @@ var CashPointProxy: TDataProxy;
     InstrumentValueProxy: TDataProxy;
     InvestmentItemProxy: TDataProxy;
     InvestmentMovementProxy: TDataProxy;
+    InvestmentPortfolioProxy: TDataProxy;
 
 var GActiveProfileId: TDataGid = CEmptyDataGid;
     GCurrencyCache: TCurrCache;
@@ -1048,6 +1074,7 @@ begin
   InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'StnInstrumentValue');
   InvestmentItemProxy := TDataProxy.Create(GDataProvider, 'investmentItem');
   InvestmentMovementProxy := TDataProxy.Create(GDataProvider, 'investmentMovement');
+  InvestmentPortfolioProxy := TDataProxy.Create(GDataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -4455,6 +4482,26 @@ begin
     xSql := xSql + ' and quantity >= ' + IntToStr(AMinimumQuantity);
   end;
   Result := TInvestmentItem(TInvestmentItem.FindByCondition(InvestmentItemProxy, xSql, False));
+end;
+
+procedure TInvestmentPortfolio.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FidInstrument := FieldByName('idInstrument').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FinstrumentName := FieldByName('instrumentName').AsString;
+    FaccountName := FieldByName('accountName').AsString;
+    FinstrumentType := FieldByName('instrumentType').AsString;
+    Fquantity := FieldByName('quantity').AsInteger;
+    FvalueOf := FieldByName('valueOf').AsCurrency;
+  end;
+end;
+
+function TInvestmentPortfolio.GetoverallValue: Currency;
+begin
+  Result := SimpleRoundTo(Fquantity * FvalueOf, -2);
 end;
 
 initialization

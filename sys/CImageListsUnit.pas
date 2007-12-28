@@ -37,6 +37,7 @@ type
     UnitedefsImageList24x24: TPngImageList;
     InstrumentImageList24x24: TPngImageList;
     ExchangesImageList24x24: TPngImageList;
+    InvestmentImageList24x24: TPngImageList;
   private
     { Private declarations }
   public

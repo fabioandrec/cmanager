@@ -176,4 +176,29 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       end>
     WideDefaultText = ''
   end
+  inherited ButtonPanel: TPanel
+    inherited CButtonAdd: TCButton
+      Width = 124
+    end
+    inherited CButtonEdit: TCButton
+      Width = 124
+    end
+    inherited CButtonDelete: TCButton
+      Width = 132
+    end
+  end
+  inherited ActionListButtons: TActionList
+    Images = CImageLists.InvestmentImageList24x24
+    inherited ActionAdd: TAction
+      Caption = 'Dodaj operacj'#281
+      ImageIndex = 1
+    end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj operacj'#281
+      ImageIndex = 0
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' operacj'#281
+    end
+  end
 end

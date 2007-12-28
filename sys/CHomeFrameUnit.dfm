@@ -1,4 +1,6 @@
 inherited CHomeFrame: TCHomeFrame
+  Width = 562
+  Height = 511
   object Image1: TImage [0]
     Left = 24
     Top = 26
@@ -713,7 +715,7 @@ inherited CHomeFrame: TCHomeFrame
     Left = 24
     Top = 120
     object ActionNewOperation: TAction
-      Caption = 'Zarejestruj now'#261' operacj'#281
+      Caption = 'Zarejestruj now'#261' operacj'#281' finansow'#261
       ImageIndex = 0
       ShortCut = 16462
       OnExecute = ActionNewOperationExecute
@@ -744,7 +746,7 @@ inherited CHomeFrame: TCHomeFrame
       OnExecute = ActionStartupInfoExecute
     end
     object ActionAddNewList: TAction
-      Caption = 'Zarejestruj now'#261' list'#281' operacji'
+      Caption = 'Zarejestruj now'#261' list'#281' operacji finansowych'
       ImageIndex = 0
       ShortCut = 16460
       OnExecute = ActionAddNewListExecute

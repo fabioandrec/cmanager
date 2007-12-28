@@ -467,12 +467,21 @@ create view balances as select * from (
 create view filters as
   select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m
     left outer join accountFilter a on a.idMovementFilter = m.idMovementFilter)
-    left join cashpointFilter c on c.idMovementFilter = m.idMovementFilter)
-    left join productFilter p on p.idMovementFilter = m.idMovementFilter);
+    left outer join cashpointFilter c on c.idMovementFilter = m.idMovementFilter)
+    left outer join productFilter p on p.idMovementFilter = m.idMovementFilter);
 
 create view StnInstrumentValue as
   select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
   left join instrument i on i.idInstrument = v.idInstrument;
+  
+create view StnInvestmentPortfolio as 
+  select v.idInstrument, i.idCurrencyDef, i.name as instrumentName, i.instrumentType, v.idAccount,
+         a.name as accountName, idInvestmentItem, v.created, v.modified, v.quantity,
+         (select top 1 valueOf from instrumentValue where idInstrument = v.idInstrument order by regDateTime desc) as valueOf
+    from ((investmentItem v
+      left outer join instrument i on i.idInstrument = v.idInstrument)
+      left outer join account a on a.idAccount = v.idAccount)
+    where v.quantity > 0;
   
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);
