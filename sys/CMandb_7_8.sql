@@ -96,8 +96,10 @@ create index ix_currencyRate_regDate on currencyRate (bindingDate);
 create index ix_instrumentValue_regDatetime on instrumentValue (regDateTime);
 create index ix_investmentItemInstrument on investmentItem (idInstrument, idAccount);
 
-insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementOut', '@rodzaj@ - @instrument@');
-insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementIn', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementBuy', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementSell', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementBuyFree', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementSellFree', '@rodzaj@ - @instrument@');
 
 alter table baseMovement add isInvestmentMovement bit not null;
 update baseMovement set isInvestmentMovement = 0;

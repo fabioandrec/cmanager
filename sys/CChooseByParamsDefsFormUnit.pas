@@ -359,7 +359,7 @@ begin
     if Fparam.isMultiple then begin
       if TCStatic(control).DataId = '' then begin
         SetLength(Result, 0);
-        xXml := Fparam.propertyItems;
+        xXml := Fparam.propertyItems[Fparam.paramType];
         if Fparam.paramType = CParamTypeProperty then begin
           xType := Fparam.propertyType;
         end else begin
@@ -567,7 +567,7 @@ var xList: TStringList;
     xType: Integer;
 begin
   xList := TStringList.Create;
-  xXml := Fparam.propertyItems;
+  xXml := Fparam.propertyItems[Fparam.paramType];
   if Fparam.paramType = CParamTypeProperty then begin
     xType := Fparam.propertyType;
   end else begin

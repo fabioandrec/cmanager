@@ -434,8 +434,10 @@ insert into cmanagerParams (paramName, paramValue) values ('MovementListElement'
 insert into cmanagerParams (paramName, paramValue) values ('Currencyrate', '@isobazowej@/@isodocelowej@');
 insert into cmanagerParams (paramName, paramValue) values ('AccountExctraction', '@konto@ - wyci¹g z dnia @datawyciagu@');
 insert into cmanagerParams (paramName, paramValue) values ('InstrumentValue', '@instrument@');
-insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementOut', '@rodzaj@ - @instrument@');
-insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementIn', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementBuy', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementSell', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementBuyFree', '@rodzaj@ - @instrument@');
+insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementSellFree', '@rodzaj@ - @instrument@');
 
 insert into currencyDef (idcurrencyDef, created, modified, name, symbol, iso, description, isBase) values ('{00000000-0000-0000-0000-000000000001}', #2007-04-18 10:33:02#, #2007-04-18 10:33:02#, 'z³oty polski', 'z³', 'PLN', 'z³oty polski', 1);
 insert into reportDef (idreportDef, created, modified, name, description, queryText, paramsDefs, xsltText, xsltType) values ('{00000000-0000-0000-0000-000000000001}', #2007-09-02 12:13:53#, #2007-09-03 21:10:41#, 'Lista kont - raport w³asny', 'Jest to przyk³ad definiowalnego raportu z wykorzystaniem prezentacji wyników raportu w postaci dokumentu XML', 'eNorTs1JTS5R0FJIK8rPVUhMTs4vzSsBAFJRB6w=', 'eNqzsa/IzVEoSy0qzszPs1Uy1DNQUkjNS85PycxLt1UKz8xLyS8v1jU0MjVQsrfj5bIpSCxKzC12SU0r1gdyAXd2EyU=', '', 'S');

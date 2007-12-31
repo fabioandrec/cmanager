@@ -24,12 +24,13 @@ type
     FpropertyType: Integer;
     FdecimalLen: Integer;
     FpropertyItems: ICXMLDOMDocument;
+    FcustomItems: ICXMLDOMDocument;
     FpropertyList: String;
     procedure SetparamValues(const Value: TVariantDynArray);
     function GetParamValuesLength: Integer;
     function GetparamAsString(AParamOption: String): String;
     function GetvalueAsString(AIndex: Integer): String;
-    function GetPropertyItems: ICXMLDOMDocument;
+    function GetPropertyItems(AParamType: String): ICXMLDOMDocument;
   public
     constructor Create(AParentParamsDefs: TReportDialogParamsDefs);
     procedure LoadFromXml(ANode: ICXMLDOMNode);
@@ -42,6 +43,7 @@ type
     property paramValuesLength: Integer read GetParamValuesLength;
     property paramAsString[AParamOption: String]: String read GetparamAsString;
     property valueAsString[AIndex: Integer]: String read GetvalueAsString;
+    property propertyItems[AParamType: String]: ICXMLDOMDocument read GetPropertyItems;
   published
     property name: String read Fname write Fname;
     property desc: String read Fdesc write Fdesc;
@@ -53,7 +55,6 @@ type
     property frameType: Integer read FframeType write FframeType;
     property decimalLen: Integer read FdecimalLen write FdecimalLen;
     property propertyType: Integer read FpropertyType write FpropertyType;
-    property propertyItems: ICXMLDOMDocument read GetPropertyItems;
     property propertyList: String read FpropertyList write FpropertyList;
   end;
 
@@ -4704,7 +4705,7 @@ begin
   FisMultiple := False;
   FdecimalLen := 2;
   FframeType := CFRAMETYPE_UNKNOWN;
-  FparamType := 'O';
+  FparamType := 'text';
 end;
 
 function TReportDialgoParamDef.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
@@ -4751,34 +4752,37 @@ begin
   Result := Length(FparamValues);
 end;
 
-function TReportDialgoParamDef.GetPropertyItems: ICXMLDOMDocument;
+function TReportDialgoParamDef.GetPropertyItems(AParamType: String): ICXMLDOMDocument;
 var xStr: TStringList;
     xCount: Integer;
     xNode: ICXMLDOMNode;
     xProperty: ICXMLDOMNode;
 begin
-  if FpropertyItems = Nil then begin
-    if FparamType = CParamTypeProperty then begin
+  if AParamType = CParamTypeProperty then begin
+    if FpropertyItems = Nil then begin
       FpropertyItems := GetReportPropertyItems;
-    end else if FparamType = CParamTypeList then begin
-      FpropertyItems := GetXmlDocument;
+    end;
+    Result := FpropertyItems;
+  end else if AParamType = CParamTypeList then begin
+    if FcustomItems = Nil then begin
+      FcustomItems := GetXmlDocument;
       xStr := TStringList.Create;
       xStr.Text := FpropertyList;
-      FpropertyItems.appendChild(FpropertyItems.createElement('list'));
-      xProperty := FpropertyItems.createElement('property');
-      FpropertyItems.documentElement.appendChild(xProperty);
+      FcustomItems.appendChild(FcustomItems.createElement('list'));
+      xProperty := FcustomItems.createElement('property');
+      FcustomItems.documentElement.appendChild(xProperty);
       for xCount := 0 to xStr.Count - 1 do begin
-        xNode := FpropertyItems.createElement('item');
+        xNode := FcustomItems.createElement('item');
         SetXmlAttribute('name', xNode, xStr.Names[xCount]);
         SetXmlAttribute('value', xNode, xStr.ValueFromIndex[xCount]);
         xProperty.appendChild(xNode);
       end;
       xStr.Free;
-    end else begin
-      FpropertyItems := Nil;
     end;
+    Result := FcustomItems;
+  end else begin
+    Result := Nil;
   end;
-  Result := FpropertyItems;
 end;
 
 function TReportDialgoParamDef.GetvalueAsString(AIndex: Integer): String;

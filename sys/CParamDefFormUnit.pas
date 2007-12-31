@@ -103,7 +103,7 @@ begin
     end;
   end;
   xIndexProperty := 0;
-  xXml := FParamDef.propertyItems;
+  xXml := FParamDef.propertyItems[CParamTypeProperty];
   if xXml <> Nil then begin
     for xCount := 0 to xXml.documentElement.childNodes.length - 1 do begin
       xNode := xXml.documentElement.childNodes.item[xCount];

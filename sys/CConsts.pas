@@ -205,7 +205,7 @@ const
      ('AccountExctraction', '', '', '', ''),
      ('ExctractionItem', 'ExtractionItemIn', 'ExtractionItemOut', '', ''),
      ('InstrumentValue', '', '', '', ''),
-     ('InvestmentMovementOut', 'InvestmentMovementIn', '', '', ''));
+     ('InvestmentMovementBuy', 'InvestmentMovementSell', 'InvestmentMovementBuyFree', '', 'InvestmentMovementSellFree'));
 
   CDescPatternsNames: array[0..8, 0..4] of string =
     (('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód'),
@@ -216,7 +216,8 @@ const
      ('Wszystkie elementy', '', '', '', ''),
      ('Uznanie', 'Obci¹¿enie', '', '', ''),
      ('Wszystkie elementy', '', '', '', ''),
-     ('Zakup', 'Sprzeda¿', '', '', ''));
+     ('Zakup', 'Sprzeda¿', 'Przyjêcie do portfela', 'Wydanie z portfela', ''));
+
 
 
   CBackupActionOnce = 0;
@@ -290,6 +291,14 @@ const
      '    <item name="otwrty" value="' + CExtractionStateOpen + '"/>' +
      '    <item name="zamkniêty" value="' + CExtractionStateClose + '"/>' +
      '    <item name="uzgodniony" value="' + CExtractionStateStated + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj instrumentu">' +
+     '    <item name="Indeks gie³dowy" value="' + CInstrumentTypeIndex + '"/>' +
+     '    <item name="Akcje" value="' + CInstrumentTypeStock + '"/>' +
+     '    <item name="Obligacje" value="' + CInstrumentTypeBond + '"/>' +
+     '    <item name="Fundusz inwestycyjny" value="' + CInstrumentTypeFundinv + '"/>' +
+     '    <item name="Fundusz emerytalny" value="' + CInstrumentTypeFundret + '"/>' +
+     '    <item name="Nieokreœlony" value="' + CInstrumentTypeUndefined + '"/>' +
      '  </property>' +
      '</list>';
 

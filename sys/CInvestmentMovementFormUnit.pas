@@ -94,7 +94,16 @@ uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
 
 procedure TCInvestmentMovementForm.CStaticInstrumentGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := TCFrameForm.ShowFrame(TCInstrumentFrame, ADataGid, AText);
+  if TCFrameForm.ShowFrame(TCInstrumentFrame, ADataGid, AText) then begin
+    GDataProvider.BeginTransaction;
+    AAccepted := TInstrument(TInstrument.LoadObject(InstrumentProxy, ADataGid, False)).idCurrencyDef <> CEmptyDataGid;
+    GDataProvider.RollbackTransaction;
+    if not AAccepted then begin
+      ShowInfo(itWarning, 'Wybrany instrument musi mieæ zdefiniowan¹ walutê notowañ', '');
+    end;
+  end else begin
+    AAccepted := False;
+  end;
 end;
 
 procedure TCInvestmentMovementForm.CStaticInstrumentValueGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -500,6 +509,11 @@ begin
     Result := False;
     ShowInfo(itError, 'Iloœæ nie mo¿e byæ zerowa', '');
     CCurrEditQuantity.SetFocus;
+  end else if (ComboBoxType.ItemIndex in [0, 1]) and (CStaticCategory.DataId = CEmptyDataGid) then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCategory.DoGetDataId;
+    end;
   end;
 end;
 
