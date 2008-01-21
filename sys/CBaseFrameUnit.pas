@@ -62,6 +62,7 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; virtual;
     procedure ExecuteSelectedPluginAction(ASender: TObject);
   public
+    function CanAcceptSelectedObject: Boolean; virtual;
     procedure UpdateButtons(AIsSelectedSomething: Boolean); virtual;
     procedure HideFrame; virtual;
     procedure ShowFrame; virtual;
@@ -744,6 +745,11 @@ begin
       xNode := GetList.GetNext(xNode);
     end;
   end;
+end;
+
+function TCBaseFrame.CanAcceptSelectedObject: Boolean;
+begin
+  Result := True;
 end;
 
 initialization

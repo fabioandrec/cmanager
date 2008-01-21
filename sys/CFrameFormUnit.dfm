@@ -1,6 +1,6 @@
 inherited CFrameForm: TCFrameForm
-  Left = 220
-  Top = 174
+  Left = 144
+  Top = 47
   Caption = 'CFrameForm'
   ClientHeight = 621
   ClientWidth = 877

@@ -21,6 +21,7 @@ type
     procedure WndProc(var Message: TMessage); override;
     function GetSelectedId: String;
     function GetSelectedType: Integer;
+    function CanAccept: Boolean; override;
   public
     constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True); virtual;
     class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
@@ -36,6 +37,15 @@ uses CCashpointsFrameUnit, CDatabase, VirtualTrees, CConsts, CPluginConsts,
   CTools;
 
 {$R *.dfm}
+
+function TCFrameForm.CanAccept: Boolean;
+begin
+  if FFrame <> Nil then begin
+    Result := FFrame.CanAcceptSelectedObject;
+  end else begin
+    Result := True;
+  end;
+end;
 
 constructor TCFrameForm.CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True);
 begin

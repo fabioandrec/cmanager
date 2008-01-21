@@ -94,16 +94,7 @@ uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
 
 procedure TCInvestmentMovementForm.CStaticInstrumentGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  if TCFrameForm.ShowFrame(TCInstrumentFrame, ADataGid, AText) then begin
-    GDataProvider.BeginTransaction;
-    AAccepted := TInstrument(TInstrument.LoadObject(InstrumentProxy, ADataGid, False)).idCurrencyDef <> CEmptyDataGid;
-    GDataProvider.RollbackTransaction;
-    if not AAccepted then begin
-      ShowInfo(itWarning, 'Wybrany instrument musi mieæ zdefiniowan¹ walutê notowañ', '');
-    end;
-  end else begin
-    AAccepted := False;
-  end;
+  AAccepted := TCFrameForm.ShowFrame(TCInstrumentFrame, ADataGid, AText, TCInstrumentFrameAdditionalData.Create(True));
 end;
 
 procedure TCInvestmentMovementForm.CStaticInstrumentValueGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

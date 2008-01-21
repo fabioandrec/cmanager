@@ -9,6 +9,15 @@ uses
   CDataobjectFormUnit, CImageListsUnit;
 
 type
+  TCInstrumentFrameAdditionalData = class(TCDataobjectFrameData)
+  private
+    FOnlyWithCurrency: Boolean;
+  public
+    constructor Create(AOnlyWithCurrency: Boolean);
+  published
+    property OnlyWithCurrency: Boolean read FOnlyWithCurrency write FOnlyWithCurrency;
+  end;
+
   TCInstrumentFrame = class(TCDataobjectFrame)
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
@@ -23,13 +32,30 @@ type
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
+    function CanAcceptSelectedObject: Boolean; override;
   end;
 
 implementation
 
-uses CConsts, CPluginConsts, CInstrumentFormUnit, CReports;
+uses CConsts, CPluginConsts, CInstrumentFormUnit, CReports, CBaseFrameUnit,
+  CTools, CInfoFormUnit;
 
 {$R *.dfm}
+
+function TCInstrumentFrame.CanAcceptSelectedObject: Boolean;
+begin
+  Result := inherited CanAcceptSelectedObject;
+  if Result and (AdditionalData <> Nil)then begin
+    if TCInstrumentFrameAdditionalData(AdditionalData).OnlyWithCurrency then begin
+      GDataProvider.BeginTransaction;
+      Result := TInstrument(TInstrument.LoadObject(InstrumentProxy, SelectedId, False)).idCurrencyDef <> CEmptyDataGid;
+      GDataProvider.RollbackTransaction;
+      if not Result then begin
+        ShowInfo(itWarning, 'Musisz wybraæ instrument ze zdefiniowan¹ walutê notowañ', '');
+      end;
+    end;
+  end;
+end;
 
 class function TCInstrumentFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
@@ -107,6 +133,14 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+{ TCInstrumentFrameAdditionalData }
+
+constructor TCInstrumentFrameAdditionalData.Create(AOnlyWithCurrency: Boolean);
+begin
+  CreateNew;
+  FOnlyWithCurrency := AOnlyWithCurrency;
 end;
 
 end.
