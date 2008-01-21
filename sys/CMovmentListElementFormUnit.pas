@@ -260,7 +260,7 @@ begin
   Result := inherited ExpandTemplate(ATemplate);
   if ATemplate = '@dataoperacji@' then begin
     Result := GetFormattedDate(Felement.dateTime, 'yyyy-MM-dd');
-  end else if ATemplate = '@kategoria@' then begin
+  end else if ATemplate = '@rodzaj@' then begin
     Result := IfThen(Felement.movementType = CInMovement, 'Przychód', 'Rozchód');
   end else if ATemplate = '@kategoria@' then begin
     Result := '<kategoria>';

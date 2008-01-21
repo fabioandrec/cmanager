@@ -141,7 +141,7 @@ begin
       xTypes := xTypes + 'O';
     end;
     if startupInfoOldIn or startupInfoOldOut then begin
-      xDf := IncDay(xDf, (-1) * DaysInMonth(xDf));
+      xDf := IncDay(xDf, (-3) * DaysInMonth(xDf));
     end;
     xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
     if Length(xTypes) = 1 then begin

@@ -1890,7 +1890,7 @@ end;
 
 function TOperationsBySomethingChart.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodByForm(FStartDate, FEndDate, @CurrencyView);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView);
 end;
 
 function TOperationsByCategoryChart.GetReportTitle: String;
@@ -1903,13 +1903,15 @@ begin
 end;
 
 function TOperationsByCategoryChart.GetSql: String;
+var xFilter: String;
 begin
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'transactions.idAccount', 'transactions.idCashpoint', 'transactions.idProduct');
   Result := Format('select v.%s as idCurrencyDef, v.cash, p.name from ( ' +
                 '  select sum(%s) as cash, idProduct, %s from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by %s, idProduct) as v ' +
+                '  where movementType = ''%s'' %s and regDate between %s and %s group by %s, idProduct) as v ' +
                 '  left outer join product p on p.idProduct = v.idProduct',
                 [GetCurrencyField, GetCashField, GetCurrencyField,
-                 TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                 TCSelectedMovementTypeParams(FParams).movementType, xFilter, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
                  GetCurrencyField]);
 end;
 
@@ -1923,13 +1925,15 @@ begin
 end;
 
 function TOperationsByCashpointChart.GetSql: String;
+var xFilter: String;
 begin
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'transactions.idAccount', 'transactions.idCashpoint', 'transactions.idProduct');
   Result := Format('select v.%s as idCurrencyDef, v.cash, p.name from ( ' +
                 '  select sum(%s) as cash, idCashpoint, %s from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by %s, idCashpoint) as v ' +
+                '  where movementType = ''%s'' %s and regDate between %s and %s group by %s, idCashpoint) as v ' +
                 '  left outer join cashpoint p on p.idCashpoint = v.idCashpoint',
                 [GetCurrencyField, GetCashField, GetCurrencyField,
-                 TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                 TCSelectedMovementTypeParams(FParams).movementType, xFilter, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
                  GetCurrencyField]);
 end;
 
@@ -2026,7 +2030,7 @@ end;
 
 function TOperationsBySomethingList.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodByForm(FStartDate, FEndDate, @CurrencyView);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView);
 end;
 
 function TOperationsByCategoryList.GetReportTitle: String;
@@ -2039,13 +2043,15 @@ begin
 end;
 
 function TOperationsByCategoryList.GetSql: String;
+var xFilter: String;
 begin
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'transactions.idAccount', 'transactions.idCashpoint', 'transactions.idProduct');
   Result := Format('select v.cash, p.name, v.idCurrencyDef from ( ' +
                 '  select sum(%s) as cash, idProduct, %s as idCurrencyDef from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by idProduct, %s) as v ' +
+                '  where movementType = ''%s'' %s and regDate between %s and %s group by idProduct, %s) as v ' +
                 '  left outer join product p on p.idProduct = v.idProduct',
                 [GetCashField, GetCurrencyField,
-                 TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                 TCSelectedMovementTypeParams(FParams).movementType, xFilter, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
                  GetCurrencyField]);
 end;
 
@@ -2059,13 +2065,15 @@ begin
 end;
 
 function TOperationsByCashpointList.GetSql: String;
+var xFilter: String;
 begin
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'transactions.idAccount', 'transactions.idCashpoint', 'transactions.idProduct');
   Result := Format('select v.cash, p.name, v.idCurrencyDef from ( ' +
                 '  select sum(%s) as cash, idCashpoint, %s as idCurrencyDef from transactions ' +
-                '  where movementType = ''%s'' and regDate between %s and %s group by idCashpoint, %s) as v ' +
+                '  where movementType = ''%s'' %s and regDate between %s and %s group by idCashpoint, %s) as v ' +
                 '  left outer join cashpoint p on p.idCashpoint = v.idCashpoint',
                 [GetCashField, GetCurrencyField,
-                 TCSelectedMovementTypeParams(FParams).movementType, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                 TCSelectedMovementTypeParams(FParams).movementType, xFilter, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
                  GetCurrencyField]);
 end;
 

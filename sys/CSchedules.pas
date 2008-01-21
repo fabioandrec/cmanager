@@ -83,31 +83,34 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
         xValid := AMovement.scheduleDate = xCurDate;
         xTriggerDate := xCurDate;
       end else begin
-        if AMovement.triggerType = CTriggerTypeWeekly then begin
-          xValid := DayOfTheWeek(xCurDate) = (AMovement.triggerDay + 1);
-          xTriggerDate := xCurDate;
-        end else begin
-          if AMovement.triggerDay = 0 then begin
-            xD := DaysInMonth(xCurDate);
+        xValid := xCurDate >= AMovement.scheduleDate;
+        if xValid then begin
+          if AMovement.triggerType = CTriggerTypeWeekly then begin
+            xValid := DayOfTheWeek(xCurDate) = (AMovement.triggerDay + 1);
+            xTriggerDate := xCurDate;
           end else begin
-            xD := AMovement.triggerDay;
+            if AMovement.triggerDay = 0 then begin
+              xD := DaysInMonth(xCurDate);
+            end else begin
+              xD := AMovement.triggerDay;
+            end;
+            if TryEncodeDate(xY, xM, xD, xTriggerDate) then begin
+              xTriggerDate := AMovement.GetboundaryDate(xTriggerDate);
+              xValid := xCurDate = xTriggerDate;
+            end else begin
+              xValid := False;
+            end;
           end;
-          if TryEncodeDate(xY, xM, xD, xTriggerDate) then begin
-            xTriggerDate := AMovement.GetboundaryDate(xTriggerDate);
-            xValid := xCurDate = xTriggerDate; 
+          if AMovement.endCondition = CEndConditionTimes then begin
+            xValid := xValid and (xTimes < AMovement.endCount);
+            if xValid then begin
+              Inc(xTimes);
+            end;
+          end else if AMovement.endCondition = CEndConditionDate then begin
+            xValid := xValid and (xCurDate <= AMovement.endDate);
           end else begin
-            xValid := False;
+            xValid := xValid and (xCurDate >= AMovement.scheduleDate);
           end;
-        end;
-        if AMovement.endCondition = CEndConditionTimes then begin
-          xValid := xValid and (xTimes < AMovement.endCount);
-          if xValid then begin
-            Inc(xTimes);
-          end;
-        end else if AMovement.endCondition = CEndConditionDate then begin
-          xValid := xValid and (xCurDate <= AMovement.endDate);
-        end else begin
-          xValid := xValid and (xCurDate >= AMovement.scheduleDate);
         end;
       end;
       if xValid then begin
