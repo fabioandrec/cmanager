@@ -500,7 +500,17 @@ begin
     Result := False;
     ShowInfo(itError, 'Iloœæ nie mo¿e byæ zerowa', '');
     CCurrEditQuantity.SetFocus;
-  end else if (ComboBoxType.ItemIndex in [0, 1]) and (CStaticCategory.DataId = CEmptyDataGid) then begin
+  end else begin
+    if ComboBoxType.ItemIndex in [1, 3] then begin
+      GDataProvider.BeginTransaction;
+      Result := TInvestmentItem.FindInvestmentItem(CStaticInstrument.DataId, CStaticAccount.DataId, Trunc(CCurrEditQuantity.Value)) <> Nil;
+      GDataProvider.RollbackTransaction;
+      if not Result then begin
+        ShowInfo(itQuestion, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption  wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+      end;
+    end;
+  end;
+  if Result and (ComboBoxType.ItemIndex in [0, 1]) and (CStaticCategory.DataId = CEmptyDataGid) then begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCategory.DoGetDataId;
