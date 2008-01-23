@@ -479,6 +479,8 @@ begin
 end;
 
 function TCInvestmentMovementForm.CanAccept: Boolean;
+var xIlosc: Integer;
+    xInvestment: TInvestmentItem;
 begin
   Result := True;
   if CStaticInstrument.DataId = CEmptyDataGid then begin
@@ -503,10 +505,29 @@ begin
   end else begin
     if ComboBoxType.ItemIndex in [1, 3] then begin
       GDataProvider.BeginTransaction;
-      Result := TInvestmentItem.FindInvestmentItem(CStaticInstrument.DataId, CStaticAccount.DataId, Trunc(CCurrEditQuantity.Value)) <> Nil;
+      xInvestment := TInvestmentItem.FindInvestmentItem(CStaticInstrument.DataId, CStaticAccount.DataId);
+      if (TInvestmentMovement(Dataobject).idAccount <> CStaticAccount.DataId) or (TInvestmentMovement(Dataobject).idInstrument <> CStaticInstrument.DataId) then begin
+        if xInvestment <> Nil then begin
+          xIlosc := xInvestment.quantity;
+        end else begin
+          xIlosc := 0;
+        end;
+        Result := xIlosc >= CCurrEditQuantity.Value;
+      end else begin
+        if xInvestment <> Nil then begin
+          xIlosc := xInvestment.quantity + TInvestmentMovement(Dataobject).quantity;
+        end else begin
+          xIlosc := TInvestmentMovement(Dataobject).quantity;
+        end;
+      end;
       GDataProvider.RollbackTransaction;
       if not Result then begin
-        ShowInfo(itQuestion, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption  wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+        if xIlosc = 0 then begin
+          ShowInfo(itWarning, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption + '" nie masz instrumentów "' + CStaticInstrument.Caption + '"', '');
+        end else begin
+          ShowInfo(itWarning, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption + '" nie ma takiej iloœci instrumentów "' + CStaticInstrument.Caption + '".\n' +
+                               'Maksymalna iloœæ wynosi ' + IntToStr(xIlosc), '');
+        end;
       end;
     end;
   end;

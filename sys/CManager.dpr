@@ -134,7 +134,8 @@ uses
   CBasics in 'Shared\CBasics.pas',
   CChoosePeriodInstrumentValueFormUnit in 'CChoosePeriodInstrumentValueFormUnit.pas' {CChoosePeriodInstrumentValueForm},
   CInvestmentMovementFrameUnit in 'CInvestmentMovementFrameUnit.pas' {CInvestmentMovementFrame: TFrame},
-  CInvestmentMovementFormUnit in 'CInvestmentMovementFormUnit.pas' {CInvestmentMovementForm};
+  CInvestmentMovementFormUnit in 'CInvestmentMovementFormUnit.pas' {CInvestmentMovementForm},
+  CInvestmentPortfolioFrameUnit in 'CInvestmentPortfolioFrameUnit.pas' {CInvestmentPortfolioFrame: TFrame};
 
 {$R *.res}
 
@@ -183,7 +184,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
