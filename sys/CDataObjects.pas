@@ -906,6 +906,8 @@ type
     function GetoverallValue: Currency;
   public
     procedure FromDataset(ADataset: TADOQuery); override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetElementText: String; override;
   published
     property idInstrument: TDataGid read FidInstrument;
     property idCurrencyDef: TDataGid read FIdCurrencyDef;
@@ -4497,6 +4499,26 @@ begin
     Fquantity := FieldByName('quantity').AsInteger;
     FvalueOf := FieldByName('valueOf').AsCurrency;
   end;
+end;
+
+function TInvestmentPortfolio.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  if AColumnIndex = 0 then begin
+    Result := FinstrumentName;
+  end else if AColumnIndex = 1 then begin
+    Result := FaccountName;
+  end else if AColumnIndex = 2 then begin
+    Result := IntToStr(Fquantity);
+  end else if AColumnIndex = 3 then begin
+    Result := CurrencyToString(FvalueOf, FidCurrencyDef, False);
+  end else if AColumnIndex = 4 then begin
+    Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
+  end;
+end;
+
+function TInvestmentPortfolio.GetElementText: String;
+begin
+  Result := FaccountName + ' - ' + FinstrumentName;
 end;
 
 function TInvestmentPortfolio.GetoverallValue: Currency;

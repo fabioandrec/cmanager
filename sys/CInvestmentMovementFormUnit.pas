@@ -46,6 +46,8 @@ type
     CStaticAccountCurrency: TCStatic;
     Label21: TLabel;
     CCurrEditAccount: TCCurrEdit;
+    Label7: TLabel;
+    CStaticPortfolio: TCStatic;
     procedure CStaticInstrumentGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInstrumentValueGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -64,6 +66,9 @@ type
     procedure CStaticCategoryChanged(Sender: TObject);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
+    procedure CStaticPortfolioChanged(Sender: TObject);
+    procedure CStaticPortfolioGetDataId(var ADataGid, AText: String;
+      var AAccepted: Boolean);
   private
     FRateHelper: TCurrencyRateHelper;
     procedure UpdateCurrencyInstrument;
@@ -88,7 +93,8 @@ implementation
 uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
   CAccountsFrameUnit, CCurrencyRateFrameUnit, CProductsFrameUnit, CTools,
   CConsts, CInvestmentMovementFrameUnit, CConfigFormUnit,
-  CDescpatternFormUnit, CPreferences, CTemplates, CRichtext, CInfoFormUnit;
+  CDescpatternFormUnit, CPreferences, CTemplates, CRichtext, CInfoFormUnit,
+  CInvestmentPortfolioFrameUnit;
 
 {$R *.dfm}
 
@@ -537,6 +543,16 @@ begin
       CStaticCategory.DoGetDataId;
     end;
   end;
+end;
+
+procedure TCInvestmentMovementForm.CStaticPortfolioChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCInvestmentMovementForm.CStaticPortfolioGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCInvestmentPortfolioFrame, ADataGid, AText);
 end;
 
 end.
