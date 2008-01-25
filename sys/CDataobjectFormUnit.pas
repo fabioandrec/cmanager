@@ -62,6 +62,9 @@ begin
   if Operation = coEdit then begin
     FillForm;
   end;
+  if not CanModifyValues then begin
+    DisableComponents;
+  end;
   ShowModal;
   Result := Accepted;
 end;

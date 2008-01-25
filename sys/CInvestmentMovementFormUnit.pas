@@ -67,8 +67,7 @@ type
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
     procedure CStaticPortfolioChanged(Sender: TObject);
-    procedure CStaticPortfolioGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticPortfolioGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FRateHelper: TCurrencyRateHelper;
     procedure UpdateCurrencyInstrument;
@@ -197,8 +196,6 @@ begin
       (CStaticAccountCurrency.DataId <> CEmptyDataGid);
     CStaticCurrencyRate.HotTrack := CStaticCurrencyRate.Enabled;
     Label22.Enabled := CStaticCurrencyRate.Enabled;
-    Label17.Enabled := CStaticCurrencyRate.Enabled;
-    Label21.Enabled := CStaticCurrencyRate.Enabled;
     if CStaticCurrencyRate.Enabled then begin
       GDataProvider.BeginTransaction;
       xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate,

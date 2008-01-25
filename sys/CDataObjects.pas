@@ -4509,7 +4509,7 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := IntToStr(Fquantity);
   end else if AColumnIndex = 3 then begin
-    Result := CurrencyToString(FvalueOf, FidCurrencyDef, False);
+    Result := CurrencyToString(SimpleRoundTo(FvalueOf * Fquantity, -2), FidCurrencyDef, False);
   end else if AColumnIndex = 4 then begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
   end;

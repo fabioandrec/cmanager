@@ -82,7 +82,7 @@ begin
   inherited ReloadDataobjects;
   if CStaticFilter.DataId = CFilterAllElements then begin
     xCondition := '';
-  end else if CStaticFilter.DataId = CCashpointTypeAll then begin
+  end else begin
     xCondition := ' where instrumentType = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TDataObject.GetList(TInvestmentPortfolio, InvestmentPortfolioProxy, 'select * from StnInvestmentPortfolio' + xCondition);
