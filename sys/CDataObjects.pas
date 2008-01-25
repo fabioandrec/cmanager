@@ -1,4 +1,3 @@
-
 unit CDataObjects;
 
 interface
@@ -4235,7 +4234,7 @@ var xSql: String;
 begin
   Result := inherited OnDeleteObject(AProxy);
   xSql := Format('update investmentItem set quantity = quantity %s where idInstrument = %s and idAccount = %s',
-                 [IntToStr(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * Fquantity),
+                 [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * Fquantity),
                   DataGidToDatabase(FidInstrument), DataGidToDatabase(FidAccount)]);
   AProxy.DataProvider.ExecuteSql(xSql);
 end;
@@ -4271,7 +4270,7 @@ begin
     AProxy.DataProvider.ExecuteSql(xSql);
   end else begin
     xSql := Format('update investmentItem set quantity = quantity %s where idInstrument = %s and idAccount = %s',
-                   [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, -1, 1) * FprevQuantity),
+                   [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * FprevQuantity),
                     DataGidToDatabase(FprevIdInstrument), DataGidToDatabase(FprevIdAccount)]);
     AProxy.DataProvider.ExecuteSql(xSql);
     OnInsertObject(AProxy);

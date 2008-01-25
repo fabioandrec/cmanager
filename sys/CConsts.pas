@@ -205,7 +205,7 @@ const
      ('AccountExctraction', '', '', '', ''),
      ('ExctractionItem', 'ExtractionItemIn', 'ExtractionItemOut', '', ''),
      ('InstrumentValue', '', '', '', ''),
-     ('InvestmentMovementBuy', 'InvestmentMovementSell', 'InvestmentMovementBuyFree', '', 'InvestmentMovementSellFree'));
+     ('InvestmentMovementBuy', 'InvestmentMovementSell', 'InvestmentMovementBuyFree', 'InvestmentMovementSellFree', ''));
 
   CDescPatternsNames: array[0..8, 0..4] of string =
     (('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód'),

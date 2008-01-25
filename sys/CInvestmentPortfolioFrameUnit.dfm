@@ -21,11 +21,12 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       item
         Alignment = taRightJustify
         Position = 3
-        Width = 68
+        Width = 150
         WideText = 'Aktualna warto'#347#263
       end
       item
         Position = 4
+        Width = 10
         WideText = 'Waluta'
       end>
     WideDefaultText = ''

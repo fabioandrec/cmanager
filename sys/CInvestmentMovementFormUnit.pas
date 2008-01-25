@@ -509,30 +509,42 @@ begin
     ShowInfo(itError, 'Iloœæ nie mo¿e byæ zerowa', '');
     CCurrEditQuantity.SetFocus;
   end else begin
-    if ComboBoxType.ItemIndex in [1, 3] then begin
+    if (ComboBoxType.ItemIndex in [1, 3]) then begin
+      Result := False;
       GDataProvider.BeginTransaction;
       xInvestment := TInvestmentItem.FindInvestmentItem(CStaticInstrument.DataId, CStaticAccount.DataId);
-      if (TInvestmentMovement(Dataobject).idAccount <> CStaticAccount.DataId) or (TInvestmentMovement(Dataobject).idInstrument <> CStaticInstrument.DataId) then begin
-        if xInvestment <> Nil then begin
-          xIlosc := xInvestment.quantity;
+      if Operation = coEdit then begin
+        if (CStaticAccount.DataId = TInvestmentMovement(Dataobject).idAccount) and
+           (CStaticInstrument.DataId = TInvestmentMovement(Dataobject).idInstrument) then begin
+          if xInvestment = Nil then begin
+            xIlosc := 0;
+          end else begin
+            xIlosc := TInvestmentMovement(Dataobject).quantity + xInvestment.quantity;
+            Result := CCurrEditQuantity.Value <= xIlosc;
+          end;
         end else begin
-          xIlosc := 0;
+          if xInvestment = Nil then begin
+            xIlosc := 0;
+          end else begin
+            xIlosc := xInvestment.quantity;
+            Result := CCurrEditQuantity.Value <= xIlosc;
+          end;
         end;
-        Result := xIlosc >= CCurrEditQuantity.Value;
       end else begin
-        if xInvestment <> Nil then begin
-          xIlosc := xInvestment.quantity + TInvestmentMovement(Dataobject).quantity;
+        if xInvestment = Nil then begin
+          xIlosc := 0;
         end else begin
-          xIlosc := TInvestmentMovement(Dataobject).quantity;
+          xIlosc := xInvestment.quantity;
+          Result := CCurrEditQuantity.Value <= xIlosc;
         end;
       end;
       GDataProvider.RollbackTransaction;
       if not Result then begin
         if xIlosc = 0 then begin
-          ShowInfo(itWarning, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption + '" nie masz instrumentów "' + CStaticInstrument.Caption + '"', '');
+          ShowInfo(itWarning, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption + '" nie ma instrumentów "' + CStaticInstrument.Caption + '".', '');
         end else begin
           ShowInfo(itWarning, 'W portfelu inwestycyjnym "' + CStaticAccount.Caption + '" nie ma takiej iloœci instrumentów "' + CStaticInstrument.Caption + '".\n' +
-                               'Maksymalna iloœæ wynosi ' + IntToStr(xIlosc), '');
+                               'Maksymalna iloœæ wynosi ' + IntToStr(xIlosc) + '.', '');
         end;
       end;
     end;
@@ -551,8 +563,24 @@ begin
 end;
 
 procedure TCInvestmentMovementForm.CStaticPortfolioGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xPortfolio: TInvestmentPortfolio;
+    xAccount: TAccount;
+    xInstrument: TInstrument;
 begin
   AAccepted := TCFrameForm.ShowFrame(TCInvestmentPortfolioFrame, ADataGid, AText);
+  if AAccepted then begin
+    GDataProvider.BeginTransaction;
+    xPortfolio := TInvestmentPortfolio(TInvestmentPortfolio.LoadObject(InvestmentPortfolioProxy, ADataGid, False));
+    xAccount := TAccount(TAccount.LoadObject(AccountProxy, xPortfolio.idAccount, False));
+    xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, xPortfolio.idInstrument, False));
+    CStaticAccount.DataId := xAccount.id;
+    CStaticAccount.Caption := xAccount.GetElementText;
+    CStaticInstrument.DataId := xInstrument.id;
+    CStaticInstrument.Caption := xInstrument.GetElementText;
+    GDataProvider.RollbackTransaction;
+    CStaticAccountChanged(Nil);
+    CStaticInstrumentChanged(Nil);
+  end;
 end;
 
 end.

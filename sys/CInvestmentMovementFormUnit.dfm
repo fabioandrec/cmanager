@@ -225,12 +225,12 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'W walucie konta'
       end
       object Label7: TLabel
-        Left = 58
+        Left = 26
         Top = 33
-        Width = 30
+        Width = 62
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Portfel'
+        Caption = 'Szybki wyb'#243'r'
       end
       object CStaticAccount: TCStatic
         Left = 96
