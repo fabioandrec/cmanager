@@ -82,6 +82,7 @@ type
     procedure UpdateDescription;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
+    procedure UpdateFrames(ADataGid: ShortString; AMessage: Integer; AOption: Integer); override;
   public
     destructor Destroy; override;
     function ExpandTemplate(ATemplate: String): String; override;
@@ -574,10 +575,18 @@ begin
     CStaticAccount.Caption := xAccount.GetElementText;
     CStaticInstrument.DataId := xInstrument.id;
     CStaticInstrument.Caption := xInstrument.GetElementText;
+    CCurrEditQuantity.Value := xPortfolio.quantity;
     GDataProvider.RollbackTransaction;
     CStaticAccountChanged(Nil);
     CStaticInstrumentChanged(Nil);
+    UpdateOverallSum;
   end;
+end;
+
+procedure TCInvestmentMovementForm.UpdateFrames(ADataGid: ShortString; AMessage, AOption: Integer);
+begin
+  inherited UpdateFrames(ADataGid, AMessage, AOption);
+  SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
 end;
 
 end.

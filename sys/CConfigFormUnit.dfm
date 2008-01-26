@@ -10,9 +10,9 @@ inherited CConfigForm: TCConfigForm
   TextHeight = 13
   object PanelConfig: TPanel
     Left = 0
-    Top = 41
+    Top = 0
     Width = 591
-    Height = 355
+    Height = 396
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -49,15 +49,5 @@ inherited CConfigForm: TCConfigForm
       TabOrder = 1
       OnClick = BitBtnCancelClick
     end
-  end
-  object PanelInformation: TPanel
-    Left = 0
-    Top = 0
-    Width = 591
-    Height = 41
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 2
-    Visible = False
   end
 end

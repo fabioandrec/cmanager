@@ -449,7 +449,7 @@ create table cmanagerInfo (
 );
 
 create view transactions as select * from (
- select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity, idUnitDef from baseMovement where movementType = 'I'
+ select idBaseMovement, movementType, description, idProduct, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity, idUnitDef from baseMovement where movementType = 'I'
  union all
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, (-1) * cash as cash, (-1) * movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity, idUnitDef from baseMovement where movementType = 'O'
  union all
@@ -466,6 +466,11 @@ create view balances as select * from (
  union all
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount as idAccount, regDate, created, weekDate, monthDate, yearDate, cash as income, 0 as expense, movementCash as movementIncome, 0 as movementExpense, idAccountCurrencyDef, idMovementCurrencyDef, 0 as quantity, null as idUnitDef from baseMovement where movementType = 'T') as v;
 
+create view investments as select * from (
+ select idinvestmentMovement, movementType, description, idAccount, idInstrument, idProduct, regDateTime, created, weekDate, monthDate, yearDate, quantity, idAccountCurrencyDef from investmentMovement where movementType = 'B'
+ union all
+ select idinvestmentMovement, movementType, description, idAccount, idInstrument, idProduct, regDateTime, created, weekDate, monthDate, yearDate, (-1) * quantity, idAccountCurrencyDef from investmentMovement where movementType = 'S') as v;
+
 create view filters as
   select m.idMovementFilter, a.idAccount, c.idCashpoint, p.idProduct from (((movementFilter m
     left outer join accountFilter a on a.idMovementFilter = m.idMovementFilter)
@@ -475,15 +480,14 @@ create view filters as
 create view StnInstrumentValue as
   select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
   left join instrument i on i.idInstrument = v.idInstrument;
-  
+
 create view StnInvestmentPortfolio as 
   select v.idInstrument, i.idCurrencyDef, i.name as instrumentName, i.instrumentType, v.idAccount,
          a.name as accountName, idInvestmentItem, v.created, v.modified, v.quantity,
          (select top 1 valueOf from instrumentValue where idInstrument = v.idInstrument order by regDateTime desc) as valueOf
     from ((investmentItem v
       left outer join instrument i on i.idInstrument = v.idInstrument)
-      left outer join account a on a.idAccount = v.idAccount)
-    where v.quantity > 0;
+      left outer join account a on a.idAccount = v.idAccount);
   
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);

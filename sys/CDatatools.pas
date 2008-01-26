@@ -76,6 +76,9 @@ function CheckDatabase(AFilename: String; var AError: String; var AReport: TStri
 var xError, xDesc: String;
     xAccounts: TDataObjectList;
     xAccount: TAccount;
+    xInstrument: TInstrument;
+    xInvestments: TDataObjectList;
+    xInvestment: TInvestmentItem;
     xStep, xCount: Integer;
     xSum: Currency;
     xSuspectedCount: Integer;
@@ -84,9 +87,10 @@ begin
   Result := InitializeDataProvider(AFilename, xError, xDesc, False);
   if Result then begin
     GDataProvider.BeginTransaction;
-    xAccounts := TAccount.GetList(TAccount, AccountProxy, 'select * from account');
+    xAccounts := TAccount.GetAllObjects(AccountProxy);
+    xInvestments := TInvestmentItem.GetAllObjects(InvestmentItemProxy);
     if xAccounts.Count > 0 then begin
-      xStep := Trunc(100 / xAccounts.Count);
+      xStep := Trunc(100 / (xAccounts.Count + xInvestments.Count));
       for xCount := 0 to xAccounts.Count - 1 do begin
         xAccount := TAccount(xAccounts.Items[xCount]);
         AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie konta ' + xAccount.name);
@@ -102,6 +106,23 @@ begin
         end;
         AProgressEvent(xStep);
       end;
+      for xCount := 0 to xInvestments.Count - 1 do begin
+        xInvestment := TInvestmentItem(xInvestments.Items[xCount]);
+        xAccount := TAccount(TAccount.LoadObject(AccountProxy, xInvestment.idAccount, False));
+        xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, xInvestment.idInstrument, False));
+        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie inwestycji ' + xAccount.name + ' - ' + xInstrument.name);
+        xSum := GDataProvider.GetSqlCurrency('select sum(quantity) as quantity from investments where idAccount = ' + DataGidToDatabase(xInvestment.idAccount) + ' and idInstrument = ' + DataGidToDatabase(xInvestment.idInstrument), 0);
+        if xSum <> xInvestment.quantity then begin
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name +
+                  Format(' wynosi %d, powinien wynosiæ %.0f', [xInvestment.quantity, xSum]));
+          xInvestment.quantity := Trunc(xSum);
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Zmodyfikowano stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name);
+          inc(xSuspectedCount);
+        end else begin
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name + ' jest poprawny');
+        end;
+        AProgressEvent(xStep);
+      end;
     end;
     if Result then begin
       GDataProvider.CommitTransaction;
@@ -109,6 +130,7 @@ begin
       GDataProvider.RollbackTransaction;
     end;
     xAccounts.Free;
+    xInvestments.Free;
     GDataProvider.DisconnectFromDatabase;
     if xSuspectedCount = 0 then begin
       AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Nie znaleziono ¿adnych nieprawid³owoœci');

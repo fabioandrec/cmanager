@@ -14,7 +14,6 @@ type
     PanelButtons: TPanel;
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
-    PanelInformation: TPanel;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
   private
@@ -26,7 +25,6 @@ type
     procedure FillForm; virtual;
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
-    procedure ShowInformationPanel; virtual;
   public
     function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean; virtual;
     constructor Create(AOwner: TComponent); override;
@@ -101,12 +99,11 @@ var xCount: Integer;
     xComponent: TComponent;
     xControl: TControl;
 begin
-  ShowInformationPanel;
   for xCount := 0 to ComponentCount - 1  do begin
     xComponent := Components[xCount];
     if xComponent.InheritsFrom(TControl) then begin
       xControl := xComponent as TControl;
-      if (xControl.Parent <> PanelButtons) and (xControl.Parent <> PanelInformation) then begin
+      if (xControl.Parent <> PanelButtons) then begin
         xControl.Enabled := False;
       end;
     end;
@@ -116,12 +113,6 @@ end;
 constructor TCConfigForm.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-end;
-
-procedure TCConfigForm.ShowInformationPanel;
-begin
-  Height := Height + PanelInformation.Height;
-  PanelInformation.Visible := True;
 end;
 
 end.
