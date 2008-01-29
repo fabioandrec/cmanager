@@ -2956,7 +2956,7 @@ begin
   end else if AColumnIndex = 3 then begin
     Result := GetTypeDesc(FrateType);
   end else begin
-    Result := CurrencyToString(rate);
+    Result := CurrencyToString(rate, '', False, 4);
   end;
 end;
 

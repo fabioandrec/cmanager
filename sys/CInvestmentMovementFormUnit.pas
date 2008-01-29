@@ -83,6 +83,7 @@ type
     procedure FillForm; override;
     function CanAccept: Boolean; override;
     procedure UpdateFrames(ADataGid: ShortString; AMessage: Integer; AOption: Integer); override;
+    procedure AfterCommitData; override;
   public
     destructor Destroy; override;
     function ExpandTemplate(ATemplate: String): String; override;
@@ -94,7 +95,7 @@ uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
   CAccountsFrameUnit, CCurrencyRateFrameUnit, CProductsFrameUnit, CTools,
   CConsts, CInvestmentMovementFrameUnit, CConfigFormUnit,
   CDescpatternFormUnit, CPreferences, CTemplates, CRichtext, CInfoFormUnit,
-  CInvestmentPortfolioFrameUnit;
+  CInvestmentPortfolioFrameUnit, DateUtils, CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -245,7 +246,7 @@ begin
   if not CStaticCategory.Enabled then begin
     CStaticCategory.DataId := CEmptyDataGid;
   end;
-  UpdateCurrencyRates;
+  //UpdateCurrencyRates;
   UpdateDescription;
 end;
 
@@ -328,8 +329,7 @@ begin
       currencyQuantity := 1;
       currencyRate := 1;
     end;
-    idBaseMovement := CEmptyDataGid;
- end;
+  end;
 end;
 
 function TCInvestmentMovementForm.GetDataobjectClass: TDataObjectClass;
@@ -446,10 +446,6 @@ begin
     end;
     ComboBoxType.Enabled := False;
     SimpleRichText(description, RichEditDesc);
-    CCurrEditQuantity.Value := quantity;
-    CCurrEditValue.Value := valueOf;
-    CCurrMovement.Value := summaryOf;
-    CCurrEditAccount.Value := summaryOfAccount;
     GDataProvider.BeginTransaction;
     CStaticInstrument.DataId := idInstrument;
     CStaticInstrument.Caption := TInstrument(TInstrument.LoadObject(InstrumentProxy, idInstrument, False)).GetElementText;
@@ -479,6 +475,10 @@ begin
     end;
     GDataProvider.RollbackTransaction;
     ComboBoxTypeChange(Nil);
+    CCurrEditQuantity.Value := quantity;
+    CCurrEditValue.Value := valueOf;
+    CCurrMovement.Value := summaryOf;
+    CCurrEditAccount.Value := summaryOfAccount;
   end;
 end;
 
@@ -587,6 +587,71 @@ procedure TCInvestmentMovementForm.UpdateFrames(ADataGid: ShortString; AMessage,
 begin
   inherited UpdateFrames(ADataGid, AMessage, AOption);
   SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
+end;
+
+procedure TCInvestmentMovementForm.AfterCommitData;
+var xInvest: TInvestmentMovement;
+    xBase:  TBaseMovement;
+    xInstrument: TInstrument;
+    xAccount: TAccount;
+    xProduct: TProduct;
+    xBaseId: TDataGid;
+begin
+  inherited AfterCommitData;
+  if CStaticCategory.DataId <> CEmptyDataGid then begin
+    GDataProvider.BeginTransaction;
+    xInvest := TInvestmentMovement(Dataobject);
+    xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, CStaticInstrument.DataId, False));
+    xAccount := TAccount(TAccount.LoadObject(AccountProxy, CStaticAccount.DataId, False));
+    xProduct := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False));
+    if xInvest.idBaseMovement = CEmptyDataGid then begin
+      xBase := TBaseMovement.CreateObject(BaseMovementProxy, False);
+    end else begin
+      xBase := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xInvest.idBaseMovement, False));
+    end;
+    xBase.regDate := DateOf(xInvest.regDateTime);
+    if xInvest.movementType = CInvestmentSellMovement then begin
+      xBase.movementType := CInMovement;
+    end else if xInvest.movementType = CInvestmentBuyMovement then begin
+      xBase.movementType := COutMovement;
+    end;
+    xBase.description := RichEditDesc.Text;
+    xBase.idAccountCurrencyDef := CStaticAccountCurrency.DataId;
+    xBase.idAccount := CStaticAccount.DataId;
+    xBase.idSourceAccount := CEmptyDataGid;
+    xBase.idCashPoint := xInstrument.idCashpoint;
+    xBase.idPlannedDone := CEmptyDataGid;
+    xBase.isStated := xAccount.accountType = CCashAccount;
+    xBase.idExtractionItem := CEmptyDataGid;
+    if CStaticCurrencyRate.Enabled then begin
+      xBase.idCurrencyRate := CStaticCurrencyRate.DataId;
+      xBase.rateDescription := FRateHelper.desc;
+      xBase.currencyQuantity := FRateHelper.quantity;
+      xBase.currencyRate := FRateHelper.rate;
+    end else begin
+      xBase.idCurrencyRate := CEmptyDataGid;
+      xBase.rateDescription := '';
+      xBase.currencyQuantity := 1;
+      xBase.currencyRate := 1;
+    end;
+    xBase.idProduct := CStaticCategory.DataId;
+    if xProduct.idUnitDef <> CEmptyDataGid then begin
+      xBase.quantity := CCurrEditQuantity.Value;
+      xBase.idUnitDef := xProduct.idUnitDef;
+    end else begin
+      xBase.quantity := 1;
+      xBase.idUnitDef := CEmptyDataGid;
+    end;
+    xBase.movementCash := CCurrMovement.Value;
+    xBase.idMovementCurrencyDef := CStaticInstrumentCurrency.DataId;
+    xBase.cash := CCurrEditAccount.Value;
+    xBase.isInvestmentMovement := True;
+    xBaseId := xBase.id;
+    GDataProvider.CommitTransaction;
+    GDataProvider.ExecuteSql('update investmentMovement set idBaseMovement = ' + DataGidToDatabase(xBaseId) + ' where idInvestmentMovement = ' + DataGidToDatabase(Dataobject.id));
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+    SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
+  end;
 end;
 
 end.
