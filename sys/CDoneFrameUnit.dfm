@@ -149,7 +149,7 @@ inherited CDoneFrame: TCDoneFrame
     BevelKind = bkFlat
     BorderStyle = bsNone
     DefaultNodeHeight = 24
-    Header.AutoSizeIndex = 1
+    Header.AutoSizeIndex = -1
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
@@ -188,7 +188,7 @@ inherited CDoneFrame: TCDoneFrame
       end
       item
         Position = 1
-        Width = 143
+        Width = 200
         WideText = 'Opis'
         WideHint = 'Nazwa kontrahenta'
       end
@@ -218,6 +218,11 @@ inherited CDoneFrame: TCDoneFrame
       item
         Position = 6
         WideText = 'Waluta'
+      end
+      item
+        Position = 7
+        Width = 10
+        WideText = 'Data wykonania'
       end>
     WideDefaultText = ''
   end

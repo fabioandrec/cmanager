@@ -55,6 +55,7 @@ begin
     AssignRichText(FData.done.description, RichEditDesc);
     CCurrCash.Value := FData.done.cash;
     CCurrCash.SetCurrencyDef(FData.done.idDoneCurrencyDef, GCurrencyCache.GetSymbol(FData.done.idDoneCurrencyDef));
+    CDateTime.Value := FData.done.doneDate;
   end;
   GDataProvider.RollbackTransaction;
   ComboBoxStatusSelect(Nil);

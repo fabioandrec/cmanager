@@ -54,7 +54,7 @@ inherited CDoneForm: TCDoneForm
         Alignment = taRightJustify
         Caption = 'Kwota'
       end
-      object RichEditDesc: TCRichEdit
+      object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
         Width = 321
@@ -78,6 +78,7 @@ inherited CDoneForm: TCDoneForm
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
       object CCurrCash: TCCurrEdit
         Left = 256
@@ -124,8 +125,9 @@ inherited CDoneForm: TCDoneForm
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
-      object RichEditOperation: TCRichEdit
+      object RichEditOperation: TCRichedit
         Left = 24
         Top = 32
         Width = 321

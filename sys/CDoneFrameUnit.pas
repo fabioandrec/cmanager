@@ -254,6 +254,12 @@ begin
     end else begin
       CellText := GCurrencyCache.GetSymbol(xData.done.idDoneCurrencyDef);
     end;
+  end else if Column = 7 then begin
+    if xData.done <> Nil then begin
+      CellText := Date2StrDate(xData.done.doneDate);
+    end else begin
+      CellText := '';
+    end;
   end;
 end;
 
