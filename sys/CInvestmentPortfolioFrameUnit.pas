@@ -60,9 +60,9 @@ end;
 
 procedure TCInvestmentPortfolioFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   Bevel.Visible := False;
   ButtonPanel.Visible := False;
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
 end;
 
 function TCInvestmentPortfolioFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;

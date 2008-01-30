@@ -31,6 +31,7 @@ type
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
+    procedure AfterDeleteObject(ADataobject: TDataObject); override;
   public
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -47,7 +48,8 @@ type
 implementation
 
 uses CDataObjects, CInvestmentMovementFormUnit, CPluginConsts, CConsts,
-  CTools, CFrameFormUnit, CListFrameUnit;
+  CTools, CFrameFormUnit, CListFrameUnit, CBaseFrameUnit,
+  CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -233,6 +235,23 @@ end;
 procedure TCInvestmentMovementFrame.CDateTimePerEndChanged(Sender: TObject);
 begin
   RefreshData;
+end;
+
+procedure TCInvestmentMovementFrame.AfterDeleteObject(ADataobject: TDataObject);
+var xInvest: TInvestmentMovement;
+    xMovement: TBaseMovement;
+    xBaseId: TDataGid;
+begin
+  xInvest := TInvestmentMovement(ADataobject);
+  xBaseId := xInvest.idBaseMovement;
+  if (xBaseId <> CEmptyDataGid) then begin
+    GDataProvider.BeginTransaction;
+    xMovement := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xInvest.idBaseMovement, False));
+    xMovement.DeleteObject;
+    GDataProvider.CommitTransaction;
+    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+  end;
+  inherited AfterDeleteObject(ADataobject);
 end;
 
 end.

@@ -33,6 +33,9 @@ inherited CDoneFrame: TCDoneFrame
       BevelOuter = bvNone
       Color = clWindow
       TabOrder = 2
+      DesignSize = (
+        443
+        40)
       object CButtonsStatus: TCButton
         Left = 149
         Top = 4
@@ -56,6 +59,19 @@ inherited CDoneFrame: TCDoneFrame
         TxtOffset = 15
         Framed = False
         Action = ActionDooperation
+      end
+      object CButtonPlanned: TCButton
+        Left = 317
+        Top = 3
+        Width = 116
+        Height = 33
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionPlanned
+        Anchors = [akTop, akRight]
       end
     end
     object Panel2: TPanel
@@ -379,6 +395,11 @@ inherited CDoneFrame: TCDoneFrame
       Caption = 'Wykonaj operacj'#281
       ImageIndex = 1
       OnExecute = ActionDooperationExecute
+    end
+    object ActionPlanned: TAction
+      Caption = 'Harmonogramy'
+      ImageIndex = 2
+      OnExecute = ActionPlannedExecute
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu

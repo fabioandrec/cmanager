@@ -463,6 +463,9 @@ end;
 
 procedure TDataObject.AfterPost;
 begin
+  if FMemoryState <> msDeleted then begin
+    SetState(msValid);
+  end;
 end;
 
 class function TDataObject.CanBeDeleted(AId: TDataGid): Boolean;

@@ -614,6 +614,7 @@ begin
   if AUnitdefId <> CEmptyDataGid then begin
     xSymbol := GDataProvider.GetSqlString('select symbol from unitDef where idUnitDef = ' + DataGidToDatabase(AUnitdefId), '');
     AComponent.SetCurrencyDef(AUnitdefId, xSymbol);
+    AComponent.Value := 1;
   end else begin
     AComponent.SetCurrencyDef(CEmptyDataGid, '');
     AComponent.Value := 1;

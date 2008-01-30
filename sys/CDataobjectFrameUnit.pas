@@ -58,6 +58,10 @@ type
     procedure RefreshData; virtual;
     function GetAdditionalDataForObject: TAdditionalData; virtual;
     procedure DoCheckChanged; override;
+    procedure DoActionAddExecute; virtual;
+    procedure DoActionEditExecute; virtual;
+    procedure DoActionDeleteExecute; virtual;
+    procedure AfterDeleteObject(ADataobject: TDataObject); virtual;
   public
     Dataobjects: TDataObjectList;
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
@@ -82,6 +86,7 @@ type
     procedure ShowFrame; override;
     procedure HideFrame; override;
     function IsAllElementChecked(ACheckedCount: Integer): Boolean; override;
+    class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
   end;
 
 implementation
@@ -145,14 +150,22 @@ begin
     FilterPanel.Visible := False;
   end;
   xFilters.Free;
-  if not AWithButtons then begin
+  if (not AWithButtons) then begin
     Bevel.Visible := False;
     ButtonPanel.Visible := False;
     ActionAdd.Visible := False;
     ActionEdit.Visible := False;
     ActionDelete.Visible := False;
     ActionHistory.Visible := False;
+    ActionAdd.Enabled := GetDataobjectClass(WMOPT_NONE) <> Nil;
+    ActionEdit.Enabled := GetDataobjectClass(WMOPT_NONE) <> Nil;
+    ActionDelete.Enabled := GetDataobjectClass(WMOPT_NONE) <> Nil;
+    ActionHistory.Enabled := GetDataobjectClass(WMOPT_NONE) <> Nil;
   end;
+  Dodaj1.Visible := ActionAdd.Visible and ButtonPanel.Visible;
+  Edytuj1.Visible := ActionEdit.Visible and ButtonPanel.Visible;
+  Usu1.Visible := ActionDelete.Visible and ButtonPanel.Visible;
+  Historia1.Visible := ActionHistory.Visible and ButtonPanel.Visible;
   RefreshData;
 end;
 
@@ -215,12 +228,14 @@ begin
 end;
 
 procedure TCDataobjectFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+var xGotClass: Boolean;
 begin
   inherited UpdateButtons(AIsSelectedSomething);
-  ActionAdd.Enabled := True;
-  ActionEdit.Enabled := List.FocusedNode <> Nil;
-  ActionDelete.Enabled := List.FocusedNode <> Nil;
-  ActionHistory.Enabled := List.FocusedNode <> Nil;
+  xGotClass := GetDataobjectClass(WMOPT_NONE) <> Nil;
+  ActionAdd.Enabled := xGotClass;
+  ActionEdit.Enabled := (List.FocusedNode <> Nil) and xGotClass;
+  ActionDelete.Enabled := (List.FocusedNode <> Nil) and xGotClass;
+  ActionHistory.Enabled := (List.FocusedNode <> Nil) and xGotClass;
 end;
 
 procedure TCDataobjectFrame.WndProc(var Message: TMessage);
@@ -244,34 +259,18 @@ begin
 end;
 
 procedure TCDataobjectFrame.ActionAddExecute(Sender: TObject);
-var xForm: TCDataobjectForm;
 begin
-  xForm := GetDataobjectForm(WMOPT_NONE).Create(Nil);
-  xForm.ShowDataobject(coAdd, GetDataobjectProxy(WMOPT_NONE), Nil, True, GetAdditionalDataForObject);
-  xForm.Free;
+  DoActionAddExecute;
 end;
 
 procedure TCDataobjectFrame.ActionEditExecute(Sender: TObject);
-var xForm: TCDataobjectForm;
 begin
-  xForm := GetDataobjectForm(WMOPT_NONE).Create(Nil);
-  xForm.ShowDataobject(coEdit, GetDataobjectProxy(WMOPT_NONE), TDataObject(List.SelectedElement.Data), True, GetAdditionalDataForObject);
-  xForm.Free;
+  DoActionEditExecute;
 end;
 
 procedure TCDataobjectFrame.ActionDeleteExecute(Sender: TObject);
-var xData: TDataObject;
-    xBase: TDataObject;
 begin
-  xBase := TDataObject(List.SelectedElement.Data);
-  if xBase.CanBeDeleted(xBase.id) then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ obiekt o nazwie "' + xBase.GetElementText + '" ?', '') then begin
-      xData := GetDataobjectClass(WMOPT_NONE).LoadObject(GetDataobjectProxy(WMOPT_NONE), xBase.id, False);
-      xData.DeleteObject;
-      GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
-    end;
-  end;
+  DoActionDeleteExecute;
 end;
 
 procedure TCDataobjectFrame.RecreateTreeHelper;
@@ -424,6 +423,47 @@ end;
 procedure TCDataobjectFrame.DoCheckChanged;
 begin
   UpdateButtons(List.SelectedCount > 0);
+end;
+
+class function TCDataobjectFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+begin
+  Result := Nil;
+end;
+
+procedure TCDataobjectFrame.DoActionAddExecute;
+var xForm: TCDataobjectForm;
+begin
+  xForm := GetDataobjectForm(WMOPT_NONE).Create(Nil);
+  xForm.ShowDataobject(coAdd, GetDataobjectProxy(WMOPT_NONE), Nil, True, GetAdditionalDataForObject);
+  xForm.Free;
+end;
+
+procedure TCDataobjectFrame.DoActionDeleteExecute;
+var xData: TDataObject;
+    xBase: TDataObject;
+begin
+  xBase := TDataObject(List.SelectedElement.Data);
+  if xBase.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ obiekt o nazwie "' + xBase.GetElementText + '" ?', '') then begin
+      xData := GetDataobjectClass(WMOPT_NONE).LoadObject(GetDataobjectProxy(WMOPT_NONE), xBase.id, False);
+      xData.DeleteObject;
+      GDataProvider.CommitTransaction;
+      AfterDeleteObject(xBase);
+      SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAOBJECTDELETED, Integer(@xBase.id), 0);
+    end;
+  end;
+end;
+
+procedure TCDataobjectFrame.DoActionEditExecute;
+var xForm: TCDataobjectForm;
+begin
+  xForm := GetDataobjectForm(WMOPT_NONE).Create(Nil);
+  xForm.ShowDataobject(coEdit, GetDataobjectProxy(WMOPT_NONE), TDataObject(List.SelectedElement.Data), True, GetAdditionalDataForObject);
+  xForm.Free;
+end;
+
+procedure TCDataobjectFrame.AfterDeleteObject(ADataobject: TDataObject);
+begin
 end;
 
 end.

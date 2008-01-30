@@ -50,7 +50,7 @@ implementation
 uses CTemplates, CDescpatternFormUnit, CConsts, CPreferences, CRichtext,
   CInstrumentFrameUnit, CFrameFormUnit, CTools, DateUtils,
   CInstrumentValueFrameUnit, CInstrumentFormUnit, CInfoFormUnit, Math,
-  CConfigFormUnit;
+  CConfigFormUnit, CInvestmentPortfolioFrameUnit;
 
 {$R *.dfm}
 
@@ -232,6 +232,7 @@ begin
     GDataProvider.CommitTransaction;
     SendMessageToFrames(TCInstrumentValueFrame, WM_DATAOBJECTDELETED, Integer(@FValueToReplaceId), 0);
   end;
+  SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
 end;
 
 end.

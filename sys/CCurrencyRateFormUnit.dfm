@@ -55,6 +55,7 @@ inherited CCurrencyRateForm: TCCurrencyRateForm
         Transparent = False
         OnChanged = CDateTimeChanged
         HotTrack = True
+        Withtime = False
       end
       object CStaticCashpoint: TCStatic
         Left = 317

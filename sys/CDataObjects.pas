@@ -316,6 +316,7 @@ type
     function GetMovements: TDataObjectList;
     procedure DeleteObject; override;
     constructor Create(AStatic: Boolean); override;
+    procedure AfterPost; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property idAccount: TDataGid read FidAccount write SetidAccount;
@@ -396,6 +397,7 @@ type
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
+    procedure AfterPost; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
@@ -867,6 +869,8 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    procedure AfterPost; override;
+    function GetElementText: String; override;
   published
     property description: TBaseDescription read Fdescription write Setdescription;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
@@ -2738,6 +2742,7 @@ procedure TCurrencyDef.AfterPost;
 begin
   if Fsymbol <> FpreviousSymbol then begin
     GCurrencyCache.Change(id, symbol, iso);
+    FpreviousSymbol := Fsymbol;
   end;
   inherited AfterPost;
 end;
@@ -3670,6 +3675,7 @@ procedure TUnitDef.AfterPost;
 begin
   if Fsymbol <> FpreviousSymbol then begin
     GUnitdefCache.Change(id, symbol, '');
+    FpreviousSymbol := Fsymbol;
   end;
   inherited AfterPost;
 end;
@@ -4134,6 +4140,14 @@ begin
   end;
 end;
 
+procedure TInvestmentMovement.AfterPost;
+begin
+  FprevIdInstrument := FidInstrument;
+  FprevQuantity := Fquantity;
+  FprevIdAccount := FidAccount;
+  inherited AfterPost;
+end;
+
 constructor TInvestmentMovement.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
@@ -4227,6 +4241,11 @@ begin
       end;
     end;
   end;;
+end;
+
+function TInvestmentMovement.GetElementText: String;
+begin
+  Result := GetDescText(Fdescription);
 end;
 
 function TInvestmentMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -4523,6 +4542,22 @@ end;
 function TInvestmentPortfolio.GetoverallValue: Currency;
 begin
   Result := SimpleRoundTo(Fquantity * FvalueOf, -2);
+end;
+
+procedure TMovementList.AfterPost;
+begin
+  FprevIdAccount := FidAccount;
+  FprevCash := Fcash;
+  inherited AfterPost;
+end;
+
+procedure TBaseMovement.AfterPost;
+begin
+  FprevCash := Fcash;
+  FprevIdAccount := FidAccount;
+  FprevIdSourceAccount := FidSourceAccount;
+  FprevmovementCash := FmovementCash;
+  inherited AfterPost;
 end;
 
 initialization

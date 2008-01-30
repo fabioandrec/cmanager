@@ -417,7 +417,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionBug
                 Caption = '&Zg'#322'o'#347' b'#322#261'd'
-                ImageIndex = 17
+                ImageIndex = 18
               end
               item
                 Action = ActionFutureRequest
@@ -429,7 +429,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCheckUpdates
                 Caption = 'S&prawd'#378' aktualizacje'
-                ImageIndex = 18
+                ImageIndex = 19
               end
               item
                 Action = ActionAbout
@@ -458,25 +458,30 @@ object CMainForm: TCMainForm
       Caption = 'Operacje finansowe'
       ImageIndex = 1
     end
-    object ActionShortcutInvestments: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Operacje inwestycyjne'
-      ImageIndex = 16
-    end
     object ActionShortcutPlannedDone: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Plany'
+      Caption = 'Operacje zaplanowane'
       ImageIndex = 2
-    end
-    object ActionShortcutPlanned: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Harmonogramy'
-      ImageIndex = 3
     end
     object ActionShortcutAccounts: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Konta'
       ImageIndex = 4
+    end
+    object ActionShortcutExtractions: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Wyci'#261'gi'
+      ImageIndex = 13
+    end
+    object ActionShortcutInvestments: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Operacje inwestycyjne'
+      ImageIndex = 16
+    end
+    object ActionShortcutInvestmentPortfolio: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Inwestycje'
+      ImageIndex = 17
     end
     object ActionShortcutProducts: TAction
       Category = 'S'#322'owniki'
@@ -487,6 +492,11 @@ object CMainForm: TCMainForm
       Category = 'S'#322'owniki'
       Caption = 'Kontrahenci'
       ImageIndex = 6
+    end
+    object ActionShortcutPlanned: TAction
+      Category = 'S'#322'owniki'
+      Caption = 'Harmonogramy'
+      ImageIndex = 3
     end
     object ActionStatusbar: TAction
       Category = 'Widok'
@@ -501,7 +511,7 @@ object CMainForm: TCMainForm
     object ActionCheckUpdates: TAction
       Category = 'Pomoc'
       Caption = 'Sprawd'#378' aktualizacje'
-      ImageIndex = 18
+      ImageIndex = 19
       OnExecute = ActionCheckUpdatesExecute
     end
     object ActionAbout: TAction
@@ -584,11 +594,6 @@ object CMainForm: TCMainForm
       Caption = 'Waluty'
       ImageIndex = 11
     end
-    object ActionShortcutExtractions: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Wyci'#261'gi'
-      ImageIndex = 13
-    end
     object ActionShortcutCurrencyRate: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Kursy'
@@ -602,7 +607,7 @@ object CMainForm: TCMainForm
     object ActionBug: TAction
       Category = 'Pomoc'
       Caption = 'Zg'#322'o'#347' b'#322#261'd'
-      ImageIndex = 17
+      ImageIndex = 18
       OnExecute = ActionBugExecute
     end
     object ActionFutureRequest: TAction

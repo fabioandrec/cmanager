@@ -42,6 +42,8 @@ type
     Bevel: TBevel;
     ActionDooperation: TAction;
     CButtonOperation: TCButton;
+    CButtonPlanned: TCButton;
+    ActionPlanned: TAction;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -63,6 +65,7 @@ type
     procedure ActionDooperationExecute(Sender: TObject);
     procedure DoneListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
+    procedure ActionPlannedExecute(Sender: TObject);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -96,7 +99,7 @@ implementation
 uses CFrameFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Math, CDoneFormUnit, CConsts, CPreferences, CTools,
-  CPluginConsts;
+  CPluginConsts, CPlannedFrameUnit;
 
 {$R *.dfm}
 
@@ -873,6 +876,12 @@ end;
 function TCDoneFrame.GetSelectedType: Integer;
 begin
   Result := CSELECTEDITEM_PLANNEDDONE;
+end;
+
+procedure TCDoneFrame.ActionPlannedExecute(Sender: TObject);
+var xGid, xText: String;
+begin
+  TCFrameForm.ShowFrame(TCPlannedFrame, xGid, xText, nil, nil, nil, nil, False);
 end;
 
 end.

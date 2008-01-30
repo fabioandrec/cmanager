@@ -29,7 +29,6 @@ type
     Label1: TLabel;
     CStaticInstrument: TCStatic;
     Label15: TLabel;
-    CCurrEditQuantity: TCCurrEdit;
     Label2: TLabel;
     CStaticInstrumentValue: TCStatic;
     Label6: TLabel;
@@ -48,6 +47,7 @@ type
     CCurrEditAccount: TCCurrEdit;
     Label7: TLabel;
     CStaticPortfolio: TCStatic;
+    CIntQuantity: TCIntEdit;
     procedure CStaticInstrumentGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInstrumentValueGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -157,7 +157,6 @@ begin
   CStaticAccountCurrency.DataId := CEmptyDataGid;
   CCurrEditAccount.SetCurrencyDef(CEmptyDataGid, '');
   CStaticInstrument.DataId := CEmptyDataGid;
-  CCurrEditQuantity.SetCurrencyDef(CEmptyDataGid, '');
   UpdateCurrencyInstrument;
   UpdateCurrencyRates;
   CDateTime.Value := Now;
@@ -258,8 +257,8 @@ end;
 procedure TCInvestmentMovementForm.UpdateOverallSum;
 begin
   if not (csLoading in ComponentState) then begin
-    if (CCurrEditQuantity.Value <> 0) and (CCurrEditValue.Value <> 0) then begin
-      CCurrMovement.Value := SimpleRoundTo(CCurrEditQuantity.Value * CCurrEditValue.Value, -2);
+    if (CIntQuantity.Value <> 0) and (CCurrEditValue.Value <> 0) then begin
+      CCurrMovement.Value := SimpleRoundTo(CIntQuantity.Value * CCurrEditValue.Value, -2);
     end else begin
       CCurrMovement.Value := 0;
     end;
@@ -309,7 +308,7 @@ begin
     regDateTime := CDateTime.Value;
     idInstrument := CStaticInstrument.DataId;
     idInstrumentCurrencyDef := CStaticInstrumentCurrency.DataId;
-    quantity := Trunc(CCurrEditQuantity.Value);
+    quantity := CIntQuantity.Value;
     idInstrumentValue := CStaticInstrumentValue.DataId;
     valueOf := CCurrEditValue.Value;
     summaryOf := CCurrMovement.Value;
@@ -475,7 +474,7 @@ begin
     end;
     GDataProvider.RollbackTransaction;
     ComboBoxTypeChange(Nil);
-    CCurrEditQuantity.Value := quantity;
+    CIntQuantity.Text := IntToStr(quantity);
     CCurrEditValue.Value := valueOf;
     CCurrMovement.Value := summaryOf;
     CCurrEditAccount.Value := summaryOfAccount;
@@ -502,10 +501,10 @@ begin
     if ShowInfo(itQuestion, 'Nie wybrano przelicznika waluty. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCurrencyRate.DoGetDataId;
     end;
-  end else if CCurrEditQuantity.Value = 0 then begin
+  end else if CIntQuantity.Value = 0 then begin
     Result := False;
     ShowInfo(itError, 'Iloœæ nie mo¿e byæ zerowa', '');
-    CCurrEditQuantity.SetFocus;
+    CIntQuantity.SetFocus;
   end else begin
     if (ComboBoxType.ItemIndex in [1, 3]) then begin
       Result := False;
@@ -518,14 +517,14 @@ begin
             xIlosc := 0;
           end else begin
             xIlosc := TInvestmentMovement(Dataobject).quantity + xInvestment.quantity;
-            Result := CCurrEditQuantity.Value <= xIlosc;
+            Result := CIntQuantity.Value <= xIlosc;
           end;
         end else begin
           if xInvestment = Nil then begin
             xIlosc := 0;
           end else begin
             xIlosc := xInvestment.quantity;
-            Result := CCurrEditQuantity.Value <= xIlosc;
+            Result := CIntQuantity.Value <= xIlosc;
           end;
         end;
       end else begin
@@ -533,7 +532,7 @@ begin
           xIlosc := 0;
         end else begin
           xIlosc := xInvestment.quantity;
-          Result := CCurrEditQuantity.Value <= xIlosc;
+          Result := CIntQuantity.Value <= xIlosc;
         end;
       end;
       GDataProvider.RollbackTransaction;
@@ -575,7 +574,7 @@ begin
     CStaticAccount.Caption := xAccount.GetElementText;
     CStaticInstrument.DataId := xInstrument.id;
     CStaticInstrument.Caption := xInstrument.GetElementText;
-    CCurrEditQuantity.Value := xPortfolio.quantity;
+    CIntQuantity.Text := IntToStr(xPortfolio.quantity);
     GDataProvider.RollbackTransaction;
     CStaticAccountChanged(Nil);
     CStaticInstrumentChanged(Nil);
@@ -636,7 +635,7 @@ begin
     end;
     xBase.idProduct := CStaticCategory.DataId;
     if xProduct.idUnitDef <> CEmptyDataGid then begin
-      xBase.quantity := CCurrEditQuantity.Value;
+      xBase.quantity := CIntQuantity.Value;
       xBase.idUnitDef := xProduct.idUnitDef;
     end else begin
       xBase.quantity := 1;
@@ -649,8 +648,13 @@ begin
     xBaseId := xBase.id;
     GDataProvider.CommitTransaction;
     GDataProvider.ExecuteSql('update investmentMovement set idBaseMovement = ' + DataGidToDatabase(xBaseId) + ' where idInvestmentMovement = ' + DataGidToDatabase(Dataobject.id));
-    SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+    if Operation = coEdit then begin
+      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+    end else begin
+      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+    end;
     SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
+    SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
   end;
 end;
 

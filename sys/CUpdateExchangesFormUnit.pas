@@ -67,7 +67,7 @@ uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
   CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit,
-  CPluginConsts, CXmlTlb;
+  CPluginConsts, CXmlTlb, CInvestmentPortfolioFrameUnit;
 
 {$R *.dfm}
 
@@ -310,6 +310,7 @@ begin
   HideWaitForm;
   if xAnyValueAdded then begin
     SendMessageToFrames(TCInstrumentValueFrame, WM_DATAREFRESH, 0, 0);
+    SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
   end;
   if xAnyInstrumentAdded then begin
     SendMessageToFrames(TCInstrumentFrame, WM_DATAREFRESH, 0, 0);
