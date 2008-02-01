@@ -177,26 +177,29 @@ var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
   if xBase.elementType = mtObject then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
-      xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
-      xIdTemp1 := xBase.Dataobject.id;
-      xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
-      xIdTemp3 := TBaseMovement(xBase.Dataobject).idSourceAccount;
-      xIdTemp4 :=  TBaseMovement(xBase.Dataobject).idMovementList;
-      xIdTemp5 :=  TBaseMovement(xBase.Dataobject).idPlannedDone;
-      xBase.Dataobject.DeleteObject;
-      GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_BASEMOVEMENT);
-      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
-      if (xIdTemp3 <> CEmptyDataGid) then begin
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
+    if not TBaseMovement(xBase.Dataobject).isInvestmentMovement then begin
+      if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
+        xIdTemp1 := xBase.Dataobject.id;
+        xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
+        xIdTemp3 := TBaseMovement(xBase.Dataobject).idSourceAccount;
+        xIdTemp4 :=  TBaseMovement(xBase.Dataobject).idMovementList;
+        xIdTemp5 :=  TBaseMovement(xBase.Dataobject).idPlannedDone;
+        xBase.Dataobject.DeleteObject;
+        GDataProvider.CommitTransaction;
+        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_BASEMOVEMENT);
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
+        if (xIdTemp3 <> CEmptyDataGid) then begin
+          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
+        end;
+        if (xIdTemp4 <> CEmptyDataGid) then begin
+          SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp4), WMOPT_MOVEMENTLIST);
+        end;
+        if xIdTemp5 <> CEmptyDataGid then begin
+          SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+        end;
       end;
-      if (xIdTemp4 <> CEmptyDataGid) then begin
-        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp4), WMOPT_MOVEMENTLIST);
-      end;
-      if xIdTemp5 <> CEmptyDataGid then begin
-        SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
-      end;
+    end else begin
+      ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji inwestycyjnej', '')
     end;
   end else if xBase.elementType = mtList then begin
     if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ listê operacji ?', '') then begin

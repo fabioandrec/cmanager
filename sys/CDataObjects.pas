@@ -777,6 +777,8 @@ type
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetregDateTime(const Value: TDateTime);
     procedure SetvalueOf(const Value: Currency);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
@@ -4006,6 +4008,12 @@ end;
 function TInstrumentValue.GetElementText: String;
 begin
   Result := Fdescription;
+end;
+
+function TInstrumentValue.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql('update investmentMovement set idInstrumentValue = null where idInstrumentValue = ' + DataGidToDatabase(id));
 end;
 
 procedure TInstrumentValue.Setdescription(const Value: TBaseDescription);

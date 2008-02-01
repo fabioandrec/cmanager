@@ -9,8 +9,8 @@ DefaultDirName={pf}\CManager
 DefaultGroupName=CManager
 AllowNoIcons=true
 LicenseFile=..\..\docs\license
-OutputDir=..\..\bin
-OutputBaseFilename=..\..\releases\CManagerSetup_1_8_1_Beta
+OutputDir=..\..\releases\
+OutputBaseFilename=CManagerSetup_1_8_1_Beta
 SetupIconFile=..\res\cmanager32.ico
 Compression=lzma/max
 SolidCompression=true
@@ -34,28 +34,30 @@ Name: "custom"; Description: "Wybrane elementy"; Flags: iscustom
 Name: "program"; Description: "Pliki programu"; Types: full custom; Flags: fixed
 Name: "plugins"; Description: "Wtyczki do programu"; Types: full
 Name: "plugins\mbank"; Description: "Import wyci¹gów z mBanku"; Types: full
+Name: "plugins\exchange"; Description: "Import notowañ gie³dowych"; Types: full
 Name: "plugins\currency"; Description: "Import kursów walut z NBP"; Types: full
 Name: "advanced"; Description: "Zaawansowane sk³adniki systemu"; Types: full
 Name: "advanced\psql"; Description: "Konsola Sql"; Types: full
 
 [Files]
-;Source: ..\..\bin\CManager.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\docs\readme; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\docs\changelog; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\docs\contrib; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\docs\license; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\docs\plugins; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\docs\Help\CManager.chm; DestDir: {app}\Help\; Components: program; Flags: ignoreversion
-;Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\bin\CArchive.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\bin\CQuery.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\bin\CTransform.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\bin\CValidate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-;Source: ..\..\bin\Wtyczki\NBPACurrencyRates.dll; DestDir: {app}\Wtyczki\; Components: plugins\currency; Flags: ignoreversion
-;Source: ..\..\bin\Wtyczki\NBPBSCurrencyRates.dll; DestDir: {app}\Wtyczki\; Components: plugins\currency; Flags: ignoreversion
-;Source: ..\..\bin\Wtyczki\MbankExtFF.dll; DestDir: {app}\Wtyczki\; Components: plugins\mbank; Flags: ignoreversion
-;Source: ..\..\bin\Wtyczki\SqlConsole.dll; DestDir: {app}\Wtyczki\; Components: advanced\psql; Flags: ignoreversion
-;Source: ..\..\sources\res\home.url; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CManager.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\readme; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\changelog; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\contrib; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\license; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\plugins; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\Help\CManager.chm; DestDir: {app}\Help\; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CArchive.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CQuery.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CTransform.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\CValidate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\bin\Wtyczki\NBPACurrencyRates.dll; DestDir: {app}\Wtyczki\; Components: plugins\currency; Flags: ignoreversion
+Source: ..\..\bin\Wtyczki\NBPBSCurrencyRates.dll; DestDir: {app}\Wtyczki\; Components: plugins\currency; Flags: ignoreversion
+Source: ..\..\bin\Wtyczki\MbankExtFF.dll; DestDir: {app}\Wtyczki\; Components: plugins\mbank; Flags: ignoreversion
+Source: ..\..\bin\Wtyczki\Metastock.dll; DestDir: {app}\Wtyczki\; Components: plugins\exchange; Flags: ignoreversion
+Source: ..\..\bin\Wtyczki\SqlConsole.dll; DestDir: {app}\Wtyczki\; Components: advanced\psql; Flags: ignoreversion
+Source: ..\..\sources\res\home.url; DestDir: {app}; Components: program; Flags: ignoreversion
 
 [Icons]
 Name: {group}\CManager; Filename: {app}\CManager.exe; WorkingDir: {app}

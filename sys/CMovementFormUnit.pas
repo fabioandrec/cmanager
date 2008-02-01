@@ -173,6 +173,7 @@ type
     procedure UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer); override;
     function GetUpdateFrameOption: Integer; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
+    function CanModifyValues: Boolean; override;
   public
     function ExpandTemplate(ATemplate: String): String; override;
     destructor Destroy; override;
@@ -1345,6 +1346,17 @@ end;
 procedure TCMovementForm.ActionStateCyclicExecute(Sender: TObject);
 begin
   ChooseState(FcyclicState, ActionStateCyclic, CButtonStateCyclic);
+end;
+
+function TCMovementForm.CanModifyValues: Boolean;
+begin
+  Result := inherited CanModifyValues;
+  if Result and (Operation = coEdit) then begin
+    Result := not TBaseMovement(Dataobject).isInvestmentMovement;
+    if not Result then begin
+      ShowInfoPanel(50, 'Edycja operacji powsta³ej na bazie operacji inwestycyjnej nie jest mo¿liwa', clWindowText, [fsBold]);
+    end;
+  end;
 end;
 
 end.

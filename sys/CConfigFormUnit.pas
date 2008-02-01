@@ -17,6 +17,8 @@ type
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
   private
+    FInfoPanel: TPanel;
+    FInfoBevel: TBevel;
     FAccepted: Boolean;
     FOperation: TConfigOperation;
   protected
@@ -25,6 +27,7 @@ type
     procedure FillForm; virtual;
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
+    procedure ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
   public
     function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean; virtual;
     constructor Create(AOwner: TComponent); override;
@@ -103,16 +106,41 @@ begin
     xComponent := Components[xCount];
     if xComponent.InheritsFrom(TControl) then begin
       xControl := xComponent as TControl;
-      if (xControl.Parent <> PanelButtons) then begin
+      if (xControl.Parent <> PanelButtons) and (xControl <> PanelButtons) and (xControl <> FInfoPanel) then begin
         xControl.Enabled := False;
       end;
     end;
   end;
+  BitBtnOk.Visible := False;
+  BitBtnCancel.Default := True;
+  BitBtnCancel.Caption := '&Wyjœcie';
 end;
 
 constructor TCConfigForm.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FInfoPanel := TPanel.Create(Self);
+  FInfoPanel.BorderStyle := bsNone;
+  FInfoPanel.BevelInner := bvNone;
+  FInfoPanel.BevelOuter := bvNone;
+  FInfoBevel := TBevel.Create(Self);
+  FInfoBevel.Shape := bsBottomLine;
+  FInfoBevel.Parent := FInfoPanel;
+  FInfoBevel.Align := alBottom;
+  FInfoBevel.Height := 3;
+end;
+
+procedure TCConfigForm.ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
+begin
+  FInfoPanel.Align := alTop;
+  FInfoPanel.Height := AHeight;
+  FInfoPanel.Caption := AText;
+  FInfoPanel.Font.Color := AFontColor;
+  FInfoPanel.Font.Style := AFontStyle;
+  DisableAlign;
+  Height := Height + FInfoPanel.Height;
+  FInfoPanel.Parent := Self;
+  EnableAlign;
 end;
 
 end.

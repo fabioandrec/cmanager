@@ -104,7 +104,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelKind = bkFlat
       BorderStyle = bsNone
       DefaultNodeHeight = 24
-      Header.AutoSizeIndex = 0
+      Header.AutoSizeIndex = -1
       Header.Font.Charset = DEFAULT_CHARSET
       Header.Font.Color = clWindowText
       Header.Font.Height = -11
@@ -132,30 +132,31 @@ inherited CMovementFrame: TCMovementFrame
       Columns = <
         item
           Position = 0
-          Width = 10
+          Width = 200
           WideText = 'Konto'
           WideHint = 'Nazwa kontrahenta'
         end
         item
           Alignment = taRightJustify
           Position = 1
-          Width = 150
+          Width = 130
           WideText = 'Rozch'#243'd'
         end
         item
           Alignment = taRightJustify
           Position = 2
-          Width = 150
+          Width = 130
           WideText = 'Przych'#243'd'
         end
         item
           Alignment = taRightJustify
           Position = 3
-          Width = 150
+          Width = 130
           WideText = 'Saldo'
         end
         item
           Position = 4
+          Width = 10
           WideText = 'Waluta'
         end>
       WideDefaultText = ''
