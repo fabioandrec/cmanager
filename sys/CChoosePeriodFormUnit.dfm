@@ -57,7 +57,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         Items.Strings = (
           'dowolny'
           'tylko dzi'#347
-          'w tym tygodni'
+          'w tym tygodniu'
           'w tym miesi'#261'cu'
           'w tym kwartale'
           'w tym p'#243#322'roczu'
@@ -73,7 +73,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         Height = 21
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 1
@@ -89,7 +89,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         Height = 21
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 2

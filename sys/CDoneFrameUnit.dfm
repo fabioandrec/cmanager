@@ -322,7 +322,7 @@ inherited CDoneFrame: TCDoneFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '<w tym tygodni>'
+      Caption = '<w tym tygodniu>'
       Color = clBtnFace
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
