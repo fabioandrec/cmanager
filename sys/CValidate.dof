@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=0
-Build=4
+Build=3
 Debug=0
 PreRelease=0
 Special=0
@@ -125,13 +125,13 @@ Locale=1045
 CodePage=1250
 [Version Info Keys]
 CompanyName=
-FileDescription=CTransform - transformacja wg arkusza styli
-FileVersion=1.0.0.4
+FileDescription=CValidate - walidacja xml
+FileVersion=1.0.0.3
 InternalName=
 LegalCopyright=
 LegalTrademarks=
-OriginalFilename=CTransfer
-ProductName=CTransfer
+OriginalFilename=CValidate
+ProductName=CValidate
 ProductVersion=1.0.0.0
 Comments=
 [HistoryLists\hlDebugSourcePath]
@@ -145,9 +145,9 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=6
-Item0=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
-Item1=..\others\PngComponents\Source;..\others\Vtv\Source
-Item2=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item2=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
 Item3=..\..\..\others\PngComponents\Source
 Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
