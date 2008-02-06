@@ -1890,7 +1890,7 @@ end;
 
 function TOperationsBySomethingChart.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView, True);
 end;
 
 function TOperationsByCategoryChart.GetReportTitle: String;
@@ -2030,7 +2030,7 @@ end;
 
 function TOperationsBySomethingList.PrepareReportConditions: Boolean;
 begin
-  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView);
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView, True);
 end;
 
 function TOperationsByCategoryList.GetReportTitle: String;

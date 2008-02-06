@@ -74,6 +74,7 @@ type
     ActionImportStockExchanges: TAction;
     ActionShortcutInvestments: TAction;
     ActionShortcutInvestmentPortfolio: TAction;
+    ActionPassword: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -110,6 +111,7 @@ type
     procedure ActionImportDatafileExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
     procedure ActionImportStockExchangesExecute(Sender: TObject);
+    procedure ActionPasswordExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -481,7 +483,7 @@ procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
 var xError, xDesc: String;
 begin
   if SaveDialog.Execute then begin
-    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True) then begin
+    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True, True) then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
     end else begin
@@ -502,7 +504,7 @@ end;
 
 function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
 begin
-  Result := InitializeDataProvider(AFilename, AError, ADesc, False);
+  Result := InitializeDataProvider(AFilename, AError, ADesc, False, True);
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);
@@ -890,6 +892,11 @@ end;
 procedure TCMainForm.ActionDictionaryExecute(ASender: TObject);
 begin
   PerformDictionaryAction(TAction(ASender));
+end;
+
+procedure TCMainForm.ActionPasswordExecute(Sender: TObject);
+begin
+  GDataProvider.ExecuteSql('alter database password sanipor1brs NULL')
 end;
 
 end.

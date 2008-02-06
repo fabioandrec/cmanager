@@ -3,7 +3,7 @@ unit CDatabase;
 interface
 
 uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
-     Types, CComponents;
+     Types, CComponents, AdoInt;
 
 type
   TDataGid = ShortString;
@@ -39,7 +39,7 @@ type
     procedure BeginTransaction;
     procedure RollbackTransaction;
     function CommitTransaction: Boolean;
-    function ExecuteSql(ASql: String; AShowError: Boolean = True): Boolean;
+    function ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False): Boolean;
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
     function GetSqlBoolean(ASql: String; ADefault: Boolean): Boolean;
@@ -237,7 +237,7 @@ var GDataProvider: TDataProvider;
     GSqllogfile: String = '';
     GShutdownEvent: THandle;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean; AExclusive: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
@@ -291,16 +291,22 @@ begin
   end;
 end;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean; AExclusive: Boolean): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
     xError: String;
     xDataVersion: String;
     xFileVersion: String;
+    xMode: Integer;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
+  if AExclusive then begin
+    xMode := adModeShareExclusive;
+  end else begin
+    xMode := adModeShareDenyNone;
+  end;
   if (not Result) then begin
     if ACanCreate then begin
       Result := CreateDatabase(ADatabaseName, xError);
@@ -321,7 +327,7 @@ begin
     if GDataProvider.IsConnected then begin
       GDataProvider.DisconnectFromDatabase;
     end;
-    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
+    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName, xMode]));
     if not Result then begin
       AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';
       ADesc := GDataProvider.LastError;
@@ -545,7 +551,7 @@ begin
             Result := xObj.OnDeleteObject(Self);
             if Result then begin
               xSql := xObj.DataFieldList.GetDeleteSql(xObj.Id, xTableNames.Strings[xCountSql], xIdFieldNames.Strings[xCountSql]);
-              Result := FDataProvider.ExecuteSql(xSql);
+              Result := FDataProvider.ExecuteSql(xSql, True, True);
             end;
             Inc(xCountSql);
           end;
@@ -620,6 +626,9 @@ begin
   except
     on E: Exception do begin
       FLastError := E.Message;
+      if FConnection.Errors.Count > 0 then begin
+        ShowInfo(itWarning, IntToStr(FConnection.Errors.Item[0].NativeError), '');
+      end;
     end;
   end;
 end;
@@ -648,7 +657,7 @@ begin
   GDatabaseName := '';
 end;
 
-function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True): Boolean;
+function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False): Boolean;
 var xFinished: Boolean;
     xPos: Integer;
     xSql, xRemains: String;
@@ -656,20 +665,39 @@ begin
   Result := True;
   xRemains := ASql;
   xFinished := False;
-  repeat
-    xPos := Pos(';', xRemains);
-    if xPos > 0 then begin
-      xSql := Copy(xRemains, 1, xPos - 1);
-      Delete(xRemains, 1, xPos);
-    end else begin
-      xSql := xRemains;
-      xFinished := True;
-    end;
-    if Trim(xSql) <> '' then begin
+  if not AOneStatement then begin
+    repeat
+      xPos := Pos(';', xRemains);
+      if xPos > 0 then begin
+        xSql := Copy(xRemains, 1, xPos - 1);
+        Delete(xRemains, 1, xPos);
+      end else begin
+        xSql := xRemains;
+        xFinished := True;
+      end;
+      if Trim(xSql) <> '' then begin
+        try
+          SaveToLog('Wykonywanie "' + xSql + '"', GSqllogfile);
+          FLastStatemenet := StringReplace(xSql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
+          FConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
+        except
+          on E: Exception do begin
+            if AShowError then begin
+               ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
+            end;
+            FLastError := E.Message;
+            Result := False;
+            xFinished := True;
+          end;
+        end;
+      end;
+    until xFinished;
+  end else begin
+    if Trim(ASql) <> '' then begin
       try
-        SaveToLog('Wykonywanie "' + xSql + '"', GSqllogfile);
-        FLastStatemenet := StringReplace(xSql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
-        FConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
+        SaveToLog('Wykonywanie "' + ASql + '"', GSqllogfile);
+        FLastStatemenet := StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
+        FConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
       except
         on E: Exception do begin
           if AShowError then begin
@@ -677,11 +705,10 @@ begin
           end;
           FLastError := E.Message;
           Result := False;
-          xFinished := True;
         end;
       end;
     end;
-  until xFinished;
+  end;
   if not Result then begin
     SaveToLog('B³¹d "' + FLastError + '"', GSqllogfile);
   end;
@@ -906,7 +933,7 @@ begin
             Result := xObj.OnInsertObject(Self);
             if Result then begin
               xSql := xObj.DataFieldList.GetInsertSql(xObj.Id, xTableNames.Strings[xCountSql], xIdFieldNames.Strings[xCountSql]);
-              Result := FDataProvider.ExecuteSql(xSql);
+              Result := FDataProvider.ExecuteSql(xSql, True, True);
             end;
             if Result then begin
               xObj.AfterPost;
@@ -953,7 +980,7 @@ begin
             Result := xObj.OnUpdateObject(Self);
             if Result then begin
               xSql := xObj.DataFieldList.GetUpdateSql(xObj.Id, xTableNames.Strings[xCountSql], xIdFieldNames.Strings[xCountSql]);
-              Result := FDataProvider.ExecuteSql(xSql);
+              Result := FDataProvider.ExecuteSql(xSql, True, True);
             end;
             if Result then begin
               xObj.AfterPost;
