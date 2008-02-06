@@ -483,7 +483,7 @@ procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
 var xError, xDesc: String;
 begin
   if SaveDialog.Execute then begin
-    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True, True) then begin
+    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True) then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
     end else begin
@@ -504,7 +504,7 @@ end;
 
 function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
 begin
-  Result := InitializeDataProvider(AFilename, AError, ADesc, False, True);
+  Result := InitializeDataProvider(AFilename, AError, ADesc, False);
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);

@@ -237,7 +237,7 @@ var GDataProvider: TDataProvider;
     GSqllogfile: String = '';
     GShutdownEvent: THandle;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean; AExclusive: Boolean): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
@@ -291,22 +291,16 @@ begin
   end;
 end;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean; AExclusive: Boolean): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
 var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
     xError: String;
     xDataVersion: String;
     xFileVersion: String;
-    xMode: Integer;
 begin
   xCommand := '';
   Result := FileExists(ADatabaseName);
-  if AExclusive then begin
-    xMode := adModeShareExclusive;
-  end else begin
-    xMode := adModeShareDenyNone;
-  end;
   if (not Result) then begin
     if ACanCreate then begin
       Result := CreateDatabase(ADatabaseName, xError);
@@ -327,7 +321,7 @@ begin
     if GDataProvider.IsConnected then begin
       GDataProvider.DisconnectFromDatabase;
     end;
-    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName, xMode]));
+    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
     if not Result then begin
       AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';
       ADesc := GDataProvider.LastError;
@@ -617,7 +611,7 @@ begin
     FConnection.Close;
   end;
   FConnection.ConnectionString := AConnectionString;
-  FConnection.Mode := cmShareDenyNone;
+  FConnection.Mode := cmShareExclusive;
   FConnection.LoginPrompt := False;
   FConnection.CursorLocation := clUseClient;
   try

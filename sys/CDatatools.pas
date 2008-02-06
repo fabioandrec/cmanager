@@ -84,7 +84,7 @@ var xError, xDesc: String;
     xSuspectedCount: Integer;
 begin
   xSuspectedCount := 0;
-  Result := InitializeDataProvider(AFilename, xError, xDesc, False, True);
+  Result := InitializeDataProvider(AFilename, xError, xDesc, False);
   if Result then begin
     GDataProvider.BeginTransaction;
     xAccounts := TAccount.GetAllObjects(AccountProxy);
@@ -214,7 +214,7 @@ function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var 
 var xError, xDesc: String;
     xStr: TStringList;
 begin
-  Result := InitializeDataProvider(ATargetFile, xError, xDesc, False, True);
+  Result := InitializeDataProvider(ATargetFile, xError, xDesc, False);
   if Result then begin
     xStr := TStringList.Create;
     try
@@ -252,7 +252,7 @@ var xError, xDesc: String;
     xCount: Integer;
     xMin, xMax: Integer;
 begin
-  Result := InitializeDataProvider(AFilename, xError, xDesc, False, True);
+  Result := InitializeDataProvider(AFilename, xError, xDesc, False);
   if Result then begin
     xStr := TStringList.Create;
     try

@@ -34,7 +34,7 @@ const
   CXSLDefaultTransformResname = 'DEFAULTXSL';
 
 const
-  CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False;Mode=%d';
+  CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
   CDefaultFilename = 'CManager.dat';
 
   CFilterAllElements = '@';
