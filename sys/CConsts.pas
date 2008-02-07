@@ -35,6 +35,7 @@ const
 
 const
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
+  CDefaultConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False;PWD=%s';
   CDefaultFilename = 'CManager.dat';
 
   CFilterAllElements = '@';

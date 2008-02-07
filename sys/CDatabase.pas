@@ -12,6 +12,7 @@ type
   TDataMemoryState = (msValid, msModified, msDeleted);
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
+  TInitializeProviderResult = (iprSuccess, iprCancelled, iprError);
 
   TDataGids = class(TStringList)
   public
@@ -34,7 +35,7 @@ type
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
     destructor Destroy; override;
-    function ConnectToDatabase(AConnectionString: String): Boolean;
+    function ConnectToDatabase(AConnectionString: String; var ANativeErrorCode: Integer): Boolean;
     procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
@@ -297,6 +298,7 @@ var xResStream: TResourceStream;
     xDataset: TADOQuery;
     xError: String;
     xDataVersion: String;
+    xNativeErrorCode: Integer;
     xFileVersion: String;
 begin
   xCommand := '';
@@ -321,7 +323,7 @@ begin
     if GDataProvider.IsConnected then begin
       GDataProvider.DisconnectFromDatabase;
     end;
-    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]));
+    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]), xNativeErrorCode);
     if not Result then begin
       AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';
       ADesc := GDataProvider.LastError;
@@ -604,9 +606,10 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.ConnectToDatabase(AConnectionString: String): Boolean;
+function TDataProvider.ConnectToDatabase(AConnectionString: String; var ANativeErrorCode: Integer): Boolean;
 begin
   Result := False;
+  ANativeErrorCode := 0;
   if FConnection.Connected then begin
     FConnection.Close;
   end;
@@ -621,7 +624,7 @@ begin
     on E: Exception do begin
       FLastError := E.Message;
       if FConnection.Errors.Count > 0 then begin
-        ShowInfo(itWarning, IntToStr(FConnection.Errors.Item[0].NativeError), '');
+        ANativeErrorCode := FConnection.Errors.Item[0].NativeError;
       end;
     end;
   end;
