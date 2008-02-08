@@ -106,6 +106,7 @@ var xMustReconect: Boolean;
     xText: String;
     xPrevDatabase: String;
     xReport: TStringList;
+    xStatus: TInitializeProviderResult;
 begin
   AddToReport('Rozpoczêcie wykonywania eksportu pliku danych...');
   Label5.Caption := 'Trwa wykonywanie eksportu pliku danych...';
@@ -137,7 +138,8 @@ begin
   end;
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
-    if CMainForm.OpenConnection(xPrevDatabase, xError, xDesc) then begin
+    xStatus := CMainForm.OpenConnection(xPrevDatabase, xError, xDesc);
+    if xStatus = iprSuccess then begin
       CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;
     end else begin

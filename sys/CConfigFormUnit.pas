@@ -24,6 +24,7 @@ type
   protected
     function CanAccept: Boolean; virtual;
     function CanModifyValues: Boolean; virtual;
+    procedure DoAccept; virtual;
     procedure FillForm; virtual;
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
@@ -44,10 +45,7 @@ uses Math;
 
 procedure TCConfigForm.BitBtnOkClick(Sender: TObject);
 begin
-  if CanAccept then begin
-    FAccepted := True;
-    Close;
-  end;
+  DoAccept;
 end;
 
 function TCConfigForm.CanAccept: Boolean;
@@ -141,6 +139,14 @@ begin
   Height := Height + FInfoPanel.Height;
   FInfoPanel.Parent := Self;
   EnableAlign;
+end;
+
+procedure TCConfigForm.DoAccept;
+begin
+  if CanAccept then begin
+    FAccepted := True;
+    Close;
+  end;
 end;
 
 end.

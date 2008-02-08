@@ -164,7 +164,7 @@ begin
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile then begin
         xFilename := GBasePreferences.startupDatafileName;
       end;
-      xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime);
+      xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
     end else begin
       xProceed := True;
     end;

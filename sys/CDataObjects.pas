@@ -962,7 +962,7 @@ const CDatafileTables: array[0..25] of string =
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
              'accountCurrencyRule', 'reportDef',
-             'instrument', 'intrumentValue', 'investmentItem', 'investmentMovement');
+             'instrument', 'instrumentValue', 'investmentItem', 'investmentMovement');
 
 const CDatafileTablesExportConditions: array[0..25] of string =
             ('', '', '', '', '',

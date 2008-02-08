@@ -168,6 +168,7 @@ var xMustReconect: Boolean;
     xText: String;
     xPrevDatabase: String;
     xBackupPref: TBackupPref;
+    xStatus: TInitializeProviderResult;
 begin
   if FArchOperation = aoBackup then begin
     AddToReport('Rozpoczêcie wykonywania kopii pliku danych...');
@@ -225,7 +226,8 @@ begin
   end;
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
-    if CMainForm.OpenConnection(xPrevDatabase, xError, xDesc) then begin
+    xStatus := CMainForm.OpenConnection(xPrevDatabase, xError, xDesc);
+    if xStatus = iprSuccess then begin
       CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;
     end else begin

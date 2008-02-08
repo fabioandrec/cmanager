@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
-  ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, 
+  ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList,
   PngSpeedButton, ShellApi, CBaseFrameUnit;
 
@@ -140,7 +140,7 @@ type
     procedure ExecuteOnstartupPlugins;
     procedure ExecuteOnexitPlugins;
     procedure FinalizeMainForm;
-    function OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
+    function OpenConnection(AFilename: String; var AError: String; var ADesc: String): TInitializeProviderResult;
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
     property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
@@ -152,7 +152,7 @@ var
 
 implementation
 
-uses CDataObjects, CDatabase, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
+uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProductsFrameUnit, CMovementFrameUnit, 
      CReportsFrameUnit, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
@@ -162,10 +162,10 @@ uses CDataObjects, CDatabase, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFra
      CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
      CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
      CMemoFormUnit, CCurrencydefFrameUnit,
-     CCurrencyRateFrameUnit, CPlugins, CPluginConsts, 
-  CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
-  CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
-  CInvestmentPortfolioFrameUnit;
+     CCurrencyRateFrameUnit, CPlugins, CPluginConsts,
+     CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
+     CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
+     CInvestmentPortfolioFrameUnit;
 
 {$R *.dfm}
 
@@ -468,11 +468,13 @@ end;
 
 procedure TCMainForm.ActionOpenConnectionExecute(Sender: TObject);
 var xError, xDesc: String;
+    xStatus: TInitializeProviderResult;
 begin
   if OpenDialog.Execute then begin
-    if not OpenConnection(OpenDialog.FileName, xError, xDesc) then begin
+    xStatus := OpenConnection(OpenDialog.FileName, xError, xDesc);
+    if xStatus = iprError then begin
       ShowInfo(itError, xError, xDesc)
-    end else begin
+    end else if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
     end;
@@ -481,12 +483,14 @@ end;
 
 procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
 var xError, xDesc: String;
+    xStatus: TInitializeProviderResult;
 begin
   if SaveDialog.Execute then begin
-    if InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True) then begin
+    xStatus := InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True);
+    if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
-    end else begin
+    end else if xStatus = iprError then begin
       ShowInfo(itError, xError, xDesc);
     end;
   end;
@@ -502,7 +506,7 @@ begin
   ShowProgressForm(TCCompactDatafileForm);
 end;
 
-function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): Boolean;
+function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): TInitializeProviderResult;
 begin
   Result := InitializeDataProvider(AFilename, AError, ADesc, False);
 end;

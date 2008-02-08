@@ -30,12 +30,12 @@ type
     function GetInTransaction: Boolean;
     function GetIsConnected: Boolean;
   public
+    function OpenConnection(var ANativeErrorCode: Integer; ADatasource: String): Boolean;
     function ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
     procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
     destructor Destroy; override;
-    function ConnectToDatabase(AConnectionString: String; var ANativeErrorCode: Integer): Boolean;
     procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
@@ -237,8 +237,10 @@ var GDataProvider: TDataProvider;
     GDatabaseName: String;
     GSqllogfile: String = '';
     GShutdownEvent: THandle;
+    GLastUsedPassword: String = '';
+    GLastUsedPasswordPresent: Boolean = False;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): TInitializeProviderResult;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
@@ -257,7 +259,8 @@ function GetSystemPathname(AFilename: String): String;
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
-     CPreferences, CTools, CAdox, CDataObjects;
+     CPreferences, CTools, CAdox, CDataObjects,
+  CInitializeProviderFormUnit;
 
 
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
@@ -292,7 +295,7 @@ begin
   end;
 end;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): Boolean;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): TInitializeProviderResult;
 var xResStream: TResourceStream;
     xCommand: String;
     xDataset: TADOQuery;
@@ -300,13 +303,15 @@ var xResStream: TResourceStream;
     xDataVersion: String;
     xNativeErrorCode: Integer;
     xFileVersion: String;
+    xValid: Boolean;
 begin
   xCommand := '';
-  Result := FileExists(ADatabaseName);
-  if (not Result) then begin
+  AError := '';
+  Result := iprError;
+  if (not FileExists(ADatabaseName)) then begin
     if ACanCreate then begin
-      Result := CreateDatabase(ADatabaseName, xError);
-      if Result then begin
+      xValid := CreateDatabase(ADatabaseName, xError);
+      if xValid then begin
         xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
         SetLength(xCommand, xResStream.Size);
         CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
@@ -319,23 +324,34 @@ begin
       AError := 'Nie odnaleziono pliku danych ' + ADatabaseName + '.';
     end;
   end;
-  if Result then begin
+  if AError = '' then begin
     if GDataProvider.IsConnected then begin
       GDataProvider.DisconnectFromDatabase;
     end;
-    Result := GDataProvider.ConnectToDatabase(Format(CDefaultConnectionString, [ADatabaseName]), xNativeErrorCode);
-    if not Result then begin
+    if not GDataProvider.OpenConnection(xNativeErrorCode, ADatabaseName) then begin
+      if (xNativeErrorCode = CProviderErrorCodeInvalidPassword) then begin
+        if ConnectToDatabaseWithPassword(ADatabaseName) then begin
+          Result := iprSuccess;
+        end else begin
+          Result := iprCancelled;
+        end;
+      end;
+    end else begin
+      Result := iprSuccess;
+    end;
+    if Result = iprError then begin
       AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';
       ADesc := GDataProvider.LastError;
-    end else begin
+    end else if Result = iprSuccess then begin
       if xCommand <> '' then begin
-        Result := GDataProvider.ExecuteSql(xCommand, False) and
+        xValid := GDataProvider.ExecuteSql(xCommand, False) and
                   GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]), False);
-        if not Result then begin
+        if not xValid then begin
           AError := 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.';
           ADesc := GDataProvider.LastError;
           GDataProvider.DisconnectFromDatabase;
           DeleteFile(ADatabaseName);
+          Result := iprError;
         end else begin
           GDatabaseName := ADatabaseName;
           if ShowInfo(itQuestion, 'Utworzono nowy plik danych. Czy chcesz wype³niæ go podstawowymi ustawieniami?', '') then begin
@@ -349,21 +365,20 @@ begin
           AError := 'Plik ' + ADatabaseName + ' nie jest poprawnym plikiem danych';
           ADesc := '';
           GDataProvider.DisconnectFromDatabase;
-          Result := False;
+          Result := iprError;
         end else begin
           xDataVersion := xDataset.FieldByName('version').AsString;
           xFileVersion := FileVersion(ParamStr(0));
           if xFileVersion <> xDataVersion then begin
-            Result := UpdateDatabase(xDataVersion, xFileVersion);
-            if Result then begin
-              Result := UpdateConfiguration(xDataVersion, xFileVersion);
+            if not (UpdateDatabase(xDataVersion, xFileVersion) or UpdateConfiguration(xDataVersion, xFileVersion)) then begin
+              Result := iprError;
             end;
           end;
           xDataset.Free;
         end;
       end;
     end;
-    if Result then begin
+    if Result = iprSuccess then begin
       GBasePreferences.lastOpenedDatafilename := GDatabaseName;
       ReloadCaches;
     end;
@@ -606,15 +621,21 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.ConnectToDatabase(AConnectionString: String; var ANativeErrorCode: Integer): Boolean;
+function TDataProvider.OpenConnection(var ANativeErrorCode: Integer; ADatasource: String): Boolean;
+var xConnectionString: String;
 begin
   Result := False;
   ANativeErrorCode := 0;
   if FConnection.Connected then begin
     FConnection.Close;
   end;
-  FConnection.ConnectionString := AConnectionString;
-  FConnection.Mode := cmShareExclusive;
+  if GLastUsedPasswordPresent then begin
+    xConnectionString := Format(CDefaultConnectionStringWithPass, [ADatasource, GLastUsedPassword]);
+  end else begin
+    xConnectionString := Format(CDefaultConnectionString, [ADatasource]);
+  end;
+  FConnection.ConnectionString := xConnectionString;
+  FConnection.Mode := cmShareDenyNone;
   FConnection.LoginPrompt := False;
   FConnection.CursorLocation := clUseClient;
   try

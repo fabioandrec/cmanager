@@ -34,8 +34,11 @@ const
   CXSLDefaultTransformResname = 'DEFAULTXSL';
 
 const
+  CProviderErrorCodeInvalidPassword = -124782449;
+
+const
   CDefaultConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
-  CDefaultConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False;PWD=%s';
+  CDefaultConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False;Jet OLEDB:Database Password=%s';
   CDefaultFilename = 'CManager.dat';
 
   CFilterAllElements = '@';
