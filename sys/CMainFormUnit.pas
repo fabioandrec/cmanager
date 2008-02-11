@@ -74,7 +74,6 @@ type
     ActionImportStockExchanges: TAction;
     ActionShortcutInvestments: TAction;
     ActionShortcutInvestmentPortfolio: TAction;
-    ActionPassword: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -111,7 +110,6 @@ type
     procedure ActionImportDatafileExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
     procedure ActionImportStockExchangesExecute(Sender: TObject);
-    procedure ActionPasswordExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -165,7 +163,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts,
      CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
-     CInvestmentPortfolioFrameUnit;
+     CInvestmentPortfolioFrameUnit, CConfigFormUnit;
 
 {$R *.dfm}
 
@@ -896,11 +894,6 @@ end;
 procedure TCMainForm.ActionDictionaryExecute(ASender: TObject);
 begin
   PerformDictionaryAction(TAction(ASender));
-end;
-
-procedure TCMainForm.ActionPasswordExecute(Sender: TObject);
-begin
-  GDataProvider.ExecuteSql('alter database password sanipor1brs NULL')
 end;
 
 end.

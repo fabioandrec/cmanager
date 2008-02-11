@@ -1,33 +1,14 @@
 inherited CInitializeProviderForm: TCInitializeProviderForm
-  Caption = 'Otwieranie pliku danych'
-  ClientHeight = 140
-  ClientWidth = 342
+  Left = 422
+  Top = 330
+  Caption = 'Plik danych zabezpieczony has'#322'em'
+  ClientHeight = 92
+  ClientWidth = 295
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 342
-    Height = 99
-    object Label1: TLabel
-      Left = 64
-      Top = 16
-      Width = 138
-      Height = 13
-      Caption = 'Podaj has'#322'o dost'#281'pu do pliku'
-    end
-    object Label3: TLabel
-      Left = 64
-      Top = 36
-      Width = 265
-      Height = 13
-      AutoSize = False
-      Caption = 'Plik danych'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
+    Width = 295
+    Height = 51
     object Image1: TImage
       Left = 16
       Top = 16
@@ -171,10 +152,18 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
         E0000007F000000FF800001FFC00003FFE00007FFF0000FFFFC003FFFFFFFFFF
         FFFFFFFF}
     end
+    object Label1: TLabel
+      Left = 59
+      Top = 26
+      Width = 29
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Has'#322'o'
+    end
     object EditPassword: TEdit
-      Left = 16
-      Top = 68
-      Width = 313
+      Left = 96
+      Top = 22
+      Width = 185
       Height = 21
       BevelKind = bkTile
       BorderStyle = bsNone
@@ -184,13 +173,13 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 99
-    Width = 342
+    Top = 51
+    Width = 295
     inherited BitBtnOk: TBitBtn
-      Left = 165
+      Left = 118
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 253
+      Left = 206
     end
   end
 end

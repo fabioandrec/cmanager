@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 377
-  Top = 92
+  Left = 91
+  Top = 83
   Width = 860
   Height = 633
   Caption = 'CManager'
@@ -329,9 +329,6 @@ object CMainForm: TCMainForm
                   item
                     Action = ActionRandom
                     Caption = 'W&ype'#322'nij losowo dane'
-                  end
-                  item
-                    Action = ActionPassword
                   end>
                 Caption = 'N&arz'#281'dzia'
               end>
@@ -662,11 +659,6 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Wczytaj notowania'
       OnExecute = ActionImportStockExchangesExecute
-    end
-    object ActionPassword: TAction
-      Category = 'Plik'
-      Caption = 'Zmie'#324' has'#322'o pliku danych'
-      OnExecute = ActionPasswordExecute
     end
   end
   object OpenDialog: TOpenDialog

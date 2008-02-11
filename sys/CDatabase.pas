@@ -30,7 +30,7 @@ type
     function GetInTransaction: Boolean;
     function GetIsConnected: Boolean;
   public
-    function OpenConnection(var ANativeErrorCode: Integer; ADatasource: String): Boolean;
+    function OpenConnection(var ANativeErrorCode: Integer; ADatasource: String; AExclusive: Boolean = False): Boolean;
     function ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
     procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
@@ -621,7 +621,7 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.OpenConnection(var ANativeErrorCode: Integer; ADatasource: String): Boolean;
+function TDataProvider.OpenConnection(var ANativeErrorCode: Integer; ADatasource: String; AExclusive: Boolean = False): Boolean;
 var xConnectionString: String;
 begin
   Result := False;
@@ -635,7 +635,11 @@ begin
     xConnectionString := Format(CDefaultConnectionString, [ADatasource]);
   end;
   FConnection.ConnectionString := xConnectionString;
-  FConnection.Mode := cmShareDenyNone;
+  if AExclusive then begin
+    FConnection.Mode := cmShareExclusive;
+  end else begin
+    FConnection.Mode := cmShareDenyNone;
+  end;
   FConnection.LoginPrompt := False;
   FConnection.CursorLocation := clUseClient;
   try

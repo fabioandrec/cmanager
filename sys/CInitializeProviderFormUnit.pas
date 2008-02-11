@@ -10,10 +10,9 @@ uses
 
 type
   TCInitializeProviderForm = class(TCConfigForm)
-    Label1: TLabel;
     EditPassword: TEdit;
-    Label3: TLabel;
     Image1: TImage;
+    Label1: TLabel;
   private
     FFilename: String;
     FTries: Integer;
@@ -78,7 +77,6 @@ end;
 procedure TCInitializeProviderForm.SetFilename(const Value: String);
 begin
   FFilename := Value;
-  Label3.Caption := MinimizeName(FFilename, Label3.Canvas, Label3.Width);
 end;
 
 end.
