@@ -2,12 +2,12 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
   Left = 319
   Top = 289
   Caption = 'Sprawdzanie pliku danych'
-  ClientHeight = 124
+  ClientHeight = 139
   ClientWidth = 456
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelButtons: TPanel
-    Top = 83
+    Top = 98
     Width = 456
     inherited BitBtnOk: TBitBtn
       Left = 279
@@ -18,11 +18,10 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
   end
   inherited PanelConfig: TPanel
     Width = 456
-    Height = 83
+    Height = 98
     inherited PageControl: TPageControl
       Width = 456
-      Height = 83
-      ActivePage = TabSheetStart
+      Height = 98
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
           ImageIndex = 3
@@ -36,7 +35,7 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
         end
         object CStaticName: TCStatic
           Left = 64
-          Top = 46
+          Top = 58
           Width = 353
           Height = 21
           AutoSize = False
@@ -65,11 +64,11 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
         end
         inherited StaticText: TStaticText
           Left = 64
-          Top = 51
+          Top = 56
         end
         inherited ProgressBar: TProgressBar
           Left = 64
-          Top = 51
+          Top = 56
         end
       end
       inherited TabSheetEnd: TTabSheet

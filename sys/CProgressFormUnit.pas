@@ -47,13 +47,15 @@ type
     CImageStart: TCImage;
     CImageWork: TCImage;
     CImageEnd: TCImage;
-    LabelEnd: TLabel;
     CStaticDesc: TCStatic;
+    LabelEnd: TLabel;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     FWaitThread: TWaitThread;
     FWaitHandle: THandle;
@@ -284,6 +286,13 @@ procedure TCProgressForm.CStaticDescGetDataId(var ADataGid, AText: String; var A
 begin
   AAccepted := False;
   ShowReport('Raport z wykonanych czynnoœci', Report.Text, 400, 300);
+end;
+
+procedure TCProgressForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then begin
+    BitBtnCancel.Click;
+  end;
 end;
 
 end.

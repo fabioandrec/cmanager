@@ -13,6 +13,8 @@ type
     EditPassword: TEdit;
     Image1: TImage;
     Label1: TLabel;
+    Label2: TLabel;
+    CStaticName: TCStatic;
   private
     FFilename: String;
     FTries: Integer;
@@ -77,6 +79,7 @@ end;
 procedure TCInitializeProviderForm.SetFilename(const Value: String);
 begin
   FFilename := Value;
+  CStaticName.Caption := MinimizeName(FFilename, CStaticName.Canvas, CStaticName.Width);
 end;
 
 end.

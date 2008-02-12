@@ -1,6 +1,6 @@
 object CProgressForm: TCProgressForm
-  Left = 201
-  Top = 336
+  Left = 223
+  Top = 253
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CProgressForm'
@@ -12,10 +12,12 @@ object CProgressForm: TCProgressForm
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object PanelButtons: TPanel
@@ -64,7 +66,7 @@ object CProgressForm: TCProgressForm
       Top = 0
       Width = 499
       Height = 171
-      ActivePage = TabSheetWork
+      ActivePage = TabSheetEnd
       Align = alClient
       Style = tsFlatButtons
       TabOrder = 0
@@ -128,14 +130,14 @@ object CProgressForm: TCProgressForm
         end
         object LabelEnd: TLabel
           Left = 64
-          Top = 24
-          Width = 108
+          Top = 26
+          Width = 60
           Height = 13
-          Caption = 'Wynik kompaktowania'
+          Caption = 'Zako'#324'czono'
         end
         object CStaticDesc: TCStatic
           Left = 64
-          Top = 46
+          Top = 58
           Width = 353
           Height = 21
           AutoSize = False

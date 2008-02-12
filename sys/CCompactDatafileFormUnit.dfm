@@ -1,43 +1,52 @@
 inherited CCompactDatafileForm: TCCompactDatafileForm
   Left = 319
   Top = 289
+  ActiveControl = CStaticName
   Caption = 'Kompaktowanie pliku danych'
-  ClientHeight = 121
-  ClientWidth = 435
+  ClientHeight = 133
+  ClientWidth = 415
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelButtons: TPanel
-    Top = 80
-    Width = 435
+    Top = 92
+    Width = 415
     inherited BitBtnOk: TBitBtn
-      Left = 258
+      Left = 238
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 346
+      Left = 326
     end
   end
   inherited PanelConfig: TPanel
-    Width = 435
-    Height = 80
+    Width = 415
+    Height = 92
     inherited PageControl: TPageControl
-      Width = 435
-      Height = 80
-      ActivePage = TabSheetEnd
+      Width = 415
+      Height = 92
+      ActivePage = TabSheetStart
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
           ImageIndex = 3
         end
         object Label1: TLabel
           Left = 64
-          Top = 24
-          Width = 261
+          Top = 26
+          Width = 55
           Height = 13
-          Caption = 'Wybierz plika danych, kt'#243'ry ma zosta'#263' skompaktowany'
+          Caption = 'Plik danych'
+        end
+        object LabelPass: TLabel
+          Left = 63
+          Top = 62
+          Width = 217
+          Height = 13
+          Alignment = taRightJustify
+          Caption = 'Has'#322'o (wype'#322'nij, je'#380'eli plik jest zabezpieczony)'
         end
         object CStaticName: TCStatic
-          Left = 64
-          Top = 46
-          Width = 353
+          Left = 128
+          Top = 22
+          Width = 265
           Height = 21
           AutoSize = False
           BevelKind = bkTile
@@ -51,31 +60,46 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
           OnGetDataId = CStaticNameGetDataId
           HotTrack = True
         end
+        object EditPassword: TEdit
+          Left = 288
+          Top = 58
+          Width = 105
+          Height = 21
+          BevelKind = bkTile
+          BorderStyle = bsNone
+          MaxLength = 40
+          PasswordChar = '*'
+          TabOrder = 1
+        end
       end
       inherited TabSheetWork: TTabSheet
         inherited CImageWork: TCImage
           ImageIndex = 3
         end
-        object Label2: TLabel [1]
+        object LabelProgress: TLabel [1]
           Left = 64
-          Top = 24
-          Width = 250
+          Top = 26
+          Width = 246
           Height = 13
-          Caption = 'Trwa kompaktowanie pliku danych. Prosz'#281' czeka'#263'...'
+          Caption = 'Prosz'#281' czeka'#263', trwa kompaktowanie pliku danych...'
         end
         inherited StaticText: TStaticText
           Left = 64
-          Top = 51
-          Width = 353
+          Top = 56
+          Width = 290
         end
         inherited ProgressBar: TProgressBar
-          Top = 80
+          Left = 64
+          Top = 56
         end
       end
       inherited TabSheetEnd: TTabSheet
         ImageIndex = -1
         inherited CImageEnd: TCImage
           ImageIndex = 0
+        end
+        inherited CStaticDesc: TCStatic
+          Width = 329
         end
       end
     end
@@ -353,8 +377,8 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
         Name = 'PngImage2'
         Background = clWindow
       end>
-    Left = 124
-    Top = 72
+    Left = 12
+    Top = 64
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog

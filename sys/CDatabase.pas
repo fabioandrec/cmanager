@@ -310,7 +310,7 @@ begin
   Result := iprError;
   if (not FileExists(ADatabaseName)) then begin
     if ACanCreate then begin
-      xValid := CreateDatabase(ADatabaseName, xError);
+      xValid := CreateDatabase(ADatabaseName, '', xError);
       if xValid then begin
         xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
         SetLength(xCommand, xResStream.Size);

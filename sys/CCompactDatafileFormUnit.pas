@@ -13,8 +13,10 @@ type
   TCCompactDatafileForm = class(TCProgressForm)
     CStaticName: TCStatic;
     OpenDialog: TOpenDialog;
-    Label2: TLabel;
     Label1: TLabel;
+    LabelPass: TLabel;
+    EditPassword: TEdit;
+    LabelProgress: TLabel;
     procedure CStaticNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   protected
     function DoWork: Boolean; override;
@@ -48,7 +50,7 @@ begin
   end;
   xBeforeSize := FileSize(CStaticName.DataId);
   AddToReport('Kompaktowanie pliku danych...');
-  Result := CompactDatabase(CStaticName.DataId, xError);
+  Result := CompactDatabase(CStaticName.DataId, EditPassword.Text, xError);
   if Result then begin
     xAfterSize := FileSize(CStaticName.DataId);
     xText := 'Wykonano kompaktowanie pliku danych';

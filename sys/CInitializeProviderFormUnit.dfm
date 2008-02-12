@@ -1,14 +1,14 @@
 inherited CInitializeProviderForm: TCInitializeProviderForm
-  Left = 422
-  Top = 330
-  Caption = 'Plik danych zabezpieczony has'#322'em'
-  ClientHeight = 92
-  ClientWidth = 295
+  Left = 308
+  Top = 273
+  Caption = 'CManager - plik danych zabezpieczony has'#322'em'
+  ClientHeight = 132
+  ClientWidth = 357
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 295
-    Height = 51
+    Width = 357
+    Height = 91
     object Image1: TImage
       Left = 16
       Top = 16
@@ -154,16 +154,24 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     end
     object Label1: TLabel
       Left = 59
-      Top = 26
+      Top = 62
       Width = 29
       Height = 13
       Alignment = taRightJustify
       Caption = 'Has'#322'o'
     end
+    object Label2: TLabel
+      Left = 71
+      Top = 26
+      Width = 17
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Plik'
+    end
     object EditPassword: TEdit
       Left = 96
-      Top = 22
-      Width = 185
+      Top = 58
+      Width = 241
       Height = 21
       BevelKind = bkTile
       BorderStyle = bsNone
@@ -171,15 +179,30 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
       PasswordChar = '*'
       TabOrder = 0
     end
+    object CStaticName: TCStatic
+      Left = 96
+      Top = 22
+      Width = 241
+      Height = 21
+      AutoSize = False
+      BevelKind = bkTile
+      Caption = '<kliknij tutaj aby wybra'#263' plik danych>'
+      Color = clWindow
+      ParentColor = False
+      TabOrder = 1
+      Transparent = False
+      TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
+      HotTrack = False
+    end
   end
   inherited PanelButtons: TPanel
-    Top = 51
-    Width = 295
+    Top = 91
+    Width = 357
     inherited BitBtnOk: TBitBtn
-      Left = 118
+      Left = 180
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 206
+      Left = 268
     end
   end
 end
