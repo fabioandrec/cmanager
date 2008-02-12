@@ -2,27 +2,27 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
   Left = 319
   Top = 289
   Caption = 'Kompaktowanie pliku danych'
-  ClientHeight = 124
-  ClientWidth = 456
+  ClientHeight = 121
+  ClientWidth = 435
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelButtons: TPanel
-    Top = 83
-    Width = 456
+    Top = 80
+    Width = 435
     inherited BitBtnOk: TBitBtn
-      Left = 279
+      Left = 258
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 367
+      Left = 346
     end
   end
   inherited PanelConfig: TPanel
-    Width = 456
-    Height = 83
+    Width = 435
+    Height = 80
     inherited PageControl: TPageControl
-      Width = 456
-      Height = 83
-      ActivePage = TabSheetStart
+      Width = 435
+      Height = 80
+      ActivePage = TabSheetEnd
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
           ImageIndex = 3
@@ -45,6 +45,8 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
           Color = clWindow
           ParentColor = False
           TabOrder = 0
+          TabStop = True
+          Transparent = False
           TextOnEmpty = '<kliknij tutaj aby wybra'#263' plik danych>'
           OnGetDataId = CStaticNameGetDataId
           HotTrack = True
@@ -64,6 +66,7 @@ inherited CCompactDatafileForm: TCCompactDatafileForm
         inherited StaticText: TStaticText
           Left = 64
           Top = 51
+          Width = 353
         end
         inherited ProgressBar: TProgressBar
           Top = 80

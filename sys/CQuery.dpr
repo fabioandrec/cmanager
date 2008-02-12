@@ -22,12 +22,18 @@ uses
 
 const
   CConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False';
+  CConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Persist Security Info=False;Jet OLEDB:Database Password=%s';
 
-function ConnectToDatabase(ADatafile: String; ADatabase: TADOConnection; var AError: String): Boolean;
+
+function ConnectToDatabase(ADatafile: String; APassword: String; ADatabase: TADOConnection; var AError: String): Boolean;
 begin
   AError := '';
   Result := False;
-  ADatabase.ConnectionString := Format(CConnectionString, [ADatafile]);
+  if APassword = '' then begin
+    ADatabase.ConnectionString := Format(CConnectionString, [ADatafile]);
+  end else begin
+    ADatabase.ConnectionString := Format(CConnectionStringWithPass, [ADatafile, APassword]);
+  end;
   ADatabase.Mode := cmShareDenyNone;
   ADatabase.LoginPrompt := False;
   ADatabase.CursorLocation := clUseClient;
@@ -81,6 +87,7 @@ var xAction: Integer;
     xText: String;
     xFile: String;
     xSql: String;
+    xPassword: String;
     xDatabase: TADOConnection;
     xScript: TStringList;
     xDelimeter: String;
@@ -95,11 +102,12 @@ begin
   if IsValidXmlparserInstalled(True, False) then begin
     xDelimeter := '';
     if GetSwitch('-h') then begin
-      xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych]' + sLineBreak +
+      xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych] -p [has³o do pliku]' + sLineBreak +
                '  -s wykonaj komendê sql [komenda]' + sLineBreak +
                '  -f wykonaj skrypt sql [plik]' + sLineBreak +
                '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
                '  -x wynik w postaci xml-a' + sLineBreak +
+               '  -p wskazuje has³o dostêpu do pliku danych' + sLineBreak +
                '  -h wyœwietla ten ekran';
     end else begin
       xAction := 0;
@@ -147,9 +155,10 @@ begin
             end;
           end;
           if xText = '' then begin
+            xPassword := GetParamValue('-p');
             xDatabase := TADOConnection.Create(Nil);
             try
-              if ConnectToDatabase(xFile, xDatabase, xText) then begin
+              if ConnectToDatabase(xFile, xPassword, xDatabase, xText) then begin
                 if ExecuteSql(xDatabase, xSql, xText, xDelimeter, xToXml) then begin
                   xExitCode := $00;
                 end;
