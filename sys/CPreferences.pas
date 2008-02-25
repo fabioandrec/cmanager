@@ -172,6 +172,7 @@ type
     FstartupDatafileName: String;
     FlastOpenedDatafilename: String;
     FshowShortcutBar: Boolean;
+    FshortcutBarSmall: Boolean;
     FshowStatusBar: Boolean;
     FstartupInfo: Boolean;
     FstartupInfoType: Integer;
@@ -209,6 +210,7 @@ type
     property startupDatafileName: String read FstartupDatafileName write FstartupDatafileName;
     property lastOpenedDatafilename: String read FlastOpenedDatafilename write FlastOpenedDatafilename;
     property showShortcutBar: Boolean read FshowShortcutBar write FshowShortcutBar;
+    property shortcutBarSmall: Boolean read FshortcutBarSmall write FshortcutBarSmall;
     property showStatusBar: Boolean read FshowStatusBar write FshowStatusBar;
     property startupInfo: Boolean read FstartupInfo write FstartupInfo;
     property startupInfoType: Integer read FstartupInfoType write FstartupInfoType;
@@ -534,6 +536,7 @@ begin
   FstartupDatafileName := TBasePref(APrefItem).startupDatafileName;
   FlastOpenedDatafilename := TBasePref(APrefItem).lastOpenedDatafilename;
   FshowShortcutBar := TBasePref(APrefItem).showShortcutBar;
+  FshortcutBarSmall := TBasePref(APrefItem).shortcutBarSmall;
   FshowStatusBar := TBasePref(APrefItem).showStatusBar;
   FstartupInfo := TBasePref(APrefItem).startupInfo;
   FstartupInfoType := TBasePref(APrefItem).startupInfoType;
@@ -606,6 +609,7 @@ begin
   FstartupDatafileName := GetXmlAttribute('startupfilename', ANode, GetSystemPathname(CDefaultFilename));
   FlastOpenedDatafilename := GetXmlAttribute('lastopenedfilename', ANode, '');
   FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
+  FshortcutBarSmall := GetXmlAttribute('shortcutBarSmall', ANode, False);
   FshowStatusBar := GetXmlAttribute('showStatusBar', ANode, True);
   FstartupInfo := GetXmlAttribute('startupInfo', ANode, False);
   FstartupInfoType := GetXmlAttribute('startupInfoType', ANode, CStartupInfoToday);
@@ -648,6 +652,7 @@ begin
   SetXmlAttribute('startupfilename', ANode, FstartupDatafileName);
   SetXmlAttribute('lastopenedfilename', ANode, FlastOpenedDatafilename);
   SetXmlAttribute('showShortcutBar', ANode, FshowShortcutBar);
+  SetXmlAttribute('shortcutBarSmall', ANode, FshortcutBarSmall);
   SetXmlAttribute('showStatusBar', ANode, FshowStatusBar);
   SetXmlAttribute('startupInfo', ANode, FstartupInfo);
   SetXmlAttribute('startupInfoType', ANode, FstartupInfoType);

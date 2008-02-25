@@ -259,6 +259,7 @@ object CMainForm: TCMainForm
         Indent = 20
         Margin = 15
         ParentShowHint = False
+        PopupMenu = PopupMenuShortcutView
         ShowHint = True
         TabOrder = 1
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -685,5 +686,22 @@ object CMainForm: TCMainForm
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 474
     Top = 232
+  end
+  object PopupMenuShortcutView: TPopupMenu
+    Left = 128
+    Top = 337
+    object MenuItemSmallShortcut: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      GroupIndex = 1
+      RadioItem = True
+      OnClick = MenuItemSmallShortcutClick
+    end
+    object MenuItemBigShortcut: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      GroupIndex = 1
+      RadioItem = True
+      OnClick = MenuItemBigShortcutClick
+    end
   end
 end

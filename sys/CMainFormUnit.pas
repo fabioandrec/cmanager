@@ -7,7 +7,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList,
-  PngSpeedButton, ShellApi, CBaseFrameUnit;
+  PngSpeedButton, ShellApi, CBaseFrameUnit, Menus;
 
 type
   TCMainForm = class(TForm)
@@ -74,6 +74,9 @@ type
     ActionImportStockExchanges: TAction;
     ActionShortcutInvestments: TAction;
     ActionShortcutInvestmentPortfolio: TAction;
+    PopupMenuShortcutView: TPopupMenu;
+    MenuItemSmallShortcut: TMenuItem;
+    MenuItemBigShortcut: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -110,6 +113,8 @@ type
     procedure ActionImportDatafileExecute(Sender: TObject);
     procedure ActionXslExecute(Sender: TObject);
     procedure ActionImportStockExchangesExecute(Sender: TObject);
+    procedure MenuItemBigShortcutClick(Sender: TObject);
+    procedure MenuItemSmallShortcutClick(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -126,6 +131,7 @@ type
     function CallHelp(ACommand: Word; AData: Longint; var ACallHelp: Boolean): Boolean;
     function GetSelectedId: String;
     function GetSelectedType: Integer;
+    procedure SetShortcutnodesHeight(AHeight: Integer);
   protected
     procedure WndProc(var Message: TMessage); override;
     function GetFrameClassForAction(AAction: TAction): TCBaseFrameClass;
@@ -163,7 +169,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts,
      CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
-     CInvestmentPortfolioFrameUnit, CConfigFormUnit;
+     CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math;
 
 {$R *.dfm}
 
@@ -204,6 +210,9 @@ begin
   UpdateDictionaryList;
   UpdateStatusbar;
   ShortcutList.RootNodeCount := FShortcutList.Count;
+  if GBasePreferences.shortcutBarSmall then begin
+    MenuItemSmallShortcut.Click;
+  end;
   PerformShortcutAction(ActionShortcutStart);
 end;
 
@@ -894,6 +903,42 @@ end;
 procedure TCMainForm.ActionDictionaryExecute(ASender: TObject);
 begin
   PerformDictionaryAction(TAction(ASender));
+end;
+
+procedure TCMainForm.MenuItemBigShortcutClick(Sender: TObject);
+begin
+  with ShortcutList do begin
+    BeginUpdate;
+    Images := CImageLists.MainImageList32x32;
+    SetShortcutnodesHeight(60);
+    EndUpdate;
+    Repaint;
+    MenuItemBigShortcut.Checked := True;
+    GBasePreferences.shortcutBarSmall := False;
+  end;
+end;
+
+procedure TCMainForm.MenuItemSmallShortcutClick(Sender: TObject);
+begin
+  with ShortcutList do begin
+    BeginUpdate;
+    Images := CImageLists.MainImageList16x16;
+    SetShortcutnodesHeight(24);
+    EndUpdate;
+    Repaint;
+    MenuItemSmallShortcut.Checked := True;
+    GBasePreferences.shortcutBarSmall := True;
+  end;
+end;
+
+procedure TCMainForm.SetShortcutnodesHeight(AHeight: Integer);
+var xNode: PVirtualNode;
+begin
+  xNode := ShortcutList.GetFirst;
+  while (xNode <> Nil) do begin
+    ShortcutList.NodeHeight[xNode] := AHeight;
+    xNode := ShortcutList.GetNext(xNode);
+  end;
 end;
 
 end.
