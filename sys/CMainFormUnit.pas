@@ -429,6 +429,11 @@ begin
     ShortcutsVisible := GBasePreferences.showShortcutBar;
     StatusbarVisible := GBasePreferences.showStatusBar;
     SetEvenListColors(GBasePreferences.evenListColor, GBasePreferences.oddListColor);
+    if GBasePreferences.shortcutBarSmall then begin
+      MenuItemSmallShortcut.Click;
+    end else begin
+      MenuItemBigShortcut.Click;
+    end;
     Invalidate;
   end else if Message.Msg = WM_OPENCONNECTION then begin
   end else if Message.Msg = WM_CLOSECONNECTION then begin

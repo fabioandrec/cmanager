@@ -1,17 +1,17 @@
 inherited CListPreferencesForm: TCListPreferencesForm
   Caption = 'Ustawienia listy'
-  ClientHeight = 229
-  ClientWidth = 367
+  ClientHeight = 274
+  ClientWidth = 365
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 367
-    Height = 188
+    Width = 365
+    Height = 233
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
       Width = 337
-      Height = 161
+      Height = 209
       Caption = ' Ustawienia czcionek '
       TabOrder = 0
       object CButton5: TCButton
@@ -40,15 +40,31 @@ inherited CListPreferencesForm: TCListPreferencesForm
         Action = Action4
         Color = clBtnFace
       end
+      object Label1: TLabel
+        Left = 264
+        Top = 149
+        Width = 50
+        Height = 13
+        Caption = 'Wysoko'#347#263
+      end
       object PanelExample: TPanel
         Left = 24
         Top = 68
         Width = 201
-        Height = 69
+        Height = 117
         BevelOuter = bvLowered
-        Caption = 'Przyk'#322'adowy widok elementu'
         Color = clWindow
         TabOrder = 0
+        object PanelRow: TPanel
+          Left = 1
+          Top = 1
+          Width = 199
+          Height = 115
+          BevelOuter = bvNone
+          Caption = 'Przyk'#322'adowy widok elementu'
+          Color = clWindow
+          TabOrder = 0
+        end
       end
       object ComboBoxType: TComboBox
         Left = 24
@@ -62,16 +78,30 @@ inherited CListPreferencesForm: TCListPreferencesForm
         TabOrder = 1
         OnChange = ComboBoxTypeChange
       end
+      object TrackBar: TTrackBar
+        Left = 247
+        Top = 136
+        Width = 10
+        Height = 38
+        Max = 60
+        Min = 8
+        Orientation = trVertical
+        Position = 24
+        TabOrder = 2
+        ThumbLength = 8
+        TickStyle = tsNone
+        OnChange = TrackBarChange
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 188
-    Width = 367
+    Top = 233
+    Width = 365
     inherited BitBtnOk: TBitBtn
-      Left = 190
+      Left = 188
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 278
+      Left = 276
     end
   end
   object FontImageList: TPngImageList

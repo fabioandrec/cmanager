@@ -33,12 +33,14 @@ inherited CStartupInfoFrame: TCStartupInfoFrame
     TreeOptions.PaintOptions = [toHideFocusRect, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
     TreeOptions.StringOptions = [toSaveCaptions, toShowStaticText, toAutoAcceptEditChange]
+    OnBeforeItemErase = RepaymentListBeforeItemErase
     OnGetText = RepaymentListGetText
     OnPaintText = RepaymentListPaintText
     OnGetImageIndexEx = RepaymentListGetImageIndexEx
     OnGetNodeDataSize = RepaymentListGetNodeDataSize
     OnInitChildren = RepaymentListInitChildren
     OnInitNode = RepaymentListInitNode
+    OnMeasureItem = RepaymentListMeasureItem
     AutoExpand = True
     Columns = <
       item

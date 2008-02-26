@@ -90,6 +90,7 @@ type
     procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticViewCurrencyChanged(Sender: TObject);
+    procedure TodayListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
   private
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
@@ -100,7 +101,7 @@ type
     procedure MessageMovementDeleted(AId: TDataGid; AOption: Integer);
     procedure UpdateCustomPeriod;
     procedure RecreateTreeHelper;
-    procedure FindFontAndBackground(AHelper: TMovementTreeElement; AFont: TFont; var ABackground: TColor);
+    procedure FindRowVisualProperties(AHelper: TMovementTreeElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
     function FindParentMovementList(AListGid: TDataGid): TTreeObjectList;
     function FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
     procedure DeleteObjectsWithMovementList(AListId: TDataGid);
@@ -413,7 +414,7 @@ var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    FindFontAndBackground(xBase, Nil, xColor);
+    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
@@ -858,7 +859,7 @@ begin
   ActionEditMovement.Execute;
 end;
 
-procedure TCMovementFrame.FindFontAndBackground(AHelper: TMovementTreeElement; AFont: TFont; var ABackground: TColor);
+procedure TCMovementFrame.FindRowVisualProperties(AHelper: TMovementTreeElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
@@ -872,19 +873,23 @@ begin
   end;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['baseMovement']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
-    ABackground := xPref.Background;
+    if ABackground <> Nil then begin
+      ABackground^ := xPref.Background;
+    end;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+    end;
+    if ARowHeight <> Nil then begin
+      ARowHeight^ := xPref.RowHeight;
     end;
   end;
 end;
 
 procedure TCMovementFrame.TodayListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 var xBase: TMovementTreeElement;
-    xColor: TColor;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
-  FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
+  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
 end;
 
 class function TCMovementFrame.GetPrefname: String;
@@ -1133,6 +1138,11 @@ begin
   end else begin
     Result := '';
   end;
+end;
+
+procedure TCMovementFrame.TodayListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+begin
+  FindRowVisualProperties(TMovementTreeElement(TodayList.GetNodeData(Node)^), Nil, Nil, @NodeHeight);
 end;
 
 end.

@@ -319,10 +319,18 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CheckBoxStatusVisible: TCheckBox
                 Left = 16
-                Top = 56
+                Top = 80
                 Width = 145
                 Height = 17
                 Caption = 'Pasek statusu widoczny'
+                TabOrder = 2
+              end
+              object CheckBoxSmallIcons: TCheckBox
+                Left = 16
+                Top = 56
+                Width = 145
+                Height = 17
+                Caption = 'Ma'#322'e ikony dla skr'#243't'#243'w'
                 TabOrder = 1
               end
             end
@@ -330,7 +338,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 192
               Top = 8
               Width = 265
-              Height = 161
+              Height = 257
               Caption = ' Czcionki '
               TabOrder = 1
               object CButton4: TCButton
@@ -385,10 +393,23 @@ inherited CPreferencesForm: TCPreferencesForm
                 Action = Action7
                 Color = clBtnFace
               end
+              object CButton12: TCButton
+                Left = 5
+                Top = 152
+                Width = 250
+                Height = 25
+                Cursor = crHandPoint
+                PicPosition = ppLeft
+                PicOffset = 10
+                TxtOffset = 15
+                Framed = False
+                Action = Action11
+                Color = clBtnFace
+              end
             end
             object GroupBox7: TGroupBox
               Left = 192
-              Top = 184
+              Top = 280
               Width = 265
               Height = 121
               Caption = ' Wy'#347'wietlanie element'#243'w list '
@@ -1325,6 +1346,36 @@ inherited CPreferencesForm: TCPreferencesForm
           5697249F24900155F67FAF71C3EE5DFAE4A06DA0E7ACDE33FCE7FB5C3B9EF36F
           B6322E251644F2710000000049454E44AE426082}
         Name = 'PngImage5'
+      end
+      item
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+          6100000006624B474400FF00FF00FFA0BDA793000000097048597300000B1300
+          000B1301009A9C18000002CE4944415478DAA5935F4853511CC7BF677F9A9BEE
+          6E0E9D29D3A52234731A463D64E55E4A140A22A4B0171F7A91248CC0F42D7AE8
+          A1B7A00C1F32831E2C7A2891444B57C2343468EE0E73585BEA164E73EECF9DDB
+          BDDBBDB7ED96820F41E0EF3C9C1F9C733EBFEFF7FCF811EC3348F995A7CD07CD
+          874A72A95CE46935D0E4E540A552422E23E0791E6C8203134B201A8923BAC580
+          E578CDC250CF3331EC8A4A8086EB431F2E361D6F34156951A0CB815C21079396
+          C117E121FE0588A914489AC3AF4D060E7A0D8EFEAE2AC4DCDF2480E1D2A0FD42
+          D3095B4D850131A24265711EB46A399619602B2E20148E439D4EA2409142602D
+          8AFED70B484EDFAA45CBF22606F193F4F48DDBAB2CD53695FA00D46A150E64E4
+          AB94040A42C0092258964732C921B1CD229960E1F1AFF2726AD46B321A55BD0F
+          7BCF11374DDB8FD4D4D8763E65756535A30B8846258BA0286A378FF06178C5EF
+          385A5C8F949042FB93F63942BB687B6959A96DF75238029D5E0777D8855298A5
+          3C7B164A6F608A1987D5780C3196C1BDE1FBDE85C1852609A0A5B43688804C26
+          83200A78E57F8140D20BA3A210B7CFDCC5A7C5298CC58750A43121928C61E0DD
+          73F7D2E3403396E1DF0564AB90CCF2257DE898BE86C6C3B530505A1889118C7A
+          1D394A3536D90D6CAF2B101C10EADEBE1C73495D70CDBBEC948E9200590562E6
+          E316635FD1BBD40E430907835E0D4DA62B024941BB528707A786D17AFEB279E2
+          E3C48A049877CEDB333E6DD98772B95CB2603299303CFB068FA237905F1643BD
+          EE24E28B465C2DEE8146A3113A3B3AEB464647DC7B003B16B291B1048661F023
+          EAC318E94361C882AED377C0711C3C1E8FD87DB3BBCC31EBF04B00E717A75D9F
+          AFDF6341A7D32112894830468C43C92A505955099AA661B55A8596B32DE699CF
+          337F0093EF2747CA2BCA1BFE352CD9AAC16010E1AD30B1545BC48C48B1ADB5CD
+          3AE79C0B480025947A92DDFE3FC434D22101822001F63BCEBF01436A52A2D23C
+          F83C0000000049454E44AE426082}
+        Name = 'PngImage6'
       end>
     Left = 46
     Top = 340
@@ -1364,6 +1415,11 @@ inherited CPreferencesForm: TCPreferencesForm
       Caption = 'Informacje o wtyczce'
       ImageIndex = 5
       OnExecute = Action10Execute
+    end
+    object Action11: TAction
+      Caption = 'Ustawienia dla listy wyci'#261'g'#243'w'
+      ImageIndex = 6
+      OnExecute = Action11Execute
     end
   end
   object ActionManager: TActionManager

@@ -24,6 +24,11 @@ type
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure RepaymentListGetImageIndexEx(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; var ImageList: TCustomImageList);
+    procedure RepaymentListMeasureItem(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure RepaymentListBeforeItemErase(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
+      var ItemColor: TColor; var EraseAction: TItemEraseAction);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -31,7 +36,7 @@ type
     FLimitData: TDataObjectList;
     FExtractionsData: TDataObjectList;
     FHelperList: TStartupHelperList;
-    procedure FindFontAndBackground(AHelper: TStartupHelper; AFont: TFont; var ABackground: TColor);
+    procedure FindRowVisualProperties(AHelper: TStartupHelper; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   public
     procedure ReloadInfoTree;
     destructor Destroy; override;
@@ -455,10 +460,9 @@ end;
 
 procedure TCStartupInfoFrame.RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 var xData: TStartupHelper;
-    xColor: TColor;
 begin
   xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
-  FindFontAndBackground(xData, TargetCanvas.Font, xColor);
+  FindRowVisualProperties(xData, TargetCanvas.Font, Nil, Nil);
 end;
 
 procedure TCStartupInfoFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
@@ -491,7 +495,7 @@ begin
   Result := RepaymentList;
 end;
 
-procedure TCStartupInfoFrame.FindFontAndBackground(AHelper: TStartupHelper; AFont: TFont; var ABackground: TColor);
+procedure TCStartupInfoFrame.FindRowVisualProperties(AHelper: TStartupHelper; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
@@ -517,9 +521,14 @@ begin
   end;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['startupInfo']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
-    ABackground := xPref.Background;
+    if ABackground <> Nil then begin
+      ABackground^ := xPref.Background;
+    end;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+    end;
+    if ARowHeight <> Nil then begin
+      ARowHeight^ := xPref.RowHeight;
     end;
   end;
 end;
@@ -590,6 +599,26 @@ end;
 class function TCStartupInfoFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := Nil;
+end;
+
+procedure TCStartupInfoFrame.RepaymentListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+var xData: TStartupHelper;
+begin
+  xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
+  FindRowVisualProperties(xData, Nil, Nil, @NodeHeight);
+end;
+
+procedure TCStartupInfoFrame.RepaymentListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var xBase: TStartupHelper;
+    xColor: TColor;
+begin
+  xBase := TStartupHelper(RepaymentList.GetNodeData(Node)^);
+  with TargetCanvas do begin
+    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
+    if xColor <> clWindow then begin
+      ItemColor := xColor;
+    end;
+  end;
 end;
 
 end.

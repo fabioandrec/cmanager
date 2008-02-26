@@ -86,6 +86,7 @@ inherited CPlannedFrame: TCPlannedFrame
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
     OnInitNode = PlannedListInitNode
+    OnMeasureItem = PlannedListMeasureItem
     AutoExpand = True
     Columns = <
       item

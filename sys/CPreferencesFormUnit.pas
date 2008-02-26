@@ -100,6 +100,9 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     ColorDialog: TColorDialog;
+    CheckBoxSmallIcons: TCheckBox;
+    CButton12: TCButton;
+    Action11: TAction;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -123,6 +126,7 @@ type
     procedure Action10Execute(Sender: TObject);
     procedure Panel4Click(Sender: TObject);
     procedure Panel5Click(Sender: TObject);
+    procedure Action11Execute(Sender: TObject);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -149,7 +153,8 @@ implementation
 uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CMovementFrameUnit, CBaseFormUnit, CBaseFrameUnit, CDoneFrameUnit,
   CPlannedFrameUnit, CStartupInfoFrameUnit, Registry, CInfoFormUnit,
-  CTemplates, CDescpatternFormUnit, CPlugins;
+  CTemplates, CDescpatternFormUnit, CPlugins, CExtractionItemFormUnit,
+  CExtractionsFrameUnit;
 
 {$R *.dfm}
 
@@ -249,6 +254,7 @@ begin
     CStaticFileName.DataId := startupDatafileName;
     CStaticFileName.Caption := MinimizeName(startupDatafileName, CStaticFileName.Canvas, CStaticFileName.Width);
     CheckBoxShortcutVisible.Checked := showShortcutBar;
+    CheckBoxSmallIcons.Checked := shortcutBarSmall;
     CheckBoxStatusVisible.Checked := showStatusBar;
     CheckBoxAutostartOperations.Checked := startupInfo;
     ComboBoxDays.ItemIndex := startupInfoType;
@@ -319,6 +325,7 @@ begin
     end;
     startupDatafileName := CStaticFileName.DataId;
     showShortcutBar := CheckBoxShortcutVisible.Checked;
+    shortcutBarSmall := CheckBoxSmallIcons.Checked;
     showStatusBar := CheckBoxStatusVisible.Checked;
     startupInfo := CheckBoxAutostartOperations.Checked;
     startupInfoType := ComboBoxDays.ItemIndex;
@@ -582,6 +589,16 @@ begin
   if ColorDialog.Execute then begin
     Panel5.Color := ColorDialog.Color;
   end;
+end;
+
+procedure TCPreferencesForm.Action11Execute(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(TCExtractionsFrame.GetPrefname, FViewPrefs) then begin
+    SendMessageToFrames(TCExtractionsFrame, WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
 end;
 
 end.

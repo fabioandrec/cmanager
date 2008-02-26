@@ -33,12 +33,14 @@ type
     procedure PlannedListDblClick(Sender: TObject);
     procedure PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure PlannedListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure PlannedListMeasureItem(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
   private
     FPlannedObjects: TDataObjectList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
-    procedure FindFontAndBackground(AMovement: TPlannedMovement; AFont: TFont; var ABackground: TColor);
+    procedure FindRowVisualProperties(AHelper: TPlannedMovement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   protected
     procedure WndProc(var Message: TMessage); override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
@@ -182,7 +184,7 @@ var xBase: TPlannedMovement;
 begin
   xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    FindFontAndBackground(xBase, Nil, xColor);
+    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
@@ -306,26 +308,30 @@ begin
   ActionEditMovement.Execute;
 end;
 
-procedure TCPlannedFrame.FindFontAndBackground(AMovement: TPlannedMovement; AFont: TFont; var ABackground: TColor);
+procedure TCPlannedFrame.FindRowVisualProperties(AHelper: TPlannedMovement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
-  xKey := AMovement.movementType;
+  xKey := AHelper.movementType;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['plannedMovement']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
-    ABackground := xPref.Background;
+    if ABackground <> Nil then begin
+      ABackground^ := xPref.Background;
+    end;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+    end;
+    if ARowHeight <> Nil then begin
+      ARowHeight^ := xPref.RowHeight;
     end;
   end;
 end;
 
 procedure TCPlannedFrame.PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 var xBase: TPlannedMovement;
-    xColor: TColor;
 begin
   xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
-  FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
+  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
 end;
 
 class function TCPlannedFrame.GetPrefname: String;
@@ -370,6 +376,13 @@ begin
   end else begin
     Result := CEmptyDataGid;
   end;
+end;
+
+procedure TCPlannedFrame.PlannedListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+var xBase: TPlannedMovement;
+begin
+  xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
+  FindRowVisualProperties(xBase, Nil, Nil, @NodeHeight);
 end;
 
 end.

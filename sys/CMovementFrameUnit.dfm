@@ -1,9 +1,8 @@
 inherited CMovementFrame: TCMovementFrame
-  Width = 678
   object Splitter1: TSplitter [0]
     Left = 0
     Top = 86
-    Width = 678
+    Width = 443
     Height = 2
     Cursor = crVSplit
     Align = alBottom
@@ -11,7 +10,7 @@ inherited CMovementFrame: TCMovementFrame
   object PanelFrameButtons: TPanel [1]
     Left = 0
     Top = 88
-    Width = 678
+    Width = 443
     Height = 189
     Align = alBottom
     BevelOuter = bvNone
@@ -20,7 +19,7 @@ inherited CMovementFrame: TCMovementFrame
     object Bevel: TBevel
       Left = 0
       Top = 146
-      Width = 678
+      Width = 443
       Height = 3
       Align = alBottom
       Shape = bsBottomLine
@@ -28,7 +27,7 @@ inherited CMovementFrame: TCMovementFrame
     object Panel1: TPanel
       Left = 0
       Top = 149
-      Width = 678
+      Width = 443
       Height = 40
       Align = alBottom
       BevelOuter = bvNone
@@ -86,7 +85,7 @@ inherited CMovementFrame: TCMovementFrame
     object Panel2: TPanel
       Left = 0
       Top = 0
-      Width = 678
+      Width = 443
       Height = 21
       Align = alTop
       Alignment = taLeftJustify
@@ -96,7 +95,7 @@ inherited CMovementFrame: TCMovementFrame
     object SumList: TCList
       Left = 0
       Top = 21
-      Width = 678
+      Width = 443
       Height = 125
       Align = alClient
       BevelEdges = []
@@ -157,7 +156,7 @@ inherited CMovementFrame: TCMovementFrame
         end
         item
           Position = 4
-          Width = 88
+          Width = 10
           WideText = 'Waluta'
         end>
       WideDefaultText = ''
@@ -166,7 +165,7 @@ inherited CMovementFrame: TCMovementFrame
   object TodayList: TCList [2]
     Left = 0
     Top = 21
-    Width = 678
+    Width = 443
     Height = 65
     Align = alClient
     BevelEdges = []
@@ -206,6 +205,7 @@ inherited CMovementFrame: TCMovementFrame
     OnGetNodeDataSize = TodayListGetNodeDataSize
     OnInitChildren = TodayListInitChildren
     OnInitNode = TodayListInitNode
+    OnMeasureItem = TodayListMeasureItem
     AutoExpand = True
     Columns = <
       item
@@ -216,7 +216,7 @@ inherited CMovementFrame: TCMovementFrame
       end
       item
         Position = 1
-        Width = 378
+        Width = 143
         WideText = 'Opis'
         WideHint = 'Nazwa kontrahenta'
       end
@@ -251,7 +251,7 @@ inherited CMovementFrame: TCMovementFrame
   object Panel: TPanel [3]
     Left = 0
     Top = 0
-    Width = 678
+    Width = 443
     Height = 21
     Align = alTop
     Alignment = taLeftJustify

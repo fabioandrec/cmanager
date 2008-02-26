@@ -194,6 +194,7 @@ inherited CDoneFrame: TCDoneFrame
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
     OnInitNode = DoneListInitNode
+    OnMeasureItem = DoneListMeasureItem
     AutoExpand = True
     Columns = <
       item

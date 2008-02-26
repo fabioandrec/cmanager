@@ -66,13 +66,15 @@ type
     procedure DoneListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ActionPlannedExecute(Sender: TObject);
+    procedure DoneListMeasureItem(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
     FSumRoot: TSumElement;
     FTreeObjects: TObjectList;
     procedure UpdateCustomPeriod;
-    procedure FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
+    procedure FindRowVisualProperties(AHelper: TPlannedTreeItem; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
@@ -317,7 +319,7 @@ var xColor: TColor;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    FindFontAndBackground(xBase, Nil, xColor);
+    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
@@ -779,14 +781,14 @@ begin
   end;
 end;
 
-procedure TCDoneFrame.FindFontAndBackground(ADone: TPlannedTreeItem; AFont: TFont; var ABackground: TColor);
+procedure TCDoneFrame.FindRowVisualProperties(AHelper: TPlannedTreeItem; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
-  if ADone.done <> Nil then begin
-    xKey := 'D' + ADone.done.doneState;
+  if AHelper.done <> Nil then begin
+    xKey := 'D' + AHelper.done.doneState;
   end else begin
-    if ADone.triggerDate >= GWorkDate then begin
+    if AHelper.triggerDate >= GWorkDate then begin
       xKey := 'R';
     end else begin
       xKey := 'W';
@@ -794,19 +796,23 @@ begin
   end;
   xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['plannedDone']).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
-    ABackground := xPref.Background;
+    if ABackground <> Nil then begin
+      ABackground^ := xPref.Background;
+    end;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+    end;
+    if ARowHeight <> Nil then begin
+      ARowHeight^ := xPref.RowHeight;
     end;
   end;
 end;
 
 procedure TCDoneFrame.DoneListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 var xBase: TPlannedTreeItem;
-    xColor: TColor;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
-  FindFontAndBackground(xBase, TargetCanvas.Font, xColor);
+  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
 end;
 
 class function TCDoneFrame.GetPrefname: String;
@@ -882,6 +888,13 @@ procedure TCDoneFrame.ActionPlannedExecute(Sender: TObject);
 var xGid, xText: String;
 begin
   TCFrameForm.ShowFrame(TCPlannedFrame, xGid, xText, nil, nil, nil, nil, False);
+end;
+
+procedure TCDoneFrame.DoneListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+var xBase: TPlannedTreeItem;
+begin
+  xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
+  FindRowVisualProperties(xBase, Nil, Nil, @NodeHeight);
 end;
 
 end.

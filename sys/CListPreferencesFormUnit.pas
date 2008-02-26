@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
-  ActnList, XPStyleActnCtrls, ActnMan, ImgList, PngImageList, CPreferences;
+  ActnList, XPStyleActnCtrls, ActnMan, ImgList, PngImageList, CPreferences,
+  ComCtrls;
 
 type
   TCListPreferencesForm = class(TCConfigForm)
@@ -20,11 +21,16 @@ type
     ComboBoxType: TComboBox;
     FontDialog: TFontDialog;
     ColorDialog: TColorDialog;
+    TrackBar: TTrackBar;
+    Label1: TLabel;
+    PanelRow: TPanel;
     procedure Action3Execute(Sender: TObject);
     procedure Action4Execute(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
+    procedure TrackBarChange(Sender: TObject);
   private
     FPrefContainer: TPrefList;
+    procedure UpdatePanelRowPosition;
   public
     function ShowListPreferences(AFrameName: String; APrefContainer: TPrefList): Boolean;
   end;
@@ -39,9 +45,9 @@ procedure TCListPreferencesForm.Action3Execute(Sender: TObject);
 var xObj: TFontPref;
 begin
   xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-  FontDialog.Font := PanelExample.Font;
+  FontDialog.Font := PanelRow.Font;
   if FontDialog.Execute then begin
-    PanelExample.Font := FontDialog.Font;
+    PanelRow.Font := FontDialog.Font;
     xObj.Font.Assign(FontDialog.Font);
   end;
 end;
@@ -50,9 +56,9 @@ procedure TCListPreferencesForm.Action4Execute(Sender: TObject);
 var xObj: TFontPref;
 begin
   xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-  ColorDialog.Color := PanelExample.Color;
+  ColorDialog.Color := PanelRow.Color;
   if ColorDialog.Execute then begin
-    PanelExample.Color := ColorDialog.Color;
+    PanelRow.Color := ColorDialog.Color;
     xObj.Background := ColorDialog.Color;
   end;
 end;
@@ -83,10 +89,25 @@ var xObj: TFontPref;
 begin
   if ComboBoxType.ItemIndex <> -1 then begin
     xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-    PanelExample.Font.Assign(xObj.Font);
-    PanelExample.Color := xObj.Background;
+    PanelRow.Font.Assign(xObj.Font);
+    PanelRow.Color := xObj.Background;
+    TrackBar.Position := xObj.RowHeight;
+    UpdatePanelRowPosition;
   end;
 end;
 
+procedure TCListPreferencesForm.TrackBarChange(Sender: TObject);
+var xObj: TFontPref;
+begin
+  xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
+  xObj.RowHeight := TrackBar.Position;
+  UpdatePanelRowPosition;
+end;
+
+procedure TCListPreferencesForm.UpdatePanelRowPosition;
+begin
+  PanelRow.Height := TrackBar.Position;
+  PanelRow.Top := (PanelExample.Height - PanelRow.Height) div 2;
+end;
+
 end.
- 

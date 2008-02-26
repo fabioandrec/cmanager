@@ -84,9 +84,12 @@ inherited CDataobjectFrame: TCDataobjectFrame
     TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnBeforeItemErase = ListBeforeItemErase
     OnCompareNodes = ListCompareNodes
     OnDblClick = ListDblClick
     OnFocusChanged = ListFocusChanged
+    OnPaintText = ListPaintText
+    OnMeasureItem = ListMeasureItem
     AutoExpand = True
     OnCDataListReloadTree = ListCDataListReloadTree
     Columns = <>

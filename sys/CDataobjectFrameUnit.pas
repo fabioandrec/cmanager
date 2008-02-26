@@ -50,6 +50,9 @@ type
     procedure ListDblClick(Sender: TObject);
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionHistoryExecute(Sender: TObject);
+    procedure ListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure ListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
@@ -87,12 +90,14 @@ type
     procedure HideFrame; override;
     function IsAllElementChecked(ACheckedCount: Integer): Boolean; override;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
+    procedure FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger); virtual;
+    class function GetPrefname: String; override;
   end;
 
 implementation
 
 uses CFrameFormUnit, CConsts, CConfigFormUnit, CInfoFormUnit, CDatatools,
-  CListFrameUnit, CTools;
+  CListFrameUnit, CTools, CPreferences;
 
 {$R *.dfm}
 
@@ -464,6 +469,47 @@ end;
 
 procedure TCDataobjectFrame.AfterDeleteObject(ADataobject: TDataObject);
 begin
+end;
+
+procedure TCDataobjectFrame.FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+var xKey: String;
+    xPref: TFontPref;
+begin
+  xKey := '*';
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[GetPrefname]).Fontprefs.ByPrefname[xKey]);
+  if xPref <> Nil then begin
+    if ABackground <> Nil then begin
+      if xPref.Background <> clWindow then begin
+        ABackground^ := xPref.Background;
+      end;
+    end;
+    if AFont <> Nil then begin
+      AFont.Assign(xPref.Font);
+    end;
+    if ARowHeight <> Nil then begin
+      ARowHeight^ := xPref.RowHeight;
+    end;
+  end;
+end;
+
+procedure TCDataobjectFrame.ListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+begin
+  FindRowVisualProperties(TCListDataElement(GetList.GetNodeData(Node)^), Nil, Nil, @NodeHeight);
+end;
+
+procedure TCDataobjectFrame.ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+begin
+  FindRowVisualProperties(TCListDataElement(GetList.GetNodeData(Node)^), Nil, @ItemColor, Nil);
+end;
+
+procedure TCDataobjectFrame.ListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+begin
+  FindRowVisualProperties(TCListDataElement(GetList.GetNodeData(Node)^), TargetCanvas.Font, Nil, Nil);
+end;
+
+class function TCDataobjectFrame.GetPrefname: String;
+begin
+  Result := ClassName;;
 end;
 
 end.

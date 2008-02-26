@@ -31,14 +31,34 @@ type
     class function GetPrefname: String; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
+    procedure FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger); override;
   end;
 
 implementation
 
 uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts,
-  CTools;
+  CTools, CPreferences;
 
 {$R *.dfm}
+
+procedure TCExtractionsFrame.FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+var xKey: String;
+    xPref: TFontPref;
+begin
+  xKey := TAccountExtraction(AHelper.Data).extractionState;
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[GetPrefname]).Fontprefs.ByPrefname[xKey]);
+  if xPref <> Nil then begin
+    if ABackground <> Nil then begin
+      ABackground^ := xPref.Background;
+    end;
+    if AFont <> Nil then begin
+      AFont.Assign(xPref.Font);
+    end;
+    if ARowHeight <> Nil then begin
+      ARowHeight^ := xPref.RowHeight;
+    end;
+  end;
+end;
 
 class function TCExtractionsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin

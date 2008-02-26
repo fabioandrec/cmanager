@@ -133,7 +133,8 @@ uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
   CExtractionsFrameUnit, CFilterFrameUnit, CLimitsFrameUnit,
   CMovementFrameUnit, CPlannedFrameUnit, CProductsFrameUnit,
   CProfileFrameUnit, CUnitdefFormUnit, CUpdateCurrencyRatesFormUnit,
-  CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit;
+  CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
+  CInvestmentMovementFrameUnit, CInvestmentPortfolioFrameUnit;
 
 {$R *.dfm}
 
@@ -319,7 +320,8 @@ begin
   inherited WndProc(Message);
   if Message.Msg = WM_MUSTREPAINT then begin
     if GetList <> Nil then begin
-      GetList.Invalidate;
+      GetList.ReinitNode(GetList.RootNode, True);
+      GetList.Repaint;
     end;
   end;
 end;
@@ -702,6 +704,7 @@ begin
 end;
 
 procedure InitializeFrameGlobals;
+var xCount: Integer;
 begin
   GFrames := TObjectList.Create(False);
   GRegisteredClasses := TRegisteredFrameClasses.Create(True);
@@ -721,6 +724,19 @@ begin
   GRegisteredClasses.AddClass(TCUnitDefFrame, CFRAMETYPE_UNITDEFFRAME, True);
   GRegisteredClasses.AddClass(TCInstrumentFrame, CFRAMETYPE_INSTRUMENT, True);
   GRegisteredClasses.AddClass(TCInstrumentValueFrame, CFRAMETYPE_INSTRUMENTVALUE, True);
+
+  GRegisteredClasses.AddClass(TCInvestmentMovementFrame, CFRAMETYPE_INVESTMENTMOVEMENT, True);
+  GRegisteredClasses.AddClass(TCInvestmentPortfolioFrame, CFRAMETYPE_INVESTMENTPORTFOLIO, True);
+
+
+  for xCount := 0 to GRegisteredClasses.Count - 1 do begin
+    if GViewsPreferences.ByPrefname[TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname] = Nil then begin
+      GViewsPreferences.Add(TViewPref.Create(TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname));
+      with TViewPref(GViewsPreferences.Last) do begin
+        Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+      end;
+    end;
+  end;
 end;
 
 procedure FinalizeFrameGlobals;

@@ -90,6 +90,7 @@ type
   TFontPref = class(TPrefItem)
   private
     FBackground: TColor;
+    FRowHeight: Integer;
     FFont: TFont;
     FDesc: String;
   public
@@ -99,6 +100,7 @@ type
     function GetNodeName: String; override;
     property Font: TFont read FFont;
     property Background: TColor read FBackground write FBackground;
+    property RowHeight: Integer read FRowHeight write FRowHeight;
     property Desc: String read FDesc;
     constructor Create(APrefname: String); override;
     constructor CreateFontPref(APrefname: String; ADesc: String);
@@ -259,7 +261,9 @@ function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, SysUtils,
-     DateUtils, CBackups, CTools, Forms;
+     DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit, CDoneFrameUnit,
+  CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit,
+  CBaseFrameUnit;
 
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
 begin
@@ -458,6 +462,7 @@ procedure TFontPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
   FBackground := TFontPref(APrefItem).Background;
+  FRowHeight := TFontPref(APrefItem).RowHeight;
   FFont.Assign(TFontPref(APrefItem).Font);
   FDesc := TFontPref(APrefItem).Desc;
 end;
@@ -471,6 +476,7 @@ begin
   FFont.Style := [];
   FFont.Size := 8;
   FFont.Name := 'MS Sans Serif';
+  FRowHeight := 24;
 end;
 
 constructor TFontPref.CreateFontPref(APrefname, ADesc: String);
@@ -493,6 +499,7 @@ end;
 procedure TFontPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   FBackground := GetXmlAttribute('background', ANode, FBackground);
+  FRowHeight := GetXmlAttribute('rowheight', ANode, FRowHeight);
   LoadFontFromXml(ANode, FFont);
 end;
 
@@ -500,6 +507,7 @@ procedure TFontPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('background', ANode, FBackground);
+  SetXmlAttribute('rowheight', ANode, FRowHeight);
   SaveFontToXml(ANode, FFont);
 end;
 
@@ -1010,7 +1018,7 @@ initialization
   GBackupsPreferences := TPrefList.Create(TBackupPref);
   GPluginsPreferences := TPrefList.Create(TPluginPref);
   GChartPreferences := TPrefList.Create(TChartPref);
-  GViewsPreferences.Add(TViewPref.Create('baseMovement'));
+  GViewsPreferences.Add(TViewPref.Create(TCMovementFrame.GetPrefname));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód jednorazowy'));
@@ -1020,7 +1028,7 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('SI', 'Lista przychodów'));
     Fontprefs.Add(TFontPref.CreateFontPref('SO', 'Lista rozchodów'));
   end;
-  GViewsPreferences.Add(TViewPref.Create('plannedDone'));
+  GViewsPreferences.Add(TViewPref.Create(TCDoneFrame.GetPrefname));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('R', 'Gotowe do realizacji'));
     Fontprefs.Add(TFontPref.CreateFontPref('W', 'Operacje zaleg³e'));
@@ -1028,12 +1036,12 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('DA', 'Uznane za wykonane'));
     Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Odrzucone jako niezasadne'));
   end;
-  GViewsPreferences.Add(TViewPref.Create('plannedMovement'));
+  GViewsPreferences.Add(TViewPref.Create(TCPlannedFrame.GetPrefname));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód'));
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód'));
   end;
-  GViewsPreferences.Add(TViewPref.Create('startupInfo'));
+  GViewsPreferences.Add(TViewPref.Create(TCStartupInfoFrame.GetPrefname));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('II', 'Zaplanowane operacje przychodowe'));
     Fontprefs.Add(TFontPref.CreateFontPref('IO', 'Zaplanowane operacje rozchodowe'));
@@ -1045,7 +1053,7 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'));
     Fontprefs.Add(TFontPref.CreateFontPref('UE', 'Nieuzgodnione wyci¹gi'));
   end;
-  GViewsPreferences.Add(TViewPref.Create('accountExtraction'));
+  GViewsPreferences.Add(TViewPref.Create(TCExtractionsFrame.GetPrefname));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'));
     Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'));
