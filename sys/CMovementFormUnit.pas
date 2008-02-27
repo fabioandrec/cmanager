@@ -198,29 +198,47 @@ end;
 
 procedure TCMovementForm.ComboBoxTypeChange(Sender: TObject);
 var xProfile: TProfile;
+    xProfileId, xAccountId, xCashpointId, xProductId: TDataGid;
 begin
   Caption := 'Operacja';
   if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
     PageControl.ActivePage := TabSheetInOutOnce;
     if Operation = coAdd then begin
+      xProductId := GDefaultProductId;
+      xAccountId := GDefaultAccountId;
+      xCashpointId := GDefaultCashpointId;
+      xProfileId := GDefaultProfileId;
       if GActiveProfileId <> CEmptyDataGid then begin
-        GDataProvider.BeginTransaction;
-        xProfile := TProfile(TProfile.LoadObject(ProfileProxy, GActiveProfileId, False));
+        xProfileId := GActiveProfileId;
+      end;
+      GDataProvider.BeginTransaction;
+      if xProfileId <> CEmptyDataGid then begin
+        xProfile := TProfile(TProfile.LoadObject(ProfileProxy, xProfileId, False));
         Caption := Caption + ' - ' + xProfile.name;
         if xProfile.idAccount <> CEmptyDataGid then begin
-          CStaticInoutOnceAccount.DataId := xProfile.idAccount;
-          CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xProfile.idAccount, False)).name;
+          xAccountId := xProfile.idAccount;
         end;
         if xProfile.idCashPoint <> CEmptyDataGid then begin
-          CStaticInoutOnceCashpoint.DataId := xProfile.idCashPoint;
-          CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xProfile.idCashPoint, False)).name;
+          xCashpointId := xProfile.idCashPoint;
         end;
         if xProfile.idProduct <> CEmptyDataGid then begin
           CStaticInoutOnceCategory.DataId := xProfile.idProduct;
           CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProfile.idProduct, False)).name;
         end;
-        GDataProvider.RollbackTransaction;
       end;
+      if xAccountId <> CEmptyDataGid then begin
+        CStaticInoutOnceAccount.DataId := xAccountId;
+        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
+      end;
+      if xCashpointId <> CEmptyDataGid then begin
+        CStaticInoutOnceCashpoint.DataId := xCashpointId;
+        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xCashpointId, False)).name;
+      end;
+      if xProductId <> CEmptyDataGid then begin
+        CStaticInoutOnceCategory.DataId := xProductId;
+        CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProductId, False)).name;
+      end;
+      GDataProvider.RollbackTransaction;
     end;
   end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
     PageControl.ActivePage := TabSheetInOutCyclic;

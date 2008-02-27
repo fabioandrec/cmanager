@@ -17,11 +17,13 @@ type
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
   end;
 
 implementation
 
-uses CDataObjects, CProfileFormUnit, CPluginConsts, CBaseFrameUnit;
+uses CDataObjects, CProfileFormUnit, CPluginConsts, CBaseFrameUnit,
+  CDatatools, CTools;
 
 {$R *.dfm}
 
@@ -60,9 +62,21 @@ begin
 end;
 
 procedure TCProfileFrame.ReloadDataobjects;
+var xMark: TProfile;
 begin
   inherited ReloadDataobjects;
-  Dataobjects := TProfile.GetList(TProfile, ProfileProxy, 'select * from profile')
+  Dataobjects := TProfile.GetList(TProfile, ProfileProxy, 'select * from profile');
+  xMark := TProfile.Create(True);
+  xMark.id := CEmptyDataGid;
+  xMark.name := '<wyczyœæ aktywny profil>';
+  Dataobjects.Add(xMark);
+end;
+
+procedure TCProfileFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  ActionEdit.Enabled := ActionEdit.Enabled and (TDataObject(List.SelectedElement.Data).id <> CEmptyDataGid);
+  ActionDelete.Enabled := ActionDelete.Enabled and (TDataObject(List.SelectedElement.Data).id <> CEmptyDataGid);
 end;
 
 end.

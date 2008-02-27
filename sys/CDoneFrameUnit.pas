@@ -44,6 +44,8 @@ type
     CButtonOperation: TCButton;
     CButtonPlanned: TCButton;
     ActionPlanned: TAction;
+    PopupMenuSums: TPopupMenu;
+    Ustawienialisty2: TMenuItem;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -66,8 +68,14 @@ type
     procedure DoneListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure SumListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ActionPlannedExecute(Sender: TObject);
-    procedure DoneListMeasureItem(Sender: TBaseVirtualTree;
+    procedure DoneListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure Ustawienialisty2Click(Sender: TObject);
+    procedure SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure SumListMeasureItem(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure SumListPaintText(Sender: TBaseVirtualTree;
+      const TargetCanvas: TCanvas; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -82,6 +90,7 @@ type
     function GetSelectedText: String; override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
+    procedure DoRepaintLists; override;
   public
     function GetList: TCList; override;
     procedure ReloadDone;
@@ -101,7 +110,7 @@ implementation
 uses CFrameFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Math, CDoneFormUnit, CConsts, CPreferences, CTools,
-  CPluginConsts, CPlannedFrameUnit;
+  CPluginConsts, CPlannedFrameUnit, CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -895,6 +904,46 @@ var xBase: TPlannedTreeItem;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
   FindRowVisualProperties(xBase, Nil, Nil, @NodeHeight);
+end;
+
+procedure TCDoneFrame.DoRepaintLists;
+begin
+  inherited DoRepaintLists;
+  SumList.ReinitNode(SumList.RootNode, True);
+  SumList.Repaint;
+end;
+
+procedure TCDoneFrame.Ustawienialisty2Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesDoneListSum, GViewsPreferences) then begin
+    SendMessageToFrames(TCBaseFrameClass(ClassType), WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCDoneFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var xPref: TFontPref;
+begin
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]).Fontprefs.ByPrefname['*']);
+  if xPref.Background <> clWindow then begin
+    ItemColor := xPref.Background;
+  end;
+end;
+
+procedure TCDoneFrame.SumListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+var xPref: TFontPref;
+begin
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]).Fontprefs.ByPrefname['*']);
+  NodeHeight := xPref.RowHeight;
+end;
+
+procedure TCDoneFrame.SumListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+var xPref: TFontPref;
+begin
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]).Fontprefs.ByPrefname['*']);
+  TargetCanvas.Font.Assign(xPref.Font);
 end;
 
 end.

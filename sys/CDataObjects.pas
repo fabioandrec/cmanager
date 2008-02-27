@@ -27,6 +27,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    procedure DeleteObject; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -174,6 +175,7 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementCompare(AColumnIndex: Integer; ACompareWith: TCDataListElementObject; AViewTextSelector: String): Integer; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    procedure DeleteObject; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -275,6 +277,7 @@ type
     function GetElementText: String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    procedure DeleteObject; override;
   published
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
@@ -948,9 +951,13 @@ var CashPointProxy: TDataProxy;
     InvestmentMovementProxy: TDataProxy;
     InvestmentPortfolioProxy: TDataProxy;
 
-var GActiveProfileId: TDataGid = CEmptyDataGid;
-    GCurrencyCache: TCurrCache;
+var GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
+    GActiveProfileId: TDataGid = CEmptyDataGid;
+    GDefaultProfileId: TDataGid = CEmptyDataGid;
+    GDefaultProductId: TDataGid = CEmptyDataGid;
+    GDefaultAccountId: TDataGid = CEmptyDataGid;
+    GDefaultCashpointId: TDataGid = CEmptyDataGid;
 
 const CHASH_INSTRUMENT_SYMBOL = 0;
       CHASH_INSTRUMENT_NAME = 1;
@@ -1108,6 +1115,14 @@ begin
   end;
 end;
 
+procedure TCashPoint.DeleteObject;
+begin
+  inherited DeleteObject;
+  if GDefaultCashpointId = id then begin
+    GDefaultCashpointId := CEmptyDataGid;
+  end;
+end;
+
 procedure TCashPoint.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
@@ -1255,6 +1270,14 @@ class function TProduct.CanChangeUnitdef(AId: ShortString): Boolean;
 begin
   Result := (GDataProvider.GetSqlInteger('select count(*) from plannedMovement where idProduct = ' + DataGidToDatabase(AId), 0) = 0) and
             (GDataProvider.GetSqlInteger('select count(*) from baseMovement where idProduct = ' + DataGidToDatabase(AId), 0) = 0);
+end;
+
+procedure TProduct.DeleteObject;
+begin
+  inherited DeleteObject;
+  if GDefaultProductId = id then begin
+    GDefaultProductId := CEmptyDataGid;
+  end;
 end;
 
 procedure TProduct.FromDataset(ADataset: TADOQuery);
@@ -2152,6 +2175,9 @@ end;
 
 procedure TProfile.DeleteObject;
 begin
+  if GDefaultProfileId = id then begin
+    GDefaultProfileId := CEmptyDataGid;
+  end;
   if GActiveProfileId = id then begin
     GActiveProfileId := CEmptyDataGid;
   end;
@@ -4566,6 +4592,14 @@ begin
   FprevIdSourceAccount := FidSourceAccount;
   FprevmovementCash := FmovementCash;
   inherited AfterPost;
+end;
+
+procedure TAccount.DeleteObject;
+begin
+  inherited DeleteObject;
+  if GDefaultAccountId = id then begin
+    GDefaultAccountId := CEmptyDataGid;
+  end;
 end;
 
 initialization

@@ -115,6 +115,7 @@ inherited CMovementFrame: TCMovementFrame
       Header.PopupMenu = VTHeaderPopupMenu
       Header.Style = hsFlatButtons
       ParentShowHint = False
+      PopupMenu = PopupMenuSums
       ShowHint = True
       TabOrder = 2
       TabStop = False
@@ -122,12 +123,15 @@ inherited CMovementFrame: TCMovementFrame
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
+      OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
       OnGetText = SumListGetText
+      OnPaintText = SumListPaintText
       OnGetHint = TodayListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
+      OnMeasureItem = SumListMeasureItem
       AutoExpand = True
       Columns = <
         item
@@ -452,5 +456,13 @@ inherited CMovementFrame: TCMovementFrame
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80
     Top = 120
+  end
+  object PopupMenuSums: TPopupMenu
+    Left = 152
+    Top = 160
+    object Ustawienialisty2: TMenuItem
+      Caption = 'Ustawienia listy'
+      OnClick = Ustawienialisty2Click
+    end
   end
 end

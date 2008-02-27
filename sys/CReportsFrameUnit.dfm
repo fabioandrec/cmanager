@@ -103,8 +103,11 @@ inherited CReportsFrame: TCReportsFrame
     TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnBeforeItemErase = ListBeforeItemErase
     OnDblClick = ListDblClick
     OnFocusChanged = ListFocusChanged
+    OnPaintText = ListPaintText
+    OnMeasureItem = ListMeasureItem
     AutoExpand = False
     OnCDataListReloadTree = ListCDataListReloadTree
     Columns = <

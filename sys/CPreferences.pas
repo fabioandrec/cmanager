@@ -263,7 +263,7 @@ implementation
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, SysUtils,
      DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit, CDoneFrameUnit,
   CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit,
-  CBaseFrameUnit;
+  CBaseFrameUnit, CReportsFrameUnit;
 
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
 begin
@@ -1058,6 +1058,19 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'));
     Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'));
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodniona'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(TCReportsFrame.GetPrefname));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Raporty'));
+    Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesMovementListSum));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesDoneListSum));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin

@@ -258,6 +258,7 @@ end;
 
 procedure TCMovementListForm.InitializeForm;
 var xProfile: TProfile;
+    xProfileId, xAccountId, xCashpointId: TDataGid;
 begin
   inherited InitializeForm;
   FonceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
@@ -272,20 +273,32 @@ begin
   FbaseCashpoint := CEmptyDataGid;
   FbaseDate := 0;
   if Operation = coAdd then begin
+    xAccountId := GDefaultAccountId;
+    xCashpointId := GDefaultCashpointId;
+    xProfileId := GDefaultProfileId;
     if GActiveProfileId <> CEmptyDataGid then begin
-      GDataProvider.BeginTransaction;
-      xProfile := TProfile(TProfile.LoadObject(ProfileProxy, GActiveProfileId, False));
+      xProfileId := GActiveProfileId;
+    end;
+    GDataProvider.BeginTransaction;
+    if xProfileId <> CEmptyDataGid then begin
+      xProfile := TProfile(TProfile.LoadObject(ProfileProxy, xProfileId, False));
       Caption := Caption + ' - ' + xProfile.name;
       if xProfile.idAccount <> CEmptyDataGid then begin
-        CStaticInoutOnceAccount.DataId := xProfile.idAccount;
-        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xProfile.idAccount, False)).name;
+        xAccountId := xProfile.idAccount;
       end;
       if xProfile.idCashPoint <> CEmptyDataGid then begin
-        CStaticInoutOnceCashpoint.DataId := xProfile.idCashPoint;
-        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xProfile.idCashPoint, False)).name;
+        xCashpointId := xProfile.idCashPoint;
       end;
-      GDataProvider.RollbackTransaction;
     end;
+    if xAccountId <> CEmptyDataGid then begin
+      CStaticInoutOnceAccount.DataId := xAccountId;
+      CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
+    end;
+    if xCashpointId <> CEmptyDataGid then begin
+      CStaticInoutOnceCashpoint.DataId := xCashpointId;
+      CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xCashpointId, False)).name;
+    end;
+    GDataProvider.RollbackTransaction;
   end;
   UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
   CButtonStateOnce.Enabled := False;

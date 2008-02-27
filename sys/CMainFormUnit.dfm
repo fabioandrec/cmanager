@@ -425,6 +425,9 @@ object CMainForm: TCMainForm
                 Caption = 'Z&aproponuj zmian'#281
               end
               item
+                Action = ActionDiscForum
+              end
+              item
                 Caption = '-'
               end
               item
@@ -660,6 +663,11 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Wczytaj notowania'
       OnExecute = ActionImportStockExchangesExecute
+    end
+    object ActionDiscForum: TAction
+      Category = 'Pomoc'
+      Caption = 'Forum dyskusyjne'
+      OnExecute = ActionDiscForumExecute
     end
   end
   object OpenDialog: TOpenDialog

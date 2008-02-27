@@ -103,6 +103,20 @@ type
     CheckBoxSmallIcons: TCheckBox;
     CButton12: TCButton;
     Action11: TAction;
+    Label7: TLabel;
+    CButton13: TCButton;
+    Action12: TAction;
+    TabSheetOperations: TTabSheet;
+    GroupBox8: TGroupBox;
+    Label8: TLabel;
+    CStaticAccount: TCStatic;
+    Label9: TLabel;
+    CStaticCategory: TCStatic;
+    Label10: TLabel;
+    CStaticCashpoint: TCStatic;
+    Label11: TLabel;
+    CStaticProfile: TCStatic;
+    Label12: TLabel;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -127,6 +141,10 @@ type
     procedure Panel4Click(Sender: TObject);
     procedure Panel5Click(Sender: TObject);
     procedure Action11Execute(Sender: TObject);
+    procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticProfileGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -154,7 +172,9 @@ uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CMovementFrameUnit, CBaseFormUnit, CBaseFrameUnit, CDoneFrameUnit,
   CPlannedFrameUnit, CStartupInfoFrameUnit, Registry, CInfoFormUnit,
   CTemplates, CDescpatternFormUnit, CPlugins, CExtractionItemFormUnit,
-  CExtractionsFrameUnit;
+  CExtractionsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
+  CProductsFrameUnit, CCashpointsFrameUnit, CProfileFrameUnit, CDatabase,
+  CDataObjects, CTools;
 
 {$R *.dfm}
 
@@ -164,6 +184,7 @@ begin
   Action2.OnExecute := ActionExecute;
   Action3.OnExecute := ActionExecute;
   Action8.OnExecute := ActionExecute;
+  Action12.OnExecute := ActionExecute;
   ActiveAction := TAction(ActionManager1.Actions[ATab]);
   FViewPrefs.Clone(GViewsPreferences);
   FBasePrefs.Clone(GBasePreferences);
@@ -285,6 +306,24 @@ begin
     Panel5.Color := oddListColor;
     Panel4.Color := evenListColor;
   end;
+  GDataProvider.BeginTransaction;
+  if GDefaultAccountId <> CEmptyDataGid then begin
+    CStaticAccount.DataId := GDefaultAccountId;
+    CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, GDefaultAccountId, False)).name;
+  end;
+  if GDefaultProductId <> CEmptyDataGid then begin
+    CStaticCategory.DataId := GDefaultProductId;
+    CStaticCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, GDefaultProductId, False)).name;
+  end;
+  if GDefaultCashpointId <> CEmptyDataGid then begin
+    CStaticCashpoint.DataId := GDefaultCashpointId;
+    CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, GDefaultCashpointId, False)).name;
+  end;
+  if GDefaultProfileId <> CEmptyDataGid then begin
+    CStaticProfile.DataId := GDefaultProfileId;
+    CStaticProfile.Caption := TProfile(TProfile.LoadObject(ProfileProxy, GDefaultProfileId, False)).name;
+  end;
+  GDataProvider.RollbackTransaction;
   ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
   ComboBoxBackupActionChange(Nil);
@@ -378,6 +417,16 @@ begin
       xPref.isEnabled := xNode.CheckState = csCheckedNormal;
       xNode := List.GetNext(xNode);
     end;
+    GDefaultProfileId := CStaticProfile.DataId;
+    GDefaultProductId := CStaticCategory.DataId;
+    GDefaultAccountId := CStaticAccount.DataId;
+    GDefaultCashpointId := CStaticCashpoint.DataId;
+    GDataProvider.BeginTransaction;
+    GDataProvider.SetCmanagerParam('GActiveProfileId', GDefaultProfileId);
+    GDataProvider.SetCmanagerParam('GDefaultProductId', GDefaultProductId);
+    GDataProvider.SetCmanagerParam('GDefaultAccountId', GDefaultAccountId);
+    GDataProvider.SetCmanagerParam('GDefaultCashpointId', GDefaultCashpointId);
+    GDataProvider.CommitTransaction;
   end;
 end;
 
@@ -599,6 +648,26 @@ begin
     SendMessageToFrames(TCExtractionsFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
+end;
+
+procedure TCPreferencesForm.CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCAccountsFrame, ADataGid, AText);
+end;
+
+procedure TCPreferencesForm.CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCProductsFrame, ADataGid, AText);
+end;
+
+procedure TCPreferencesForm.CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText);
+end;
+
+procedure TCPreferencesForm.CStaticProfileGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCProfileFrame, ADataGid, AText);
 end;
 
 end.

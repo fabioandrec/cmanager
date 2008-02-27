@@ -107,6 +107,7 @@ inherited CDoneFrame: TCDoneFrame
       Header.PopupMenu = VTHeaderPopupMenu
       Header.Style = hsFlatButtons
       ParentShowHint = False
+      PopupMenu = PopupMenuSums
       ShowHint = True
       TabOrder = 1
       TabStop = False
@@ -114,12 +115,15 @@ inherited CDoneFrame: TCDoneFrame
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
+      OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
       OnGetText = SumListGetText
+      OnPaintText = SumListPaintText
       OnGetHint = DoneListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
+      OnMeasureItem = SumListMeasureItem
       AutoExpand = True
       Columns = <
         item
@@ -406,5 +410,13 @@ inherited CDoneFrame: TCDoneFrame
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 128
     Top = 152
+  end
+  object PopupMenuSums: TPopupMenu
+    Left = 152
+    Top = 160
+    object Ustawienialisty2: TMenuItem
+      Caption = 'Ustawienia listy'
+      OnClick = Ustawienialisty2Click
+    end
   end
 end

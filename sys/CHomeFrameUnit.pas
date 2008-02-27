@@ -85,13 +85,9 @@ end;
 procedure TCHomeFrame.ActionSetProfileExecute(Sender: TObject);
 var xText: String;
     xProfileId: String;
-    xMark: TProfile;
 begin
   xProfileId := GActiveProfileId;
-  xMark := TProfile.Create(True);
-  xMark.id := CEmptyDataGid;
-  xMark.name := '<usuñ aktywny profil>';
-  if TCFrameForm.ShowFrame(TCProfileFrame, xProfileId, xText, xMark) then begin
+  if TCFrameForm.ShowFrame(TCProfileFrame, xProfileId, xText) then begin
     GActiveProfileId := xProfileId;
   end;
 end;

@@ -77,6 +77,7 @@ type
     PopupMenuShortcutView: TPopupMenu;
     MenuItemSmallShortcut: TMenuItem;
     MenuItemBigShortcut: TMenuItem;
+    ActionDiscForum: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -115,6 +116,7 @@ type
     procedure ActionImportStockExchangesExecute(Sender: TObject);
     procedure MenuItemBigShortcutClick(Sender: TObject);
     procedure MenuItemSmallShortcutClick(Sender: TObject);
+    procedure ActionDiscForumExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -944,6 +946,11 @@ begin
     ShortcutList.NodeHeight[xNode] := AHeight;
     xNode := ShortcutList.GetNext(xNode);
   end;
+end;
+
+procedure TCMainForm.ActionDiscForumExecute(Sender: TObject);
+begin
+  ShellExecute(0, nil, 'http://sourceforge.net/forum/forum.php?forum_id=617716', nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

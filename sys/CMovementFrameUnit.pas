@@ -64,6 +64,8 @@ type
     CButton1: TCButton;
     CStaticViewCurrency: TCStatic;
     Label6: TLabel;
+    PopupMenuSums: TPopupMenu;
+    Ustawienialisty2: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -91,6 +93,10 @@ type
     procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticViewCurrencyChanged(Sender: TObject);
     procedure TodayListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure SumListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure SumListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure Ustawienialisty2Click(Sender: TObject);
   private
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
@@ -101,7 +107,7 @@ type
     procedure MessageMovementDeleted(AId: TDataGid; AOption: Integer);
     procedure UpdateCustomPeriod;
     procedure RecreateTreeHelper;
-    procedure FindRowVisualProperties(AHelper: TMovementTreeElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+    procedure FindRowVisualPropertiesMovements(AHelper: TMovementTreeElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
     function FindParentMovementList(AListGid: TDataGid): TTreeObjectList;
     function FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
     procedure DeleteObjectsWithMovementList(AListId: TDataGid);
@@ -112,6 +118,7 @@ type
     function GetSelectedId: ShortString; override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedText: String; override;
+    procedure DoRepaintLists; override;
   public
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
@@ -414,7 +421,7 @@ var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
+    FindRowVisualPropertiesMovements(xBase, Nil, @xColor, Nil);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
@@ -859,7 +866,7 @@ begin
   ActionEditMovement.Execute;
 end;
 
-procedure TCMovementFrame.FindRowVisualProperties(AHelper: TMovementTreeElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+procedure TCMovementFrame.FindRowVisualPropertiesMovements(AHelper: TMovementTreeElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
@@ -871,7 +878,7 @@ begin
   end else begin
     xKey := 'S' + xKey;
   end;
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['baseMovement']).Fontprefs.ByPrefname[xKey]);
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[GetPrefname]).Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
     if ABackground <> Nil then begin
       ABackground^ := xPref.Background;
@@ -889,7 +896,7 @@ procedure TCMovementFrame.TodayListPaintText(Sender: TBaseVirtualTree; const Tar
 var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(Node)^);
-  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
+  FindRowVisualPropertiesMovements(xBase, TargetCanvas.Font, Nil, Nil);
 end;
 
 class function TCMovementFrame.GetPrefname: String;
@@ -1142,7 +1149,47 @@ end;
 
 procedure TCMovementFrame.TodayListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
 begin
-  FindRowVisualProperties(TMovementTreeElement(TodayList.GetNodeData(Node)^), Nil, Nil, @NodeHeight);
+  FindRowVisualPropertiesMovements(TMovementTreeElement(TodayList.GetNodeData(Node)^), Nil, Nil, @NodeHeight);
+end;
+
+procedure TCMovementFrame.DoRepaintLists;
+begin
+  inherited DoRepaintLists;
+  SumList.ReinitNode(SumList.RootNode, True);
+  SumList.Repaint;
+end;
+
+procedure TCMovementFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var xPref: TFontPref;
+begin
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementListSum]).Fontprefs.ByPrefname['*']);
+  if xPref.Background <> clWindow then begin
+    ItemColor := xPref.Background;
+  end;
+end;
+
+procedure TCMovementFrame.SumListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+var xPref: TFontPref;
+begin
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementListSum]).Fontprefs.ByPrefname['*']);
+  NodeHeight := xPref.RowHeight;
+end;
+
+procedure TCMovementFrame.SumListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+var xPref: TFontPref;
+begin
+  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementListSum]).Fontprefs.ByPrefname['*']);
+  TargetCanvas.Font.Assign(xPref.Font);
+end;
+
+procedure TCMovementFrame.Ustawienialisty2Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesMovementListSum, GViewsPreferences) then begin
+    SendMessageToFrames(TCBaseFrameClass(ClassType), WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
 end;
 
 end.

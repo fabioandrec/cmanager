@@ -3,16 +3,16 @@ inherited CPreferencesForm: TCPreferencesForm
   Top = 226
   Caption = 'Preferencje'
   ClientHeight = 486
-  ClientWidth = 602
+  ClientWidth = 609
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 602
+    Width = 609
     Height = 445
     object PanelMain: TPanel
       Left = 0
       Top = 0
-      Width = 602
+      Width = 609
       Height = 445
       Align = alClient
       BevelOuter = bvNone
@@ -21,7 +21,7 @@ inherited CPreferencesForm: TCPreferencesForm
       object PanelShortcuts: TPanel
         Left = 129
         Top = 0
-        Width = 473
+        Width = 480
         Height = 445
         Align = alClient
         BevelOuter = bvLowered
@@ -29,7 +29,7 @@ inherited CPreferencesForm: TCPreferencesForm
         object PanelShortcutsTitle: TPanel
           Left = 1
           Top = 1
-          Width = 471
+          Width = 478
           Height = 21
           Align = alTop
           Alignment = taLeftJustify
@@ -46,9 +46,9 @@ inherited CPreferencesForm: TCPreferencesForm
         object PageControl: TPageControl
           Left = 1
           Top = 22
-          Width = 471
+          Width = 478
           Height = 422
-          ActivePage = TabSheetView
+          ActivePage = TabSheetOperations
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -306,7 +306,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 169
-              Height = 161
+              Height = 121
               Caption = ' Okno g'#322#243'wne '
               TabOrder = 0
               object CheckBoxShortcutVisible: TCheckBox
@@ -339,7 +339,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Top = 8
               Width = 265
               Height = 257
-              Caption = ' Czcionki '
+              Caption = ' Czcionki i kolory element'#243'w list  '
               TabOrder = 1
               object CButton4: TCButton
                 Left = 5
@@ -406,13 +406,23 @@ inherited CPreferencesForm: TCPreferencesForm
                 Action = Action11
                 Color = clBtnFace
               end
+              object Label7: TLabel
+                Left = 16
+                Top = 200
+                Width = 222
+                Height = 39
+                Caption = 
+                  '* Informacja dodatkowa: ustawienia dla innych list dost'#281'pne s'#261' z' +
+                  'azwyczaj w menu kontekstowym danej listy'
+                WordWrap = True
+              end
             end
             object GroupBox7: TGroupBox
               Left = 192
               Top = 280
               Width = 265
               Height = 121
-              Caption = ' Wy'#347'wietlanie element'#243'w list '
+              Caption = ' Domy'#347'lne kolory element'#243'w list '
               TabOrder = 2
               object Panel4: TPanel
                 Left = 24
@@ -609,14 +619,14 @@ inherited CPreferencesForm: TCPreferencesForm
             object Panel3: TPanel
               Left = 8
               Top = 8
-              Width = 441
+              Width = 449
               Height = 361
               BevelOuter = bvLowered
               TabOrder = 0
               object List: TCDataList
                 Left = 1
                 Top = 1
-                Width = 439
+                Width = 447
                 Height = 359
                 Align = alClient
                 BevelEdges = []
@@ -663,10 +673,139 @@ inherited CPreferencesForm: TCPreferencesForm
                   end
                   item
                     Position = 2
-                    Width = 234
+                    Width = 242
                     WideText = 'Opis'
                   end>
                 WideDefaultText = ''
+              end
+            end
+          end
+          object TabSheetOperations: TTabSheet
+            Caption = 'TabSheetOperations'
+            ImageIndex = 4
+            TabVisible = False
+            object GroupBox8: TGroupBox
+              Left = 8
+              Top = 8
+              Width = 449
+              Height = 241
+              Caption = ' Domy'#347'lnie przyjmowane warto'#347'ci '
+              TabOrder = 0
+              object Label8: TLabel
+                Left = 36
+                Top = 41
+                Width = 76
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Domy'#347'lne konto'
+              end
+              object Label9: TLabel
+                Left = 19
+                Top = 77
+                Width = 93
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Domy'#347'lna kategoria'
+              end
+              object Label10: TLabel
+                Left = 13
+                Top = 113
+                Width = 99
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Domy'#347'lny kontrahent'
+              end
+              object Label11: TLabel
+                Left = 42
+                Top = 149
+                Width = 70
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Domy'#347'lny profil'
+              end
+              object Label12: TLabel
+                Left = 16
+                Top = 192
+                Width = 425
+                Height = 41
+                AutoSize = False
+                Caption = 
+                  '* Przy wype'#322'nianiu domy'#347'lnymi warto'#347'ciami, priorytet ma zawsze a' +
+                  'ktywny profil, nast'#281'pnie domy'#347'lny profil, dopiero na ko'#324'cu warto' +
+                  #347'ci domy'#347'lne dla poszczeg'#243'lnych p'#243'l'
+                WordWrap = True
+              end
+              object CStaticAccount: TCStatic
+                Left = 120
+                Top = 37
+                Width = 305
+                Height = 21
+                Cursor = crHandPoint
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<wybierz konto z listy>'
+                Color = clWindow
+                ParentColor = False
+                TabOrder = 0
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<wybierz konto z listy>'
+                OnGetDataId = CStaticAccountGetDataId
+                HotTrack = True
+              end
+              object CStaticCategory: TCStatic
+                Left = 120
+                Top = 73
+                Width = 305
+                Height = 21
+                Cursor = crHandPoint
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<wybierz kategori'#281' z listy>'
+                Color = clWindow
+                ParentColor = False
+                TabOrder = 1
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<wybierz kategori'#281' z listy>'
+                OnGetDataId = CStaticCategoryGetDataId
+                HotTrack = True
+              end
+              object CStaticCashpoint: TCStatic
+                Left = 120
+                Top = 109
+                Width = 305
+                Height = 21
+                Cursor = crHandPoint
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<wybierz kontrahenta z listy>'
+                Color = clWindow
+                ParentColor = False
+                TabOrder = 2
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<wybierz kontrahenta z listy>'
+                OnGetDataId = CStaticCashpointGetDataId
+                HotTrack = True
+              end
+              object CStaticProfile: TCStatic
+                Left = 120
+                Top = 145
+                Width = 305
+                Height = 21
+                Cursor = crHandPoint
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<wybierz profil z listy>'
+                Color = clWindow
+                ParentColor = False
+                TabOrder = 3
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<wybierz profil z listy>'
+                OnGetDataId = CStaticProfileGetDataId
+                HotTrack = True
               end
             end
           end
@@ -729,6 +868,18 @@ inherited CPreferencesForm: TCPreferencesForm
           Framed = False
           Action = Action8
         end
+        object CButton13: TCButton
+          Left = 16
+          Top = 328
+          Width = 100
+          Height = 57
+          Cursor = crHandPoint
+          PicPosition = ppTop
+          PicOffset = 10
+          TxtOffset = 15
+          Framed = False
+          Action = Action12
+        end
         object Panel2: TPanel
           Left = 1
           Top = 1
@@ -750,18 +901,18 @@ inherited CPreferencesForm: TCPreferencesForm
   end
   inherited PanelButtons: TPanel
     Top = 445
-    Width = 602
+    Width = 609
     inherited BitBtnOk: TBitBtn
-      Left = 425
+      Left = 432
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 513
+      Left = 520
     end
   end
   object ActionManager1: TActionManager
     Images = CategoryImageList
-    Left = 81
-    Top = 336
+    Left = 289
+    Top = 384
     StyleName = 'XP Style'
     object Action1: TAction
       Caption = 'Podstawowe'
@@ -778,6 +929,10 @@ inherited CPreferencesForm: TCPreferencesForm
     object Action8: TAction
       Caption = 'Wtyczki'
       ImageIndex = 3
+    end
+    object Action12: TAction
+      Caption = 'Rejestracja'
+      ImageIndex = 4
     end
   end
   object CategoryImageList: TPngImageList
@@ -977,9 +1132,68 @@ inherited CPreferencesForm: TCPreferencesForm
           44AE426082}
         Name = 'PngImage3'
         Background = clWindow
+      end
+      item
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D4948445200000018000000180806000000E0773D
+          F800000006624B474400FF00FF00FFA0BDA793000000097048597300000B1300
+          000B1301009A9C180000000774494D45000000000000000973942E0000064D49
+          44415478DAAD556B6C5365187EBE73CE7A5BDBB55B69BB5107BB39C660300495
+          882897181D1A51E30DD1A12192A0E2444DBC800AD3C825C4E10D081A451CBBA0
+          30D4A1481636450654D8D898D00DBB95B5DDC6DAB55BE9F5B4E7F875E8C21042
+          4C3C3FBE9373F2BDEFF3BECFFB3CDF47F03F3DE28574DD60E7C4C7DBFE4812AB
+          F79F2EDFBCBBCD13FF4FAE17289DF60D03DE2D0DB72E0B5E33B9DB24A1EB5B08
+          8D5FDEF27BAEEC4043D756A7B37F535965AB6314806C5A358909825A14118C9E
+          7A2C222DAC920A22F30C2BF233F8FEDAB298B3BCE5EAC9B19C96BA16FE98AAE3
+          841E15F506FF0493F2C3ED158DEB46016867EECB4F4F557F288A42475B876B43
+          4A8A7AC9DC59992563929354DFED3FD6E2B4D697F09D1F1CBA2C79327DBD0442
+          5EC46050856E2FC420412C38079D1183A3E2E7B34B4601E42E38B8EAE5257925
+          4A394BDEFCA8B569E60CD394D79766EB92D52C3EAE726167F5D116C799F2A7C5
+          DEEA93E2C070E5AB29CBCFE162588BAE01887E16B19E31080C2486F759F8435F
+          1C1D5A350240265798EEBB23E7C0FA95F969EA4456BE6B7F8FD473318497168F
+          474A92044E8F80CD9503D8F6595D03717CF566EFE9E619B204762D7CE14B955F
+          14117318C0F855F8BCD153B7FDB0B7D47C3ED448FE4E2ED3AA546B3F59756BF1
+          A46C456224262A344A8E3498DDE8EE1BC2B24732204A24E0E8DEB29D5DA29E7B
+          CFB774E10199C21F94FC434BD4664270501AAE6A1A3CFCECAE9E1574EB99388B
+          4452584908126EBFFBB6CC8D2B1667E512066A958225091C011D368E340FA0D7
+          1BC4630B4C186794C1EFD90C25F9148A1055619787564E69E9A5B4B895E17DA7
+          870E7D54EF5967B6057F89271F2E9E9D5CA9C9308D796B5151D613051392741A
+          15C74868A9E46FF2A2024163B39BEE8EA0686E1A26700B2163CCC0F9C065B428
+          292D8375DB7FF3949A6DA123348C1FA15E33F387FBA7E7A76E2B9A7D833E63AC
+          94B08C386C8E383C2F000CFDE0E872AC6D08614F075E9BBF17C9F809A2D74669
+          49C39057812F8FFB4FBEF2AD6D310D39FB4FE52300C6D9DFAF2E9AAD5E73D7AD
+          20E7BA0D90C9922095B26059060A298124018844C97047168B0DEA58138A6735
+          43DF7F0443E7FCD86D9F84F58D53AC9DE75B1F167AAB4E5EE913F2FC6BAF1465
+          A6CBBEF605B5DA3AB31ED999D3A0506B20A53429E50CB80486AA888110E5E1EE
+          EB84D71B8286B1607E461BBA076488A4DF8FC6F66CF1EBDDBFFCEA77EE29117A
+          AB9B46017C55967547972B6D4D85F9A98946BD4937BD404322312D582691DA99
+          76C052874BE869110DC2E5EC8456A382C3C3416082585A5C089952010D75C4E7
+          BB5CD85B7BA4C5D55D5F12B9CC8C644D89DE6048210F1F6ECFCFCA9ABA60499A
+          8E681A4E2481E766C0644CA13310E18F8002C5671303580E52DA95BD2F0075B2
+          88BBE79BA054CA80B0809A1FFBB1AF963AFEEC8EE258EFDE53741C22914A0899
+          90C1CA092BD1AE2CB9AD7653CD423D0F43EAD4BCF1301AC722141520A18317E8
+          E842517AF87197E415A1EABAE0F6416F2098376F1CD44ADA863F860D5B1DF8AD
+          616779B8FD9D1720463D234E56C818F693B586B7ADAEECA9EDFE45372D5A104B
+          3B7E5A0E6BDF64180D6311E0450A1497ED252096464629A8CDE1C59C3B533067
+          BA01DFFDE841F5F7CD017BF3BA4D31D7C14D34EDE0A8B3E8C6F19C2A51C1194B
+          DFBEA5744BEDDCD9172E66A7AA1253909B370509AC0081B611E42F493716EF88
+          827ABD8378E81E233AAC0C2A6BCC3EA7A5724FC4FEE56ACA8E7DD8C957CA2A23
+          5DC6BDFFAAF18D3F9CD90FD65B1FCFBE779E46A1928BE4B825074C4232E20E8F
+          77C1538A02FE3092D5118CD119B0A3FA44A0AFBD7C37EF3AB85E0CD947FC70D5
+          0B87CE453A292761D2B3CB663ED0E52D58DA649D6270FB923039BF109C444E15
+          25529F10FC79DE85448512AD6D5D81EE531BB708FD3F95D170FB28995EEB96CA
+          CF4D64DF7D35F5C993EDBAE2DAB3CB6E2EC8D3CBA7E671C46C49835CA1859F56
+          7FCAE2867F68C0D7DB5EB527DCFDC52A1AE6F89793AF0540878E9267528C9490
+          3B1DFC9C8282C289CB0703DAA4B819D34C85B0F58461B5F5047CDD7BAAC3177E
+          DE40693973B53CD7BD93E34FE5A739B3DA9DC6772B8E3F952F5766E82432352C
+          567BC0D7F9D9D668DFFE0FAEA4E53F0394AED4EB755AF2E8B13FF3C7D575AEB8
+          2F1215F503B69A1ADEBE63F5D568F9CF00C366CC64E5FEA0C8D984A70B48CC97
+          C37B8EFE2A066DE7AE17FB179138C5EE3DFC0B1A0000000049454E44AE426082}
+        Name = 'PngImage4'
+        Background = clWindow
       end>
-    Left = 49
-    Top = 344
+    Left = 209
+    Top = 392
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog
@@ -1377,14 +1591,14 @@ inherited CPreferencesForm: TCPreferencesForm
           F83C0000000049454E44AE426082}
         Name = 'PngImage6'
       end>
-    Left = 46
-    Top = 340
+    Left = 174
+    Top = 396
     Bitmap = {}
   end
   object ActionManager2: TActionManager
     Images = PngImageList
-    Left = 88
-    Top = 272
+    Left = 344
+    Top = 360
     StyleName = 'XP Style'
     object Action4: TAction
       Caption = 'Ustawienia dla listy wykonanych operacji'
@@ -1435,7 +1649,7 @@ inherited CPreferencesForm: TCPreferencesForm
   end
   object ColorDialog: TColorDialog
     Options = [cdFullOpen]
-    Left = 222
-    Top = 268
+    Left = 350
+    Top = 412
   end
 end

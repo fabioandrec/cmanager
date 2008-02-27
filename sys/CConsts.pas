@@ -306,6 +306,10 @@ const
      '  </property>' +
      '</list>';
 
+const
+  CFontPreferencesMovementListSum = 'baseMovementSums';
+  CFontPreferencesDoneListSum = 'plannedDoneSums';
+
 implementation
 
 end.

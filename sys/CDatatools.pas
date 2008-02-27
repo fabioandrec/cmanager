@@ -441,6 +441,11 @@ begin
       GUnitdefCache.Change(xUni.id, xUni.symbol, '');
     end;
     xC.Free;
+    GActiveProfileId := CEmptyDataGid;
+    GDefaultProfileId := GDataProvider.GetCmanagerParam('GActiveProfileId', CEmptyDataGid);
+    GDefaultProductId := GDataProvider.GetCmanagerParam('GDefaultProductId', CEmptyDataGid);
+    GDefaultAccountId := GDataProvider.GetCmanagerParam('GDefaultAccountId', CEmptyDataGid);
+    GDefaultCashpointId := GDataProvider.GetCmanagerParam('GDefaultCashpointId', CEmptyDataGid);
   end;
 end;
 

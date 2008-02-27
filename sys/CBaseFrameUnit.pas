@@ -54,6 +54,7 @@ type
     function GetSelectedType: Integer; virtual;
     function GetSelectedText: String; virtual;
     procedure WndProc(var Message: TMessage); override;
+    procedure DoRepaintLists; virtual;
     function GetBaseForm: TCBaseForm;
     procedure Loaded; override;
     procedure DoCheckChanged; virtual; 
@@ -134,7 +135,8 @@ uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
   CMovementFrameUnit, CPlannedFrameUnit, CProductsFrameUnit,
   CProfileFrameUnit, CUnitdefFormUnit, CUpdateCurrencyRatesFormUnit,
   CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
-  CInvestmentMovementFrameUnit, CInvestmentPortfolioFrameUnit;
+  CInvestmentMovementFrameUnit, CInvestmentPortfolioFrameUnit,
+  CReportsFrameUnit;
 
 {$R *.dfm}
 
@@ -319,10 +321,7 @@ procedure TCBaseFrame.WndProc(var Message: TMessage);
 begin
   inherited WndProc(Message);
   if Message.Msg = WM_MUSTREPAINT then begin
-    if GetList <> Nil then begin
-      GetList.ReinitNode(GetList.RootNode, True);
-      GetList.Repaint;
-    end;
+    DoRepaintLists;
   end;
 end;
 
@@ -724,11 +723,9 @@ begin
   GRegisteredClasses.AddClass(TCUnitDefFrame, CFRAMETYPE_UNITDEFFRAME, True);
   GRegisteredClasses.AddClass(TCInstrumentFrame, CFRAMETYPE_INSTRUMENT, True);
   GRegisteredClasses.AddClass(TCInstrumentValueFrame, CFRAMETYPE_INSTRUMENTVALUE, True);
-
   GRegisteredClasses.AddClass(TCInvestmentMovementFrame, CFRAMETYPE_INVESTMENTMOVEMENT, True);
   GRegisteredClasses.AddClass(TCInvestmentPortfolioFrame, CFRAMETYPE_INVESTMENTPORTFOLIO, True);
-
-
+  GRegisteredClasses.AddClass(TCReportsFrame, CFRAMETYPE_REPORTS, True);
   for xCount := 0 to GRegisteredClasses.Count - 1 do begin
     if GViewsPreferences.ByPrefname[TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname] = Nil then begin
       GViewsPreferences.Add(TViewPref.Create(TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname));
@@ -766,6 +763,14 @@ end;
 function TCBaseFrame.CanAcceptSelectedObject: Boolean;
 begin
   Result := True;
+end;
+
+procedure TCBaseFrame.DoRepaintLists;
+begin
+  if GetList <> Nil then begin
+    GetList.ReinitNode(GetList.RootNode, True);
+    GetList.Repaint;
+  end;
 end;
 
 initialization
