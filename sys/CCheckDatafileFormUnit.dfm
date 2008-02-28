@@ -22,6 +22,7 @@ inherited CCheckDatafileFormUnit: TCCheckDatafileFormUnit
     inherited PageControl: TPageControl
       Width = 456
       Height = 98
+      ActivePage = TabSheetStart
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
           ImageIndex = 3

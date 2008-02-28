@@ -17,6 +17,7 @@ uses
   MemCheck in 'MemCheck.pas',
   Forms,
   Windows,
+  SysUtils,
   CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},
   CDatabase in 'CDatabase.pas',
   CDataObjects in 'CDataObjects.pas',
@@ -136,7 +137,8 @@ uses
   CInvestmentMovementFrameUnit in 'CInvestmentMovementFrameUnit.pas' {CInvestmentMovementFrame: TFrame},
   CInvestmentMovementFormUnit in 'CInvestmentMovementFormUnit.pas' {CInvestmentMovementForm},
   CInvestmentPortfolioFrameUnit in 'CInvestmentPortfolioFrameUnit.pas' {CInvestmentPortfolioFrame: TFrame},
-  CInitializeProviderFormUnit in 'CInitializeProviderFormUnit.pas' {CInitializeProviderForm};
+  CInitializeProviderFormUnit in 'CInitializeProviderFormUnit.pas' {CInitializeProviderForm},
+  CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm};
 
 {$R *.res}
 
@@ -164,7 +166,14 @@ begin
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile then begin
         xFilename := GBasePreferences.startupDatafileName;
       end;
-      xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
+      if (GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) and (not FileExists(xFilename)) then begin
+        xProceed := CreateDatafileWithWizard(xFilename);
+      end else begin
+        xProceed := True;
+      end;
+      if xProceed then begin
+        xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
+      end;
     end else begin
       xProceed := True;
     end;
@@ -185,7 +194,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

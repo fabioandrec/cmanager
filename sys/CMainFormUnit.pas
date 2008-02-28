@@ -171,7 +171,8 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts,
      CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
-     CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math;
+     CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
+  CCreateDatafileFormUnit;
 
 {$R *.dfm}
 
@@ -496,11 +497,11 @@ begin
 end;
 
 procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
-var xError, xDesc: String;
+var xError, xDesc, xFilename: String;
     xStatus: TInitializeProviderResult;
 begin
-  if SaveDialog.Execute then begin
-    xStatus := InitializeDataProvider(SaveDialog.FileName, xError, xDesc, True);
+  if CreateDatafileWithWizard(xFilename) then begin
+    xStatus := InitializeDataProvider(xFilename, xError, xDesc, True);
     if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
