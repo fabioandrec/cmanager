@@ -365,19 +365,24 @@ var xList: TCList;
 begin
   xList := GetList;
   if xList <> Nil then begin
-    if xList.Header.Columns.Count > 1 then begin
-      for xCount := 0 to xList.Header.Columns.Count - 1 do begin
-        xPrefname := FOwner.Name + '|' + Self.ClassName + '|' + xList.Name + '|' + IntToStr(xCount);
-        xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
-        if xColumnPref <> Nil then begin
-          xColumn := xList.Header.Columns.Items[xCount];
-          xColumn.Position := xColumnPref.position;
-          xColumn.Width := xColumnPref.width;
-          if xColumnPref.visible = 1 then begin
-            xColumn.Options := xColumn.Options + [coVisible];
-          end else if xColumnPref.visible = 0 then begin
-            xColumn.Options := xColumn.Options - [coVisible];
-          end;
+    for xCount := 0 to xList.Header.Columns.Count - 1 do begin
+      xPrefname := FOwner.Name + '|' + Self.ClassName + '|' + xList.Name + '|' + IntToStr(xCount);
+      xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
+      if xColumnPref <> Nil then begin
+        xColumn := xList.Header.Columns.Items[xCount];
+        xColumn.Position := xColumnPref.position;
+        xColumn.Width := xColumnPref.width;
+        if xColumnPref.visible = 1 then begin
+          xColumn.Options := xColumn.Options + [coVisible];
+        end else if xColumnPref.visible = 0 then begin
+          xColumn.Options := xColumn.Options - [coVisible];
+        end;
+        if xColumnPref.sortOrder = 1 then begin
+          xList.Header.SortDirection := sdAscending;
+          xList.Header.SortColumn := xCount;
+        end else if xColumnPref.sortOrder = -1 then begin
+          xList.Header.SortDirection := sdDescending;
+          xList.Header.SortColumn := xCount;
         end;
       end;
     end;
@@ -393,18 +398,21 @@ var xList: TCList;
 begin
   xList := GetList;
   if xList <> Nil then begin
-    if xList.Header.Columns.Count > 1 then begin
-      for xCount := 0 to xList.Header.Columns.Count - 1 do begin
-        xPrefname := FOwner.Name + '|' + Self.ClassName + '|' + xList.Name + '|' + IntToStr(xCount);
-        xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
-        if xColumnPref = Nil then begin
-          xColumnPref := TViewColumnPref.Create(xPrefname);
-          GColumnsPreferences.Add(xColumnPref);
-        end;
-        xColumn := xList.Header.Columns.Items[xCount];
-        xColumnPref.position := xColumn.Position;
-        xColumnPref.width := xColumn.Width;
-        xColumnPref.visible := IfThen(coVisible in xColumn.Options, 1, 0);
+    for xCount := 0 to xList.Header.Columns.Count - 1 do begin
+      xPrefname := FOwner.Name + '|' + Self.ClassName + '|' + xList.Name + '|' + IntToStr(xCount);
+      xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
+      if xColumnPref = Nil then begin
+        xColumnPref := TViewColumnPref.Create(xPrefname);
+        GColumnsPreferences.Add(xColumnPref);
+      end;
+      xColumn := xList.Header.Columns.Items[xCount];
+      xColumnPref.position := xColumn.Position;
+      xColumnPref.width := xColumn.Width;
+      xColumnPref.visible := IfThen(coVisible in xColumn.Options, 1, 0);
+      if xCount = xList.Header.SortColumn then begin
+        xColumnPref.sortOrder := IfThen(xList.Header.SortDirection = sdAscending, 1, -1);
+      end else begin
+        xColumnPref.sortOrder := 0;
       end;
     end;
   end;

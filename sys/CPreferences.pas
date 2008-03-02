@@ -112,6 +112,7 @@ type
     Fposition: Integer;
     Fwidth: Integer;
     Fvisible: Integer;
+    FsortOrder: Integer;
   public
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     procedure SaveToXml(ANode: ICXMLDOMNode); override;
@@ -121,6 +122,7 @@ type
     property position: Integer read Fposition write Fposition;
     property width: Integer read Fwidth write Fwidth;
     property visible: Integer read Fvisible write Fvisible;
+    property sortOrder: Integer read FsortOrder write FsortOrder;
   end;
 
   TViewPref = class(TPrefItem)
@@ -690,6 +692,7 @@ begin
   Fposition := TViewColumnPref(APrefItem).position;
   Fwidth := TViewColumnPref(APrefItem).width;
   Fvisible := TViewColumnPref(APrefItem).visible;
+  FsortOrder := TViewColumnPref(APrefItem).sortOrder;
 end;
 
 function TViewColumnPref.GetNodeName: String;
@@ -703,6 +706,7 @@ begin
   Fposition := GetXmlAttribute('position', ANode, -1);
   Fwidth := GetXmlAttribute('width', ANode, -1);
   Fvisible := GetXmlAttribute('visible', ANode, -1);
+  FsortOrder := GetXmlAttribute('sortOrder', ANode, 0);
 end;
 
 procedure TViewColumnPref.SaveToXml(ANode: ICXMLDOMNode);
@@ -711,6 +715,7 @@ begin
   SetXmlAttribute('position', ANode, Fposition);
   SetXmlAttribute('width', ANode, Fwidth);
   SetXmlAttribute('visible', ANode, Fvisible);
+  SetXmlAttribute('sortOrder', ANode, FsortOrder);
 end;
 
 constructor TDescPatterns.Create(ASaveToDatabase: Boolean);
