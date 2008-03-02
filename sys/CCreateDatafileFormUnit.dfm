@@ -1,6 +1,6 @@
 inherited CCreateDatafileForm: TCCreateDatafileForm
-  Left = 452
-  Top = 323
+  Left = 285
+  Top = 179
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Utw'#243'rz plik danych'
@@ -74,7 +74,6 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
     Top = 0
     Width = 364
     Height = 150
-    ActivePage = TabSheetDefault
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 2
@@ -128,8 +127,9 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       object Label4: TLabel
         Left = 16
         Top = 40
-        Width = 305
+        Width = 321
         Height = 39
+        AutoSize = False
         Caption = 
           'Wybierz lokalizacj'#281' i nazw'#281' nowego pliku danych. Ze wzgl'#281'd'#243'w bez' +
           'piecze'#324'stwa zaleca si'#281', aby by'#322' to folder, do kt'#243'rego uprawnieni' +
@@ -182,7 +182,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       object Label6: TLabel
         Left = 16
         Top = 40
-        Width = 288
+        Width = 305
         Height = 52
         Caption = 
           'Aby zwi'#281'kszy'#263' poziom bezpiecze'#324'stwa pliku danych mo'#380'esz okre'#347'li'#263 +
@@ -228,6 +228,51 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         Font.Style = [fsBold]
         ParentFont = False
       end
+      object Label10: TLabel
+        Left = 16
+        Top = 40
+        Width = 305
+        Height = 57
+        AutoSize = False
+        Caption = 
+          'Mo'#380'esz wype'#322'ni'#263' nowy plik danych domy'#347'ln'#261' zawarto'#347'ci'#261'. Dzi'#281'ki te' +
+          'mu nie b'#281'dziesz musia'#322' tworzy'#263' podstawowych kategorii, automatyc' +
+          'znie zostan'#261' utworzone konta oraz kontrahenci. '
+        WordWrap = True
+      end
+      object CButtonShowDefault: TCButton
+        Left = 65
+        Top = 77
+        Width = 224
+        Height = 18
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Caption = 'Kliknij tutaj, aby przejrze'#263' domy'#347'lne dane.'
+        Color = clBtnFace
+      end
+      object ComboBoxDefault: TComboBox
+        Left = 19
+        Top = 106
+        Width = 318
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 0
+        Text = 'Tak, wype'#322'nij plik domy'#347'lnymi danymi'
+        Items.Strings = (
+          'Tak, wype'#322'nij plik domy'#347'lnymi danymi'
+          'Nie, po prostu utw'#243'rz nowy plik danych')
+      end
+    end
+    object TabSheetFinish: TTabSheet
+      ImageIndex = 4
+      TabVisible = False
     end
   end
   object PngImageList: TPngImageList
@@ -485,7 +530,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
     FilterIndex = 0
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Plik danych'
-    Left = 514
-    Top = 192
+    Left = 18
+    Top = 60
   end
 end

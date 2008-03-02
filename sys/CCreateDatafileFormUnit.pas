@@ -35,6 +35,10 @@ type
     Label8: TLabel;
     TabSheetDefault: TTabSheet;
     Label9: TLabel;
+    Label10: TLabel;
+    ComboBoxDefault: TComboBox;
+    CButtonShowDefault: TCButton;
+    TabSheetFinish: TTabSheet;
     procedure FormCreate(Sender: TObject);
     procedure BitBtnFinishClick(Sender: TObject);
     procedure BitBtnPrevClick(Sender: TObject);
@@ -77,12 +81,19 @@ end;
 procedure TCCreateDatafileForm.UpdateButtons;
 begin
   BitBtnPrev.Enabled := PageControl.ActivePageIndex <> 0;
-  BitBtnNext.Enabled := PageControl.ActivePageIndex <> PageControl.PageCount - 1;
   CImage.ImageIndex := PageControl.ActivePageIndex;
   if PageControl.ActivePage = TabSheetDatafile then begin
     CStaticName.SetFocus;
   end else if PageControl.ActivePage = TabSheetSecurity then begin
     EditPassword.SetFocus;
+  end else if PageControl.ActivePage = TabSheetDefault then begin
+    ComboBoxDefault.SetFocus;
+  end;
+  if PageControl.ActivePage = TabSheetFinish then begin
+    BitBtnNext.Caption := 'Utwórz';
+    BitBtnNext.SetFocus;
+  end else begin
+    BitBtnNext.Caption := 'Dalej';
   end;
 end;
 
