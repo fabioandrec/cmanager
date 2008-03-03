@@ -166,11 +166,14 @@ begin
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile then begin
         xFilename := GBasePreferences.startupDatafileName;
       end;
+      {
       if (GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) and (not FileExists(xFilename)) then begin
         xProceed := CreateDatafileWithWizard(xFilename);
       end else begin
         xProceed := True;
       end;
+      }
+      xProceed := True;
       if xProceed then begin
         xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
       end;
@@ -194,7 +197,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

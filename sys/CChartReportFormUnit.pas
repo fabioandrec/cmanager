@@ -23,12 +23,16 @@ type
     function GetIsregVisible: Boolean;
     procedure SetIsavgVisible(const Value: Boolean);
     procedure SetIsregVisible(const Value: Boolean);
+    function GetBarSeriesCount: Integer;
+  protected
+    function GetSeriesOfClassCount(ASerie: TChartSeries): Integer;
   public
     constructor CreateNew(AOwner: TComponent; ASymbol: String);
     property symbol: String read Fsymbol write Fsymbol;
     property thumbTitle: String read Ftitle write Ftitle;
     property isPie: Boolean read GetIsPie;
     property isBar: Boolean read GetIsBar;
+    property BarSeriesCount: Integer read GetBarSeriesCount;
     property isLin: Boolean read GetIsLin;
     property isAvgVisible: Boolean read GetIsavgVisible write SetIsavgVisible;
     property isRegVisible: Boolean read GetIsregVisible write SetIsregVisible;
@@ -395,6 +399,14 @@ begin
   inherited Destroy;
 end;
 
+function TCChart.GetBarSeriesCount: Integer;
+var xTemp: TBarSeries;
+begin
+  xTemp := TBarSeries.Create(Nil);
+  Result := GetSeriesOfClassCount(xTemp);
+  xTemp.Free;
+end;
+
 function TCChart.GetIsavgVisible: Boolean;
 begin
   Result := FavgSeries.Count > 0;
@@ -483,6 +495,19 @@ end;
 function TCChart.GetIsregVisible: Boolean;
 begin
   Result := FregSeries.Count > 0;
+end;
+
+function TCChart.GetSeriesOfClassCount(ASerie: TChartSeries): Integer;
+var xCount: Integer;
+begin
+  xCount := 0;
+  Result := 0;
+  while (xCount <= SeriesCount - 1) do begin
+    if Series[xCount].SameClass(ASerie) then begin
+      Inc(Result);
+    end;
+    Inc(xCount);
+  end;
 end;
 
 procedure TCChart.SetIsavgVisible(const Value: Boolean);

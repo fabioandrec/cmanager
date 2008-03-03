@@ -237,6 +237,8 @@ type
 
   TCChartReport = class(TCBaseReport)
   private
+    procedure OnZoom(Sender: TObject);
+    procedure OnUnzoom(Sender: TObject);
     procedure Setmarks(const Value: Integer);
     procedure UpdateChartsThumbnails;
   protected
@@ -247,6 +249,8 @@ type
     function GetChart(ASymbol: String = ''): TCChart;
     function CanShowReport: Boolean; override;
     function GetSerie(AChart: TCChart; AClass: TChartSeriesClass): TChartSeries;
+    procedure DoZoom(AChart: TCChart); virtual;
+    procedure DoUnzoom(AChart: TCChart); virtual;
   public
     procedure SetChartProps; virtual;
     function GetReportFooter: String; override;
@@ -1585,9 +1589,19 @@ begin
   TCChartReportForm(FForm).PanelNoData.Visible := TCChartReportForm(FForm).charts.Count = 0;
 end;
 
+procedure TCChartReport.DoUnzoom(AChart: TCChart);
+begin
+end;
+
+procedure TCChartReport.DoZoom(AChart: TCChart);
+begin
+end;
+
 function TCChartReport.GetChart(ASymbol: String = ''): TCChart;
 begin
   Result := TCChartReportForm(FForm).GetChart(ASymbol, True);
+  Result.OnZoom := OnZoom;
+  Result.OnUndoZoom := OnUnzoom;
 end;
 
 function TCChartReport.GetFormClass: TCReportFormClass;
@@ -1619,6 +1633,20 @@ function TCChartReport.GetSerie(AChart: TCChart; AClass: TChartSeriesClass): TCh
 begin
   Result := AClass.Create(AChart);
   Result.OnGetMarkText := GetMarkText;
+end;
+
+procedure TCChartReport.OnUnzoom(Sender: TObject);
+begin
+  if Sender.InheritsFrom(TCChart) then begin
+    DoUnzoom(TCChart(Sender));
+  end;
+end;
+
+procedure TCChartReport.OnZoom(Sender: TObject);
+begin
+  if Sender.InheritsFrom(TCChart) then begin
+    DoZoom(TCChart(Sender));
+  end;
 end;
 
 procedure TCChartReport.PrepareReportData;
@@ -2337,6 +2365,7 @@ begin
         end else begin
           xCurDate := IncDay(xCurDate, 1);
         end;
+        xInSerie.XLabel[xInSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
       end;
     end;
     if xOutMovements then begin
@@ -2375,6 +2404,7 @@ begin
         end else begin
           xCurDate := IncDay(xCurDate, 1);
         end;
+        xOutSerie.XLabel[xOutSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
       end;
     end;
     with xChart do begin
@@ -2385,12 +2415,15 @@ begin
         if FGroupBy = CGroupByWeek then begin
           Maximum := EndOfTheWeek(FEndDate);
           Minimum := StartOfTheWeek(FStartDate);
+          Increment := DateTimeStep[dtOneWeek];
         end else if FGroupBy = CGroupByMonth then begin
           Maximum := EndOfTheMonth(FEndDate);
           Minimum := StartOfTheMonth(FStartDate);
+          Increment := DateTimeStep[dtOneMonth];
         end else begin
           Maximum := FEndDate;
           Minimum := FStartDate;
+          Increment := DateTimeStep[dtOneDay];
         end;
         LabelsAngle := 90;
         MinorTickCount := 0;
@@ -3918,6 +3951,7 @@ begin
         end else begin
           xCurDate := IncDay(xCurDate, 1);
         end;
+        xSerie.XLabel[xSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
       end;
       xChart.AddSeries(xSerie);
     end;
@@ -3929,15 +3963,19 @@ begin
         if FGroupBy = CGroupByWeek then begin
           Maximum := EndOfTheWeek(FEndDate);
           Minimum := StartOfTheWeek(FStartDate);
+          Increment := DateTimeStep[dtOneWeek];
         end else if FGroupBy = CGroupByMonth then begin
           Maximum := EndOfTheMonth(FEndDate);
           Minimum := StartOfTheMonth(FStartDate);
+          Increment := DateTimeStep[dtOneMonth];
         end else begin
           Maximum := FEndDate;
           Minimum := FStartDate;
+          Increment := DateTimeStep[dtOneDay];
         end;
         LabelsAngle := 90;
         MinorTickCount := 0;
+        LabelStyle := talText;
       end;
       with LeftAxis do begin
         MinorTickCount := 0;
