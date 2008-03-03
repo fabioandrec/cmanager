@@ -31,7 +31,7 @@ type
     class function GetPrefname: String; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
-    procedure FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger); override;
+    procedure FindRowVisualProperties(AIsFocused: Boolean; AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger); override;
   end;
 
 implementation
@@ -41,7 +41,7 @@ uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts,
 
 {$R *.dfm}
 
-procedure TCExtractionsFrame.FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+procedure TCExtractionsFrame.FindRowVisualProperties(AIsFocused: Boolean; AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
@@ -53,6 +53,9 @@ begin
     end;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+      if AIsFocused then begin
+        AFont.Color := ViewPref.FocusedFontColor;
+      end;
     end;
     if ARowHeight <> Nil then begin
       ARowHeight^ := xPref.RowHeight;

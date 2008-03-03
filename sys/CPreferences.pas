@@ -128,6 +128,8 @@ type
   TViewPref = class(TPrefItem)
   private
     FFontprefs: TPrefList;
+    FFocusedBackgroundColor: TColor;
+    FFocusedFontColor: TColor;
   public
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     procedure SaveToXml(ANode: ICXMLDOMNode); override;
@@ -136,6 +138,8 @@ type
     constructor Create(APrefname: String); override;
     destructor Destroy; override;
     property Fontprefs: TPrefList read FFontprefs;
+    property FocusedBackgroundColor: TColor read FFocusedBackgroundColor write FFocusedBackgroundColor;
+    property FocusedFontColor: TColor read FFocusedFontColor write FFocusedFontColor;
   end;
 
   TChartPref = class(TPrefItem)
@@ -440,12 +444,16 @@ end;
 procedure TViewPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
+  FFocusedBackgroundColor := TViewPref(APrefItem).FocusedBackgroundColor;
+  FocusedFontColor := TViewPref(APrefItem).FocusedFontColor;
   FFontprefs.Clone(TViewPref(APrefItem).Fontprefs);
 end;
 
 constructor TViewPref.Create(APrefname: String);
 begin
   inherited Create(APrefname);
+  FFocusedBackgroundColor := clHighlight;
+  FFocusedFontColor := clHighlightText;
   FFontprefs := TPrefList.Create(TFontPref);
 end;
 
@@ -521,6 +529,8 @@ procedure TViewPref.LoadFromXml(ANode: ICXMLDOMNode);
 var xFontprefs: ICXMLDOMNode;
 begin
   inherited LoadFromXml(ANode);
+  FFocusedBackgroundColor := GetXmlAttribute('focusedBackgroundColor', ANode, clYellow);
+  FFocusedFontColor := GetXmlAttribute('focusedFontColor', ANode, clRed);
   xFontprefs := ANode.selectSingleNode('fontprefs');
   if xFontprefs <> Nil then begin
     FFontprefs.LoadFromParentNode(xFontprefs);
@@ -531,6 +541,8 @@ procedure TViewPref.SaveToXml(ANode: ICXMLDOMNode);
 var xFontprefs: ICXMLDOMNode;
 begin
   inherited SaveToXml(ANode);
+  SetXmlAttribute('focusedBackgroundColor', ANode, FFocusedBackgroundColor);
+  SetXmlAttribute('focusedFontColor', ANode, FFocusedFontColor);
   xFontprefs := ANode.selectSingleNode('fontprefs');
   if xFontprefs = Nil then begin
     xFontprefs := ANode.ownerDocument.createElement('fontprefs');

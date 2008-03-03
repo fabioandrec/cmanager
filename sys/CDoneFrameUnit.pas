@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, CDataObjects, PngImageList, CImageListsUnit, CSchedules;
+  Contnrs, CDataObjects, PngImageList, CImageListsUnit, CSchedules, CPreferences;
 
 type
   TDoneFrameAdditionalData = class
@@ -71,18 +71,17 @@ type
     procedure DoneListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
     procedure Ustawienialisty2Click(Sender: TObject);
     procedure SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-    procedure SumListMeasureItem(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-    procedure SumListPaintText(Sender: TBaseVirtualTree;
-      const TargetCanvas: TCanvas; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType);
+    procedure SumListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure SumListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
     FSumRoot: TSumElement;
     FTreeObjects: TObjectList;
+    FViewPref: TViewPref;
+    FSumPref: TViewPref;
     procedure UpdateCustomPeriod;
-    procedure FindRowVisualProperties(AHelper: TPlannedTreeItem; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+    procedure FindRowVisualProperties(AIsFocused: Boolean; AHelper: TPlannedTreeItem; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
@@ -109,7 +108,7 @@ implementation
 
 uses CFrameFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   DateUtils, CListFrameUnit, DB, CMovementFormUnit,
-  Math, CDoneFormUnit, CConsts, CPreferences, CTools,
+  Math, CDoneFormUnit, CConsts, CTools,
   CPluginConsts, CPlannedFrameUnit, CListPreferencesFormUnit;
 
 {$R *.dfm}
@@ -186,6 +185,16 @@ begin
       CStaticFilter.DataId := '3';
       CStaticFilter.Caption := '<przychód>';
     end;
+  end;
+  FViewPref := TViewPref(GViewsPreferences.ByPrefname[GetPrefname]);
+  FSumPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]);
+  if (FViewPref <> Nil) then begin
+    DoneList.Colors.FocusedSelectionColor := FViewPref.FocusedBackgroundColor;
+    DoneList.Colors.FocusedSelectionBorderColor := FViewPref.FocusedBackgroundColor;
+  end;
+  if (FSumPref <> Nil) then begin
+    SumList.Colors.FocusedSelectionColor := FSumPref.FocusedBackgroundColor;
+    SumList.Colors.FocusedSelectionBorderColor := FSumPref.FocusedBackgroundColor;
   end;
   ReloadDone;
   if not AWithButtons then begin
@@ -328,7 +337,7 @@ var xColor: TColor;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
   with TargetCanvas do begin
-    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
+    FindRowVisualProperties(Node = DoneList.FocusedNode, xBase, Nil, @xColor, Nil);
     if xColor <> clWindow then begin
       ItemColor := xColor;
     end;
@@ -790,7 +799,7 @@ begin
   end;
 end;
 
-procedure TCDoneFrame.FindRowVisualProperties(AHelper: TPlannedTreeItem; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
+procedure TCDoneFrame.FindRowVisualProperties(AIsFocused: Boolean; AHelper: TPlannedTreeItem; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
 var xKey: String;
     xPref: TFontPref;
 begin
@@ -803,13 +812,16 @@ begin
       xKey := 'W';
     end;
   end;
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['plannedDone']).Fontprefs.ByPrefname[xKey]);
+  xPref := TFontPref(FViewPref.Fontprefs.ByPrefname[xKey]);
   if xPref <> Nil then begin
     if ABackground <> Nil then begin
       ABackground^ := xPref.Background;
     end;
     if AFont <> Nil then begin
       AFont.Assign(xPref.Font);
+      if AIsFocused then begin
+        AFont.Color := FViewPref.FocusedFontColor;
+      end;
     end;
     if ARowHeight <> Nil then begin
       ARowHeight^ := xPref.RowHeight;
@@ -821,7 +833,7 @@ procedure TCDoneFrame.DoneListPaintText(Sender: TBaseVirtualTree; const TargetCa
 var xBase: TPlannedTreeItem;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
-  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
+  FindRowVisualProperties(Node = DoneList.FocusedNode, xBase, TargetCanvas.Font, Nil, Nil);
 end;
 
 class function TCDoneFrame.GetPrefname: String;
@@ -903,7 +915,7 @@ procedure TCDoneFrame.DoneListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas
 var xBase: TPlannedTreeItem;
 begin
   xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);
-  FindRowVisualProperties(xBase, Nil, Nil, @NodeHeight);
+  FindRowVisualProperties(Node = DoneList.FocusedNode, xBase, Nil, Nil, @NodeHeight);
 end;
 
 procedure TCDoneFrame.DoRepaintLists;
@@ -926,7 +938,7 @@ end;
 procedure TCDoneFrame.SumListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
 var xPref: TFontPref;
 begin
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]).Fontprefs.ByPrefname['*']);
+  xPref := TFontPref(FSumPref.Fontprefs.ByPrefname['*']);
   if xPref.Background <> clWindow then begin
     ItemColor := xPref.Background;
   end;
@@ -935,15 +947,18 @@ end;
 procedure TCDoneFrame.SumListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
 var xPref: TFontPref;
 begin
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]).Fontprefs.ByPrefname['*']);
+  xPref := TFontPref(FSumPref.Fontprefs.ByPrefname['*']);
   NodeHeight := xPref.RowHeight;
 end;
 
 procedure TCDoneFrame.SumListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 var xPref: TFontPref;
 begin
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]).Fontprefs.ByPrefname['*']);
+  xPref := TFontPref(FSumPref.Fontprefs.ByPrefname['*']);
   TargetCanvas.Font.Assign(xPref.Font);
+  if Node = SumList.FocusedNode then begin
+    TargetCanvas.Font.Color := FSumPref.FocusedFontColor;
+  end;
 end;
 
 end.

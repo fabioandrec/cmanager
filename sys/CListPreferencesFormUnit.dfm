@@ -1,23 +1,23 @@
 inherited CListPreferencesForm: TCListPreferencesForm
   Caption = 'Ustawienia listy'
-  ClientHeight = 274
-  ClientWidth = 365
+  ClientHeight = 338
+  ClientWidth = 421
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 365
-    Height = 233
+    Width = 421
+    Height = 297
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
-      Width = 337
-      Height = 209
-      Caption = ' Ustawienia czcionek '
+      Width = 385
+      Height = 273
+      Caption = ' Ustawienia czcionek i kolor'#243'w '
       TabOrder = 0
       object CButton5: TCButton
         Left = 232
         Top = 76
-        Width = 81
+        Width = 137
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -30,7 +30,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
       object CButton6: TCButton
         Left = 232
         Top = 108
-        Width = 57
+        Width = 145
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -42,34 +42,70 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object Label1: TLabel
         Left = 264
-        Top = 149
+        Top = 221
         Width = 50
         Height = 13
         Caption = 'Wysoko'#347#263
+      end
+      object CButton1: TCButton
+        Left = 232
+        Top = 140
+        Width = 161
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = Action1
+        Color = clBtnFace
+      end
+      object CButton2: TCButton
+        Left = 232
+        Top = 172
+        Width = 169
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = Action2
+        Color = clBtnFace
       end
       object PanelExample: TPanel
         Left = 24
         Top = 68
         Width = 201
-        Height = 117
+        Height = 185
         BevelOuter = bvLowered
         Color = clWindow
         TabOrder = 0
         object PanelRow: TPanel
           Left = 1
           Top = 1
-          Width = 199
-          Height = 115
+          Width = 200
+          Height = 56
           BevelOuter = bvNone
           Caption = 'Przyk'#322'adowy widok elementu'
           Color = clWindow
           TabOrder = 0
         end
+        object PanelActive: TPanel
+          Left = 1
+          Top = 97
+          Width = 200
+          Height = 56
+          BevelOuter = bvNone
+          Caption = 'Przyk'#322'adowy aktywny element'
+          Color = clWindow
+          TabOrder = 1
+        end
       end
       object ComboBoxType: TComboBox
         Left = 24
         Top = 28
-        Width = 289
+        Width = 345
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -80,7 +116,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object TrackBar: TTrackBar
         Left = 247
-        Top = 136
+        Top = 208
         Width = 10
         Height = 38
         Max = 60
@@ -95,13 +131,13 @@ inherited CListPreferencesForm: TCListPreferencesForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 233
-    Width = 365
+    Top = 297
+    Width = 421
     inherited BitBtnOk: TBitBtn
-      Left = 188
+      Left = 244
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 276
+      Left = 332
     end
   end
   object FontImageList: TPngImageList
@@ -175,14 +211,24 @@ inherited CListPreferencesForm: TCListPreferencesForm
     Top = 152
     StyleName = 'XP Style'
     object Action3: TAction
-      Caption = 'Czcionka'
+      Caption = 'Czcionka element'#243'w'
       ImageIndex = 0
       OnExecute = Action3Execute
     end
     object Action4: TAction
-      Caption = 'T'#322'o'
+      Caption = 'T'#322'o element'#243'w'
       ImageIndex = 1
       OnExecute = Action4Execute
+    end
+    object Action1: TAction
+      Caption = 'Aktywny element'
+      ImageIndex = 1
+      OnExecute = Action1Execute
+    end
+    object Action2: TAction
+      Caption = 'Czcionka aktywnego'
+      ImageIndex = 1
+      OnExecute = Action2Execute
     end
   end
   object FontDialog: TFontDialog

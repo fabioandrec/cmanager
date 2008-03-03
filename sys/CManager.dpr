@@ -171,8 +171,7 @@ begin
         xProceed := CreateDatafileWithWizard(xFilename);
       end else begin
         xProceed := True;
-      end;
-      }
+      end;}
       xProceed := True;
       if xProceed then begin
         xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
