@@ -138,6 +138,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           Header.Style = hsFlatButtons
           HintMode = hmHint
           ParentShowHint = False
+          PopupMenu = PopupMenu1
           ShowHint = True
           TabOrder = 1
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -208,6 +209,15 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
       Caption = 'Odznacz wszystkie'
       ImageIndex = 2
       OnExecute = Action3Execute
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 297
+    object Zaznaczwszystkie1: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = Zaznaczwszystkie1Click
     end
   end
 end

@@ -17,6 +17,7 @@ type
   end;
 
   TCExtractionsFrame = class(TCDataobjectFrame)
+    procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   protected
     function GetSelectedType: Integer; override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
@@ -31,7 +32,6 @@ type
     class function GetPrefname: String; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
-    procedure FindRowVisualProperties(AIsFocused: Boolean; AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger); override;
   end;
 
 implementation
@@ -40,28 +40,6 @@ uses CConsts, CExtractionFormUnit, CBaseFrameUnit, CReports, CPluginConsts,
   CTools, CPreferences;
 
 {$R *.dfm}
-
-procedure TCExtractionsFrame.FindRowVisualProperties(AIsFocused: Boolean; AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
-var xKey: String;
-    xPref: TFontPref;
-begin
-  xKey := TAccountExtraction(AHelper.Data).extractionState;
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[GetPrefname]).Fontprefs.ByPrefname[xKey]);
-  if xPref <> Nil then begin
-    if ABackground <> Nil then begin
-      ABackground^ := xPref.Background;
-    end;
-    if AFont <> Nil then begin
-      AFont.Assign(xPref.Font);
-      if AIsFocused then begin
-        AFont.Color := ViewPref.FocusedFontColor;
-      end;
-    end;
-    if ARowHeight <> Nil then begin
-      ARowHeight^ := xPref.RowHeight;
-    end;
-  end;
-end;
 
 class function TCExtractionsFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
@@ -159,6 +137,11 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+procedure TCExtractionsFrame.ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  APrefname := TAccountExtraction(TCListDataElement(AHelper).Data).extractionState;
 end;
 
 end.

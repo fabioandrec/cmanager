@@ -2,10 +2,10 @@ unit CSchedules;
 
 interface
 
-uses CDataObjects, Contnrs, CDatabase, SysUtils, Math;
+uses CDataObjects, Contnrs, CDatabase, SysUtils, Math, CComponents;
 
 type
-  TPlannedTreeItem = class(TObject)
+  TPlannedTreeItem = class(TCListDataElement)
   private
     FPlanned: TPlannedMovement;
     FDone: TPlannedDone;
@@ -43,7 +43,7 @@ end;
 
 constructor TPlannedTreeItem.Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
 begin
-  inherited Create;
+  inherited Create(False, Nil, Nil, False, False);
   FPlanned := APlanned;
   FDone := ADone;
   FtriggerDate := ATriggerDate;

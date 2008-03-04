@@ -37,6 +37,8 @@ contains
   CCalendarFormUnit in 'CCalendarFormUnit.pas' {CCalendarForm},
   IntfUIHandlers in 'IntfUIHandlers.pas',
   CCalculatorFormUnit in 'CCalculatorFormUnit.pas' {CCalculatorForm},
-  CRichtext in 'Shared\CRichtext.pas';
+  CRichtext in 'Shared\CRichtext.pas',
+  CXmlTlb in 'Shared\CXmlTlb.pas',
+  CXml in 'Shared\CXml.pas';
 
 end.

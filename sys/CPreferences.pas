@@ -2,45 +2,9 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml;
+uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml, CComponents;
 
 type
-  TPrefList = class;
-  TPrefItemClass = class of TPrefItem;
-
-  TPrefItem = class(TObject)
-  private
-    FPrefname: String;
-    function FindNode(AParentNode: ICXMLDOMNode; ACanCreate: Boolean): ICXMLDOMNode;
-  protected
-    procedure LoadFromParentNode(AParentNode: ICXMLDOMNode);
-    procedure SaveToParentNode(AParentNode: ICXMLDOMNode);
-  public
-    procedure LoadFromXml(ANode: ICXMLDOMNode); virtual;
-    procedure SaveToXml(ANode: ICXMLDOMNode); virtual;
-    procedure Clone(APrefItem: TPrefItem); virtual;
-    constructor Create(APrefname: String); virtual;
-    function GetNodeName: String; virtual; abstract;
-  published
-    property Prefname: String read FPrefname write FPrefname;
-  end;
-
-  TPrefList = class(TObjectList)
-  private
-    FItemClass: TPrefItemClass;
-    function GetItems(AIndex: Integer): TPrefItem;
-    procedure SetItems(AIndex: Integer; const Value: TPrefItem);
-    function GetByPrefname(APrefname: String): TPrefItem;
-  public
-    procedure Clone(APrefList: TPrefList);
-    constructor Create(AItemClass: TPrefItemClass);
-    procedure LoadFromParentNode(AParentNode: ICXMLDOMNode);
-    procedure LoadAllFromParentNode(AParentNode: ICXMLDOMNode);
-    procedure SavetToParentNode(AParentNode: ICXMLDOMNode);
-    property Items[AIndex: Integer]: TPrefItem read GetItems write SetItems;
-    property ByPrefname[APrefname: String]: TPrefItem read GetByPrefname;
-  end;
-
   TBackupPref = class(TPrefItem)
   private
     FlastBackup: TDateTime;
@@ -87,60 +51,6 @@ type
     destructor Destroy; override;
   end;
 
-  TFontPref = class(TPrefItem)
-  private
-    FBackground: TColor;
-    FRowHeight: Integer;
-    FFont: TFont;
-    FDesc: String;
-  public
-    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
-    procedure SaveToXml(ANode: ICXMLDOMNode); override;
-    procedure Clone(APrefItem: TPrefItem); override;
-    function GetNodeName: String; override;
-    property Font: TFont read FFont;
-    property Background: TColor read FBackground write FBackground;
-    property RowHeight: Integer read FRowHeight write FRowHeight;
-    property Desc: String read FDesc;
-    constructor Create(APrefname: String); override;
-    constructor CreateFontPref(APrefname: String; ADesc: String);
-    destructor Destroy; override;
-  end;
-
-  TViewColumnPref = class(TPrefItem)
-  private
-    Fposition: Integer;
-    Fwidth: Integer;
-    Fvisible: Integer;
-    FsortOrder: Integer;
-  public
-    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
-    procedure SaveToXml(ANode: ICXMLDOMNode); override;
-    procedure Clone(APrefItem: TPrefItem); override;
-    function GetNodeName: String; override;
-  published
-    property position: Integer read Fposition write Fposition;
-    property width: Integer read Fwidth write Fwidth;
-    property visible: Integer read Fvisible write Fvisible;
-    property sortOrder: Integer read FsortOrder write FsortOrder;
-  end;
-
-  TViewPref = class(TPrefItem)
-  private
-    FFontprefs: TPrefList;
-    FFocusedBackgroundColor: TColor;
-    FFocusedFontColor: TColor;
-  public
-    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
-    procedure SaveToXml(ANode: ICXMLDOMNode); override;
-    procedure Clone(APrefItem: TPrefItem); override;
-    function GetNodeName: String; override;
-    constructor Create(APrefname: String); override;
-    destructor Destroy; override;
-    property Fontprefs: TPrefList read FFontprefs;
-    property FocusedBackgroundColor: TColor read FFocusedBackgroundColor write FFocusedBackgroundColor;
-    property FocusedFontColor: TColor read FFocusedFontColor write FFocusedFontColor;
-  end;
 
   TChartPref = class(TPrefItem)
   private
@@ -269,286 +179,13 @@ implementation
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, SysUtils,
      DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit, CDoneFrameUnit,
   CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit,
-  CBaseFrameUnit, CReportsFrameUnit;
+  CBaseFrameUnit, CReportsFrameUnit, CDescTemplatesFrameUnit;
 
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
 begin
   if Application.MainForm <> Nil then begin
     SendMessage(Application.MainForm.Handle, AMsg, AWParam, ALParam);
   end;
-end;
-
-procedure SaveFontToXml(ANode: ICXMLDOMNode; AFont: TFont);
-begin
-  SetXmlAttribute('FontName', ANode, AFont.Name);
-  SetXmlAttribute('Size', ANode, AFont.Size);
-  SetXmlAttribute('Color', ANode, AFont.Color);
-  SetXmlAttribute('IsBold', ANode, fsBold in AFont.Style);
-  SetXmlAttribute('IsItalic', ANode, fsItalic in AFont.Style);
-  SetXmlAttribute('IsUnderline', ANode, fsUnderline in AFont.Style);
-  SetXmlAttribute('IsStrikeout', ANode, fsStrikeOut in AFont.Style);
-end;
-
-procedure LoadFontFromXml(ANode: ICXMLDOMNode; AFont: TFont);
-begin
-  AFont.Name := GetXmlAttribute('FontName', ANode, 'MS Sans Serif');
-  AFont.Size := GetXmlAttribute('Size', ANode, 8);
-  AFont.Color := GetXmlAttribute('Color', ANode, clWindowText);
-  if GetXmlAttribute('IsBold', ANode, False) then begin
-    AFont.Style := AFont.Style +  [fsBold];
-  end else begin
-    AFont.Style := AFont.Style - [fsBold];
-  end;
-  if GetXmlAttribute('IsItalic', ANode, False) then begin
-    AFont.Style := AFont.Style + [fsItalic];
-  end else begin
-    AFont.Style := AFont.Style - [fsItalic];
-  end;
-  if GetXmlAttribute('IsUnderline', ANode, False) then begin
-    AFont.Style := AFont.Style + [fsUnderline];
-  end else begin
-    AFont.Style := AFont.Style - [fsUnderline];
-  end;
-  if GetXmlAttribute('IsStrikeout', ANode, False) then begin
-    AFont.Style := AFont.Style + [fsStrikeOut];
-  end else begin
-    AFont.Style := AFont.Style - [fsStrikeOut];
-  end;
-end;
-
-procedure TPrefItem.Clone(APrefItem: TPrefItem);
-begin
-  FPrefname := APrefItem.Prefname;
-end;
-
-constructor TPrefItem.Create(APrefname: String);
-begin
-  inherited Create;
-  FPrefname := APrefname;
-end;
-
-function TPrefItem.FindNode(AParentNode: ICXMLDOMNode; ACanCreate: Boolean): ICXMLDOMNode;
-var xNode: ICXMLDOMNode;
-begin
-  xNode := AParentNode.firstChild;
-  Result := Nil;
-  while (xNode <> Nil) and (Result = Nil) do begin
-    if xNode.nodeName = GetNodeName then begin
-      if GetXmlAttribute('name', xNode, '') = FPrefname then begin
-        Result := xNode;
-      end;
-    end;
-    xNode := xNode.nextSibling;
-  end;
-  if ACanCreate and (Result = Nil) then begin
-    Result := AParentNode.ownerDocument.createElement(GetNodeName);
-    AParentNode.appendChild(Result);
-    SetXmlAttribute('name', Result, FPrefname);
-  end;
-end;
-
-procedure TPrefItem.LoadFromParentNode(AParentNode: ICXMLDOMNode);
-var xNode: ICXMLDOMNode;
-begin
-  xNode := FindNode(AParentNode, False);
-  if xNode <> Nil then begin
-    LoadFromXml(xNode);
-  end;
-end;
-
-procedure TPrefItem.LoadFromXml(ANode: ICXMLDOMNode);
-begin
-end;
-
-procedure TPrefItem.SaveToParentNode(AParentNode: ICXMLDOMNode);
-var xNode: ICXMLDOMNode;
-begin
-  xNode := FindNode(AParentNode, True);
-  SaveToXml(xNode);
-end;
-
-procedure TPrefList.Clone(APrefList: TPrefList);
-var xCount: Integer;
-    xObj: TPrefItem;
-    xSou: TPrefItem;
-begin
-  Clear;
-  for xCount := 0 to APrefList.Count - 1 do begin
-    xSou := APrefList.Items[xCount];
-    xObj := FItemClass.Create(xSou.FPrefname);
-    xObj.Clone(xSou);
-    Add(xObj);
-  end;
-end;
-
-constructor TPrefList.Create(AItemClass: TPrefItemClass);
-begin
-  inherited Create(True);
-  FItemClass := AItemClass;
-end;
-
-function TPrefList.GetByPrefname(APrefname: String): TPrefItem;
-var xCount: Integer;
-    xPrefname: String;
-begin
-  xCount := 0;
-  xPrefname := AnsiLowerCase(APrefname);
-  Result := Nil;
-  while (xCount <= Count - 1) and (Result = Nil) do begin
-    if AnsiLowerCase(Items[xCount].Prefname) = xPrefname then begin
-      Result := Items[xCount];
-    end;
-    Inc(xCount);
-  end;
-end;
-
-function TPrefList.GetItems(AIndex: Integer): TPrefItem;
-begin
-  Result := TPrefItem(inherited Items[AIndex]);
-end;
-
-procedure TPrefList.LoadAllFromParentNode(AParentNode: ICXMLDOMNode);
-var xNode: ICXMLDOMNode;
-    xItem: TPrefItem;
-begin
-  xNode := AParentNode.firstChild;
-  while (xNode <> Nil) do begin
-    xItem := FItemClass.Create(GetXmlAttribute('name', xNode, ''));
-    xItem.LoadFromXml(xNode);
-    Add(xItem);
-    xNode := xNode.nextSibling;
-  end;
-end;
-
-procedure TPrefList.LoadFromParentNode(AParentNode: ICXMLDOMNode);
-var xCount: Integer;
-begin
-  for xCount := 0 to Count - 1 do begin
-    Items[xCount].LoadFromParentNode(AParentNode);
-  end;
-end;
-
-procedure TPrefList.SavetToParentNode(AParentNode: ICXMLDOMNode);
-var xCount: Integer;
-begin
-  for xCount := 0 to Count - 1 do begin
-    Items[xCount].SaveToParentNode(AParentNode);
-  end;
-end;
-
-procedure TPrefList.SetItems(AIndex: Integer; const Value: TPrefItem);
-begin
-  inherited Items[AIndex] := Value;
-end;
-
-procedure TViewPref.Clone(APrefItem: TPrefItem);
-begin
-  inherited Clone(APrefItem);
-  FFocusedBackgroundColor := TViewPref(APrefItem).FocusedBackgroundColor;
-  FocusedFontColor := TViewPref(APrefItem).FocusedFontColor;
-  FFontprefs.Clone(TViewPref(APrefItem).Fontprefs);
-end;
-
-constructor TViewPref.Create(APrefname: String);
-begin
-  inherited Create(APrefname);
-  FFocusedBackgroundColor := clHighlight;
-  FFocusedFontColor := clHighlightText;
-  FFontprefs := TPrefList.Create(TFontPref);
-end;
-
-destructor TViewPref.Destroy;
-begin
-  FFontprefs.Free;
-  inherited Destroy;
-end;
-
-function TViewPref.GetNodeName: String;
-begin
-  Result := 'viewpref';
-end;
-
-procedure TFontPref.Clone(APrefItem: TPrefItem);
-begin
-  inherited Clone(APrefItem);
-  FBackground := TFontPref(APrefItem).Background;
-  FRowHeight := TFontPref(APrefItem).RowHeight;
-  FFont.Assign(TFontPref(APrefItem).Font);
-  FDesc := TFontPref(APrefItem).Desc;
-end;
-
-constructor TFontPref.Create(APrefname: String);
-begin
-  inherited Create(APrefname);
-  FBackground := clWindow;
-  FFont := TFont.Create;
-  FFont.Color := clWindowText;
-  FFont.Style := [];
-  FFont.Size := 8;
-  FFont.Name := 'MS Sans Serif';
-  FRowHeight := 24;
-end;
-
-constructor TFontPref.CreateFontPref(APrefname, ADesc: String);
-begin
-  Create(APrefname);
-  FDesc := ADesc;
-end;
-
-destructor TFontPref.Destroy;
-begin
-  FFont.Free;
-  inherited Destroy;
-end;
-
-function TFontPref.GetNodeName: String;
-begin
-  Result := 'fontpref';
-end;
-
-procedure TFontPref.LoadFromXml(ANode: ICXMLDOMNode);
-begin
-  FBackground := GetXmlAttribute('background', ANode, FBackground);
-  FRowHeight := GetXmlAttribute('rowheight', ANode, FRowHeight);
-  LoadFontFromXml(ANode, FFont);
-end;
-
-procedure TFontPref.SaveToXml(ANode: ICXMLDOMNode);
-begin
-  inherited SaveToXml(ANode);
-  SetXmlAttribute('background', ANode, FBackground);
-  SetXmlAttribute('rowheight', ANode, FRowHeight);
-  SaveFontToXml(ANode, FFont);
-end;
-
-procedure TPrefItem.SaveToXml(ANode: ICXMLDOMNode);
-begin
-end;
-
-procedure TViewPref.LoadFromXml(ANode: ICXMLDOMNode);
-var xFontprefs: ICXMLDOMNode;
-begin
-  inherited LoadFromXml(ANode);
-  FFocusedBackgroundColor := GetXmlAttribute('focusedBackgroundColor', ANode, clYellow);
-  FFocusedFontColor := GetXmlAttribute('focusedFontColor', ANode, clRed);
-  xFontprefs := ANode.selectSingleNode('fontprefs');
-  if xFontprefs <> Nil then begin
-    FFontprefs.LoadFromParentNode(xFontprefs);
-  end;
-end;
-
-procedure TViewPref.SaveToXml(ANode: ICXMLDOMNode);
-var xFontprefs: ICXMLDOMNode;
-begin
-  inherited SaveToXml(ANode);
-  SetXmlAttribute('focusedBackgroundColor', ANode, FFocusedBackgroundColor);
-  SetXmlAttribute('focusedFontColor', ANode, FFocusedFontColor);
-  xFontprefs := ANode.selectSingleNode('fontprefs');
-  if xFontprefs = Nil then begin
-    xFontprefs := ANode.ownerDocument.createElement('fontprefs');
-    ANode.appendChild(xFontprefs);
-  end;
-  FFontprefs.SavetToParentNode(xFontprefs);
 end;
 
 procedure TBasePref.Clone(APrefItem: TPrefItem);
@@ -696,38 +333,6 @@ begin
   SetXmlAttribute('startupUncheckedExtractions', ANode, FstartupUncheckedExtractions);
   SetXmlAttribute('evenListColor', ANode, FevenListColor);
   SetXmlAttribute('oddListColor', ANode, FoddListColor);
-end;
-
-procedure TViewColumnPref.Clone(APrefItem: TPrefItem);
-begin
-  inherited Clone(APrefItem);
-  Fposition := TViewColumnPref(APrefItem).position;
-  Fwidth := TViewColumnPref(APrefItem).width;
-  Fvisible := TViewColumnPref(APrefItem).visible;
-  FsortOrder := TViewColumnPref(APrefItem).sortOrder;
-end;
-
-function TViewColumnPref.GetNodeName: String;
-begin
-  Result := 'columnPref'; 
-end;
-
-procedure TViewColumnPref.LoadFromXml(ANode: ICXMLDOMNode);
-begin
-  inherited LoadFromXml(ANode);
-  Fposition := GetXmlAttribute('position', ANode, -1);
-  Fwidth := GetXmlAttribute('width', ANode, -1);
-  Fvisible := GetXmlAttribute('visible', ANode, -1);
-  FsortOrder := GetXmlAttribute('sortOrder', ANode, 0);
-end;
-
-procedure TViewColumnPref.SaveToXml(ANode: ICXMLDOMNode);
-begin
-  inherited SaveToXml(ANode);
-  SetXmlAttribute('position', ANode, Fposition);
-  SetXmlAttribute('width', ANode, Fwidth);
-  SetXmlAttribute('visible', ANode, Fvisible);
-  SetXmlAttribute('sortOrder', ANode, FsortOrder);
 end;
 
 constructor TDescPatterns.Create(ASaveToDatabase: Boolean);
@@ -1088,6 +693,43 @@ initialization
   GViewsPreferences.Add(TViewPref.Create(CFontPreferencesDoneListSum));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesRatesList));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesExchangesList));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(TCDescTemplatesFrame.GetPrefname));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Mnemoniki'));
+    Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesExtraction));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Obci¹¿enie'));
+    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Uznanie'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesListFrame));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesMovementList));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesParamsDefs));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesShortcuts));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
+    TFontPref(Fontprefs.Last).RowHeight := 60;
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
+    TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin

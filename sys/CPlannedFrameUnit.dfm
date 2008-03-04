@@ -76,18 +76,16 @@ inherited CPlannedFrame: TCPlannedFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = PlannedListBeforeItemErase
     OnCompareNodes = PlannedListCompareNodes
     OnDblClick = PlannedListDblClick
     OnFocusChanged = PlannedListFocusChanged
     OnGetText = PlannedListGetText
-    OnPaintText = PlannedListPaintText
     OnGetImageIndex = PlannedListGetImageIndex
     OnGetHint = PlannedListGetHint
     OnGetNodeDataSize = PlannedListGetNodeDataSize
     OnInitNode = PlannedListInitNode
-    OnMeasureItem = PlannedListMeasureItem
     AutoExpand = True
+    OnGetRowPreferencesName = PlannedListGetRowPreferencesName
     Columns = <
       item
         Alignment = taRightJustify

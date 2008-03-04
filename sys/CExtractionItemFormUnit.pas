@@ -8,7 +8,7 @@ uses
   ComCtrls, CComponents, ActnList, XPStyleActnCtrls, ActnMan, Contnrs;
 
 type
-  TExtractionListElement = class(TObject)
+  TExtractionListElement = class(TCListDataElement)
   private
     FIsNew: Boolean;
     Fid: TDataGid;
@@ -81,7 +81,7 @@ uses CCurrencydefFrameUnit, CFrameFormUnit, Math, CRichtext, StrUtils,
 constructor TExtractionListElement.Create;
 var xGuid: TGUID;
 begin
-  inherited Create;
+  inherited Create(False, Nil, Nil, False, False);
   FIsNew := False;
   CreateGUID(xGuid);
   Fid := GUIDToString(xGuid);

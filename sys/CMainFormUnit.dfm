@@ -229,7 +229,7 @@ object CMainForm: TCMainForm
           OnClick = SpeedButtonCloseShortcutsClick
         end
       end
-      object ShortcutList: TVirtualStringTree
+      object ShortcutList: TCList
         Left = 1
         Top = 22
         Width = 193
@@ -269,13 +269,17 @@ object CMainForm: TCMainForm
         OnClick = ShortcutListClick
         OnGetText = ShortcutListGetText
         OnGetImageIndex = ShortcutListGetImageIndex
+        OnGetNodeDataSize = ShortcutListGetNodeDataSize
         OnHotChange = ShortcutListHotChange
+        AutoExpand = True
+        OnGetRowPreferencesName = ShortcutListGetRowPreferencesName
         Columns = <
           item
             Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
             Width = 193
           end>
+        WideDefaultText = ''
       end
     end
   end
@@ -698,6 +702,13 @@ object CMainForm: TCMainForm
   object PopupMenuShortcutView: TPopupMenu
     Left = 128
     Top = 337
+    object Ustawienialisty1: TMenuItem
+      Caption = 'Ustawienia listy'
+      OnClick = Ustawienialisty1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
     object MenuItemSmallShortcut: TMenuItem
       Caption = 'Ma'#322'e ikony'
       GroupIndex = 1

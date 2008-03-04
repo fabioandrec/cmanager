@@ -35,12 +35,13 @@ type
     function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function MustFreeAdditionalData: Boolean; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
 
 uses CReports, CParamDefFormUnit, CConfigFormUnit, CInfoFormUnit,
-  CChooseByParamsDefsFormUnit, CMemoFormUnit;
+  CChooseByParamsDefsFormUnit, CMemoFormUnit, CConsts;
 
 {$R *.dfm}
 
@@ -182,6 +183,11 @@ begin
       end;
     end;
   end;
+end;
+
+class function TCParamsDefsFrame.GetPrefname: String;
+begin
+  Result := CFontPreferencesParamsDefs;
 end;
 
 end.

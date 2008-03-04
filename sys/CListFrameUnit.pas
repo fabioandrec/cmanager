@@ -31,6 +31,7 @@ type
     class function GetTitle: String; override;
     function FindNode(ADataId: ShortString; AList: TCList): PVirtualNode; override;
     function FindNodeId(ANode: PVirtualNode): ShortString; override;
+    class function GetPrefname: String; override;
   end;
 
 function ShowCurrencyViewTypeBaseMovement(var ACurrencType: String; var AText: String): Boolean;
@@ -108,6 +109,7 @@ begin
   FGids := TStringList.Create;
   FNames := TStringList.Create;
   ReloadList(TStringList(AAdditionalData));
+  
   UpdateButtons(List.SelectedCount > 0);
 end;
 
@@ -227,6 +229,11 @@ end;
 function TCListFrame.FindNodeId(ANode: PVirtualNode): ShortString;
 begin
   Result := FGids.Strings[ANode.Index];
+end;
+
+class function TCListFrame.GetPrefname: String;
+begin
+  Result := CFontPreferencesListFrame;
 end;
 
 end.

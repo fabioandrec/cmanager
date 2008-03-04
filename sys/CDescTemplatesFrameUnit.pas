@@ -8,7 +8,7 @@ uses
   Contnrs, CComponents;
 
 type
-  TDescAdditionalData = class(TObject)
+  TDescAdditionalData = class(TCListDataElement)
   private
     FTemplates: TObjectList;
   public
@@ -24,6 +24,7 @@ type
     procedure TempListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
     procedure TempListDblClick(Sender: TObject);
     procedure TempListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure TempListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   protected
     function GetSelectedId: ShortString; override;
     function GetSelectedText: String; override;
@@ -31,11 +32,12 @@ type
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function GetList: TCList; override;
     class function GetTitle: String; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
 
-uses CTemplates, CBaseFormUnit, CFrameFormUnit, CTools;
+uses CTemplates, CBaseFormUnit, CFrameFormUnit, CTools, CConsts;
 
 {$R *.dfm}
 
@@ -138,8 +140,22 @@ end;
 
 constructor TDescAdditionalData.Create(ATemplates: TObjectList);
 begin
-  inherited Create;
+  inherited Create(False, Nil, Nil, False, False);
   FTemplates := ATemplates;
+end;
+
+class function TCDescTemplatesFrame.GetPrefname: String;
+begin
+  Result := CFontPreferencesDescTemplatesList;
+end;
+
+procedure TCDescTemplatesFrame.TempListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  if AHelper.InheritsFrom(TDescTemplateList) then begin
+    APrefname := 'G';
+  end else begin
+    APrefname := 'R';
+  end;
 end;
 
 end.

@@ -183,7 +183,7 @@ type
 
   TTreeObjectList = class;
 
-  TTreeObject = class(TObject)
+  TTreeObject = class(TCListDataElement)
   private
     FDataobject: TDataObject;
     FChildobjects: TTreeObjectList;
@@ -1216,7 +1216,7 @@ end;
 
 constructor TTreeObject.Create;
 begin
-  inherited Create;
+  inherited Create(False, Nil, Nil, False, False);
   FChildobjects := TTreeObjectList.Create(True);
 end;
 

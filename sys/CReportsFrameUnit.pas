@@ -61,9 +61,7 @@ type
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionEditExecute(Sender: TObject);
     procedure ActionDelExecute(Sender: TObject);
-    procedure ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-    procedure ListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-    procedure ListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
     FPrivateList: TDataObjectList;
     FPrivateElement: TCListDataElement;
@@ -73,7 +71,6 @@ type
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
     procedure MessageMovementEdited(AId: TDataGid; AOptions: Integer); virtual;
     procedure MessageMovementDeleted(AId: TDataGid; AOptions: Integer); virtual;
-    procedure FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   public
     function GetList: TCList; override;
     class function GetTitle: String; override;
@@ -85,7 +82,8 @@ type
 implementation
 
 uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts,
-  CPlugins, CPluginConsts, CTools, CReportDefFormUnit, CPreferences;
+  CPlugins, CPluginConsts, CTools, CReportDefFormUnit, CPreferences,
+  StrUtils;
 
 {$R *.dfm}
 
@@ -407,52 +405,9 @@ begin
   Result := 'reportsFrame';
 end;
 
-procedure TCReportsFrame.ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-var xBase: TCListDataElement;
-    xColor: TColor;
+procedure TCReportsFrame.ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
-  xBase := TCListDataElement(List.GetNodeData(Node)^);
-  with TargetCanvas do begin
-    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
-    if xColor <> clWindow then begin
-      ItemColor := xColor;
-    end;
-  end;
-end;
-
-procedure TCReportsFrame.FindRowVisualProperties(AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
-var xKey: String;
-    xPref: TFontPref;
-begin
-  if TReportListElement(AHelper.Data).isReport then begin
-    xKey := 'R';
-  end else begin
-    xKey := 'G';
-  end;
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname[GetPrefname]).Fontprefs.ByPrefname[xKey]);
-  if xPref <> Nil then begin
-    if ABackground <> Nil then begin
-      ABackground^ := xPref.Background;
-    end;
-    if AFont <> Nil then begin
-      AFont.Assign(xPref.Font);
-    end;
-    if ARowHeight <> Nil then begin
-      ARowHeight^ := xPref.RowHeight;
-    end;
-  end;
-end;
-
-procedure TCReportsFrame.ListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-begin
-  FindRowVisualProperties(TCListDataElement(List.GetNodeData(Node)^), Nil, Nil, @NodeHeight);
-end;
-
-procedure TCReportsFrame.ListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-var xBase: TCListDataElement;
-begin
-  xBase := TCListDataElement(List.GetNodeData(Node)^);
-  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
+  APrefname := IfThen(TReportListElement(TCListDataElement(AHelper).Data).isReport, 'R', 'G');
 end;
 
 end.

@@ -309,6 +309,14 @@ const
 const
   CFontPreferencesMovementListSum = 'baseMovementSums';
   CFontPreferencesDoneListSum = 'plannedDoneSums';
+  CFontPreferencesRatesList = 'updateCurrencyRates';
+  CFontPreferencesExchangesList = 'updateExchanges';
+  CFontPreferencesDescTemplatesList = 'descTemplates';
+  CFontPreferencesExtraction = 'extraction';
+  CFontPreferencesListFrame = 'listFrame';
+  CFontPreferencesMovementList = 'movementList';
+  CFontPreferencesParamsDefs = 'paramsDefs';
+  CFontPreferencesShortcuts = 'shortcutsList';
 
 implementation
 

@@ -2,14 +2,14 @@ unit CTemplates;
 
 interface
 
-uses Contnrs;
+uses Contnrs, CComponents;
 
 type
   IDescTemplateExpander = interface
     function ExpandTemplate(ATemplate: String): String;
   end;
 
-  TDescTemplate = class(TObject)
+  TDescTemplate = class(TCListDataElement)
   private
     Fsymbol: String;
     Fdescription: String;
@@ -21,7 +21,7 @@ type
     property description: String read Fdescription;
   end;
 
-  TDescTemplateList = class(TObjectList)
+  TDescTemplateList = class(TCListDataElement)
   private
     Fname: String;
     function GetItems(AIndex: Integer): TDescTemplate;
@@ -52,7 +52,7 @@ uses Classes, SysUtils;
 
 constructor TDescTemplate.Create(ASymbol, ADescription: String);
 begin
-  inherited Create;
+  inherited Create(False, Nil, Nil, False, False);
   Fsymbol := ASymbol;
   Fdescription := ADescription;
 end;
@@ -69,7 +69,7 @@ end;
 
 constructor TDescTemplateList.Create(AName: String);
 begin
-  inherited Create(True);
+  inherited Create(False, Nil, Nil, False, False);
   Fname := AName;
 end;
 

@@ -50,9 +50,6 @@ type
     procedure ListDblClick(Sender: TObject);
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionHistoryExecute(Sender: TObject);
-    procedure ListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-    procedure ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-    procedure ListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
@@ -67,7 +64,6 @@ type
     procedure AfterDeleteObject(ADataobject: TDataObject); virtual;
   public
     Dataobjects: TDataObjectList;
-    ViewPref: TViewPref;
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     procedure RecreateTreeHelper; virtual;
     procedure ReloadDataobjects; virtual;
@@ -91,7 +87,6 @@ type
     procedure HideFrame; override;
     function IsAllElementChecked(ACheckedCount: Integer): Boolean; override;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
-    procedure FindRowVisualProperties(AIsFocused: Boolean; AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger); virtual;
     class function GetPrefname: String; override;
   end;
 
@@ -172,11 +167,6 @@ begin
   Edytuj1.Visible := ActionEdit.Visible and ButtonPanel.Visible;
   Usu1.Visible := ActionDelete.Visible and ButtonPanel.Visible;
   Historia1.Visible := ActionHistory.Visible and ButtonPanel.Visible;
-  ViewPref := TViewPref(GViewsPreferences.ByPrefname[GetPrefname]);
-  if (ViewPref <> Nil) and (GetList <> Nil) then begin
-    GetList.Colors.FocusedSelectionColor := ViewPref.FocusedBackgroundColor;
-    GetList.Colors.FocusedSelectionBorderColor := ViewPref.FocusedBackgroundColor;
-  end;
   RefreshData;
 end;
 
@@ -475,45 +465,6 @@ end;
 
 procedure TCDataobjectFrame.AfterDeleteObject(ADataobject: TDataObject);
 begin
-end;
-
-procedure TCDataobjectFrame.FindRowVisualProperties(AIsFocused: Boolean; AHelper: TCListDataElement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
-var xKey: String;
-    xPref: TFontPref;
-begin
-  xKey := '*';
-  xPref := TFontPref(ViewPref.Fontprefs.ByPrefname[xKey]);
-  if xPref <> Nil then begin
-    if ABackground <> Nil then begin
-      if xPref.Background <> clWindow then begin
-        ABackground^ := xPref.Background;
-      end;
-    end;
-    if AFont <> Nil then begin
-      AFont.Assign(xPref.Font);
-      if AIsFocused then begin
-        AFont.Color := ViewPref.FocusedFontColor;
-      end;
-    end;
-    if ARowHeight <> Nil then begin
-      ARowHeight^ := xPref.RowHeight;
-    end;
-  end;
-end;
-
-procedure TCDataobjectFrame.ListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-begin
-  FindRowVisualProperties(Node = GetList.FocusedNode, TCListDataElement(GetList.GetNodeData(Node)^), Nil, Nil, @NodeHeight);
-end;
-
-procedure TCDataobjectFrame.ListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-begin
-  FindRowVisualProperties(Node = GetList.FocusedNode, TCListDataElement(GetList.GetNodeData(Node)^), Nil, @ItemColor, Nil);
-end;
-
-procedure TCDataobjectFrame.ListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-begin
-  FindRowVisualProperties(Node = GetList.FocusedNode, TCListDataElement(GetList.GetNodeData(Node)^), TargetCanvas.Font, Nil, Nil);
 end;
 
 class function TCDataobjectFrame.GetPrefname: String;

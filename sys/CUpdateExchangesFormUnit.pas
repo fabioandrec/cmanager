@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, CComponents, StdCtrls, Buttons, ExtCtrls, CXml,
-  VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects;
+  VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects,
+  Menus;
 
 type
   TCUpdateExchangesForm = class(TCBaseForm)
@@ -25,6 +26,8 @@ type
     CButtonEdit: TCButton;
     Label1: TLabel;
     ComboBoxType: TComboBox;
+    PopupMenu1: TPopupMenu;
+    Zaznaczwszystkie1: TMenuItem;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure ExchangesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ExchangesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -36,6 +39,7 @@ type
     procedure BitBtnOkClick(Sender: TObject);
     procedure ExchangesListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ComboBoxTypeChange(Sender: TObject);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
   private
     FSourceXml: ICXMLDOMDocument;
     FSourceRoot: ICXMLDOMNode;
@@ -67,7 +71,8 @@ uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
   CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit,
-  CPluginConsts, CXmlTlb, CInvestmentPortfolioFrameUnit;
+  CPluginConsts, CXmlTlb, CInvestmentPortfolioFrameUnit,
+  CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -135,6 +140,7 @@ begin
   end;
   GDataProvider.RollbackTransaction;
   xList.Free;
+  ExchangesList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesExchangesList]);
   RecreateTreeExchanges;
 end;
 
@@ -380,6 +386,17 @@ begin
   FByNamesList.Free;
   FBySymbolList.Free;
   inherited Destroy;
+end;
+
+procedure TCUpdateExchangesForm.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesExchangesList, GViewsPreferences) then begin
+    ExchangesList.ReinitNode(ExchangesList.RootNode, True);
+    ExchangesList.Repaint;
+  end;
+  xPrefs.Free;
 end;
 
 end.

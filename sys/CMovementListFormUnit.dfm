@@ -69,7 +69,7 @@ inherited CMovementListForm: TCMovementListForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 0
@@ -77,6 +77,7 @@ inherited CMovementListForm: TCMovementListForm
         Transparent = False
         OnChanged = CDateTime1Changed
         HotTrack = True
+        Withtime = False
       end
       object ComboBox1: TComboBox
         Left = 192
@@ -303,6 +304,7 @@ inherited CMovementListForm: TCMovementListForm
           HintMode = hmHint
           Images = CImageLists.MovementIcons16x16
           ParentShowHint = False
+          PopupMenu = PopupMenu1
           ShowHint = True
           TabOrder = 1
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -477,6 +479,15 @@ inherited CMovementListForm: TCMovementListForm
       Caption = 'Do uzgodnienia'
       ImageIndex = 1
       OnExecute = ActionStateOnceExecute
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 297
+    object Zaznaczwszystkie1: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = Zaznaczwszystkie1Click
     end
   end
 end

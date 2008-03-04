@@ -7,7 +7,7 @@ uses
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, VirtualTrees, ActnList, XPStyleActnCtrls, ActnMan, Contnrs,
   CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit, CTools,
-  CMovementStateFormUnit;
+  CMovementStateFormUnit, Menus;
 
 type
   TCMovementListForm = class(TCDataobjectForm)
@@ -50,6 +50,8 @@ type
     ActionManagerStates: TActionManager;
     ActionStateOnce: TAction;
     CButtonStateOnce: TCButton;
+    PopupMenu1: TPopupMenu;
+    Zaznaczwszystkie1: TMenuItem;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -74,6 +76,7 @@ type
     procedure CStaticViewCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticViewCurrencyChanged(Sender: TObject);
     procedure ActionStateOnceExecute(Sender: TObject);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -117,7 +120,8 @@ uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
      CBaseFormUnit, CConsts, GraphUtil, CInfoFormUnit, Math,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
   CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit,
-  CCurrencydefFrameUnit, CSurpassedFormUnit, CListFrameUnit;
+  CCurrencydefFrameUnit, CSurpassedFormUnit, CListFrameUnit,
+  CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -300,6 +304,7 @@ begin
     end;
     GDataProvider.RollbackTransaction;
   end;
+  MovementList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementList]);
   UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
   CButtonStateOnce.Enabled := False;
   UpdateDescription;
@@ -848,6 +853,17 @@ end;
 procedure TCMovementListForm.ActionStateOnceExecute(Sender: TObject);
 begin
   ChooseState(FonceState, ActionStateOnce, CButtonStateOnce);
+end;
+
+procedure TCMovementListForm.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesMovementList, GViewsPreferences) then begin
+    MovementList.ReinitNode(MovementList.RootNode, True);
+    MovementList.Repaint;
+  end;
+  xPrefs.Free;
 end;
 
 end.

@@ -22,13 +22,8 @@ type
     procedure RepaymentListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure RepaymentListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    procedure RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure RepaymentListGetImageIndexEx(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; var ImageList: TCustomImageList);
-    procedure RepaymentListMeasureItem(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-    procedure RepaymentListBeforeItemErase(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
-      var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure RepaymentListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
@@ -36,7 +31,6 @@ type
     FLimitData: TDataObjectList;
     FExtractionsData: TDataObjectList;
     FHelperList: TStartupHelperList;
-    procedure FindRowVisualProperties(AHelper: TStartupHelper; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   public
     procedure ReloadInfoTree;
     destructor Destroy; override;
@@ -458,13 +452,6 @@ begin
   end;
 end;
 
-procedure TCStartupInfoFrame.RepaymentListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-var xData: TStartupHelper;
-begin
-  xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
-  FindRowVisualProperties(xData, TargetCanvas.Font, Nil, Nil);
-end;
-
 procedure TCStartupInfoFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
@@ -493,44 +480,6 @@ end;
 function TCStartupInfoFrame.GetList: TCList;
 begin
   Result := RepaymentList;
-end;
-
-procedure TCStartupInfoFrame.FindRowVisualProperties(AHelper: TStartupHelper; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
-var xKey: String;
-    xPref: TFontPref;
-begin
-  if AHelper.helperType = shtGroup then begin
-    xKey := 'TT';
-  end else if AHelper.helperType = shtDate then begin
-    xKey := 'DD';
-  end else if AHelper.helperType = shtExtraction then begin
-    xKey := 'UE';
-  end else if AHelper.helperType = shtLimit then begin
-    if TMovementLimit(AHelper.item).IsSurpassed(AHelper.sum) then begin
-      xKey := 'SL';
-    end else begin
-      xKey := 'VL';
-    end;
-  end else begin
-    if TPlannedTreeItem(AHelper.item).triggerDate < GWorkDate then begin
-      xKey := 'O';
-    end else begin
-      xKey := 'I';
-    end;
-    xKey := xKey + TPlannedTreeItem(AHelper.item).planned.movementType;
-  end;
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['startupInfo']).Fontprefs.ByPrefname[xKey]);
-  if xPref <> Nil then begin
-    if ABackground <> Nil then begin
-      ABackground^ := xPref.Background;
-    end;
-    if AFont <> Nil then begin
-      AFont.Assign(xPref.Font);
-    end;
-    if ARowHeight <> Nil then begin
-      ARowHeight^ := xPref.RowHeight;
-    end;
-  end;
 end;
 
 procedure TCStartupInfoFrame.RepaymentListGetImageIndexEx(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer; var ImageList: TCustomImageList);
@@ -601,23 +550,29 @@ begin
   Result := Nil;
 end;
 
-procedure TCStartupInfoFrame.RepaymentListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-var xData: TStartupHelper;
+procedure TCStartupInfoFrame.RepaymentListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+var xHelper: TStartupHelper;
 begin
-  xData := TStartupHelper(RepaymentList.GetNodeData(Node)^);
-  FindRowVisualProperties(xData, Nil, Nil, @NodeHeight);
-end;
-
-procedure TCStartupInfoFrame.RepaymentListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-var xBase: TStartupHelper;
-    xColor: TColor;
-begin
-  xBase := TStartupHelper(RepaymentList.GetNodeData(Node)^);
-  with TargetCanvas do begin
-    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
-    if xColor <> clWindow then begin
-      ItemColor := xColor;
+  xHelper := TStartupHelper(AHelper);
+  if xHelper.helperType = shtGroup then begin
+    APrefname := 'TT';
+  end else if xHelper.helperType = shtDate then begin
+    APrefname := 'DD';
+  end else if xHelper.helperType = shtExtraction then begin
+    APrefname := 'UE';
+  end else if xHelper.helperType = shtLimit then begin
+    if TMovementLimit(xHelper.item).IsSurpassed(xHelper.sum) then begin
+      APrefname := 'SL';
+    end else begin
+      APrefname := 'VL';
     end;
+  end else begin
+    if TPlannedTreeItem(xHelper.item).triggerDate < GWorkDate then begin
+      APrefname := 'O';
+    end else begin
+      APrefname := 'I';
+    end;
+    APrefname := APrefname + TPlannedTreeItem(xHelper.item).planned.movementType;
   end;
 end;
 

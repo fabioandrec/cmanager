@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, CComponents, StdCtrls, Buttons, ExtCtrls, CXml,
-  VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects;
+  VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects,
+  Menus;
 
 type
   TCUpdateCurrencyRatesForm = class(TCBaseForm)
@@ -30,6 +31,8 @@ type
     CButtonEdit: TCButton;
     ComboBoxType: TComboBox;
     Label1: TLabel;
+    PopupMenu1: TPopupMenu;
+    Zaznaczwszystkie1: TMenuItem;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure RatesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure RatesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -40,6 +43,7 @@ type
     procedure Action3Execute(Sender: TObject);
     procedure BitBtnOkClick(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
   private
     FXml: ICXMLDOMDocument;
     FRoot: ICXMLDOMNode;
@@ -82,7 +86,7 @@ implementation
 uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
-  CWaitFormUnit, CProgressFormUnit;
+  CWaitFormUnit, CProgressFormUnit, CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -134,6 +138,7 @@ begin
   CStaticCashpoint.DataId := GDataProvider.GetSqlString('select idCashpoint from cashpoint where name = ''' + FCashpointName + '''', CEmptyDataGid);
   GDataProvider.RollbackTransaction;
   CDateTime.Value := FBindingDate;
+  RatesList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesRatesList]);
   RecreateTreeRates;
 end;
 
@@ -330,6 +335,17 @@ end;
 procedure TCUpdateCurrencyRatesForm.ComboBoxTypeChange(Sender: TObject);
 begin
   RecreateTreeRates;
+end;
+
+procedure TCUpdateCurrencyRatesForm.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesRatesList, GViewsPreferences) then begin
+    RatesList.ReinitNode(RatesList.RootNode, True);
+    RatesList.Repaint;
+  end;
+  xPrefs.Free;
 end;
 
 end.

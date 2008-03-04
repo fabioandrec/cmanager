@@ -26,21 +26,17 @@ type
     procedure PlannedListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure PlannedListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure PlannedListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
-    procedure PlannedListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
     procedure PlannedListDblClick(Sender: TObject);
-    procedure PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
     procedure PlannedListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure PlannedListMeasureItem(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure PlannedListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
     FPlannedObjects: TDataObjectList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
-    procedure FindRowVisualProperties(AHelper: TPlannedMovement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
   protected
     procedure WndProc(var Message: TMessage); override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
@@ -178,19 +174,6 @@ begin
   LineBreakStyle := hlbForceMultiLine;
 end;
 
-procedure TCPlannedFrame.PlannedListBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
-var xBase: TPlannedMovement;
-    xColor: TColor;
-begin
-  xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
-  with TargetCanvas do begin
-    FindRowVisualProperties(xBase, Nil, @xColor, Nil);
-    if xColor <> clWindow then begin
-      ItemColor := xColor;
-    end;
-  end;
-end;
-
 procedure TCPlannedFrame.MessageMovementAdded(AId: TDataGid);
 var xDataobject: TPlannedMovement;
     xNode: PVirtualNode;
@@ -308,32 +291,6 @@ begin
   ActionEditMovement.Execute;
 end;
 
-procedure TCPlannedFrame.FindRowVisualProperties(AHelper: TPlannedMovement; AFont: TFont; ABackground: PColor; ARowHeight: PInteger);
-var xKey: String;
-    xPref: TFontPref;
-begin
-  xKey := AHelper.movementType;
-  xPref := TFontPref(TViewPref(GViewsPreferences.ByPrefname['plannedMovement']).Fontprefs.ByPrefname[xKey]);
-  if xPref <> Nil then begin
-    if ABackground <> Nil then begin
-      ABackground^ := xPref.Background;
-    end;
-    if AFont <> Nil then begin
-      AFont.Assign(xPref.Font);
-    end;
-    if ARowHeight <> Nil then begin
-      ARowHeight^ := xPref.RowHeight;
-    end;
-  end;
-end;
-
-procedure TCPlannedFrame.PlannedListPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-var xBase: TPlannedMovement;
-begin
-  xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
-  FindRowVisualProperties(xBase, TargetCanvas.Font, Nil, Nil);
-end;
-
 class function TCPlannedFrame.GetPrefname: String;
 begin
   Result := 'plannedMovement';
@@ -378,11 +335,9 @@ begin
   end;
 end;
 
-procedure TCPlannedFrame.PlannedListMeasureItem(Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
-var xBase: TPlannedMovement;
+procedure TCPlannedFrame.PlannedListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
-  xBase := TPlannedMovement(PlannedList.GetNodeData(Node)^);
-  FindRowVisualProperties(xBase, Nil, Nil, @NodeHeight);
+  APrefname := TPlannedMovement(AHelper).movementType;
 end;
 
 end.

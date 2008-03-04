@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, VirtualTrees, Contnrs,
-  CDatabase, CBaseFrameUnit, CExtractionItemFormUnit;
+  CDatabase, CBaseFrameUnit, CExtractionItemFormUnit, Menus;
 
 type
   TExtractionAdditionalData = class(TAdditionalData)
@@ -54,6 +54,8 @@ type
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
     MovementList: TCList;
+    PopupMenu1: TPopupMenu;
+    Zaznaczwszystkie1: TMenuItem;
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticAccountChanged(Sender: TObject);
     procedure CDateTime1Changed(Sender: TObject);
@@ -73,6 +75,8 @@ type
     procedure MovementListDblClick(Sender: TObject);
     procedure MovementListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure MovementListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure MovementListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
@@ -103,7 +107,8 @@ implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CTemplates, CPreferences, CConsts,
   CRichtext, CDescpatternFormUnit, DateUtils, CInfoFormUnit, CDataObjects,
-  Math, CConfigFormUnit, CExtractionsFrameUnit, StrUtils, CTools;
+  Math, CConfigFormUnit, CExtractionsFrameUnit, StrUtils, CTools,
+  CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -157,6 +162,7 @@ begin
     end;
     MovementList.RootNodeCount := Fmovements.Count;
   end;
+  MovementList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesExtraction]);
   MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
   UpdateButtons;
   UpdateDescription;
@@ -617,6 +623,22 @@ destructor TExtractionAdditionalData.Destroy;
 begin
   Fmovements.Free;
   inherited Destroy;
+end;
+
+procedure TCExtractionForm.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesExtraction, GViewsPreferences) then begin
+    MovementList.ReinitNode(MovementList.RootNode, True);
+    MovementList.Repaint;
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCExtractionForm.MovementListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  APrefname := TExtractionListElement(AHelper).movementType;
 end;
 
 end.

@@ -39,6 +39,7 @@ inherited CDescTemplatesFrame: TCDescTemplatesFrame
     OnInitChildren = TempListInitChildren
     OnInitNode = TempListInitNode
     AutoExpand = True
+    OnGetRowPreferencesName = TempListGetRowPreferencesName
     Columns = <
       item
         Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]

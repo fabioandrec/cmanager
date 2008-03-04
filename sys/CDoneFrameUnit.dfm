@@ -115,15 +115,12 @@ inherited CDoneFrame: TCDoneFrame
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
       OnGetText = SumListGetText
-      OnPaintText = SumListPaintText
       OnGetHint = DoneListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
-      OnMeasureItem = SumListMeasureItem
       AutoExpand = True
       Columns = <
         item
@@ -188,18 +185,16 @@ inherited CDoneFrame: TCDoneFrame
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = DoneListBeforeItemErase
     OnCompareNodes = DoneListCompareNodes
     OnDblClick = DoneListDblClick
     OnFocusChanged = DoneListFocusChanged
     OnGetText = DoneListGetText
-    OnPaintText = DoneListPaintText
     OnGetImageIndex = DoneListGetImageIndex
     OnGetHint = DoneListGetHint
     OnGetNodeDataSize = DoneListGetNodeDataSize
     OnInitNode = DoneListInitNode
-    OnMeasureItem = DoneListMeasureItem
     AutoExpand = True
+    OnGetRowPreferencesName = DoneListGetRowPreferencesName
     Columns = <
       item
         Alignment = taRightJustify

@@ -57,7 +57,7 @@ type
     procedure DoRepaintLists; virtual;
     function GetBaseForm: TCBaseForm;
     procedure Loaded; override;
-    procedure DoCheckChanged; virtual; 
+    procedure DoCheckChanged; virtual;
     procedure ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure UpdateSelectedItemPlugins;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; virtual;
@@ -234,6 +234,7 @@ end;
 
 procedure TCBaseFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 var xList: TCList;
+    xViewPref: TViewPref;
 begin
   FOwner := AOwner;
   FAdditionalData := AAdditionalData;
@@ -255,6 +256,10 @@ begin
     UpdateSelectedItemPlugins;
   end;
   LoadColumns;
+  xViewPref := TViewPref(GViewsPreferences.ByPrefname[GetPrefname]);
+  if (xViewPref <> Nil) then begin
+    GetList.ViewPref := xViewPref;
+  end;
 end;
 
 function TCBaseFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;

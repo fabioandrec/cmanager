@@ -123,15 +123,12 @@ inherited CMovementFrame: TCMovementFrame
       TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
       TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnBeforeItemErase = SumListBeforeItemErase
       OnCompareNodes = SumListCompareNodes
       OnGetText = SumListGetText
-      OnPaintText = SumListPaintText
       OnGetHint = TodayListGetHint
       OnGetNodeDataSize = SumListGetNodeDataSize
       OnInitChildren = SumListInitChildren
       OnInitNode = SumListInitNode
-      OnMeasureItem = SumListMeasureItem
       AutoExpand = True
       Columns = <
         item
@@ -198,19 +195,17 @@ inherited CMovementFrame: TCMovementFrame
     TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
     TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnBeforeItemErase = TodayListBeforeItemErase
     OnCompareNodes = TodayListCompareNodes
     OnDblClick = TodayListDblClick
     OnFocusChanged = TodayListFocusChanged
     OnGetText = TodayListGetText
-    OnPaintText = TodayListPaintText
     OnGetImageIndex = TodayListGetImageIndex
     OnGetHint = TodayListGetHint
     OnGetNodeDataSize = TodayListGetNodeDataSize
     OnInitChildren = TodayListInitChildren
     OnInitNode = TodayListInitNode
-    OnMeasureItem = TodayListMeasureItem
     AutoExpand = True
+    OnGetRowPreferencesName = TodayListGetRowPreferencesName
     Columns = <
       item
         Alignment = taRightJustify

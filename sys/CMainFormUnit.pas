@@ -45,7 +45,7 @@ type
     PanelShortcuts: TPanel;
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
-    ShortcutList: TVirtualStringTree;
+    ShortcutList: TCList;
     ActionBackup: TAction;
     ActionRestore: TAction;
     ActionCheckDatafile: TAction;
@@ -78,6 +78,8 @@ type
     MenuItemSmallShortcut: TMenuItem;
     MenuItemBigShortcut: TMenuItem;
     ActionDiscForum: TAction;
+    N1: TMenuItem;
+    Ustawienialisty1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -117,6 +119,9 @@ type
     procedure MenuItemBigShortcutClick(Sender: TObject);
     procedure MenuItemSmallShortcutClick(Sender: TObject);
     procedure ActionDiscForumExecute(Sender: TObject);
+    procedure Ustawienialisty1Click(Sender: TObject);
+    procedure ShortcutListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
+    procedure ShortcutListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -133,7 +138,6 @@ type
     function CallHelp(ACommand: Word; AData: Longint; var ACallHelp: Boolean): Boolean;
     function GetSelectedId: String;
     function GetSelectedType: Integer;
-    procedure SetShortcutnodesHeight(AHeight: Integer);
   protected
     procedure WndProc(var Message: TMessage); override;
     function GetFrameClassForAction(AAction: TAction): TCBaseFrameClass;
@@ -172,7 +176,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
-  CCreateDatafileFormUnit;
+  CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils;
 
 {$R *.dfm}
 
@@ -349,6 +353,7 @@ begin
       end;
     end;
   end;
+  ShortcutList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesShortcuts]);
 end;
 
 procedure TCMainForm.ActionShortcutExecute(ASender: TObject);
@@ -916,12 +921,10 @@ end;
 procedure TCMainForm.MenuItemBigShortcutClick(Sender: TObject);
 begin
   with ShortcutList do begin
-    BeginUpdate;
     Images := CImageLists.MainImageList32x32;
-    SetShortcutnodesHeight(60);
-    EndUpdate;
-    Repaint;
     MenuItemBigShortcut.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
     GBasePreferences.shortcutBarSmall := False;
   end;
 end;
@@ -929,29 +932,38 @@ end;
 procedure TCMainForm.MenuItemSmallShortcutClick(Sender: TObject);
 begin
   with ShortcutList do begin
-    BeginUpdate;
     Images := CImageLists.MainImageList16x16;
-    SetShortcutnodesHeight(24);
-    EndUpdate;
-    Repaint;
     MenuItemSmallShortcut.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
     GBasePreferences.shortcutBarSmall := True;
-  end;
-end;
-
-procedure TCMainForm.SetShortcutnodesHeight(AHeight: Integer);
-var xNode: PVirtualNode;
-begin
-  xNode := ShortcutList.GetFirst;
-  while (xNode <> Nil) do begin
-    ShortcutList.NodeHeight[xNode] := AHeight;
-    xNode := ShortcutList.GetNext(xNode);
   end;
 end;
 
 procedure TCMainForm.ActionDiscForumExecute(Sender: TObject);
 begin
   ShellExecute(0, nil, 'http://sourceforge.net/forum/forum.php?forum_id=617716', nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TCMainForm.Ustawienialisty1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(CFontPreferencesShortcuts, GViewsPreferences) then begin
+    ShortcutList.ReinitNode(ShortcutList.RootNode, True);
+    ShortcutList.Repaint;
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCMainForm.ShortcutListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
+begin
+  NodeDataSize := SizeOf(TObject);
+end;
+
+procedure TCMainForm.ShortcutListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  APrefname := IfThen(MenuItemBigShortcut.Checked, 'B', 'S');
 end;
 
 end.

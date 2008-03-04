@@ -64,7 +64,7 @@ inherited CExtractionForm: TCExtractionForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 0
@@ -72,6 +72,7 @@ inherited CExtractionForm: TCExtractionForm
         Transparent = False
         OnChanged = CDateTimeChanged
         HotTrack = True
+        Withtime = False
       end
       object CStaticAccount: TCStatic
         Left = 312
@@ -118,7 +119,7 @@ inherited CExtractionForm: TCExtractionForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 3
@@ -126,6 +127,7 @@ inherited CExtractionForm: TCExtractionForm
         Transparent = False
         OnChanged = CDateTime1Changed
         HotTrack = True
+        Withtime = False
       end
       object CDateTime2: TCDateTime
         Left = 440
@@ -135,7 +137,7 @@ inherited CExtractionForm: TCExtractionForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 4
@@ -143,6 +145,7 @@ inherited CExtractionForm: TCExtractionForm
         Transparent = False
         OnChanged = CDateTime2Changed
         HotTrack = True
+        Withtime = False
       end
     end
     object GroupBox2: TGroupBox
@@ -297,6 +300,7 @@ inherited CExtractionForm: TCExtractionForm
           HintMode = hmHint
           Images = CImageLists.MovementIcons16x16
           ParentShowHint = False
+          PopupMenu = PopupMenu1
           ShowHint = True
           TabOrder = 1
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -312,6 +316,7 @@ inherited CExtractionForm: TCExtractionForm
           OnGetNodeDataSize = MovementListGetNodeDataSize
           OnInitNode = MovementListInitNode
           AutoExpand = True
+          OnGetRowPreferencesName = MovementListGetRowPreferencesName
           Columns = <
             item
               Alignment = taRightJustify
@@ -396,6 +401,15 @@ inherited CExtractionForm: TCExtractionForm
       Caption = 'Usu'#324' operacj'#281
       ImageIndex = 2
       OnExecute = Action3Execute
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 297
+    object Zaznaczwszystkie1: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = Zaznaczwszystkie1Click
     end
   end
 end
