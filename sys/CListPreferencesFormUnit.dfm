@@ -1,17 +1,17 @@
 inherited CListPreferencesForm: TCListPreferencesForm
   Caption = 'Ustawienia listy'
-  ClientHeight = 338
-  ClientWidth = 421
+  ClientHeight = 378
+  ClientWidth = 428
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 421
-    Height = 297
+    Width = 428
+    Height = 337
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
-      Width = 385
-      Height = 273
+      Width = 393
+      Height = 313
       Caption = ' Ustawienia czcionek i kolor'#243'w '
       TabOrder = 0
       object CButton5: TCButton
@@ -42,15 +42,15 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object Label1: TLabel
         Left = 264
-        Top = 221
+        Top = 253
         Width = 50
         Height = 13
         Caption = 'Wysoko'#347#263
       end
       object CButton1: TCButton
         Left = 232
-        Top = 140
-        Width = 161
+        Top = 172
+        Width = 150
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -62,8 +62,8 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object CButton2: TCButton
         Left = 232
-        Top = 172
-        Width = 169
+        Top = 204
+        Width = 147
         Height = 25
         Cursor = crHandPoint
         PicPosition = ppLeft
@@ -73,11 +73,24 @@ inherited CListPreferencesForm: TCListPreferencesForm
         Action = Action2
         Color = clBtnFace
       end
+      object CButton3: TCButton
+        Left = 232
+        Top = 140
+        Width = 145
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = Action5
+        Color = clBtnFace
+      end
       object PanelExample: TPanel
         Left = 24
         Top = 68
         Width = 201
-        Height = 185
+        Height = 221
         BevelOuter = bvLowered
         Color = clWindow
         TabOrder = 0
@@ -116,7 +129,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object TrackBar: TTrackBar
         Left = 247
-        Top = 208
+        Top = 240
         Width = 10
         Height = 38
         Max = 60
@@ -131,13 +144,13 @@ inherited CListPreferencesForm: TCListPreferencesForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 297
-    Width = 421
+    Top = 337
+    Width = 428
     inherited BitBtnOk: TBitBtn
-      Left = 244
+      Left = 251
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 332
+      Left = 339
     end
   end
   object FontImageList: TPngImageList
@@ -211,14 +224,18 @@ inherited CListPreferencesForm: TCListPreferencesForm
     Top = 152
     StyleName = 'XP Style'
     object Action3: TAction
-      Caption = 'Czcionka element'#243'w'
+      Caption = 'Czcionka elementu'
       ImageIndex = 0
       OnExecute = Action3Execute
     end
     object Action4: TAction
-      Caption = 'T'#322'o element'#243'w'
+      Caption = 'Elementy nieparzyste'
       ImageIndex = 1
       OnExecute = Action4Execute
+    end
+    object Action5: TAction
+      Caption = 'Elementy parzyste'
+      ImageIndex = 1
     end
     object Action1: TAction
       Caption = 'Aktywny element'

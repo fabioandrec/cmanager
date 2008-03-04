@@ -49,6 +49,7 @@ type
   TFontPref = class(TPrefItem)
   private
     FBackground: TColor;
+    FBackgroundEven: TColor;
     FRowHeight: Integer;
     FFont: TFont;
     FDesc: String;
@@ -59,6 +60,7 @@ type
     function GetNodeName: String; override;
     property Font: TFont read FFont;
     property Background: TColor read FBackground write FBackground;
+    property BackgroundEven: TColor read FBackgroundEven write FBackgroundEven;
     property RowHeight: Integer read FRowHeight write FRowHeight;
     property Desc: String read FDesc;
     constructor Create(APrefname: String); override;
@@ -1630,10 +1632,10 @@ var xIndex: Cardinal;
 begin
   with Canvas do begin
     xIndex := GetVisibleIndex(Node);
-    if not Odd(xIndex) then begin
-      Color := LEvenColor;
-    end else begin
+    if Odd(xIndex) then begin
       Color := LOddColor;
+    end else begin
+      Color := LEvenColor;
     end;
     EraseAction := eaColor;
   end;
@@ -1643,8 +1645,14 @@ begin
     if (xPrefname <> '') then begin
       xPref := TFontPref(FViewPref.Fontprefs.ByPrefname[xPrefname]);
       if xPref <> Nil then begin
-        if xPref.Background <> clWindow then begin
-          Color := xPref.Background;
+        if Odd(xIndex) then begin
+          if xPref.Background <> clWindow then begin
+            Color := xPref.Background;
+          end;
+        end else begin
+          if xPref.BackgroundEven <> clWindow then begin
+            Color := xPref.BackgroundEven;
+          end;
         end;
       end;
     end;
@@ -2428,6 +2436,7 @@ procedure TFontPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
   FBackground := TFontPref(APrefItem).Background;
+  FBackgroundEven := TFontPref(APrefItem).BackgroundEven;
   FRowHeight := TFontPref(APrefItem).RowHeight;
   FFont.Assign(TFontPref(APrefItem).Font);
   FDesc := TFontPref(APrefItem).Desc;
@@ -2464,7 +2473,8 @@ end;
 
 procedure TFontPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
-  FBackground := GetXmlAttribute('background', ANode, FBackground);
+  FBackground := GetXmlAttribute('background', ANode, LOddColor);
+  FBackgroundEven := GetXmlAttribute('backgroundEven', ANode, LEvenColor);
   FRowHeight := GetXmlAttribute('rowheight', ANode, FRowHeight);
   LoadFontFromXml(ANode, FFont);
 end;
@@ -2473,6 +2483,7 @@ procedure TFontPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('background', ANode, FBackground);
+  SetXmlAttribute('backgroundEven', ANode, FBackgroundEven);
   SetXmlAttribute('rowheight', ANode, FRowHeight);
   SaveFontToXml(ANode, FFont);
 end;

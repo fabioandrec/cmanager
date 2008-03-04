@@ -29,6 +29,8 @@ type
     CButton1: TCButton;
     CButton2: TCButton;
     PanelActive: TPanel;
+    CButton3: TCButton;
+    Action5: TAction;
     procedure Action3Execute(Sender: TObject);
     procedure Action4Execute(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
