@@ -1754,7 +1754,6 @@ begin
   xNode := GetFirst;
   while (xNode <> Nil) and Result do begin
     xStr := Text[xNode, AColumnIndex];
-
     Val(StringReplace(xStr, ',', '.', [rfReplaceAll, rfIgnoreCase]), xValue, xCode);
     Result := Result and (xCode = 0);
     if Result then begin

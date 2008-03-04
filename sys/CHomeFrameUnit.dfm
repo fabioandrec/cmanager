@@ -1,8 +1,8 @@
 inherited CHomeFrame: TCHomeFrame
-  Width = 562
-  Height = 511
+  Width = 682
+  Height = 655
   object Image1: TImage [0]
-    Left = 24
+    Left = 320
     Top = 26
     Width = 32
     Height = 32
@@ -62,7 +62,7 @@ inherited CHomeFrame: TCHomeFrame
       000049454E44AE426082}
   end
   object Label1: TLabel [1]
-    Left = 64
+    Left = 360
     Top = 32
     Width = 70
     Height = 20
@@ -75,7 +75,7 @@ inherited CHomeFrame: TCHomeFrame
     ParentFont = False
   end
   object CButton1: TCButton [2]
-    Left = 88
+    Left = 384
     Top = 120
     Width = 249
     Height = 49
@@ -87,7 +87,7 @@ inherited CHomeFrame: TCHomeFrame
     Action = ActionNewOperation
   end
   object CButton2: TCButton [3]
-    Left = 88
+    Left = 384
     Top = 232
     Width = 249
     Height = 49
@@ -99,7 +99,7 @@ inherited CHomeFrame: TCHomeFrame
     Action = ActionNewCyclic
   end
   object CButton3: TCButton [4]
-    Left = 88
+    Left = 384
     Top = 288
     Width = 249
     Height = 49
@@ -111,7 +111,7 @@ inherited CHomeFrame: TCHomeFrame
     Action = ActionOperationsList
   end
   object CButton4: TCButton [5]
-    Left = 88
+    Left = 384
     Top = 408
     Width = 249
     Height = 49
@@ -123,7 +123,7 @@ inherited CHomeFrame: TCHomeFrame
     Action = ActionSetProfile
   end
   object Image2: TImage [6]
-    Left = 24
+    Left = 320
     Top = 362
     Width = 32
     Height = 32
@@ -183,7 +183,7 @@ inherited CHomeFrame: TCHomeFrame
       000049454E44AE426082}
   end
   object Label2: TLabel [7]
-    Left = 64
+    Left = 360
     Top = 368
     Width = 140
     Height = 20
@@ -196,7 +196,7 @@ inherited CHomeFrame: TCHomeFrame
     ParentFont = False
   end
   object CButton5: TCButton [8]
-    Left = 88
+    Left = 384
     Top = 464
     Width = 249
     Height = 49
@@ -208,7 +208,7 @@ inherited CHomeFrame: TCHomeFrame
     Action = ActionPreferences
   end
   object CButton6: TCButton [9]
-    Left = 88
+    Left = 384
     Top = 64
     Width = 249
     Height = 49
@@ -220,7 +220,7 @@ inherited CHomeFrame: TCHomeFrame
     Action = ActionStartupInfo
   end
   object CButton7: TCButton [10]
-    Left = 92
+    Left = 388
     Top = 176
     Width = 249
     Height = 49
@@ -230,6 +230,52 @@ inherited CHomeFrame: TCHomeFrame
     TxtOffset = 15
     Framed = False
     Action = ActionAddNewList
+  end
+  object List: TCDataList [11]
+    Left = 0
+    Top = 0
+    Width = 273
+    Height = 655
+    Align = alLeft
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvRaised
+    BevelKind = bkFlat
+    BorderStyle = bsNone
+    ButtonStyle = bsTriangle
+    DefaultNodeHeight = 24
+    Header.AutoSizeIndex = -1
+    Header.Background = clWindow
+    Header.Font.Charset = DEFAULT_CHARSET
+    Header.Font.Color = clWindowText
+    Header.Font.Height = -11
+    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Style = []
+    Header.Height = 24
+    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+    Header.Style = hsFlatButtons
+    HintMode = hmHint
+    HotCursor = crHandPoint
+    Images = ImageList
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 0
+    TreeOptions.AutoOptions = [toAutoExpand, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+    TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+    TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toHotTrack, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
+    TreeOptions.SelectionOptions = [toDisableDrawSelection, toFullRowSelect]
+    OnCollapsing = ListCollapsing
+    OnExpanding = ListExpanding
+    OnInitNode = ListInitNode
+    AutoExpand = False
+    OnCDataListReloadTree = ListCDataListReloadTree
+    Columns = <
+      item
+        Position = 0
+        Width = 273
+        WideText = 'Nazwa'
+      end>
+    WideDefaultText = ''
   end
   inherited ImageList: TPngImageList
     Height = 32

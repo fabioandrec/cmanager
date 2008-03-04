@@ -5,9 +5,20 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, PngImageList, ExtCtrls, StdCtrls,
-  pngimage, ActnList, CComponents, Menus;
+  pngimage, ActnList, CComponents, Menus, VirtualTrees;
 
 type
+  THomeListElement = class(TCDataListElementObject)
+  private
+    Faction: TAction;
+    Fcaption: String;
+    FimageIndex: Integer;
+  public
+    constructor Create(AAction: TAction; ACaption: String = ''; AImageIndex: Integer = -1);
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
+  end;
+
   TCHomeFrame = class(TCBaseFrame)
     Image1: TImage;
     Label1: TLabel;
@@ -28,6 +39,7 @@ type
     ActionStartupInfo: TAction;
     CButton7: TCButton;
     ActionAddNewList: TAction;
+    List: TCDataList;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
@@ -35,11 +47,15 @@ type
     procedure ActionOperationsListExecute(Sender: TObject);
     procedure ActionStartupInfoExecute(Sender: TObject);
     procedure ActionAddNewListExecute(Sender: TObject);
-  private
+    procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+    procedure ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure ListExpanding(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+    procedure ListCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
   public
     constructor Create(AOwner: TComponent); override;
     procedure ShowFrame; override;
     procedure HideFrame; override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
   end;
 
 implementation
@@ -126,6 +142,70 @@ begin
   inherited ShowFrame;
   ActionNewOperation.ShortCut := ShortCut(Word('N'), [ssCtrl]);
   ActionAddNewList.ShortCut := ShortCut(Word('L'), [ssCtrl]);
+end;
+
+procedure TCHomeFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
+begin
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  List.ReloadTree;
+end;
+
+procedure TCHomeFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+var xShr: TCListDataElement;
+    xPrf: TCListDataElement;
+begin
+  ARootElement.Add(TCListDataElement.Create(False, List, THomeListElement.Create(Nil, ''), True));
+  ARootElement.Add(TCListDataElement.Create(False, List, THomeListElement.Create(Nil, ''), True));
+  xShr := TCListDataElement.Create(False, List, THomeListElement.Create(Nil, 'Na skróty'), True);
+  ARootElement.Add(xShr);
+  xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionStartupInfo), True));
+  xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionNewOperation), True));
+  xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionAddNewList), True));
+  xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionNewCyclic), True));
+  xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionOperationsList), True));
+  xPrf := TCListDataElement.Create(False, List, THomeListElement.Create(Nil, 'Ustawienia i profile'), True);
+  ARootElement.Add(xPrf);
+  xPrf.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionSetProfile), True));
+  xPrf.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionPreferences), True));
+end;
+
+constructor THomeListElement.Create(AAction: TAction; ACaption: String = ''; AImageIndex: Integer = -1);
+begin
+  inherited Create;
+  Faction := AAction;
+  Fcaption := ACaption;
+  FimageIndex := AImageIndex;
+  if (Fcaption = '') and (Faction <> Nil) then begin
+    Fcaption := Faction.Caption;
+  end;
+  if (FimageIndex = -1) and (Faction <> Nil) then begin
+    FimageIndex := Faction.ImageIndex;
+  end;
+end;
+
+function THomeListElement.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := FimageIndex;
+end;
+
+function THomeListElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  Result := Fcaption;
+end;
+
+procedure TCHomeFrame.ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+begin
+  InitialStates := InitialStates + [ivsExpanded];
+end;
+
+procedure TCHomeFrame.ListExpanding(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+begin
+  Allowed := True;
+end;
+
+procedure TCHomeFrame.ListCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+begin
+  Allowed := False;
 end;
 
 end.

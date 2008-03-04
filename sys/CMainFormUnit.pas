@@ -7,7 +7,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList,
-  PngSpeedButton, ShellApi, CBaseFrameUnit, Menus;
+  PngSpeedButton, ShellApi, CBaseFrameUnit, Menus, XPMan;
 
 type
   TCMainForm = class(TForm)
