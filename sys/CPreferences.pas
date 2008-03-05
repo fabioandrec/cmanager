@@ -775,6 +775,10 @@ initialization
     FocusedBackgroundColor := clWindow;
     FocusedFontColor := clWindowText;
   end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesLoancalc));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+  end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin
     startupDatafileMode := CStartupFilemodeFirsttime;

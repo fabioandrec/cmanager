@@ -1650,7 +1650,11 @@ begin
   end;
   if (FViewPref <> Nil) then begin
     xPrefname := '*';
-    DoOnGetRowPreferencesName(TObject(GetNodeData(Node)^), xPrefname);
+    if NodeDataSize > 0 then begin
+      DoOnGetRowPreferencesName(TObject(GetNodeData(Node)^), xPrefname);
+    end else begin
+      DoOnGetRowPreferencesName(Nil, xPrefname);
+    end;
     if (xPrefname <> '') then begin
       xPref := TFontPref(FViewPref.Fontprefs.ByPrefname[xPrefname]);
       if xPref <> Nil then begin
@@ -1687,7 +1691,11 @@ var xPrefname: String;
 begin
   if (FViewPref <> Nil) then begin
     xPrefname := '*';
-    DoOnGetRowPreferencesName(TCListDataElement(GetNodeData(Node)^), xPrefname);
+    if NodeDataSize > 0 then begin
+      DoOnGetRowPreferencesName(TObject(GetNodeData(Node)^), xPrefname);
+    end else begin
+      DoOnGetRowPreferencesName(Nil, xPrefname);
+    end;
     if (xPrefname <> '') then begin
       xPref := TFontPref(FViewPref.Fontprefs.ByPrefname[xPrefname]);
       if xPref <> Nil then begin
@@ -1711,7 +1719,11 @@ var xPrefname: String;
 begin
   if (FViewPref <> Nil) then begin
     xPrefname := '*';
-    DoOnGetRowPreferencesName(TCListDataElement(GetNodeData(Node)^), xPrefname);
+    if NodeDataSize > 0 then begin
+      DoOnGetRowPreferencesName(TObject(GetNodeData(Node)^), xPrefname);
+    end else begin
+      DoOnGetRowPreferencesName(Nil, xPrefname);
+    end;
     if (xPrefname <> '') then begin
       xPref := TFontPref(FViewPref.Fontprefs.ByPrefname[xPrefname]);
       if xPref <> Nil then begin

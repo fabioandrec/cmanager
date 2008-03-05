@@ -536,11 +536,11 @@ begin
 end;
 
 procedure TCBaseFrame.IncrementalSearch(Sender: TBaseVirtualTree; Node: PVirtualNode; const SearchText: WideString; var Result: Integer);
-var xTree: TVirtualStringTree;
+var xTree: TCList;
     xColumn: TColumnIndex;
     xText: String;
 begin
-  xTree := TVirtualStringTree(Sender);
+  xTree := TCList(Sender);
   xColumn := xTree.Header.SortColumn;
   if xColumn = NoColumn then begin
     xColumn := xTree.Header.MainColumn;

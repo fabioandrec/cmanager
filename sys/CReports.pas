@@ -3155,7 +3155,7 @@ begin
 end;
 
 function TVirtualStringReport.GetColumnPercentage(AColumn: TVirtualTreeColumn): Integer;
-var xList: TVirtualStringTree;
+var xList: TCList;
     xScroll: TScrollInfo;
 begin
   xList := TCVirtualStringTreeParams(FParams).list;

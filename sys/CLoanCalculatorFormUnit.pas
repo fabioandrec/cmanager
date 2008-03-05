@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CLoans,
-  CComponents, VirtualTrees;
+  CComponents, VirtualTrees, Menus, ActnList;
 
 type
   TCLoanCalculatorForm = class(TCConfigForm)
@@ -24,14 +24,18 @@ type
     CCurrEditCash: TCCurrEdit;
     GroupBox2: TGroupBox;
     Panel1: TPanel;
-    RepaymentList: TVirtualStringTree;
+    RepaymentList: TCList;
     PanelError: TPanel;
     Label7: TLabel;
     CCurrEditOthers: TCCurrEdit;
-    BitBtnPrint: TBitBtn;
     Label8: TLabel;
     Panel2: TPanel;
     CCurrEditRrso: TCCurrEdit;
+    PopupMenu1: TPopupMenu;
+    Zaznaczwszystkie1: TMenuItem;
+    ActionList: TActionList;
+    Action1: TAction;
+    CButton1: TCButton;
     procedure ComboBoxPeriodChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CCurrEditCashChange(Sender: TObject);
@@ -41,6 +45,8 @@ type
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure BitBtnOkClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure Action1Execute(Sender: TObject);
   private
     Floan: TLoan;
     procedure UpdateLoanData;
@@ -52,7 +58,8 @@ function ShowLoanCalculator(ACanAccept: Boolean): TLoan;
 
 implementation
 
-uses CDatabase, CReports, CTools;
+uses CDatabase, CReports, CTools, CPreferences, CConsts,
+  CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -123,7 +130,7 @@ begin
         Header.Options := Header.Options - [hoVisible];
       end;
     end;
-    BitBtnPrint.Enabled := xValid;
+    Action1.Enabled := xValid;
   end;
 end;
 
@@ -200,6 +207,29 @@ begin
   inherited;
   CCurrEditCash.CurrencyStr := '';
   CCurrEditOthers.CurrencyStr := '';
+  RepaymentList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesLoancalc]);
+end;
+
+procedure TCLoanCalculatorForm.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(RepaymentList.ViewPref) then begin
+    RepaymentList.ReinitNode(RepaymentList.RootNode, True);
+    RepaymentList.Repaint;
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCLoanCalculatorForm.Action1Execute(Sender: TObject);
+var xParams: TLoanReportParams;
+    xReport: TLoanReport;
+begin
+  xParams := TLoanReportParams.Create(Floan);
+  xReport := TLoanReport.CreateReport(xParams);
+  xReport.ShowReport;
+  xReport.Free;
+  xParams.Free;
 end;
 
 end.

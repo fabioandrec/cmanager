@@ -81,7 +81,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 5
@@ -89,6 +89,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Transparent = False
         OnChanged = CDateTimeChanged
         HotTrack = True
+        Withtime = False
       end
       object ComboBoxType: TComboBox
         Left = 409
@@ -186,9 +187,6 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       Height = 273
       Caption = ' Dane szczeg'#243#322'owe i harmonogram  '
       TabOrder = 1
-      DesignSize = (
-        545
-        273)
       object Label8: TLabel
         Left = 207
         Top = 241
@@ -196,6 +194,19 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Rzeczywista roczna stopa oprocentowania'
+      end
+      object CButton1: TCButton
+        Left = 16
+        Top = 235
+        Width = 105
+        Height = 25
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = Action1
+        Color = clBtnFace
       end
       object Panel1: TPanel
         Left = 16
@@ -205,7 +216,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
-        object RepaymentList: TVirtualStringTree
+        object RepaymentList: TCList
           Left = 1
           Top = 1
           Width = 511
@@ -217,17 +228,18 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           BevelKind = bkFlat
           BorderStyle = bsNone
           DefaultNodeHeight = 24
-          Header.AutoSizeIndex = -1
+          Header.AutoSizeIndex = 5
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11
           Header.Font.Name = 'MS Sans Serif'
           Header.Font.Style = []
           Header.Height = 21
-          Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
           Header.Style = hsFlatButtons
           HintMode = hmHint
           ParentShowHint = False
+          PopupMenu = PopupMenu1
           ShowHint = True
           TabOrder = 0
           TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -235,12 +247,12 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
           OnGetText = RepaymentListGetText
+          AutoExpand = True
           Columns = <
             item
               Alignment = taRightJustify
               Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 0
-              Width = 70
               WideText = 'Lp'
             end
             item
@@ -273,9 +285,10 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
             item
               Alignment = taRightJustify
               Position = 5
-              Width = 80
+              Width = 126
               WideText = 'Pozosta'#322'o'
             end>
+          WideDefaultText = ''
         end
         object PanelError: TPanel
           Left = 96
@@ -294,17 +307,6 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           TabOrder = 1
         end
       end
-      object BitBtnPrint: TBitBtn
-        Left = 16
-        Top = 235
-        Width = 75
-        Height = 25
-        Anchors = [akLeft, akBottom]
-        Caption = 'Do druku'
-        Enabled = False
-        TabOrder = 1
-        OnClick = BitBtnOkClick
-      end
       object Panel2: TPanel
         Left = 413
         Top = 232
@@ -312,7 +314,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Height = 33
         BevelOuter = bvNone
         Enabled = False
-        TabOrder = 2
+        TabOrder = 1
         object CCurrEditRrso: TCCurrEdit
           Left = 5
           Top = 4
@@ -339,6 +341,25 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
     end
     inherited BitBtnCancel: TBitBtn
       Left = 489
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 297
+    object Zaznaczwszystkie1: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = Zaznaczwszystkie1Click
+    end
+  end
+  object ActionList: TActionList
+    Images = CImageLists.ActionImageList
+    Left = 196
+    Top = 132
+    object Action1: TAction
+      Caption = 'Do druku'
+      ImageIndex = 0
+      OnExecute = Action1Execute
     end
   end
 end

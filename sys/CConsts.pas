@@ -318,6 +318,7 @@ const
   CFontPreferencesParamsDefs = 'paramsDefs';
   CFontPreferencesShortcuts = 'shortcutsList';
   CFontPreferencesHomelist = 'shortcutHomelist';
+  CFontPreferencesLoancalc = 'loanCalc';
 
 implementation
 
