@@ -295,8 +295,8 @@ begin
   FbackupFileName := GetXmlAttribute('backupFilename', ANode, '@data@.cmb');
   FbackupOverwrite := GetXmlAttribute('backupOverwrite', ANode, False);
   FstartupUncheckedExtractions := GetXmlAttribute('startupUncheckedExtractions', ANode, False);
-  FevenListColor := GetXmlAttribute('evenListColor', ANode, clWindow);
-  FoddListColor := GetXmlAttribute('oddListColor', ANode, GetHighLightColor(FevenListColor, -10));
+  FevenListColor := StringToColor(GetXmlAttribute('evenListColor', ANode, ColorToString(clWindow)));
+  FoddListColor := StringToColor(GetXmlAttribute('oddListColor', ANode, ColorToString(GetHighLightColor(FevenListColor, -10))));
 end;
 
 function TBasePref.QueryInterface(const IID: TGUID; out Obj): HRESULT;
@@ -336,8 +336,8 @@ begin
   SetXmlAttribute('backupFilename', ANode, FbackupFileName);
   SetXmlAttribute('backupOverwrite', ANode, FbackupOverwrite);
   SetXmlAttribute('startupUncheckedExtractions', ANode, FstartupUncheckedExtractions);
-  SetXmlAttribute('evenListColor', ANode, FevenListColor);
-  SetXmlAttribute('oddListColor', ANode, FoddListColor);
+  SetXmlAttribute('evenListColor', ANode, ColorToString(FevenListColor));
+  SetXmlAttribute('oddListColor', ANode, ColorToString(FoddListColor));
 end;
 
 constructor TDescPatterns.Create(ASaveToDatabase: Boolean);
@@ -805,7 +805,7 @@ initialization
     backupFileName := '@data@ @godz@ @min@.cmb';
     backupOverwrite := False;
     evenListColor := clWindow;
-    oddListColor := GetHighLightColor(FevenListColor, -10);
+    oddListColor := clBtnFace; {GetHighLightColor(FevenListColor, -10)};
   end;
 finalization
   if GBackupThread <> Nil then begin

@@ -2501,8 +2501,8 @@ end;
 
 procedure TFontPref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
-  FBackground := GetXmlAttribute('background', ANode, LOddColor);
-  FBackgroundEven := GetXmlAttribute('backgroundEven', ANode, LEvenColor);
+  FBackground := StringToColor(GetXmlAttribute('background', ANode, IntToStr(LOddColor)));
+  FBackgroundEven := StringToColor(GetXmlAttribute('backgroundEven', ANode, IntToStr(LEvenColor)));
   FRowHeight := GetXmlAttribute('rowheight', ANode, FRowHeight);
   LoadFontFromXml(ANode, FFont);
 end;
@@ -2510,8 +2510,8 @@ end;
 procedure TFontPref.SaveToXml(ANode: ICXMLDOMNode);
 begin
   inherited SaveToXml(ANode);
-  SetXmlAttribute('background', ANode, FBackground);
-  SetXmlAttribute('backgroundEven', ANode, FBackgroundEven);
+  SetXmlAttribute('background', ANode, ColorToString(FBackground));
+  SetXmlAttribute('backgroundEven', ANode, ColorToString(FBackgroundEven));
   SetXmlAttribute('rowheight', ANode, FRowHeight);
   SaveFontToXml(ANode, FFont);
 end;
@@ -2520,8 +2520,8 @@ procedure TViewPref.LoadFromXml(ANode: ICXMLDOMNode);
 var xFontprefs: ICXMLDOMNode;
 begin
   inherited LoadFromXml(ANode);
-  FFocusedBackgroundColor := GetXmlAttribute('focusedBackgroundColor', ANode, clHighlight);
-  FFocusedFontColor := GetXmlAttribute('focusedFontColor', ANode, clHighlightText);
+  FFocusedBackgroundColor := StringToColor(GetXmlAttribute('focusedBackgroundColor', ANode, ColorToString(clHighlight)));
+  FFocusedFontColor := StringToColor(GetXmlAttribute('focusedFontColor', ANode, ColorToString(clHighlightText)));
   xFontprefs := ANode.selectSingleNode('fontprefs');
   if xFontprefs <> Nil then begin
     FFontprefs.LoadFromParentNode(xFontprefs);
@@ -2532,8 +2532,8 @@ procedure TViewPref.SaveToXml(ANode: ICXMLDOMNode);
 var xFontprefs: ICXMLDOMNode;
 begin
   inherited SaveToXml(ANode);
-  SetXmlAttribute('focusedBackgroundColor', ANode, FFocusedBackgroundColor);
-  SetXmlAttribute('focusedFontColor', ANode, FFocusedFontColor);
+  SetXmlAttribute('focusedBackgroundColor', ANode, ColorToString(FFocusedBackgroundColor));
+  SetXmlAttribute('focusedFontColor', ANode, ColorToString(FFocusedFontColor));
   xFontprefs := ANode.selectSingleNode('fontprefs');
   if xFontprefs = Nil then begin
     xFontprefs := ANode.ownerDocument.createElement('fontprefs');
@@ -2589,7 +2589,7 @@ initialization
   CurrencyComponents := TObjectList.Create(False);
   ListComponents := TObjectList.Create(False);
   LEvenColor := clWindow;
-  LOddColor := GetHighLightColor(LEvenColor, -10);
+  LOddColor := clBtnFace; //GetHighLightColor(LEvenColor, -10);
 finalization
   FreeAndNil(CurrencyComponents);
   FreeAndNil(ListComponents);
