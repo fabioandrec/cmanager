@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CReportFormUnit, StdCtrls, Buttons, ExtCtrls, TeeProcs,
   TeEngine, Chart, Series, ActnList, CComponents, Contnrs, VirtualTrees,
-  CImageListsUnit;
+  CImageListsUnit, Menus, StrUtils;
 
 type
   TCChart = class(TChart)
@@ -58,14 +58,23 @@ type
     Splitter: TSplitter;
     PanelParent: TPanel;
     PanelNoData: TPanel;
-    ThumbsList: TVirtualStringTree;
+    ThumbsList: TCList;
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
+    PopupMenu1: TPopupMenu;
+    MenuItemList: TMenuItem;
+    N4: TMenuItem;
+    MenuItemBig: TMenuItem;
+    MenuItemSmall: TMenuItem;
     procedure ActionGraphExecute(Sender: TObject);
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ThumbsListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
     procedure ThumbsListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+    procedure ThumbsListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemListClick(Sender: TObject);
+    procedure MenuItemBigClick(Sender: TObject);
+    procedure MenuItemSmallClick(Sender: TObject);
   private
     Fcharts: TChartList;
     FActiveChartIndex: Integer;
@@ -88,7 +97,8 @@ type
 
 implementation
 
-uses CChartPropsFormUnit, CReports, CConfigFormUnit, Math;
+uses CChartPropsFormUnit, CReports, CConfigFormUnit, Math, CPreferences,
+  CConsts, CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -373,6 +383,10 @@ begin
   inherited CreateForm(AReport);
   Fcharts := TChartList.Create(True);
   Fprops := Nil;
+  ThumbsList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesChartList]);
+  if GBasePreferences.chartListSmall then begin
+    MenuItemSmall.Click;
+  end;
   FActiveChartIndex := -1;
 end;
 
@@ -559,6 +573,44 @@ begin
         FregSeries.Delete(0);
       end;
     end;
+  end;
+end;
+
+procedure TCChartReportForm.ThumbsListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  APrefname := IfThen(MenuItemBig.Checked, 'B', 'S');
+end;
+
+procedure TCChartReportForm.MenuItemListClick(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(ThumbsList.ViewPref) then begin
+    ThumbsList.ReinitNode(ThumbsList.RootNode, True);
+    ThumbsList.Repaint;
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCChartReportForm.MenuItemBigClick(Sender: TObject);
+begin
+  with ThumbsList do begin
+    Images := CImageLists.ChartImageList32x32;
+    MenuItemBig.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
+    GBasePreferences.chartListSmall := False;
+  end;
+end;
+
+procedure TCChartReportForm.MenuItemSmallClick(Sender: TObject);
+begin
+  with ThumbsList do begin
+    Images := CImageLists.ChartImageList16x16;
+    MenuItemSmall.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
+    GBasePreferences.chartListSmall := True;
   end;
 end;
 

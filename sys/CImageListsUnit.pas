@@ -38,6 +38,7 @@ type
     InstrumentImageList24x24: TPngImageList;
     ExchangesImageList24x24: TPngImageList;
     InvestmentImageList24x24: TPngImageList;
+    ChartImageList16x16: TPngImageList;
   private
     { Private declarations }
   public

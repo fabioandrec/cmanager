@@ -319,6 +319,8 @@ const
   CFontPreferencesShortcuts = 'shortcutsList';
   CFontPreferencesHomelist = 'shortcutHomelist';
   CFontPreferencesLoancalc = 'loanCalc';
+  CFontPreferencesFilterdetails = 'filterDetails';
+  CFontPreferencesChartList = 'chartList';
 
 implementation
 

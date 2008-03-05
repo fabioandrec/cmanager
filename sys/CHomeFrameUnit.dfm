@@ -602,16 +602,23 @@ inherited CHomeFrame: TCHomeFrame
     Bitmap = {}
   end
   inherited ListPopupMenu: TPopupMenu
-    object MenuItemBigIcons: TMenuItem [0]
+    inherited Ustawienialisty1: TMenuItem [0]
+    end
+    inherited N1: TMenuItem [1]
+    end
+    object MenuItemBigIcons: TMenuItem [2]
       Caption = 'Du'#380'e ikony'
       Checked = True
       RadioItem = True
       OnClick = MenuItemBigIconsClick
     end
-    object MenuItemSmallIcons: TMenuItem [1]
+    object MenuItemSmallIcons: TMenuItem [3]
       Caption = 'Ma'#322'e ikony'
       RadioItem = True
       OnClick = MenuItemSmallIconsClick
+    end
+    object N4: TMenuItem [4]
+      Caption = '-'
     end
   end
   object ActionListSimple: TActionList

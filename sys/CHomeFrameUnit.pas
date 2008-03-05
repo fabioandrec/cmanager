@@ -34,6 +34,7 @@ type
     MenuItemSmallIcons: TMenuItem;
     PanelShortcutsTitle: TPanel;
     ImageList16: TPngImageList;
+    N4: TMenuItem;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);

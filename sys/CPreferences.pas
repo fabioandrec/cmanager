@@ -92,6 +92,8 @@ type
     FshowShortcutBar: Boolean;
     FshortcutBarSmall: Boolean;
     FhomeListSmall: Boolean;
+    FfilterDetailSmall: Boolean;
+    FchartListSmall: Boolean;
     FshowStatusBar: Boolean;
     FstartupInfo: Boolean;
     FstartupInfoType: Integer;
@@ -131,6 +133,8 @@ type
     property showShortcutBar: Boolean read FshowShortcutBar write FshowShortcutBar;
     property shortcutBarSmall: Boolean read FshortcutBarSmall write FshortcutBarSmall;
     property homeListSmall: Boolean read FhomeListSmall write FhomeListSmall;
+    property chartListSmall: Boolean read FchartListSmall write FchartListSmall;
+    property filterDetailSmall: Boolean read FfilterDetailSmall write FfilterDetailSmall;
     property showStatusBar: Boolean read FshowStatusBar write FshowStatusBar;
     property startupInfo: Boolean read FstartupInfo write FstartupInfo;
     property startupInfoType: Integer read FstartupInfoType write FstartupInfoType;
@@ -199,6 +203,8 @@ begin
   FshowShortcutBar := TBasePref(APrefItem).showShortcutBar;
   FshortcutBarSmall := TBasePref(APrefItem).shortcutBarSmall;
   FhomeListSmall := TBasePref(APrefItem).homeListSmall;
+  FfilterDetailSmall := TBasePref(APrefItem).filterDetailSmall;
+  FchartListSmall := TBasePref(APrefItem).chartListSmall;
   FshowStatusBar := TBasePref(APrefItem).showStatusBar;
   FstartupInfo := TBasePref(APrefItem).startupInfo;
   FstartupInfoType := TBasePref(APrefItem).startupInfoType;
@@ -273,6 +279,8 @@ begin
   FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
   FshortcutBarSmall := GetXmlAttribute('shortcutBarSmall', ANode, False);
   FhomeListSmall := GetXmlAttribute('homeListSmall', ANode, False);
+  FfilterDetailSmall := GetXmlAttribute('filterDetailSmall', ANode, False);
+  FchartListSmall := GetXmlAttribute('chartListSmall', ANode, False);
   FshowStatusBar := GetXmlAttribute('showStatusBar', ANode, True);
   FstartupInfo := GetXmlAttribute('startupInfo', ANode, False);
   FstartupInfoType := GetXmlAttribute('startupInfoType', ANode, CStartupInfoToday);
@@ -296,7 +304,7 @@ begin
   FbackupOverwrite := GetXmlAttribute('backupOverwrite', ANode, False);
   FstartupUncheckedExtractions := GetXmlAttribute('startupUncheckedExtractions', ANode, False);
   FevenListColor := StringToColor(GetXmlAttribute('evenListColor', ANode, ColorToString(clWindow)));
-  FoddListColor := StringToColor(GetXmlAttribute('oddListColor', ANode, ColorToString(GetHighLightColor(FevenListColor, -10))));
+  FoddListColor := StringToColor(GetXmlAttribute('oddListColor', ANode, ColorToString(GetDarkerColor(FevenListColor))));
 end;
 
 function TBasePref.QueryInterface(const IID: TGUID; out Obj): HRESULT;
@@ -316,6 +324,8 @@ begin
   SetXmlAttribute('lastopenedfilename', ANode, FlastOpenedDatafilename);
   SetXmlAttribute('showShortcutBar', ANode, FshowShortcutBar);
   SetXmlAttribute('homeListSmall', ANode, FhomeListSmall);
+  SetXmlAttribute('filterDetailSmall', ANode, FfilterDetailSmall);
+  SetXmlAttribute('chartListSmall', ANode, FchartListSmall);
   SetXmlAttribute('shortcutBarSmall', ANode, FshortcutBarSmall);
   SetXmlAttribute('showStatusBar', ANode, FshowStatusBar);
   SetXmlAttribute('startupInfo', ANode, FstartupInfo);
@@ -736,6 +746,20 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesFilterdetails));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
+    TFontPref(Fontprefs.Last).RowHeight := 48;
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
+    TFontPref(Fontprefs.Last).RowHeight := 24;
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesChartList));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
+    TFontPref(Fontprefs.Last).RowHeight := 48;
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
+    TFontPref(Fontprefs.Last).RowHeight := 24;
+  end;
   GViewsPreferences.Add(TViewPref.Create(CFontPreferencesHomelist));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('BA', 'Akcje - du¿e ikony'));
@@ -805,7 +829,7 @@ initialization
     backupFileName := '@data@ @godz@ @min@.cmb';
     backupOverwrite := False;
     evenListColor := clWindow;
-    oddListColor := clBtnFace; {GetHighLightColor(FevenListColor, -10)};
+    oddListColor := GetDarkerColor(evenListColor);
   end;
 finalization
   if GBackupThread <> Nil then begin

@@ -16,7 +16,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
     BevelOuter = bvLowered
     Caption = 'PanelThumbs'
     TabOrder = 0
-    object ThumbsList: TVirtualStringTree
+    object ThumbsList: TCList
       Left = 1
       Top = 22
       Width = 129
@@ -46,6 +46,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       Indent = 20
       Margin = 15
       ParentShowHint = False
+      PopupMenu = PopupMenu1
       ShowHint = True
       TabOrder = 0
       TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -55,12 +56,15 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       OnChange = ThumbsListChange
       OnGetText = ThumbsListGetText
       OnGetImageIndex = ThumbsListGetImageIndex
+      AutoExpand = True
+      OnGetRowPreferencesName = ThumbsListGetRowPreferencesName
       Columns = <
         item
           Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
           Position = 0
           Width = 129
         end>
+      WideDefaultText = ''
     end
     object PanelShortcutsTitle: TPanel
       Left = 1
@@ -147,5 +151,28 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
   inherited ListPopupMenu: TPopupMenu
     Left = 240
     Top = 128
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 100
+    object MenuItemList: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = Zaznaczwszystkie1Click
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemBig: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigClick
+    end
+    object MenuItemSmall: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallClick
+    end
   end
 end

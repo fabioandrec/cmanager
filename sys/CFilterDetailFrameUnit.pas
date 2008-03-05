@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees,
   ExtCtrls, CImageListsUnit, CDatabase, CDataObjects, CConsts, StdCtrls,
-  CComponents, Buttons;
+  CComponents, Buttons, StrUtils;
 
 type
   TFilterDetailData = class(TObject)
@@ -24,18 +24,27 @@ type
 
   TCFilterDetailFrame = class(TCBaseFrame)
     PanelThumbs: TPanel;
-    ThumbsList: TVirtualStringTree;
+    ThumbsList: TCList;
     Splitter: TSplitter;
     PanelFrames: TPanel;
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     Panel1: TPanel;
     CStaticFilter: TCStatic;
+    PopupMenu1: TPopupMenu;
+    MenuItemList: TMenuItem;
+    N4: TMenuItem;
+    MenuItemBig: TMenuItem;
+    MenuItemSmall: TMenuItem;
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ThumbsListChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure CStaticPredefinedGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticPredefinedChanged(Sender: TObject);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure MenuItemBigClick(Sender: TObject);
+    procedure MenuItemSmallClick(Sender: TObject);
+    procedure ThumbsListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
     FActiveFrameIndex: Integer;
     procedure SetActiveFrameIndex(const Value: Integer);
@@ -63,7 +72,7 @@ function DoTemporaryMovementFilter(var ADataGid: String; var AText: String): Boo
 implementation
 
 uses CFrameFormUnit, CAccountsFrameUnit, CProductsFrameUnit, CCashpointsFrameUnit,
-  CFilterFrameUnit, CTools;
+  CFilterFrameUnit, CTools, CListPreferencesFormUnit, CPreferences;
 
 {$R *.dfm}
 
@@ -84,6 +93,10 @@ begin
     end;
   end;
   FActiveFrameIndex := -1;
+  ThumbsList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesFilterdetails]);
+  if GBasePreferences.filterDetailSmall then begin
+    MenuItemSmall.Click;
+  end;
   ThumbsList.RootNodeCount := 3;
 end;
 
@@ -338,6 +351,44 @@ end;
 procedure TCFilterDetailFrame.CheckChanged(Sender: TObject);
 begin
   CStaticFilter.DataId := CEmptyDataGid;
+end;
+
+procedure TCFilterDetailFrame.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(ThumbsList.ViewPref) then begin
+    ThumbsList.ReinitNode(ThumbsList.RootNode, True);
+    ThumbsList.Repaint;
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCFilterDetailFrame.MenuItemBigClick(Sender: TObject);
+begin
+  with ThumbsList do begin
+    Images := CImageLists.MainImageList32x32;
+    MenuItemBig.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
+    GBasePreferences.filterDetailSmall := False;
+  end;
+end;
+
+procedure TCFilterDetailFrame.MenuItemSmallClick(Sender: TObject);
+begin
+  with ThumbsList do begin
+    Images := CImageLists.MainImageList16x16;
+    MenuItemSmall.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
+    GBasePreferences.filterDetailSmall := True;
+  end;
+end;
+
+procedure TCFilterDetailFrame.ThumbsListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  APrefname := IfThen(MenuItemBig.Checked, 'B', 'S');
 end;
 
 end.

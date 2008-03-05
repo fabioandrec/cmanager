@@ -3,6 +3,7 @@ object CMainForm: TCMainForm
   Top = 83
   Width = 860
   Height = 633
+  ActiveControl = ShortcutList
   Caption = 'CManager'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET

@@ -513,6 +513,8 @@ function GetCurrencySymbol: string;
 procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String; AComponentTag: Integer);
 function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
 procedure SetEvenListColors(AColorEven, AColorOdd: TColor);
+function GetDarkerColor(ABaseColor: TColor): TColor;
+function GetBrighterColor(ABaseColor: TColor): TColor;
 
 var CurrencyComponents: TObjectList;
     ListComponents: TObjectList;
@@ -530,6 +532,20 @@ var LOddColor: TColor;
 procedure Register;
 begin
   RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit]);
+end;
+
+function GetBrighterColor(ABaseColor: TColor): TColor;
+begin
+  Result := RGB(Min(GetRValue(ColorToRGB(ABaseColor)) + 8, 255),
+                Min(GetGValue(ColorToRGB(ABaseColor)) + 8, 255),
+                Min(GetBValue(ColorToRGB(ABaseColor)) + 8, 255));
+end;
+
+function GetDarkerColor(ABaseColor: TColor): TColor;
+begin
+  Result := RGB(Max(GetRValue(ColorToRGB(ABaseColor)) - 8, 0),
+                Max(GetGValue(ColorToRGB(ABaseColor)) - 8, 0),
+                Max(GetBValue(ColorToRGB(ABaseColor)) - 8, 0));
 end;
 
 procedure TCButton.ActionChange(Sender: TObject; CheckDefaults: Boolean);
@@ -1731,9 +1747,22 @@ begin
       end;
       if Focused then begin
         if (Node = HotNode) and (toHotTrack in TreeOptions.PaintOptions) then begin
-          Canvas.Font.Color := Colors.HotColor;
           Canvas.Font.Style := Canvas.Font.Style + [fsUnderline];
+          if FocusedNode = Node then begin
+            Canvas.Font.Color := ViewPref.FocusedFontColor;
+          end;
         end else if Node = FocusedNode then begin
+          Canvas.Font.Color := ViewPref.FocusedFontColor;
+        end;
+      end else if (Node = HotNode) and (toHotTrack in TreeOptions.PaintOptions) then begin
+        if Selected[Node] then begin
+          Canvas.Font.Color := ViewPref.FocusedFontColor;
+        end else begin
+          Canvas.Font.Color := Colors.HotColor;
+        end;
+        Canvas.Font.Style := Canvas.Font.Style + [fsUnderline];
+      end else if (toHotTrack in TreeOptions.PaintOptions) then begin
+        if Selected[Node] then begin
           Canvas.Font.Color := ViewPref.FocusedFontColor;
         end;
       end;
@@ -2589,7 +2618,7 @@ initialization
   CurrencyComponents := TObjectList.Create(False);
   ListComponents := TObjectList.Create(False);
   LEvenColor := clWindow;
-  LOddColor := clBtnFace; //GetHighLightColor(LEvenColor, -10);
+  LOddColor := GetDarkerColor(LEvenColor);
 finalization
   FreeAndNil(CurrencyComponents);
   FreeAndNil(ListComponents);

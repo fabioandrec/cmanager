@@ -25,7 +25,7 @@ inherited CChartReportForm: TCChartReportForm
       BevelOuter = bvLowered
       Caption = 'PanelThumbs'
       TabOrder = 0
-      object ThumbsList: TVirtualStringTree
+      object ThumbsList: TCList
         Left = 1
         Top = 22
         Width = 129
@@ -37,7 +37,6 @@ inherited CChartReportForm: TCChartReportForm
         BevelKind = bkFlat
         BorderStyle = bsNone
         ButtonStyle = bsTriangle
-        Color = clWhite
         Colors.HotColor = clNavy
         Colors.UnfocusedSelectionColor = clHighlight
         Colors.UnfocusedSelectionBorderColor = clHighlight
@@ -57,6 +56,7 @@ inherited CChartReportForm: TCChartReportForm
         Indent = 20
         Margin = 15
         ParentShowHint = False
+        PopupMenu = PopupMenu1
         ShowHint = True
         TabOrder = 0
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -67,12 +67,15 @@ inherited CChartReportForm: TCChartReportForm
         OnGetText = ThumbsListGetText
         OnGetImageIndex = ThumbsListGetImageIndex
         OnHotChange = ThumbsListHotChange
+        AutoExpand = True
+        OnGetRowPreferencesName = ThumbsListGetRowPreferencesName
         Columns = <
           item
             Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 0
             Width = 129
           end>
+        WideDefaultText = ''
       end
       object PanelShortcutsTitle: TPanel
         Left = 1
@@ -175,5 +178,28 @@ inherited CChartReportForm: TCChartReportForm
   object PrintDialog: TPrintDialog
     Left = 129
     Top = 65
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 100
+    object MenuItemList: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = MenuItemListClick
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemBig: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigClick
+    end
+    object MenuItemSmall: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallClick
+    end
   end
 end
