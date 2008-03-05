@@ -24,7 +24,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
         PicOffset = 10
         TxtOffset = 15
         Framed = False
-        Action = Action3
+        Action = ActionFont
         Color = clBtnFace
       end
       object CButton6: TCButton
@@ -37,7 +37,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
         PicOffset = 10
         TxtOffset = 15
         Framed = False
-        Action = Action4
+        Action = ActionBackgroundOdd
         Color = clBtnFace
       end
       object Label1: TLabel
@@ -57,7 +57,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
         PicOffset = 10
         TxtOffset = 15
         Framed = False
-        Action = Action1
+        Action = ActionBackgroundActive
         Color = clBtnFace
       end
       object CButton2: TCButton
@@ -70,7 +70,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
         PicOffset = 10
         TxtOffset = 15
         Framed = False
-        Action = Action2
+        Action = ActionFontActive
         Color = clBtnFace
       end
       object CButton3: TCButton
@@ -83,7 +83,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
         PicOffset = 10
         TxtOffset = 15
         Framed = False
-        Action = Action5
+        Action = ActionBackgroundEven
         Color = clBtnFace
       end
       object PanelExample: TPanel
@@ -94,25 +94,37 @@ inherited CListPreferencesForm: TCListPreferencesForm
         BevelOuter = bvLowered
         Color = clWindow
         TabOrder = 0
-        object PanelRow: TPanel
+        object ExampleList: TCDataList
           Left = 1
           Top = 1
-          Width = 200
-          Height = 56
-          BevelOuter = bvNone
-          Caption = 'Przyk'#322'adowy widok elementu'
-          Color = clWindow
+          Width = 199
+          Height = 219
+          Align = alClient
+          BorderStyle = bsNone
+          Header.AutoSizeIndex = 0
+          Header.Font.Charset = DEFAULT_CHARSET
+          Header.Font.Color = clWindowText
+          Header.Font.Height = -11
+          Header.Font.Name = 'MS Sans Serif'
+          Header.Font.Style = []
+          Header.Height = 21
+          Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoVisible]
+          Header.Style = hsFlatButtons
           TabOrder = 0
-        end
-        object PanelActive: TPanel
-          Left = 1
-          Top = 97
-          Width = 200
-          Height = 56
-          BevelOuter = bvNone
-          Caption = 'Przyk'#322'adowy aktywny element'
-          Color = clWindow
-          TabOrder = 1
+          TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+          TreeOptions.PaintOptions = [toShowDropmark, toThemeAware, toUseBlendedImages]
+          TreeOptions.SelectionOptions = [toFullRowSelect]
+          AutoExpand = True
+          OnGetRowPreferencesName = ExampleListGetRowPreferencesName
+          OnCDataListReloadTree = ExampleListCDataListReloadTree
+          Columns = <
+            item
+              Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+              Position = 0
+              Width = 199
+              WideText = 'Przyk'#322'adowy widok listy'
+            end>
+          WideDefaultText = ''
         end
       end
       object ComboBoxType: TComboBox
@@ -223,29 +235,30 @@ inherited CListPreferencesForm: TCListPreferencesForm
     Left = 145
     Top = 152
     StyleName = 'XP Style'
-    object Action3: TAction
+    object ActionFont: TAction
       Caption = 'Czcionka elementu'
       ImageIndex = 0
-      OnExecute = Action3Execute
+      OnExecute = ActionFontExecute
     end
-    object Action4: TAction
+    object ActionBackgroundOdd: TAction
       Caption = 'Elementy nieparzyste'
       ImageIndex = 1
-      OnExecute = Action4Execute
+      OnExecute = ActionBackgroundOddExecute
     end
-    object Action5: TAction
+    object ActionBackgroundEven: TAction
       Caption = 'Elementy parzyste'
       ImageIndex = 1
+      OnExecute = ActionBackgroundEvenExecute
     end
-    object Action1: TAction
+    object ActionBackgroundActive: TAction
       Caption = 'Aktywny element'
       ImageIndex = 1
-      OnExecute = Action1Execute
+      OnExecute = ActionBackgroundActiveExecute
     end
-    object Action2: TAction
+    object ActionFontActive: TAction
       Caption = 'Czcionka aktywnego'
       ImageIndex = 1
-      OnExecute = Action2Execute
+      OnExecute = ActionFontActiveExecute
     end
   end
   object FontDialog: TFontDialog

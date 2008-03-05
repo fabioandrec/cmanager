@@ -458,7 +458,7 @@ procedure TCPreferencesForm.Action4Execute(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(TCMovementFrame.GetPrefname, FViewPrefs) then begin
+  if xPrefs.ShowListPreferences(TViewPref(FViewPrefs.ByPrefname[TCMovementFrame.GetPrefname])) then begin
     SendMessageToFrames(TCMovementFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
@@ -468,7 +468,7 @@ procedure TCPreferencesForm.Action5Execute(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(TCDoneFrame.GetPrefname, FViewPrefs) then begin
+  if xPrefs.ShowListPreferences(TViewPref(FViewPrefs.ByPrefname[TCDoneFrame.GetPrefname])) then begin
     SendMessageToFrames(TCDoneFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
@@ -478,7 +478,7 @@ procedure TCPreferencesForm.Action6Execute(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(TCPlannedFrame.GetPrefname, FViewPrefs) then begin
+  if xPrefs.ShowListPreferences(TViewPref(FViewPrefs.ByPrefname[TCPlannedFrame.GetPrefname])) then begin
     SendMessageToFrames(TCPlannedFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
@@ -488,7 +488,7 @@ procedure TCPreferencesForm.Action7Execute(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(TCStartupInfoFrame.GetPrefname, FViewPrefs) then begin
+  if xPrefs.ShowListPreferences(TViewPref(FViewPrefs.ByPrefname[TCStartupInfoFrame.GetPrefname])) then begin
     SendMessageToFrames(TCStartupInfoFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
@@ -644,7 +644,7 @@ procedure TCPreferencesForm.Action11Execute(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(TCExtractionsFrame.GetPrefname, FViewPrefs) then begin
+  if xPrefs.ShowListPreferences(TViewPref(FViewPrefs.ByPrefname[TCExtractionsFrame.GetPrefname])) then begin
     SendMessageToFrames(TCExtractionsFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;

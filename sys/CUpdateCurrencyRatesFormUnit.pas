@@ -341,7 +341,7 @@ procedure TCUpdateCurrencyRatesForm.Zaznaczwszystkie1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(CFontPreferencesRatesList, GViewsPreferences) then begin
+  if xPrefs.ShowListPreferences(RatesList.ViewPref) then begin
     RatesList.ReinitNode(RatesList.RootNode, True);
     RatesList.Repaint;
   end;

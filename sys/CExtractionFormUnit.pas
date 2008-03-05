@@ -629,7 +629,7 @@ procedure TCExtractionForm.Zaznaczwszystkie1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(CFontPreferencesExtraction, GViewsPreferences) then begin
+  if xPrefs.ShowListPreferences(MovementList.ViewPref) then begin
     MovementList.ReinitNode(MovementList.RootNode, True);
     MovementList.Repaint;
   end;

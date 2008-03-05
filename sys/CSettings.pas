@@ -10,9 +10,9 @@ const
 function InitializeSettings(AFileName: String): Boolean;
 procedure FinalizeSettings(AFilename: String);
 procedure SaveSettings;
-procedure SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer); overload;
-procedure SaveFormPosition(AForm: TForm); overload;
-procedure LoadFormPosition(AForm: TForm);
+function SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer): ICXMLDOMNode; overload;
+function SaveFormPosition(AForm: TForm): ICXMLDOMNode; overload;
+function LoadFormPosition(AForm: TForm): ICXMLDOMNode;
 function GetSettingsRoot: ICXMLDOMNode;
 function GetSettingsForms: ICXMLDOMNode;
 function GetSettingsPreferences: ICXMLDOMNode;
@@ -131,7 +131,7 @@ begin
   end;
 end;
 
-procedure SaveFormPosition(AForm: TForm);
+function SaveFormPosition(AForm: TForm): ICXMLDOMNode;
 var xPlacement: TWindowPlacement;
     xState: Integer;
 begin
@@ -144,7 +144,8 @@ begin
   end else begin
     xState := 0;
   end;
-  SaveFormPosition(AnsiLowerCase(StringReplace(AForm.Name + Copy(AForm.Caption, 1, 12), ' ', '', [rfReplaceAll, rfIgnoreCase])),
+  Result := SaveFormPosition(
+                   AnsiLowerCase(StringReplace(AForm.Name + Copy(AForm.Caption, 1, 12), ' ', '', [rfReplaceAll, rfIgnoreCase])),
                    xPlacement.rcNormalPosition.Left,
                    xPlacement.rcNormalPosition.Top,
                    xPlacement.rcNormalPosition.Right - xPlacement.rcNormalPosition.Left,
@@ -152,7 +153,7 @@ begin
                    xState);
 end;
 
-procedure LoadFormPosition(AForm: TForm);
+function LoadFormPosition(AForm: TForm): ICXMLDOMNode;
 var xForms: ICXMLDOMNode;
     xNode: ICXMLDOMNode;
     xPlacement: TWindowPlacement;
@@ -160,6 +161,7 @@ var xForms: ICXMLDOMNode;
     xLoaded: Boolean;
 begin
   xLoaded := False;
+  Result := Nil;
   if GSettings <> Nil then begin
     xForms := GetSettingsForms;
     xNode := xForms.selectSingleNode(AnsiLowerCase(StringReplace(AForm.Name + Copy(AForm.Caption, 1, 12), ' ', '', [rfReplaceAll, rfIgnoreCase])));
@@ -186,6 +188,7 @@ begin
       end;
       SetWindowPlacement(AForm.Handle, @xPlacement);
       xLoaded := True;
+      Result := xNode;
     end;
   end;
   if not xLoaded then begin
@@ -251,7 +254,7 @@ begin
   end;
 end;
 
-procedure SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer);
+function SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer): ICXMLDOMNode;
 var xForms: ICXMLDOMNode;
     xNode: ICXMLDOMNode;
 begin
@@ -267,6 +270,7 @@ begin
     SetXmlAttribute('width', xNode, AWidth);
     SetXmlAttribute('height', xNode, AHeight);
     SetXmlAttribute('state', xNode, AState);
+    Result := xNode;
   end;
 end;
 

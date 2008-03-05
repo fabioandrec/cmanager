@@ -334,7 +334,7 @@ procedure TCBaseFrame.Ustawienialisty1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(GetPrefname, GViewsPreferences) then begin
+  if xPrefs.ShowListPreferences(TViewPref(GViewsPreferences.ByPrefname[GetPrefname])) then begin
     SendMessageToFrames(TCBaseFrameClass(ClassType), WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;

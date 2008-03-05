@@ -373,6 +373,14 @@ type
     procedure GetElementReload; virtual; 
   end;
 
+  TCDataListSimpleString = class(TCDataListElementObject)
+  private
+    FCaption: String;
+  public
+    constructor Create(ACaption: String);
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+  end;
+
   TCListDataElement = class(TObjectList)
   private
     FFreeDataOnClear: Boolean;
@@ -419,6 +427,7 @@ type
     function GetVisibleIndex(ANode: PVirtualNode): Integer;
     function SumColumn(AColumnIndex: TColumnIndex; var ASum: Extended): Boolean;
     destructor Destroy; override;
+    procedure Repaint; override;
   published
     property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
     property ViewPref: TViewPref read FViewPref write SetViewPref;
@@ -1646,13 +1655,9 @@ begin
       xPref := TFontPref(FViewPref.Fontprefs.ByPrefname[xPrefname]);
       if xPref <> Nil then begin
         if Odd(xIndex) then begin
-          if xPref.Background <> clWindow then begin
-            Color := xPref.Background;
-          end;
+          Color := xPref.Background;
         end else begin
-          if xPref.BackgroundEven <> clWindow then begin
-            Color := xPref.BackgroundEven;
-          end;
+          Color := xPref.BackgroundEven;
         end;
       end;
     end;
@@ -1730,9 +1735,13 @@ begin
   if FViewPref <> Nil then begin
     Colors.FocusedSelectionColor := FViewPref.FocusedBackgroundColor;
     Colors.FocusedSelectionBorderColor := FViewPref.FocusedBackgroundColor;
+    Colors.UnfocusedSelectionColor := FViewPref.FocusedBackgroundColor;
+    Colors.UnfocusedSelectionBorderColor := FViewPref.FocusedBackgroundColor;
   end else begin
     Colors.FocusedSelectionColor := clHighlight;
     Colors.FocusedSelectionBorderColor := clHighlight;
+    Colors.UnfocusedSelectionColor := clHighlight;
+    Colors.UnfocusedSelectionBorderColor := clHighlight;
   end;
 end;
 
@@ -1743,6 +1752,12 @@ begin
     Inc(Result);
     ANode := GetPreviousVisible(ANode);
   end;
+end;
+
+procedure TCList.Repaint;
+begin
+  DoViewPrefChanged;
+  inherited Repaint;
 end;
 
 procedure TCList.SetViewPref(const Value: TViewPref);
@@ -2445,7 +2460,8 @@ end;
 constructor TFontPref.Create(APrefname: String);
 begin
   inherited Create(APrefname);
-  FBackground := clWindow;
+  FBackground := LOddColor;
+  FBackgroundEven := LEvenColor;
   FFont := TFont.Create;
   FFont.Color := clWindowText;
   FFont.Style := [];
@@ -2544,6 +2560,17 @@ begin
   SetXmlAttribute('width', ANode, Fwidth);
   SetXmlAttribute('visible', ANode, Fvisible);
   SetXmlAttribute('sortOrder', ANode, FsortOrder);
+end;
+
+constructor TCDataListSimpleString.Create(ACaption: String);
+begin
+  inherited Create;
+  FCaption := ACaption;
+end;
+
+function TCDataListSimpleString.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  Result := FCaption;
 end;
 
 initialization

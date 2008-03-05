@@ -317,6 +317,7 @@ const
   CFontPreferencesMovementList = 'movementList';
   CFontPreferencesParamsDefs = 'paramsDefs';
   CFontPreferencesShortcuts = 'shortcutsList';
+  CFontPreferencesHomelist = 'shortcutHomelist';
 
 implementation
 

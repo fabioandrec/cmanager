@@ -6,8 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
-  CComponents, VirtualTrees, PngImageList,
-  PngSpeedButton, ShellApi, CBaseFrameUnit, Menus, XPMan;
+  CComponents, VirtualTrees, PngImageList, CXml, PngSpeedButton, ShellApi,
+  CBaseFrameUnit, Menus, XPMan;
 
 type
   TCMainForm = class(TForm)
@@ -421,8 +421,12 @@ begin
 end;
 
 procedure TCMainForm.FormShow(Sender: TObject);
+var xNode: ICXMLDOMNode;
 begin
-  LoadFormPosition(Self);
+  xNode := LoadFormPosition(Self);
+  if xNode <> Nil then begin
+    PanelShortcuts.Width := GetXmlAttribute('shortcutWidth', xNode, PanelShortcuts.Width);
+  end;
 end;
 
 procedure TCMainForm.WndProc(var Message: TMessage);
@@ -578,12 +582,16 @@ end;
 
 procedure TCMainForm.FinalizeMainForm;
 var xCount: Integer;
+    xNode: ICXMLDOMNode;
 begin
   ExecuteOnexitPlugins;
   for xCount := 0 to FShortcutsFrames.Count - 1 do begin
     TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
   end;
-  SaveFormPosition(Self);
+  xNode := SaveFormPosition(Self);
+  if xNode <> Nil then begin
+    SetXmlAttribute('shortcutWidth', xNode, PanelShortcuts.Width);
+  end;
 end;
 
 function TCMainForm.CallHelp(ACommand: Word; AData: Integer; var ACallHelp: Boolean): Boolean;
@@ -949,7 +957,7 @@ procedure TCMainForm.Ustawienialisty1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(CFontPreferencesShortcuts, GViewsPreferences) then begin
+  if xPrefs.ShowListPreferences(ShortcutList.ViewPref) then begin
     ShortcutList.ReinitNode(ShortcutList.RootNode, True);
     ShortcutList.Repaint;
   end;

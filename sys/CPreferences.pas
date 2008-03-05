@@ -91,6 +91,7 @@ type
     FlastOpenedDatafilename: String;
     FshowShortcutBar: Boolean;
     FshortcutBarSmall: Boolean;
+    FhomeListSmall: Boolean;
     FshowStatusBar: Boolean;
     FstartupInfo: Boolean;
     FstartupInfoType: Integer;
@@ -129,6 +130,7 @@ type
     property lastOpenedDatafilename: String read FlastOpenedDatafilename write FlastOpenedDatafilename;
     property showShortcutBar: Boolean read FshowShortcutBar write FshowShortcutBar;
     property shortcutBarSmall: Boolean read FshortcutBarSmall write FshortcutBarSmall;
+    property homeListSmall: Boolean read FhomeListSmall write FhomeListSmall;
     property showStatusBar: Boolean read FshowStatusBar write FshowStatusBar;
     property startupInfo: Boolean read FstartupInfo write FstartupInfo;
     property startupInfoType: Integer read FstartupInfoType write FstartupInfoType;
@@ -196,6 +198,7 @@ begin
   FlastOpenedDatafilename := TBasePref(APrefItem).lastOpenedDatafilename;
   FshowShortcutBar := TBasePref(APrefItem).showShortcutBar;
   FshortcutBarSmall := TBasePref(APrefItem).shortcutBarSmall;
+  FhomeListSmall := TBasePref(APrefItem).homeListSmall;
   FshowStatusBar := TBasePref(APrefItem).showStatusBar;
   FstartupInfo := TBasePref(APrefItem).startupInfo;
   FstartupInfoType := TBasePref(APrefItem).startupInfoType;
@@ -269,6 +272,7 @@ begin
   FlastOpenedDatafilename := GetXmlAttribute('lastopenedfilename', ANode, '');
   FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
   FshortcutBarSmall := GetXmlAttribute('shortcutBarSmall', ANode, False);
+  FhomeListSmall := GetXmlAttribute('homeListSmall', ANode, False);
   FshowStatusBar := GetXmlAttribute('showStatusBar', ANode, True);
   FstartupInfo := GetXmlAttribute('startupInfo', ANode, False);
   FstartupInfoType := GetXmlAttribute('startupInfoType', ANode, CStartupInfoToday);
@@ -311,6 +315,7 @@ begin
   SetXmlAttribute('startupfilename', ANode, FstartupDatafileName);
   SetXmlAttribute('lastopenedfilename', ANode, FlastOpenedDatafilename);
   SetXmlAttribute('showShortcutBar', ANode, FshowShortcutBar);
+  SetXmlAttribute('homeListSmall', ANode, FhomeListSmall);
   SetXmlAttribute('shortcutBarSmall', ANode, FshortcutBarSmall);
   SetXmlAttribute('showStatusBar', ANode, FshowStatusBar);
   SetXmlAttribute('startupInfo', ANode, FstartupInfo);
@@ -727,9 +732,48 @@ initialization
   GViewsPreferences.Add(TViewPref.Create(CFontPreferencesShortcuts));
   with TViewPref(GViewsPreferences.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
-    TFontPref(Fontprefs.Last).RowHeight := 60;
+    TFontPref(Fontprefs.Last).RowHeight := 48;
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 24;
+  end;
+  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesHomelist));
+  with TViewPref(GViewsPreferences.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('BA', 'Akcje - du¿e ikony'));
+    with TFontPref(Fontprefs.Last) do begin
+      RowHeight := 48;
+      Background := clWindow;
+      BackgroundEven := clWindow;
+    end;
+    FocusedBackgroundColor := clWindow;
+    FocusedFontColor := clWindowText;
+    Fontprefs.Add(TFontPref.CreateFontPref('SA', 'Akcje - ma³e ikony'));
+    with TFontPref(Fontprefs.Last) do begin
+      RowHeight := 24;
+      Background := clWindow;
+      BackgroundEven := clWindow;
+    end;
+    FocusedBackgroundColor := clWindow;
+    FocusedFontColor := clWindowText;
+    Fontprefs.Add(TFontPref.CreateFontPref('BG', 'Elementy grupuj¹ce - du¿e ikony'));
+    with TFontPref(Fontprefs.Last) do begin
+      RowHeight := 48;
+      Background := clWindow;
+      BackgroundEven := clWindow;
+      Font.Style := Font.Style + [fsUnderline, fsBold];
+      Font.Size := 10;
+    end;
+    FocusedBackgroundColor := clWindow;
+    FocusedFontColor := clWindowText;
+    Fontprefs.Add(TFontPref.CreateFontPref('SG', 'Elementy grupuj¹ce - ma³e ikony'));
+    with TFontPref(Fontprefs.Last) do begin
+      RowHeight := 24;
+      Background := clWindow;
+      BackgroundEven := clWindow;
+      Font.Style := Font.Style + [fsUnderline, fsBold];
+      Font.Size := 10;
+    end;
+    FocusedBackgroundColor := clWindow;
+    FocusedFontColor := clWindowText;
   end;
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin

@@ -859,7 +859,7 @@ procedure TCMovementListForm.Zaznaczwszystkie1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(CFontPreferencesMovementList, GViewsPreferences) then begin
+  if xPrefs.ShowListPreferences(MovementList.ViewPref) then begin
     MovementList.ReinitNode(MovementList.RootNode, True);
     MovementList.Repaint;
   end;

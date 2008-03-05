@@ -392,7 +392,7 @@ procedure TCUpdateExchangesForm.Zaznaczwszystkie1Click(Sender: TObject);
 var xPrefs: TCListPreferencesForm;
 begin
   xPrefs := TCListPreferencesForm.Create(Nil);
-  if xPrefs.ShowListPreferences(CFontPreferencesExchangesList, GViewsPreferences) then begin
+  if xPrefs.ShowListPreferences(ExchangesList.ViewPref) then begin
     ExchangesList.ReinitNode(ExchangesList.RootNode, True);
     ExchangesList.Repaint;
   end;

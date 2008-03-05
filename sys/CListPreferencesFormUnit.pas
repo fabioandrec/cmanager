@@ -6,14 +6,14 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ActnList, XPStyleActnCtrls, ActnMan, ImgList, PngImageList, CPreferences,
-  ComCtrls;
+  ComCtrls, VirtualTrees;
 
 type
   TCListPreferencesForm = class(TCConfigForm)
     FontImageList: TPngImageList;
     ActionManager: TActionManager;
-    Action3: TAction;
-    Action4: TAction;
+    ActionFont: TAction;
+    ActionBackgroundOdd: TAction;
     GroupBox2: TGroupBox;
     CButton5: TCButton;
     CButton6: TCButton;
@@ -23,26 +23,28 @@ type
     ColorDialog: TColorDialog;
     TrackBar: TTrackBar;
     Label1: TLabel;
-    PanelRow: TPanel;
-    Action1: TAction;
-    Action2: TAction;
+    ActionBackgroundActive: TAction;
+    ActionFontActive: TAction;
     CButton1: TCButton;
     CButton2: TCButton;
-    PanelActive: TPanel;
     CButton3: TCButton;
-    Action5: TAction;
-    procedure Action3Execute(Sender: TObject);
-    procedure Action4Execute(Sender: TObject);
-    procedure ComboBoxTypeChange(Sender: TObject);
+    ActionBackgroundEven: TAction;
+    ExampleList: TCDataList;
+    procedure ExampleListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+    procedure ActionFontExecute(Sender: TObject);
+    procedure ActionBackgroundOddExecute(Sender: TObject);
+    procedure ActionBackgroundEvenExecute(Sender: TObject);
+    procedure ActionBackgroundActiveExecute(Sender: TObject);
+    procedure ActionFontActiveExecute(Sender: TObject);
     procedure TrackBarChange(Sender: TObject);
-    procedure Action1Execute(Sender: TObject);
-    procedure Action2Execute(Sender: TObject);
+    procedure ComboBoxTypeChange(Sender: TObject);
+    procedure ExampleListGetRowPreferencesName(AHelper: TObject;
+      var APrefname: String);
   private
-    FPrefContainer: TPrefList;
     FViewPref: TViewPref;
-    procedure UpdatePanelRowPosition;
+    procedure RefreshList;
   public
-    function ShowListPreferences(AFrameName: String; APrefContainer: TPrefList): Boolean;
+    function ShowListPreferences(AViewPref: TViewPref): Boolean;
   end;
 
 implementation
@@ -51,102 +53,109 @@ uses Contnrs;
 
 {$R *.dfm}
 
-procedure TCListPreferencesForm.Action3Execute(Sender: TObject);
-var xObj: TFontPref;
-    xPrevColor: TColor;
-begin
-  xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-  FontDialog.Font := PanelRow.Font;
-  xPrevColor := PanelActive.Font.Color;;
-  if FontDialog.Execute then begin
-    PanelRow.Font := FontDialog.Font;
-    PanelActive.Font := FontDialog.Font;
-    PanelActive.Font.Color := xPrevColor;
-    xObj.Font.Assign(FontDialog.Font);
-  end;
-end;
-
-procedure TCListPreferencesForm.Action4Execute(Sender: TObject);
-var xObj: TFontPref;
-begin
-  xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-  ColorDialog.Color := PanelRow.Color;
-  if ColorDialog.Execute then begin
-    PanelRow.Color := ColorDialog.Color;
-    xObj.Background := ColorDialog.Color;
-  end;
-end;
-
-function TCListPreferencesForm.ShowListPreferences(AFrameName: String; APrefContainer: TPrefList): Boolean;
+function TCListPreferencesForm.ShowListPreferences(AViewPref: TViewPref): Boolean;
 var xCount: Integer;
     xFontPref: TFontPref;
 begin
-  FPrefContainer := APrefContainer;
-  FViewPref := TViewPref.Create(AFrameName);
-  FViewPref.Clone(FPrefContainer.ByPrefname[AFramename]);
+  FViewPref := TViewPref.Create(AViewPref.Prefname);
+  FViewPref.Clone(AViewPref);
   for xCount := 0 to FViewPref.Fontprefs.Count - 1 do begin
     xFontPref := TFontPref(FViewPref.Fontprefs.Items[xCount]);
     ComboBoxType.AddItem(xFontPref.Desc, xFontPref);
   end;
   ComboBoxType.ItemIndex := 0;
+  ExampleList.ViewPref := FViewPref;
+  ExampleList.ReloadTree;
   ComboBoxTypeChange(Nil);
-  PanelActive.Font.Color := FViewPref.FocusedFontColor;
-  PanelActive.Color := FViewPref.FocusedBackgroundColor;
   Result := ShowConfig(coEdit);
   if Result then begin
-    FPrefContainer.ByPrefname[AFramename].Clone(FViewPref);
+    AViewPref.Clone(FViewPref);
   end;
   FViewPref.Free;
 end;
 
-procedure TCListPreferencesForm.ComboBoxTypeChange(Sender: TObject);
-var xObj: TFontPref;
-    xPrevColor: TColor;
+procedure TCListPreferencesForm.ExampleListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
 begin
-  if ComboBoxType.ItemIndex <> -1 then begin
-    xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-    xPrevColor := PanelActive.Font.Color;
-    PanelRow.Font.Assign(xObj.Font);
-    PanelActive.Font.Assign(xObj.Font);
-    PanelActive.Font.Color := xPrevColor;
-    PanelRow.Color := xObj.Background;
-    TrackBar.Position := xObj.RowHeight;
-    UpdatePanelRowPosition;
+  ARootElement.Add(TCListDataElement.Create(False, ExampleList, TCDataListSimpleString.Create('Element 0 - parzysty'), True, False));
+  ARootElement.Add(TCListDataElement.Create(False, ExampleList, TCDataListSimpleString.Create('Element 1 - nieparzysty'), True, False));
+  ARootElement.Add(TCListDataElement.Create(False, ExampleList, TCDataListSimpleString.Create('Element 2 - parzysty'), True, False));
+  ARootElement.Add(TCListDataElement.Create(False, ExampleList, TCDataListSimpleString.Create('Element 3 - nieparzysty'), True, False));
+end;
+
+procedure TCListPreferencesForm.ActionFontExecute(Sender: TObject);
+var xFontPref: TFontPref;
+begin
+  xFontPref := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
+  FontDialog.Font.Assign(xFontPref.Font);
+  if FontDialog.Execute then begin
+    xFontPref.Font.Assign(FontDialog.Font);
+    RefreshList;
+  end;
+end;
+
+procedure TCListPreferencesForm.RefreshList;
+begin
+  ExampleList.ReinitNode(ExampleList.RootNode, True);
+  ExampleList.Repaint;
+end;
+
+procedure TCListPreferencesForm.ActionBackgroundOddExecute(Sender: TObject);
+var xFontPref: TFontPref;
+begin
+  xFontPref := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
+  ColorDialog.Color := xFontPref.Background;
+  if ColorDialog.Execute then begin
+    xFontPref.Background := ColorDialog.Color;
+    RefreshList;
+  end;
+end;
+
+procedure TCListPreferencesForm.ActionBackgroundEvenExecute(Sender: TObject);
+var xFontPref: TFontPref;
+begin
+  xFontPref := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
+  ColorDialog.Color := xFontPref.BackgroundEven;
+  if ColorDialog.Execute then begin
+    xFontPref.BackgroundEven := ColorDialog.Color;
+    RefreshList;
+  end;
+end;
+
+procedure TCListPreferencesForm.ActionBackgroundActiveExecute(Sender: TObject);
+begin
+  ColorDialog.Color := FViewPref.FocusedBackgroundColor;
+  if ColorDialog.Execute then begin
+    FViewPref.FocusedBackgroundColor := ColorDialog.Color;
+    RefreshList;
+  end;
+end;
+
+procedure TCListPreferencesForm.ActionFontActiveExecute(Sender: TObject);
+begin
+  ColorDialog.Color := FViewPref.FocusedFontColor;
+  if ColorDialog.Execute then begin
+    FViewPref.FocusedFontColor := ColorDialog.Color;
+    RefreshList;
   end;
 end;
 
 procedure TCListPreferencesForm.TrackBarChange(Sender: TObject);
-var xObj: TFontPref;
 begin
-  xObj := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]);
-  xObj.RowHeight := TrackBar.Position;
-  UpdatePanelRowPosition;
+  TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]).RowHeight := TrackBar.Position;
+  RefreshList;
 end;
 
-procedure TCListPreferencesForm.UpdatePanelRowPosition;
+procedure TCListPreferencesForm.ComboBoxTypeChange(Sender: TObject);
 begin
-  PanelRow.Height := TrackBar.Position;
-  PanelActive.Height := TrackBar.Position;
-  PanelRow.Top := (PanelExample.Height - (PanelRow.Height + PanelActive.Height)) div 2;
-  PanelActive.Top := PanelRow.Top + PanelRow.Height + 1;
-end;
-
-procedure TCListPreferencesForm.Action1Execute(Sender: TObject);
-begin
-  ColorDialog.Color := PanelActive.Color;
-  if ColorDialog.Execute then begin
-    PanelActive.Color := ColorDialog.Color;
-    FViewPref.FocusedBackgroundColor := ColorDialog.Color;
+  if ComboBoxType.ItemIndex <> -1 then begin
+    TrackBar.Position := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]).RowHeight;
+    RefreshList; 
   end;
 end;
 
-procedure TCListPreferencesForm.Action2Execute(Sender: TObject);
+procedure TCListPreferencesForm.ExampleListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
-  ColorDialog.Color := PanelActive.Font.Color;
-  if ColorDialog.Execute then begin
-    PanelActive.Font.Color := ColorDialog.Color;
-    FViewPref.FocusedFontColor := ColorDialog.Color;
-  end;
+  APrefname := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]).Prefname;
 end;
 
 end.

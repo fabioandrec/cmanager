@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, PngImageList, ExtCtrls, StdCtrls,
-  pngimage, ActnList, CComponents, Menus, VirtualTrees;
+  pngimage, ActnList, CComponents, Menus, VirtualTrees, StrUtils;
 
 type
   THomeListElement = class(TCDataListElementObject)
@@ -17,29 +17,23 @@ type
     constructor Create(AAction: TAction; ACaption: String = ''; AImageIndex: Integer = -1);
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    property Action: TAction read Faction;
   end;
 
   TCHomeFrame = class(TCBaseFrame)
-    Image1: TImage;
-    Label1: TLabel;
-    CButton1: TCButton;
     ActionListSimple: TActionList;
     ActionNewOperation: TAction;
     ActionNewCyclic: TAction;
-    CButton2: TCButton;
     ActionOperationsList: TAction;
-    CButton3: TCButton;
     ActionPreferences: TAction;
-    CButton4: TCButton;
-    Image2: TImage;
-    Label2: TLabel;
     ActionSetProfile: TAction;
-    CButton5: TCButton;
-    CButton6: TCButton;
     ActionStartupInfo: TAction;
-    CButton7: TCButton;
     ActionAddNewList: TAction;
     List: TCDataList;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
+    PanelShortcutsTitle: TPanel;
+    ImageList16: TPngImageList;
     procedure ActionNewOperationExecute(Sender: TObject);
     procedure ActionNewCyclicExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
@@ -51,11 +45,17 @@ type
     procedure ListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure ListExpanding(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
     procedure ListCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
+    procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure ListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+    procedure ListClick(Sender: TObject);
   public
-    constructor Create(AOwner: TComponent); override;
     procedure ShowFrame; override;
     procedure HideFrame; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
+    function GetList: TCList; override;
+    class function GetPrefname: String; override;
   end;
 
 implementation
@@ -64,15 +64,9 @@ uses CMovementFormUnit, CDatabase, CConfigFormUnit, CDataObjects, CConsts,
   CMovementFrameUnit, CPlannedFormUnit, CPlannedFrameUnit,
   CPreferencesFormUnit, CFrameFormUnit, CProfileFrameUnit, CReports,
   CStartupInfoFrameUnit, CMovementListFormUnit, CDescpatternFormUnit,
-  CTools;
+  CTools, CPreferences;
 
 {$R *.dfm}
-
-constructor TCHomeFrame.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  Label1.Caption := Label1.Caption + ' - ' + FormatDateTime('dd MMMM yyyy', Now);
-end;
 
 procedure TCHomeFrame.ActionNewOperationExecute(Sender: TObject);
 var xForm: TCMovementForm;
@@ -147,6 +141,9 @@ end;
 procedure TCHomeFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  if GBasePreferences.homeListSmall then begin
+    MenuItemSmallIcons.Click;
+  end;
   List.ReloadTree;
 end;
 
@@ -154,16 +151,15 @@ procedure TCHomeFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: 
 var xShr: TCListDataElement;
     xPrf: TCListDataElement;
 begin
-  ARootElement.Add(TCListDataElement.Create(False, List, THomeListElement.Create(Nil, ''), True));
-  ARootElement.Add(TCListDataElement.Create(False, List, THomeListElement.Create(Nil, ''), True));
-  xShr := TCListDataElement.Create(False, List, THomeListElement.Create(Nil, 'Na skróty'), True);
+  ARootElement.Add(TCListDataElement.Create(False, List, THomeListElement.Create(Nil), True));
+  xShr := TCListDataElement.Create(False, List, THomeListElement.Create(Nil, 'Na skróty - ' + FormatDateTime('dd MMMM yyyy', Now), 6), True);
   ARootElement.Add(xShr);
   xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionStartupInfo), True));
   xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionNewOperation), True));
   xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionAddNewList), True));
   xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionNewCyclic), True));
   xShr.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionOperationsList), True));
-  xPrf := TCListDataElement.Create(False, List, THomeListElement.Create(Nil, 'Ustawienia i profile'), True);
+  xPrf := TCListDataElement.Create(False, List, THomeListElement.Create(Nil, 'Ustawienia i profile', 6), True);
   ARootElement.Add(xPrf);
   xPrf.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionSetProfile), True));
   xPrf.Add(TCListDataElement.Create(False, List, THomeListElement.Create(ActionPreferences), True));
@@ -206,6 +202,69 @@ end;
 procedure TCHomeFrame.ListCollapsing(Sender: TBaseVirtualTree; Node: PVirtualNode; var Allowed: Boolean);
 begin
   Allowed := False;
+end;
+
+function TCHomeFrame.GetList: TCList;
+begin
+  Result := List;
+end;
+
+class function TCHomeFrame.GetPrefname: String;
+begin
+  Result := CFontPreferencesHomelist;
+end;
+
+procedure TCHomeFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  with List do begin
+    Images := ImageList;
+    MenuItemBigIcons.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
+    GBasePreferences.homeListSmall := False;
+  end;
+end;
+
+procedure TCHomeFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  with List do begin
+    Images := ImageList16;
+    MenuItemSmallIcons.Checked := True;
+    ReinitNode(RootNode, True);
+    Repaint;
+    GBasePreferences.homeListSmall := True;
+  end;
+end;
+
+procedure TCHomeFrame.ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+var xData: TCListDataElement;
+begin
+  xData := TCListDataElement(AHelper);
+  APrefname := IfThen(MenuItemBigIcons.Checked, 'B', 'S') + IfThen(THomeListElement(xData.Data).Action <> Nil, 'A', 'G');
+end;
+
+procedure TCHomeFrame.ListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+var xData: TCListDataElement;
+begin
+  if NewNode <> Nil then begin
+    xData := TCListDataElement(List.GetNodeData(NewNode)^);
+    if THomeListElement(xData.Data).Action <> Nil then begin
+      List.TreeOptions.PaintOptions := List.TreeOptions.PaintOptions + [toHotTrack];
+    end else begin
+      List.TreeOptions.PaintOptions := List.TreeOptions.PaintOptions - [toHotTrack];
+    end;
+  end;
+end;
+
+procedure TCHomeFrame.ListClick(Sender: TObject);
+var xSelected: TCListDataElement;
+begin
+  xSelected := List.SelectedElement;
+  if xSelected <> Nil then begin
+    if THomeListElement(xSelected.Data).Action <> Nil then begin
+      THomeListElement(xSelected.Data).Action.Execute;
+    end;
+  end;
 end;
 
 end.
