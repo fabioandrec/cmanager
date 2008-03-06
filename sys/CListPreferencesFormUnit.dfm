@@ -1,17 +1,19 @@
 inherited CListPreferencesForm: TCListPreferencesForm
+  Left = 300
+  Top = 36
   Caption = 'Ustawienia listy'
-  ClientHeight = 378
+  ClientHeight = 409
   ClientWidth = 428
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 428
-    Height = 337
+    Height = 368
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
       Width = 393
-      Height = 313
+      Height = 345
       Caption = ' Ustawienia czcionek i kolor'#243'w '
       TabOrder = 0
       object CButton5: TCButton
@@ -42,10 +44,10 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object Label1: TLabel
         Left = 264
-        Top = 253
-        Width = 50
+        Top = 245
+        Width = 96
         Height = 13
-        Caption = 'Wysoko'#347#263
+        Caption = 'Wysoko'#347#263' elementu'
       end
       object CButton1: TCButton
         Left = 232
@@ -86,11 +88,24 @@ inherited CListPreferencesForm: TCListPreferencesForm
         Action = ActionBackgroundEven
         Color = clBtnFace
       end
+      object CButton4: TCButton
+        Left = 232
+        Top = 284
+        Width = 145
+        Height = 41
+        Cursor = crHandPoint
+        PicPosition = ppLeft
+        PicOffset = 10
+        TxtOffset = 15
+        Framed = False
+        Action = ActionDefault
+        Color = clBtnFace
+      end
       object PanelExample: TPanel
         Left = 24
         Top = 68
         Width = 201
-        Height = 221
+        Height = 253
         BevelOuter = bvLowered
         Color = clWindow
         TabOrder = 0
@@ -98,7 +113,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
           Left = 1
           Top = 1
           Width = 199
-          Height = 219
+          Height = 251
           Align = alClient
           BorderStyle = bsNone
           Header.AutoSizeIndex = 0
@@ -141,7 +156,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
       object TrackBar: TTrackBar
         Left = 247
-        Top = 240
+        Top = 232
         Width = 10
         Height = 38
         Max = 60
@@ -156,8 +171,11 @@ inherited CListPreferencesForm: TCListPreferencesForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 337
+    Top = 368
     Width = 428
+    DesignSize = (
+      428
+      41)
     inherited BitBtnOk: TBitBtn
       Left = 251
     end
@@ -191,7 +209,6 @@ inherited CListPreferencesForm: TCListPreferencesForm
           BE0420E928D0C5B327280E51C54C144560E14E341ABD43CBD42F743037200C8A
           0DB50000000049454E44AE426082}
         Name = 'PngImage0'
-        Background = clWindow
       end
       item
         PngImage.Data = {
@@ -224,7 +241,37 @@ inherited CListPreferencesForm: TCListPreferencesForm
           0B782D06AA8C8DEC964A759AE852E97DF5F105915D3E24BA8F6AEF0000000049
           454E44AE426082}
         Name = 'PngImage1'
-        Background = clWindow
+      end
+      item
+        PngImage.Data = {
+          89504E470D0A1A0A0000000D49484452000000100000001008060000001FF3FF
+          6100000006624B474400FF00FF00FFA0BDA793000000097048597300000B1300
+          000B1301009A9C180000000774494D45000000000000000973942E000002D449
+          44415478DA63648082A0A030A180003FB175EBD67F9F376FC1B9F0F0509DE4E4
+          14C99933A7DED9BF7FFF27061C8011C6983B77519CB38BDB842BD7EEFDE5E6E6
+          166167637AAEA224CBD7D6D612326142CF0E7C06B01C3D767EEEE7AF3F8D5EBF
+          FDA2232D29CAC0CCC2CCF0F7EF3F0636561606C67FBF8EDEBCFDE05252424016
+          2E0398172E5AB799894DC053544490E1DBB71F0C1F3FBEFB2D2C2CCACAC2C2C2
+          F0FBD75F867D7BB6CF9C38A12E03AB012DAD53AC9554B5E6FCFBC7ACC1C3C3CD
+          B069E3DAB9F366B7771497F7CEB2B4B0727CF2F425D0963FA7EEDFBB953FA1AF
+          EA048601691955AD4626B645DC3CDC1C2242020C8F1FDE687FFAE46A959C82E1
+          6A6111E990376F3F30DCBE7DFBDD9933076BF6EE5C391D6B209655F5AF3131B1
+          0C961413621011E6FFCFC0F0EFCDBF7F0CA26FDF7D6278F2FC35C386F5AB3B57
+          2D9F5881D50B3C3C3C02D1F1E5E7D4D454C55D1CADB8D858D919FEFDFBCFC0CC
+          CCC8F0E3E74F8615AB377FB872E5E2E52D1B66D96DDBB6DDC1CBCBF300B668E4
+          F5F64B2CB073F06C32365065E0E7E36178F9FA2DC3E9B337FFAF583A2DA2ABA3
+          26E12F03E7132505F9D8B76F5FAFFEFEEDF3531F1FF74A9474A0AD6765F7FFDF
+          7F55A0824F2E9ED173CF9ED8D50472457353830717B780B99AAA028F003F0FC3
+          874F5F191E3C7874FFEA95EBCB737362AA19B1F98B8F5FD4E6D3C7D71780CC6F
+          D367AE3E616F676DFAF0D1F37F274E1D7FE260E720C7C6CECEB071C386C95D1D
+          A579580D8081CA9A9E2C0303CB7E111101B67367CF1C292D8EF798326DCD155E
+          3E2185D76FDE7E5E34BFCF16AF014020D2D83AE7B094B48286B020CF6F6E4EA6
+          D36FDE7DB77CFDF623E3995387962C59D8938CD7007E7E6111DFC0C4B536B6F6
+          16CC4CAC6C5FBE7E63E0E2E26478FEFCE99B8307F66EDEBF7B791221178003DA
+          2F30FDA8B494E85F45556DF32B97CE9E7FF2E4F9E97DBB96E6A0C40201C003C4
+          5F3475AC0AAF5F393613C806263686EF200900F03725EBF40C331D0000000049
+          454E44AE426082}
+        Name = 'PngImage2'
       end>
     Left = 113
     Top = 152
@@ -259,6 +306,11 @@ inherited CListPreferencesForm: TCListPreferencesForm
       Caption = 'Czcionka aktywnego'
       ImageIndex = 1
       OnExecute = ActionFontActiveExecute
+    end
+    object ActionDefault: TAction
+      Caption = 'Ustawienia domy'#347'lne'
+      ImageIndex = 2
+      OnExecute = ActionDefaultExecute
     end
   end
   object FontDialog: TFontDialog

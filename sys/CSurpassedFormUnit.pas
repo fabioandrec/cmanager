@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CBaseFrameUnit, CDatabase,
-  VirtualTrees, CComponents, Contnrs, CDataObjects, CImageListsUnit, CTools;
+  VirtualTrees, CComponents, Contnrs, CDataObjects, CImageListsUnit, CTools,
+  Menus;
 
 type
   TSurpassedLimit = class(TCDataListElementObject)
@@ -17,6 +18,7 @@ type
     function GetElementHint(AColumnIndex: Integer): String; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    property limit: TMovementLimit read Flimit;
   end;
 
   TCSurpassedForm = class(TCConfigForm)
@@ -24,7 +26,11 @@ type
     Label1: TLabel;
     Label2: TLabel;
     SurpassedList: TCDataList;
+    PopupMenu1: TPopupMenu;
+    Zaznaczwszystkie1: TMenuItem;
     procedure SurpassedListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+    procedure SurpassedListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure Zaznaczwszystkie1Click(Sender: TObject);
   private
     FMovementType: TBaseEnumeration;
     FDate: TDateTime;
@@ -40,7 +46,7 @@ function CheckSurpassedLimits(AMovementType: TBaseEnumeration; ADate: TDateTime;
 
 implementation
 
-uses CConsts;
+uses CConsts, StrUtils, CPreferences, CListPreferencesFormUnit;
 
 {$R *.dfm}
 
@@ -53,6 +59,7 @@ begin
   xForm.FCategorySums := ACategorySums;
   xForm.FCashpointIds := ACashpointIds;
   xForm.FMovementType := AMovementType;
+  xForm.SurpassedList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesSurpassesLimits]);
   xForm.SurpassedList.ReloadTree;
   if xForm.SurpassedList.RootNodeCount <> 0 then begin
     Result := xForm.ShowConfig(coEdit);
@@ -223,6 +230,22 @@ end;
 function TSurpassedLimit.GetElementHint(AColumnIndex: Integer): String;
 begin
   Result := Flimit.description;
+end;
+
+procedure TCSurpassedForm.SurpassedListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+begin
+  APrefname := TSurpassedLimit(TCListDataElement(AHelper).Data).limit.sumType;
+end;
+
+procedure TCSurpassedForm.Zaznaczwszystkie1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(SurpassedList.ViewPref) then begin
+    SurpassedList.ReinitNode(SurpassedList.RootNode, True);
+    SurpassedList.Repaint;
+  end;
+  xPrefs.Free;
 end;
 
 end.

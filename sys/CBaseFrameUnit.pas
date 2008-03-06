@@ -75,6 +75,7 @@ type
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); virtual;
     procedure FinalizeFrame; virtual;
     procedure PrepareCheckStates; virtual;
+    function GetCheckType(ANode: PVirtualNode): TCheckType; virtual;
     class function GetTitle: String; virtual;
     class function GetOperation: TConfigOperation; virtual;
     class function GetPrefname: String; virtual;
@@ -280,7 +281,7 @@ begin
     xAll := FMultipleChecks.Count = 0;
     xNode := xList.GetFirst;
     while (xNode <> Nil) do begin
-      xNode.CheckType := ctCheckBox;
+      xNode.CheckType := GetCheckType(xNode);
       xChecked := xAll;
       if not xChecked then begin
         xId := FindNodeId(xNode);
@@ -309,7 +310,7 @@ begin
     xNode := xList.GetFirst;
     xAll := True;
     while (xNode <> Nil) do begin
-      if xNode.CheckState = csCheckedNormal then begin
+      if (xNode.CheckState = csCheckedNormal) or (xNode.CheckState = csMixedNormal) then begin
         FMultipleChecks.Add(FindNodeId(xNode));
       end else begin
         xAll := False;
@@ -716,7 +717,7 @@ begin
 end;
 
 procedure InitializeFrameGlobals;
-var xCount: Integer;
+var xDefaultViewPrefs: TPrefList;
 begin
   GFrames := TObjectList.Create(False);
   GRegisteredClasses := TRegisteredFrameClasses.Create(True);
@@ -739,14 +740,9 @@ begin
   GRegisteredClasses.AddClass(TCInvestmentMovementFrame, CFRAMETYPE_INVESTMENTMOVEMENT, True);
   GRegisteredClasses.AddClass(TCInvestmentPortfolioFrame, CFRAMETYPE_INVESTMENTPORTFOLIO, True);
   GRegisteredClasses.AddClass(TCReportsFrame, CFRAMETYPE_REPORTS, True);
-  for xCount := 0 to GRegisteredClasses.Count - 1 do begin
-    if GViewsPreferences.ByPrefname[TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname] = Nil then begin
-      GViewsPreferences.Add(TViewPref.Create(TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname));
-      with TViewPref(GViewsPreferences.Last) do begin
-        Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
-      end;
-    end;
-  end;
+  xDefaultViewPrefs := GetDefaultViewPreferences;
+  GViewsPreferences.Clone(xDefaultViewPrefs);
+  xDefaultViewPrefs.Free;
 end;
 
 procedure FinalizeFrameGlobals;
@@ -767,7 +763,7 @@ begin
   if GetList <> Nil then begin
     xNode := GetList.GetFirst;
     while (xNode <> Nil) and (not Result) do begin
-      Result := (xNode.CheckState = csCheckedNormal) and (xNode.CheckType = ctCheckBox);
+      Result := ((xNode.CheckState = csCheckedNormal) or (xNode.CheckState = csMixedNormal)) and (xNode.CheckType <> ctNone);
       xNode := GetList.GetNext(xNode);
     end;
   end;
@@ -784,6 +780,11 @@ begin
     GetList.ReinitNode(GetList.RootNode, True);
     GetList.Repaint;
   end;
+end;
+
+function TCBaseFrame.GetCheckType(ANode: PVirtualNode): TCheckType;
+begin
+  Result := ctCheckBox;
 end;
 
 initialization

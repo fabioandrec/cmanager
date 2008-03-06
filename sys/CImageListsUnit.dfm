@@ -1,9 +1,9 @@
 object CImageLists: TCImageLists
   OldCreateOrder = False
-  Left = 73
-  Top = 45
-  Height = 685
-  Width = 916
+  Left = 3
+  Top = 3
+  Height = 450
+  Width = 638
   object MainImageList24x24: TPngImageList
     Height = 24
     Width = 24

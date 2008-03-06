@@ -321,6 +321,8 @@ const
   CFontPreferencesLoancalc = 'loanCalc';
   CFontPreferencesFilterdetails = 'filterDetails';
   CFontPreferencesChartList = 'chartList';
+  CFontPreferencesDefaultdataElements = 'defaultData';
+  CFontPreferencesSurpassesLimits = 'surpassedLimits';
 
 implementation
 

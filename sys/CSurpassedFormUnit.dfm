@@ -1,4 +1,6 @@
 inherited CSurpassedForm: TCSurpassedForm
+  Left = 380
+  Top = 245
   Caption = 'Przekroczone limity'
   PixelsPerInch = 96
   TextHeight = 13
@@ -14,7 +16,7 @@ inherited CSurpassedForm: TCSurpassedForm
     end
     object Label2: TLabel
       Left = 158
-      Top = 372
+      Top = 360
       Width = 421
       Height = 13
       Alignment = taRightJustify
@@ -26,7 +28,7 @@ inherited CSurpassedForm: TCSurpassedForm
       Left = 2
       Top = 40
       Width = 591
-      Height = 313
+      Height = 301
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
@@ -34,7 +36,7 @@ inherited CSurpassedForm: TCSurpassedForm
         Left = 1
         Top = 1
         Width = 589
-        Height = 311
+        Height = 299
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -55,6 +57,7 @@ inherited CSurpassedForm: TCSurpassedForm
         HintMode = hmHint
         Images = CImageLists.DoneImageList16x16
         ParentShowHint = False
+        PopupMenu = PopupMenu1
         ShowHint = True
         TabOrder = 0
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -62,6 +65,7 @@ inherited CSurpassedForm: TCSurpassedForm
         TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect]
         AutoExpand = True
+        OnGetRowPreferencesName = SurpassedListGetRowPreferencesName
         OnCDataListReloadTree = SurpassedListCDataListReloadTree
         Columns = <
           item
@@ -90,6 +94,15 @@ inherited CSurpassedForm: TCSurpassedForm
           end>
         WideDefaultText = ''
       end
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 152
+    Top = 297
+    object Zaznaczwszystkie1: TMenuItem
+      Caption = 'Ustawienia listy'
+      ImageIndex = 0
+      OnClick = Zaznaczwszystkie1Click
     end
   end
 end

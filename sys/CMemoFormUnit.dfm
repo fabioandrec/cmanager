@@ -8,12 +8,12 @@ inherited CMemoForm: TCMemoForm
   inherited PanelConfig: TPanel
     DesignSize = (
       591
-      396)
-    object RichEdit: TCRichEdit
+      384)
+    object RichEdit: TCRichedit
       Left = 4
       Top = 5
       Width = 585
-      Height = 390
+      Height = 376
       TabStop = False
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelKind = bkTile

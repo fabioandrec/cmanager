@@ -179,6 +179,7 @@ var GViewsPreferences: TPrefList;
     GBackupThread: TBackupThread;
 
 function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
+function GetDefaultViewPreferences: TPrefList;
 
 implementation
 
@@ -648,15 +649,12 @@ begin
   SetXmlAttribute('isReg', ANode, FisReg);
 end;
 
-initialization
-  GDescPatterns := TDescPatterns.Create(True);
-  GViewsPreferences := TPrefList.Create(TViewPref);
-  GColumnsPreferences := TPrefList.Create(TViewColumnPref);
-  GBackupsPreferences := TPrefList.Create(TBackupPref);
-  GPluginsPreferences := TPrefList.Create(TPluginPref);
-  GChartPreferences := TPrefList.Create(TChartPref);
-  GViewsPreferences.Add(TViewPref.Create(TCMovementFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+function GetDefaultViewPreferences: TPrefList;
+var xCount: Integer;
+begin
+  Result := TPrefList.Create(TViewPref);
+  Result.Add(TViewPref.Create(TCMovementFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód jednorazowy'));
     Fontprefs.Add(TFontPref.CreateFontPref('T', 'Transfer œrodków'));
@@ -665,21 +663,21 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('SI', 'Lista przychodów'));
     Fontprefs.Add(TFontPref.CreateFontPref('SO', 'Lista rozchodów'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(TCDoneFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(TCDoneFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('R', 'Gotowe do realizacji'));
     Fontprefs.Add(TFontPref.CreateFontPref('W', 'Operacje zaleg³e'));
     Fontprefs.Add(TFontPref.CreateFontPref('DO', 'Wykonane'));
     Fontprefs.Add(TFontPref.CreateFontPref('DA', 'Uznane za wykonane'));
     Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Odrzucone jako niezasadne'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(TCPlannedFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(TCPlannedFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód'));
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(TCStartupInfoFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(TCStartupInfoFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('II', 'Zaplanowane operacje przychodowe'));
     Fontprefs.Add(TFontPref.CreateFontPref('IO', 'Zaplanowane operacje rozchodowe'));
     Fontprefs.Add(TFontPref.CreateFontPref('OI', 'Zaleg³e operacje przychodowe'));
@@ -690,78 +688,84 @@ initialization
     Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'));
     Fontprefs.Add(TFontPref.CreateFontPref('UE', 'Nieuzgodnione wyci¹gi'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(TCExtractionsFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesSurpassesLimits));
+  with TViewPref(Result.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przekroczone limity przychodu'));
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Przekroczone limity rozchodu'));
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Przekroczone limity salda'));
+  end;
+  Result.Add(TViewPref.Create(TCExtractionsFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'));
     Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'));
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodniona'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(TCReportsFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(TCReportsFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('R', 'Raporty'));
     Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesMovementListSum));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesMovementListSum));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesDoneListSum));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesDoneListSum));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesRatesList));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesRatesList));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesExchangesList));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesExchangesList));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(TCDescTemplatesFrame.GetPrefname));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(TCDescTemplatesFrame.GetPrefname));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('R', 'Mnemoniki'));
     Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesExtraction));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesExtraction));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('O', 'Obci¹¿enie'));
     Fontprefs.Add(TFontPref.CreateFontPref('I', 'Uznanie'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesListFrame));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesListFrame));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesMovementList));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesMovementList));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesParamsDefs));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesParamsDefs));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesShortcuts));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesShortcuts));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 48;
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesFilterdetails));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesFilterdetails));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 48;
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesChartList));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesChartList));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 48;
     Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesHomelist));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesHomelist));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('BA', 'Akcje - du¿e ikony'));
     with TFontPref(Fontprefs.Last) do begin
       RowHeight := 48;
@@ -799,10 +803,36 @@ initialization
     FocusedBackgroundColor := clWindow;
     FocusedFontColor := clWindowText;
   end;
-  GViewsPreferences.Add(TViewPref.Create(CFontPreferencesLoancalc));
-  with TViewPref(GViewsPreferences.Last) do begin
+  Result.Add(TViewPref.Create(CFontPreferencesLoancalc));
+  with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
   end;
+  Result.Add(TViewPref.Create(CFontPreferencesDefaultdataElements));
+  with TViewPref(Result.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('T', 'Rodzaj danych'));
+    with TFontPref(Fontprefs.Last) do begin
+      Font.Style := Font.Style + [fsUnderline, fsBold];
+      Font.Size := 10;
+    end;
+    Fontprefs.Add(TFontPref.CreateFontPref('E', 'Dane domyœlne'));
+  end;
+  for xCount := 0 to GRegisteredClasses.Count - 1 do begin
+    if Result.ByPrefname[TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname] = Nil then begin
+      Result.Add(TViewPref.Create(TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname));
+      with TViewPref(Result.Last) do begin
+        Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+      end;
+    end;
+  end;
+end;
+
+initialization
+  GDescPatterns := TDescPatterns.Create(True);
+  GViewsPreferences := TPrefList.Create(TViewPref);
+  GColumnsPreferences := TPrefList.Create(TViewColumnPref);
+  GBackupsPreferences := TPrefList.Create(TBackupPref);
+  GPluginsPreferences := TPrefList.Create(TPluginPref);
+  GChartPreferences := TPrefList.Create(TChartPref);
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin
     startupDatafileMode := CStartupFilemodeFirsttime;

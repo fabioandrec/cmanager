@@ -30,6 +30,8 @@ type
     CButton3: TCButton;
     ActionBackgroundEven: TAction;
     ExampleList: TCDataList;
+    CButton4: TCButton;
+    ActionDefault: TAction;
     procedure ExampleListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ActionFontExecute(Sender: TObject);
     procedure ActionBackgroundOddExecute(Sender: TObject);
@@ -38,8 +40,8 @@ type
     procedure ActionFontActiveExecute(Sender: TObject);
     procedure TrackBarChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
-    procedure ExampleListGetRowPreferencesName(AHelper: TObject;
-      var APrefname: String);
+    procedure ExampleListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure ActionDefaultExecute(Sender: TObject);
   private
     FViewPref: TViewPref;
     procedure RefreshList;
@@ -156,6 +158,31 @@ end;
 procedure TCListPreferencesForm.ExampleListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
   APrefname := TFontPref(ComboBoxType.Items.Objects[ComboBoxType.ItemIndex]).Prefname;
+end;
+
+procedure TCListPreferencesForm.ActionDefaultExecute(Sender: TObject);
+var xDefault: TPrefList;
+    xPref: TViewPref;
+    xCount: Integer;
+begin
+  xDefault := GetDefaultViewPreferences;
+  xPref := TViewPref(xDefault.ByPrefname[FViewPref.Prefname]);
+  if xPref <> Nil then begin
+    ExampleList.BeginUpdate;
+    ComboBoxType.Items.BeginUpdate;
+    for xCount := 0 to ComboBoxType.Items.Count - 1 do begin
+      ComboBoxType.Items.Objects[xCount] := Nil;
+    end;
+    FViewPref.Clone(xPref);
+    for xCount := 0 to ComboBoxType.Items.Count - 1 do begin
+      ComboBoxType.Items.Objects[xCount] := TFontPref(FViewPref.Fontprefs.Items[xCount]);
+    end;
+    ExampleList.ViewPref := FViewPref;
+    ComboBoxType.Items.EndUpdate;
+    ExampleList.EndUpdate;
+    RefreshList;
+  end;
+  xDefault.Free;
 end;
 
 end.

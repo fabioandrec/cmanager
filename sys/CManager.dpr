@@ -138,7 +138,8 @@ uses
   CInvestmentMovementFormUnit in 'CInvestmentMovementFormUnit.pas' {CInvestmentMovementForm},
   CInvestmentPortfolioFrameUnit in 'CInvestmentPortfolioFrameUnit.pas' {CInvestmentPortfolioFrame: TFrame},
   CInitializeProviderFormUnit in 'CInitializeProviderFormUnit.pas' {CInitializeProviderForm},
-  CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm};
+  CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
+  CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame};
 
 {$R *.res}
 
@@ -166,13 +167,11 @@ begin
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile then begin
         xFilename := GBasePreferences.startupDatafileName;
       end;
-      {
-      if (GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) and (not FileExists(xFilename)) then begin
+      if ((GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) and (not FileExists(xFilename))) or (GetSwitch('/newdatafile')) then begin
         xProceed := CreateDatafileWithWizard(xFilename);
       end else begin
         xProceed := True;
-      end;}
-      xProceed := True;
+      end;
       if xProceed then begin
         xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
       end;
@@ -196,7 +195,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

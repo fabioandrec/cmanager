@@ -1,10 +1,10 @@
 inherited CConfigForm: TCConfigForm
-  Left = 298
-  Top = 171
+  Left = 83
+  Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'ConfigForm'
-  ClientHeight = 437
+  ClientHeight = 425
   ClientWidth = 591
   PixelsPerInch = 96
   TextHeight = 13
@@ -12,14 +12,14 @@ inherited CConfigForm: TCConfigForm
     Left = 0
     Top = 0
     Width = 591
-    Height = 396
+    Height = 384
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
   end
   object PanelButtons: TPanel
     Left = 0
-    Top = 396
+    Top = 384
     Width = 591
     Height = 41
     Align = alBottom

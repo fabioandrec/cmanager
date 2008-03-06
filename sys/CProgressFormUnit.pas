@@ -54,8 +54,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FWaitThread: TWaitThread;
     FWaitHandle: THandle;

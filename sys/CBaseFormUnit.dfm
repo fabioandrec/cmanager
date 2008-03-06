@@ -1,8 +1,8 @@
 object CBaseForm: TCBaseForm
-  Left = 237
-  Top = 161
-  Width = 690
-  Height = 481
+  Left = 3
+  Top = 3
+  Width = 638
+  Height = 450
   Caption = 'BaseForm'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET

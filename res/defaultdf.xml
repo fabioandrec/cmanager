@@ -71,7 +71,4 @@
       <treeElement description="Aerobic i fitness" sql="insert into product (idProduct, created, modified, name, description, idParentProduct, productType) values ('{C28FBA7D-33FE-4658-97C4-106B0319B5B0}', #2007-03-14 13:24:57#, #2007-03-14 13:24:57#, 'Aerobic i fitness', 'Aerobic i fitness', '{2B13288A-8C31-4088-916C-7BA6DA8EBB5B}', 'O');"/>
     </treeElement>
   </treeElement>
-  <treeElement description="Priofile rejestracji">
-    <treeElement description="Zakupy w sklepie osiedlowym" sql="insert into profile (idProfile, created, modified, name, description, idAccount, idCashPoint, idProduct) values ('{4C0569FA-82C8-426C-A6DD-C76C873F5EF3}', #2007-03-14 13:26:01#, #2007-03-14 13:26:01#, 'Zakupy w sklepie osiedlowym', 'Zakupy w sklepie osiedlowym', '{3FA611D2-F6D6-4DAA-9EE8-CE8193FEB1B5}', '{72976F14-B380-4F40-B9F2-E6A328453DC4}', null);"/>
-  </treeElement>
 </defaultdatafile>
