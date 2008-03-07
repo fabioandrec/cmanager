@@ -233,7 +233,7 @@ begin
     end;
   end;
   if (xConfigurationDecoded = '') or (Result = Nil) then begin
-    xConfigurationDecoded := GetStringFromResources('DEFAULTXML');
+    xConfigurationDecoded := GetStringFromResources('DEFAULTXML', RT_RCDATA);
     Result := GetDocumentFromString(xConfigurationDecoded, Nil);
     if Result.parseError.errorCode <> 0 then begin
       AErrorText := 'Konfiguracja wtyczki jest niepoprawna';

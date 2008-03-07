@@ -78,7 +78,7 @@ begin
             xExitCode := $00;
           end;
         end else if xAction = 4 then begin
-          if CompactDatabase(xFile, xPassword, xText) then begin
+          if DbCompactDatabase(xFile, xPassword, xText) then begin
             xExitCode := $00;
           end;
         end else if xAction = 8 then begin
@@ -87,11 +87,11 @@ begin
               DeleteFile(xFile);
             end;
           end;
-          if CreateDatabase(xFile, xPassword, xText) then begin
+          if DbCreateDatabase(xFile, xPassword, xText) then begin
             xExitCode := $00;
           end;
         end else if xAction = 16 then begin
-          if ChangeDatabasePassword(xFile, xPassword, xNewPassword, xText) then begin
+          if DbChangeDatabasePassword(xFile, xPassword, xNewPassword, xText) then begin
             xExitCode := $00;
           end;
         end;
