@@ -16,7 +16,7 @@ type
 const
   CNODE_PROCESSING_INSTRUCTION = NODE_PROCESSING_INSTRUCTION;
 
-procedure SetXmlAttribute(AName: String; ANode: ICXMLDOMNode; AValue: OleVariant);
+procedure SetXmlAttribute(AName: String; ANode: ICXMLDOMNode; AValue: OleVariant; ARecursive: Boolean = False);
 function GetXmlAttribute(AName: String; ANode: ICXMLDOMNode; ADefault: OleVariant): OleVariant;
 function GetDocumentFromString(AString: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
 function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
@@ -29,6 +29,7 @@ function GetSchemaCacheFromXsd(AXsd: ICXMLDOMDocument): ICXMLDOMSchemaCollection
 procedure AppendEncoding(var AXml: ICXMLDOMDocument; AEncoding: String = 'Windows-1250');
 function GetParseErrorDescription(AError: ICXMLDOMParseError; AWithLinebraks: Boolean): String;
 function IsValidXmlparserInstalled(AShowError: Boolean; AShowQuestion: Boolean): Boolean;
+procedure SetXmlIdForEach(ANodes: ICXMLDOMNodeList; ARecursive: Boolean);
 
 resourcestring
   CNoValidMsxmlFoundError = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
@@ -39,7 +40,7 @@ resourcestring
 
 implementation
 
-uses SysUtils, StrUtils;
+uses SysUtils, StrUtils, CTools;
 
 procedure AppendEncoding(var AXml: ICXMLDOMDocument; AEncoding: String = 'Windows-1250');
 var xProc: ICXMLDOMProcessingInstruction;
@@ -83,12 +84,18 @@ begin
   end;
 end;
 
-procedure SetXmlAttribute(AName: String; ANode: ICXMLDOMNode; AValue: OleVariant);
+procedure SetXmlAttribute(AName: String; ANode: ICXMLDOMNode; AValue: OleVariant; ARecursive: Boolean = False);
 var xNode: ICXMLDOMNode;
+    xCount: Integer;
 begin
   xNode := ANode.ownerDocument.createAttribute(AName);
   ANode.attributes.setNamedItem(xNode);
   xNode.nodeValue := AValue;
+  if ARecursive then begin
+    for xCount := 0 to xNode.childNodes.length - 1 do begin
+      SetXmlAttribute(AName, xNode.childNodes.item[xCount], AValue, ARecursive);
+    end;
+  end;
 end;
 
 function GetDocumentFromFile(AFilename: String; AXsd: ICXMLDOMDocument): ICXMLDOMDocument;
@@ -213,6 +220,17 @@ begin
           MessageBox(0, PChar(CNoValidMsxmlFoundError), 'B³¹d', MB_OK + MB_ICONERROR);
         end;
       end;
+    end;
+  end;
+end;
+
+procedure SetXmlIdForEach(ANodes: ICXMLDOMNodeList; ARecursive: Boolean);
+var xCount: Integer;
+begin
+  for xCount := 0 to ANodes.length - 1 do begin
+    SetXmlAttribute('id', ANodes.item[xCount], CreateNewGuid);
+    if ARecursive then begin
+      SetXmlIdForEach(ANodes.item[xCount].childNodes, ARecursive);
     end;
   end;
 end;

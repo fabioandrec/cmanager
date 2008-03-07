@@ -564,6 +564,7 @@ begin
       List.CheckState[xNode] := csCheckedNormal;
       xNode := List.GetNext(xNode);
     end;
+    UpdateButtons(List.SelectedCount > 0);
   end;
 end;
 
@@ -576,6 +577,7 @@ begin
       List.CheckState[xNode] := csUncheckedNormal;
       xNode := List.GetNext(xNode);
     end;
+    UpdateButtons(List.SelectedCount > 0);
   end;
 end;
 
@@ -595,6 +597,7 @@ begin
       List.CheckState[xNode] := xState;
       xNode := List.GetNext(xNode);
     end;
+    UpdateButtons(List.SelectedCount > 0);
   end;
 end;
 

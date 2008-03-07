@@ -50,7 +50,7 @@ begin
   end;
   xBeforeSize := FileSize(CStaticName.DataId);
   AddToReport('Kompaktowanie pliku danych...');
-  Result := CompactDatabase(CStaticName.DataId, EditPassword.Text, xError);
+  Result := DbCompactDatabase(CStaticName.DataId, EditPassword.Text, xError);
   if Result then begin
     xAfterSize := FileSize(CStaticName.DataId);
     xText := 'Wykonano kompaktowanie pliku danych';

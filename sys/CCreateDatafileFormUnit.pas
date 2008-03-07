@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, ImgList, PngImageList, CXml;
+  CComponents, ImgList, PngImageList, CXml, AdoDb;
 
 type
   TCCreateDatafileForm = class(TCBaseForm)
@@ -42,6 +42,7 @@ type
     LabelInfo: TLabel;
     LabelFinish: TLabel;
     CStaticDesc: TCStatic;
+    ProgressBar: TProgressBar;
     procedure FormCreate(Sender: TObject);
     procedure BitBtnFinishClick(Sender: TObject);
     procedure BitBtnPrevClick(Sender: TObject);
@@ -49,8 +50,7 @@ type
     procedure CStaticNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure FormDestroy(Sender: TObject);
     procedure CButtonShowDefaultClick(Sender: TObject);
-    procedure CStaticDescGetDataId(var ADataGid, AText: String;
-      var AAccepted: Boolean);
+    procedure CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FDefaultXml: ICXMLDOMDocument;
     FCheckedData: TStringList;
@@ -64,20 +64,23 @@ type
     function GetDisabled: Boolean;
     procedure SetDisabled(const Value: Boolean);
     procedure AddToReport(AText: String);
+    function GetDefaultDataAsString: String;
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
   end;
 
-function CreateDatafileWithWizard(var AFilename: String): Boolean;
+function CreateDatafileWithWizard(var AFilename: String; var APassword: String): Boolean;
 
 implementation
 
 uses CRichtext, FileCtrl, CXmlFrameUnit, CInfoFormUnit, CReportFormUnit,
-  CMemoFormUnit, CAdox;
+  CMemoFormUnit, CAdox, CTools, CXmlTlb;
 
 {$R *.dfm}
 
-function CreateDatafileWithWizard(var AFilename: String): Boolean;
+const CInsertCmanagerInfo = 'insert into cmanagerInfo (version, created) values (''%s'', %s)';
+
+function CreateDatafileWithWizard(var AFilename: String; var APassword: String): Boolean;
 begin
   with TCCreateDatafileForm.Create(Application) do begin
     SaveDialog.FileName := AFilename;
@@ -86,6 +89,7 @@ begin
     Result := ShowModal = mrOk;
     if Result then begin
       AFilename := CStaticName.DataId;
+      APassword := EditPassword.Text;
     end;
     Free;
   end;
@@ -169,6 +173,7 @@ begin
     CopyMemory(@xXmlString[1], xResStream.Memory, xResStream.Size);
   end;
   FDefaultXml := GetDocumentFromString(xXmlString, Nil);
+  SetXmlIdForEach(FDefaultXml.documentElement.childNodes, True);
   xResStream.Free;
 end;
 
@@ -201,9 +206,17 @@ function TCCreateDatafileForm.DoCreateDatafile: Boolean;
 var xOverridenBackupFilename: String;
     xProceed: Boolean;
     xError: String;
+    xConnection: TADOConnection;
+    xNativeError: Integer;
 begin
+  LabelInfo.Caption := 'Trwa tworzenie pliku danych';
+  LabelInfo.Update;
+  LabelFinish.Caption := 'Proszê czekaæ. CManager aktualnie tworzy nowy plik danych. Po zakoñczeniu bêdzie on gotowy do u¿ycia.';
+  LabelFinish.Update;
   Result := False;
   Disabled := True;
+  ProgressBar.Visible := True;
+  //Krok 1
   if FileExists(CStaticName.DataId) then begin
     xOverridenBackupFilename := ChangeFileExt(CStaticName.DataId, '.' + FormatDateTime('yymmddhhnnss', Now));
     AddToReport('Wykonywanie kopii pliku ' + CStaticName.DataId + ' do pliku ' + xOverridenBackupFilename);
@@ -217,16 +230,65 @@ begin
   end else begin
     xProceed := True;
   end;
+  ProgressBar.StepBy(1);
+  //Kork 2
   if xProceed then begin
     AddToReport('Tworzenie nowego pliku danych');
-    if CreateDatabase(CStaticName.DataId, EditPassword.Text, xError) then begin
+    if DbCreateDatabase(CStaticName.DataId, EditPassword.Text, xError) then begin
+      ProgressBar.StepBy(1);
+      //Krok 3
+      xConnection := TADOConnection.Create(Nil);
+      try
+        if DbConnectDatabase(CStaticName.DataId, EditPassword.Text, xConnection, xError, xNativeError, True) then begin
+          ProgressBar.StepBy(1);
+          //Krok 4
+          if DbExecuteSql(xConnection, GetStringFromResources('SQLPATTERN', RT_RCDATA), False, xError) then begin
+            ProgressBar.StepBy(1);
+            //Krok 5
+            if DbExecuteSql(xConnection, Format(CInsertCmanagerInfo , [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]), False, xError) then begin
+               ProgressBar.StepBy(1);
+               //Krok 6
+               if (ComboBoxDefault.ItemIndex = 0) then begin
+                 if DbExecuteSql(xConnection, GetDefaultDataAsString, False, xError) then begin
+                   ProgressBar.StepBy(1);
+                   Result := True;
+                 end else begin
+                   AddToReport('B³¹d tworzenia domyœlnych danych w pliku, opis b³êdu ' + xError);
+                 end;
+               end else begin
+                 ProgressBar.StepBy(1);
+                 Result := True;
+               end;
+            end else begin
+              AddToReport('B³¹d zapisu CManagerInfo, opis b³êdu ' + xError);
+            end;
+          end else begin
+            AddToReport('B³¹d tworzenia struktur pliku danych, opis b³êdu ' + xError);
+          end;
+        end else begin
+          AddToReport('B³¹d podczas pod³¹czania do pliku danych');
+          AddToReport('Kod b³êdu ' + IntToStr(xNativeError) + ', opis b³êdu ' + xError);
+        end;
+      finally
+        xConnection.Free;
+      end;
+      if not Result then begin
+        if not Windows.DeleteFile(PChar(CStaticName.DataId)) then begin
+          AddToReport('Nie uda³o siê usun¹æ utworzonego pliku danych. Plik mo¿e byæ niepoprawny');
+        end;
+      end;
     end else begin
       AddToReport('B³¹d podczas tworzenia pliku danych');
       AddToReport(xError);
     end;
   end;
+  //Krok 7
   if (xOverridenBackupFilename <> '') then begin
     if Result then begin
+      AddToReport('Usuwanie nadpisywanego pliku danych');
+      if not Windows.DeleteFile(PChar(xOverridenBackupFilename)) then begin
+        AddToReport('Nie uda³o siê usun¹æ kopii pliku danych');
+      end;
     end else begin
       AddToReport('Przywracanie pliku ' + CStaticName.DataId + ' z kopii ' + xOverridenBackupFilename);
       if MoveFile(PChar(xOverridenBackupFilename), PChar(CStaticName.DataId)) then begin
@@ -235,8 +297,10 @@ begin
         AddToReport('Nie mo¿na przywróciæ pliku ' + CStaticName.DataId + ' z kopii ' + xOverridenBackupFilename + '. ' + SysErrorMessage(GetLastError));
       end;
     end;
-    CStaticDesc.Visible := True;
   end;
+  ProgressBar.StepBy(1);
+  ProgressBar.Visible := False;
+  CStaticDesc.Visible := not Result;
   Disabled := False;
 end;
 
@@ -290,6 +354,33 @@ procedure TCCreateDatafileForm.CStaticDescGetDataId(var ADataGid, AText: String;
 begin
   AAccepted := False;
   ShowReport('Raport z wykonanych czynnoœci', FReportList.Text, 400, 300);
+end;
+
+function TCCreateDatafileForm.GetDefaultDataAsString: String;
+
+  procedure AppendCommands(ANodes: ICXMLDOMNodeList; ACommands: TStringList);
+  var xCount: Integer;
+      xNode: ICXMLDOMNode;
+      xId: String;
+      xSql: String;
+  begin
+    for xCount := 0 to ANodes.length - 1 do begin
+      xNode := ANodes.item[xCount];
+      xId := GetXmlAttribute('id', xNode, CEmptyDataGid);
+      xSql := GetXmlAttribute('sql', xNode, '');
+      if (xSql <> '') and (xId <> CEmptyDataGid) and ((FCheckedData.Count = 0) or (FCheckedData.IndexOf(xId) >= 0)) then begin
+        ACommands.Add(xSql);
+      end;
+      AppendCommands(xNode.childNodes, ACommands);
+    end;
+  end;
+
+var xCommands: TStringList;
+begin
+  xCommands := TStringList.Create;
+  AppendCommands(FDefaultXml.documentElement.childNodes, xCommands);
+  Result := xCommands.Text;
+  xCommands.Free;
 end;
 
 end.

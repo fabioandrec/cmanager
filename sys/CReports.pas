@@ -693,15 +693,12 @@ var LDefaultXsl: ICXMLDOMDocument = Nil;
 
 
 function TCHtmlReport.GetDefaultXsl(var AError: String): ICXMLDOMDocument;
-var xRes: TResourceStream;
-    xStr: TStringList;
+var xStr: TStringList;
 begin
   Result := Nil;
   PrepareReportPath;
   if not FileExists(GetSystemPathname(CXSLReportFile)) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPXSL', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname(CXSLReportFile));
-    xRes.Free;
+    GetFileFromResource('REPXSL', RT_RCDATA, GetSystemPathname(CXSLReportFile));
   end;
   xStr := TStringList.Create;
   try
@@ -726,18 +723,11 @@ begin
 end;
 
 function TCHtmlReport.GetSystemXsl(var AError: String): ICXMLDOMDocument;
-var xResStream: TResourceStream;
-    xStrStream: TStringStream;
 begin
   if LDefaultXsl = Nil then begin
     Result := Nil;
     try
-      xResStream := TResourceStream.Create(HInstance, CXSLDefaultTransformResname, RT_RCDATA);
-      xStrStream := TStringStream.Create('');
-      xResStream.SaveToStream(xStrStream);
-      xResStream.Free;
-      LDefaultXsl := GetDocumentFromString(xStrStream.DataString, Nil);
-      xStrStream.Free;
+      LDefaultXsl := GetDocumentFromString(GetStringFromResources(CXSLDefaultTransformResname, RT_RCDATA), Nil);
       if LDefaultXsl.parseError.errorCode <> 0 then begin
         AError := GetParseErrorDescription(LDefaultXsl.parseError, True);
         LDefaultXsl := Nil;
@@ -983,7 +973,7 @@ begin
         end;
         Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
         Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
-        Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
+        Add('<td class="text" width="30%">' + ReplaceLinebreaks(FieldByName('description').AsString) + '</td>');
         Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
         Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName(xFieldC).AsString) + '</td>');
         Add('<td class="cash" width="10%">' + xIn + '</td>');
@@ -1400,7 +1390,7 @@ begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="40%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
+      Add('<td class="text" width="40%">' + ReplaceLinebreaks(FieldByName('description').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idMovementCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('movementCash').AsCurrency, '', False) + '</td>');
       xSum := xSum + FieldByName('cash').AsCurrency;
@@ -1567,17 +1557,12 @@ begin
 end;
 
 procedure TCHtmlReport.PrepareReportPath;
-var xRes: TResourceStream;
 begin
   if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
-    xRes.Free;
+    GetFileFromResource('REPCSS', RT_RCDATA, GetSystemPathname(CCSSReportFile));
   end;
   if not FileExists(GetSystemPathname(CHTMReportFile)) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname(CHTMReportFile));
-    xRes.Free;
+    GetFileFromResource('REPBASE', RT_RCDATA, GetSystemPathname(CHTMReportFile));
   end;
   FreportText.LoadFromFile(GetSystemPathname(CHTMReportFile));
   FreportStyle.LoadFromFile(GetSystemPathname(CCSSReportFile));
@@ -1812,7 +1797,7 @@ begin
       xSums.AddSum(FieldByName(xFieldC).AsString, xCash, CEmptyDataGid);
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="40%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
+      Add('<td class="text" width="40%">' + ReplaceLinebreaks(FieldByName('description').AsString) + '</td>');
       Add('<td class="text" width="20%">' + FieldByName('name').AsString + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName(xFieldC).AsString) + '</td>');
       Add('<td class="cash" width="10%">' + CurrencyToString(xCash, '', False) + '</td>');
@@ -3762,8 +3747,8 @@ begin
       Add('<tr class="' + IsEvenToStr(RecNo) + 'base">');
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '30', '25') + '%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
-      Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '25', '20') + '%">' + ReplaceLinebreaksBR(FieldByName('descriptionSecond').AsString) + '</td>');
+      Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '30', '25') + '%">' + ReplaceLinebreaks(FieldByName('description').AsString) + '</td>');
+      Add('<td class="text" width="' + IfThen(FIdUnitDef = CEmptyDataGid, '25', '20') + '%">' + ReplaceLinebreaks(FieldByName('descriptionSecond').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="15%">' + CurrencyToString(FieldByName('cash').AsCurrency, '', False) + '</td>');
       if FIdUnitDef <> CEmptyDataGid then begin
@@ -4190,7 +4175,7 @@ begin
       Add('<td class="text" width="5%">' + IntToStr(RecNo) + '</td>');
       Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('regDate').AsDateTime) + '</td>');
       Add('<td class="text" width="15%">' + Date2StrDate(FieldByName('accountingDate').AsDateTime) + '</td>');
-      Add('<td class="text" width="30%">' + ReplaceLinebreaksBR(FieldByName('description').AsString) + '</td>');
+      Add('<td class="text" width="30%">' + ReplaceLinebreaks(FieldByName('description').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + GCurrencyCache.GetSymbol(FieldByName('idCurrencyDef').AsString) + '</td>');
       Add('<td class="cash" width="10%">' + xCashStr + '</td>');
       Add('<td class="text" width="15%">' + xMovement + '</td>');

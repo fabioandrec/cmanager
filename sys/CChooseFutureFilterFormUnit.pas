@@ -26,7 +26,7 @@ function ChooseFutureFilterByForm(var AStartDate, AEndDate, AStartFuture, AEndFu
 
 implementation
 
-uses CConfigFormUnit, DateUtils;
+uses CConfigFormUnit, DateUtils, CTools;
 
 {$R *.dfm}
 

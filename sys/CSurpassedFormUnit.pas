@@ -46,7 +46,7 @@ function CheckSurpassedLimits(AMovementType: TBaseEnumeration; ADate: TDateTime;
 
 implementation
 
-uses CConsts, StrUtils, CPreferences, CListPreferencesFormUnit;
+uses CConsts, StrUtils, CPreferences, CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

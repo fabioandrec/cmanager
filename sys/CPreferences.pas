@@ -2,7 +2,7 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml, CComponents;
+uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml, CComponents, SysUtils, Types;
 
 type
   TBackupPref = class(TPrefItem)
@@ -50,7 +50,6 @@ type
     property IsRunning: Boolean read FIsRunning;
     destructor Destroy; override;
   end;
-
 
   TChartPref = class(TPrefItem)
   private
@@ -180,13 +179,13 @@ var GViewsPreferences: TPrefList;
 
 function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 function GetDefaultViewPreferences: TPrefList;
+function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 
 implementation
 
-uses CSettings, CMovementFrameUnit, CConsts, CDatabase, SysUtils,
-     DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit, CDoneFrameUnit,
-  CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit,
-  CBaseFrameUnit, CReportsFrameUnit, CDescTemplatesFrameUnit;
+uses CSettings, CMovementFrameUnit, CConsts, CDatabase, DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit,
+     CDoneFrameUnit, CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit, CBaseFrameUnit, CReportsFrameUnit,
+     CDescTemplatesFrameUnit, CInfoFormUnit;
 
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
 begin
@@ -822,6 +821,30 @@ begin
       with TViewPref(Result.Last) do begin
         Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
       end;
+    end;
+  end;
+end;
+
+function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
+var xCurDbversion: Integer;
+    xToDbversion: Integer;
+    xCurDynArray, xToDynArray: TStringDynArray;
+begin
+  Result := True;
+  xCurDynArray := StringToStringArray(AFromVersion, '.');
+  xToDynArray := StringToStringArray(AToVersion, '.');
+  if Length(xCurDynArray) <> 4 then begin
+    Result := False;
+  end else begin
+    xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
+    xToDbversion := StrToIntDef(xToDynArray[1], -1);
+    if (xCurDbversion < 4) and (xToDbversion = 4) then begin
+      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
+                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
+                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
+                       'zostan¹ domyœlne ustawienia.', '');
+      GColumnsPreferences.Clear;
+      GChartPreferences.Clear;
     end;
   end;
 end;

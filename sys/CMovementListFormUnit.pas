@@ -121,7 +121,7 @@ uses CFrameFormUnit, CAccountsFrameUnit, CCashpointsFrameUnit, CConfigFormUnit,
   CDataObjects, StrUtils, CMovementFrameUnit, CPreferences, CTemplates,
   CDescpatternFormUnit, CRichtext, CDataobjectFrameUnit,
   CCurrencydefFrameUnit, CSurpassedFormUnit, CListFrameUnit,
-  CListPreferencesFormUnit;
+  CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

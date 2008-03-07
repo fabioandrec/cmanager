@@ -84,7 +84,7 @@ function StrToDatetime(ADateTime: String; ADateFormat, ATimeFormat, ADateSeparat
 procedure FillCombo(ACombo: TComboBox; const AList: array of String; AItemIndex: Integer = 0);
 function PolishConversion(AStdIn, AStdOut: TPolishEncodings; ALine: string): string;
 function GetDescText(ADescription: String; ALineNo: Integer = 0; AWithInfo: Boolean = True): String;
-function ReplaceLinebreaksBR(AText: String): String;
+function ReplaceLinebreaks(AText: String; AWith: String = '<br>'): String;
 function CreateNewGuid: String;
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
@@ -96,10 +96,20 @@ function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
 function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
 function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
-function GetStringFromResources(AResName: String): String;
+function GetStringFromResources(AResName: String; AResType: PChar): String;
+procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String);
 function XsdToDateTime(ADateTimeStr: String; AYearFirst: Boolean = True): TDateTime;
 function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
 function IntToStrWithSign(AInteger: Integer): String;
+function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
+function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
+function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
+function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
+function GetSystemPathname(AFilename: String): String;
 
 implementation
 
@@ -600,10 +610,10 @@ begin
   end;
 end;
 
-function ReplaceLinebreaksBR(AText: String): String;
+function ReplaceLinebreaks(AText: String; AWith: String = '<br>'): String;
 begin
-  Result := StringReplace(AText, sLineBreak, '<br>', [rfReplaceAll, rfIgnoreCase]);
-  Result := StringReplace(Result, Chr(10), '<br>', [rfReplaceAll, rfIgnoreCase]);
+  Result := StringReplace(AText, sLineBreak, AWith, [rfReplaceAll, rfIgnoreCase]);
+  Result := StringReplace(Result, Chr(10), AWith, [rfReplaceAll, rfIgnoreCase]);
 end;
 
 function CreateNewGuid: String;
@@ -698,13 +708,13 @@ begin
   Result := EncodeDateTime(xY, xM, xD, xH, xN, 0, 0);
 end;
 
-function GetStringFromResources(AResName: String): String;
+function GetStringFromResources(AResName: String; AResType: PChar): String;
 var xResStr: TResourceStream;
     xStrStr: TStringStream;
 begin
   xStrStr := TStringStream.Create('');
   try
-    xResStr := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+    xResStr := TResourceStream.Create(HInstance, AResName, AResType);
     xStrStr.CopyFrom(xResStr, xResStr.Size);
     Result := xStrStr.DataString;
     xResStr.Free;
@@ -989,6 +999,85 @@ begin
   if AInteger >= 0 then begin
     Result := '+' + Result;
   end;
+end;
+
+procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String);
+var xRes: TResourceStream;
+begin
+  xRes := TResourceStream.Create(HInstance, AResName, AResType);
+  xRes.SaveToFile(AFilename);
+  xRes.Free;
+end;
+
+function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+var xQuarter: Integer;
+begin
+  xQuarter := GetQuarterOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), (xQuarter - 1) * 3 + 1, 1);
+end;
+
+function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
+var xQuarter: Integer;
+begin
+  xQuarter := GetQuarterOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), xQuarter * 3, DayOf(EndOfAMonth(YearOf(ADateTime), xQuarter * 3)));
+end;
+
+function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
+var xMonth: Integer;
+begin
+  xMonth := MonthOf(ADateTime);
+  Result := ((xMonth - 1) div 3) + 1;
+end;
+
+function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+var xHalf: Integer;
+begin
+  xHalf := GetHalfOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), (xHalf - 1) * 6 + 1, 1);
+end;
+
+function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
+var xHalf: Integer;
+begin
+  xHalf := GetHalfOfTheYear(ADateTime);
+  Result := EncodeDate(YearOf(ADateTime), xHalf * 6, DayOf(EndOfAMonth(YearOf(ADateTime), xHalf * 6)));
+end;
+
+function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
+var xMonth: Integer;
+begin
+  xMonth := MonthOf(ADateTime);
+  Result := ((xMonth - 1) div 6) + 1;
+end;
+
+function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
+var xTime: TSystemTime;
+    xRes: PChar;
+begin
+  GetMem(xRes, $FF);
+  DateTimeToSystemTime(ADate, xTime);
+  if GetDateFormat(GetThreadLocale, 0, @xTime, PChar(AFormat), xRes, $FF) <> 0 then begin
+    Result := String(xRes);
+  end;
+  FreeMem(xRes);
+end;
+
+function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
+var xTime: TSystemTime;
+    xRes: PChar;
+begin
+  GetMem(xRes, $FF);
+  DateTimeToSystemTime(ADate, xTime);
+  if GetTimeFormat(GetThreadLocale, 0, @xTime, PChar(AFormat), xRes, $FF) <> 0 then begin
+    Result := String(xRes);
+  end;
+  FreeMem(xRes);
+end;
+
+function GetSystemPathname(AFilename: String): String;
+begin
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + ExtractFileName(AFilename);
 end;
 
 end.

@@ -86,7 +86,7 @@ implementation
 uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CCashpointsFrameUnit, CDataobjectFrameUnit, CPreferences, CInfoFormUnit,
   CBaseFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
-  CWaitFormUnit, CProgressFormUnit, CListPreferencesFormUnit;
+  CWaitFormUnit, CProgressFormUnit, CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

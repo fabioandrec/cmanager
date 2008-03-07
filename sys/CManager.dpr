@@ -139,11 +139,12 @@ uses
   CInvestmentPortfolioFrameUnit in 'CInvestmentPortfolioFrameUnit.pas' {CInvestmentPortfolioFrame: TFrame},
   CInitializeProviderFormUnit in 'CInitializeProviderFormUnit.pas' {CInitializeProviderForm},
   CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
-  CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame};
+  CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
+  CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm};
 
 {$R *.res}
 
-var xError, xDesc, xFilename: String;
+var xError, xDesc, xFilename, xPassword: String;
     xProceed: Boolean;
 
 begin
@@ -168,12 +169,12 @@ begin
         xFilename := GBasePreferences.startupDatafileName;
       end;
       if ((GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) and (not FileExists(xFilename))) or (GetSwitch('/newdatafile')) then begin
-        xProceed := CreateDatafileWithWizard(xFilename);
+        xProceed := CreateDatafileWithWizard(xFilename, xPassword);
       end else begin
         xProceed := True;
       end;
       if xProceed then begin
-        xProceed := InitializeDataProvider(xFilename, xError, xDesc, GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime) = iprSuccess;
+        xProceed := InitializeDataProvider(xFilename, xError, xDesc) = iprSuccess;
       end;
     end else begin
       xProceed := True;
@@ -185,7 +186,7 @@ begin
       if xProceed then begin
         xFilename := GetParamValue('/savequery');
         if xFilename <> '' then begin
-          GSqllogfile := GetSystemPathname(xFilename);
+          DbSqllogfile := GetSystemPathname(xFilename);
         end;
         xFilename := GetParamValue('/saveplugin');
         if xFilename <> '' then begin

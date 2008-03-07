@@ -108,7 +108,7 @@ implementation
 uses CFrameFormUnit, CAccountsFrameUnit, CTemplates, CPreferences, CConsts,
   CRichtext, CDescpatternFormUnit, DateUtils, CInfoFormUnit, CDataObjects,
   Math, CConfigFormUnit, CExtractionsFrameUnit, StrUtils, CTools,
-  CListPreferencesFormUnit;
+  CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

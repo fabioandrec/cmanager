@@ -3,7 +3,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
   Top = 179
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Utw'#243'rz plik danych'
+  Caption = 'CManager'
   ClientHeight = 191
   ClientWidth = 426
   Position = poScreenCenter
@@ -317,6 +317,16 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         TextOnEmpty = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
         OnGetDataId = CStaticDescGetDataId
         HotTrack = True
+      end
+      object ProgressBar: TProgressBar
+        Left = 19
+        Top = 106
+        Width = 318
+        Height = 21
+        Max = 7
+        Smooth = True
+        TabOrder = 1
+        Visible = False
       end
     end
   end

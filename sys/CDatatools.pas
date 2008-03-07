@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils, AdoDb, VirtualTrees, CXml;
+     DateUtils, AdoDb, VirtualTrees, CXml, Db;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
@@ -17,7 +17,6 @@ function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
 procedure CheckForBackups;
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
-procedure SetDatabaseDefaultData;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExchanges(AExchangesText: String);
@@ -29,6 +28,9 @@ function GetRatesXsd: ICXMLDOMDocument;
 function GetExchangesXsd: ICXMLDOMDocument;
 function GetExtractionsXsd: ICXMLDOMDocument;
 function GetChartsXsd: ICXMLDOMDocument;
+function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
+function DatabaseToDatetime(ADatetime: String): TDateTime;
+function GetFieldValueDef(ADataset: TADOQuery; AFieldname: String; ADefValue: Variant): Variant;
 
 implementation
 
@@ -84,7 +86,7 @@ var xError, xDesc: String;
     xSuspectedCount: Integer;
 begin
   xSuspectedCount := 0;
-  Result := InitializeDataProvider(AFilename, xError, xDesc, False) = iprSuccess;
+  Result := InitializeDataProvider(AFilename, xError, xDesc) = iprSuccess;
   if Result then begin
     GDataProvider.BeginTransaction;
     xAccounts := TAccount.GetAllObjects(AccountProxy);
@@ -178,16 +180,12 @@ end;
 
 function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 var xResName: String;
-    xResStream: TResourceStream;
     xCommand: String;
 begin
   Result := False;
   try
     xResName := Format('SQLUPD_%d_%d', [AFrom, ATo]);
-    xResStream := TResourceStream.Create(HInstance, xResName, RT_RCDATA);
-    SetLength(xCommand, xResStream.Size);
-    CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
-    xResStream.Free;
+    xCommand := GetStringFromResources(xResName, RT_RCDATA);
     Result := GDataProvider.ExecuteSql(xCommand, False);
   except
     on E: Exception do begin
@@ -196,25 +194,11 @@ begin
   end;
 end;
 
-procedure SetDatabaseDefaultData;
-var xResStream: TResourceStream;
-    xCommand: String;
-begin
-  xCommand := '';
-  xResStream := TResourceStream.Create(HInstance, 'SQLDEFS', RT_RCDATA);
-  SetLength(xCommand, xResStream.Size);
-  if xResStream.Size > 0 then begin
-    CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
-    GDataProvider.ExecuteSql(xCommand, True);
-  end;
-  xResStream.Free;
-end;
-
 function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xError, xDesc: String;
     xStr: TStringList;
 begin
-  Result := InitializeDataProvider(ATargetFile, xError, xDesc, False) = iprSuccess;
+  Result := InitializeDataProvider(ATargetFile, xError, xDesc) = iprSuccess;
   if Result then begin
     xStr := TStringList.Create;
     try
@@ -252,7 +236,7 @@ var xError, xDesc: String;
     xCount: Integer;
     xMin, xMax: Integer;
 begin
-  Result := InitializeDataProvider(AFilename, xError, xDesc, False) = iprSuccess;
+  Result := InitializeDataProvider(AFilename, xError, xDesc) = iprSuccess;
   if Result then begin
     xStr := TStringList.Create;
     try
@@ -459,7 +443,7 @@ var xConnection: TADOConnection;
     xSum: Extended;
 begin
   xError := '';
-  xCatalog := CreateExcelFile(AFilename, xError);
+  xCatalog := DbCreateExcelFile(AFilename, xError);
   if not VarIsEmpty(xCatalog) then begin
     try
       try
@@ -628,22 +612,65 @@ end;
 
 function GetRatesXsd: ICXMLDOMDocument;
 begin
-  Result := GetDocumentFromString(GetStringFromResources('RATESXSD'), Nil);
+  Result := GetDocumentFromString(GetStringFromResources('RATESXSD', RT_RCDATA), Nil);
 end;
 
 function GetExchangesXsd: ICXMLDOMDocument;
 begin
-  Result := GetDocumentFromString(GetStringFromResources('EXCHANGESXSD'), Nil);
+  Result := GetDocumentFromString(GetStringFromResources('EXCHANGESXSD', RT_RCDATA), Nil);
 end;
 
 function GetExtractionsXsd: ICXMLDOMDocument;
 begin
-  Result := GetDocumentFromString(GetStringFromResources('EXTRACTIONSXSD'), Nil);
+  Result := GetDocumentFromString(GetStringFromResources('EXTRACTIONSXSD', RT_RCDATA), Nil);
 end;
 
 function GetChartsXsd: ICXMLDOMDocument;
 begin
-  Result := GetDocumentFromString(GetStringFromResources('CHARTSXSD'), Nil);
+  Result := GetDocumentFromString(GetStringFromResources('CHARTSXSD', RT_RCDATA), Nil);
+end;
+
+function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
+var xCurSymbol: String;
+begin
+  if AWithSymbol then begin
+    if ACurrencyId = '' then begin
+      xCurSymbol := GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN);
+    end else begin
+      xCurSymbol := GCurrencyCache.GetSymbol(ACurrencyId);
+    end;
+    Result := CurrToStrF(ACurrency, ffNumber, ADecimal) + ' ' + xCurSymbol;
+  end else begin
+    Result := CurrToStrF(ACurrency, ffNumber, ADecimal);
+  end;
+end;
+
+function DatabaseToDatetime(ADatetime: String): TDateTime;
+var xY, xM, xD: Word;
+    xDs: String;
+begin
+  xDs := StringReplace(ADatetime, '''', '', [rfReplaceAll, rfIgnoreCase]);
+  xDs := StringReplace(xDs, '-', '', [rfReplaceAll, rfIgnoreCase]);
+  xDs := StringReplace(xDs, '#', '', [rfReplaceAll, rfIgnoreCase]);
+  xY := StrToIntDef(Copy(xDs, 1, 4), 0);
+  xM := StrToIntDef(Copy(xDs, 5, 2), 0);
+  xD := StrToIntDef(Copy(xDs, 7, 2), 0);
+  try
+    Result := EncodeDate(xY, xM, xD);
+  except
+    Result := 0;
+  end;
+end;
+
+function GetFieldValueDef(ADataset: TADOQuery; AFieldname: String; ADefValue: Variant): Variant;
+var xField: TField;
+begin
+  xField := ADataset.FindField(AFieldname);
+  if xField <> Nil then begin
+    Result := xField.AsVariant;
+  end else begin
+    Result := ADefValue;
+  end;
 end;
 
 end.

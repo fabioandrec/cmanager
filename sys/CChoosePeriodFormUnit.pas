@@ -30,7 +30,7 @@ function ChoosePeriodByForm(var AStartDate, AEndDate: TDateTime; ACurrencyView: 
 
 implementation
 
-uses CDatabase, DateUtils, CListFrameUnit;
+uses CDatabase, DateUtils, CListFrameUnit, CTools;
 
 {$R *.dfm}
 

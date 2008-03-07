@@ -132,7 +132,7 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
   CListPreferencesFormUnit, CReports, CMovmentListElementFormUnit,
-  CMovementListFormUnit, CTools, CPluginConsts;
+  CMovementListFormUnit, CTools, CPluginConsts, CDatatools;
 
 {$R *.dfm}
 

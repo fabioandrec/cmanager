@@ -235,153 +235,75 @@ type
 var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
     GDatabaseName: String;
-    GSqllogfile: String = '';
     GShutdownEvent: THandle;
     GLastUsedPassword: String = '';
     GLastUsedPasswordPresent: Boolean = False;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): TInitializeProviderResult;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): TInitializeProviderResult;
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
-function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
-function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
-function DatabaseToDatetime(ADatetime: String): TDateTime;
-function GetFieldValueDef(ADataset: TADOQuery; AFieldname: String; ADefValue: Variant): Variant;
-function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
-function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
-function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
-function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
-function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
-function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
-function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
-function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
-function GetSystemPathname(AFilename: String): String;
 
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
      CPreferences, CTools, CAdox, CDataObjects,
-  CInitializeProviderFormUnit;
+  CInitializeProviderFormUnit, CAdotools;
 
-
-function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
-var xCurSymbol: String;
-begin
-  if AWithSymbol then begin
-    if ACurrencyId = '' then begin
-      xCurSymbol := GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN);
-    end else begin
-      xCurSymbol := GCurrencyCache.GetSymbol(ACurrencyId);
-    end;
-    Result := CurrToStrF(ACurrency, ffNumber, ADecimal) + ' ' + xCurSymbol;
-  end else begin
-    Result := CurrToStrF(ACurrency, ffNumber, ADecimal);
-  end;
-end;
-
-function DatabaseToDatetime(ADatetime: String): TDateTime;
-var xY, xM, xD: Word;
-    xDs: String;
-begin
-  xDs := StringReplace(ADatetime, '''', '', [rfReplaceAll, rfIgnoreCase]);
-  xDs := StringReplace(xDs, '-', '', [rfReplaceAll, rfIgnoreCase]);
-  xDs := StringReplace(xDs, '#', '', [rfReplaceAll, rfIgnoreCase]);
-  xY := StrToIntDef(Copy(xDs, 1, 4), 0);
-  xM := StrToIntDef(Copy(xDs, 5, 2), 0);
-  xD := StrToIntDef(Copy(xDs, 7, 2), 0);
-  try
-    Result := EncodeDate(xY, xM, xD);
-  except
-    Result := 0;
-  end;
-end;
-
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String; ACanCreate: Boolean): TInitializeProviderResult;
-var xResStream: TResourceStream;
-    xCommand: String;
+function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): TInitializeProviderResult;
+var xCommand: String;
     xDataset: TADOQuery;
-    xError: String;
     xDataVersion: String;
     xNativeErrorCode: Integer;
     xFileVersion: String;
-    xValid: Boolean;
+    xDatabaseName: String;
 begin
   xCommand := '';
   AError := '';
   Result := iprError;
-  if (not FileExists(ADatabaseName)) then begin
-    if ACanCreate then begin
-      xValid := CreateDatabase(ADatabaseName, '', xError);
-      if xValid then begin
-        xResStream := TResourceStream.Create(HInstance, 'SQLPATTERN', RT_RCDATA);
-        SetLength(xCommand, xResStream.Size);
-        CopyMemory(@xCommand[1], xResStream.Memory, xResStream.Size);
-        xResStream.Free;
+  xDatabaseName := ExpandFileName(ADatabaseName);
+  if GDataProvider.IsConnected then begin
+    GDataProvider.DisconnectFromDatabase;
+  end;
+  if not GDataProvider.OpenConnection(xNativeErrorCode, xDatabaseName) then begin
+    if (xNativeErrorCode = CProviderErrorCodeInvalidPassword) then begin
+      if ConnectToDatabaseWithPassword(xDatabaseName, GDataProvider.Connection) then begin
+        Result := iprSuccess;
       end else begin
-        AError := 'Nie uda³o siê utworzyæ pliku danych. Kontynuacja nie jest mo¿liwa.';
-        ADesc := xError;
+        Result := iprCancelled;
       end;
+    end;
+  end else begin
+    Result := iprSuccess;
+  end;
+  if Result = iprError then begin
+    AError := 'Nie uda³o siê otworzyæ pliku danych ' + xDatabaseName + '.';
+    ADesc := GDataProvider.LastError;
+  end else if Result = iprSuccess then begin
+    GDatabaseName := xDatabaseName;
+    xDataset := GDataProvider.OpenSql('select * from cmanagerInfo', False);
+    if xDataset = Nil then begin
+      AError := 'Plik ' + xDatabaseName + ' nie jest poprawnym plikiem danych';
+      ADesc := '';
+      GDataProvider.DisconnectFromDatabase;
+      Result := iprError;
     end else begin
-      AError := 'Nie odnaleziono pliku danych ' + ADatabaseName + '.';
+      xDataVersion := xDataset.FieldByName('version').AsString;
+      xFileVersion := FileVersion(ParamStr(0));
+      if xFileVersion <> xDataVersion then begin
+        if UpdateDatabase(xDataVersion, xFileVersion) then begin
+          if not UpdateConfiguration(xDataVersion, xFileVersion) then begin
+            Result := iprError;
+            ShowInfo(itError, 'Plik "' + xDatabaseName + '" nie jest poprawnym plikiem danych', '');
+          end;
+        end else begin
+          Result :=iprError;
+        end;
+      end;
+      xDataset.Free;
     end;
   end;
-  if AError = '' then begin
-    if GDataProvider.IsConnected then begin
-      GDataProvider.DisconnectFromDatabase;
-    end;
-    if not GDataProvider.OpenConnection(xNativeErrorCode, ADatabaseName) then begin
-      if (xNativeErrorCode = CProviderErrorCodeInvalidPassword) then begin
-        if ConnectToDatabaseWithPassword(ADatabaseName) then begin
-          Result := iprSuccess;
-        end else begin
-          Result := iprCancelled;
-        end;
-      end;
-    end else begin
-      Result := iprSuccess;
-    end;
-    if Result = iprError then begin
-      AError := 'Nie uda³o siê otworzyæ pliku danych ' + ADatabaseName + '.';
-      ADesc := GDataProvider.LastError;
-    end else if Result = iprSuccess then begin
-      if xCommand <> '' then begin
-        xValid := GDataProvider.ExecuteSql(xCommand, False) and
-                  GDataProvider.ExecuteSql(Format('insert into cmanagerInfo (version, created) values (''%s'', %s)', [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]), False);
-        if not xValid then begin
-          AError := 'Nie uda³o siê utworzyæ schematu danych. Kontynuacja nie jest mo¿liwa.';
-          ADesc := GDataProvider.LastError;
-          GDataProvider.DisconnectFromDatabase;
-          DeleteFile(ADatabaseName);
-          Result := iprError;
-        end else begin
-          GDatabaseName := ADatabaseName;
-          if ShowInfo(itQuestion, 'Utworzono nowy plik danych. Czy chcesz wype³niæ go podstawowymi ustawieniami?', '') then begin
-            SetDatabaseDefaultData;
-          end;
-        end;
-      end else begin
-        GDatabaseName := ADatabaseName;
-        xDataset := GDataProvider.OpenSql('select * from cmanagerInfo', False);
-        if xDataset = Nil then begin
-          AError := 'Plik ' + ADatabaseName + ' nie jest poprawnym plikiem danych';
-          ADesc := '';
-          GDataProvider.DisconnectFromDatabase;
-          Result := iprError;
-        end else begin
-          xDataVersion := xDataset.FieldByName('version').AsString;
-          xFileVersion := FileVersion(ParamStr(0));
-          if xFileVersion <> xDataVersion then begin
-            if not (UpdateDatabase(xDataVersion, xFileVersion) or UpdateConfiguration(xDataVersion, xFileVersion)) then begin
-              Result := iprError;
-            end;
-          end;
-          xDataset.Free;
-        end;
-      end;
-    end;
-    if Result = iprSuccess then begin
-      GBasePreferences.lastOpenedDatafilename := GDatabaseName;
-      ReloadCaches;
-    end;
+  if Result = iprSuccess then begin
+    GBasePreferences.lastOpenedDatafilename := GDatabaseName;
+    ReloadCaches;
   end;
 end;
 
@@ -587,7 +509,7 @@ begin
   if not FConnection.InTransaction then begin
     FConnection.BeginTrans;
   end;
-  SaveToLog('begin transaction', GSqllogfile);
+  SaveToLog('begin transaction', DbSqllogfile);
 end;
 
 procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
@@ -613,7 +535,7 @@ begin
   if FConnection.InTransaction then begin
     if Result then begin
       FConnection.CommitTrans;
-      SaveToLog('commit transaction', GSqllogfile);
+      SaveToLog('commit transaction', DbSqllogfile);
     end else begin
       FConnection.RollbackTrans;
     end;
@@ -699,7 +621,7 @@ begin
       end;
       if Trim(xSql) <> '' then begin
         try
-          SaveToLog('Wykonywanie "' + xSql + '"', GSqllogfile);
+          SaveToLog('Wykonywanie "' + xSql + '"', DbSqllogfile);
           FLastStatemenet := StringReplace(xSql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
           FConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
         except
@@ -717,7 +639,7 @@ begin
   end else begin
     if Trim(ASql) <> '' then begin
       try
-        SaveToLog('Wykonywanie "' + ASql + '"', GSqllogfile);
+        SaveToLog('Wykonywanie "' + ASql + '"', DbSqllogfile);
         FLastStatemenet := StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
         FConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
       except
@@ -732,7 +654,7 @@ begin
     end;
   end;
   if not Result then begin
-    SaveToLog('B³¹d "' + FLastError + '"', GSqllogfile);
+    SaveToLog('B³¹d "' + FLastError + '"', DbSqllogfile);
   end;
 end;
 
@@ -774,7 +696,7 @@ end;
 
 function TDataProvider.OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
 begin
-  SaveToLog('Otwieranie "' + ASql + '"', GSqllogfile);
+  SaveToLog('Otwieranie "' + ASql + '"', DbSqllogfile);
   Result := TADOQuery.Create(Nil);
   try
     Result.ParamCheck := False;
@@ -793,7 +715,7 @@ begin
     end;
   end;
   if Result = Nil then begin
-    SaveToLog('B³¹d "' + FLastError + '"', GSqllogfile);
+    SaveToLog('B³¹d "' + FLastError + '"', DbSqllogfile);
   end;
 end;
 
@@ -826,7 +748,7 @@ procedure TDataProvider.RollbackTransaction;
 begin
   if FConnection.InTransaction then begin
     FConnection.RollbackTrans;
-    SaveToLog('rollback transaction', GSqllogfile);
+    SaveToLog('rollback transaction', DbSqllogfile);
   end;
   ClearProxies(False);
 end;
@@ -1306,78 +1228,6 @@ begin
   end;
 end;
 
-
-function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
-var xQuarter: Integer;
-begin
-  xQuarter := GetQuarterOfTheYear(ADateTime);
-  Result := EncodeDate(YearOf(ADateTime), (xQuarter - 1) * 3 + 1, 1);
-end;
-
-function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
-var xQuarter: Integer;
-begin
-  xQuarter := GetQuarterOfTheYear(ADateTime);
-  Result := EncodeDate(YearOf(ADateTime), xQuarter * 3, DayOf(EndOfAMonth(YearOf(ADateTime), xQuarter * 3)));
-end;
-
-function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
-var xMonth: Integer;
-begin
-  xMonth := MonthOf(ADateTime);
-  Result := ((xMonth - 1) div 3) + 1;
-end;
-
-function GetStartHalfOfTheYear(ADateTime: TDateTime): TDateTime;
-var xHalf: Integer;
-begin
-  xHalf := GetHalfOfTheYear(ADateTime);
-  Result := EncodeDate(YearOf(ADateTime), (xHalf - 1) * 6 + 1, 1);
-end;
-
-function GetEndHalfOfTheYear(ADateTime: TDateTime): TDateTime;
-var xHalf: Integer;
-begin
-  xHalf := GetHalfOfTheYear(ADateTime);
-  Result := EncodeDate(YearOf(ADateTime), xHalf * 6, DayOf(EndOfAMonth(YearOf(ADateTime), xHalf * 6)));
-end;
-
-function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
-var xMonth: Integer;
-begin
-  xMonth := MonthOf(ADateTime);
-  Result := ((xMonth - 1) div 6) + 1;
-end;
-
-function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
-var xTime: TSystemTime;
-    xRes: PChar;
-begin
-  GetMem(xRes, $FF);
-  DateTimeToSystemTime(ADate, xTime);
-  if GetDateFormat(GetThreadLocale, 0, @xTime, PChar(AFormat), xRes, $FF) <> 0 then begin
-    Result := String(xRes);
-  end;
-  FreeMem(xRes);
-end;
-
-function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
-var xTime: TSystemTime;
-    xRes: PChar;
-begin
-  GetMem(xRes, $FF);
-  DateTimeToSystemTime(ADate, xTime);
-  if GetTimeFormat(GetThreadLocale, 0, @xTime, PChar(AFormat), xRes, $FF) <> 0 then begin
-    Result := String(xRes);
-  end;
-  FreeMem(xRes);
-end;
-
-function GetSystemPathname(AFilename: String): String;
-begin
-  Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + ExtractFileName(AFilename);
-end;
-
 function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
 var xCurDbversion: Integer;
     xToDbversion: Integer;
@@ -1400,10 +1250,10 @@ begin
       Result := ShowInfo(itQuestion, xText, '');
       if Result then begin
         Result := True;
-        GSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
-        SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion, GSqllogfile);
+        DbSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
+        SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion, DbSqllogfile);
         while Result and (xCurDbversion <> xToDbversion) do begin
-          SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), GSqllogfile);
+          SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), DbSqllogfile);
           Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
           Inc(xCurDbversion);
         end;
@@ -1412,36 +1262,11 @@ begin
                    'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
           ShowInfo(itError, xText, xError);
         end;
-        GSqllogfile := '';
+        DbSqllogfile := '';
       end;
     end;
     if Result then begin
       GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
-    end;
-  end;
-end;
-
-function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
-var xCurDbversion: Integer;
-    xToDbversion: Integer;
-    xCurDynArray, xToDynArray: TStringDynArray;
-begin
-  Result := True;
-  xCurDynArray := StringToStringArray(AFromVersion, '.');
-  xToDynArray := StringToStringArray(AToVersion, '.');
-  if Length(xCurDynArray) <> 4 then begin
-    ShowInfo(itError, 'Plik ' + GDatabaseName + ' nie jest poprawnym plikiem danych', '');
-    Result := False;
-  end else begin
-    xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
-    xToDbversion := StrToIntDef(xToDynArray[1], -1);
-    if (xCurDbversion < 4) and (xToDbversion = 4) then begin
-      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
-                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
-                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
-                       'zostan¹ domyœlne ustawienia.', '');
-      GColumnsPreferences.Clear;
-      GChartPreferences.Clear;
     end;
   end;
 end;
@@ -1526,17 +1351,6 @@ procedure TDataGids.MergeWithDataGids(AGids: TDataGids);
 begin
   Duplicates := dupIgnore;
   AddStrings(AGids);
-end;
-
-function GetFieldValueDef(ADataset: TADOQuery; AFieldname: String; ADefValue: Variant): Variant;
-var xField: TField;
-begin
-  xField := ADataset.FindField(AFieldname);
-  if xField <> Nil then begin
-    Result := xField.AsVariant;
-  end else begin
-    Result := ADefValue;
-  end;
 end;
 
 initialization

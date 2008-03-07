@@ -77,7 +77,7 @@ type
 
 implementation
 
-uses CPreferences, CConsts, DateUtils, CTools;
+uses CPreferences, CConsts, DateUtils, CTools, CDatatools;
 
 {$R *.dfm}
 

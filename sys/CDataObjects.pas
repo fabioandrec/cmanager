@@ -999,7 +999,7 @@ function GetNamesFromDataset(ADataset: TADOQuery; ACurDefFieldname, ACurNameFiel
 implementation
 
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit,
-  CBase64;
+  CBase64, CDatatools;
 
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 var xGid: String;

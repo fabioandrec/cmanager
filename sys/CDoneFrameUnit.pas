@@ -101,7 +101,7 @@ implementation
 uses CFrameFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Math, CDoneFormUnit, CConsts, CTools,
-  CPluginConsts, CPlannedFrameUnit, CListPreferencesFormUnit;
+  CPluginConsts, CPlannedFrameUnit, CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

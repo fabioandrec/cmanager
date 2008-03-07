@@ -72,7 +72,7 @@ uses CDatabase, CTools, CConsts, CFrameFormUnit,
   CBaseFrameUnit, CWaitFormUnit, CProgressFormUnit,
   CInstrumentValueFrameUnit, CInstrumentFrameUnit, CCurrencydefFrameUnit,
   CPluginConsts, CXmlTlb, CInvestmentPortfolioFrameUnit,
-  CListPreferencesFormUnit;
+  CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

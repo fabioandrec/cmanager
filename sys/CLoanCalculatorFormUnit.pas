@@ -59,7 +59,7 @@ function ShowLoanCalculator(ACanAccept: Boolean): TLoan;
 implementation
 
 uses CDatabase, CReports, CTools, CPreferences, CConsts,
-  CListPreferencesFormUnit;
+  CListPreferencesFormUnit, CDatatools;
 
 {$R *.dfm}
 

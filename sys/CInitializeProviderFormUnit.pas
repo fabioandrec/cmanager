@@ -6,7 +6,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, CDatabase;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, CDatabase,
+  pngimage, AdoDb;
 
 type
   TCInitializeProviderForm = class(TCConfigForm)
@@ -14,10 +15,11 @@ type
     Image1: TImage;
     Label1: TLabel;
     Label2: TLabel;
-    CStaticName: TCStatic;
+    LabelFilename: TLabel;
   private
     FFilename: String;
     FTries: Integer;
+    FConnection: TADOConnection;
     procedure SetFilename(const Value: String);
   protected
     function CanAccept: Boolean; override;
@@ -26,37 +28,34 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property Filename: String write SetFilename;
+    property Connection: TADOConnection write FConnection;
   end;
 
-function ConnectToDatabaseWithPassword(AFilename: String): Boolean;
+function ConnectToDatabaseWithPassword(AFilename: String; AConnection: TADOConnection): Boolean;
 
 implementation
 
 {$R *.dfm}
 
-uses FileCtrl, CConsts, CInfoFormUnit;
+uses FileCtrl, CConsts, CInfoFormUnit, CAdox;
 
-function ConnectToDatabaseWithPassword(AFilename: String): Boolean;
+function ConnectToDatabaseWithPassword(AFilename: String; AConnection: TADOConnection): Boolean;
 var xDialog: TCInitializeProviderForm;
 begin
   xDialog := TCInitializeProviderForm.Create(Application);
   xDialog.Filename := AFilename;
+  xDialog.Connection := AConnection;
   Result := xDialog.ShowConfig(coEdit);
-  if not Result then begin
-    GLastUsedPassword := '';
-    GLastUsedPasswordPresent := False;
-  end;
   xDialog.Free;
 end;
 
 function TCInitializeProviderForm.CanAccept: Boolean;
 var xNativeErrorCode: Integer;
+    xError: String;
 begin
-  GLastUsedPassword := EditPassword.Text;
-  GLastUsedPasswordPresent := True;
-  Result := GDataProvider.OpenConnection(xNativeErrorCode, FFilename);
+  Result := DbConnectDatabase(FFilename, EditPassword.Text, FConnection, xError, xNativeErrorCode, False);
   if not Result then begin
-    ShowInfo(itError, 'Podczas otwierania pliku danych wyst¹pi³ b³¹d', GDataProvider.LastError);
+    ShowInfo(itError, 'Podczas otwierania pliku danych wyst¹pi³ b³¹d', xError);
     EditPassword.SetFocus;
   end;
   Inc(FTries);
@@ -77,9 +76,14 @@ begin
 end;
 
 procedure TCInitializeProviderForm.SetFilename(const Value: String);
+var xCanvas: TControlCanvas;
 begin
   FFilename := Value;
-  CStaticName.Caption := MinimizeName(FFilename, CStaticName.Canvas, CStaticName.Width);
+  xCanvas := TControlCanvas.Create;
+  xCanvas.Control := LabelFilename;
+  xCanvas.Font.Style := xCanvas.Font.Style + [fsBold];
+  LabelFilename.Caption := MinimizeName(FFilename, xCanvas, LabelFilename.Width);
+  xCanvas.Free;
 end;
 
 end.

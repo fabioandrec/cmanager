@@ -447,7 +447,6 @@ begin
       MenuItemBigShortcut.Click;
     end;
     Invalidate;
-  end else if Message.Msg = WM_OPENCONNECTION then begin
   end else if Message.Msg = WM_CLOSECONNECTION then begin
     ActionCloseConnection.Execute;
   end else if Message.Msg = WM_STATCLEAR then begin
@@ -506,11 +505,11 @@ begin
 end;
 
 procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
-var xError, xDesc, xFilename: String;
+var xError, xDesc, xFilename, xPassword: String;
     xStatus: TInitializeProviderResult;
 begin
-  if CreateDatafileWithWizard(xFilename) then begin
-    xStatus := InitializeDataProvider(xFilename, xError, xDesc, True);
+  if CreateDatafileWithWizard(xFilename, xPassword) then begin
+    xStatus := InitializeDataProvider(xFilename, xError, xDesc);
     if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
@@ -532,7 +531,7 @@ end;
 
 function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): TInitializeProviderResult;
 begin
-  Result := InitializeDataProvider(AFilename, AError, ADesc, False);
+  Result := InitializeDataProvider(AFilename, AError, ADesc);
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);
@@ -747,12 +746,9 @@ begin
 end;
 
 procedure TCMainForm.ActionCssExecute(Sender: TObject);
-var xRes: TResourceStream;
 begin
   if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
-    xRes.Free;
+    GetFileFromResource('REPCSS', RT_RCDATA, GetSystemPathname(CCSSReportFile));
   end;
   if FileExists(GetSystemPathname(CCSSReportFile)) then begin
     ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CCSSReportFile)), Nil, SW_SHOWNORMAL);
@@ -816,12 +812,9 @@ begin
 end;
 
 procedure TCMainForm.ActionXslExecute(Sender: TObject);
-var xRes: TResourceStream;
 begin
   if not FileExists(GetSystemPathname(CXSLReportFile)) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPXSL', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname(CXSLReportFile));
-    xRes.Free;
+    GetFileFromResource('REPXSL', RT_RCDATA, GetSystemPathname(CXSLReportFile));
   end;
   if FileExists(GetSystemPathname(CXSLReportFile)) then begin
     ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CXSLReportFile)), Nil, SW_SHOWNORMAL);

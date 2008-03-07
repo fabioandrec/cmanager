@@ -45,16 +45,9 @@ begin
 end;
 
 procedure TCAboutForm.FillForm;
-var xText: TStringStream;
-    xRes: TResourceStream;
 begin
   inherited FillForm;
-  xRes := TResourceStream.Create(HInstance, 'CONTRIB', RT_RCDATA);
-  xText := TStringStream.Create('');
-  xRes.SaveToStream(xText);
-  AssignRichText(xText.DataString, RichEditContrib);
-  xRes.Free;
-  xText.Free;
+  AssignRichText(GetStringFromResources('CONTRIB', RT_RCDATA), RichEditContrib);
 end;
 
 procedure TCAboutForm.FormCreate(Sender: TObject);

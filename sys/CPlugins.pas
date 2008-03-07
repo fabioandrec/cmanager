@@ -417,13 +417,10 @@ begin
 end;
 
 function TCManagerInterfaceObject.GetReportCss: OleVariant;
-var xRes: TResourceStream;
-    xStr: TStringList;
+var xStr: TStringList;
 begin
   if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPCSS', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname(CCSSReportFile));
-    xRes.Free;
+    GetFileFromResource('REPCSS', RT_RCDATA, GetSystemPathname(CCSSReportFile));
   end;
   xStr := TStringList.Create;
   xStr.LoadFromFile(GetSystemPathname(CCSSReportFile));
@@ -432,16 +429,13 @@ begin
 end;
 
 function TCManagerInterfaceObject.GetReportText: OleVariant;
-var xRes: TResourceStream;
-    xStr: TStringList;
+var xStr: TStringList;
 begin
-  if not FileExists(GetSystemPathname('report.htm')) then begin
-    xRes := TResourceStream.Create(HInstance, 'REPBASE', RT_RCDATA);
-    xRes.SaveToFile(GetSystemPathname('report.htm'));
-    xRes.Free;
+  if not FileExists(GetSystemPathname(CHTMReportFile)) then begin
+    GetFileFromResource('REPBASE', RT_RCDATA, GetSystemPathname(CHTMReportFile));
   end;
   xStr := TStringList.Create;
-  xStr.LoadFromFile(GetSystemPathname('report.htm'));
+  xStr.LoadFromFile(GetSystemPathname(CHTMReportFile));
   Result := xStr.Text;
   xStr.Free;
 end;

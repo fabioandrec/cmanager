@@ -2,21 +2,60 @@ unit CAdox;
 
 interface
 
-uses ShellApi, SysUtils, Classes, ComObj, Variants;
+uses ShellApi, SysUtils, Classes, ComObj, Variants, AdoDb;
 
-function CreateDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
-function CreateExcelFile(AFilename: String; var AError: String): OleVariant;
-function CompactDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
-function ChangeDatabasePassword(AFilename: String; APassword, ANewPassword: String; var AError: String): Boolean;
+function DbCreateDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
+function DbCreateExcelFile(AFilename: String; var AError: String): OleVariant;
+function DbCompactDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
+function DbChangeDatabasePassword(AFilename: String; APassword, ANewPassword: String; var AError: String): Boolean;
+function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean;
+function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String): Boolean;
+
+var DbSqllogfile: String = '';
 
 implementation
 
-const
-  CConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
-  CConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Jet OLEDB:Database Password=%s';
-  CCreateExcelFile = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Extended Properties="Excel 8.0"';
+uses CTools;
 
-function CreateDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
+const CConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
+      CConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Jet OLEDB:Database Password=%s';
+      CCreateExcelFile = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Extended Properties="Excel 8.0"';
+
+function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean;
+var xConnectionString: String;
+begin
+  Result := False;
+  ANativeError := 0;
+  try
+    if APassword = '' then begin
+      xConnectionString := Format(CConnectionString, [AFilename]);
+    end else begin
+      xConnectionString := Format(CConnectionStringWithPass, [AFilename, APassword]);
+    end;
+    if AConnection.Connected then begin
+      AConnection.Close;
+    end;
+    AConnection.ConnectionString := xConnectionString;
+    if AExclusive then begin
+      AConnection.Mode := cmShareExclusive;
+    end else begin
+      AConnection.Mode := cmShareDenyNone;
+    end;
+    AConnection.LoginPrompt := False;
+    AConnection.CursorLocation := clUseClient;
+    AConnection.Open;
+    Result := True;
+  except
+    on E: Exception do begin
+      AError := E.Message;
+      if AConnection.Errors.Count > 0 then begin
+        ANativeError := AConnection.Errors.Item[0].NativeError;
+      end;
+    end;
+  end;
+end;
+
+function DbCreateDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
 var xCatalog : OLEVariant;
     xConnectionString: String;
 begin
@@ -41,7 +80,7 @@ begin
   end;
 end;
 
-function CreateExcelFile(AFilename: String; var AError: String): OleVariant;
+function DbCreateExcelFile(AFilename: String; var AError: String): OleVariant;
 begin
   VarClear(Result);
   try
@@ -58,7 +97,7 @@ begin
   end;
 end;
 
-function CompactDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
+function DbCompactDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
 var xJetEngine: OLEVariant;
     xCompactedFilename: String;
     xTempbackupFilename: String;
@@ -102,7 +141,7 @@ begin
   end;
 end;
 
-function ChangeDatabasePassword(AFilename: String; APassword, ANewPassword: String; var AError: String): Boolean;
+function DbChangeDatabasePassword(AFilename: String; APassword, ANewPassword: String; var AError: String): Boolean;
 var xAdo: OLEVariant;
     xConnectionString: String;
     xOldPass, xNewPass: String;
@@ -135,6 +174,57 @@ begin
     end;
   finally
     xAdo := Unassigned;
+  end;
+end;
+
+function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String): Boolean;
+var xFinished: Boolean;
+    xPos: Integer;
+    xSql, xRemains: String;
+begin
+  Result := True;
+  if Trim(ReplaceLinebreaks(ASql)) <> '' then begin
+    xRemains := ASql;
+    xFinished := False;
+    if not AOneStatement then begin
+      repeat
+        xPos := Pos(';', xRemains);
+        if xPos > 0 then begin
+          xSql := Copy(xRemains, 1, xPos - 1);
+          Delete(xRemains, 1, xPos);
+        end else begin
+          xSql := xRemains;
+          xFinished := True;
+        end;
+        if Trim(xSql) <> '' then begin
+          try
+            SaveToLog('Wykonywanie "' + xSql + '"', DbSqllogfile);
+            AConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
+          except
+            on E: Exception do begin
+              AErrorText := E.Message;
+              Result := False;
+              xFinished := True;
+            end;
+          end;
+        end;
+      until xFinished;
+    end else begin
+      if Trim(ASql) <> '' then begin
+        try
+          SaveToLog('Wykonywanie "' + ASql + '"', DbSqllogfile);
+          AConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
+        except
+          on E: Exception do begin
+            AErrorText := E.Message;
+            Result := False;
+          end;
+        end;
+      end;
+    end;
+    if not Result then begin
+      SaveToLog('B³¹d "' + AErrorText + '"', DbSqllogfile);
+    end;
   end;
 end;
 
