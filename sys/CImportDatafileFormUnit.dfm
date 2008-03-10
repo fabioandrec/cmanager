@@ -22,7 +22,6 @@ inherited CImportDatafileForm: TCImportDatafileForm
     inherited PageControl: TPageControl
       Width = 456
       Height = 99
-      ActivePage = TabSheetWork
       inherited TabSheetStart: TTabSheet
         inherited CImageStart: TCImage
           ImageIndex = 3

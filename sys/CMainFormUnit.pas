@@ -7,7 +7,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList, CXml, PngSpeedButton, ShellApi,
-  CBaseFrameUnit, Menus, XPMan;
+  CBaseFrameUnit, Menus, CInitializeProviderFormUnit;
 
 type
   TCMainForm = class(TForm)
@@ -150,7 +150,6 @@ type
     procedure ExecuteOnstartupPlugins;
     procedure ExecuteOnexitPlugins;
     procedure FinalizeMainForm;
-    function OpenConnection(AFilename: String; var AError: String; var ADesc: String): TInitializeProviderResult;
   published
     property ShortcutsVisible: Boolean read GetShortcutsVisible write SetShortcutsVisible;
     property StatusbarVisible: Boolean read GetStatusbarVisible write SetStatusbarVisible;
@@ -393,7 +392,7 @@ begin
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
     Caption := 'CManager - obs³uga finansów (na dzieñ ' + Date2StrDate(GWorkDate) + ')';
-    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDatabaseName));
+    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDataProvider.Filename));
   end else begin
     Caption := 'CManager - obs³uga finansów';
     StatusBar.Panels.Items[0].Text := ' (brak otwartego pliku danych)';
@@ -484,7 +483,7 @@ begin
     end;
     FShortcutsFrames.Clear;
     FActiveFrame := Nil;
-    GDataProvider.DisconnectFromDatabase;
+    FinalizeDataProvider(GDataProvider);
     UpdateStatusbar;
   end;
 end;
@@ -494,7 +493,7 @@ var xError, xDesc: String;
     xStatus: TInitializeProviderResult;
 begin
   if OpenDialog.Execute then begin
-    xStatus := OpenConnection(OpenDialog.FileName, xError, xDesc);
+    xStatus := InitializeDataProvider(OpenDialog.FileName, '', GDataProvider);
     if xStatus = iprError then begin
       ShowInfo(itError, xError, xDesc)
     end else if xStatus = iprSuccess then begin
@@ -505,16 +504,14 @@ begin
 end;
 
 procedure TCMainForm.ActionCreateConnectionExecute(Sender: TObject);
-var xError, xDesc, xFilename, xPassword: String;
+var xFilename, xPassword: String;
     xStatus: TInitializeProviderResult;
 begin
   if CreateDatafileWithWizard(xFilename, xPassword) then begin
-    xStatus := InitializeDataProvider(xFilename, xError, xDesc);
+    xStatus := InitializeDataProvider(xFilename, '', GDataProvider);
     if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
-    end else if xStatus = iprError then begin
-      ShowInfo(itError, xError, xDesc);
     end;
   end;
 end;
@@ -527,11 +524,6 @@ end;
 procedure TCMainForm.ActionCompactExecute(Sender: TObject);
 begin
   ShowProgressForm(TCCompactDatafileForm);
-end;
-
-function TCMainForm.OpenConnection(AFilename: String; var AError: String; var ADesc: String): TInitializeProviderResult;
-begin
-  Result := InitializeDataProvider(AFilename, AError, ADesc);
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);

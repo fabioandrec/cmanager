@@ -21,7 +21,6 @@ procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataE
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExchanges(AExchangesText: String);
 procedure UpdateExtractions(AExtractionText: String);
-procedure ReloadCaches;
 procedure ExportListToExcel(AList: TCList; AFilename: String);
 procedure SetComponentUnitdef(AUnitdefId: TDataGid; AComponent: TCCurrEdit);
 function GetRatesXsd: ICXMLDOMDocument;
@@ -38,7 +37,8 @@ uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CDataObjects, CInfoFormUnit, CStartupInfoFormUnit, Forms,
   CTools, StrUtils, CPreferences, CUpdateCurrencyRatesFormUnit,
   CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
-  CExtractionItemFormUnit, CUpdateExchangesFormUnit;
+  CExtractionItemFormUnit, CUpdateExchangesFormUnit,
+  CInitializeProviderFormUnit;
 
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -86,7 +86,7 @@ var xError, xDesc: String;
     xSuspectedCount: Integer;
 begin
   xSuspectedCount := 0;
-  Result := InitializeDataProvider(AFilename, xError, xDesc) = iprSuccess;
+  Result := InitializeDataProvider(AFilename, '', GDataProvider) = iprSuccess;
   if Result then begin
     GDataProvider.BeginTransaction;
     xAccounts := TAccount.GetAllObjects(AccountProxy);
@@ -133,7 +133,7 @@ begin
     end;
     xAccounts.Free;
     xInvestments.Free;
-    GDataProvider.DisconnectFromDatabase;
+    FinalizeDataProvider(GDataProvider);
     if xSuspectedCount = 0 then begin
       AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Nie znaleziono ¿adnych nieprawid³owoœci');
     end else begin
@@ -198,7 +198,7 @@ function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var 
 var xError, xDesc: String;
     xStr: TStringList;
 begin
-  Result := InitializeDataProvider(ATargetFile, xError, xDesc) = iprSuccess;
+  Result := InitializeDataProvider(ATargetFile, '', GDataProvider) = iprSuccess;
   if Result then begin
     xStr := TStringList.Create;
     try
@@ -207,9 +207,9 @@ begin
         GDataProvider.BeginTransaction;
         Result := GDataProvider.ExecuteSql(xStr.Text, False);
         if not Result then begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + GDataProvider.LastError);
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + GDataProvider.LastStatement + '"');
-          AError := GDataProvider.LastError;
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + DbLastError);
+          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + DbLastStatement + '"');
+          AError := DbLastError;
           GDataProvider.RollbackTransaction;
         end else begin
           GDataProvider.CommitTransaction;
@@ -222,7 +222,7 @@ begin
       end;
     finally
       xStr.Free;
-      GDataProvider.DisconnectFromDatabase;
+      FinalizeDataProvider(GDataProvider);
     end;
   end else begin
     AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
@@ -236,7 +236,7 @@ var xError, xDesc: String;
     xCount: Integer;
     xMin, xMax: Integer;
 begin
-  Result := InitializeDataProvider(AFilename, xError, xDesc) = iprSuccess;
+  Result := InitializeDataProvider(AFilename, '', GDataProvider) = iprSuccess;
   if Result then begin
     xStr := TStringList.Create;
     try
@@ -251,9 +251,9 @@ begin
           end;
           Result := GDataProvider.ExportTable(CDatafileTables[xCount], CDatafileTablesExportConditions[xCount], xStr);
           if not Result then begin
-            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + GDataProvider.LastError);
-            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + GDataProvider.LastStatement + '"');
-            AError := GDataProvider.LastError;
+            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + DbLastError);
+            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + DbLastStatement + '"');
+            AError := DbLastError;
           end;
           Inc(xCount);
           AProgressEvent(Trunc(100 * xCount/(xMax - xMin)));
@@ -267,7 +267,7 @@ begin
       end;
     finally
       xStr.Free;
-      GDataProvider.DisconnectFromDatabase;
+      FinalizeDataProvider(GDataProvider);
     end;
   end else begin
     AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
@@ -292,7 +292,7 @@ var xPref: TBackupPref;
     xMustbackup: Boolean;
 begin
   xMustbackup := False;
-  xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDatabaseName]);
+  xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDataProvider.Filename]);
   if GBasePreferences.backupAction = CBackupActionOnce then begin
     if xPref <> Nil then begin
       xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
@@ -313,7 +313,7 @@ begin
     end;
   end;
   if xMustbackup then begin
-    GBackupThread := TBackupThread.Create(GDatabaseName);
+    GBackupThread := TBackupThread.Create(GDataProvider.Filename);
   end;
 end;
 
@@ -403,33 +403,6 @@ begin
     end;
   end else begin
     ShowInfo(itError, 'Nie mo¿na wczytaæ tabeli kursów walut poniewa¿ ¿aden plik danych nie jest otwarty', '');
-  end;
-end;
-
-procedure ReloadCaches;
-var xC: TDataObjectList;
-    xCount: Integer;
-    xCur: TCurrencyDef;
-    xUni: TUnitDef;
-begin
-  if GDataProvider.IsConnected then begin
-    xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
-    for xCount := 0 to xC.Count - 1 do begin
-      xCur := TCurrencyDef(xC.Items[xCount]);
-      GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
-    end;
-    xC.Free;
-    xC := TUnitDef.GetAllObjects(UnitDefProxy);
-    for xCount := 0 to xC.Count - 1 do begin
-      xUni := TUnitDef(xC.Items[xCount]);
-      GUnitdefCache.Change(xUni.id, xUni.symbol, '');
-    end;
-    xC.Free;
-    GActiveProfileId := CEmptyDataGid;
-    GDefaultProfileId := GDataProvider.GetCmanagerParam('GActiveProfileId', CEmptyDataGid);
-    GDefaultProductId := GDataProvider.GetCmanagerParam('GDefaultProductId', CEmptyDataGid);
-    GDefaultAccountId := GDataProvider.GetCmanagerParam('GDefaultAccountId', CEmptyDataGid);
-    GDefaultCashpointId := GDataProvider.GetCmanagerParam('GDefaultCashpointId', CEmptyDataGid);
   end;
 end;
 

@@ -144,7 +144,7 @@ uses
 
 {$R *.res}
 
-var xError, xDesc, xFilename, xPassword: String;
+var xFilename, xPassword: String;
     xProceed: Boolean;
 
 begin
@@ -159,7 +159,7 @@ begin
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   InitializeFrameGlobals;
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
-    InitializeProxies;
+    InitializeProxies(GDataProvider);
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
         xFilename := GetSystemPathname(CDefaultFilename);
@@ -174,7 +174,7 @@ begin
         xProceed := True;
       end;
       if xProceed then begin
-        xProceed := InitializeDataProvider(xFilename, xError, xDesc) = iprSuccess;
+        xProceed := InitializeDataProvider(xFilename, GetParamValue('/password'), GDataProvider) = iprSuccess;
       end;
     end else begin
       xProceed := True;
@@ -208,10 +208,6 @@ begin
         CMainForm.FinalizeMainForm;
       end;
       SaveSettings;
-    end else begin
-      if xError <> '' then begin
-        ShowInfo(itError, xError, xDesc)
-      end;
     end;
   end;
 end.

@@ -30,22 +30,23 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, CDatabase, CMainFormUnit, CDatatools, CMemoFormUnit,
-  StrUtils, CInfoFormUnit, CConsts;
+  StrUtils, CInfoFormUnit, CConsts, CInitializeProviderFormUnit;
 
 function TCCheckDatafileFormUnit.DoWork: Boolean;
 var xMustReconect: Boolean;
     xError, xDesc: String;
     xText: String;
-    xPrevDatabase: String;
+    xPrevDatabase, xPrevPassword: String;
     xReport: TStringList;
     xStatus: TInitializeProviderResult;
 begin
   AddToReport('Rozpoczêcie wykonywania sprawdzania pliku danych...');
   AddToReport('Plik ' + CStaticName.DataId);
-  xMustReconect := GDatabaseName <> '';
+  xMustReconect := GDataProvider.Filename <> '';
   if xMustReconect then begin
     AddToReport('Zamykanie aktualnie wybranego pliku danych...');
-    xPrevDatabase := GDatabaseName;
+    xPrevDatabase := GDataProvider.Filename;
+    xPrevPassword := GDataProvider.Password;
     SendMessage(CMainForm.Handle, WM_CLOSECONNECTION, 0, 0);
   end;
   AddToReport('Sprawdzanie pliku danych...');
@@ -67,7 +68,7 @@ begin
   end;
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
-    xStatus := CMainForm.OpenConnection(xPrevDatabase, xError, xDesc);
+    xStatus := InitializeDataProvider(xPrevDatabase, xPrevPassword, GDataProvider);
     if xStatus = iprSuccess then begin
       CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;
@@ -87,11 +88,11 @@ end;
 
 procedure TCCheckDatafileFormUnit.InitializeForm;
 begin
-  CStaticName.DataId := GDatabaseName;
-  if GDatabaseName <> '' then begin
+  CStaticName.DataId := GDataProvider.Filename;
+  if GDataProvider.Filename <> '' then begin
     CStaticName.Caption := MinimizeName(CStaticName.DataId, CStaticName.Canvas, CStaticName.Width);
   end;
-  OpenDialog.FileName := GDatabaseName;
+  OpenDialog.FileName := GDataProvider.Filename;
 end;
 
 procedure TCCheckDatafileFormUnit.CStaticNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

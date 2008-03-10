@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, ImgList, PngImageList, CXml, AdoDb;
+  CComponents, ImgList, PngImageList, CXml, AdoDb, Types;
 
 type
   TCUpdateDatafileForm = class(TCBaseForm)
@@ -29,6 +29,12 @@ type
   private
     FReportList: TStringList;
     FIsDisabled: Boolean;
+    FFilename: String;
+    FConnection: TADOConnection;
+    FFromDbversion: Integer;
+    FToDbversion: Integer;
+    FFromVersion: String;
+    FToVersion: String;
     procedure UpdateButtons;
     function DoUpdateDatafile: Boolean;
     function GetDisabled: Boolean;
@@ -36,9 +42,15 @@ type
     procedure AddToReport(AText: String);
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
+    property Filename: String read FFilename write FFilename;
+    property Connection: TADOConnection read FConnection write FConnection;
+    property FromDbversion: Integer read FFromDbversion write FFromDbversion;
+    property ToDbversion: Integer read FToDbversion write FToDbversion;
+    property FromVersion: String read FFromVersion write FFromVersion;
+    property ToVersion: String read FToVersion write FToVersion;
   end;
 
-function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection): Boolean;
+function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection; var AFromVersion, AToVersion: String): Boolean;
 
 implementation
 
@@ -47,16 +59,47 @@ uses CRichtext, FileCtrl, CXmlFrameUnit, CInfoFormUnit, CReportFormUnit,
 
 {$R *.dfm}
 
-function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection): Boolean;
+function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection; var AFromVersion, AToVersion: String): Boolean;
+var xDataset: TADOQuery;
+    xError: String;
+    xFromDynArray, xToDynArray: TStringDynArray;
+    xFromDb, xToDb: Integer;
 begin
-  with TCUpdateDatafileForm.Create(Application) do begin
-    {
-    CStaticName.Caption := MinimizeName(AFilename, CStaticName.Canvas, CStaticName.Width);
-    CStaticName.DataId := AFilename;
-    }
-    CImage.ImageIndex := 0;
-    Result := ShowModal = mrOk;
-    Free;
+  Result := False;
+  AFromVersion := '';
+  AToVersion := '';
+  xDataset := DbOpenSql(AConnection, 'select * from cmanagerInfo', xError);
+  if xDataset <> Nil then begin
+    AFromVersion := xDataset.FieldByName('version').AsString;
+    AToVersion := FileVersion(ParamStr(0));
+    xDataset.Free;
+    xFromDynArray := StringToStringArray(AFromVersion, '.');
+    xToDynArray := StringToStringArray(AToVersion, '.');
+    if Length(xFromDynArray) <> 4 then begin
+      ShowInfo(itError, 'Informacja o wersji pliku danych jest wiew³aœciwa. Byæ mo¿e wskazany plik\n' +
+                        'nie jest poprawnym plikiem danych programu CManager lub jest uszkodzony', '');
+    end else begin
+      xFromDb := StrToIntDef(xFromDynArray[1], -1);
+      xToDb := StrToIntDef(xToDynArray[1], -1);
+      Result := xFromDb = xToDb;
+      if not Result then begin
+        with TCUpdateDatafileForm.Create(Application) do begin
+          Filename := AFilename;
+          Connection := AConnection;
+          FToVersion := AToVersion;
+          FFromVersion := AFromVersion;
+          FFromDbversion := xFromDb;
+          FToDbversion := xToDb;
+          LabelFinish.Caption := Format(LabelFinish.Caption, [FFromVersion, FToVersion]);
+          CImage.ImageIndex := 0;
+          Result := ShowModal = mrOk;
+          Free;
+        end;
+      end;
+    end;
+  end else begin
+    ShowInfo(itError, 'Nie uda³o siê odczytaæ informacji o wersji pliku danych. Byæ mo¿e wskazany plik\n' +
+                      'nie jest poprawnym plikiem danych programu CManager lub jest uszkodzony', xError);
   end;
 end;
 
@@ -96,101 +139,92 @@ begin
 end;
 
 function TCUpdateDatafileForm.DoUpdateDatafile: Boolean;
-{
-var xOverridenBackupFilename: String;
+var xBackupFilename: String;
     xProceed: Boolean;
     xError: String;
-    xConnection: TADOConnection;
     xNativeError: Integer;
-}
+    xLogFile: String;
+    xCommand: String;
+    xCurDbversion: Integer;
+    xBackupCreated: Boolean;
 begin
-{
-  LabelInfo.Caption := 'Trwa tworzenie pliku danych';
+  LabelInfo.Caption := 'Trwa uaktualnianie pliku danych';
   LabelInfo.Update;
-  LabelFinish.Caption := 'Proszê czekaæ. CManager aktualnie tworzy nowy plik danych. Po zakoñczeniu bêdzie on gotowy do u¿ycia.';
+  LabelFinish.Caption := 'Proszê czekaæ. CManager w³aœnie uaktualnia wybrany plik danych. Po zakoñczeniu bêdzie on gotowy do u¿ycia.';
   LabelFinish.Update;
   Result := False;
   Disabled := True;
+  ProgressBar.Max := 4 + (FToDbversion - FFromDbversion);
   ProgressBar.Visible := True;
+  xBackupCreated := False;
   //Krok 1
-  if FileExists(CStaticName.DataId) then begin
-    xOverridenBackupFilename := ChangeFileExt(CStaticName.DataId, '.' + FormatDateTime('yymmddhhnnss', Now));
-    AddToReport('Wykonywanie kopii pliku ' + CStaticName.DataId + ' do pliku ' + xOverridenBackupFilename);
-    if MoveFile(PChar(CStaticName.DataId), PChar(xOverridenBackupFilename)) then begin
-      xProceed := True;
-      AddToReport('Utworzono kopiê pliku ' + CStaticName.DataId);
-    end else begin
+  xProceed := True;
+  if not FConnection.Connected then begin
+    if not DbConnectDatabase(FConnection.ConnectionString, FConnection, xError, xNativeError, False) then begin
+      AddToReport('Nie uda³o siê pod³¹czyæ do pliku danych, opis b³êdu ' + xError);
       xProceed := False;
-      AddToReport('Nie mo¿na utworzyæ kopii istniej¹cego pliku ' + CStaticName.DataId + '. ' + SysErrorMessage(GetLastError));
     end;
-  end else begin
-    xProceed := True;
   end;
   ProgressBar.StepBy(1);
-  //Kork 2
   if xProceed then begin
-    AddToReport('Tworzenie nowego pliku danych');
-    if DbCreateDatabase(CStaticName.DataId, EditPassword.Text, xError) then begin
-      ProgressBar.StepBy(1);
-      //Krok 3
-      xConnection := TADOConnection.Create(Nil);
-      try
-        if DbConnectDatabase(CStaticName.DataId, EditPassword.Text, xConnection, xError, xNativeError, True) then begin
-          ProgressBar.StepBy(1);
-          //Krok 4
-          if DbExecuteSql(xConnection, GetStringFromResources('SQLPATTERN', RT_RCDATA), False, xError) then begin
-            ProgressBar.StepBy(1);
-            //Krok 5
-            if DbExecuteSql(xConnection, Format(CInsertCmanagerInfo , [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]), False, xError) then begin
-               ProgressBar.StepBy(1);
-               //Krok 6
-               if (ComboBoxDefault.ItemIndex = 0) then begin
-                 if DbExecuteSql(xConnection, GetDefaultDataAsString, False, xError) then begin
-                   ProgressBar.StepBy(1);
-                   Result := True;
-                 end else begin
-                   AddToReport('B³¹d tworzenia domyœlnych danych w pliku, opis b³êdu ' + xError);
-                 end;
-               end else begin
-                 ProgressBar.StepBy(1);
-                 Result := True;
-               end;
-            end else begin
-              AddToReport('B³¹d zapisu CManagerInfo, opis b³êdu ' + xError);
-            end;
-          end else begin
-            AddToReport('B³¹d tworzenia struktur pliku danych, opis b³êdu ' + xError);
-          end;
-        end else begin
-          AddToReport('B³¹d podczas pod³¹czania do pliku danych');
-          AddToReport('Kod b³êdu ' + IntToStr(xNativeError) + ', opis b³êdu ' + xError);
-        end;
-      finally
-        xConnection.Free;
-      end;
-      if not Result then begin
-        if not Windows.DeleteFile(PChar(CStaticName.DataId)) then begin
-          AddToReport('Nie uda³o siê usun¹æ utworzonego pliku danych. Plik mo¿e byæ niepoprawny');
-        end;
-      end;
+    //Krok 2
+    xBackupFilename := ChangeFileExt(FFilename, '.' + FormatDateTime('yymmddhhnnss', Now));
+    AddToReport('Wykonywanie kopii pliku ' + FFilename + ' do pliku ' + xBackupFilename);
+    if CopyFile(PChar(FFilename), PChar(xBackupFilename), True) then begin
+      xProceed := True;
+      AddToReport('Utworzono kopiê pliku ' + FFilename);
+      xBackupCreated := True;
     end else begin
-      AddToReport('B³¹d podczas tworzenia pliku danych');
-      AddToReport(xError);
+      xProceed := False;
+      AddToReport('Nie mo¿na utworzyæ kopii pliku ' + FFilename + '. ' + SysErrorMessage(GetLastError));
     end;
-  end;
-  //Krok 7
-  if (xOverridenBackupFilename <> '') then begin
+    ProgressBar.StepBy(1);
+    //Kork 3
+    if xProceed then begin
+      AddToReport('Uaktualnianie pliku danych');
+      Result := True;
+      xLogFile := DbSqllogfile;
+      DbSqllogfile := GetSystemPathname(ChangeFileExt(FFilename, '') + '_update.log');
+      SaveToLog('Sesja uaktualnienia z ' + FFromVersion + ' do ' + FToVersion, DbSqllogfile);
+      xCurDbversion := FFromDbversion;
+      while Result and (xCurDbversion <> FToDbversion) do begin
+        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), DbSqllogfile);
+        xCommand := GetStringFromResources(Format('SQLUPD_%d_%d', [xCurDbversion, xCurDbversion + 1]), RT_RCDATA);
+        Result := DbExecuteSql(FConnection, xCommand, False, xError);
+        Inc(xCurDbversion);
+        ProgressBar.StepBy(1);
+      end;
+      if Result then begin
+        Result := DbExecuteSql(FConnection, 'update cmanagerInfo set version = ''' + FToVersion + '''', False, xError);
+        if not Result then begin
+          AddToReport('B³¹d uaktualniania informacji o wersji pliku danych, opis b³êdu ' + xError);
+        end;
+      end else begin
+        AddToReport('B³¹d uaktualniania struktur pliku danych, opis b³êdu ' + xError);
+      end;
+      DbSqllogfile := xLogFile;
+    end;
+    ProgressBar.StepBy(1);
+    //Krok 4
     if Result then begin
-      AddToReport('Usuwanie nadpisywanego pliku danych');
-      if not Windows.DeleteFile(PChar(xOverridenBackupFilename)) then begin
+      AddToReport('Usuwanie kopii pliku danych');
+      if not Windows.DeleteFile(PChar(xBackupFilename)) then begin
         AddToReport('Nie uda³o siê usun¹æ kopii pliku danych');
       end;
     end else begin
-      AddToReport('Przywracanie pliku ' + CStaticName.DataId + ' z kopii ' + xOverridenBackupFilename);
-      if MoveFile(PChar(xOverridenBackupFilename), PChar(CStaticName.DataId)) then begin
-        AddToReport('Przywrócono kopiê pliku ' + CStaticName.DataId + ' z pliku ' + xOverridenBackupFilename);
-      end else begin
-        AddToReport('Nie mo¿na przywróciæ pliku ' + CStaticName.DataId + ' z kopii ' + xOverridenBackupFilename + '. ' + SysErrorMessage(GetLastError));
+      if xBackupCreated then begin
+        AddToReport('Przywracanie pliku ' + FFilename + ' z kopii ' + xBackupFilename);
+        FConnection.Close;
+        if Windows.DeleteFile(PChar(FFilename)) then begin
+          if MoveFile(PChar(xBackupFilename), PChar(FFilename)) then begin
+            AddToReport('Przywrócono kopiê pliku ' + FFilename + ' z pliku ' + xBackupFilename);
+          end else begin
+            AddToReport('Nie mo¿na przywróciæ pliku ' + FFilename + ' z kopii ' + xBackupFilename + '. ' + SysErrorMessage(GetLastError));
+          end;
+        end else begin
+          AddToReport('Nie mo¿na usun¹æ pliku danych ' + FFilename + ', aby przywróciæ go z kopii ' + xBackupFilename + '. ' + SysErrorMessage(GetLastError));
+          AddToReport('Usuñ plik rêcznie, zmieñ nazwê dla kopii pliku z ' + xBackupFilename + ' na ' + FFilename + ' i nastêpnie ponów próbê uaktualnienia');
+        end;
       end;
     end;
   end;
@@ -198,7 +232,6 @@ begin
   ProgressBar.Visible := False;
   CStaticDesc.Visible := not Result;
   Disabled := False;
-}
 end;
 
 function TCUpdateDatafileForm.GetDisabled: Boolean;

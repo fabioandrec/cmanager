@@ -30,9 +30,10 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     Height = 57
     AutoSize = False
     Caption = 
-      'CManager jest gotowy do utworzenia nowego pliku danych. Wybierz ' +
-      'przycisk "Utw'#243'rz" aby rozpocz'#261#263' tworzenie pliku danych. Je'#380'eli c' +
-      'hcesz zrezygnowa'#263' wybierz przycisk "Wyj'#347'cie".'
+      'CManager wykry'#322', '#380'e chcesz otworzy'#263' plik danych wersji %s. Wybra' +
+      'ny plik musi zosta'#263' uaktualniony do wersji %s. Je'#380'eli zrezygnuje' +
+      'sz z uaktualnienia plik danych nie zostanie otwarty. Aby rozpocz' +
+      #261#263' wci'#347'nij przycisk "Uaktualnij".'
     WordWrap = True
   end
   object PanelButtons: TPanel
@@ -107,7 +108,7 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     Top = 114
     Width = 318
     Height = 21
-    Max = 7
+    Max = 4
     Smooth = True
     TabOrder = 3
     Visible = False

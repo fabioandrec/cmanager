@@ -990,7 +990,7 @@ const CDatafileDeletes: array[0..25] of string =
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
-procedure InitializeProxies;
+procedure InitializeProxies(ADataProvider: TDataProvider);
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
 function IsUnitdefDataset(ADataset: TADOQuery; ACDefFieldname: String = 'idUnitdef'): Boolean;
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
@@ -1065,30 +1065,30 @@ begin
   ADataset.First;
 end;
 
-procedure InitializeProxies;
+procedure InitializeProxies(ADataProvider: TDataProvider);
 begin
-  CashPointProxy := TDataProxy.Create(GDataProvider, 'cashPoint');
-  AccountProxy := TDataProxy.Create(GDataProvider, 'account');
-  ProductProxy := TDataProxy.Create(GDataProvider, 'product');
-  MovementListProxy :=  TDataProxy.Create(GDataProvider, 'movementList');
-  BaseMovementProxy := TDataProxy.Create(GDataProvider, 'baseMovement');
-  PlannedMovementProxy :=  TDataProxy.Create(GDataProvider, 'plannedMovement');
-  PlannedDoneProxy :=  TDataProxy.Create(GDataProvider, 'plannedDone');
-  MovementFilterProxy :=  TDataProxy.Create(GDataProvider, 'movementFilter');
-  ProfileProxy :=  TDataProxy.Create(GDataProvider, 'profile');
-  MovementLimitProxy :=  TDataProxy.Create(GDataProvider, 'movementLimit');
-  CurrencyDefProxy :=  TDataProxy.Create(GDataProvider, 'currencyDef');
-  CurrencyRateProxy :=  TDataProxy.Create(GDataProvider, 'currencyRate');
-  AccountCurrencyRuleProxy := TDataProxy.Create(GDataProvider, 'accountCurrencyRule');
-  AccountExtractionProxy := TDataProxy.Create(GDataProvider, 'accountExtraction');
-  ExtractionItemProxy := TDataProxy.Create(GDataProvider, 'extractionItem');
-  UnitDefProxy := TDataProxy.Create(GDataProvider, 'unitDef');
-  ReportDefProxy := TDataProxy.Create(GDataProvider, 'reportDef');
-  InstrumentProxy := TDataProxy.Create(GDataProvider, 'instrument');
-  InstrumentValueProxy := TDataProxy.Create(GDataProvider, 'instrumentValue', 'StnInstrumentValue');
-  InvestmentItemProxy := TDataProxy.Create(GDataProvider, 'investmentItem');
-  InvestmentMovementProxy := TDataProxy.Create(GDataProvider, 'investmentMovement');
-  InvestmentPortfolioProxy := TDataProxy.Create(GDataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
+  CashPointProxy := TDataProxy.Create(ADataProvider, 'cashPoint');
+  AccountProxy := TDataProxy.Create(ADataProvider, 'account');
+  ProductProxy := TDataProxy.Create(ADataProvider, 'product');
+  MovementListProxy :=  TDataProxy.Create(ADataProvider, 'movementList');
+  BaseMovementProxy := TDataProxy.Create(ADataProvider, 'baseMovement');
+  PlannedMovementProxy :=  TDataProxy.Create(ADataProvider, 'plannedMovement');
+  PlannedDoneProxy :=  TDataProxy.Create(ADataProvider, 'plannedDone');
+  MovementFilterProxy :=  TDataProxy.Create(ADataProvider, 'movementFilter');
+  ProfileProxy :=  TDataProxy.Create(ADataProvider, 'profile');
+  MovementLimitProxy :=  TDataProxy.Create(ADataProvider, 'movementLimit');
+  CurrencyDefProxy :=  TDataProxy.Create(ADataProvider, 'currencyDef');
+  CurrencyRateProxy :=  TDataProxy.Create(ADataProvider, 'currencyRate');
+  AccountCurrencyRuleProxy := TDataProxy.Create(ADataProvider, 'accountCurrencyRule');
+  AccountExtractionProxy := TDataProxy.Create(ADataProvider, 'accountExtraction');
+  ExtractionItemProxy := TDataProxy.Create(ADataProvider, 'extractionItem');
+  UnitDefProxy := TDataProxy.Create(ADataProvider, 'unitDef');
+  ReportDefProxy := TDataProxy.Create(ADataProvider, 'reportDef');
+  InstrumentProxy := TDataProxy.Create(ADataProvider, 'instrument');
+  InstrumentValueProxy := TDataProxy.Create(ADataProvider, 'instrumentValue', 'StnInstrumentValue');
+  InvestmentItemProxy := TDataProxy.Create(ADataProvider, 'investmentItem');
+  InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
+  InvestmentPortfolioProxy := TDataProxy.Create(ADataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;

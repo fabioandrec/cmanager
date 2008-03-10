@@ -30,22 +30,24 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, CDatabase, CMainFormUnit, CDatatools, CMemoFormUnit,
-  StrUtils, CInfoFormUnit, CConsts, CTools, CAdox;
+  StrUtils, CInfoFormUnit, CConsts, CTools, CAdox,
+  CInitializeProviderFormUnit;
 
 function TCCompactDatafileForm.DoWork: Boolean;
 var xMustReconect: Boolean;
     xError, xDesc: String;
     xBeforeSize, xAfterSize: Int64;
     xText: String;
-    xPrevDatabase: String;
+    xPrevDatabase, xPrevPassword: String;
     xStatus: TInitializeProviderResult;
 begin
   AddToReport('Rozpoczêcie wykonywania kompaktowania pliku danych...');
   AddToReport('Plik ' + CStaticName.DataId);
-  xMustReconect := GDatabaseName <> '';
+  xMustReconect := GDataProvider.Filename <> '';
   if xMustReconect then begin
     AddToReport('Zamykanie aktualnie wybranego pliku danych...');
-    xPrevDatabase := GDatabaseName;
+    xPrevDatabase := GDataProvider.Filename;
+    xPrevPassword := GDataProvider.Password;
     SendMessage(CMainForm.Handle, WM_CLOSECONNECTION, 0, 0);
   end;
   xBeforeSize := FileSize(CStaticName.DataId);
@@ -63,7 +65,7 @@ begin
   end;
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
-    xStatus := CMainForm.OpenConnection(xPrevDatabase, xError, xDesc);
+    xStatus := InitializeDataProvider(xPrevDatabase, xPrevPassword, GDataProvider);
     if xStatus = iprSuccess then begin
       CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;
@@ -83,11 +85,11 @@ end;
 
 procedure TCCompactDatafileForm.InitializeForm;
 begin
-  CStaticName.DataId := GDatabaseName;
-  if GDatabaseName <> '' then begin
+  CStaticName.DataId := GDataProvider.Filename;
+  if GDataProvider.Filename <> '' then begin
     CStaticName.Caption := MinimizeName(CStaticName.DataId, CStaticName.Canvas, CStaticName.Width);
   end;
-  OpenDialog.FileName := GDatabaseName;
+  OpenDialog.FileName := GDataProvider.Filename;
 end;
 
 procedure TCCompactDatafileForm.CStaticNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

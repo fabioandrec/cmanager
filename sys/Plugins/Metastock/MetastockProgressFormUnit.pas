@@ -130,7 +130,6 @@ begin
         SetXmlAttribute('error', xNode, xRes);
         SetXmlAttribute('isValid', xNode, False);
       end;
-      SaveToLog(xResponse, 'xxx' + IntToStr(xCount) + '.txt');
       FIsValidResponse := FIsValidResponse and (xRes = ERROR_SUCCESS);
     end;
     Inc(xCount);

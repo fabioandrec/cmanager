@@ -6,10 +6,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, CDatabase,
-  pngimage, AdoDb;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, pngimage, AdoDb;
 
 type
+  TInitializeProviderResult = (iprSuccess, iprCancelled, iprError);
+
   TCInitializeProviderForm = class(TCConfigForm)
     EditPassword: TEdit;
     Image1: TImage;
@@ -31,22 +32,41 @@ type
     property Connection: TADOConnection write FConnection;
   end;
 
-function ConnectToDatabaseWithPassword(AFilename: String; AConnection: TADOConnection): Boolean;
+function ConnectToDatabase(AFilename: String; var APassword: String; AConnection: TADOConnection): TInitializeProviderResult;
 
 implementation
 
 {$R *.dfm}
 
-uses FileCtrl, CConsts, CInfoFormUnit, CAdox;
+uses FileCtrl, CConsts, CInfoFormUnit, CAdox, CDatabase;
 
-function ConnectToDatabaseWithPassword(AFilename: String; AConnection: TADOConnection): Boolean;
+function ConnectToDatabase(AFilename: String; var APassword: String; AConnection: TADOConnection): TInitializeProviderResult;
 var xDialog: TCInitializeProviderForm;
+    xError: String;
+    xNativeError: Integer;
 begin
-  xDialog := TCInitializeProviderForm.Create(Application);
-  xDialog.Filename := AFilename;
-  xDialog.Connection := AConnection;
-  Result := xDialog.ShowConfig(coEdit);
-  xDialog.Free;
+  if AConnection.Connected then begin
+    AConnection.Close;
+  end;
+  if DbConnectDatabase(AFilename, APassword, AConnection, xError, xNativeError, False) then begin
+    Result := iprSuccess;
+  end else begin
+    if (xNativeError = CProviderErrorCodeInvalidPassword) then begin
+      xDialog := TCInitializeProviderForm.Create(Application);
+      xDialog.Filename := AFilename;
+      xDialog.Connection := AConnection;
+      if xDialog.ShowConfig(coEdit) then begin
+        Result := iprSuccess;
+        APassword := xDialog.EditPassword.Text;
+      end else begin
+        Result := iprCancelled;
+      end;
+      xDialog.Free;
+    end else begin
+      ShowInfo(itError, 'Nie uda³o siê otworzyæ pliku danych ' + AFilename + '.', xError);
+      Result := iprError;
+    end;
+  end;
 end;
 
 function TCInitializeProviderForm.CanAccept: Boolean;
@@ -76,14 +96,9 @@ begin
 end;
 
 procedure TCInitializeProviderForm.SetFilename(const Value: String);
-var xCanvas: TControlCanvas;
 begin
   FFilename := Value;
-  xCanvas := TControlCanvas.Create;
-  xCanvas.Control := LabelFilename;
-  xCanvas.Font.Style := xCanvas.Font.Style + [fsBold];
-  LabelFilename.Caption := MinimizeName(FFilename, xCanvas, LabelFilename.Width);
-  xCanvas.Free;
+  LabelFilename.Caption := MinimizeName(FFilename, LabelFilename.Canvas, LabelFilename.Width);
 end;
 
 end.

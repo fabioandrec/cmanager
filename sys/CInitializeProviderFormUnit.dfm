@@ -1,14 +1,14 @@
 inherited CInitializeProviderForm: TCInitializeProviderForm
-  Left = 338
-  Top = 416
+  Left = 241
+  Top = 37
   Caption = 'CManager'
-  ClientHeight = 127
+  ClientHeight = 153
   ClientWidth = 367
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 367
-    Height = 86
+    Height = 112
     object Image1: TImage
       Left = 16
       Top = 16
@@ -85,7 +85,7 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     end
     object Label1: TLabel
       Left = 80
-      Top = 62
+      Top = 86
       Width = 29
       Height = 13
       Alignment = taRightJustify
@@ -94,13 +94,19 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     object Label2: TLabel
       Left = 81
       Top = 18
-      Width = 99
+      Width = 167
       Height = 13
-      Caption = 'Wybrany plik danych'
+      Caption = 'Podaj has'#322'o dost'#281'pu do pliku'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
     end
     object LabelFilename: TLabel
       Left = 80
-      Top = 34
+      Top = 50
       Width = 265
       Height = 13
       AutoSize = False
@@ -109,12 +115,12 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
       Font.Color = clWindowText
       Font.Height = -11
       Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
+      Font.Style = []
       ParentFont = False
     end
     object EditPassword: TEdit
       Left = 117
-      Top = 58
+      Top = 82
       Width = 228
       Height = 21
       BevelKind = bkTile
@@ -125,7 +131,7 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 86
+    Top = 112
     Width = 367
     inherited BitBtnOk: TBitBtn
       Left = 190

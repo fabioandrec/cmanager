@@ -1,6 +1,6 @@
 inherited CCreateDatafileForm: TCCreateDatafileForm
-  Left = 285
-  Top = 179
+  Left = 102
+  Top = 36
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager'

@@ -8,10 +8,14 @@ function DbCreateDatabase(AFilename: String; APassword: String; var AError: Stri
 function DbCreateExcelFile(AFilename: String; var AError: String): OleVariant;
 function DbCompactDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
 function DbChangeDatabasePassword(AFilename: String; APassword, ANewPassword: String; var AError: String): Boolean;
-function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean;
+function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean; overload;
+function DbConnectDatabase(AConnectionString: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean; overload;
 function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String): Boolean;
+function DbOpenSql(AConnection: TADOConnection; ASql: String; var AErrorText: String): TADOQuery;
 
 var DbSqllogfile: String = '';
+    DbLastStatement: String = '';
+    DbLastError: String = '';
 
 implementation
 
@@ -48,6 +52,36 @@ begin
   except
     on E: Exception do begin
       AError := E.Message;
+      DbLastError := AError;
+      if AConnection.Errors.Count > 0 then begin
+        ANativeError := AConnection.Errors.Item[0].NativeError;
+      end;
+    end;
+  end;
+end;
+
+function DbConnectDatabase(AConnectionString: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean; overload;
+begin
+  Result := False;
+  ANativeError := 0;
+  try
+    if AConnection.Connected then begin
+      AConnection.Close;
+    end;
+    AConnection.ConnectionString := AConnectionString;
+    if AExclusive then begin
+      AConnection.Mode := cmShareExclusive;
+    end else begin
+      AConnection.Mode := cmShareDenyNone;
+    end;
+    AConnection.LoginPrompt := False;
+    AConnection.CursorLocation := clUseClient;
+    AConnection.Open;
+    Result := True;
+  except
+    on E: Exception do begin
+      AError := E.Message;
+      DbLastError := AError;
       if AConnection.Errors.Count > 0 then begin
         ANativeError := AConnection.Errors.Item[0].NativeError;
       end;
@@ -73,6 +107,7 @@ begin
     except
       on E: Exception do begin
         AError := E.Message;
+        DbLastError := AError;
       end;
     end
   finally
@@ -90,6 +125,7 @@ begin
     except
       on E: Exception do begin
         AError := E.Message;
+        DbLastError := AError;
         Result := Unassigned;
       end;
     end
@@ -126,6 +162,7 @@ begin
     except
       on E: Exception do begin
         AError := E.Message;
+        DbLastError := AError;
       end;
     end
   finally
@@ -170,6 +207,7 @@ begin
     except
       on E: Exception do begin
         AError := E.Message;
+        DbLastError := AError;
       end;
     end;
   finally
@@ -200,9 +238,11 @@ begin
           try
             SaveToLog('Wykonywanie "' + xSql + '"', DbSqllogfile);
             AConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
+            DbLastStatement := xSql;
           except
             on E: Exception do begin
               AErrorText := E.Message;
+              DbLastError := AErrorText;
               Result := False;
               xFinished := True;
             end;
@@ -214,9 +254,11 @@ begin
         try
           SaveToLog('Wykonywanie "' + ASql + '"', DbSqllogfile);
           AConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
+          DbLastStatement := ASql;
         except
           on E: Exception do begin
             AErrorText := E.Message;
+            DbLastError := AErrorText;
             Result := False;
           end;
         end;
@@ -225,6 +267,29 @@ begin
     if not Result then begin
       SaveToLog('B³¹d "' + AErrorText + '"', DbSqllogfile);
     end;
+  end;
+end;
+
+function DbOpenSql(AConnection: TADOConnection; ASql: String; var AErrorText: String): TADOQuery;
+begin
+  SaveToLog('Otwieranie "' + ASql + '"', DbSqllogfile);
+  Result := TADOQuery.Create(Nil);
+  try
+    Result.ParamCheck := False;
+    Result.Connection := AConnection;
+    Result.SQL.Text := ASql;
+    DbLastStatement := ASql;
+    Result.Prepared := True;
+    Result.Open
+  except
+    on E: Exception do begin
+      AErrorText := E.Message;
+      DbLastError := AErrorText;
+      FreeAndNil(Result);
+    end;
+  end;
+  if Result = Nil then begin
+    SaveToLog('B³¹d "' + AErrorText + '"', DbSqllogfile);
   end;
 end;
 

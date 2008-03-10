@@ -3,7 +3,7 @@ unit CDatabase;
 interface
 
 uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
-     Types, CComponents, AdoInt;
+     Types, CComponents, AdoInt, CInitializeProviderFormUnit;
 
 type
   TDataGid = ShortString;
@@ -12,7 +12,6 @@ type
   TDataMemoryState = (msValid, msModified, msDeleted);
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
-  TInitializeProviderResult = (iprSuccess, iprCancelled, iprError);
 
   TDataGids = class(TStringList)
   public
@@ -23,20 +22,19 @@ type
 
   TDataProvider = class(TObject)
   private
-    FLastError: String;
-    FLastStatemenet: String;
     FConnection: TADOConnection;
     FDataProxyList: TObjectList;
+    FFilename: String;
+    FPassword: String;
     function GetInTransaction: Boolean;
     function GetIsConnected: Boolean;
   public
-    function OpenConnection(var ANativeErrorCode: Integer; ADatasource: String; AExclusive: Boolean = False): Boolean;
+    procedure ReloadCaches;
     function ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
     procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
     destructor Destroy; override;
-    procedure DisconnectFromDatabase;
     procedure BeginTransaction;
     procedure RollbackTransaction;
     function CommitTransaction: Boolean;
@@ -53,9 +51,9 @@ type
     property DataProxyList: TObjectList read FDataProxyList;
     property InTransaction: Boolean read GetInTransaction;
     property IsConnected: Boolean read GetIsConnected;
-    property LastError: String read FLastError;
-    property LastStatement: String read FLastStatemenet;
     property Connection: TADOConnection read FConnection;
+    property Filename: String read FFilename write FFilename;
+    property Password: String read FPassword write FPassword;
   end;
 
   TDataObjectList = class(TObjectList)
@@ -234,77 +232,54 @@ type
 
 var GDataProvider: TDataProvider;
     GWorkDate: TDateTime;
-    GDatabaseName: String;
     GShutdownEvent: THandle;
-    GLastUsedPassword: String = '';
-    GLastUsedPasswordPresent: Boolean = False;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): TInitializeProviderResult;
-function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
+function InitializeDataProvider(ADatabaseName: String; APassword: String; ADataProvider: TDataProvider): TInitializeProviderResult;
+procedure FinalizeDataProvider(ADataProvider: TDataProvider);
 
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
      CPreferences, CTools, CAdox, CDataObjects,
-  CInitializeProviderFormUnit, CAdotools;
+     CAdotools, CUpdateDatafileFormUnit;
 
-function InitializeDataProvider(ADatabaseName: String; var AError: String; var ADesc: String): TInitializeProviderResult;
+function InitializeDataProvider(ADatabaseName: String; APassword: String; ADataProvider: TDataProvider): TInitializeProviderResult;
 var xCommand: String;
-    xDataset: TADOQuery;
     xDataVersion: String;
-    xNativeErrorCode: Integer;
     xFileVersion: String;
     xDatabaseName: String;
+    xPassword: String;
 begin
   xCommand := '';
-  AError := '';
-  Result := iprError;
   xDatabaseName := ExpandFileName(ADatabaseName);
-  if GDataProvider.IsConnected then begin
-    GDataProvider.DisconnectFromDatabase;
+  if ADataProvider.IsConnected then begin
+    FinalizeDataProvider(ADataProvider);
   end;
-  if not GDataProvider.OpenConnection(xNativeErrorCode, xDatabaseName) then begin
-    if (xNativeErrorCode = CProviderErrorCodeInvalidPassword) then begin
-      if ConnectToDatabaseWithPassword(xDatabaseName, GDataProvider.Connection) then begin
-        Result := iprSuccess;
-      end else begin
-        Result := iprCancelled;
+  xPassword := APassword;
+  Result := ConnectToDatabase(xDatabaseName, xPassword, ADataProvider.Connection);
+  if Result = iprSuccess then begin
+    if UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xDataVersion, xFileVersion) then begin
+      if not UpdateConfiguration(xDataVersion, xFileVersion) then begin
+        Result := iprError;
+        ShowInfo(itError, 'Plik "' + xDatabaseName + '" nie jest poprawnym plikiem danych', '');
       end;
-    end;
-  end else begin
-    Result := iprSuccess;
-  end;
-  if Result = iprError then begin
-    AError := 'Nie uda³o siê otworzyæ pliku danych ' + xDatabaseName + '.';
-    ADesc := GDataProvider.LastError;
-  end else if Result = iprSuccess then begin
-    GDatabaseName := xDatabaseName;
-    xDataset := GDataProvider.OpenSql('select * from cmanagerInfo', False);
-    if xDataset = Nil then begin
-      AError := 'Plik ' + xDatabaseName + ' nie jest poprawnym plikiem danych';
-      ADesc := '';
-      GDataProvider.DisconnectFromDatabase;
-      Result := iprError;
     end else begin
-      xDataVersion := xDataset.FieldByName('version').AsString;
-      xFileVersion := FileVersion(ParamStr(0));
-      if xFileVersion <> xDataVersion then begin
-        if UpdateDatabase(xDataVersion, xFileVersion) then begin
-          if not UpdateConfiguration(xDataVersion, xFileVersion) then begin
-            Result := iprError;
-            ShowInfo(itError, 'Plik "' + xDatabaseName + '" nie jest poprawnym plikiem danych', '');
-          end;
-        end else begin
-          Result :=iprError;
-        end;
-      end;
-      xDataset.Free;
+      Result := iprError;
     end;
   end;
   if Result = iprSuccess then begin
-    GBasePreferences.lastOpenedDatafilename := GDatabaseName;
-    ReloadCaches;
+    ADataProvider.Filename := xDatabaseName;
+    ADataProvider.Password := xPassword;
+    GBasePreferences.lastOpenedDatafilename := ADataProvider.Filename;
+    ADataProvider.ReloadCaches;
   end;
+end;
+
+procedure FinalizeDataProvider(ADataProvider: TDataProvider);
+begin
+  ADataProvider.ClearProxies(True);
+  ADataProvider.Connection.Connected := False;
+  ADataProvider.Filename := '';
 end;
 
 procedure TDataProxy.AddDataObject(ADataObject: TDataObject);
@@ -543,47 +518,11 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.OpenConnection(var ANativeErrorCode: Integer; ADatasource: String; AExclusive: Boolean = False): Boolean;
-var xConnectionString: String;
-begin
-  Result := False;
-  ANativeErrorCode := 0;
-  if FConnection.Connected then begin
-    FConnection.Close;
-  end;
-  if GLastUsedPasswordPresent then begin
-    xConnectionString := Format(CDefaultConnectionStringWithPass, [ADatasource, GLastUsedPassword]);
-  end else begin
-    xConnectionString := Format(CDefaultConnectionString, [ADatasource]);
-  end;
-  FConnection.ConnectionString := xConnectionString;
-  if AExclusive then begin
-    FConnection.Mode := cmShareExclusive;
-  end else begin
-    FConnection.Mode := cmShareDenyNone;
-  end;
-  FConnection.LoginPrompt := False;
-  FConnection.CursorLocation := clUseClient;
-  try
-    FConnection.Open;
-    Result := True;
-  except
-    on E: Exception do begin
-      FLastError := E.Message;
-      if FConnection.Errors.Count > 0 then begin
-        ANativeErrorCode := FConnection.Errors.Item[0].NativeError;
-      end;
-    end;
-  end;
-end;
-
 constructor TDataProvider.Create;
 begin
   inherited Create;
   FDataProxyList := TObjectList.Create(True);
   FConnection := TADOConnection.Create(Nil);
-  FLastError := '';
-  FLastStatemenet := '';
 end;
 
 destructor TDataProvider.Destroy;
@@ -594,67 +533,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TDataProvider.DisconnectFromDatabase;
-begin
-  ClearProxies(True);
-  FConnection.Connected := False;
-  GDatabaseName := '';
-end;
-
 function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False): Boolean;
-var xFinished: Boolean;
-    xPos: Integer;
-    xSql, xRemains: String;
+var xError: String;
 begin
-  Result := True;
-  xRemains := ASql;
-  xFinished := False;
-  if not AOneStatement then begin
-    repeat
-      xPos := Pos(';', xRemains);
-      if xPos > 0 then begin
-        xSql := Copy(xRemains, 1, xPos - 1);
-        Delete(xRemains, 1, xPos);
-      end else begin
-        xSql := xRemains;
-        xFinished := True;
-      end;
-      if Trim(xSql) <> '' then begin
-        try
-          SaveToLog('Wykonywanie "' + xSql + '"', DbSqllogfile);
-          FLastStatemenet := StringReplace(xSql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
-          FConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
-        except
-          on E: Exception do begin
-            if AShowError then begin
-               ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
-            end;
-            FLastError := E.Message;
-            Result := False;
-            xFinished := True;
-          end;
-        end;
-      end;
-    until xFinished;
-  end else begin
-    if Trim(ASql) <> '' then begin
-      try
-        SaveToLog('Wykonywanie "' + ASql + '"', DbSqllogfile);
-        FLastStatemenet := StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);
-        FConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
-      except
-        on E: Exception do begin
-          if AShowError then begin
-             ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
-          end;
-          FLastError := E.Message;
-          Result := False;
-        end;
-      end;
-    end;
-  end;
-  if not Result then begin
-    SaveToLog('B³¹d "' + FLastError + '"', DbSqllogfile);
+  Result := DbExecuteSql(FConnection, ASql, AOneStatement, xError);
+  if (not Result) and AShowError then begin
+    ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', xError);
   end;
 end;
 
@@ -695,27 +579,11 @@ begin
 end;
 
 function TDataProvider.OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
+var xError: String;
 begin
-  SaveToLog('Otwieranie "' + ASql + '"', DbSqllogfile);
-  Result := TADOQuery.Create(Nil);
-  try
-    Result.ParamCheck := False;
-    Result.Connection := FConnection;
-    Result.SQL.Text := ASql;
-    FLastStatemenet := StringReplace(ASql, sLineBreak, '', [rfReplaceAll, rfIgnoreCase]);;    
-    Result.Prepared := True;
-    Result.Open
-  except
-    on E: Exception do begin
-      if AShowError then begin
-        ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', E.Message);
-      end;
-      FLastError := E.Message;
-      FreeAndNil(Result);
-    end;
-  end;
-  if Result = Nil then begin
-    SaveToLog('B³¹d "' + FLastError + '"', DbSqllogfile);
+  Result := DbOpenSql(FConnection, ASql, xError);
+  if (Result = Nil) and AShowError then begin
+    ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', xError);
   end;
 end;
 
@@ -790,7 +658,7 @@ begin
             xVal := IntToStr(Integer(xField.AsBoolean));
           end else begin
             Result := False;
-            FLastError := 'Podczas eksportu tabeli ' + ATableName + ' nie uda³o siê przetworzyæ pola ' + xField.FieldName;
+            DbLastError := 'Podczas eksportu tabeli ' + ATableName + ' nie uda³o siê przetworzyæ pola ' + xField.FieldName;
           end;
         end else begin
           xVal := 'null';
@@ -1228,49 +1096,6 @@ begin
   end;
 end;
 
-function UpdateDatabase(AFromVersion, AToVersion: String): Boolean;
-var xCurDbversion: Integer;
-    xToDbversion: Integer;
-    xCurDynArray, xToDynArray: TStringDynArray;
-    xText: String;
-    xError: String;
-begin
-  Result := True;
-  xCurDynArray := StringToStringArray(AFromVersion, '.');
-  xToDynArray := StringToStringArray(AToVersion, '.');
-  if Length(xCurDynArray) <> 4 then begin
-    ShowInfo(itError, 'Plik ' + GDatabaseName + ' nie jest poprawnym plikiem danych', '');
-    Result := False;
-  end else begin
-    xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
-    xToDbversion := StrToIntDef(xToDynArray[1], -1);
-    if xCurDbversion < xToDbversion then begin
-      xText := 'Otwierany plik danych ma strukturê ' + AFromVersion + ' i musi byæ uaktualniony do wersji ' + AToVersion + '\n' +
-               'Czy rozpocz¹æ uaktualnianie pliku danych ?';
-      Result := ShowInfo(itQuestion, xText, '');
-      if Result then begin
-        Result := True;
-        DbSqllogfile := GetSystemPathname(ChangeFileExt(GDatabaseName, '') + '_update.log');
-        SaveToLog('Sesja uaktualnienia z ' + AFromVersion + ' do ' + AToVersion, DbSqllogfile);
-        while Result and (xCurDbversion <> xToDbversion) do begin
-          SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), DbSqllogfile);
-          Result := CheckDatabaseStructure(xCurDbversion, xCurDbversion + 1, xError);
-          Inc(xCurDbversion);
-        end;
-        if not Result then begin
-          xText := 'Podczas uaktualniania pliku danych z wersji ' + AFromVersion + ' do ' + AToVersion + ' wyst¹pi³ b³¹d' + '\n' +
-                   'Aby rozwi¹zaæ problem skontaktuj siê z autorem CManager-a';
-          ShowInfo(itError, xText, xError);
-        end;
-        DbSqllogfile := '';
-      end;
-    end;
-    if Result then begin
-      GDataProvider.ExecuteSql('update cmanagerInfo set version = ''' + AToVersion + '''');
-    end;
-  end;
-end;
-
 function TDataProvider.GetCmanagerParam(AName, ADefault: String): String;
 begin
   Result := GetSqlString('select paramValue from cmanagerParams where paramName = ''' + AName + '''', ADefault);
@@ -1352,6 +1177,34 @@ begin
   Duplicates := dupIgnore;
   AddStrings(AGids);
 end;
+
+procedure TDataProvider.ReloadCaches;
+var xC: TDataObjectList;
+    xCount: Integer;
+    xCur: TCurrencyDef;
+    xUni: TUnitDef;
+begin
+  if IsConnected then begin
+    xC := TCurrencyDef.GetAllObjects(CurrencyDefProxy);
+    for xCount := 0 to xC.Count - 1 do begin
+      xCur := TCurrencyDef(xC.Items[xCount]);
+      GCurrencyCache.Change(xCur.id, xCur.symbol, xCur.iso);
+    end;
+    xC.Free;
+    xC := TUnitDef.GetAllObjects(UnitDefProxy);
+    for xCount := 0 to xC.Count - 1 do begin
+      xUni := TUnitDef(xC.Items[xCount]);
+      GUnitdefCache.Change(xUni.id, xUni.symbol, '');
+    end;
+    xC.Free;
+    GActiveProfileId := CEmptyDataGid;
+    GDefaultProfileId := GetCmanagerParam('GActiveProfileId', CEmptyDataGid);
+    GDefaultProductId := GetCmanagerParam('GDefaultProductId', CEmptyDataGid);
+    GDefaultAccountId := GetCmanagerParam('GDefaultAccountId', CEmptyDataGid);
+    GDefaultCashpointId := GetCmanagerParam('GDefaultCashpointId', CEmptyDataGid);
+  end;
+end;
+
 
 initialization
   CoInitialize(Nil);

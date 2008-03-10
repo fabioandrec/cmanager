@@ -39,7 +39,7 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, CDatabase, CDatatools, CInfoFormUnit, CMainFormUnit,
-     CConsts, StrUtils, CTools, CPreferences;
+     CConsts, StrUtils, CTools, CPreferences, CInitializeProviderFormUnit;
 
 procedure TCArchForm.InitializeForm;
 var xIndex: Integer;
@@ -54,12 +54,12 @@ begin
     SaveDialog.DefaultExt := '.cmg';
     OpenDialog.Filter := 'Pliki danych|*.dat|Wszystkie pliki|*.*';
     OpenDialog.DefaultExt := '.dat';
-    if GDatabaseName <> '' then begin
-      CStaticSource.DataId := GDatabaseName;
+    if GDataProvider.Filename <> '' then begin
+      CStaticSource.DataId := GDataProvider.Filename;
       CStaticSource.Caption := MinimizeName(CStaticSource.DataId, CStaticSource.Canvas, CStaticSource.Width);
-      CStaticDest.DataId := GetDefaultBackupFilename(GDatabaseName);
+      CStaticDest.DataId := GetDefaultBackupFilename(GDataProvider.Filename);
       CStaticDest.Caption := MinimizeName(CStaticDest.DataId, CStaticDest.Canvas, CStaticDest.Width);
-      OpenDialog.FileName := GDatabaseName;
+      OpenDialog.FileName := GDataProvider.Filename;
       SaveDialog.FileName := CStaticDest.DataId;
     end;
   end else begin
@@ -166,7 +166,7 @@ var xMustReconect: Boolean;
     xError, xDesc: String;
     xBeforeSize, xAfterSize: Int64;
     xText: String;
-    xPrevDatabase: String;
+    xPrevDatabase, xPrevPassword: String;
     xBackupPref: TBackupPref;
     xStatus: TInitializeProviderResult;
 begin
@@ -182,10 +182,11 @@ begin
   AddToReport('Plik Ÿród³owy ' + CStaticSource.DataId);
   AddToReport('Plik docelowy ' + CStaticDest.DataId);
   xBeforeSize := FileSize(CStaticSource.DataId);
-  xMustReconect := GDatabaseName <> '';
+  xMustReconect := GDataProvider.Filename <> '';
   if xMustReconect then begin
     AddToReport('Zamykanie aktualnie wybranego pliku danych...');
-    xPrevDatabase := GDatabaseName;
+    xPrevDatabase := GDataProvider.Filename;
+    xPrevPassword := GDataProvider.Password;
     SendMessage(CMainForm.Handle, WM_CLOSECONNECTION, 0, 0);
   end;
   if FArchOperation = aoBackup then begin
@@ -226,7 +227,7 @@ begin
   end;
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
-    xStatus := CMainForm.OpenConnection(xPrevDatabase, xError, xDesc);
+    xStatus := InitializeDataProvider(xPrevDatabase, xPrevPassword, GDataProvider);
     if xStatus = iprSuccess then begin
       CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;

@@ -828,17 +828,17 @@ end;
 function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 var xCurDbversion: Integer;
     xToDbversion: Integer;
-    xCurDynArray, xToDynArray: TStringDynArray;
+    xFromDynArray, xToDynArray: TStringDynArray;
 begin
   Result := True;
-  xCurDynArray := StringToStringArray(AFromVersion, '.');
+  xFromDynArray := StringToStringArray(AFromVersion, '.');
   xToDynArray := StringToStringArray(AToVersion, '.');
-  if Length(xCurDynArray) <> 4 then begin
+  if Length(xFromDynArray) <> 4 then begin
     Result := False;
   end else begin
-    xCurDbversion := StrToIntDef(xCurDynArray[1], -1);
+    xCurDbversion := StrToIntDef(xFromDynArray[1], -1);
     xToDbversion := StrToIntDef(xToDynArray[1], -1);
-    if (xCurDbversion < 4) and (xToDbversion = 4) then begin
+    if (xCurDbversion < 4) and (xToDbversion >= 4) then begin
       ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
                        'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
                        'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +

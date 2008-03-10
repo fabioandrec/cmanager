@@ -34,7 +34,7 @@ implementation
 {$R *.dfm}
 
 uses StrUtils, CInfoFormUnit, CDatabase, CMainFormUnit, CConsts,
-  CDatatools;
+  CDatatools, CInitializeProviderFormUnit;
 
 procedure TCExportDatafileForm.CStaticSourceGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
@@ -104,7 +104,7 @@ function TCExportDatafileForm.DoWork: Boolean;
 var xMustReconect: Boolean;
     xError, xDesc: String;
     xText: String;
-    xPrevDatabase: String;
+    xPrevDatabase, xPrevPassword: String;
     xReport: TStringList;
     xStatus: TInitializeProviderResult;
 begin
@@ -116,10 +116,11 @@ begin
   ProgressBar.Position := 0;
   AddToReport('Plik Ÿród³owy ' + CStaticSource.DataId);
   AddToReport('Plik docelowy ' + CStaticDest.DataId);
-  xMustReconect := GDatabaseName <> '';
+  xMustReconect := GDataProvider.Filename <> '';
   if xMustReconect then begin
     AddToReport('Zamykanie aktualnie wybranego pliku danych...');
-    xPrevDatabase := GDatabaseName;
+    xPrevDatabase := GDataProvider.Filename;
+    xPrevPassword := GDataProvider.Password;
     SendMessage(CMainForm.Handle, WM_CLOSECONNECTION, 0, 0);
   end;
   AddToReport('Wykonywanie eksportu pliku danych...');
@@ -138,7 +139,7 @@ begin
   end;
   if xMustReconect then begin
     AddToReport('Otwieranie poprzednio wybranego pliku danych...');
-    xStatus := CMainForm.OpenConnection(xPrevDatabase, xError, xDesc);
+    xStatus := InitializeDataProvider(xPrevDatabase, xPrevPassword, GDataProvider);
     if xStatus = iprSuccess then begin
       CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
       CMainForm.UpdateStatusbar;
@@ -159,11 +160,11 @@ end;
 
 procedure TCExportDatafileForm.InitializeForm;
 begin
-  CStaticSource.DataId := GDatabaseName;
-  if GDatabaseName <> '' then begin
+  CStaticSource.DataId := GDataProvider.Filename;
+  if GDataProvider.Filename <> '' then begin
     CStaticSource.Caption := MinimizeName(CStaticSource.DataId, CStaticSource.Canvas, CStaticSource.Width);
   end;
-  OpenDialog.FileName := GDatabaseName;
+  OpenDialog.FileName := GDataProvider.Filename;
 end;
 
 end.

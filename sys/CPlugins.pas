@@ -408,7 +408,7 @@ end;
 
 function TCManagerInterfaceObject.GetDatafilename: OleVariant;
 begin
-  Result := GDatabaseName;
+  Result := GDataProvider.Filename;
 end;
 
 function TCManagerInterfaceObject.GetWorkdate: OleVariant;
