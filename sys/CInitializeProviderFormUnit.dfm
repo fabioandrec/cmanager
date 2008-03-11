@@ -1,14 +1,14 @@
 inherited CInitializeProviderForm: TCInitializeProviderForm
-  Left = 241
-  Top = 37
+  Left = 272
+  Top = 296
   Caption = 'CManager'
-  ClientHeight = 153
-  ClientWidth = 367
+  ClientHeight = 138
+  ClientWidth = 350
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 367
-    Height = 112
+    Width = 350
+    Height = 97
     object Image1: TImage
       Left = 16
       Top = 16
@@ -83,16 +83,8 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
         7BBBFDE6C3D8F9569F665F7E7416191A1994466AF5D2809BF33CBDBB7E43B23F
         328047D1FE0312BEA73F73A97AC10000000049454E44AE426082}
     end
-    object Label1: TLabel
-      Left = 80
-      Top = 86
-      Width = 29
-      Height = 13
-      Alignment = taRightJustify
-      Caption = 'Has'#322'o'
-    end
     object Label2: TLabel
-      Left = 81
+      Left = 68
       Top = 18
       Width = 167
       Height = 13
@@ -105,9 +97,9 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
       ParentFont = False
     end
     object LabelFilename: TLabel
-      Left = 80
-      Top = 50
-      Width = 265
+      Left = 68
+      Top = 40
+      Width = 263
       Height = 13
       AutoSize = False
       Caption = 'Plik'
@@ -119,9 +111,9 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
       ParentFont = False
     end
     object EditPassword: TEdit
-      Left = 117
-      Top = 82
-      Width = 228
+      Left = 68
+      Top = 66
+      Width = 265
       Height = 21
       BevelKind = bkTile
       BorderStyle = bsNone
@@ -131,13 +123,13 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 112
-    Width = 367
+    Top = 97
+    Width = 350
     inherited BitBtnOk: TBitBtn
-      Left = 190
+      Left = 173
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 278
+      Left = 261
     end
   end
 end

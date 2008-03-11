@@ -30,9 +30,7 @@ type
     TabSheetSecurity: TTabSheet;
     Label5: TLabel;
     Label6: TLabel;
-    Label7: TLabel;
     EditPassword: TEdit;
-    Label8: TLabel;
     TabSheetDefault: TTabSheet;
     Label9: TLabel;
     Label10: TLabel;

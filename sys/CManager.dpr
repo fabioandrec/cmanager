@@ -140,7 +140,8 @@ uses
   CInitializeProviderFormUnit in 'CInitializeProviderFormUnit.pas' {CInitializeProviderForm},
   CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
   CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
-  CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm};
+  CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
+  CProgressXXXFormUnit in 'CProgressXXXFormUnit.pas' {CProgressXXXForm};
 
 {$R *.res}
 
@@ -196,7 +197,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

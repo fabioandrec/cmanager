@@ -175,8 +175,8 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
-  CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils;
-
+     CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
+     CProgressXXXFormUnit;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -404,6 +404,7 @@ begin
     end;
   end;
   ActionImportCurrencyRates.Enabled := GDataProvider.IsConnected;
+  ActionCompact.Enabled := GDataProvider.IsConnected;
   ActionImportExtraction.Enabled := GDataProvider.IsConnected;
   ActionImportStockExchanges.Enabled := GDataProvider.IsConnected;
   TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[1]).Visible := GDataProvider.IsConnected;
@@ -485,6 +486,7 @@ begin
     FActiveFrame := Nil;
     FinalizeDataProvider(GDataProvider);
     UpdateStatusbar;
+    Refresh;
   end;
 end;
 
@@ -499,6 +501,7 @@ begin
     end else if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
+      Refresh;
     end;
   end;
 end;
@@ -512,6 +515,7 @@ begin
     if xStatus = iprSuccess then begin
       ActionShortcutExecute(ActionShortcutStart);
       UpdateStatusbar;
+      Refresh;
     end;
   end;
 end;
@@ -523,26 +527,26 @@ end;
 
 procedure TCMainForm.ActionCompactExecute(Sender: TObject);
 begin
-  ShowProgressForm(TCCompactDatafileForm);
+  CProgressXXXFormUnit.ShowProgressForm(TCCompactDatafileForm, GDataProvider);
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);
 var xOperation: TArchOperation;
 begin
   xOperation := aoBackup;
-  ShowProgressForm(TCArchForm, @xOperation);
+  CProgressFormUnit.ShowProgressForm(TCArchForm, @xOperation);
 end;
 
 procedure TCMainForm.ActionRestoreExecute(Sender: TObject);
 var xOperation: TArchOperation;
 begin
   xOperation := aoRestore;
-  ShowProgressForm(TCArchForm, @xOperation);
+  CProgressFormUnit.ShowProgressForm(TCArchForm, @xOperation);
 end;
 
 procedure TCMainForm.ActionCheckDatafileExecute(Sender: TObject);
 begin
-  ShowProgressForm(TCCheckDatafileFormUnit);
+  CProgressXXXFormUnit.ShowProgressForm(TCCheckDatafileForm, GDataProvider);
 end;
 
 procedure TCMainForm.ActionPreferencesExecute(Sender: TObject);
@@ -601,7 +605,7 @@ end;
 
 procedure TCMainForm.ActionExportExecute(Sender: TObject);
 begin
-  ShowProgressForm(TCExportDatafileForm);
+  CProgressFormUnit.ShowProgressForm(TCExportDatafileForm);
 end;
 
 procedure TCMainForm.ActionRandomExecute(Sender: TObject);
@@ -800,7 +804,7 @@ end;
 
 procedure TCMainForm.ActionImportDatafileExecute(Sender: TObject);
 begin
-  ShowProgressForm(TCImportDatafileForm);
+  CProgressFormUnit.ShowProgressForm(TCImportDatafileForm);
 end;
 
 procedure TCMainForm.ActionXslExecute(Sender: TObject);

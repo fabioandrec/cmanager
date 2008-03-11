@@ -14,7 +14,6 @@ type
   TCInitializeProviderForm = class(TCConfigForm)
     EditPassword: TEdit;
     Image1: TImage;
-    Label1: TLabel;
     Label2: TLabel;
     LabelFilename: TLabel;
   private

@@ -66,7 +66,7 @@ object CProgressForm: TCProgressForm
       Top = 0
       Width = 499
       Height = 171
-      ActivePage = TabSheetWork
+      ActivePage = TabSheetEnd
       Align = alClient
       Style = tsFlatButtons
       TabOrder = 0

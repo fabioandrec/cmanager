@@ -1,17 +1,17 @@
 inherited CUpdateDatafileForm: TCUpdateDatafileForm
-  Left = 392
-  Top = 178
+  Left = 179
+  Top = 207
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager'
-  ClientHeight = 191
-  ClientWidth = 426
+  ClientHeight = 172
+  ClientWidth = 406
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object LabelInfo: TLabel
-    Left = 84
+    Left = 68
     Top = 20
     Width = 127
     Height = 13
@@ -24,31 +24,30 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     ParentFont = False
   end
   object LabelFinish: TLabel
-    Left = 84
-    Top = 48
+    Left = 68
+    Top = 40
     Width = 313
     Height = 57
     AutoSize = False
     Caption = 
       'CManager wykry'#322', '#380'e chcesz otworzy'#263' plik danych wersji %s. Wybra' +
-      'ny plik musi zosta'#263' uaktualniony do wersji %s. Je'#380'eli zrezygnuje' +
-      'sz z uaktualnienia plik danych nie zostanie otwarty. Aby rozpocz' +
-      #261#263' wci'#347'nij przycisk "Uaktualnij".'
+      'ny plik musi zosta'#263' uaktualniony do wersji %s. Aby rozpocz'#261#263' wci' +
+      #347'nij przycisk "Uaktualnij".'
     WordWrap = True
   end
   object PanelButtons: TPanel
     Left = 0
-    Top = 150
-    Width = 426
+    Top = 131
+    Width = 406
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      426
+      406
       41)
     object BitBtnNext: TBitBtn
-      Left = 249
+      Left = 229
       Top = 8
       Width = 75
       Height = 25
@@ -58,7 +57,7 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
       OnClick = BitBtnNextClick
     end
     object BitBtnFinish: TBitBtn
-      Left = 337
+      Left = 317
       Top = 8
       Width = 75
       Height = 25
@@ -72,7 +71,7 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     Left = 0
     Top = 0
     Width = 62
-    Height = 150
+    Height = 131
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 1
@@ -86,8 +85,8 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     end
   end
   object CStaticDesc: TCStatic
-    Left = 87
-    Top = 114
+    Left = 68
+    Top = 98
     Width = 318
     Height = 21
     AutoSize = False
@@ -104,8 +103,8 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     HotTrack = True
   end
   object ProgressBar: TProgressBar
-    Left = 87
-    Top = 114
+    Left = 68
+    Top = 98
     Width = 318
     Height = 21
     Max = 4

@@ -1,28 +1,28 @@
 inherited CCreateDatafileForm: TCCreateDatafileForm
-  Left = 102
-  Top = 36
+  Left = 138
+  Top = 19
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager'
-  ClientHeight = 191
-  ClientWidth = 426
+  ClientHeight = 172
+  ClientWidth = 401
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object PanelButtons: TPanel
     Left = 0
-    Top = 150
-    Width = 426
+    Top = 131
+    Width = 401
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      426
+      401
       41)
     object BitBtnNext: TBitBtn
-      Left = 249
+      Left = 224
       Top = 8
       Width = 75
       Height = 25
@@ -32,7 +32,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       OnClick = BitBtnNextClick
     end
     object BitBtnFinish: TBitBtn
-      Left = 337
+      Left = 312
       Top = 8
       Width = 75
       Height = 25
@@ -42,7 +42,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       OnClick = BitBtnFinishClick
     end
     object BitBtnPrev: TBitBtn
-      Left = 161
+      Left = 136
       Top = 8
       Width = 75
       Height = 25
@@ -56,7 +56,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
     Left = 0
     Top = 0
     Width = 62
-    Height = 150
+    Height = 131
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 1
@@ -72,9 +72,9 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
   object PageControl: TPageControl
     Left = 62
     Top = 0
-    Width = 364
-    Height = 150
-    ActivePage = TabSheetFinish
+    Width = 339
+    Height = 131
+    ActivePage = TabSheetDatafile
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 2
@@ -83,7 +83,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       Enabled = False
       TabVisible = False
       object Label2: TLabel
-        Left = 16
+        Left = 0
         Top = 12
         Width = 224
         Height = 13
@@ -96,8 +96,8 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         ParentFont = False
       end
       object Label3: TLabel
-        Left = 16
-        Top = 40
+        Left = 0
+        Top = 32
         Width = 299
         Height = 52
         Caption = 
@@ -113,7 +113,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       ImageIndex = 1
       TabVisible = False
       object Label1: TLabel
-        Left = 16
+        Left = 0
         Top = 12
         Width = 141
         Height = 13
@@ -126,8 +126,8 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         ParentFont = False
       end
       object Label4: TLabel
-        Left = 16
-        Top = 40
+        Left = 0
+        Top = 32
         Width = 321
         Height = 39
         AutoSize = False
@@ -137,18 +137,10 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
           'a masz tylko Ty.'
         WordWrap = True
       end
-      object Label8: TLabel
-        Left = 15
-        Top = 110
-        Width = 17
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Plik'
-      end
       object CStaticName: TCStatic
-        Left = 40
-        Top = 106
-        Width = 294
+        Left = 2
+        Top = 90
+        Width = 320
         Height = 21
         AutoSize = False
         BevelKind = bkTile
@@ -168,7 +160,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       ImageIndex = 2
       TabVisible = False
       object Label5: TLabel
-        Left = 16
+        Left = 0
         Top = 12
         Width = 84
         Height = 13
@@ -181,8 +173,8 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         ParentFont = False
       end
       object Label6: TLabel
-        Left = 16
-        Top = 40
+        Left = 0
+        Top = 32
         Width = 305
         Height = 52
         Caption = 
@@ -192,18 +184,10 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
           'taw poni'#380'sze pole puste.'
         WordWrap = True
       end
-      object Label7: TLabel
-        Left = 15
-        Top = 110
-        Width = 29
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Has'#322'o'
-      end
       object EditPassword: TEdit
-        Left = 53
-        Top = 106
-        Width = 281
+        Left = 2
+        Top = 90
+        Width = 320
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -217,7 +201,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       ImageIndex = 3
       TabVisible = False
       object Label9: TLabel
-        Left = 16
+        Left = 0
         Top = 12
         Width = 131
         Height = 13
@@ -230,20 +214,19 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         ParentFont = False
       end
       object Label10: TLabel
-        Left = 16
-        Top = 40
-        Width = 305
+        Left = 0
+        Top = 32
+        Width = 281
         Height = 57
         AutoSize = False
         Caption = 
           'Mo'#380'esz wype'#322'ni'#263' nowy plik danych domy'#347'ln'#261' zawarto'#347'ci'#261'. Dzi'#281'ki te' +
-          'mu nie b'#281'dziesz musia'#322' tworzy'#263' podstawowych kategorii, automatyc' +
-          'znie zostan'#261' utworzone konta oraz kontrahenci. '
+          'mu nie b'#281'dziesz musia'#322' tworzy'#263' podstawowych danych.'
         WordWrap = True
       end
       object CButtonShowDefault: TCButton
-        Left = 65
-        Top = 77
+        Left = 28
+        Top = 56
         Width = 224
         Height = 18
         Cursor = crHandPoint
@@ -256,9 +239,9 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         Color = clBtnFace
       end
       object ComboBoxDefault: TComboBox
-        Left = 19
-        Top = 106
-        Width = 318
+        Left = 2
+        Top = 90
+        Width = 320
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -276,7 +259,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       ImageIndex = 4
       TabVisible = False
       object LabelInfo: TLabel
-        Left = 16
+        Left = 0
         Top = 12
         Width = 197
         Height = 13
@@ -289,8 +272,8 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         ParentFont = False
       end
       object LabelFinish: TLabel
-        Left = 16
-        Top = 40
+        Left = 0
+        Top = 32
         Width = 313
         Height = 57
         AutoSize = False
@@ -301,9 +284,9 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         WordWrap = True
       end
       object CStaticDesc: TCStatic
-        Left = 19
-        Top = 106
-        Width = 318
+        Left = 2
+        Top = 90
+        Width = 320
         Height = 21
         AutoSize = False
         BevelKind = bkTile
@@ -319,9 +302,9 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         HotTrack = True
       end
       object ProgressBar: TProgressBar
-        Left = 19
-        Top = 106
-        Width = 318
+        Left = 2
+        Top = 90
+        Width = 320
         Height = 21
         Max = 7
         Smooth = True
