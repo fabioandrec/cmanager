@@ -11,9 +11,11 @@ const
   CIMAGE_OK = 0;
   CIMAGE_ERROR = 1;
   CIMAGE_WARNING = 2;
+  CIMAGE_UNKNOWN = 3;
 
 type
   TProgressClass = class of TCProgressForm;
+  TDoWorkResult = (dwrUnknown, dwrSuccess, dwrWarning, dwrError);
 
   TWaitType = (wtProgressbar, wtAnimate);
 
@@ -23,6 +25,10 @@ type
     FWaitHandle: THandle;
     FCurLeft: Integer;
     FCurWidth: Integer;
+    FBtnFaceBrush: HBRUSH;
+    FHighliteBrush: HBRUSH;
+    FImage: TBitmap;
+    FImageRect: TRect;
   protected
     procedure DoAnimate;
     procedure Execute; override;
@@ -32,23 +38,29 @@ type
     property WaitHandle: THandle read FWaitHandle write FWaitHandle;
   end;
 
+  TCProgressAdditionalData = class(TObject)
+  end;
+
+  TCProgressSimpleAdditionalData = class(TCProgressAdditionalData)
+  private
+    FData: TObject;
+  public
+    constructor Create(AData: TObject);
+    property Data: TObject read FData;
+  end;
+
   TCProgressForm = class(TForm)
     PanelButtons: TPanel;
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
-    PanelConfig: TPanel;
-    PageControl: TPageControl;
-    TabSheetStart: TTabSheet;
-    TabSheetWork: TTabSheet;
-    TabSheetEnd: TTabSheet;
-    StaticText: TStaticText;
-    ProgressBar: TProgressBar;
     PngImageList: TPngImageList;
-    CImageStart: TCImage;
-    CImageWork: TCImage;
-    CImageEnd: TCImage;
+    PanelImage: TPanel;
+    CImage: TCImage;
+    ProgressText: TStaticText;
+    ProgressBar: TProgressBar;
+    LabelInfo: TLabel;
+    LabelDescription: TLabel;
     CStaticDesc: TCStatic;
-    LabelEnd: TLabel;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -60,6 +72,8 @@ type
     FWaitHandle: THandle;
     FWaitType: TWaitType;
     FReport: TStringList;
+    FDoWorkResult: TDoWorkResult;
+    FAdditionalData: TCProgressAdditionalData;
     procedure InitializeProgress(AWaitType: TWaitType; AMin: Integer = 0; AMax: Integer = 100);
     procedure FinalizeProgress;
     function GetDisabled: Boolean;
@@ -68,18 +82,24 @@ type
     procedure InitializeForm; virtual;
     function GetMin: Integer; virtual;
     function GetMax: Integer; virtual;
+    function GetAutoclose: Boolean; virtual;
+    function GetFormTitle: String; virtual;
     function GetProgressType: TWaitType; virtual;
-    function DoWork: Boolean; virtual;
-    procedure NextTab;
+    function DoWork: TDoWorkResult; virtual; abstract;
     procedure AddToReport(AText: String);
     function CanAccept: Boolean; virtual;
-    procedure ShowProgress(AAdditionalData: Pointer = Nil); virtual;
+    function ShowProgress(AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult; virtual;
+    procedure InitializeLabels; virtual; abstract;
+    procedure FinalizeLabels; virtual; abstract;
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
     property Report: TStringList read FReport;
+    property DoWorkResult: TDoWorkResult read FDoWorkResult write FDoWorkResult;
+    property AdditionalData: TCProgressAdditionalData read FAdditionalData write FAdditionalData;
+    destructor Destroy; override;
   end;
 
-procedure ShowProgressForm(AClass: TProgressClass; AAdditionalData: Pointer = Nil);
+function ShowProgressForm(AClass: TProgressClass; AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult;
 
 implementation
 
@@ -99,68 +119,70 @@ end;
 
 procedure TWaitThread.DoAnimate;
 var xDC: HDC;
-    xBrush: HBRUSH;
 begin
-  xDC := GetDC(FProgress.Handle);
-  try
-    xBrush := CreateSolidBrush(ColorToRGB(clBtnFace));
-    FillRect(xDC, Rect(0, 1, FProgress.Width - 1, FProgress.Height - 3), xBrush);
-    DeleteObject(xBrush);
-    xBrush := CreateSolidBrush(ColorToRGB(clHighlight));
+  with FImage.Canvas do begin
+    Brush.Color := clBtnFace;
+    FillRect(Rect(0, 0, FProgress.Width, FProgress.Height));
     if FCurWidth < (FProgress.Width div 2) then begin
       Inc(FCurWidth);
     end else begin
-      if FCurLeft > FProgress.Width - 4 then begin
+      if FCurLeft > FProgress.Width - 3 then begin
         FCurLeft := 1;
         FCurWidth := 0;
       end else begin
         Inc(FCurLeft);
       end;
     end;
-    FillRect(xDC, Rect(FCurLeft, 1, Min(FCurLeft + FCurWidth - 1, FProgress.Width - 4), FProgress.Height - 3), xBrush);
-    DeleteObject(xBrush);
+    Brush.Color := clHighlight;
+    FillRect(Rect(FCurLeft, 1, Min(FCurLeft + FCurWidth, FProgress.Width - 3), FProgress.Height - 3));
+  end;
+  xDC := GetDC(FProgress.Handle);
+  try
+    BitBlt(xDC, 0, 0, FProgress.Width, FProgress.Height, FImage.Canvas.Handle, 0, 0, SRCCOPY);
   finally
     ReleaseDC(FProgress.Handle, xDC);
   end;
+  InvalidateRect(FProgress.Handle, Nil, True);
 end;
 
 procedure TWaitThread.Execute;
 var xRes: Integer;
 begin
+  FBtnFaceBrush := CreateSolidBrush(ColorToRGB(clBtnFace));
+  FHighliteBrush := CreateSolidBrush(ColorToRGB(clHighlight));
+  FImage := TBitmap.Create;
+  FImage.Width := FProgress.Width;
+  FImage.Height := FProgress.Height;
+  FImageRect := Rect(0, 0, FProgress.Width, FProgress.Height);
   while not Terminated do begin
     xRes := WaitForSingleObject(FWaitHandle, 5);
     if xRes = WAIT_TIMEOUT then begin
       DoAnimate;
     end;
   end;
+  FImage.Free;
+  DeleteObject(FBtnFaceBrush);
+  DeleteObject(FHighliteBrush);
 end;
 
 procedure TCProgressForm.BitBtnOkClick(Sender: TObject);
-var xRes: Boolean;
 begin
   if CanAccept then begin
-    NextTab;
     Disabled := True;
     InitializeProgress(GetProgressType, GetMin, GetMax);
-    xRes := DoWork;
+    InitializeLabels;
+    FDoWorkResult := DoWork;
     FinalizeProgress;
-    NextTab;
-    if xRes then begin
-      CImageEnd.ImageIndex := CIMAGE_OK;
-    end else begin
-      CImageEnd.ImageIndex := CIMAGE_ERROR;
+    FinalizeLabels;
+    if (FDoWorkResult = dwrSuccess) and GetAutoclose then begin
+      ModalResult := mrOk;
     end;
-    Disabled := False;
-    BitBtnOk.Visible := False;
-    BitBtnCancel.Caption := '&Zamknij';
-    BitBtnCancel.Default := True;
-    BitBtnCancel.SetFocus;
   end;
 end;
 
 procedure TCProgressForm.FinalizeProgress;
 begin
-  StaticText.Visible := False;
+  ProgressText.Visible := False;
   ProgressBar.Visible := False;
   if FWaitType = wtAnimate then begin
     FWaitThread.Terminate;
@@ -168,6 +190,21 @@ begin
     FWaitThread.WaitFor;
     FWaitThread.Free;
   end;
+  if FDoWorkResult = dwrSuccess then begin
+    CImage.ImageIndex := CIMAGE_OK;
+  end else if FDoWorkResult = dwrWarning then begin
+    CImage.ImageIndex := CIMAGE_WARNING;
+  end else if FDoWorkResult = dwrError then begin
+    CImage.ImageIndex := CIMAGE_ERROR;
+  end else begin
+    CImage.ImageIndex := CIMAGE_UNKNOWN;
+  end;
+  Disabled := False;
+  BitBtnOk.Visible := False;
+  CStaticDesc.Visible := True;
+  BitBtnCancel.Caption := '&Wyjœcie';
+  BitBtnCancel.Default := True;
+  BitBtnCancel.SetFocus;
 end;
 
 function TCProgressForm.GetDisabled: Boolean;
@@ -190,15 +227,15 @@ begin
   FWaitType := AWaitType;
   if AWaitType = wtProgressbar then begin
     ProgressBar.Visible := True;
-    StaticText.Visible := False;
+    ProgressText.Visible := False;
     ProgressBar.Min := AMin;
     ProgressBar.Position := AMin;
     ProgressBar.Max := AMax;
   end else begin
     ProgressBar.Visible := False;
-    StaticText.Visible := True;
+    ProgressText.Visible := True;
     FWaitHandle := CreateEvent(Nil, True, False, Nil);
-    FWaitThread := TWaitThread.Create(FWaitHandle, StaticText);
+    FWaitThread := TWaitThread.Create(FWaitHandle, ProgressText);
     FWaitThread.Resume;
   end;
 end;
@@ -217,13 +254,14 @@ begin
     xOpt := MF_ENABLED;
   end;
   EnableMenuItem(hMenu, SC_CLOSE, xOpt);
+  Refresh;
 end;
 
-procedure ShowProgressForm(AClass: TProgressClass; AAdditionalData: Pointer = Nil);
+function ShowProgressForm(AClass: TProgressClass; AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult;
 var xForm: TCProgressForm;
 begin
   xForm := AClass.Create(Nil);
-  xForm.ShowProgress(AAdditionalData);
+  Result := xForm.ShowProgress(AAdditionalData);
   xForm.Free;
 end;
 
@@ -234,20 +272,16 @@ end;
 
 procedure TCProgressForm.FormCreate(Sender: TObject);
 begin
-  PageControl.ActivePageIndex := 0;
-  StaticText.Visible := False;
+  ProgressText.Visible := False;
   ProgressBar.Visible := False;
   FReport := TStringList.Create;
 end;
 
-procedure TCProgressForm.NextTab;
-begin
-  PageControl.ActivePageIndex := PageControl.ActivePageIndex + 1;
-  PageControl.ActivePage.Refresh;
-end;
-
 procedure TCProgressForm.InitializeForm;
 begin
+  FDoWorkResult := dwrUnknown;
+  CImage.ImageIndex := CIMAGE_UNKNOWN;
+  Caption := GetFormTitle;
 end;
 
 procedure TCProgressForm.FormDestroy(Sender: TObject);
@@ -260,11 +294,6 @@ begin
   FReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + AText);
 end;
 
-function TCProgressForm.DoWork: Boolean;
-begin
-  Result := True;
-end;
-
 function TCProgressForm.GetProgressType: TWaitType;
 begin
   Result := wtAnimate;
@@ -275,10 +304,12 @@ begin
   Result := True;
 end;
 
-procedure TCProgressForm.ShowProgress(AAdditionalData: Pointer = Nil);
+function TCProgressForm.ShowProgress(AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult;
 begin
- InitializeForm;
- ShowModal;
+  FAdditionalData := AAdditionalData;
+  InitializeForm;
+  ShowModal;
+  Result := FDoWorkResult;
 end;
 
 procedure TCProgressForm.CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -292,6 +323,30 @@ begin
   if Key = VK_ESCAPE then begin
     BitBtnCancel.Click;
   end;
+end;
+
+function TCProgressForm.GetAutoclose: Boolean;
+begin
+  Result := False;
+end;
+
+function TCProgressForm.GetFormTitle: String;
+begin
+  Result := 'CManager';
+end;
+
+destructor TCProgressForm.Destroy;
+begin
+  if FAdditionalData <> Nil then begin
+    FAdditionalData.Free;
+  end;
+  inherited Destroy;
+end;
+
+constructor TCProgressSimpleAdditionalData.Create(AData: TObject);
+begin
+  inherited Create;
+  FData := AData;
 end;
 
 end.

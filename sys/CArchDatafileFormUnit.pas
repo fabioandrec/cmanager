@@ -6,7 +6,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CProgressXXXFormUnit, ImgList, PngImageList, ComCtrls,
+  Dialogs, CProgressFormUnit, ImgList, PngImageList, ComCtrls,
   CComponents, StdCtrls, Buttons, ExtCtrls, CDatabase;
 
 type
@@ -20,7 +20,7 @@ type
     property Operation: TArchOperation read FOperation;
   end;
 
-  TCArchDatafileForm = class(TCProgressXXXForm)
+  TCArchDatafileForm = class(TCProgressForm)
     CStaticFilename: TCStatic;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;

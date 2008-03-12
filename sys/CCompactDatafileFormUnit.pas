@@ -6,11 +6,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CProgressXXXFormUnit, ImgList, PngImageList, ComCtrls,
+  Dialogs, CProgressFormUnit, ImgList, PngImageList, ComCtrls,
   CComponents, StdCtrls, Buttons, ExtCtrls, CDatabase;
 
 type
-  TCCompactDatafileForm = class(TCProgressXXXForm)
+  TCCompactDatafileForm = class(TCProgressForm)
   private
     FDataProvider: TDataProvider;
   protected

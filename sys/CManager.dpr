@@ -139,7 +139,6 @@ uses
   CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
   CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
   CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
-  CProgressXXXFormUnit in 'CProgressXXXFormUnit.pas' {CProgressXXXForm},
   CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm};
 
 {$R *.res}

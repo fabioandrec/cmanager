@@ -1,6 +1,6 @@
 inherited CCompactDatafileForm: TCCompactDatafileForm
-  Left = 835
-  Top = 49
+  Left = 231
+  Top = 191
   Caption = 'CCompactDatafileForm'
   ClientHeight = 137
   PixelsPerInch = 96
