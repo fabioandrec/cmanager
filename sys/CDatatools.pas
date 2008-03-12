@@ -7,7 +7,6 @@ interface
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
      DateUtils, AdoDb, VirtualTrees, CXml, Db;
 
-function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
@@ -102,51 +101,6 @@ begin
     xQuiet := '';
   end;
   ShellExecute(0, 'open', PChar('cupdate.exe'), PChar(xQuiet), '.', SW_SHOW)
-end;
-
-function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
-var xError, xDesc: String;
-    xStr: TStringList;
-    xCount: Integer;
-    xMin, xMax: Integer;
-begin
-  Result := InitializeDataProvider(AFilename, '', GDataProvider) = iprSuccess;
-  if Result then begin
-    xStr := TStringList.Create;
-    try
-      try
-        xMin := Low(CDatafileTables);
-        xCount := xMin;
-        xMax := High(CDatafileTables);
-        while (xCount <= xMax) and Result do begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Eksportowanie tabeli ' + CDatafileTables[xCount]);
-          if CDatafileDeletes[xCount] <> '' then begin
-            xStr.Add('delete from ' + CDatafileDeletes[xCount] + ';');
-          end;
-          Result := GDataProvider.ExportTable(CDatafileTables[xCount], CDatafileTablesExportConditions[xCount], xStr);
-          if not Result then begin
-            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + DbLastError);
-            AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + DbLastStatement + '"');
-            AError := DbLastError;
-          end;
-          Inc(xCount);
-          AProgressEvent(Trunc(100 * xCount/(xMax - xMin)));
-        end;
-        xStr.SaveToFile(ATargetFile);
-      except
-        on E: Exception do begin
-          Result := False;
-          AError := E.Message;
-        end;
-      end;
-    finally
-      xStr.Free;
-      FinalizeDataProvider(GDataProvider);
-    end;
-  end else begin
-    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
-    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
-  end;
 end;
 
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);

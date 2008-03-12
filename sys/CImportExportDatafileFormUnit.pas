@@ -96,7 +96,7 @@ begin
           if CDatafileDeletes[xCount] <> '' then begin
             xStr.Add('delete from ' + CDatafileDeletes[xCount] + ';');
           end;
-          if not FDataProvider.ExportTable(CDatafileTables[xCount], CDatafileTablesExportConditions[xCount], xStr) then begin
+          if not FDataProvider.ExportTable(CDatafileTables[xCount], CDatafileTablesExportConditions[xCount], CDatafileTablesExportOrders[xCount], xStr) then begin
             AddToReport('Podczas eksportu wyst¹pi³ b³¹d ' + DbLastError);
             AddToReport('Wykonywana komenda "' + DbLastStatement + '"');
             xOk := False;

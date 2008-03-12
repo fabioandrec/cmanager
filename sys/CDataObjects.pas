@@ -988,6 +988,15 @@ const CDatafileDeletes: array[0..25] of string =
              'cmanagerParams', '', '', '',
              '', '', '', '', '', '');
 
+const CDatafileTablesExportOrders: array[0..25] of string =
+            ('', '', '', '', '',
+             'created', '', '',
+             '', '', '', '',
+             '', '', '', '',
+             '', '', '', 
+             '', '', '',
+             '', '', '', '');
+
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
 procedure InitializeProxies(ADataProvider: TDataProvider);

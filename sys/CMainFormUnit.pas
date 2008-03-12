@@ -31,7 +31,7 @@ type
     ActionCreateConnection: TAction;
     ActionShortcutFilters: TAction;
     ActionShortcutStart: TAction;
-    ActionCompact: TAction;
+    ActionCompactDatafile: TAction;
     ActionHelp: TAction;
     PanelNotconnected: TPanel;
     PanelMain: TPanel;
@@ -53,7 +53,7 @@ type
     ActionShortcutProfiles: TAction;
     ActionLoanCalc: TAction;
     ActionCheckUpdates: TAction;
-    ActionExport: TAction;
+    ActionExportDatafile: TAction;
     ActionRandom: TAction;
     ActionShortcutLimits: TAction;
     ActionShortcutCurrencydef: TAction;
@@ -95,7 +95,7 @@ type
     procedure ActionOpenConnectionExecute(Sender: TObject);
     procedure ActionCreateConnectionExecute(Sender: TObject);
     procedure ActionHelpExecute(Sender: TObject);
-    procedure ActionCompactExecute(Sender: TObject);
+    procedure ActionCompactDatafileExecute(Sender: TObject);
     procedure ActionBackupExecute(Sender: TObject);
     procedure ActionRestoreExecute(Sender: TObject);
     procedure ActionCheckDatafileExecute(Sender: TObject);
@@ -103,7 +103,7 @@ type
     procedure ActionLoanCalcExecute(Sender: TObject);
     procedure ActionCheckUpdatesExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure ActionExportExecute(Sender: TObject);
+    procedure ActionExportDatafileExecute(Sender: TObject);
     procedure ActionRandomExecute(Sender: TObject);
     procedure StatusBarClick(Sender: TObject);
     procedure ActionImportCurrencyRatesExecute(Sender: TObject);
@@ -169,7 +169,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
      CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
-     CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
+     CRandomFormUnit, CLimitsFrameUnit,
      CMemoFormUnit, CCurrencydefFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts,
      CExtractionsFrameUnit, CInstrumentFrameUnit,
@@ -403,10 +403,14 @@ begin
       xAction.Visible := GDataProvider.IsConnected;
     end;
   end;
-  ActionImportCurrencyRates.Enabled := GDataProvider.IsConnected;
-  ActionCompact.Enabled := GDataProvider.IsConnected;
-  ActionImportExtraction.Enabled := GDataProvider.IsConnected;
-  ActionImportStockExchanges.Enabled := GDataProvider.IsConnected;
+  ActionImportCurrencyRates.Visible := GDataProvider.IsConnected;
+  ActionCompactDatafile.Visible := GDataProvider.IsConnected;
+  ActionRandom.Visible := GDataProvider.IsConnected;
+  ActionCheckDatafile.Visible := GDataProvider.IsConnected;
+  ActionImportDatafile.Visible := GDataProvider.IsConnected;
+  ActionExportDatafile.Visible := GDataProvider.IsConnected;
+  ActionImportExtraction.Visible := GDataProvider.IsConnected;
+  ActionImportStockExchanges.Visible := GDataProvider.IsConnected;
   TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[1]).Visible := GDataProvider.IsConnected;
   TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[3]).Visible := GDataProvider.IsConnected;
   ActionShortcuts.Visible := GDataProvider.IsConnected;
@@ -525,7 +529,7 @@ begin
   HelpShowDefault;
 end;
 
-procedure TCMainForm.ActionCompactExecute(Sender: TObject);
+procedure TCMainForm.ActionCompactDatafileExecute(Sender: TObject);
 begin
   CProgressXXXFormUnit.ShowProgressForm(TCCompactDatafileForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
 end;
@@ -603,7 +607,7 @@ begin
   HelpCloseAll;
 end;
 
-procedure TCMainForm.ActionExportExecute(Sender: TObject);
+procedure TCMainForm.ActionExportDatafileExecute(Sender: TObject);
 begin
   CProgressXXXFormUnit.ShowProgressForm(TCImportExportDatafileForm, TCImportExportAdditionalData.Create(GDataProvider, ieoExport));
 end;

@@ -309,11 +309,11 @@ object CMainForm: TCMainForm
               item
                 Items = <
                   item
-                    Action = ActionCompact
+                    Action = ActionCompactDatafile
                     Caption = '&Kompaktuj plik danych'
                   end
                   item
-                    Action = ActionExport
+                    Action = ActionExportDatafile
                     Caption = '&Eksportuj plik danych'
                   end
                   item
@@ -548,15 +548,15 @@ object CMainForm: TCMainForm
       Caption = 'Filtry'
       ImageIndex = 8
     end
-    object ActionCompact: TAction
+    object ActionCompactDatafile: TAction
       Category = 'Plik'
       Caption = 'Kompaktuj plik danych'
-      OnExecute = ActionCompactExecute
+      OnExecute = ActionCompactDatafileExecute
     end
-    object ActionExport: TAction
+    object ActionExportDatafile: TAction
       Category = 'Plik'
       Caption = 'Eksportuj plik danych'
-      OnExecute = ActionExportExecute
+      OnExecute = ActionExportDatafileExecute
     end
     object ActionBackup: TAction
       Category = 'Plik'

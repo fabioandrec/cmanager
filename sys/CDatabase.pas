@@ -30,7 +30,7 @@ type
     function GetIsConnected: Boolean;
   public
     procedure ReloadCaches;
-    function ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
+    function ExportTable(ATableName: String; ACondition: String; AOrderBy: String; AStrings: TStringList): Boolean;
     procedure ClearProxies(AForceClearStatic: Boolean);
     function PostProxies(AOnlyThisGid: TDataGid = ''): Boolean;
     constructor Create;
@@ -621,7 +621,7 @@ begin
   ClearProxies(False);
 end;
 
-function TDataProvider.ExportTable(ATableName: String; ACondition: String; AStrings: TStringList): Boolean;
+function TDataProvider.ExportTable(ATableName: String; ACondition: String; AOrderBy: String; AStrings: TStringList): Boolean;
 var xDataset: TADOQuery;
     xStrSchema, xStr: String;
     xCount: Integer;
@@ -629,7 +629,10 @@ var xDataset: TADOQuery;
     xVal: String;
 begin
   Result := False;
-  xDataset := OpenSql('select * from ' + ATableName + IfThen(ACondition <> '', ' where ' + ACondition, ''), False);
+  xDataset := OpenSql('select * from ' + ATableName +
+                          IfThen(ACondition <> '', ' where ' + ACondition, '') +
+                          IfThen(AOrderBy <> '', ' order by ' + AOrderBy, ''),
+                          False);
   if xDataset <> Nil then begin
     Result := True;
     xStrSchema := 'insert into ' + ATableName + ' (';

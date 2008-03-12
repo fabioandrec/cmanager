@@ -353,16 +353,18 @@ inherited CImportExportDatafileForm: TCImportExportDatafileForm
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog
-    Filter = 'Pliki sql|*,sql|Wszystkie pliki|*.*'
+    DefaultExt = '.sql'
+    Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
     FilterIndex = 0
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 24
-    Top = 120
+    Left = 16
+    Top = 56
   end
   object SaveDialog: TSaveDialog
+    DefaultExt = '.sql'
     Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 64
-    Top = 123
+    Left = 48
+    Top = 59
   end
 end
