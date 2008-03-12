@@ -166,7 +166,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CReportsFrameUnit, CPlannedFrameUnit, CDoneFrameUnit,
      CAboutFormUnit, CSettings, CFilterFrameUnit, CHomeFrameUnit,
      CInfoFormUnit, CCompactDatafileFormUnit,
-     CProgressFormUnit, CConsts, CArchFormUnit, CCheckDatafileFormUnit,
+     CProgressFormUnit, CConsts, CArchDatafileFormUnit, CCheckDatafileFormUnit,
      CPreferencesFormUnit, CImageListsUnit, Types, CPreferences,
      CProfileFrameUnit, CLoanCalculatorFormUnit, CDatatools, CHelp,
      CRandomFormUnit, CLimitsFrameUnit,
@@ -535,17 +535,13 @@ begin
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);
-var xOperation: TArchOperation;
 begin
-  xOperation := aoBackup;
-  CProgressFormUnit.ShowProgressForm(TCArchForm, @xOperation);
+  CProgressXXXFormUnit.ShowProgressForm(TCArchDatafileForm, TCArchAdditionalData.Create(GDataProvider, aoBackup));
 end;
 
 procedure TCMainForm.ActionRestoreExecute(Sender: TObject);
-var xOperation: TArchOperation;
 begin
-  xOperation := aoRestore;
-  CProgressFormUnit.ShowProgressForm(TCArchForm, @xOperation);
+  CProgressXXXFormUnit.ShowProgressForm(TCArchDatafileForm, TCArchAdditionalData.Create(GDataProvider, aoRestore));
 end;
 
 procedure TCMainForm.ActionCheckDatafileExecute(Sender: TObject);

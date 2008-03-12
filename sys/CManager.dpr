@@ -67,7 +67,7 @@ uses
   CProgressFormUnit in 'CProgressFormUnit.pas' {CProgressForm},
   CCompactDatafileFormUnit in 'CCompactDatafileFormUnit.pas' {CCompactDatafileForm},
   CMemoFormUnit in 'CMemoFormUnit.pas',
-  CArchFormUnit in 'CArchFormUnit.pas' {CArchForm},
+  CArchDatafileFormUnit in 'CArchDatafileFormUnit.pas' {CArchDatafileForm},
   CImageListsUnit in 'CImageListsUnit.pas' {CImageLists: TDataModule},
   CCheckDatafileFormUnit in 'CCheckDatafileFormUnit.pas' {CCheckDatafileFormUnit},
   CPreferencesFormUnit in 'CPreferencesFormUnit.pas' {CPreferencesForm},

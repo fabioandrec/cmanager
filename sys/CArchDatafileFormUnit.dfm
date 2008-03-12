@@ -1,7 +1,7 @@
-inherited CImportExportDatafileForm: TCImportExportDatafileForm
+inherited CArchDatafileForm: TCArchDatafileForm
   Left = 522
   Top = 381
-  Caption = 'CImportExportDatafileForm'
+  Caption = 'CArchDatafileForm'
   ClientHeight = 137
   PixelsPerInch = 96
   TextHeight = 13
