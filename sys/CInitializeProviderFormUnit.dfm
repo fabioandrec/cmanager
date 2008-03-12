@@ -1,6 +1,6 @@
 inherited CInitializeProviderForm: TCInitializeProviderForm
-  Left = 272
-  Top = 296
+  Left = 250
+  Top = 378
   Caption = 'CManager'
   ClientHeight = 138
   ClientWidth = 350
@@ -85,7 +85,7 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
     end
     object Label2: TLabel
       Left = 68
-      Top = 18
+      Top = 20
       Width = 167
       Height = 13
       Caption = 'Podaj has'#322'o dost'#281'pu do pliku'

@@ -12,10 +12,10 @@ type
   TInitializeProviderResult = (iprSuccess, iprCancelled, iprError);
 
   TCInitializeProviderForm = class(TCConfigForm)
-    EditPassword: TEdit;
     Image1: TImage;
     Label2: TLabel;
     LabelFilename: TLabel;
+    EditPassword: TEdit;
   private
     FFilename: String;
     FTries: Integer;

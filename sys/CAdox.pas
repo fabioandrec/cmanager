@@ -4,13 +4,16 @@ interface
 
 uses ShellApi, SysUtils, Classes, ComObj, Variants, AdoDb;
 
+type
+  TDbExecuteSqlProgress = procedure (AMin, AMax, AStep: Integer) of Object;
+
 function DbCreateDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
 function DbCreateExcelFile(AFilename: String; var AError: String): OleVariant;
 function DbCompactDatabase(AFilename: String; APassword: String; var AError: String): Boolean;
 function DbChangeDatabasePassword(AFilename: String; APassword, ANewPassword: String; var AError: String): Boolean;
 function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean; overload;
 function DbConnectDatabase(AConnectionString: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean; overload;
-function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String): Boolean;
+function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String; ADbProgressEvent: TDbExecuteSqlProgress = Nil): Boolean;
 function DbOpenSql(AConnection: TADOConnection; ASql: String; var AErrorText: String): TADOQuery;
 
 var DbSqllogfile: String = '';
@@ -215,16 +218,21 @@ begin
   end;
 end;
 
-function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String): Boolean;
+function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String; ADbProgressEvent: TDbExecuteSqlProgress = Nil): Boolean;
 var xFinished: Boolean;
     xPos: Integer;
     xSql, xRemains: String;
+    xMax: Integer;
 begin
   Result := True;
   if Trim(ReplaceLinebreaks(ASql)) <> '' then begin
     xRemains := ASql;
     xFinished := False;
     if not AOneStatement then begin
+      xMax := Length(xRemains) - Length(StringReplace(xRemains, ';', '', [rfReplaceAll, rfIgnoreCase])) + 1;
+      if Assigned(ADbProgressEvent) then begin
+        ADbProgressEvent(0, xMax, 0);
+      end;
       repeat
         xPos := Pos(';', xRemains);
         if xPos > 0 then begin
@@ -237,8 +245,8 @@ begin
         if Trim(xSql) <> '' then begin
           try
             SaveToLog('Wykonywanie "' + xSql + '"', DbSqllogfile);
-            AConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
             DbLastStatement := xSql;
+            AConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
           except
             on E: Exception do begin
               AErrorText := E.Message;
@@ -248,13 +256,19 @@ begin
             end;
           end;
         end;
+        if Assigned(ADbProgressEvent) then begin
+          ADbProgressEvent(0, xMax, 1);
+        end;
       until xFinished;
     end else begin
+      if Assigned(ADbProgressEvent) then begin
+        ADbProgressEvent(0, 1, 0);
+      end;
       if Trim(ASql) <> '' then begin
         try
           SaveToLog('Wykonywanie "' + ASql + '"', DbSqllogfile);
-          AConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
           DbLastStatement := ASql;
+          AConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
         except
           on E: Exception do begin
             AErrorText := E.Message;
@@ -262,6 +276,9 @@ begin
             Result := False;
           end;
         end;
+      end;
+      if Assigned(ADbProgressEvent) then begin
+        ADbProgressEvent(0, 1, 1);
       end;
     end;
     if not Result then begin

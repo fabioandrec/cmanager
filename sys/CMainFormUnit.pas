@@ -172,11 +172,11 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CExportDatafileFormUnit, CRandomFormUnit, CLimitsFrameUnit,
      CMemoFormUnit, CCurrencydefFrameUnit,
      CCurrencyRateFrameUnit, CPlugins, CPluginConsts,
-     CExtractionsFrameUnit, CImportDatafileFormUnit, CInstrumentFrameUnit,
+     CExtractionsFrameUnit, CInstrumentFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
-     CProgressXXXFormUnit;
+     CProgressXXXFormUnit, CImportExportDatafileFormUnit;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -527,7 +527,7 @@ end;
 
 procedure TCMainForm.ActionCompactExecute(Sender: TObject);
 begin
-  CProgressXXXFormUnit.ShowProgressForm(TCCompactDatafileForm, GDataProvider);
+  CProgressXXXFormUnit.ShowProgressForm(TCCompactDatafileForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
 end;
 
 procedure TCMainForm.ActionBackupExecute(Sender: TObject);
@@ -546,7 +546,7 @@ end;
 
 procedure TCMainForm.ActionCheckDatafileExecute(Sender: TObject);
 begin
-  CProgressXXXFormUnit.ShowProgressForm(TCCheckDatafileForm, GDataProvider);
+  CProgressXXXFormUnit.ShowProgressForm(TCCheckDatafileForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
 end;
 
 procedure TCMainForm.ActionPreferencesExecute(Sender: TObject);
@@ -605,7 +605,7 @@ end;
 
 procedure TCMainForm.ActionExportExecute(Sender: TObject);
 begin
-  CProgressFormUnit.ShowProgressForm(TCExportDatafileForm);
+  CProgressXXXFormUnit.ShowProgressForm(TCImportExportDatafileForm, TCImportExportAdditionalData.Create(GDataProvider, ieoExport));
 end;
 
 procedure TCMainForm.ActionRandomExecute(Sender: TObject);
@@ -804,7 +804,7 @@ end;
 
 procedure TCMainForm.ActionImportDatafileExecute(Sender: TObject);
 begin
-  CProgressFormUnit.ShowProgressForm(TCImportDatafileForm);
+  CProgressXXXFormUnit.ShowProgressForm(TCImportExportDatafileForm, TCImportExportAdditionalData.Create(GDataProvider, ieoImport));
 end;
 
 procedure TCMainForm.ActionXslExecute(Sender: TObject);

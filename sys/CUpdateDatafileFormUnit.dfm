@@ -1,6 +1,6 @@
 inherited CUpdateDatafileForm: TCUpdateDatafileForm
-  Left = 179
-  Top = 207
+  Left = 341
+  Top = 379
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager'

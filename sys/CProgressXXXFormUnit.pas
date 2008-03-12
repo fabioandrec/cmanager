@@ -38,6 +38,17 @@ type
     property WaitHandle: THandle read FWaitHandle write FWaitHandle;
   end;
 
+  TCProgressAdditionalData = class(TObject)
+  end;
+
+  TCProgressSimpleAdditionalData = class(TCProgressAdditionalData)
+  private
+    FData: TObject;
+  public
+    constructor Create(AData: TObject);
+    property Data: TObject read FData;
+  end;
+
   TCProgressXXXForm = class(TForm)
     PanelButtons: TPanel;
     BitBtnOk: TBitBtn;
@@ -62,7 +73,7 @@ type
     FWaitType: TWaitType;
     FReport: TStringList;
     FDoWorkResult: TDoWorkResult;
-    FAdditionalData: Pointer;
+    FAdditionalData: TCProgressAdditionalData;
     procedure InitializeProgress(AWaitType: TWaitType; AMin: Integer = 0; AMax: Integer = 100);
     procedure FinalizeProgress;
     function GetDisabled: Boolean;
@@ -77,17 +88,18 @@ type
     function DoWork: TDoWorkResult; virtual; abstract;
     procedure AddToReport(AText: String);
     function CanAccept: Boolean; virtual;
-    function ShowProgress(AAdditionalData: Pointer = Nil): TDoWorkResult; virtual;
+    function ShowProgress(AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult; virtual;
     procedure InitializeLabels; virtual; abstract;
     procedure FinalizeLabels; virtual; abstract;
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
     property Report: TStringList read FReport;
     property DoWorkResult: TDoWorkResult read FDoWorkResult write FDoWorkResult;
-    property AdditionalData: Pointer read FAdditionalData write FAdditionalData;
+    property AdditionalData: TCProgressAdditionalData read FAdditionalData write FAdditionalData;
+    destructor Destroy; override;
   end;
 
-function ShowProgressForm(AClass: TProgressClass; AAdditionalData: Pointer = Nil): TDoWorkResult;
+function ShowProgressForm(AClass: TProgressClass; AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult;
 
 implementation
 
@@ -245,7 +257,7 @@ begin
   Refresh;
 end;
 
-function ShowProgressForm(AClass: TProgressClass; AAdditionalData: Pointer = Nil): TDoWorkResult;
+function ShowProgressForm(AClass: TProgressClass; AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult;
 var xForm: TCProgressXXXForm;
 begin
   xForm := AClass.Create(Nil);
@@ -292,7 +304,7 @@ begin
   Result := True;
 end;
 
-function TCProgressXXXForm.ShowProgress(AAdditionalData: Pointer = Nil): TDoWorkResult;
+function TCProgressXXXForm.ShowProgress(AAdditionalData: TCProgressAdditionalData = Nil): TDoWorkResult;
 begin
   FAdditionalData := AAdditionalData;
   InitializeForm;
@@ -321,6 +333,22 @@ end;
 function TCProgressXXXForm.GetFormTitle: String;
 begin
   Result := 'CManager';
+end;
+
+destructor TCProgressXXXForm.Destroy;
+begin
+  if FAdditionalData <> Nil then begin
+    FAdditionalData.Free;
+  end;
+  inherited Destroy;
+end;
+
+{ TCProgressSimpleAdditionalData }
+
+constructor TCProgressSimpleAdditionalData.Create(AData: TObject);
+begin
+  inherited Create;
+  FData := AData;
 end;
 
 end.

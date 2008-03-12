@@ -84,7 +84,7 @@ end;
 procedure TCCompactDatafileForm.InitializeForm;
 begin
   inherited InitializeForm;
-  FDataProvider := TDataProvider(AdditionalData);
+  FDataProvider := TDataProvider(TCProgressSimpleAdditionalData(AdditionalData).Data);
   LabelDescription.Caption := MinimizeName(FDataProvider.Filename, LabelDescription.Canvas, LabelDescription.Width);
 end;
 

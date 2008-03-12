@@ -8,15 +8,12 @@ uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBa
      DateUtils, AdoDb, VirtualTrees, CXml, Db;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
-function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
-function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
 function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
 procedure CheckForBackups;
-function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExchanges(AExchangesText: String);
@@ -74,77 +71,6 @@ begin
   end;
 end;
 
-function CheckDatabase(AFilename: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
-var xError, xDesc: String;
-    xAccounts: TDataObjectList;
-    xAccount: TAccount;
-    xInstrument: TInstrument;
-    xInvestments: TDataObjectList;
-    xInvestment: TInvestmentItem;
-    xStep, xCount: Integer;
-    xSum: Currency;
-    xSuspectedCount: Integer;
-begin
-  xSuspectedCount := 0;
-  Result := InitializeDataProvider(AFilename, '', GDataProvider) = iprSuccess;
-  if Result then begin
-    GDataProvider.BeginTransaction;
-    xAccounts := TAccount.GetAllObjects(AccountProxy);
-    xInvestments := TInvestmentItem.GetAllObjects(InvestmentItemProxy);
-    if xAccounts.Count > 0 then begin
-      xStep := Trunc(100 / (xAccounts.Count + xInvestments.Count));
-      for xCount := 0 to xAccounts.Count - 1 do begin
-        xAccount := TAccount(xAccounts.Items[xCount]);
-        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie konta ' + xAccount.name);
-        xSum := GDataProvider.GetSqlCurrency('select sum(cash) as cash from transactions where idAccount = ' + DataGidToDatabase(xAccount.id), 0);
-        if xSum + xAccount.initialBalance <> xAccount.cash then begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name +
-                  Format(' wynosi %.2f, powinien wynosiæ %.2f', [xAccount.cash, xSum + xAccount.initialBalance]));
-          xAccount.cash := xAccount.initialBalance + xSum;
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Zmodyfikowano stan konta ' + xAccount.name);
-          inc(xSuspectedCount);
-        end else begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan konta ' + xAccount.name + ' jest poprawny');
-        end;
-        AProgressEvent(xStep);
-      end;
-      for xCount := 0 to xInvestments.Count - 1 do begin
-        xInvestment := TInvestmentItem(xInvestments.Items[xCount]);
-        xAccount := TAccount(TAccount.LoadObject(AccountProxy, xInvestment.idAccount, False));
-        xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, xInvestment.idInstrument, False));
-        AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Sprawdzanie inwestycji ' + xAccount.name + ' - ' + xInstrument.name);
-        xSum := GDataProvider.GetSqlCurrency('select sum(quantity) as quantity from investments where idAccount = ' + DataGidToDatabase(xInvestment.idAccount) + ' and idInstrument = ' + DataGidToDatabase(xInvestment.idInstrument), 0);
-        if xSum <> xInvestment.quantity then begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name +
-                  Format(' wynosi %d, powinien wynosiæ %.0f', [xInvestment.quantity, xSum]));
-          xInvestment.quantity := Trunc(xSum);
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Zmodyfikowano stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name);
-          inc(xSuspectedCount);
-        end else begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name + ' jest poprawny');
-        end;
-        AProgressEvent(xStep);
-      end;
-    end;
-    if Result then begin
-      GDataProvider.CommitTransaction;
-    end else begin
-      GDataProvider.RollbackTransaction;
-    end;
-    xAccounts.Free;
-    xInvestments.Free;
-    FinalizeDataProvider(GDataProvider);
-    if xSuspectedCount = 0 then begin
-      AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Nie znaleziono ¿adnych nieprawid³owoœci');
-    end else begin
-      AReport.Add(FormatDateTime('hh:nn:ss', Now) + Format(' Skorygowano %d nieprawid³owoœci', [xSuspectedCount]));
-    end;
-  end else begin
-    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
-    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
-  end;
-end;
-
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 var xFilename: String;
 begin
@@ -176,58 +102,6 @@ begin
     xQuiet := '';
   end;
   ShellExecute(0, 'open', PChar('cupdate.exe'), PChar(xQuiet), '.', SW_SHOW)
-end;
-
-function CheckDatabaseStructure(AFrom, ATo: Integer; var xError: String): Boolean;
-var xResName: String;
-    xCommand: String;
-begin
-  Result := False;
-  try
-    xResName := Format('SQLUPD_%d_%d', [AFrom, ATo]);
-    xCommand := GetStringFromResources(xResName, RT_RCDATA);
-    Result := GDataProvider.ExecuteSql(xCommand, False);
-  except
-    on E: Exception do begin
-      xError := E.Message;
-    end;
-  end;
-end;
-
-function ImportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;
-var xError, xDesc: String;
-    xStr: TStringList;
-begin
-  Result := InitializeDataProvider(ATargetFile, '', GDataProvider) = iprSuccess;
-  if Result then begin
-    xStr := TStringList.Create;
-    try
-      try
-        xStr.LoadFromFile(AFilename);
-        GDataProvider.BeginTransaction;
-        Result := GDataProvider.ExecuteSql(xStr.Text, False);
-        if not Result then begin
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Podczas eksportu wyst¹pi³ b³¹d ' + DbLastError);
-          AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' Wykonywana komenda "' + DbLastStatement + '"');
-          AError := DbLastError;
-          GDataProvider.RollbackTransaction;
-        end else begin
-          GDataProvider.CommitTransaction;
-        end;
-      except
-        on E: Exception do begin
-          Result := False;
-          AError := E.Message;
-        end;
-      end;
-    finally
-      xStr.Free;
-      FinalizeDataProvider(GDataProvider);
-    end;
-  end else begin
-    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xError);
-    AReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + xDesc);
-  end;
 end;
 
 function ExportDatabase(AFilename, ATargetFile: String; var AError: String; var AReport: TStringList; AProgressEvent: TProgressEvent = Nil): Boolean;

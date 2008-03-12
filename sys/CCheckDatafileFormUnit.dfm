@@ -1,6 +1,6 @@
 inherited CCheckDatafileForm: TCCheckDatafileForm
-  Left = 417
-  Top = 49
+  Left = 108
+  Top = 24
   Caption = 'CCheckDatafileForm'
   ClientHeight = 137
   PixelsPerInch = 96

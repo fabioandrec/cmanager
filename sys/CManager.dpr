@@ -87,7 +87,6 @@ uses
   CHelp in 'CHelp.pas',
   CMovementListFormUnit in 'CMovementListFormUnit.pas' {CMovementListForm},
   CMovmentListElementFormUnit in 'CMovmentListElementFormUnit.pas' {CMovmentListElementForm},
-  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm},
   CDescpatternFormUnit in 'CDescpatternFormUnit.pas' {CDescpatternForm},
   CTemplates in 'CTemplates.pas',
   CDescTemplatesFrameUnit in 'CDescTemplatesFrameUnit.pas' {CDescTemplatesFrame: TFrame},
@@ -120,7 +119,6 @@ uses
   CAdotools in 'Shared\CAdotools.pas',
   CUnitDefFrameUnit in 'CUnitDefFrameUnit.pas' {CUnitDefFrame: TFrame},
   CUnitdefFormUnit in 'CUnitDefFormUnit.pas' {CUnitdefForm},
-  CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
   CReportDefFormUnit in 'CReportDefFormUnit.pas' {CReportDefForm},
   CBase64 in 'Shared\CBase64.pas',
   CParamsDefsFrameUnit in 'CParamsDefsFrameUnit.pas' {CParamsDefsFrame: TFrame},
@@ -141,7 +139,8 @@ uses
   CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
   CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
   CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
-  CProgressXXXFormUnit in 'CProgressXXXFormUnit.pas' {CProgressXXXForm};
+  CProgressXXXFormUnit in 'CProgressXXXFormUnit.pas' {CProgressXXXForm},
+  CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm};
 
 {$R *.res}
 

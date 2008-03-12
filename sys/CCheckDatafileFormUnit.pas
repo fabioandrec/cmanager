@@ -39,7 +39,6 @@ var xText: String;
     xSum: Currency;
 begin
   AddToReport('Rozpoczêcie wykonywania sprawdzania pliku danych...');
-  AddToReport('Sprawdzanie pliku danych...');
   try
     FDataProvider.BeginTransaction;
     xSuspectedCount := 0;
@@ -121,7 +120,7 @@ end;
 procedure TCCheckDatafileForm.InitializeForm;
 begin
   inherited InitializeForm;
-  FDataProvider := TDataProvider(AdditionalData);
+  FDataProvider := TDataProvider(TCProgressSimpleAdditionalData(AdditionalData).Data);
   LabelDescription.Caption := MinimizeName(FDataProvider.Filename, LabelDescription.Canvas, LabelDescription.Width);
 end;
 

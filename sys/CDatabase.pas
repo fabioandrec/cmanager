@@ -3,7 +3,7 @@ unit CDatabase;
 interface
 
 uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
-     Types, CComponents, AdoInt, CInitializeProviderFormUnit;
+     Types, CComponents, AdoInt, CInitializeProviderFormUnit, CAdox;
 
 type
   TDataGid = ShortString;
@@ -38,7 +38,7 @@ type
     procedure BeginTransaction;
     procedure RollbackTransaction;
     function CommitTransaction: Boolean;
-    function ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False): Boolean;
+    function ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False; ADbProgressEvent: TDbExecuteSqlProgress = Nil): Boolean;
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
     function GetSqlBoolean(ASql: String; ADefault: Boolean): Boolean;
@@ -240,7 +240,7 @@ procedure FinalizeDataProvider(ADataProvider: TDataProvider);
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
-     CPreferences, CTools, CAdox, CDataObjects,
+     CPreferences, CTools, CDataObjects,
      CAdotools, CUpdateDatafileFormUnit;
 
 function InitializeDataProvider(ADatabaseName: String; APassword: String; ADataProvider: TDataProvider): TInitializeProviderResult;
@@ -533,10 +533,10 @@ begin
   inherited Destroy;
 end;
 
-function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False): Boolean;
+function TDataProvider.ExecuteSql(ASql: String; AShowError: Boolean = True; AOneStatement: Boolean = False; ADbProgressEvent: TDbExecuteSqlProgress = Nil): Boolean;
 var xError: String;
 begin
-  Result := DbExecuteSql(FConnection, ASql, AOneStatement, xError);
+  Result := DbExecuteSql(FConnection, ASql, AOneStatement, xError, ADbProgressEvent);
   if (not Result) and AShowError then begin
     ShowInfo(itError, 'Podczas wykonywania komendy wyst¹pi³ b³¹d', xError);
   end;

@@ -1,6 +1,6 @@
 inherited CCreateDatafileForm: TCCreateDatafileForm
-  Left = 138
-  Top = 19
+  Left = 651
+  Top = 805
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager'
@@ -74,7 +74,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
     Top = 0
     Width = 339
     Height = 131
-    ActivePage = TabSheetDatafile
+    ActivePage = TabSheetDefault
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 2
@@ -84,7 +84,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       TabVisible = False
       object Label2: TLabel
         Left = 0
-        Top = 12
+        Top = 14
         Width = 224
         Height = 13
         Caption = 'Kreator tworzenia nowego pliku danych'
@@ -114,7 +114,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       TabVisible = False
       object Label1: TLabel
         Left = 0
-        Top = 12
+        Top = 14
         Width = 141
         Height = 13
         Caption = 'Lokalizacja pliku danych'
@@ -161,7 +161,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       TabVisible = False
       object Label5: TLabel
         Left = 0
-        Top = 12
+        Top = 14
         Width = 84
         Height = 13
         Caption = 'Has'#322'o dost'#281'pu'
@@ -202,7 +202,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       TabVisible = False
       object Label9: TLabel
         Left = 0
-        Top = 12
+        Top = 14
         Width = 131
         Height = 13
         Caption = 'Domy'#347'lne dane w pliku'
@@ -260,7 +260,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       TabVisible = False
       object LabelInfo: TLabel
         Left = 0
-        Top = 12
+        Top = 14
         Width = 197
         Height = 13
         Caption = 'Potwierd'#378' utworzenie pliku danych'
