@@ -171,9 +171,12 @@ begin
     Disabled := True;
     InitializeProgress(GetProgressType, GetMin, GetMax);
     InitializeLabels;
+    Application.ProcessMessages;
     FDoWorkResult := DoWork;
+    Application.ProcessMessages;
     FinalizeProgress;
     FinalizeLabels;
+    Application.ProcessMessages;
     if (FDoWorkResult = dwrSuccess) and GetAutoclose then begin
       ModalResult := mrOk;
     end;
@@ -296,7 +299,7 @@ end;
 
 function TCProgressForm.GetProgressType: TWaitType;
 begin
-  Result := wtAnimate;
+  Result := wtProgressbar;
 end;
 
 function TCProgressForm.CanAccept: Boolean;

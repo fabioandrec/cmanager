@@ -1,6 +1,6 @@
 inherited CCreateDatafileForm: TCCreateDatafileForm
-  Left = 651
-  Top = 805
+  Left = 468
+  Top = 307
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'CManager'
@@ -74,7 +74,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
     Top = 0
     Width = 339
     Height = 131
-    ActivePage = TabSheetDefault
+    ActivePage = TabSheetDatafile
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 2

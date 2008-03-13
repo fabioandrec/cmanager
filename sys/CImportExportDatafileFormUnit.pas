@@ -49,8 +49,8 @@ begin
   Result := inherited CanAccept;
   if Result and (CStaticFilename.DataId = '') then begin
     case FOperation of
-      ieoImport: xText := 'Nie wybra³eœ nazwy i lokalizacji pliku, z którego dane maj¹ byæ zaimportowane';
-      ieoExport: xText := 'Nie wybra³eœ nazwy i lokalizacji pliku, w którym zostan¹ zapisane wyeksportowane dane';
+      ieoImport: xText := 'Nie wybra³eœ nazwy pliku, z którego dane maj¹ byæ zaimportowane';
+      ieoExport: xText := 'Nie wybra³eœ nazwy pliku, w którym zostan¹ zapisane wyeksportowane dane';
     end;
     ShowInfo(itError, xText, '');
     Result := False;

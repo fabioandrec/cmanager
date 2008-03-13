@@ -357,14 +357,14 @@ inherited CImportExportDatafileForm: TCImportExportDatafileForm
     Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
     FilterIndex = 0
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 16
-    Top = 56
+    Left = 80
+    Top = 96
   end
   object SaveDialog: TSaveDialog
     DefaultExt = '.sql'
     Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 48
-    Top = 59
+    Top = 99
   end
 end

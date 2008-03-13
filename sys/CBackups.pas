@@ -37,7 +37,7 @@ type
 const ARCHIVE_TYPE = 'CMB';
 
 function CmbBackup(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string; AProgressEvent: TProgressEvent): Boolean;
-function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string; AProgressEvent: TProgressEvent): Boolean;
 
 implementation
 
@@ -50,8 +50,8 @@ begin
   FOutStream := AOutStream;
   if AInStream.Size > 0 then begin
     xToolStream := TCompressionStream.Create(clMax, AOutStream);
-    xToolStream.OnProgress := OnCompressProgress;
     AInStream.Seek(0, soFromBeginning);
+    xToolStream.OnProgress := OnCompressProgress;
     try
       try
         Result := xToolStream.CopyFrom(AInStream, 0) = AInStream.Size;
@@ -249,10 +249,10 @@ begin
   xBackup.Free;
 end;
 
-function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string): Boolean;
+function CmbRestore(AFilename: String; ABackupname: String; ACanoverride: Boolean; var AError: string; AProgressEvent: TProgressEvent): Boolean;
 var xBackup: TBackupRestore;
 begin
-  xBackup := TBackupRestore.Create(ACanoverride);
+  xBackup := TBackupRestore.Create(ACanoverride, AProgressEvent);
   Result := xBackup.DecompressFile(ABackupname, AFilename, AError);
   xBackup.Free;
 end;

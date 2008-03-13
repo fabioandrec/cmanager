@@ -193,7 +193,7 @@ begin
   Result := True;
   if PageControl.ActivePage = TabSheetDatafile then begin
     if Trim(CStaticName.DataId) = '' then begin
-      ShowInfo(itError, 'Nie wybra³eœ nazwy i lokalizacji dla nowego pliku danych', '');
+      ShowInfo(itError, 'Nie wybra³eœ nazwy dla nowego pliku danych', '');
       CStaticName.SetFocus;
       Result := False;
     end;

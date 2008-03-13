@@ -7,7 +7,6 @@ interface
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
      DateUtils, AdoDb, VirtualTrees, CXml, Db;
 
-function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckPendingInformations: Boolean;
@@ -35,23 +34,6 @@ uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
   CExtractionItemFormUnit, CUpdateExchangesFormUnit,
   CInitializeProviderFormUnit;
-
-function BackupDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
-var xTool: TBackupRestore;
-begin
-  if not Assigned(AProgressEvent) then begin
-    ShowWaitForm(wtProgressbar, 'Trwa wykonywanie kopii pliku danych. Proszê czekaæ...');
-  end;
-  xTool := TBackupRestore.Create(AOverwrite, AProgressEvent);
-  try
-    Result := xTool.CompressFile(AFilename, ATargetFilename, AError);
-  finally
-    xTool.Free;
-  end;
-  if not Assigned(AProgressEvent) then begin
-    HideWaitForm;
-  end;
-end;
 
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;

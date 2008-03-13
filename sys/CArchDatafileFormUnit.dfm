@@ -353,16 +353,16 @@ inherited CArchDatafileForm: TCArchDatafileForm
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog
-    DefaultExt = '.sql'
-    Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
+    DefaultExt = '.cmb'
+    Filter = 'Pliki archiwum|*.cmb|Wszystkie pliki|*.*'
     FilterIndex = 0
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Left = 16
     Top = 56
   end
   object SaveDialog: TSaveDialog
-    DefaultExt = '.sql'
-    Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
+    DefaultExt = '.cmb'
+    Filter = 'Pliki archiwum|*.cmb|Wszystkie pliki|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 48
     Top = 59

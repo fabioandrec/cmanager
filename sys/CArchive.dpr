@@ -74,7 +74,7 @@ begin
             xExitCode := $00;
           end;
         end else if xAction = 2 then begin
-          if CmbRestore(xFile, xBackup, xOverride, xText) then begin
+          if CmbRestore(xFile, xBackup, xOverride, xText, Nil) then begin
             xExitCode := $00;
           end;
         end else if xAction = 4 then begin

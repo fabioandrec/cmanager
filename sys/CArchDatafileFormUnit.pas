@@ -28,7 +28,7 @@ type
   private
     FDataProvider: TDataProvider;
     FOperation: TArchOperation;
-    procedure ProgressEvent(AMin, AMax, AStep: Integer);    
+    procedure ProgressEvent(AStepBy: Integer);
   protected
     procedure InitializeLabels; override;
     procedure InitializeForm; override;
@@ -41,7 +41,8 @@ implementation
 
 {$R *.dfm}
 
-uses FileCtrl, StrUtils, CAdox, CDataObjects, CInfoFormUnit;
+uses FileCtrl, StrUtils, CAdox, CDataObjects, CInfoFormUnit, CDatatools,
+  CBackups, CTools, CPreferences;
 
 function TCArchDatafileForm.CanAccept: Boolean;
 var xText: String;
@@ -50,80 +51,60 @@ begin
   if Result then begin
     if(CStaticFilename.DataId = '') then begin
       case FOperation of
-        aoRestore: xText := 'Nie wybra³eœ nazwy i lokalizacji pliku archiwum, które ma zostaæ odtworzone';
-        aoBackup: xText := 'Nie wybra³eœ nazwy i lokalizacji pliku archiwum, które ma byæ utworzone';
+        aoRestore: xText := 'Nie wybra³eœ nazwy archiwum, z którego ma byæ odtworzony plik danych';
+        aoBackup: xText := 'Nie wybra³eœ nazwy pliku, do którego ma byæ wykonana archiwizacja pliku danych';
       end;
       ShowInfo(itError, xText, '');
       Result := False;
     end else if FOperation = aoRestore then begin
-      Result := ShowInfo(itQuestion, 'Wykonanie importu do pliku danych mo¿e spowodowaæ zast¹pienie\n' +
+      Result := ShowInfo(itQuestion, 'Wykonanie odtworzenia pliku danych z archiwum spowoduje zast¹pienie\n' +
                                      'wszystkich danych znajduj¹cych siê w aktualnie otwartym pliku danych.\n' +
-                                     'Czy jesteœ pewny, ¿e chcesz wykonaæ import?', '');
+                                     'Czy jesteœ pewny, ¿e chcesz wykonaæ odtworzenia pliku danych z archiwum?', '');
     end;
   end;
 end;
 
 function TCArchDatafileForm.DoWork: TDoWorkResult;
-var xStr: TStringList;
-    xMin, xMax, xCount: Integer;
-    xOk: Boolean;
+var xError: String;
+    xBeforeSize: Int64;
+    xAfterSize: Int64;
+    xBackupPref: TBackupPref;
+    xTempfilename: String;
 begin
   Result := dwrError;
-  AddToReport('Rozpoczêcie wykonywania ' + IfThen(FOperation = aoBackup, 'kopii', 'odtwarzania') + ' pliku danych...');
-  xStr := TStringList.Create;
+  AddToReport('Rozpoczêcie wykonywania ' + IfThen(FOperation = aoBackup, 'archiwum', 'przywracania') + ' pliku danych...');
   try
     if FOperation = aoBackup then begin
-      try
-        xStr.LoadFromFile(CStaticFilename.DataId);
-        FDataProvider.BeginTransaction;
-        if not FDataProvider.ExecuteSql(xStr.Text, False, False, ProgressEvent) then begin
-          AddToReport('Podczas importu wyst¹pi³ b³¹d ' + DbLastError);
-          AddToReport('Wykonywana komenda "' + DbLastStatement + '"');
-          FDataProvider.RollbackTransaction;
+      xBeforeSize := FileSize(FDataProvider.Filename);
+      if CmbBackup(FDataProvider.Filename, CStaticFilename.DataId, True, xError, ProgressEvent) then begin
+        xAfterSize := FileSize(CStaticFilename.DataId);
+        xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[FDataProvider.Filename]);
+        if xBackupPref = Nil then begin
+          xBackupPref := TBackupPref.CreateBackupPref(FDataProvider.Filename, Now);
+          GBackupsPreferences.Add(xBackupPref);
         end else begin
-          FDataProvider.CommitTransaction;
-          Result := dwrSuccess;
+          xBackupPref.lastBackup := Now;
         end;
-      except
-        on E: Exception do begin
-          AddToReport('Podczas importu wyst¹pi³ b³¹d ' + E.Message);
-        end;
+        AddToReport(Format('Wielkoœci pliku danych: %.2f MB, pliku kopii %.2f MB', [xBeforeSize / (1024 * 1024), xAfterSize / (1024 * 1024)]));
+        Result := dwrSuccess;
+      end else begin
+        AddToReport('B³¹d podczas wykonywania archiwum pliku, opis ' + xError);
       end;
     end else begin
-      try
-        xMin := Low(CDatafileTables);
-        xMax := High(CDatafileTables);
-        xCount := xMin;
-        xOk := True;
-        ProgressBar.Min := xMin;
-        ProgressBar.Max := xMax;
-        while (xCount <= xMax) and xOk do begin
-          AddToReport('Eksportowanie tabeli ' + CDatafileTables[xCount]);
-          if CDatafileDeletes[xCount] <> '' then begin
-            xStr.Add('delete from ' + CDatafileDeletes[xCount] + ';');
-          end;
-          if not FDataProvider.ExportTable(CDatafileTables[xCount], CDatafileTablesExportConditions[xCount], CDatafileTablesExportOrders[xCount], xStr) then begin
-            AddToReport('Podczas eksportu wyst¹pi³ b³¹d ' + DbLastError);
-            AddToReport('Wykonywana komenda "' + DbLastStatement + '"');
-            xOk := False;
-          end;
-          Inc(xCount);
-          ProgressBar.StepBy(1);
-        end;
-        if xOk then begin
-          xStr.SaveToFile(CStaticFilename.DataId);
-          Result := dwrSuccess;
-        end;
-      except
-        on E: Exception do begin
-          AddToReport('Podczas eksportu wyst¹pi³ b³¹d ' + E.Message);
-        end;
+      xBeforeSize := FileSize(CStaticFilename.DataId);
+      xTempfilename := ChangeFileExt(FDataProvider.Filename, '.' + FormatDateTime('yymmddhhnnss', Now));
+      if CmbRestore(xTempfilename, CStaticFilename.DataId, True, xError, ProgressEvent) then begin
+        xAfterSize := FileSize(xTempfilename);
+        AddToReport(Format('Wielkoœci pliku danych: %.2f MB, pliku kopii %.2f MB', [xAfterSize / (1024 * 1024), xBeforeSize / (1024 * 1024)]));
+
+        Result := dwrSuccess;
+      end else begin
+        AddToReport('B³¹d podczas przywracania pliku danych z archiwum, opis ' + xError);
       end;
     end;
   finally
-    xStr.Free;
   end;
-  AddToReport('Procedura ' + IfThen(FOperation = aoBackup, 'kopii', 'odtwarzania') + ' pliku danych zakoñczona ' + IfThen(Result = dwrSuccess, 'poprawnie', 'z b³êdami'));
+  AddToReport('Procedura wykonania ' + IfThen(FOperation = aoBackup, 'archwium', 'przywracania') + ' pliku danych zakoñczona ' + IfThen(Result = dwrSuccess, 'poprawnie', 'z b³êdami'));
 end;
 
 procedure TCArchDatafileForm.FinalizeLabels;
@@ -131,16 +112,16 @@ begin
   case FOperation of
     aoBackup: begin
       if DoWorkResult = dwrSuccess then begin
-        LabelInfo.Caption := 'Wykonano kopiê pliku danych';
+        LabelInfo.Caption := 'Wykonano archiwum pliku danych';
       end else if DoWorkResult = dwrError then begin
-        LabelInfo.Caption := 'B³¹d wykonywania kopii pliku danych';
+        LabelInfo.Caption := 'B³¹d wykonywania archiwum pliku danych';
       end;
     end;
     aoRestore: begin
       if DoWorkResult = dwrSuccess then begin
-        LabelInfo.Caption := 'Odtworzono plik danych z kopii';
+        LabelInfo.Caption := 'Przywrócono plik danych z archiwum';
       end else if DoWorkResult = dwrError then begin
-        LabelInfo.Caption := 'B³¹d odtwarzania pliku danych z kopii';
+        LabelInfo.Caption := 'B³¹d przywracania pliku danych z archiwum';
       end;
     end;
   end;
@@ -154,14 +135,15 @@ begin
   LabelDescription.Caption := MinimizeName(FDataProvider.Filename, LabelDescription.Canvas, LabelDescription.Width);
   case FOperation of
     aoBackup: begin
-      LabelInfo.Caption := 'Archiwizuj plik danych';
-      CImage.ImageIndex := 3;
-      CStaticFilename.TextOnEmpty := '<kliknij tutaj aby wybraæ nazwê pliku Ÿród³owego>'
+      LabelInfo.Caption := 'Wykonaj archiwum plik danych';
+      CImage.ImageIndex := 4;
+      CStaticFilename.DataId := GetDefaultBackupFilename(FDataProvider.Filename);
+      CStaticFilename.Caption := MinimizeName(CStaticFilename.DataId, CStaticFilename.Canvas, CStaticFilename.Width);
     end;
     aoRestore: begin
-      LabelInfo.Caption := 'Odtwórz plik danych';
-      CImage.ImageIndex := 4;
-      CStaticFilename.TextOnEmpty := '<kliknij tutaj aby wybraæ nazwê pliku docelowego>'
+      LabelInfo.Caption := 'Przywróæ plik danych z archiwum';
+      CImage.ImageIndex := 3;
+      CStaticFilename.TextOnEmpty := '<kliknij tutaj aby wybraæ plik archiwum>'
     end;
   end;
 end;
@@ -169,8 +151,8 @@ end;
 procedure TCArchDatafileForm.InitializeLabels;
 begin
   case FOperation of
-    aoBackup: LabelInfo.Caption := 'Trwa wykonywanie kopii pliku danych';
-    aoRestore: LabelInfo.Caption := 'Trwa odtwarzanie pliku danych';
+    aoBackup: LabelInfo.Caption := 'Trwa wykonywanie archiwum pliku danych';
+    aoRestore: LabelInfo.Caption := 'Trwa przywracanie pliku danych z archiwum';
   end;
   CStaticFilename.Visible := False;
 end;
@@ -196,13 +178,9 @@ begin
   end;
 end;
 
-procedure TCArchDatafileForm.ProgressEvent(AMin, AMax, AStep: Integer);
+procedure TCArchDatafileForm.ProgressEvent(AStepBy: Integer);
 begin
-  if (ProgressBar.Min = 0) and (ProgressBar.Max = 0) then begin
-    ProgressBar.Min := AMin;
-    ProgressBar.Max := AMin;
-  end;
-  ProgressBar.StepBy(AStep);
+  ProgressBar.Position := AStepBy;
 end;
 
 end.
