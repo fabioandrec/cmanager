@@ -111,9 +111,9 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
       ParentFont = False
     end
     object EditPassword: TEdit
-      Left = 68
+      Left = 70
       Top = 66
-      Width = 265
+      Width = 263
       Height = 21
       BevelKind = bkTile
       BorderStyle = bsNone

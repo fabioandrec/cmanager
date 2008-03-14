@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 91
-  Top = 83
+  Left = 195
+  Top = 143
   Width = 860
   Height = 633
   ActiveControl = ShortcutList
@@ -25,6 +25,7 @@ object CMainForm: TCMainForm
     Height = 24
     UseSystemFont = False
     ActionManager = ActionManager
+    AllowHiding = True
     Caption = 'MenuBar'
     ColorMap.HighlightColor = 10725814
     ColorMap.BtnSelectedColor = clBtnFace
@@ -321,12 +322,12 @@ object CMainForm: TCMainForm
                     Caption = '&Importuj plik danych'
                   end
                   item
-                    Action = ActionBackup
-                    Caption = '&Wykonaj kopi'#281' pliku danych'
+                    Action = ActionBackupDatafile
+                    Caption = '&Wykonaj archiwum pliku danych'
                   end
                   item
-                    Action = ActionRestore
-                    Caption = '&Odtw'#243'rz plik danych z kopii'
+                    Action = ActionRestoreDatafile
+                    Caption = '&Odtw'#243'rz plik danych z archiwum'
                   end
                   item
                     Action = ActionCheckDatafile
@@ -335,8 +336,15 @@ object CMainForm: TCMainForm
                   item
                     Action = ActionRandom
                     Caption = 'W&ype'#322'nij losowo dane'
+                  end
+                  item
+                    Caption = '-'
+                  end
+                  item
+                    Action = ActionPasswordDatafile
+                    Caption = '&Ustaw/zmie'#324' has'#322'o pliku danych'
                   end>
-                Caption = 'N&arz'#281'dzia'
+                Caption = 'N&arz'#281'dzia pliku danych'
               end>
             Caption = 'P&lik'
           end
@@ -369,25 +377,6 @@ object CMainForm: TCMainForm
           item
             Items = <
               item
-                Action = ActionPreferences
-                Caption = '&Preferencje'
-              end
-              item
-                Action = ActionLoanCalc
-                Caption = '&Kalkulator kredytowy'
-              end
-              item
-                Action = ActionCss
-                Caption = '&Arkusz styli raport'#243'w'
-              end
-              item
-                Action = ActionXsl
-                Caption = '&Domy'#347'lna transformcja raport'#243'w'
-              end
-              item
-                Caption = '-'
-              end
-              item
                 Action = ActionImportCurrencyRates
                 Caption = 'W&czytaj kursy walut'
               end
@@ -403,9 +392,29 @@ object CMainForm: TCMainForm
                 Caption = '-'
               end
               item
-                Caption = '&Wtyczki'
+                Action = ActionPreferences
+                Caption = '&Preferencje'
+              end
+              item
+                Action = ActionLoanCalc
+                Caption = '&Kalkulator kredytowy'
+              end
+              item
+                Action = ActionCss
+                Caption = '&Arkusz styli raport'#243'w'
+              end
+              item
+                Action = ActionXsl
+                Caption = '&Domy'#347'lna transformcja raport'#243'w'
               end>
             Caption = '&Narz'#281'dzia'
+          end
+          item
+            Items = <
+              item
+                Caption = '&ActionClientItem0'
+              end>
+            Caption = 'W&tyczki'
           end
           item
             Items = <
@@ -431,6 +440,10 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionDiscForum
+                Caption = '&Forum dyskusyjne'
+              end
+              item
+                Action = ActionCmd
               end
               item
                 Caption = '-'
@@ -558,15 +571,15 @@ object CMainForm: TCMainForm
       Caption = 'Eksportuj plik danych'
       OnExecute = ActionExportDatafileExecute
     end
-    object ActionBackup: TAction
+    object ActionBackupDatafile: TAction
       Category = 'Plik'
-      Caption = 'Wykonaj kopi'#281' pliku danych'
-      OnExecute = ActionBackupExecute
+      Caption = 'Wykonaj archiwum pliku danych'
+      OnExecute = ActionBackupDatafileExecute
     end
-    object ActionRestore: TAction
+    object ActionRestoreDatafile: TAction
       Category = 'Plik'
-      Caption = 'Odtw'#243'rz plik danych z kopii'
-      OnExecute = ActionRestoreExecute
+      Caption = 'Odtw'#243'rz plik danych z archiwum'
+      OnExecute = ActionRestoreDatafileExecute
     end
     object ActionCheckDatafile: TAction
       Category = 'Plik'
@@ -673,6 +686,16 @@ object CMainForm: TCMainForm
       Category = 'Pomoc'
       Caption = 'Forum dyskusyjne'
       OnExecute = ActionDiscForumExecute
+    end
+    object ActionPasswordDatafile: TAction
+      Category = 'Plik'
+      Caption = 'Ustaw/zmie'#324' has'#322'o pliku danych'
+      OnExecute = ActionPasswordDatafileExecute
+    end
+    object ActionCmd: TAction
+      Category = 'Pomoc'
+      Caption = 'Linia polece'#324
+      OnExecute = ActionCmdExecute
     end
   end
   object OpenDialog: TOpenDialog

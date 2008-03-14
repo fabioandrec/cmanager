@@ -182,11 +182,11 @@ begin
       xInStream := TFileStream.Create(AInFile, fmOpenRead or fmShareDenyNone);
       xOutStream := TFileStream.Create(AOutFile, fmCreate or fmShareDenyNone);
       Result := Decompress(xInStream, xOutStream, AError);
+      xInStream.Free;
+      xOutStream.Free;
       if not Result then begin
         DeleteFile(AOutFile);
       end;
-      xInStream.Free;
-      xOutStream.Free;
     end else begin
       AError := 'Plik ' + AOutFile + ' ju¿ istnieje';
     end;

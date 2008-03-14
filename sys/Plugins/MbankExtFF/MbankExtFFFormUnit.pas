@@ -193,7 +193,7 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
           if AIsCreditCard then begin
             xRegDate := XsdToDateTime(xDatesStr.Strings[0]);
           end else begin
-            xRegDate := XsdToDateTime(xDatesStr.Strings[0], False);
+            xRegDate := XsdToDateTime(xDatesStr.Strings[0]);
           end;
         end else begin
           xRegDate := 0;
@@ -202,7 +202,7 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
           if AIsCreditCard then begin
             xAccountingDate := XsdToDateTime(xDatesStr.Strings[1]);
           end else begin
-            xAccountingDate := XsdToDateTime(xDatesStr.Strings[1], False);
+            xAccountingDate := XsdToDateTime(xDatesStr.Strings[1]);
           end;
         end else begin
           xAccountingDate := 0;
@@ -423,26 +423,66 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
       xExtractionNode: ICXMLDOMNode;
   begin
     AError := 'Nieokreœlono lub okreœlono niepoprawnie dane dla elementu wyci¹gu';
+    Result := True;
+    xRegDate := 0;
+    xAccountingDate := 0;
+    xCash := 0;
     if AIsCreditCard then begin
-      xRegDate := XsdToDateTime(ARow[Low(ARow) + 1]);
-      xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 2]);
-      xTitle := Trim(ARow[Low(ARow) + 3]) + sLineBreak + Trim(ARow[Low(ARow) + 4]);
-      xCashStr := StringReplace(Trim(ARow[Low(ARow) + 5]), '.', '', [rfReplaceAll, rfIgnoreCase]);
-      xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
-      xCash := StrToCurrencyDecimalDot(xCashStr);
-      xCurrStr := Trim(ARow[Low(ARow) + 6]);
-      Result := (xRegDate <> 0) and (xAccountingDate <> 0);
+      try
+        xRegDate := XsdToDateTime(ARow[Low(ARow) + 1]);
+      except
+        on E: Exception do begin
+          AError := 'Nierozpoznany format daty ' + ARow[Low(ARow) + 1];
+          Result := False;
+        end;
+      end;
+      if Result then begin
+        try
+          xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 2]);
+        except
+          on E: Exception do begin
+            AError := 'Nierozpoznany format daty ' + ARow[Low(ARow) + 2];
+            Result := False;
+          end;
+        end;
+        if Result then begin
+          xTitle := Trim(ARow[Low(ARow) + 3]) + sLineBreak + Trim(ARow[Low(ARow) + 4]);
+          xCashStr := StringReplace(Trim(ARow[Low(ARow) + 5]), '.', '', [rfReplaceAll, rfIgnoreCase]);
+          xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+          xCash := StrToCurrencyDecimalDot(xCashStr);
+          xCurrStr := Trim(ARow[Low(ARow) + 6]);
+          Result := (xRegDate <> 0) and (xAccountingDate <> 0);
+        end;
+      end;
     end else begin
-      xRegDate := XsdToDateTime(ARow[Low(ARow)], False);
-      xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 1]);
-      xCashStr := StringReplace(Trim(ARow[Low(ARow) + 7]), '.', '', [rfReplaceAll, rfIgnoreCase]);
-      xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
-      xCash := StrToCurrencyDecimalDot(xCashStr);
-      xTitle := Trim(ARow[Low(ARow) + 2]) + sLineBreak + Trim(ARow[Low(ARow) + 3]) + sLineBreak +
-                Trim(ARow[Low(ARow) + 4]) + sLineBreak + Trim(ARow[Low(ARow) + 5]) + sLineBreak +
-                Trim(ARow[Low(ARow) + 6]);
-      xCurrStr := 'PLN';
-      Result := (xRegDate <> 0) and (xAccountingDate <> 0);
+      try
+        xRegDate := XsdToDateTime(ARow[Low(ARow)]);
+      except
+        on E: Exception do begin
+          AError := 'Nierozpoznany format daty ' + ARow[Low(ARow)];
+          Result := False;
+        end;
+      end;
+      if Result then begin
+        try
+          xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 1]);
+        except
+          on E: Exception do begin
+            AError := 'Nierozpoznany format daty ' + ARow[Low(ARow) + 1];
+            Result := False;
+          end;
+        end;
+        if Result then begin
+          xCashStr := StringReplace(Trim(ARow[Low(ARow) + 7]), '.', '', [rfReplaceAll, rfIgnoreCase]);
+          xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+          xCash := StrToCurrencyDecimalDot(xCashStr);
+          xTitle := Trim(ARow[Low(ARow) + 2]) + sLineBreak + Trim(ARow[Low(ARow) + 3]) + sLineBreak +
+                    Trim(ARow[Low(ARow) + 4]) + sLineBreak + Trim(ARow[Low(ARow) + 5]) + sLineBreak +
+                    Trim(ARow[Low(ARow) + 6]);
+          xCurrStr := 'PLN';
+          Result := (xRegDate <> 0) and (xAccountingDate <> 0);
+        end;
+      end;
     end;
     if Result then begin
       xExtractionNode := ARootNode.ownerDocument.createElement('extractionItem');

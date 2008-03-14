@@ -42,7 +42,8 @@ implementation
 {$R *.dfm}
 
 uses FileCtrl, StrUtils, CAdox, CDataObjects, CInfoFormUnit, CDatatools,
-  CBackups, CTools, CPreferences;
+  CBackups, CTools, CPreferences, CMainFormUnit,
+  CInitializeProviderFormUnit, CConsts;
 
 function TCArchDatafileForm.CanAccept: Boolean;
 var xText: String;
@@ -69,40 +70,83 @@ var xError: String;
     xBeforeSize: Int64;
     xAfterSize: Int64;
     xBackupPref: TBackupPref;
-    xTempfilename: String;
+    xRestoredTempfilename: String;
+    xBackedupDatafilename: String;
+    xPrevDatafile, xPrevPassword: String;
+    xStatus: TInitializeProviderResult;
+    xMustConnectToPrevious: Boolean;
 begin
   Result := dwrError;
   AddToReport('Rozpoczêcie wykonywania ' + IfThen(FOperation = aoBackup, 'archiwum', 'przywracania') + ' pliku danych...');
-  try
-    if FOperation = aoBackup then begin
-      xBeforeSize := FileSize(FDataProvider.Filename);
-      if CmbBackup(FDataProvider.Filename, CStaticFilename.DataId, True, xError, ProgressEvent) then begin
-        xAfterSize := FileSize(CStaticFilename.DataId);
-        xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[FDataProvider.Filename]);
-        if xBackupPref = Nil then begin
-          xBackupPref := TBackupPref.CreateBackupPref(FDataProvider.Filename, Now);
-          GBackupsPreferences.Add(xBackupPref);
-        end else begin
-          xBackupPref.lastBackup := Now;
-        end;
-        AddToReport(Format('Wielkoœci pliku danych: %.2f MB, pliku kopii %.2f MB', [xBeforeSize / (1024 * 1024), xAfterSize / (1024 * 1024)]));
-        Result := dwrSuccess;
+  if FOperation = aoBackup then begin
+    xBeforeSize := FileSize(FDataProvider.Filename);
+    if CmbBackup(FDataProvider.Filename, CStaticFilename.DataId, True, xError, ProgressEvent) then begin
+      xAfterSize := FileSize(CStaticFilename.DataId);
+      xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[FDataProvider.Filename]);
+      if xBackupPref = Nil then begin
+        xBackupPref := TBackupPref.CreateBackupPref(FDataProvider.Filename, Now);
+        GBackupsPreferences.Add(xBackupPref);
       end else begin
-        AddToReport('B³¹d podczas wykonywania archiwum pliku, opis ' + xError);
+        xBackupPref.lastBackup := Now;
+      end;
+      AddToReport(Format('Wielkoœci pliku danych: %.2f MB, pliku archiwum %.2f MB', [xBeforeSize / (1024 * 1024), xAfterSize / (1024 * 1024)]));
+      Result := dwrSuccess;
+    end else begin
+      AddToReport('B³¹d podczas wykonywania archiwum pliku, opis ' + xError);
+    end;
+  end else begin
+    xPrevDatafile := FDataProvider.Filename;
+    xPrevPassword := FDataProvider.Password;
+    xBeforeSize := FileSize(CStaticFilename.DataId);
+    xRestoredTempfilename := ChangeFileExt(FDataProvider.Filename, '.arch_' + FormatDateTime('yymmddhhnnss', Now));
+    xMustConnectToPrevious := True;
+    if CmbRestore(xRestoredTempfilename, CStaticFilename.DataId, True, xError, ProgressEvent) then begin
+      AddToReport('Odtworzono archiwum do tymczasowego pliku danych' + xRestoredTempfilename);
+      xAfterSize := FileSize(xRestoredTempfilename);
+      AddToReport(Format('Wielkoœci tymczasowego pliku danych: %.2f MB, pliku archiwum %.2f MB', [xAfterSize / (1024 * 1024), xBeforeSize / (1024 * 1024)]));
+      SendMessage(CMainForm.Handle, WM_CLOSECONNECTION, 0, 0);
+      xBackedupDatafilename := ChangeFileExt(xPrevDatafile, '.data_' + FormatDateTime('yymmddhhnnss', Now));
+      if MoveFile(PChar(xPrevDatafile), PChar(xBackedupDatafilename)) then begin
+        AddToReport('Utworzono tymczasowe archiwum pliku danych do ' + xBackedupDatafilename);
+        if MoveFile(PChar(xRestoredTempfilename), PChar(xPrevDatafile)) then begin
+          AddToReport('Zmieniono nazwê chwilowego pliku danych na docelowy');
+          xStatus := InitializeDataProvider(xPrevDatafile, xPrevPassword, FDataProvider);
+          if xStatus = iprSuccess then begin
+            CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
+            CMainForm.UpdateStatusbar;
+            xMustConnectToPrevious := False;
+            Windows.DeleteFile(PChar(xBackedupDatafilename));
+            Result := dwrSuccess;
+          end else begin
+            AddToReport('Nie mo¿na otworzyæ pliku danych ' + xError);
+            Windows.DeleteFile(PChar(xPrevDatafile));
+            MoveFile(PChar(xBackedupDatafilename), PChar(xPrevDatafile));
+          end;
+        end else begin
+          AddToReport('B³¹d zmiany nazwy tymczasowego pliku danych na docelowy, opis ' + SysErrorMessage(GetLastError));
+          MoveFile(PChar(xBackedupDatafilename), PChar(xPrevDatafile));
+        end;
+      end else begin
+        AddToReport('B³¹d tworzenia tymczasowego archiwum ' + xBackedupDatafilename + ' pliku danych, opis ' + SysErrorMessage(GetLastError));
+        if Windows.DeleteFile(PChar(xRestoredTempfilename)) then begin
+          AddToReport('Usuniêto tymczasowy plik danych ' + xRestoredTempfilename);
+        end else begin
+          AddToReport('B³¹d usuwania tymczasowy plik danych ' + xRestoredTempfilename);
+        end;
       end;
     end else begin
-      xBeforeSize := FileSize(CStaticFilename.DataId);
-      xTempfilename := ChangeFileExt(FDataProvider.Filename, '.' + FormatDateTime('yymmddhhnnss', Now));
-      if CmbRestore(xTempfilename, CStaticFilename.DataId, True, xError, ProgressEvent) then begin
-        xAfterSize := FileSize(xTempfilename);
-        AddToReport(Format('Wielkoœci pliku danych: %.2f MB, pliku kopii %.2f MB', [xAfterSize / (1024 * 1024), xBeforeSize / (1024 * 1024)]));
-
-        Result := dwrSuccess;
+      AddToReport('B³¹d podczas przywracania pliku danych z archiwum, opis ' + xError);
+    end;
+    if xMustConnectToPrevious then begin
+      AddToReport('Otwieranie poprzedniego pliku danych...');
+      xStatus := InitializeDataProvider(xPrevDatafile, xPrevPassword, FDataProvider);
+      if xStatus = iprSuccess then begin
+        CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
+        CMainForm.UpdateStatusbar;
       end else begin
-        AddToReport('B³¹d podczas przywracania pliku danych z archiwum, opis ' + xError);
+        AddToReport('Nie mo¿na otworzyæ pliku danych ' + xError);
       end;
     end;
-  finally
   end;
   AddToReport('Procedura wykonania ' + IfThen(FOperation = aoBackup, 'archwium', 'przywracania') + ' pliku danych zakoñczona ' + IfThen(Result = dwrSuccess, 'poprawnie', 'z b³êdami'));
 end;

@@ -29,21 +29,21 @@ uses FileCtrl, CInitializeProviderFormUnit, CMainFormUnit,
 {$R *.dfm}
 
 function TCCompactDatafileForm.DoWork: TDoWorkResult;
-var xError, xDesc: String;
+var xError: String;
     xBeforeSize, xAfterSize: Int64;
     xText: String;
-    xPrevDatabase, xPrevPassword: String;
+    xPrevDatafile, xPrevPassword: String;
     xStatus: TInitializeProviderResult;
 begin
   AddToReport('Rozpoczêcie wykonywania kompaktowania pliku danych...');
   AddToReport('Zamykanie pliku danych...');
-  xPrevDatabase := FDataProvider.Filename;
+  xPrevDatafile := FDataProvider.Filename;
   xPrevPassword := FDataProvider.Password;
+  xBeforeSize := FileSize(xPrevDatafile);
   SendMessage(CMainForm.Handle, WM_CLOSECONNECTION, 0, 0);
-  xBeforeSize := FileSize(xPrevDatabase);
   AddToReport('Kompaktowanie pliku danych...');
-  if DbCompactDatabase(xPrevDatabase, xPrevPassword, xError) then begin
-    xAfterSize := FileSize(xPrevDatabase);
+  if DbCompactDatabase(xPrevDatafile, xPrevPassword, xError) then begin
+    xAfterSize := FileSize(xPrevDatafile);
     xText := 'Wykonano kompaktowanie pliku danych';
     AddToReport(xText);
     AddToReport(Format('Wielkoœci pliku danych: przed %.2f MB, po %.2f MB (mniej o %.2f', [xBeforeSize / (1024 * 1024), xAfterSize / (1024 * 1024), 100 - xAfterSize * 100 / xBeforeSize]) + '%)');
@@ -55,17 +55,15 @@ begin
     Result := dwrError;
   end;
   AddToReport('Otwieranie pliku danych...');
-  xStatus := InitializeDataProvider(xPrevDatabase, xPrevPassword, FDataProvider);
+  xStatus := InitializeDataProvider(xPrevDatafile, xPrevPassword, FDataProvider);
   if xStatus = iprSuccess then begin
     CMainForm.ActionShortcutExecute(CMainForm.ActionShortcutStart);
     CMainForm.UpdateStatusbar;
   end else begin
     AddToReport('Nie mo¿na otworzyæ pliku danych ' + xError);
-    AddToReport(xDesc);
   end;
   AddToReport('Procedura kompaktowania pliku danych zakoñczona ' + IfThen(Result = dwrSuccess, 'poprawnie', 'z b³êdami'));
 end;
-
 
 procedure TCCompactDatafileForm.FinalizeLabels;
 begin

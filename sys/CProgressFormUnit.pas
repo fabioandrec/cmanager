@@ -17,7 +17,7 @@ type
   TProgressClass = class of TCProgressForm;
   TDoWorkResult = (dwrUnknown, dwrSuccess, dwrWarning, dwrError);
 
-  TWaitType = (wtProgressbar, wtAnimate);
+  TWaitType = (wtProgressbar, wtAnimate, wtNone);
 
   TWaitThread = class(TThread)
   private
@@ -234,7 +234,7 @@ begin
     ProgressBar.Min := AMin;
     ProgressBar.Position := AMin;
     ProgressBar.Max := AMax;
-  end else begin
+  end else if AWaitType = wtAnimate then begin
     ProgressBar.Visible := False;
     ProgressText.Visible := True;
     FWaitHandle := CreateEvent(Nil, True, False, Nil);

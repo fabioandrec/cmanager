@@ -46,8 +46,8 @@ type
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     ShortcutList: TCList;
-    ActionBackup: TAction;
-    ActionRestore: TAction;
+    ActionBackupDatafile: TAction;
+    ActionRestoreDatafile: TAction;
     ActionCheckDatafile: TAction;
     ActionPreferences: TAction;
     ActionShortcutProfiles: TAction;
@@ -80,6 +80,8 @@ type
     ActionDiscForum: TAction;
     N1: TMenuItem;
     Ustawienialisty1: TMenuItem;
+    ActionPasswordDatafile: TAction;
+    ActionCmd: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -96,8 +98,8 @@ type
     procedure ActionCreateConnectionExecute(Sender: TObject);
     procedure ActionHelpExecute(Sender: TObject);
     procedure ActionCompactDatafileExecute(Sender: TObject);
-    procedure ActionBackupExecute(Sender: TObject);
-    procedure ActionRestoreExecute(Sender: TObject);
+    procedure ActionBackupDatafileExecute(Sender: TObject);
+    procedure ActionRestoreDatafileExecute(Sender: TObject);
     procedure ActionCheckDatafileExecute(Sender: TObject);
     procedure ActionPreferencesExecute(Sender: TObject);
     procedure ActionLoanCalcExecute(Sender: TObject);
@@ -122,6 +124,8 @@ type
     procedure Ustawienialisty1Click(Sender: TObject);
     procedure ShortcutListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ShortcutListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure ActionPasswordDatafileExecute(Sender: TObject);
+    procedure ActionCmdExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -176,7 +180,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
-     CImportExportDatafileFormUnit;
+     CImportExportDatafileFormUnit, CChangePasswordFormUnit;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -386,6 +390,7 @@ end;
 procedure TCMainForm.UpdateStatusbar;
 var xCount: Integer;
     xAction: TAction;
+    xItem, xSubitem: TActionClientItem;
 begin
   PanelNotconnected.Visible := not GDataProvider.IsConnected;
   PanelNotconnected.Align := alClient;
@@ -411,8 +416,24 @@ begin
   ActionExportDatafile.Visible := GDataProvider.IsConnected;
   ActionImportExtraction.Visible := GDataProvider.IsConnected;
   ActionImportStockExchanges.Visible := GDataProvider.IsConnected;
+  ActionRestoreDatafile.Visible := GDataProvider.IsConnected;
+  ActionBackupDatafile.Visible := GDataProvider.IsConnected;
+  ActionPreferences.Visible := GDataProvider.IsConnected;
+  ActionCloseConnection.Visible := GDataProvider.IsConnected;
+  ActionPasswordDatafile.Visible := GDataProvider.IsConnected;
   TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[1]).Visible := GDataProvider.IsConnected;
   TActionClient(ActionManager.ActionBars.ActionBars[1].Items.Items[3]).Visible := GDataProvider.IsConnected;
+  xItem :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Narzêdzia pliku danych');
+  if xItem <> Nil then begin
+    xItem.Visible := GDataProvider.IsConnected;
+  end;
+  xItem :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Narzêdzia');
+  if xItem <> Nil then begin
+    xSubitem := FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
+    if xSubitem <> Nil then begin
+      xSubitem.Visible := GDataProvider.IsConnected;
+    end;
+  end;
   ActionShortcuts.Visible := GDataProvider.IsConnected;
   ActionCloseConnection.Enabled := GDataProvider.IsConnected;
   ActionOpenConnection.Enabled := not GDataProvider.IsConnected;
@@ -534,12 +555,12 @@ begin
   CProgressFormUnit.ShowProgressForm(TCCompactDatafileForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
 end;
 
-procedure TCMainForm.ActionBackupExecute(Sender: TObject);
+procedure TCMainForm.ActionBackupDatafileExecute(Sender: TObject);
 begin
   CProgressFormUnit.ShowProgressForm(TCArchDatafileForm, TCArchAdditionalData.Create(GDataProvider, aoBackup));
 end;
 
-procedure TCMainForm.ActionRestoreExecute(Sender: TObject);
+procedure TCMainForm.ActionRestoreDatafileExecute(Sender: TObject);
 begin
   CProgressFormUnit.ShowProgressForm(TCArchDatafileForm, TCArchAdditionalData.Create(GDataProvider, aoRestore));
 end;
@@ -639,6 +660,7 @@ begin
           GPlugins.GetCountOfType(CPLUGINTYPE_STOCKEXCHANGE);
   if xMax > 0 then begin
     xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
+    xPluginBand.Items.Clear;
     if xPluginBand <> Nil then begin
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
@@ -961,6 +983,17 @@ end;
 procedure TCMainForm.ShortcutListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
   APrefname := IfThen(MenuItemBigShortcut.Checked, 'B', 'S');
+end;
+
+procedure TCMainForm.ActionPasswordDatafileExecute(Sender: TObject);
+begin
+  CProgressFormUnit.ShowProgressForm(TCChangePasswordForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
+end;
+
+procedure TCMainForm.ActionCmdExecute(Sender: TObject);
+begin
+  SetCurrentDir(GetSystemPathname(''));
+  ShellExecute(0, nil, 'cmd.exe', nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

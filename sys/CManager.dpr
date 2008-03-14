@@ -139,7 +139,8 @@ uses
   CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
   CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
   CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
-  CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm};
+  CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm},
+  CChangePasswordFormUnit in 'CChangePasswordFormUnit.pas' {CChangePasswordForm};
 
 {$R *.res}
 
@@ -171,9 +172,13 @@ begin
         xProceed := CreateDatafileWithWizard(xFilename, xPassword);
       end else begin
         xProceed := True;
+        xPassword := '';
       end;
       if xProceed then begin
-        xProceed := InitializeDataProvider(xFilename, GetParamValue('/password'), GDataProvider) = iprSuccess;
+        if xPassword = '' then begin
+          xPassword := GetParamValue('/password');
+        end;
+        xProceed := InitializeDataProvider(xFilename, xPassword, GDataProvider) = iprSuccess;
       end;
     end else begin
       xProceed := True;
@@ -195,7 +200,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
