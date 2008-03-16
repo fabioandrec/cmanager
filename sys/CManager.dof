@@ -100,7 +100,7 @@ Conditionals=DEBUG
 DebugSourceDirs=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOURCEFORGE\cmanager\sources\others\PngComponents\Source\
 UsePackages=0
 [Parameters]
-RunParams=
+RunParams=-m -u xxx.dat
 HostApplication=
 Launcher=
 UseLauncher=0
@@ -153,9 +153,9 @@ Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\..\..\Trash
-Item1=..\..\Trash
+Item0=..\..\Trash
+Item1=..\..\..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\Bin
+Item0=..\..\Bin
+Item1=..\..\..\..\Bin\Wtyczki

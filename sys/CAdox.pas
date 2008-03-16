@@ -20,6 +20,8 @@ var DbSqllogfile: String = '';
     DbLastStatement: String = '';
     DbLastError: String = '';
 
+const CInsertCmanagerInfo = 'insert into cmanagerInfo (version, created) values (''%s'', %s)';
+
 implementation
 
 uses CTools;

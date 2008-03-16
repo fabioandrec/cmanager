@@ -76,8 +76,6 @@ uses CRichtext, FileCtrl, CXmlFrameUnit, CInfoFormUnit, CReportFormUnit,
 
 {$R *.dfm}
 
-const CInsertCmanagerInfo = 'insert into cmanagerInfo (version, created) values (''%s'', %s)';
-
 function CreateDatafileWithWizard(var AFilename: String; var APassword: String): Boolean;
 begin
   with TCCreateDatafileForm.Create(Application) do begin

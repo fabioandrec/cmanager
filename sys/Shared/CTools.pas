@@ -96,8 +96,8 @@ function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
 function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
 function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
-function GetStringFromResources(AResName: String; AResType: PChar): String;
-procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String);
+function GetStringFromResources(AResName: String; AResType: PChar; ALibHandle: Integer = 0): String;
+procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String; ALibHandle: Integer = 0);
 function XsdToDateTime(ADateTimeStr: String): TDateTime;
 function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
 function IntToStrWithSign(AInteger: Integer): String;
@@ -708,13 +708,19 @@ begin
   Result := EncodeDateTime(xY, xM, xD, xH, xN, 0, 0);
 end;
 
-function GetStringFromResources(AResName: String; AResType: PChar): String;
+function GetStringFromResources(AResName: String; AResType: PChar; ALibHandle: Integer = 0): String;
 var xResStr: TResourceStream;
     xStrStr: TStringStream;
+    xHandle: THandle;
 begin
   xStrStr := TStringStream.Create('');
   try
-    xResStr := TResourceStream.Create(HInstance, AResName, AResType);
+    if ALibHandle = 0 then begin
+      xHandle := HInstance;
+    end else begin
+      xHandle := ALibHandle;
+    end;
+    xResStr := TResourceStream.Create(xHandle, AResName, AResType);
     xStrStr.CopyFrom(xResStr, xResStr.Size);
     Result := xStrStr.DataString;
     xResStr.Free;
@@ -1006,10 +1012,16 @@ begin
   end;
 end;
 
-procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String);
+procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String; ALibHandle: Integer = 0);
 var xRes: TResourceStream;
+    xHandle: THandle;
 begin
-  xRes := TResourceStream.Create(HInstance, AResName, AResType);
+  if ALibHandle = 0 then begin
+    xHandle := HInstance;
+  end else begin
+    xHandle := ALibHandle;
+  end;
+  xRes := TResourceStream.Create(xHandle, AResName, AResType);
   xRes.SaveToFile(AFilename);
   xRes.Free;
 end;
