@@ -22,6 +22,9 @@ type
     CButtonHistory: TCButton;
     Bevel: TBevel;
     ActionPreview: TAction;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionEditExecute(Sender: TObject);
@@ -30,12 +33,19 @@ type
     procedure ActionPreviewExecute(Sender: TObject);
     procedure ListDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
     procedure ListDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
+  private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
+    procedure UpdateIcons;
   public
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     function MustFreeAdditionalData: Boolean; override;
     class function GetPrefname: String; override;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -53,9 +63,15 @@ end;
 procedure TCParamsDefsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionListButtons.Images);
   CButtonHistory.Width := CButtonHistory.Canvas.TextWidth(ActionPreview.Caption) + CButtonHistory.PicOffset + ActionListButtons.Images.Width + 10;
   CButtonHistory.Left := ButtonPanel.Width - CButtonHistory.Width - 15;
   CButtonHistory.Anchors := [akTop, akRight];
+  if List.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   List.ReloadTree;
   UpdateButtons(List.FocusedNode <> Nil);
 end;
@@ -189,5 +205,48 @@ class function TCParamsDefsFrame.GetPrefname: String;
 begin
   Result := CFontPreferencesParamsDefs;
 end;
+
+destructor TCParamsDefsFrame.Destroy;
+begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
+  inherited Destroy;
+end;
+
+procedure TCParamsDefsFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCParamsDefsFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCParamsDefsFrame.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(ButtonPanel,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionListButtons, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
+end;
+
 
 end.

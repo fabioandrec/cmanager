@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, CComponents, StdCtrls, Buttons, ExtCtrls, CXml,
   VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects,
-  Menus;
+  Menus, PngImageList;
 
 type
   TCUpdateExchangesForm = class(TCBaseForm)
@@ -28,6 +28,9 @@ type
     ComboBoxType: TComboBox;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure ExchangesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure ExchangesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -40,7 +43,11 @@ type
     procedure ExchangesListInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode; var ChildCount: Cardinal);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     FSourceXml: ICXMLDOMDocument;
     FSourceRoot: ICXMLDOMNode;
     FTreeDocument: ICXMLDOMDocument;
@@ -48,6 +55,7 @@ type
     FBySymbolList: TStringList;
     procedure SetChecked(AChecked: Boolean);
     procedure RecreateTreeExchanges;
+    procedure UpdateIcons;
   public
     procedure InitializeForm;
     property SourceXml: ICXMLDOMDocument read FSourceXml write FSourceXml;
@@ -130,6 +138,8 @@ procedure TCUpdateExchangesForm.InitializeForm;
 var xList: TDataObjectList;
     xCount: Integer;
 begin
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionManager1.Images);
   FByNamesList := TStringList.Create;
   FBySymbolList := TStringList.Create;
   GDataProvider.BeginTransaction;
@@ -141,6 +151,10 @@ begin
   GDataProvider.RollbackTransaction;
   xList.Free;
   ExchangesList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesExchangesList]);
+  if ExchangesList.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := ExchangesList.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   RecreateTreeExchanges;
 end;
 
@@ -383,6 +397,9 @@ end;
 
 destructor TCUpdateExchangesForm.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   FByNamesList.Free;
   FBySymbolList.Free;
   inherited Destroy;
@@ -397,6 +414,40 @@ begin
     ExchangesList.Repaint;
   end;
   xPrefs.Free;
+end;
+
+procedure TCUpdateExchangesForm.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if ExchangesList.ViewPref <> Nil then begin
+      ExchangesList.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCUpdateExchangesForm.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if ExchangesList.ViewPref <> Nil then begin
+      ExchangesList.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCUpdateExchangesForm.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(Panel2,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionManager1, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
 end;
 
 end.

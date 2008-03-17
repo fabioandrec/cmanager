@@ -69,6 +69,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
+    PopupMenu = PopupMenuIcons
     TabOrder = 1
     object CButtonAdd: TCButton
       Left = 13
@@ -147,5 +148,20 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 168
     Top = 80
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 256
+    Top = 168
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
+    end
   end
 end

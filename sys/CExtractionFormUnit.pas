@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, VirtualTrees, Contnrs,
-  CDatabase, CBaseFrameUnit, CExtractionItemFormUnit, Menus;
+  CDatabase, CBaseFrameUnit, CExtractionItemFormUnit, Menus, PngImageList;
 
 type
   TExtractionAdditionalData = class(TAdditionalData)
@@ -56,6 +56,9 @@ type
     MovementList: TCList;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticAccountChanged(Sender: TObject);
     procedure CDateTime1Changed(Sender: TObject);
@@ -77,7 +80,11 @@ type
     procedure MovementListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure Zaznaczwszystkie1Click(Sender: TObject);
     procedure MovementListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
     Fmodified: TObjectList;
@@ -88,6 +95,7 @@ type
     procedure MessageMovementEdited(AData: TExtractionListElement);
     procedure MessageMovementDeleted(AData: TExtractionListElement);
     function FindNodeByData(AData: TExtractionListElement): PVirtualNode;
+    procedure UpdateIcons;
   protected
     procedure InitializeForm; override;
     function CanAccept: Boolean; override;
@@ -144,6 +152,8 @@ procedure TCExtractionForm.InitializeForm;
 var xItem: TExtractionListElement;
 begin
   inherited InitializeForm;
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionManager1.Images);
   if AdditionalData = Nil then begin
     CDateTime.Value := GWorkDate;
     CDateTime1.Value := StartOfTheMonth(GWorkDate);
@@ -163,6 +173,10 @@ begin
     MovementList.RootNodeCount := Fmovements.Count;
   end;
   MovementList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesExtraction]);
+  if MovementList.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := MovementList.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   MovementListFocusChanged(MovementList, MovementList.FocusedNode, 0);
   UpdateButtons;
   UpdateDescription;
@@ -319,6 +333,9 @@ end;
 
 destructor TCExtractionForm.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   Fadded.Free;
   Fdeleted.Free;
   Fmodified.Free;
@@ -639,6 +656,40 @@ end;
 procedure TCExtractionForm.MovementListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
   APrefname := TExtractionListElement(AHelper).movementType;
+end;
+
+procedure TCExtractionForm.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if MovementList.ViewPref <> Nil then begin
+      MovementList.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCExtractionForm.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if MovementList.ViewPref <> Nil then begin
+      MovementList.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCExtractionForm.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(Panel2,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionManager1, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
 end;
 
 end.

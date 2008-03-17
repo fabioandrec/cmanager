@@ -1,6 +1,6 @@
 inherited CExtractionForm: TCExtractionForm
-  Left = 211
-  Top = 25
+  Left = 415
+  Top = 174
   Caption = 'Wyci'#261'g'
   ClientHeight = 659
   ClientWidth = 595
@@ -238,6 +238,7 @@ inherited CExtractionForm: TCExtractionForm
           Align = alBottom
           BevelOuter = bvNone
           Color = clWindow
+          PopupMenu = PopupMenuIcons
           TabOrder = 0
           object CButtonOut: TCButton
             Left = 13
@@ -410,6 +411,21 @@ inherited CExtractionForm: TCExtractionForm
       Caption = 'Ustawienia listy'
       ImageIndex = 0
       OnClick = Zaznaczwszystkie1Click
+    end
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 376
+    Top = 296
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
     end
   end
 end

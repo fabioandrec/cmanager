@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, CComponents, StdCtrls, Buttons, ExtCtrls, CXml,
   VirtualTrees, CTemplates, ActnList, XPStyleActnCtrls, ActnMan, CDataObjects,
-  Menus;
+  Menus, PngImageList;
 
 type
   TCUpdateCurrencyRatesForm = class(TCBaseForm)
@@ -33,6 +33,9 @@ type
     Label1: TLabel;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure BitBtnCancelClick(Sender: TObject);
     procedure RatesListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure RatesListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -44,7 +47,11 @@ type
     procedure BitBtnOkClick(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     FXml: ICXMLDOMDocument;
     FRoot: ICXMLDOMNode;
     FSourceRates: ICXMLDOMNodeList;
@@ -53,6 +60,7 @@ type
     FCashpointName: String;
     procedure SetChecked(AChecked: Boolean);
     procedure RecreateTreeRates;
+    procedure UpdateIcons;
   public
     procedure InitializeForm;
     property Xml: ICXMLDOMDocument read FXml write FXml;
@@ -60,6 +68,7 @@ type
     property SourceRates: ICXMLDOMNodeList read FSourceRates write FSourceRates;
     property BindingDate: TDateTime read FBindingDate write FBindingDate;
     property CashpointName: String read FCashpointName write FCashpointName;
+    destructor Destroy; override;
   end;
 
   TCurrencyRateDescriptionHelper = class(TInterfacedObject, IDescTemplateExpander)
@@ -132,6 +141,8 @@ end;
 
 procedure TCUpdateCurrencyRatesForm.InitializeForm;
 begin
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionManager1.Images);
   CStaticCashpoint.TextOnEmpty := FCashpointName;
   CStaticCashpoint.Caption := FCashpointName;
   GDataProvider.BeginTransaction;
@@ -139,6 +150,10 @@ begin
   GDataProvider.RollbackTransaction;
   CDateTime.Value := FBindingDate;
   RatesList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesRatesList]);
+  if RatesList.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := RatesList.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   RecreateTreeRates;
 end;
 
@@ -347,6 +362,49 @@ begin
   end;
   xPrefs.Free;
 end;
+
+destructor TCUpdateCurrencyRatesForm.Destroy;
+begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
+  inherited Destroy;
+end;
+
+procedure TCUpdateCurrencyRatesForm.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if RatesList.ViewPref <> Nil then begin
+      RatesList.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCUpdateCurrencyRatesForm.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if RatesList.ViewPref <> Nil then begin
+      RatesList.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCUpdateCurrencyRatesForm.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(Panel2,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionManager1, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
+end;
+
 
 end.
 
