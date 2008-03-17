@@ -1,9 +1,9 @@
 object CImageLists: TCImageLists
   OldCreateOrder = False
-  Left = 3
-  Top = 3
-  Height = 450
-  Width = 638
+  Left = 266
+  Top = 100
+  Height = 747
+  Width = 1026
   object MainImageList24x24: TPngImageList
     Height = 24
     Width = 24
@@ -3000,7 +3000,7 @@ object CImageLists: TCImageLists
           A58A4FD6582309DB9232E982BBEED8D53E57C6300BA008B65A6410309F535271
           835AC52F10F242614F90F6257DF955B33DEC697F2824BB692E011E49804931C8
           FE0D84B25F67B7F72E850000000049454E44AE426082}
-        Name = 'PngImage0'
+        Name = 'PngImage1'
         Background = clWindow
       end
       item
@@ -3067,7 +3067,7 @@ object CImageLists: TCImageLists
           4F692DC198756599AC61C019B9D2EB48E917013401518A21FCE36F24E2BA6535
           4AC22DE0A7A32E9FDFE1F4D4777B920FF23DF9FBF8A5D89DE512F0280226C120
           FD57F8DE646783BC23620000000049454E44AE426082}
-        Name = 'PngImage1'
+        Name = 'PngImage0'
         Background = clWindow
       end
       item

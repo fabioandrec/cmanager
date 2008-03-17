@@ -23,7 +23,7 @@ S=0
 T=0
 U=0
 V=1
-W=0
+W=1
 X=1
 Y=2
 Z=1
@@ -100,7 +100,7 @@ Conditionals=DEBUG
 DebugSourceDirs=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOURCEFORGE\cmanager\sources\others\PngComponents\Source\
 UsePackages=0
 [Parameters]
-RunParams=-m -u xxx.dat
+RunParams=/debug
 HostApplication=
 Launcher=
 UseLauncher=0
@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=8
 Release=1
-Build=61
+Build=64
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.8.1.61
+FileVersion=1.8.1.64
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -135,8 +135,9 @@ ProductName=CManager
 ProductVersion=1.7.1
 Comments=
 [HistoryLists\hlDebugSourcePath]
-Count=1
-Item0=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
+Count=2
+Item0=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOURCEFORGE\cmanager\sources\others\PngComponents\Source\
+Item1=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
 [HistoryLists\hlConditionals]
 Count=1
 Item0=DEBUG
@@ -145,8 +146,8 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=6
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source
-Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
 Item2=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
 Item3=..\..\..\others\PngComponents\Source
 Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh

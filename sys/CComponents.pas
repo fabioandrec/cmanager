@@ -5,7 +5,7 @@ interface
 uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList,
      Buttons, StdCtrls, ExtCtrls, SysUtils, ComCtrls, IntfUIHandlers, ShDocVw,
      ActiveX, PngImageList, VirtualTrees, GraphUtil, Contnrs, Types, RichEdit,
-     ShellApi, CXml;
+     ShellApi, CXml, PngImage, Menus, ActnMan;
 
 type
   TPicturePosition = (ppLeft, ppTop, ppRight);
@@ -91,6 +91,7 @@ type
     FFontprefs: TPrefList;
     FFocusedBackgroundColor: TColor;
     FFocusedFontColor: TColor;
+    FButtonSmall: Boolean;
   public
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     procedure SaveToXml(ANode: ICXMLDOMNode); override;
@@ -101,6 +102,7 @@ type
     property Fontprefs: TPrefList read FFontprefs;
     property FocusedBackgroundColor: TColor read FFocusedBackgroundColor write FFocusedBackgroundColor;
     property FocusedFontColor: TColor read FFocusedFontColor write FFocusedFontColor;
+    property ButtonSmall: Boolean read FButtonSmall write FButtonSmall;
   end;
 
   TCButton = class(TGraphicControl)
@@ -515,6 +517,16 @@ function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtua
 procedure SetEvenListColors(AColorEven, AColorOdd: TColor);
 function GetDarkerColor(ABaseColor: TColor): TColor;
 function GetBrighterColor(ABaseColor: TColor): TColor;
+function GetScaledPngImageList(APngImageList: TPngImageList; ANewWidth, ANewHeight: Integer): TPngImageList;
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionList;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionManager;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
+
 
 var CurrencyComponents: TObjectList;
     ListComponents: TObjectList;
@@ -588,15 +600,12 @@ begin
 end;
 
 procedure TCButton.Paint;
-var
-  xDC: HDC;
-  xTextHeight: Integer;
-  xTextWidth: Integer;
-  xImgX, xImgY: Integer;
-  xTxtX, xTxtY: Integer;
-  xImages: TCustomImageList;
+var xTextHeight: Integer;
+    xTextWidth: Integer;
+    xImgX, xImgY: Integer;
+    xTxtX, xTxtY: Integer;
+    xImages: TCustomImageList;
 begin
-  xDC := Canvas.Handle;
   if Action <> nil then begin
     xImages := TCustomAction(Action).ActionList.Images;
   end else begin
@@ -650,7 +659,7 @@ begin
   end;
   if (Action <> nil) then begin
     if (TCustomAction(Action).ImageIndex <> -1) and (xImages <> Nil) then begin
-      ImageList_Draw(xImages.Handle, TCustomAction(Action).ImageIndex, xDC, xImgX, xImgY, ILD_NORMAL);
+      Canvas.Draw(xImgX, xImgY, TPngImageList(xImages).PngImages.Items[TCustomAction(Action).ImageIndex].PngImage);
     end;
   end;
   Canvas.Brush.Style := bsClear;
@@ -2465,7 +2474,8 @@ procedure TViewPref.Clone(APrefItem: TPrefItem);
 begin
   inherited Clone(APrefItem);
   FFocusedBackgroundColor := TViewPref(APrefItem).FocusedBackgroundColor;
-  FocusedFontColor := TViewPref(APrefItem).FocusedFontColor;
+  FFocusedFontColor := TViewPref(APrefItem).FocusedFontColor;
+  FButtonSmall := TViewPref(APrefItem).ButtonSmall;
   FFontprefs.Clone(TViewPref(APrefItem).Fontprefs);
 end;
 
@@ -2475,6 +2485,7 @@ begin
   FFocusedBackgroundColor := clHighlight;
   FFocusedFontColor := clHighlightText;
   FFontprefs := TPrefList.Create(TFontPref);
+  FButtonSmall := False;
 end;
 
 destructor TViewPref.Destroy;
@@ -2551,6 +2562,7 @@ begin
   inherited LoadFromXml(ANode);
   FFocusedBackgroundColor := StringToColor(GetXmlAttribute('focusedBackgroundColor', ANode, ColorToString(clHighlight)));
   FFocusedFontColor := StringToColor(GetXmlAttribute('focusedFontColor', ANode, ColorToString(clHighlightText)));
+  FButtonSmall := GetXmlAttribute('buttonSmall', ANode, False);
   xFontprefs := ANode.selectSingleNode('fontprefs');
   if xFontprefs <> Nil then begin
     FFontprefs.LoadFromParentNode(xFontprefs);
@@ -2563,6 +2575,7 @@ begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('focusedBackgroundColor', ANode, ColorToString(FFocusedBackgroundColor));
   SetXmlAttribute('focusedFontColor', ANode, ColorToString(FFocusedFontColor));
+  SetXmlAttribute('buttonSmall', ANode, FButtonSmall);
   xFontprefs := ANode.selectSingleNode('fontprefs');
   if xFontprefs = Nil then begin
     xFontprefs := ANode.ownerDocument.createElement('fontprefs');
@@ -2613,6 +2626,162 @@ function TCDataListSimpleString.GetColumnText(AColumnIndex: Integer; AStatic: Bo
 begin
   Result := FCaption;
 end;
+
+procedure SmoothResize(apng:tpngobject; NuWidth,NuHeight:integer);
+var
+  xscale, yscale         : Single;
+  sfrom_y, sfrom_x       : Single;
+  ifrom_y, ifrom_x       : Integer;
+  to_y, to_x             : Integer;
+  weight_x, weight_y     : array[0..1] of Single;
+  weight                 : Single;
+  new_red, new_green     : Integer;
+  new_blue, new_alpha    : Integer;
+  new_colortype          : Integer;
+  total_red, total_green : Single;
+  total_blue, total_alpha: Single;
+  IsAlpha                : Boolean;
+  ix, iy                 : Integer;
+  bTmp : TPNGObject;
+  sli, slo : pRGBLine;
+  ali, alo: pbytearray;
+begin
+  if not (apng.Header.ColorType in [COLOR_RGBALPHA, COLOR_RGB]) then
+    raise Exception.Create('Only COLOR_RGBALPHA and COLOR_RGB formats' +
+    ' are supported');
+  IsAlpha := apng.Header.ColorType in [COLOR_RGBALPHA];
+  if IsAlpha then new_colortype := COLOR_RGBALPHA else
+    new_colortype := COLOR_RGB;
+  bTmp := Tpngobject.CreateBlank(new_colortype, 8, NuWidth, NuHeight);
+  xscale := bTmp.Width / (apng.Width-1);
+  yscale := bTmp.Height / (apng.Height-1);
+  for to_y := 0 to bTmp.Height-1 do begin
+    sfrom_y := to_y / yscale;
+    ifrom_y := Trunc(sfrom_y);
+    weight_y[1] := sfrom_y - ifrom_y;
+    weight_y[0] := 1 - weight_y[1];
+    for to_x := 0 to bTmp.Width-1 do begin
+      sfrom_x := to_x / xscale;
+      ifrom_x := Trunc(sfrom_x);
+      weight_x[1] := sfrom_x - ifrom_x;
+      weight_x[0] := 1 - weight_x[1];
+ 
+      total_red   := 0.0;
+      total_green := 0.0;
+      total_blue  := 0.0;
+      total_alpha  := 0.0;
+      for ix := 0 to 1 do begin
+        for iy := 0 to 1 do begin
+          sli := apng.Scanline[ifrom_y + iy];
+          if IsAlpha then ali := apng.AlphaScanline[ifrom_y + iy];
+          new_red := sli[ifrom_x + ix].rgbtRed;
+          new_green := sli[ifrom_x + ix].rgbtGreen;
+          new_blue := sli[ifrom_x + ix].rgbtBlue;
+          if IsAlpha then new_alpha := ali[ifrom_x + ix] else new_alpha := 0;
+          weight := weight_x[ix] * weight_y[iy];
+          total_red   := total_red   + new_red   * weight;
+          total_green := total_green + new_green * weight;
+          total_blue  := total_blue  + new_blue  * weight;
+          if IsAlpha then total_alpha  := total_alpha  + new_alpha  * weight;
+        end;
+      end;
+      slo := bTmp.ScanLine[to_y];
+      if IsAlpha then alo := bTmp.AlphaScanLine[to_y];
+      slo[to_x].rgbtRed := Round(total_red);
+      slo[to_x].rgbtGreen := Round(total_green);
+      slo[to_x].rgbtBlue := Round(total_blue);
+      if isAlpha then alo[to_x] := Round(total_alpha);
+    end;
+  end;
+  apng.Assign(bTmp);
+  bTmp.Free;
+end;
+
+function GetScaledPngImageList(APngImageList: TPngImageList; ANewWidth, ANewHeight: Integer): TPngImageList;
+var xCount: Integer;
+    xPng, xInPng: TPNGObject;
+begin
+  Result := TPngImageList.Create(Nil);
+  Result.Width := ANewWidth;
+  Result.Height := ANewHeight;
+  for xCount := 0 to APngImageList.Count - 1 do begin
+    xPng := APngImageList.PngImages.Items[xCount].Duplicate;
+    SmoothResize(xPng, ANewWidth, ANewHeight);
+    xInPng := Result.PngImages.Add.PngImage;
+    xInPng.Assign(xPng);
+    Result.InsertPng(0, xInPng);
+    xPng.Free;
+  end;
+end;
+
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionList;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList);
+var xCount, xTop: Integer;
+begin
+  if APanel.Visible then begin
+    if AMenuItemBig.Checked then begin
+      AActionList_1.Images := ABigIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+        AActionList_2.Images := ABigIcons_2;
+      end;
+    end else begin
+      if ASmallIcons_1 = Nil then begin
+        ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
+      end;
+      AActionList_1.Images := ASmallIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+        ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
+        AActionList_2.Images := ASmallIcons_2;
+      end;
+    end;
+    APanel.Height := AActionList_1.Images.Height + 8;
+    APanel.Update;
+    xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
+    for xCount := 0 to APanel.ControlCount - 1 do begin
+      if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
+        APanel.Controls[xCount].Top := xTop;
+        APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+      end;
+    end;
+  end;
+end;
+
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionManager;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
+var xCount, xTop: Integer;
+begin
+  if APanel.Visible then begin
+    if AMenuItemBig.Checked then begin
+      AActionList_1.Images := ABigIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+        AActionList_2.Images := ABigIcons_2;
+      end;
+    end else begin
+      if ASmallIcons_1 = Nil then begin
+        ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
+      end;
+      AActionList_1.Images := ASmallIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+        ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
+        AActionList_2.Images := ASmallIcons_2;
+      end;
+    end;
+    APanel.Height := AActionList_1.Images.Height + 8;
+    APanel.Update;
+    xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
+    for xCount := 0 to APanel.ControlCount - 1 do begin
+      if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
+        APanel.Controls[xCount].Top := xTop;
+        APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+      end;
+    end;
+  end;
+end;
+
 
 initialization
   CurrencyComponents := TObjectList.Create(False);

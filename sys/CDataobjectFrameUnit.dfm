@@ -100,6 +100,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
+    PopupMenu = PopupMenuIcons
     TabOrder = 1
     object CButtonAdd: TCButton
       Left = 13
@@ -195,6 +196,21 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Caption = 'Historia'
       ImageIndex = 0
       OnExecute = ActionHistoryExecute
+    end
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 256
+    Top = 168
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
     end
   end
 end

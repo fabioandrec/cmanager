@@ -32,6 +32,7 @@ inherited CDoneFrame: TCDoneFrame
       Align = alBottom
       BevelOuter = bvNone
       Color = clWindow
+      PopupMenu = PopupMenuIcons
       TabOrder = 2
       DesignSize = (
         443
@@ -412,6 +413,21 @@ inherited CDoneFrame: TCDoneFrame
     object Ustawienialisty2: TMenuItem
       Caption = 'Ustawienia listy'
       OnClick = Ustawienialisty2Click
+    end
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 256
+    Top = 168
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
     end
   end
 end

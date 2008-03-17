@@ -7,6 +7,7 @@ inherited CPlannedFrame: TCPlannedFrame
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
+    PopupMenu = PopupMenuIcons
     TabOrder = 0
     object CButtonDel: TCButton
       Left = 220
@@ -143,5 +144,20 @@ inherited CPlannedFrame: TCPlannedFrame
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80
     Top = 120
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 256
+    Top = 168
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
+    end
   end
 end

@@ -40,6 +40,9 @@ type
     ActionListHistory: TActionList;
     ActionHistory: TAction;
     Historia1: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ActionAddExecute(Sender: TObject);
@@ -50,6 +53,13 @@ type
     procedure ListDblClick(Sender: TObject);
     procedure ListCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure ActionHistoryExecute(Sender: TObject);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
+  private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FSmallIconsHistoryImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
+    FBigIconsHistoryImageList: TPngImageList;
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure MessageMovementAdded(AId: TDataGid; AOptions: Integer); virtual;
@@ -88,6 +98,7 @@ type
     function IsAllElementChecked(ACheckedCount: Integer): Boolean; override;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetPrefname: String; override;
+    procedure UpdateIcons; virtual;
   end;
 
 implementation
@@ -106,6 +117,12 @@ end;
 
 destructor TCDataobjectFrame.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
+  if FSmallIconsHistoryImageList <> Nil then begin
+    FSmallIconsHistoryImageList.Free;
+  end;
   ClearDataobjects;
   inherited Destroy;
 end;
@@ -130,6 +147,10 @@ var xFilters: TStringList;
     xHistory: String;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  FSmallIconsButtonsImageList := Nil;
+  FSmallIconsHistoryImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionListButtons.Images);
+  FBigIconsHistoryImageList := TPngImageList(ActionListHistory.Images);
   Dataobjects := Nil;
   xHistory := GetHistoryText;
   if xHistory <> '' then begin
@@ -167,6 +188,10 @@ begin
   Edytuj1.Visible := ActionEdit.Visible and ButtonPanel.Visible;
   Usu1.Visible := ActionDelete.Visible and ButtonPanel.Visible;
   Historia1.Visible := ActionHistory.Visible and ButtonPanel.Visible;
+  if List.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   RefreshData;
 end;
 
@@ -469,7 +494,39 @@ end;
 
 class function TCDataobjectFrame.GetPrefname: String;
 begin
-  Result := ClassName;;
+  Result := ClassName;
+end;
+
+procedure TCDataobjectFrame.UpdateIcons;
+begin
+  UpdatePanelIcons(ButtonPanel,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, FBigIconsHistoryImageList,
+                   ActionListButtons, ActionListHistory,
+                   FSmallIconsButtonsImageList,
+                   FSmallIconsHistoryImageList);
+end;
+
+procedure TCDataobjectFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCDataobjectFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
 end;
 
 end.

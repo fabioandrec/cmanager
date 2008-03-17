@@ -15,6 +15,7 @@ inherited CReportsFrame: TCReportsFrame
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
+    PopupMenu = PopupMenuIcons
     TabOrder = 0
     DesignSize = (
       443
@@ -289,5 +290,20 @@ inherited CReportsFrame: TCReportsFrame
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
     Left = 80
     Top = 152
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 256
+    Top = 168
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
+    end
   end
 end

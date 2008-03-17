@@ -66,6 +66,9 @@ type
     Label6: TLabel;
     PopupMenuSums: TPopupMenu;
     Ustawienialisty2: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -92,7 +95,11 @@ type
     procedure CStaticViewCurrencyChanged(Sender: TObject);
     procedure Ustawienialisty2Click(Sender: TObject);
     procedure TodayListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     FTodayObjects: TDataObjectList;
     FTodayLists: TDataObjectList;
     FTreeHelper: TTreeObjectList;
@@ -113,6 +120,7 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedText: String; override;
     procedure DoRepaintLists; override;
+    procedure UpdateIcons; 
   public
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
@@ -261,6 +269,8 @@ end;
 procedure TCMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionList.Images);
   CStaticPeriod.DataId := '1';
   FTreeHelper := TTreeObjectList.Create(True);
   UpdateCustomPeriod;
@@ -283,12 +293,19 @@ begin
     Panel1.Visible := False;
   end;
   SumList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementListSum]);
+  if List.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   ReloadToday;
   ReloadSums;
 end;
 
 destructor TCMovementFrame.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   FTreeHelper.Free;
   FTodayObjects.Free;
   FTodayLists.Free;
@@ -1123,6 +1140,40 @@ begin
   end else begin
     APrefname := 'S' + APrefname;
   end;
+end;
+
+procedure TCMovementFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCMovementFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCMovementFrame.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(Panel1,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionList, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
 end;
 
 end.

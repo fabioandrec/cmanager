@@ -46,6 +46,9 @@ type
     ActionPlanned: TAction;
     PopupMenuSums: TPopupMenu;
     Ustawienialisty2: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -68,12 +71,17 @@ type
     procedure ActionPlannedExecute(Sender: TObject);
     procedure Ustawienialisty2Click(Sender: TObject);
     procedure DoneListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     FPlannedObjects: TDataObjectList;
     FDoneObjects: TDataObjectList;
     FSumRoot: TSumElement;
     FTreeObjects: TObjectList;
     procedure UpdateCustomPeriod;
+    procedure UpdateIcons;
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
@@ -157,6 +165,8 @@ procedure TCDoneFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObje
 var xDf, xDe: TDateTime;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionList.Images);
   UpdateCustomPeriod;
   GetFilterDates(xDf, xDe);
   CDateTimePerStart.Value := xDf;
@@ -179,6 +189,10 @@ begin
     end;
   end;
   SumList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]);
+  if List.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   ReloadDone;
   if not AWithButtons then begin
     Bevel.Visible := False;
@@ -189,6 +203,9 @@ end;
 
 destructor TCDoneFrame.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   FPlannedObjects.Free;
   FDoneObjects.Free;
   FSumRoot.Free;
@@ -873,5 +890,40 @@ begin
     end;
   end;
 end;
+
+procedure TCDoneFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCDoneFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCDoneFrame.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(Panel1,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionList, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
+end;
+
 
 end.

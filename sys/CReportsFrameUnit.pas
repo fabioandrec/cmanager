@@ -54,6 +54,9 @@ type
     CButton1: TCButton;
     CButton2: TCButton;
     CButton3: TCButton;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);
@@ -62,7 +65,12 @@ type
     procedure ActionEditExecute(Sender: TObject);
     procedure ActionDelExecute(Sender: TObject);
     procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+  private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     FPrivateList: TDataObjectList;
     FPrivateElement: TCListDataElement;
     procedure ReloadPrivate(ARootElement: TCListDataElement);
@@ -77,6 +85,7 @@ type
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     procedure FinalizeFrame; override;
     class function GetPrefname: String; override;
+    procedure UpdateIcons;
   end;
 
 implementation
@@ -301,6 +310,11 @@ end;
 procedure TCReportsFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
+  FBigIconsButtonsImageList := TPngImageList(ActionList.Images);
+  if List.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   List.RootElement.FreeDataOnClear := True;
   List.ReloadTree;
   ListFocusChanged(List, List.FocusedNode, 0);  
@@ -323,6 +337,9 @@ end;
 
 procedure TCReportsFrame.FinalizeFrame;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   FPrivateList.Free;
   inherited FinalizeFrame;
 end;
@@ -408,6 +425,40 @@ end;
 procedure TCReportsFrame.ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
   APrefname := IfThen(TReportListElement(TCListDataElement(AHelper).Data).isReport, 'R', 'G');
+end;
+
+procedure TCReportsFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCReportsFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCReportsFrame.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(PanelFrameButtons,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionList, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
 end;
 
 end.

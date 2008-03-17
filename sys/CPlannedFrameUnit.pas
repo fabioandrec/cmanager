@@ -20,6 +20,9 @@ type
     CButtonDel: TCButton;
     CButtonEdit: TCButton;
     CButtonOut: TCButton;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure PlannedListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure PlannedListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure PlannedListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
@@ -32,11 +35,16 @@ type
     procedure PlannedListDblClick(Sender: TObject);
     procedure PlannedListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure PlannedListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     FPlannedObjects: TDataObjectList;
     procedure MessageMovementAdded(AId: TDataGid);
     procedure MessageMovementEdited(AId: TDataGid);
     procedure MessageMovementDeleted(AId: TDataGid);
+    procedure UpdateIcons;
   protected
     procedure WndProc(var Message: TMessage); override;
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
@@ -93,11 +101,20 @@ begin
     PanelFrameButtons.Visible := False;
     List.BevelEdges := [];
   end;
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionList.Images);
+  if List.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   ReloadPlanned;
 end;
 
 destructor TCPlannedFrame.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   FPlannedObjects.Free;
   inherited Destroy;
 end;
@@ -339,5 +356,40 @@ procedure TCPlannedFrame.PlannedListGetRowPreferencesName(AHelper: TObject; var 
 begin
   APrefname := TPlannedMovement(AHelper).movementType;
 end;
+
+procedure TCPlannedFrame.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCPlannedFrame.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if List.ViewPref <> Nil then begin
+      List.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCPlannedFrame.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(PanelFrameButtons,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionList, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
+end;
+
 
 end.

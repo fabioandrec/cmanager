@@ -1,6 +1,6 @@
 inherited CMovementListForm: TCMovementListForm
-  Left = 178
-  Top = 35
+  Left = 291
+  Top = 246
   Caption = 'Lista operacji'
   ClientHeight = 667
   ClientWidth = 536
@@ -242,6 +242,7 @@ inherited CMovementListForm: TCMovementListForm
           Align = alBottom
           BevelOuter = bvNone
           Color = clWindow
+          PopupMenu = PopupMenuIcons
           TabOrder = 0
           object CButtonOut: TCButton
             Left = 13
@@ -488,6 +489,21 @@ inherited CMovementListForm: TCMovementListForm
       Caption = 'Ustawienia listy'
       ImageIndex = 0
       OnClick = Zaznaczwszystkie1Click
+    end
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 376
+    Top = 296
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
     end
   end
 end

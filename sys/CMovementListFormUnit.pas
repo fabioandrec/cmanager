@@ -7,7 +7,7 @@ uses
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents,
   ComCtrls, VirtualTrees, ActnList, XPStyleActnCtrls, ActnMan, Contnrs,
   CMovmentListElementFormUnit, CDatabase, CBaseFrameUnit, CTools,
-  CMovementStateFormUnit, Menus;
+  CMovementStateFormUnit, Menus, PngImageList;
 
 type
   TCMovementListForm = class(TCDataobjectForm)
@@ -52,6 +52,9 @@ type
     CButtonStateOnce: TCButton;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
+    PopupMenuIcons: TPopupMenu;
+    MenuItemBigIcons: TMenuItem;
+    MenuItemSmallIcons: TMenuItem;
     procedure CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutOnceCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure Action1Execute(Sender: TObject);
@@ -77,7 +80,11 @@ type
     procedure CStaticViewCurrencyChanged(Sender: TObject);
     procedure ActionStateOnceExecute(Sender: TObject);
     procedure Zaznaczwszystkie1Click(Sender: TObject);
+    procedure MenuItemBigIconsClick(Sender: TObject);
+    procedure MenuItemSmallIconsClick(Sender: TObject);
   private
+    FSmallIconsButtonsImageList: TPngImageList;
+    FBigIconsButtonsImageList: TPngImageList;
     Fmovements: TObjectList;
     Fdeleted: TObjectList;
     Fmodified: TObjectList;
@@ -96,6 +103,7 @@ type
     procedure UpdateButtons;
     procedure ChooseState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
     procedure UpdateState(AStateRecord: TMovementStateRecord; AAction: TAction; AButton: TCButton);
+    procedure UpdateIcons;
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure InitializeForm; override;
@@ -153,6 +161,9 @@ end;
 
 destructor TCMovementListForm.Destroy;
 begin
+  if FSmallIconsButtonsImageList <> Nil then begin
+    FSmallIconsButtonsImageList.Free;
+  end;
   FonceState.Free;
   FprevState.Free;
   Fadded.Free;
@@ -265,6 +276,8 @@ var xProfile: TProfile;
     xProfileId, xAccountId, xCashpointId: TDataGid;
 begin
   inherited InitializeForm;
+  FSmallIconsButtonsImageList := Nil;
+  FBigIconsButtonsImageList := TPngImageList(ActionManager1.Images);
   FonceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   FprevState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   CCurrEditCash.Value := GetCash;
@@ -305,6 +318,10 @@ begin
     GDataProvider.RollbackTransaction;
   end;
   MovementList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementList]);
+  if MovementList.ViewPref <> Nil then begin
+    MenuItemSmallIcons.Checked := MovementList.ViewPref.ButtonSmall;
+    UpdateIcons;
+  end;
   UpdateState(FonceState, ActionStateOnce, CButtonStateOnce);
   CButtonStateOnce.Enabled := False;
   UpdateDescription;
@@ -865,5 +882,40 @@ begin
   end;
   xPrefs.Free;
 end;
+
+procedure TCMovementListForm.MenuItemBigIconsClick(Sender: TObject);
+begin
+  if not MenuItemBigIcons.Checked then begin
+    MenuItemBigIcons.Checked := True;
+    if MovementList.ViewPref <> Nil then begin
+      MovementList.ViewPref.ButtonSmall := False;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCMovementListForm.MenuItemSmallIconsClick(Sender: TObject);
+begin
+  if not MenuItemSmallIcons.Checked then begin
+    MenuItemSmallIcons.Checked := True;
+    if MovementList.ViewPref <> Nil then begin
+      MovementList.ViewPref.ButtonSmall := True;
+    end;
+    UpdateIcons;
+  end;
+end;
+
+procedure TCMovementListForm.UpdateIcons;
+var xDummy: TPngImageList;
+begin
+  xDummy := Nil;
+  UpdatePanelIcons(Panel2,
+                   MenuItemBigIcons, MenuItemSmallIcons,
+                   FBigIconsButtonsImageList, Nil,
+                   ActionManager1, Nil,
+                   FSmallIconsButtonsImageList,
+                   xDummy);
+end;
+
 
 end.

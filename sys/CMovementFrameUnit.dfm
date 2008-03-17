@@ -32,6 +32,7 @@ inherited CMovementFrame: TCMovementFrame
       Align = alBottom
       BevelOuter = bvNone
       Color = clWindow
+      PopupMenu = PopupMenuIcons
       TabOrder = 0
       object CButtonOut: TCButton
         Left = 13
@@ -449,7 +450,7 @@ inherited CMovementFrame: TCMovementFrame
     end
   end
   object VTHeaderPopupMenu: TVTHeaderPopupMenu
-    Left = 80
+    Left = 120
     Top = 120
   end
   object PopupMenuSums: TPopupMenu
@@ -458,6 +459,21 @@ inherited CMovementFrame: TCMovementFrame
     object Ustawienialisty2: TMenuItem
       Caption = 'Ustawienia listy'
       OnClick = Ustawienialisty2Click
+    end
+  end
+  object PopupMenuIcons: TPopupMenu
+    Left = 256
+    Top = 168
+    object MenuItemBigIcons: TMenuItem
+      Caption = 'Du'#380'e ikony'
+      Checked = True
+      RadioItem = True
+      OnClick = MenuItemBigIconsClick
+    end
+    object MenuItemSmallIcons: TMenuItem
+      Caption = 'Ma'#322'e ikony'
+      RadioItem = True
+      OnClick = MenuItemSmallIconsClick
     end
   end
 end
