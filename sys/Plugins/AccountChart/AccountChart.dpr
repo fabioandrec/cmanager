@@ -16,7 +16,8 @@ uses
   CPluginTypes in '..\CPluginTypes.pas',
   CPluginConsts in '..\CPluginConsts.pas',
   CXmlTlb in '..\..\Shared\CXmlTlb.pas',
-  CXml in '..\..\Shared\CXml.pas';
+  CXml in '..\..\Shared\CXml.pas',
+  CTools in '..\..\Shared\CTools.pas';
 
 var CManInterface: ICManagerInterface;
     CConnection: _Connection;

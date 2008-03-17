@@ -102,7 +102,7 @@ begin
   if IsValidXmlparserInstalled(True, False) then begin
     xDelimeter := '';
     if GetSwitch('-h') then begin
-      xText := 'CQuery [-s komenda] [-d separator pól] [-q] [-f plik] -u [nazwa pliku danych] -p [has³o do pliku]' + sLineBreak +
+      xText := 'CQuery [-s komenda] [-d separator pól] [-f plik] -u [nazwa pliku danych] -p [has³o do pliku]' + sLineBreak +
                '  -s wykonaj komendê sql [komenda]' + sLineBreak +
                '  -f wykonaj skrypt sql [plik]' + sLineBreak +
                '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
