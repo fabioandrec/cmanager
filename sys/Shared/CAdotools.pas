@@ -5,7 +5,7 @@ interface
 uses AdoInt, Contnrs, Classes, Variants;
 
 function GetRowsAsObjectList(ARecordset: _Recordset): TObjectList;
-function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String): String;
+function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String; ANoHeader: Boolean = False): String;
 function GetRowsAsXml(ARecordset: _Recordset): String;
 function GetFieldType(AField: Field): String;
 
@@ -43,20 +43,22 @@ begin
   end;
 end;
 
-function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String): String;
+function GetRowsAsString(ARecordset: _Recordset; AFieldDelimeter: String; ANoHeader: Boolean = False): String;
 var xList: TObjectList;
     xWidths: Array of Integer;
     xCf, xRc, xCc: Integer;
     xRow: TStringList;
     xValue: String;
+    xStart: Integer;
 begin
+  xStart := IfThen(ANoHeader, 1, 0);
   xList := GetRowsAsObjectList(ARecordset);
   if AFieldDelimeter = '' then begin
     SetLength(xWidths, ARecordset.Fields.Count);
     for xCf := Low(xWidths) to High(xWidths) do begin
       xWidths[xCf] := -1;
     end;
-    for xRc := 0 to xList.Count - 1 do begin
+    for xRc := xStart to xList.Count - 1 do begin
       xRow := TStringList(xList.Items[xRc]);
       for xCc := 0 to xRow.Count - 1 do begin
         xWidths[xCc] := Max(xWidths[xCc], Length(xRow.Strings[xCc]));
@@ -64,7 +66,7 @@ begin
     end;
   end;
   Result := '';
-  for xRc := 0 to xList.Count - 1 do begin
+  for xRc := xStart to xList.Count - 1 do begin
     xRow := TStringList(xList.Items[xRc]);
     for xCc := 0 to xRow.Count - 1 do begin
       xValue := xRow.Strings[xCc];

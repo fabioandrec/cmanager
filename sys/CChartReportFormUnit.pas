@@ -23,7 +23,6 @@ type
     function GetIsregVisible: Boolean;
     procedure SetIsavgVisible(const Value: Boolean);
     procedure SetIsregVisible(const Value: Boolean);
-    function GetBarSeriesCount: Integer;
   protected
     function GetSeriesOfClassCount(ASerie: TChartSeries): Integer;
   public
@@ -32,7 +31,6 @@ type
     property thumbTitle: String read Ftitle write Ftitle;
     property isPie: Boolean read GetIsPie;
     property isBar: Boolean read GetIsBar;
-    property BarSeriesCount: Integer read GetBarSeriesCount;
     property isLin: Boolean read GetIsLin;
     property isAvgVisible: Boolean read GetIsavgVisible write SetIsavgVisible;
     property isRegVisible: Boolean read GetIsregVisible write SetIsregVisible;
@@ -75,6 +73,8 @@ type
     procedure MenuItemListClick(Sender: TObject);
     procedure MenuItemBigClick(Sender: TObject);
     procedure MenuItemSmallClick(Sender: TObject);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     Fcharts: TChartList;
     FActiveChartIndex: Integer;
@@ -413,14 +413,6 @@ begin
   inherited Destroy;
 end;
 
-function TCChart.GetBarSeriesCount: Integer;
-var xTemp: TBarSeries;
-begin
-  xTemp := TBarSeries.Create(Nil);
-  Result := GetSeriesOfClassCount(xTemp);
-  xTemp.Free;
-end;
-
 function TCChart.GetIsavgVisible: Boolean;
 begin
   Result := FavgSeries.Count > 0;
@@ -612,6 +604,27 @@ begin
     Repaint;
     GBasePreferences.chartListSmall := True;
   end;
+end;
+
+procedure TCChartReportForm.FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var xChart: TCChart;
+    xPos: TPoint;
+begin
+  if ActiveChartIndex >= 0 then begin
+    xChart := TCChart(Fcharts.Items[ActiveChartIndex]);
+    GetCursorPos(xPos);
+    if IsWindow(xChart.Handle) and (WindowFromPoint(xPos) = xChart.Handle) then begin
+      try
+        if WheelDelta > 0 then begin
+          xChart.ZoomPercent(96);
+        end else if WheelDelta < 0 then begin
+          xChart.ZoomPercent(104);
+        end;
+      except
+      end;
+    end;
+  end;
+  inherited;
 end;
 
 end.

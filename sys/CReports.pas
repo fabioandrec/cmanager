@@ -1618,6 +1618,10 @@ function TCChartReport.GetSerie(AChart: TCChart; AClass: TChartSeriesClass): TCh
 begin
   Result := AClass.Create(AChart);
   Result.OnGetMarkText := GetMarkText;
+  if Result.InheritsFrom(TBarSeries) then begin
+    TBarSeries(Result).BarWidthPercent := 90;
+    TBarSeries(Result).AutoBarSize := True;
+  end;
 end;
 
 procedure TCChartReport.OnUnzoom(Sender: TObject);
@@ -1640,6 +1644,7 @@ begin
   UpdateChartsThumbnails;
   if TCChartReportForm(FForm).charts.Count > 0 then begin
     TCChartReportForm(FForm).ActiveChartIndex := 0;
+    //RecalculateBarWidth(TCChartReportForm(FForm).charts.Items[0]);
     SetChartProps;
   end;
 end;

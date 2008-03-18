@@ -135,8 +135,9 @@ ProductName=CQuery
 ProductVersion=1.0.0.0
 Comments=
 [HistoryLists\hlDebugSourcePath]
-Count=1
-Item0=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
+Count=2
+Item0=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOURCEFORGE\cmanager\sources\others\PngComponents\Source\
+Item1=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
 [HistoryLists\hlConditionals]
 Count=1
 Item0=DEBUG
@@ -153,9 +154,9 @@ Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\..\..\Trash
-Item1=..\..\Trash
+Item0=..\..\Trash
+Item1=..\..\..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\Bin
+Item0=..\..\Bin
+Item1=..\..\..\..\Bin\Wtyczki

@@ -4,6 +4,7 @@ inherited CChartReportForm: TCChartReportForm
   Width = 678
   Height = 489
   Caption = 'CChartReportForm'
+  OnMouseWheel = FormMouseWheel
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel

@@ -33,7 +33,7 @@ begin
   xExitCode := $FF;
   CoInitialize(Nil);
   if GetSwitch('-h') then begin
-    xText := 'CArchive -[a|x|c|n|m|h|s] [-o] -b [nazwa kopii pliku danych] -u [nazwa pliku danych]' + sLineBreak +
+    xText := 'CArchive -[a|x|c|n|m|h|s] [-o] [-b [nazwa kopii pliku danych]] -u [nazwa pliku danych] [-p [has³o pliku danych]] [-z [nowe has³o]]' + sLineBreak +
              '  -a wykonaj kopiê pliku danych [nazwa pliku danych] i zapisz jako [nazwa kopii pliku danych]' + sLineBreak +
              '  -x odtwórz kopiê pliku danych [nazwa kopii pliku danych] do pliku o nazwie [nazwa pliku danych]' + sLineBreak +
              '  -c kompaktuj plik danych [nazwa pliku danych]' + sLineBreak +

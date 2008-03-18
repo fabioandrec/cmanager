@@ -47,7 +47,7 @@ begin
   end;
 end;
 
-function ExecuteSql(ADb: TADOConnection; ASql: String; var AError: String; ADelimeter: String; AToXml: Boolean): Boolean;
+function ExecuteSql(ADb: TADOConnection; ASql: String; var AError: String; ADelimeter: String; AToXml, ANoHeader: Boolean): Boolean;
 var xSqls: TStringList;
     xCount: Integer;
     xQuery: _Recordset;
@@ -65,7 +65,7 @@ begin
           if AToXml then begin
             xValue := GetRowsAsXml(xQuery);
           end else begin
-            xValue := GetRowsAsString(xQuery, ADelimeter);
+            xValue := GetRowsAsString(xQuery, ADelimeter, ANoHeader);
           end;
           Writeln(xValue);
         end;
@@ -93,6 +93,7 @@ var xAction: Integer;
     xDelimeter: String;
     xCode: Integer;
     xToXml: Boolean;
+    xNoHeader: Boolean;
 begin
   {$IFDEF DEBUG}
   MemChk;
@@ -102,12 +103,13 @@ begin
   if IsValidXmlparserInstalled(True, False) then begin
     xDelimeter := '';
     if GetSwitch('-h') then begin
-      xText := 'CQuery [-s komenda] [-d separator pól] [-f plik] -u [nazwa pliku danych] -p [has³o do pliku]' + sLineBreak +
+      xText := 'CQuery [-s [komenda]] [-x] [-d [separator pól]] [-w] [-f [plik]] -u [nazwa pliku danych] [-p [has³o do pliku]]' + sLineBreak +
                '  -s wykonaj komendê sql [komenda]' + sLineBreak +
                '  -f wykonaj skrypt sql [plik]' + sLineBreak +
                '  -d rodziela pola zadanym separatorem, akceptuje kody hex np. 0x0a' + sLineBreak +
                '  -x wynik w postaci xml-a' + sLineBreak +
                '  -p wskazuje has³o dostêpu do pliku danych' + sLineBreak +
+               '  -w pomija dodawanie nag³ówka z nazwami kolumn' + sLineBreak + 
                '  -h wyœwietla ten ekran';
     end else begin
       xAction := 0;
@@ -129,6 +131,7 @@ begin
         end;
       end;
       xToXml := GetSwitch('-x');
+      xNoHeader := GetSwitch('-w');
       if (xAction <= 0) or (xAction >= 3) then begin
         xText := 'Niepoprawne parametry wywo³ania. Spróbuj "CQuery -h"';
       end else begin
@@ -159,7 +162,7 @@ begin
             xDatabase := TADOConnection.Create(Nil);
             try
               if ConnectToDatabase(xFile, xPassword, xDatabase, xText) then begin
-                if ExecuteSql(xDatabase, xSql, xText, xDelimeter, xToXml) then begin
+                if ExecuteSql(xDatabase, xSql, xText, xDelimeter, xToXml, xNoHeader) then begin
                   xExitCode := $00;
                 end;
                 xDatabase.Close;
