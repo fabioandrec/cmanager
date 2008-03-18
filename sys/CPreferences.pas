@@ -829,16 +829,26 @@ function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
 var xCurDbversion: Integer;
     xToDbversion: Integer;
     xFromDynArray, xToDynArray: TStringDynArray;
+    xFromVersion, xToVersion: String;
 begin
   Result := True;
+  {
   xFromDynArray := StringToStringArray(AFromVersion, '.');
   xToDynArray := StringToStringArray(AToVersion, '.');
-  if Length(xFromDynArray) <> 4 then begin
+  if (Length(xFromDynArray) <> 4) and (Length(xToDynArray) <> 4) then begin
     Result := False;
   end else begin
+    xFromVersion := LPad(xFromDynArray[0], '0', 3) +
+                    LPad(xFromDynArray[1], '0', 3) +
+                    LPad(xFromDynArray[2], '0', 3) +
+                    LPad(xFromDynArray[3], '0', 3);
+    xToVersion := LPad(xToDynArray[0], '0', 3) +
+                  LPad(xToDynArray[1], '0', 3) +
+                  LPad(xToDynArray[2], '0', 3) +
+                  LPad(xToDynArray[3], '0', 3);
     xCurDbversion := StrToIntDef(xFromDynArray[1], -1);
     xToDbversion := StrToIntDef(xToDynArray[1], -1);
-    if (xCurDbversion < 4) and (xToDbversion >= 4) then begin
+    if xFromVersion < '001004000000' then begin
       ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
                        'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
                        'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
@@ -846,7 +856,17 @@ begin
       GColumnsPreferences.Clear;
       GChartPreferences.Clear;
     end;
-  end;
+    if xFromVersion < '001008002000' then begin
+    end;
+    {if (xCurDbversion < 4) and (xToDbversion >= 4) then begin
+      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
+                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
+                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
+                       'zostan¹ domyœlne ustawienia.', '');
+      GColumnsPreferences.Clear;
+      GChartPreferences.Clear;
+    end;}
+  {end;}
 end;
 
 initialization

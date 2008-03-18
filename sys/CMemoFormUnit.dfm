@@ -41,12 +41,12 @@ inherited CMemoForm: TCMemoForm
   end
   object PrinterSetupDialog: TPrinterSetupDialog
     Left = 216
-    Top = 408
+    Top = 392
   end
   object ActionList: TActionList
     Images = CImageLists.ActionImageList
-    Left = 376
-    Top = 402
+    Left = 256
+    Top = 394
     object Action1: TAction
       Caption = 'Drukuj'
       ImageIndex = 0

@@ -76,7 +76,7 @@ begin
     xFromDynArray := StringToStringArray(AFromVersion, '.');
     xToDynArray := StringToStringArray(AToVersion, '.');
     if Length(xFromDynArray) <> 4 then begin
-      ShowInfo(itError, 'Informacja o wersji pliku danych jest wiew³aœciwa. Byæ mo¿e wskazany plik\n' +
+      ShowInfo(itError, 'Informacja o wersji pliku danych jest niew³aœciwa. Byæ mo¿e wskazany plik\n' +
                         'nie jest poprawnym plikiem danych programu CManager lub jest uszkodzony', '');
     end else begin
       xFromDb := StrToIntDef(xFromDynArray[1], -1);
@@ -95,6 +95,9 @@ begin
           Result := ShowModal = mrOk;
           Free;
         end;
+      end;
+      if Result and (AFromVersion <> AToVersion) then begin
+        DbExecuteSql(AConnection, 'update cmanagerInfo set version = ''' + AToVersion + '''', False, xError);
       end;
     end;
   end else begin
@@ -194,12 +197,7 @@ begin
         Inc(xCurDbversion);
         ProgressBar.StepBy(1);
       end;
-      if Result then begin
-        Result := DbExecuteSql(FConnection, 'update cmanagerInfo set version = ''' + FToVersion + '''', False, xError);
-        if not Result then begin
-          AddToReport('B³¹d uaktualniania informacji o wersji pliku danych, opis b³êdu ' + xError);
-        end;
-      end else begin
+      if not Result then begin
         AddToReport('B³¹d uaktualniania struktur pliku danych, opis b³êdu ' + xError);
       end;
       DbSqllogfile := xLogFile;

@@ -1,6 +1,6 @@
 inherited CChartReportForm: TCChartReportForm
-  Left = 268
-  Top = 189
+  Left = 231
+  Top = 153
   Width = 678
   Height = 489
   Caption = 'CChartReportForm'
@@ -8,20 +8,20 @@ inherited CChartReportForm: TCChartReportForm
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 670
-    Height = 421
+    Width = 662
+    Height = 413
     BevelOuter = bvNone
     object Splitter: TSplitter
       Left = 131
       Top = 0
       Width = 2
-      Height = 421
+      Height = 413
     end
     object PanelThumbs: TPanel
       Left = 0
       Top = 0
       Width = 131
-      Height = 421
+      Height = 413
       Align = alLeft
       BevelOuter = bvLowered
       Caption = 'PanelThumbs'
@@ -30,7 +30,7 @@ inherited CChartReportForm: TCChartReportForm
         Left = 1
         Top = 22
         Width = 129
-        Height = 398
+        Height = 390
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -116,16 +116,16 @@ inherited CChartReportForm: TCChartReportForm
     object PanelParent: TPanel
       Left = 133
       Top = 0
-      Width = 537
-      Height = 421
+      Width = 529
+      Height = 413
       Align = alClient
       BevelOuter = bvLowered
       TabOrder = 1
       object PanelNoData: TPanel
         Left = 1
         Top = 1
-        Width = 535
-        Height = 419
+        Width = 527
+        Height = 411
         Align = alClient
         BevelOuter = bvNone
         Caption = 'Brak danych do utworzenia wykres'#243'w'

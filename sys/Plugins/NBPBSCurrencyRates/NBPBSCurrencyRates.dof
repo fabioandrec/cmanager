@@ -135,8 +135,9 @@ ProductName=
 ProductVersion=1.0.0.0
 Comments=
 [HistoryLists\hlDebugSourcePath]
-Count=1
-Item0=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
+Count=2
+Item0=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOURCEFORGE\cmanager\sources\others\PngComponents\Source\
+Item1=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
 [HistoryLists\hlConditionals]
 Count=1
 Item0=DEBUG
@@ -145,9 +146,9 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=6
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source
-Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
-Item2=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
+Item0=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
+Item2=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
 Item3=..\..\..\others\PngComponents\Source
 Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source

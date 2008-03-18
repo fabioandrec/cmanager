@@ -1,16 +1,22 @@
 inherited CReportForm: TCReportForm
-  Left = 260
-  Top = 190
+  Left = 162
+  Top = 77
   Width = 799
   Height = 638
   BorderIcons = [biSystemMenu, biMaximize]
   BorderStyle = bsSizeable
   Caption = 'CReportForm'
+  DesignSize = (
+    791
+    611)
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 791
-    Height = 570
+    Left = 4
+    Top = 4
+    Width = 783
+    Height = 562
+    Align = alNone
     BevelOuter = bvLowered
   end
   inherited PanelButtons: TPanel
