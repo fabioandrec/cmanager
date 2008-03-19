@@ -20,7 +20,7 @@ inherited CFrameForm: TCFrameForm
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
-      object Bevel1: TBevel
+      object BevelBottom: TBevel
         Left = 1
         Top = 568
         Width = 871

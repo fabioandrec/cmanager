@@ -63,7 +63,7 @@ var xDataId, xText: String;
 begin
   xAdditional := TXmlAdditionalData.Create(AXml);
   xRect := Rect(0, 0, 500, 400);
-  Result := TCFrameForm.ShowFrame(TCXmlFrame, xDataId, xText, xAdditional, @xRect, Nil, AChecks, True, Nil, False);
+  Result := TCFrameForm.ShowFrame(TCXmlFrame, xDataId, xText, xAdditional, @xRect, Nil, AChecks, True, Nil, False, False);
 end;
 
 constructor TXmlListElement.Create(ANode: ICXMLDOMNode);

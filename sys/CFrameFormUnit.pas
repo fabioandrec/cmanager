@@ -12,7 +12,7 @@ type
 
   TCFrameForm = class(TCConfigForm)
     PanelFrame: TPanel;
-    Bevel1: TBevel;
+    BevelBottom: TBevel;
   private
     FFrame: TCBaseFrame;
     FAdditionalData: TObject;
@@ -25,7 +25,7 @@ type
     function CanAccept: Boolean; override;
   public
     constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True); virtual;
-    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
+    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True; ABevelBottom: Boolean = True): Boolean;
     destructor Destroy; override;
   published
     property IsChoice: Boolean read FIsChoice;
@@ -102,7 +102,7 @@ begin
   end;
 end;
 
-class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True): Boolean;
+class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True; ABevelBottom: Boolean = True): Boolean;
 var xForm: TCFrameForm;
     xFormClass: TCFrameFormClass;
     xOperation: TConfigOperation;
@@ -122,6 +122,9 @@ begin
   end;
   if ARect <> Nil then begin
     xForm.SetBounds(ARect^.Left, ARect^.Top, ARect^.Right, ARect^.Bottom);
+  end;
+  if not ABevelBottom then begin
+    xForm.BevelBottom.Visible := False;
   end;
   if AIsChoice then begin
     xOperation := AFrameClass.GetOperation;

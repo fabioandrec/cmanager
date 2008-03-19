@@ -1,10 +1,9 @@
 inherited CXmlFrame: TCXmlFrame
-  Width = 468
   Color = clBtnFace
   object Panel1: TPanel [0]
     Left = 0
     Top = 0
-    Width = 468
+    Width = 443
     Height = 277
     Align = alClient
     BevelOuter = bvNone
@@ -13,7 +12,7 @@ inherited CXmlFrame: TCXmlFrame
     object Panel2: TPanel
       Left = 0
       Top = 0
-      Width = 468
+      Width = 443
       Height = 40
       Align = alTop
       BevelOuter = bvNone
@@ -31,7 +30,7 @@ inherited CXmlFrame: TCXmlFrame
     object Panel3: TPanel
       Left = 0
       Top = 40
-      Width = 468
+      Width = 443
       Height = 237
       Align = alClient
       BevelOuter = bvLowered
@@ -40,7 +39,7 @@ inherited CXmlFrame: TCXmlFrame
       object List: TCDataList
         Left = 1
         Top = 1
-        Width = 466
+        Width = 441
         Height = 235
         Align = alClient
         BevelEdges = []
@@ -73,7 +72,7 @@ inherited CXmlFrame: TCXmlFrame
         Columns = <
           item
             Position = 0
-            Width = 466
+            Width = 441
             WideText = 'Nazwa'
           end>
         WideDefaultText = ''
