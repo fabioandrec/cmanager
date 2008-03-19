@@ -20,6 +20,15 @@ inherited CFrameForm: TCFrameForm
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
+      object Bevel1: TBevel
+        Left = 1
+        Top = 568
+        Width = 871
+        Height = 2
+        Align = alBottom
+        Shape = bsBottomLine
+        Style = bsRaised
+      end
     end
   end
   inherited PanelButtons: TPanel

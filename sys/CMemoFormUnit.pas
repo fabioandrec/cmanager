@@ -39,7 +39,7 @@ begin
     xForm.RichEdit.Font.Size := AFontsize;
   end;
   AssignRichText(AReport, xForm.RichEdit);
-  xForm.ShowConfig(coNone);
+  xForm.ShowConfig(coNone, False, '&OK');
   xForm.Free;
 end;
 

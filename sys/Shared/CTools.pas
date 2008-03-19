@@ -6,7 +6,7 @@ interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows, Types, Contnrs, Classes, StdCtrls;
+uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics;
 
 const
   CEmptyDataGid = '';
@@ -97,6 +97,7 @@ function GetMonthNumber(AMonthName: String): Integer;
 function Date2StrDate(ADateTime: TDateTime; AWithTime: Boolean = False): String;
 function DateTimeUptoMinutes(ADateTime: TDateTime): TDateTime;
 function GetStringFromResources(AResName: String; AResType: PChar; ALibHandle: Integer = 0): String;
+function GetStringFromDiscfile(AFilename: String): String;
 procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: String; ALibHandle: Integer = 0);
 function XsdToDateTime(ADateTimeStr: String): TDateTime;
 function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
@@ -110,10 +111,21 @@ function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
 function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
+function ChangeColorsToRgb(AString: String): String;
+function ColorToHtmlColor(AColor: TColor): String;
 
 implementation
 
 uses SysUtils, StrUtils, DateUtils;
+
+const CSupportedColors: array[0..51] of TColor = (
+          clBlack, clMaroon, clGreen, clOlive, clNavy, clPurple, clTeal, clGray, clSilver,
+          clRed, clLime, clYellow, clBlue, clFuchsia, clAqua, clWhite, clMoneyGreen, clSkyBlue,
+          clCream, clMedGray, clActiveBorder, clActiveCaption, clAppWorkSpace, clBackground, clBtnFace,
+          clBtnHighlight, clBtnShadow, clBtnText, clCaptionText, clDefault, clGradientActiveCaption, clGradientInactiveCaption,
+          clGrayText, clHighlight, clHighlightText, clHotLight, clInactiveBorder, clInactiveCaption,
+          clInactiveCaptionText, clInfoBk, clInfoText, clMenu, clMenuBar, clMenuHighlight, clMenuText,
+          clNone, clScrollBar, cl3DDkShadow, cl3DLight, clWindow, clWindowFrame, clWindowText);
 
 function FileVersion(AName: string): String;
 var xProductVersionMS: DWORD;
@@ -729,6 +741,22 @@ begin
   end;
 end;
 
+function GetStringFromDiscfile(AFilename: String): String;
+var xStr: TStringList;
+begin
+  Result := '';
+  xStr := TStringList.Create;
+  try
+    try
+      xStr.LoadFromFile(AFilename);
+      Result := xStr.Text;
+    except
+    end;
+  finally
+    xStr.Free;
+  end;
+end;
+
 function GetTimeZoneBias : Longint;
 var xTzinfo: TTimeZoneInformation;
 begin
@@ -1095,6 +1123,26 @@ end;
 function GetSystemPathname(AFilename: String): String;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + ExtractFileName(AFilename);
+end;
+
+function ColorToHtmlColor(AColor: TColor): String;
+var xRgb: Integer;
+begin
+  xRgb := ColorToRGB(AColor);
+  Result := '#' + Format('%.2x%.2x%.2x', [GetRValue(xRgb), GetGValue(xRgb), GetBValue(xRgb)]);
+end;
+
+function ChangeColorsToRgb(AString: String): String;
+var xCount: Integer;
+    xText: String;
+    xRgb: String;
+begin
+  Result := AString;
+  for xCount := Low(CSupportedColors) to High(CSupportedColors) do begin
+    xText := ColorToString(CSupportedColors[xCount]);
+    xRgb := ColorToHtmlColor(CSupportedColors[xCount]);
+    Result := StringReplace(Result, xText, xRgb, [rfReplaceAll, rfIgnoreCase]);
+  end;
 end;
 
 end.

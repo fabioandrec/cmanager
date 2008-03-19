@@ -19,6 +19,7 @@ uses
   Forms,
   Windows,
   SysUtils,
+  Classes,
   CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},
   CDatabase in 'CDatabase.pas',
   CDataObjects in 'CDataObjects.pas',
@@ -45,7 +46,7 @@ uses
   CPlannedFormUnit in 'CPlannedFormUnit.pas' {CPlannedForm},
   CScheduleFormUnit in 'CScheduleFormUnit.pas' {CScheduleForm},
   CDoneFrameUnit in 'CDoneFrameUnit.pas' {CDoneFrame: TFrame},
-  CAboutFormUnit in 'CAboutFormUnit.pas',
+  CAboutFormUnit in 'CAboutFormUnit.pas' {CAboutForm},
   CReportFormUnit in 'CReportFormUnit.pas' {CReportForm},
   CSettings in 'CSettings.pas',
   CDoneFormUnit in 'CDoneFormUnit.pas' {CDoneForm},
@@ -67,7 +68,7 @@ uses
   CDatatools in 'CDatatools.pas',
   CProgressFormUnit in 'CProgressFormUnit.pas' {CProgressForm},
   CCompactDatafileFormUnit in 'CCompactDatafileFormUnit.pas' {CCompactDatafileForm},
-  CMemoFormUnit in 'CMemoFormUnit.pas',
+  CMemoFormUnit in 'CMemoFormUnit.pas' {CMemoForm},
   CArchDatafileFormUnit in 'CArchDatafileFormUnit.pas' {CArchDatafileForm},
   CImageListsUnit in 'CImageListsUnit.pas' {CImageLists: TDataModule},
   CCheckDatafileFormUnit in 'CCheckDatafileFormUnit.pas' {CCheckDatafileFormUnit},
@@ -141,13 +142,13 @@ uses
   CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
   CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
   CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm},
-  CChangePasswordFormUnit in 'CChangePasswordFormUnit.pas' {CChangePasswordForm};
+  CChangePasswordFormUnit in 'CChangePasswordFormUnit.pas' {CChangePasswordForm},
+  CHtmlMemoFormUnit in 'CHtmlMemoFormUnit.pas' {CHtmlMemoForm};
 
 {$R *.res}
 
 var xFilename, xPassword: String;
     xProceed: Boolean;
-
 begin
   GCmanagerState := CMANAGERSTATE_STARTING;
   GDebugMode := GetSwitch('/debug');

@@ -27,7 +27,7 @@ type
   public
     function ShowDataobject(AOperation: TConfigOperation; AProxy: TDataProxy; ADataobject: TDataObject; ACreateStatic: Boolean; AAdditionalData: TAdditionalData = Nil): TDataGid;
     property Dataobject: TDataObject read FDataobject write FDataobject;
-    function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean; override;
+    function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False; ANoneButtonCaption: String = ''): Boolean; override;
     property AdditionalData: TAdditionalData read FAdditionalData;
   end;
 
@@ -50,7 +50,7 @@ begin
   end;
 end;
 
-function TCDataobjectForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean;
+function TCDataobjectForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False; ANoneButtonCaption: String = ''): Boolean;
 begin
   Accepted := False;
   Operation := AOperation;

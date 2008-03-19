@@ -2,7 +2,8 @@ unit CPreferences;
 
 interface
 
-uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml, CComponents, SysUtils, Types;
+uses Classes, Graphics, Contnrs, Math, Windows, CTemplates, GraphUtil, CXml, CComponents, SysUtils, Types, SHDocVw,
+     Variants, StrUtils, MsHtml;
 
 type
   TBackupPref = class(TPrefItem)
@@ -114,6 +115,7 @@ type
     FstartupUncheckedExtractions: Boolean;
     FevenListColor: TColor;
     FoddListColor: TColor;
+    FconfigFileVersion: String;
   public
     function GetBackupfilename: String;
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
@@ -155,6 +157,7 @@ type
     property backupOverwrite: Boolean read FbackupOverwrite write FbackupOverwrite;
     property evenListColor: TColor read FevenListColor write FevenListColor;
     property oddListColor: TColor read FoddListColor write FoddListColor;
+    property configFileVersion: String read FconfigFileVersion write FconfigFileVersion;
   end;
 
   TDescPatterns = class(TStringList)
@@ -179,13 +182,26 @@ var GViewsPreferences: TPrefList;
 
 function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 function GetDefaultViewPreferences: TPrefList;
-function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
+function UpdateConfiguration(AFromConfigVersion, AFromDatafileVersion, AToDatafileVersion: String): Boolean;
+procedure SetInterfaceIcons(ASmall: Boolean);
 
 implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit,
      CDoneFrameUnit, CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit, CBaseFrameUnit, CReportsFrameUnit,
-     CDescTemplatesFrameUnit, CInfoFormUnit;
+     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit;
+
+procedure SetInterfaceIcons(ASmall: Boolean);
+var xCount: Integer;
+begin
+  GBasePreferences.shortcutBarSmall := ASmall;
+  GBasePreferences.homeListSmall := ASmall;
+  GBasePreferences.filterDetailSmall := ASmall;
+  GBasePreferences.chartListSmall := ASmall;
+  for xCount := 0 to GViewsPreferences.Count - 1 do begin
+    TViewPref(GViewsPreferences.Items[xCount]).ButtonSmall := ASmall;
+  end;
+end;
 
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
 begin
@@ -825,16 +841,43 @@ begin
   end;
 end;
 
-function UpdateConfiguration(AFromVersion, AToVersion: String): Boolean;
-var xCurDbversion: Integer;
-    xToDbversion: Integer;
-    xFromDynArray, xToDynArray: TStringDynArray;
-    xFromVersion, xToVersion: String;
+type
+  T001008002000Answer = class(THtmlAnswer)
+  private
+    FsmallIcons: Boolean;
+  public
+    procedure UpdateAnswer(AWebBrowser: IWebBrowser2); override;
+  published
+    property smallIcons: Boolean read FsmallIcons;
+  end;
+
+procedure T001008002000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
+var xRadioList: IDispatch;
+    xRadio: IHTMLOptionButtonElement;
+begin
+  FsmallIcons := False;
+  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('icon', EmptyParam);
+  if xRadioList <> Nil then begin
+    if IHTMLElementCollection(xRadioList).length > 0 then begin
+      xRadio := IHTMLElementCollection(xRadioList).item(0, EmptyParam) as IHTMLOptionButtonElement;
+      FsmallIcons := not xRadio.checked;
+    end;
+  end;
+end;
+
+function UpdateConfiguration(AFromConfigVersion, AFromDatafileVersion, AToDatafileVersion: String): Boolean;
+var xFromDynArray, xToDynArray: TStringDynArray;
+    xFromVersion, xToVersion, xTitle: String;
+    x001008002000Answer: T001008002000Answer;
 begin
   Result := True;
-  {
-  xFromDynArray := StringToStringArray(AFromVersion, '.');
-  xToDynArray := StringToStringArray(AToVersion, '.');
+  xTitle := 'CManager - wersja ' + AToDatafileVersion;
+  if AFromConfigVersion = '' then begin
+    xFromDynArray := StringToStringArray(AFromDatafileVersion, '.');
+  end else begin
+    xFromDynArray := StringToStringArray(AFromConfigVersion, '.');
+  end;
+  xToDynArray := StringToStringArray(AToDatafileVersion, '.');
   if (Length(xFromDynArray) <> 4) and (Length(xToDynArray) <> 4) then begin
     Result := False;
   end else begin
@@ -846,27 +889,23 @@ begin
                   LPad(xToDynArray[1], '0', 3) +
                   LPad(xToDynArray[2], '0', 3) +
                   LPad(xToDynArray[3], '0', 3);
-    xCurDbversion := StrToIntDef(xFromDynArray[1], -1);
-    xToDbversion := StrToIntDef(xToDynArray[1], -1);
     if xFromVersion < '001004000000' then begin
-      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
-                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
-                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
-                       'zostan¹ domyœlne ustawienia.', '');
+      ShowHtmlReport(xTitle, GetStringFromResources('PL_001004000000', RT_RCDATA), 500, 170);
       GColumnsPreferences.Clear;
       GChartPreferences.Clear;
     end;
     if xFromVersion < '001008002000' then begin
+      x001008002000Answer := T001008002000Answer.Create;
+      ShowHtmlReport(xTitle, GetStringFromResources('PL_001008002000', RT_RCDATA), 500, 300, '', x001008002000Answer);
+      if x001008002000Answer.smallIcons then begin
+        SetInterfaceIcons(True);
+      end;
+      x001008002000Answer.Free;
     end;
-    {if (xCurDbversion < 4) and (xToDbversion >= 4) then begin
-      ShowInfo(itInfo, 'W zwi¹zku ze zmianami wewnêtrznymi pliku konfiguracji skasowane zostan¹\n' +
-                       'ustawienia (szerokoœæ, widocznoœæ, pozycja) kolumn dla wszystkich list\n' +
-                       'wyœwietlaj¹cych dane w programie, oraz ustawienia wykresów. Zastosowane\n' +
-                       'zostan¹ domyœlne ustawienia.', '');
-      GColumnsPreferences.Clear;
-      GChartPreferences.Clear;
-    end;}
-  {end;}
+  end;
+  if Result then begin
+    GBasePreferences.configFileVersion := AToDatafileVersion;
+  end;
 end;
 
 initialization

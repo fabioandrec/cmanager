@@ -213,6 +213,7 @@ begin
               AppendEncoding(GSettings);
             end;
           end;
+          GBasePreferences.configFileVersion := GetXmlAttribute('configFileVersion', GetSettingsRoot, '');
           GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
           GColumnsPreferences.LoadAllFromParentNode(GetSettingsColumns);
           GBackupsPreferences.LoadAllFromParentNode(GetSettingsBackups);
@@ -243,6 +244,7 @@ begin
     GBasePreferences.startupDatafileMode := CStartupFilemodeLastOpened;
   end;
   GBasePreferences.SaveToXml(GetSettingsPreferences);
+  SetXmlAttribute('configFileVersion', GetSettingsRoot, GBasePreferences.configFileVersion);
   FinalizeSettings(GetSystemPathname(CSettingsFilename));
 end;
 

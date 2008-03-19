@@ -9,6 +9,7 @@ uses
 
 type
   TCHtmlReportForm = class(TCReportForm)
+    Panel1: TPanel;
     CBrowser: TCBrowser;
   protected
     procedure DoPreview; override;

@@ -55,8 +55,6 @@ type
     PanelThumbs: TPanel;
     Splitter: TSplitter;
     PanelParent: TPanel;
-    PanelNoData: TPanel;
-    ThumbsList: TCList;
     PanelShortcutsTitle: TPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     PopupMenu1: TPopupMenu;
@@ -64,6 +62,10 @@ type
     N4: TMenuItem;
     MenuItemBig: TMenuItem;
     MenuItemSmall: TMenuItem;
+    PanelChart: TPanel;
+    PanelNoData: TPanel;
+    Panel1: TPanel;
+    ThumbsList: TCList;
     procedure ActionGraphExecute(Sender: TObject);
     procedure ThumbsListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure ThumbsListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
@@ -325,7 +327,7 @@ begin
     BevelOuter := bvNone;
     Color := clWhite;
     Visible := False;
-    Parent := PanelParent;
+    Parent := PanelChart;
     Foot.Text.Text := TCBaseReport(Report).GetReportFooter;
     Title.Text.Text := TCBaseReport(Report).GetReportTitle;
     LeftAxis.Axis.Width := 1;

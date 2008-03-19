@@ -5,11 +5,15 @@ inherited CChartReportForm: TCChartReportForm
   Height = 489
   Caption = 'CChartReportForm'
   OnMouseWheel = FormMouseWheel
+  DesignSize = (
+    670
+    462)
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 662
     Height = 413
+    Anchors = [akLeft, akTop, akRight, akBottom]
     BevelOuter = bvNone
     object Splitter: TSplitter
       Left = 131
@@ -26,58 +30,6 @@ inherited CChartReportForm: TCChartReportForm
       BevelOuter = bvLowered
       Caption = 'PanelThumbs'
       TabOrder = 0
-      object ThumbsList: TCList
-        Left = 1
-        Top = 22
-        Width = 129
-        Height = 390
-        Align = alClient
-        BevelEdges = []
-        BevelInner = bvNone
-        BevelOuter = bvRaised
-        BevelKind = bkFlat
-        BorderStyle = bsNone
-        ButtonStyle = bsTriangle
-        Colors.HotColor = clNavy
-        Colors.UnfocusedSelectionColor = clHighlight
-        Colors.UnfocusedSelectionBorderColor = clHighlight
-        DefaultNodeHeight = 60
-        Header.AutoSizeIndex = -1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'MS Sans Serif'
-        Header.Font.Style = []
-        Header.Height = 21
-        Header.Options = [hoAutoResize, hoDrag, hoShowSortGlyphs]
-        Header.SortColumn = 0
-        Header.Style = hsFlatButtons
-        HintMode = hmHint
-        Images = CImageLists.ChartImageList32x32
-        Indent = 20
-        Margin = 15
-        ParentShowHint = False
-        PopupMenu = PopupMenu1
-        ShowHint = True
-        TabOrder = 0
-        TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-        TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-        TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages]
-        TreeOptions.SelectionOptions = [toFullRowSelect]
-        OnFocusChanged = ThumbsListFocusChanged
-        OnGetText = ThumbsListGetText
-        OnGetImageIndex = ThumbsListGetImageIndex
-        OnHotChange = ThumbsListHotChange
-        AutoExpand = True
-        OnGetRowPreferencesName = ThumbsListGetRowPreferencesName
-        Columns = <
-          item
-            Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
-            Position = 0
-            Width = 129
-          end>
-        WideDefaultText = ''
-      end
       object PanelShortcutsTitle: TPanel
         Left = 1
         Top = 1
@@ -92,7 +44,7 @@ inherited CChartReportForm: TCChartReportForm
         Font.Name = 'MS Sans Serif'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 0
         DesignSize = (
           129
           21)
@@ -112,6 +64,67 @@ inherited CChartReportForm: TCChartReportForm
           ParentFont = False
         end
       end
+      object Panel1: TPanel
+        Left = 1
+        Top = 22
+        Width = 129
+        Height = 390
+        Align = alClient
+        Caption = 'Panel1'
+        TabOrder = 1
+        object ThumbsList: TCList
+          Left = 1
+          Top = 1
+          Width = 127
+          Height = 388
+          Align = alClient
+          BevelEdges = []
+          BevelInner = bvNone
+          BevelOuter = bvRaised
+          BevelKind = bkFlat
+          BorderStyle = bsNone
+          ButtonStyle = bsTriangle
+          Colors.HotColor = clNavy
+          Colors.UnfocusedSelectionColor = clHighlight
+          Colors.UnfocusedSelectionBorderColor = clHighlight
+          DefaultNodeHeight = 60
+          Header.AutoSizeIndex = -1
+          Header.Font.Charset = DEFAULT_CHARSET
+          Header.Font.Color = clWindowText
+          Header.Font.Height = -11
+          Header.Font.Name = 'MS Sans Serif'
+          Header.Font.Style = []
+          Header.Height = 21
+          Header.Options = [hoAutoResize, hoDrag, hoShowSortGlyphs]
+          Header.SortColumn = 0
+          Header.Style = hsFlatButtons
+          HintMode = hmHint
+          Images = CImageLists.ChartImageList32x32
+          Indent = 20
+          Margin = 15
+          ParentShowHint = False
+          PopupMenu = PopupMenu1
+          ShowHint = True
+          TabOrder = 0
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+          TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+          TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages]
+          TreeOptions.SelectionOptions = [toFullRowSelect]
+          OnFocusChanged = ThumbsListFocusChanged
+          OnGetText = ThumbsListGetText
+          OnGetImageIndex = ThumbsListGetImageIndex
+          OnHotChange = ThumbsListHotChange
+          AutoExpand = True
+          OnGetRowPreferencesName = ThumbsListGetRowPreferencesName
+          Columns = <
+            item
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+              Position = 0
+              Width = 127
+            end>
+          WideDefaultText = ''
+        end
+      end
     end
     object PanelParent: TPanel
       Left = 133
@@ -121,22 +134,31 @@ inherited CChartReportForm: TCChartReportForm
       Align = alClient
       BevelOuter = bvLowered
       TabOrder = 1
-      object PanelNoData: TPanel
+      object PanelChart: TPanel
         Left = 1
         Top = 1
         Width = 527
         Height = 411
         Align = alClient
-        BevelOuter = bvNone
-        Caption = 'Brak danych do utworzenia wykres'#243'w'
-        Color = clWhite
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clGrayText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
+        Caption = 'PanelChart'
         TabOrder = 0
+        object PanelNoData: TPanel
+          Left = 1
+          Top = 1
+          Width = 525
+          Height = 409
+          Align = alClient
+          BevelOuter = bvNone
+          Caption = 'Brak danych do utworzenia wykres'#243'w'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clGrayText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+        end
       end
     end
   end

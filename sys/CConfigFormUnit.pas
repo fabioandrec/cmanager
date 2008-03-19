@@ -30,7 +30,7 @@ type
     procedure DisableComponents; virtual;
     procedure ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
   public
-    function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean; virtual;
+    function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False; ANoneButtonCaption: String = ''): Boolean; virtual;
     constructor Create(AOwner: TComponent); override;
   published
     property Operation: TConfigOperation read FOperation write FOperation;
@@ -53,7 +53,7 @@ begin
   Result := True;
 end;
 
-function TCConfigForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False): Boolean;
+function TCConfigForm.ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False; ANoneButtonCaption: String = ''): Boolean;
 begin
   if ACanResize then begin
     BorderStyle := bsSizeable;
@@ -64,7 +64,11 @@ begin
   if FOperation = coNone then begin
     BitBtnOk.Visible := False;
     BitBtnCancel.Default := True;
-    BitBtnCancel.Caption := '&Wyjœcie';
+    if ANoneButtonCaption = '' then begin
+      BitBtnCancel.Caption := '&Wyjœcie';
+    end else begin
+      BitBtnCancel.Caption := ANoneButtonCaption;
+    end;
   end;
   FillForm;
   if not CanModifyValues then begin

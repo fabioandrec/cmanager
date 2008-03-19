@@ -12,6 +12,7 @@ type
 
   TCFrameForm = class(TCConfigForm)
     PanelFrame: TPanel;
+    Bevel1: TBevel;
   private
     FFrame: TCBaseFrame;
     FAdditionalData: TObject;

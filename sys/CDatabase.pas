@@ -245,8 +245,8 @@ uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
 
 function InitializeDataProvider(ADatabaseName: String; APassword: String; ADataProvider: TDataProvider): TInitializeProviderResult;
 var xCommand: String;
-    xDataVersion: String;
-    xFileVersion: String;
+    xFromVersion: String;
+    xToVersion: String;
     xDatabaseName: String;
     xPassword: String;
 begin
@@ -258,8 +258,8 @@ begin
   xPassword := APassword;
   Result := ConnectToDatabase(xDatabaseName, xPassword, ADataProvider.Connection);
   if Result = iprSuccess then begin
-    if UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xDataVersion, xFileVersion) then begin
-      if not UpdateConfiguration(xDataVersion, xFileVersion) then begin
+    if UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xFromVersion, xToVersion) then begin
+      if not UpdateConfiguration(GBasePreferences.configFileVersion, xFromVersion, xToVersion) then begin
         Result := iprError;
         ShowInfo(itError, 'Plik "' + xDatabaseName + '" nie jest poprawnym plikiem danych', '');
       end;
