@@ -6,7 +6,7 @@ interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics;
+uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics, Math;
 
 const
   CEmptyDataGid = '';
@@ -1146,3 +1146,6 @@ begin
 end;
 
 end.
+
+
+

@@ -1553,7 +1553,7 @@ procedure TCHtmlReport.PrepareReportData;
 begin
   PrepareReportPath;
   PrepareReportContent;
-  TCHtmlReportForm(FForm).CBrowser.LoadFromString(GBaseTemlatesList.ExpandTemplates(FreportText.Text, Self));
+  TCHtmlReportForm(FForm).CBrowser.LoadFromString(ChangeColorsToRgb(GBaseTemlatesList.ExpandTemplates(FreportText.Text, Self)));
 end;
 
 procedure TCHtmlReport.PrepareReportPath;
@@ -3171,8 +3171,6 @@ var xBody: TStringList;
     xCount: Integer;
     xNode: PVirtualNode;
     xAl: String;
-    xLevelPrefix: String;
-    xLevel: Integer;
     xExpand: String;
 begin
   xList := TCVirtualStringTreeParams(FParams).list;
@@ -3193,17 +3191,12 @@ begin
     Add('</table><hr><table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
     xNode := xList.GetFirstVisible;
     while xNode <> Nil do begin
-      Add('<tr class="' + IsEvenToStr(xList.GetVisibleIndex(xNode) + 1) + 'base">');
+      Add('<tr style="text-indent: ' + IntToStr(25 * xList.GetNodeLevel(xNode)) +  'px;" class="' + IsEvenToStr(xList.GetVisibleIndex(xNode) + 1) + 'base">');
       for xCount := Low(xColumns) to High(xColumns) do begin
         if (xColumns[xCount].Alignment = taRightJustify) and (AnsiUpperCase(xColumns[xCount].Text) <> 'LP') then begin
           xAl := 'cash';
         end else begin
           xAl := 'text';
-        end;
-        xLevel := 16 * xList.GetNodeLevel(xNode);
-        xLevelPrefix := '';
-        while Length(xLevelPrefix) < xLevel do begin
-          xLevelPrefix := xLevelPrefix + '&nbsp';
         end;
         if xNode.ChildCount > 0 then begin
           if vsExpanded in xNode.States then begin
@@ -3214,7 +3207,7 @@ begin
         end else begin
           xExpand := '&nbsp';
         end;
-        Add(Format('<td class="%s" width="%s">' + xLevelPrefix + xExpand + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
+        Add(Format('<td class="%s" width="%s">' + xExpand + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
       end;
       Add('</tr>');
       xNode := xList.GetNextVisible(xNode);

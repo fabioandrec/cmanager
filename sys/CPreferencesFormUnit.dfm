@@ -902,6 +902,9 @@ inherited CPreferencesForm: TCPreferencesForm
   inherited PanelButtons: TPanel
     Top = 445
     Width = 609
+    DesignSize = (
+      609
+      41)
     inherited BitBtnOk: TBitBtn
       Left = 432
     end

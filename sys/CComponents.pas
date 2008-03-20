@@ -5,7 +5,7 @@ interface
 uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList,
      Buttons, StdCtrls, ExtCtrls, SysUtils, ComCtrls, IntfUIHandlers, ShDocVw,
      ActiveX, PngImageList, VirtualTrees, GraphUtil, Contnrs, Types, RichEdit,
-     ShellApi, CXml, PngImage, Menus, ActnMan;
+     ShellApi, CXml, PngImage, Menus, ActnMan, Dialogs;
 
 type
   TPicturePosition = (ppLeft, ppTop, ppRight);
