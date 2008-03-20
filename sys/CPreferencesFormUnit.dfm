@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 478
           Height = 422
-          ActivePage = TabSheetOperations
+          ActivePage = TabSheetBase
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -188,23 +188,23 @@ inherited CPreferencesForm: TCPreferencesForm
               Height = 161
               Caption = ' Automatyczne kopie plik'#243'w danych '
               TabOrder = 2
-              object Label3: TLabel
-                Left = 416
+              object LabelAge: TLabel
+                Left = 296
                 Top = 32
                 Width = 14
                 Height = 13
                 Caption = 'dni'
               end
               object Label2: TLabel
-                Left = 17
+                Left = 34
                 Top = 68
-                Width = 61
+                Width = 36
                 Height = 13
                 Alignment = taRightJustify
-                Caption = 'Katalog kopii'
+                Caption = 'Katalog'
               end
               object Label5: TLabel
-                Left = 51
+                Left = 43
                 Top = 32
                 Width = 27
                 Height = 13
@@ -212,7 +212,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Caption = 'Akcja'
               end
               object Label6: TLabel
-                Left = 22
+                Left = 14
                 Top = 104
                 Width = 58
                 Height = 13
@@ -220,7 +220,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Caption = 'Nazwa kopii'
               end
               object CButton8: TCButton
-                Left = 316
+                Left = 308
                 Top = 96
                 Width = 115
                 Height = 25
@@ -233,9 +233,9 @@ inherited CPreferencesForm: TCPreferencesForm
                 Color = clBtnFace
               end
               object ComboBoxBackupAction: TComboBox
-                Left = 88
+                Left = 80
                 Top = 28
-                Width = 265
+                Width = 169
                 Height = 21
                 BevelInner = bvNone
                 BevelKind = bkTile
@@ -243,18 +243,18 @@ inherited CPreferencesForm: TCPreferencesForm
                 ItemHeight = 13
                 ItemIndex = 2
                 TabOrder = 0
-                Text = 'Monituj, je'#380'eli ostatnia kopia jest starsza ni'#380
+                Text = 'Monituj, je'#380'eli kopia starsza ni'#380
                 OnChange = ComboBoxBackupActionChange
                 Items.Strings = (
-                  'Wykonaj raz dziennie, przy pierwszym uruchomieniu'
-                  'Wykonaj zawsze podczas uruchamiania'
-                  'Monituj, je'#380'eli ostatnia kopia jest starsza ni'#380
-                  'Nie wykonuj kopii, po prostu uruchom CManager-a')
+                  'Wykonaj raz dziennie'
+                  'Wykonaj zawsze'
+                  'Monituj, je'#380'eli kopia starsza ni'#380
+                  'Nie wykonuj kopii')
               end
               object CStaticBackupCat: TCStatic
-                Left = 88
+                Left = 80
                 Top = 64
-                Width = 321
+                Width = 353
                 Height = 21
                 AutoSize = False
                 BevelKind = bkTile
@@ -269,7 +269,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 HotTrack = True
               end
               object CIntEditBackupAge: TCIntEdit
-                Left = 376
+                Left = 256
                 Top = 28
                 Width = 33
                 Height = 21
@@ -279,22 +279,39 @@ inherited CPreferencesForm: TCPreferencesForm
                 Text = '7'
               end
               object EditBackupName: TEdit
-                Left = 88
+                Left = 80
                 Top = 100
                 Width = 227
                 Height = 21
                 BevelKind = bkTile
                 BorderStyle = bsNone
                 MaxLength = 40
-                TabOrder = 3
+                TabOrder = 4
               end
               object CheckBoxCanOverwrite: TCheckBox
-                Left = 88
+                Left = 80
                 Top = 124
                 Width = 353
                 Height = 17
                 Caption = 'Zezwalaj na nadpisywanie istniej'#261'cych kopii'
-                TabOrder = 4
+                TabOrder = 5
+              end
+              object ComboBoxWhen: TComboBox
+                Left = 320
+                Top = 28
+                Width = 113
+                Height = 21
+                BevelInner = bvNone
+                BevelKind = bkTile
+                Style = csDropDownList
+                ItemHeight = 13
+                ItemIndex = 0
+                TabOrder = 3
+                Text = 'przy uruchamianiu'
+                OnChange = ComboBoxBackupActionChange
+                Items.Strings = (
+                  'przy uruchamianiu'
+                  'przy zamkykaniu')
               end
             end
           end
@@ -914,8 +931,8 @@ inherited CPreferencesForm: TCPreferencesForm
   end
   object ActionManager1: TActionManager
     Images = CategoryImageList
-    Left = 289
-    Top = 384
+    Left = 297
+    Top = 424
     StyleName = 'XP Style'
     object Action1: TAction
       Caption = 'Podstawowe'
@@ -1195,8 +1212,8 @@ inherited CPreferencesForm: TCPreferencesForm
         Name = 'PngImage4'
         Background = clWindow
       end>
-    Left = 209
-    Top = 392
+    Left = 241
+    Top = 416
     Bitmap = {}
   end
   object OpenDialog: TOpenDialog
@@ -1595,13 +1612,13 @@ inherited CPreferencesForm: TCPreferencesForm
         Name = 'PngImage6'
       end>
     Left = 174
-    Top = 396
+    Top = 420
     Bitmap = {}
   end
   object ActionManager2: TActionManager
     Images = PngImageList
-    Left = 344
-    Top = 360
+    Left = 504
+    Top = 392
     StyleName = 'XP Style'
     object Action4: TAction
       Caption = 'Ustawienia dla listy wykonanych operacji'
@@ -1652,7 +1669,7 @@ inherited CPreferencesForm: TCPreferencesForm
   end
   object ColorDialog: TColorDialog
     Options = [cdFullOpen]
-    Left = 350
-    Top = 412
+    Left = 342
+    Top = 428
   end
 end

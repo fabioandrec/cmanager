@@ -39,6 +39,7 @@ type
     FTempfile: String;
     FReport: TStringList;
     FIsRunning: Boolean;
+    FIsError: Boolean;
     procedure Progress(AStepBy: Integer);
     procedure AddToReport(AText: String);
   protected
@@ -49,6 +50,7 @@ type
     procedure WaitFor;
     property Report: TStringList read FReport;
     property IsRunning: Boolean read FIsRunning;
+    property IsError: Boolean read FIsError;
     destructor Destroy; override;
   end;
 
@@ -108,6 +110,7 @@ type
     FstartupInfoValidLimits: Boolean;
     FworkDays: String;
     FbackupAction: Integer;
+    FbackupOnStart: Boolean;
     FbackupDaysOld: Integer;
     FbakupDirectory: String;
     FbackupFileName: String;
@@ -150,6 +153,7 @@ type
     property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
     property startupUncheckedExtractions: Boolean read FstartupUncheckedExtractions write FstartupUncheckedExtractions;
     property workDays: String read FworkDays write FworkDays;
+    property backupOnStart: Boolean read FbackupOnStart write FbackupOnStart;
     property backupAction: Integer read FbackupAction write FbackupAction;
     property backupDaysOld: Integer read FbackupDaysOld write FbackupDaysOld;
     property backupDirectory: String read FbakupDirectory write FbakupDirectory;
@@ -206,7 +210,7 @@ end;
 procedure SendMessageToMainForm(AMsg: Integer; AWParam: Integer; ALParam: Integer);
 begin
   if Application.MainForm <> Nil then begin
-    SendMessage(Application.MainForm.Handle, AMsg, AWParam, ALParam);
+    PostMessage(Application.MainForm.Handle, AMsg, AWParam, ALParam);
   end;
 end;
 
@@ -235,6 +239,7 @@ begin
   FstartupInfoValidLimits := TBasePref(APrefItem).startupInfoValidLimits;
   FworkDays := TBasePref(APrefItem).workDays;
   FbackupAction := TBasePref(APrefItem).backupAction;
+  FbackupOnStart := TBasePref(APrefItem).backupOnStart;
   FbackupDaysOld := TBasePref(APrefItem).backupDaysOld;
   FbakupDirectory := TBasePref(APrefItem).backupDirectory;
   FbackupFileName := TBasePref(APrefItem).backupFileName;
@@ -314,6 +319,7 @@ begin
     FworkDays := '+++++--';
   end;
   FbackupAction := GetXmlAttribute('backupAction', ANode, CBackupActionAsk);
+  FbackupOnStart := GetXmlAttribute('backupOnStart', ANode, True);
   FbackupDaysOld := GetXmlAttribute('backupDaysOld', ANode, 7);
   FbakupDirectory := GetXmlAttribute('backupDirectory', ANode, ExpandFileName(ExtractFilePath(ParamStr(0))));
   FbackupFileName := GetXmlAttribute('backupFilename', ANode, '@data@.cmb');
@@ -357,6 +363,7 @@ begin
   SetXmlAttribute('startupInfoValidLimits', ANode, FstartupInfoValidLimits);
   SetXmlAttribute('workDays', ANode, FworkDays);
   SetXmlAttribute('backupAction', ANode, FbackupAction);
+  SetXmlAttribute('backupOnStart', ANode, FbackupOnStart);
   SetXmlAttribute('backupDaysOld', ANode, FbackupDaysOld);
   SetXmlAttribute('backupDirectory', ANode, FbakupDirectory);
   SetXmlAttribute('backupFilename', ANode, FbackupFileName);
@@ -531,10 +538,12 @@ begin
   end;
   if not xOk then begin
     SendMessageToMainForm(WM_STATBACKUPFINISHEDERR, 0, 0);
+    FIsError := True;
   end else begin
     SendMessageToMainForm(WM_STATBACKUPFINISHEDSUCC, 0, 0);
     WaitForSingleObject(Handle, 3000);
     SendMessageToMainForm(WM_STATCLEAR, 0, 0);
+    FIsError := False;
   end;
   FIsRunning := False;
 end;

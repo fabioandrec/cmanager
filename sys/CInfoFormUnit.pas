@@ -15,7 +15,7 @@ type
     CheckBoxAlways: TCheckBox;
   end;
 
-function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil): Boolean;
+function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil; AIsQuestion: Boolean = False): Boolean;
 procedure NotImplemented(AFunctionName: String);
 
 implementation
@@ -24,7 +24,7 @@ uses CTools;
 
 {$R *.dfm}
 
-function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil): Boolean;
+function ShowInfo(AIconType: TIconType; AText: String; AAdditional: String; AAlways: Pointer = Nil; AIsQuestion: Boolean = False): Boolean;
 var xForm: TCInfoForm;
     xCaption: String;
     xIconRes: PChar;
@@ -56,9 +56,14 @@ begin
     end;
   end;
   if AIconType in [itWarning, itError, itInfo] then begin
-    xForm.BitBtnOk.Visible := False;
-    xForm.BitBtnCancel.Caption := 'OK';
-    xForm.BitBtnCancel.Default := True;
+    if not AIsQuestion then begin
+      xForm.BitBtnOk.Visible := False;
+      xForm.BitBtnCancel.Caption := 'OK';
+      xForm.BitBtnCancel.Default := True;
+    end else begin
+      xForm.BitBtnOk.Caption := '&Tak';
+      xForm.BitBtnCancel.Caption := '&Nie';
+    end;
   end else begin
     xForm.BitBtnOk.Caption := '&Tak';
     xForm.BitBtnCancel.Caption := '&Nie';

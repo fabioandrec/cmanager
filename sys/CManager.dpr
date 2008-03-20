@@ -206,7 +206,7 @@ begin
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
-          CheckForBackups;
+          CheckForBackups(CMANAGERSTATE_STARTING);
         end;
         Application.ProcessMessages;
         GCmanagerState := CMANAGERSTATE_RUNNING;

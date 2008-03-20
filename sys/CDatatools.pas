@@ -11,7 +11,7 @@ function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
 function CheckPendingInformations: Boolean;
 procedure CheckForUpdates(AQuiet: Boolean);
-procedure CheckForBackups;
+function CheckForBackups(ACManagerState: Integer): Boolean;
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);
 procedure UpdateCurrencyRates(ARatesText: String);
 procedure UpdateExchanges(AExchangesText: String);
@@ -33,7 +33,7 @@ uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CTools, StrUtils, CPreferences, CUpdateCurrencyRatesFormUnit,
   CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
   CExtractionItemFormUnit, CUpdateExchangesFormUnit,
-  CInitializeProviderFormUnit;
+  CInitializeProviderFormUnit, CPluginConsts;
 
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -97,33 +97,44 @@ begin
   end;
 end;
 
-procedure CheckForBackups;
+function CheckForBackups(ACManagerState: Integer): Boolean;
 var xPref: TBackupPref;
     xMustbackup: Boolean;
 begin
   xMustbackup := False;
-  xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDataProvider.Filename]);
-  if GBasePreferences.backupAction = CBackupActionOnce then begin
-    if xPref <> Nil then begin
-      xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
-    end else begin
+  if ((ACManagerState = CMANAGERSTATE_STARTING) and (GBasePreferences.backupOnStart)) or
+     ((ACManagerState = CMANAGERSTATE_CLOSING) and (not GBasePreferences.backupOnStart)) then begin
+    xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDataProvider.Filename]);
+    if GBasePreferences.backupAction = CBackupActionOnce then begin
+      if xPref <> Nil then begin
+        xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
+      end else begin
+        xMustbackup := True;
+      end;
+    end else if GBasePreferences.backupAction = CBackupActionAlways then begin
       xMustbackup := True;
-    end;
-  end else if GBasePreferences.backupAction = CBackupActionAlways then begin
-    xMustbackup := True;
-  end else if GBasePreferences.backupAction = CBackupActionAsk then begin
-    if xPref = Nil then begin
-      xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.\n' +
-                                          'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
-    end else begin
-      if DaysBetween(Today, xPref.lastBackup) + 1 >= GBasePreferences.backupDaysOld then begin
-        xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.\n' + 
+    end else if GBasePreferences.backupAction = CBackupActionAsk then begin
+      if xPref = Nil then begin
+        xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.\n' +
                                             'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
+      end else begin
+        if DaysBetween(Today, xPref.lastBackup) + 1 >= GBasePreferences.backupDaysOld then begin
+          xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.\n' +
+                                              'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
+        end;
       end;
     end;
   end;
   if xMustbackup then begin
     GBackupThread := TBackupThread.Create(GDataProvider.Filename);
+    if ACManagerState = CMANAGERSTATE_CLOSING then begin
+      GBackupThread.WaitFor;
+      Result := not GBackupThread.IsError;
+    end else begin
+      Result := True;
+    end;
+  end else begin
+    Result := True;
   end;
 end;
 

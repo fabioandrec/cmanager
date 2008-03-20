@@ -126,6 +126,7 @@ type
     procedure ShortcutListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure ActionPasswordDatafileExecute(Sender: TObject);
     procedure ActionCmdExecute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -410,7 +411,9 @@ begin
   end;
   ActionImportCurrencyRates.Visible := GDataProvider.IsConnected;
   ActionCompactDatafile.Visible := GDataProvider.IsConnected;
+  {$IFDEF DEBUG}
   ActionRandom.Visible := GDataProvider.IsConnected;
+  {$ENDIF}
   ActionCheckDatafile.Visible := GDataProvider.IsConnected;
   ActionImportDatafile.Visible := GDataProvider.IsConnected;
   ActionExportDatafile.Visible := GDataProvider.IsConnected;
@@ -994,6 +997,13 @@ procedure TCMainForm.ActionCmdExecute(Sender: TObject);
 begin
   SetCurrentDir(GetSystemPathname(''));
   ShellExecute(0, nil, 'cmd.exe', nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TCMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if not CheckForBackups(CMANAGERSTATE_CLOSING) then begin
+    CanClose := ShowInfo(itWarning, 'Podczas wykonywania kopii zapasowej wyst¹pi³ b³¹d. Czy chcesz zakoñczyæ pracê ?', '', Nil, True);
+  end;
 end;
 
 end.

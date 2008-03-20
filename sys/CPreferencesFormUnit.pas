@@ -77,7 +77,7 @@ type
     ComboBoxBackupAction: TComboBox;
     CStaticBackupCat: TCStatic;
     CIntEditBackupAge: TCIntEdit;
-    Label3: TLabel;
+    LabelAge: TLabel;
     Label2: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -117,6 +117,7 @@ type
     Label11: TLabel;
     CStaticProfile: TCStatic;
     Label12: TLabel;
+    ComboBoxWhen: TComboBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -174,7 +175,7 @@ uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CTemplates, CDescpatternFormUnit, CPlugins, CExtractionItemFormUnit,
   CExtractionsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
   CProductsFrameUnit, CCashpointsFrameUnit, CProfileFrameUnit, CDatabase,
-  CDataObjects, CTools;
+  CDataObjects, CTools, Math;
 
 {$R *.dfm}
 
@@ -297,6 +298,7 @@ begin
     CheckBoxSun.Checked := workDays[7] = '+';
     FPrevWorkDays := workDays;
     ComboBoxBackupAction.ItemIndex := backupAction;
+    ComboBoxWhen.ItemIndex := IfThen(backupOnStart, 0, 1);
     CIntEditBackupAge.Text := IntToStr(backupDaysOld);
     CStaticBackupCat.DataId := backupDirectory;
     CStaticBackupCat.Caption := MinimizeName(backupDirectory, CStaticBackupCat.Canvas, CStaticBackupCat.Width);
@@ -385,6 +387,7 @@ begin
     workDays := workDays + ifThen(CheckBoxSat.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxSun.Checked, '+', '-');
     backupAction := ComboBoxBackupAction.ItemIndex;
+    backupOnStart := ComboBoxWhen.ItemIndex = 0;
     backupDaysOld := CIntEditBackupAge.Value;
     backupDirectory := CStaticBackupCat.DataId;;
     backupFileName := EditBackupName.Text;
@@ -517,7 +520,7 @@ begin
     SetActiveAction(Action1);
     ShowInfo(itError, 'Nie okreœlono ¿adnego pracuj¹cego dnia, ustaw przynajmniej jeden', '');
     Result := False;
-  end else if CIntEditBackupAge.Enabled and (CIntEditBackupAge.Value = 0) then begin
+  end else if CIntEditBackupAge.Visible and (CIntEditBackupAge.Value = 0) then begin
     Result := False;
     SetActiveAction(Action1);
     ShowInfo(itError, 'Iloœæ dni nie mo¿e byæ równa zero', '');
@@ -539,7 +542,9 @@ begin
   EditBackupName.Enabled := CStaticBackupCat.Enabled;
   CheckBoxCanOverwrite.Enabled := CStaticBackupCat.Enabled;
   ActionAdd.Enabled := EditBackupName.Enabled;
-  CIntEditBackupAge.Enabled := (ComboBoxBackupAction.ItemIndex = 2);
+  CIntEditBackupAge.Visible := (ComboBoxBackupAction.ItemIndex = 2);
+  LabelAge.Visible := CIntEditBackupAge.Visible;
+  ComboBoxWhen.Visible := (ComboBoxBackupAction.ItemIndex <> 3);
 end;
 
 procedure TCPreferencesForm.ActionAddExecute(Sender: TObject);
