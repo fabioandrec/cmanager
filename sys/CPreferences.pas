@@ -40,14 +40,15 @@ type
     FReport: TStringList;
     FIsRunning: Boolean;
     FIsError: Boolean;
+    FInfoTimeout: Integer;
     procedure Progress(AStepBy: Integer);
     procedure AddToReport(AText: String);
   protected
     function PrepareFile: Boolean;
     procedure Execute; override;
   public
-    constructor Create(AFilein: String);
-    procedure WaitFor;
+    constructor Create(AFilein: String; AInfoTimeout: Integer = 3000);
+    procedure WaitFor(AWaitForStart: Boolean);
     property Report: TStringList read FReport;
     property IsRunning: Boolean read FIsRunning;
     property IsError: Boolean read FIsError;
@@ -485,11 +486,12 @@ begin
   FReport.Add(FormatDateTime('hh:nn:ss', Now) + ' ' + AText);
 end;
 
-constructor TBackupThread.Create(AFilein: String);
+constructor TBackupThread.Create(AFilein: String; AInfoTimeout: Integer = 3000);
 begin
   inherited Create(True);
   FreeOnTerminate := False;
   FFilein := AFilein;
+  FInfoTimeout := AInfoTimeout;
   FTempfile := '';
   SetThreadPriority(Handle, THREAD_PRIORITY_BELOW_NORMAL);
   FReport := TStringList.Create;
@@ -541,7 +543,9 @@ begin
     FIsError := True;
   end else begin
     SendMessageToMainForm(WM_STATBACKUPFINISHEDSUCC, 0, 0);
-    WaitForSingleObject(Handle, 3000);
+    if FInfoTimeout > 0 then begin
+      WaitForSingleObject(Handle, FInfoTimeout);
+    end;
     SendMessageToMainForm(WM_STATCLEAR, 0, 0);
     FIsError := False;
   end;
@@ -576,9 +580,14 @@ begin
   SendMessageToMainForm(WM_STATPROGRESS, 0, AStepBy);
 end;
 
-procedure TBackupThread.WaitFor;
+procedure TBackupThread.WaitFor(AWaitForStart: Boolean);
 begin
+  while not FIsRunning do begin
+    Application.ProcessMessages;
+    Sleep(10);
+  end;
   while FIsRunning do begin
+    Application.ProcessMessages;
     Sleep(10);
   end;
 end;
@@ -955,7 +964,7 @@ initialization
 finalization
   if GBackupThread <> Nil then begin
     if GBackupThread.IsRunning then begin
-      GBackupThread.WaitFor;
+      GBackupThread.WaitFor(False);
     end;
     GBackupThread.Free;
   end;

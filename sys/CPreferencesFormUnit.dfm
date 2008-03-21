@@ -311,7 +311,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 OnChange = ComboBoxBackupActionChange
                 Items.Strings = (
                   'przy uruchamianiu'
-                  'przy zamkykaniu')
+                  'przy zamykaniu')
               end
             end
           end

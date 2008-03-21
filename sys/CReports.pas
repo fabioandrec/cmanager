@@ -349,6 +349,19 @@ type
     function GetReportBody: String; override;
   end;
 
+  TOperationsTreeCategoryList = class(TCHtmlReport)
+  private
+    FStartDate: TDateTime;
+    FEndDate: TDateTime;
+  protected
+    function PrepareReportConditions: Boolean; override;
+    function GetCurrencyField: String;
+    function GetCashField: String;
+    function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
   TOperationsByCategoryChart = class(TOperationsBySomethingChart)
   protected
     function GetSql: String; override;
@@ -5233,6 +5246,150 @@ begin
     FInstrumentId := TCWithGidParams(Params).id;
   end;
   Result := ChoosePeriodInstrumentValueHistory(FStartDate, FEndDate, FInstrumentId);
+end;
+
+function TOperationsTreeCategoryList.GetCashField: String;
+begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
+    Result := 'movementCash';
+  end else begin
+    Result := 'cash';
+  end;
+end;
+
+function TOperationsTreeCategoryList.GetCurrencyField: String;
+begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
+    Result := 'idMovementCurrencyDef';
+  end else begin
+    Result := 'idAccountCurrencyDef';
+  end;
+end;
+
+function TOperationsTreeCategoryList.GetReportBody: String;
+
+  procedure AppendTreeChilds(AChilds: TSumElementList; ABody: TStringList; ACurrentLevel: Integer; var ALineNo: Integer);
+  var xCount: Integer;
+      xElement: TSumElement;
+  begin
+    for xCount := 0 to AChilds.Count - 1 do begin
+      xElement := TSumElement(AChilds.Items[xCount]);
+      ABody.Add('<tr class="' + IsEvenToStr(ALineNo) + 'base">');
+      ABody.Add('<td style="text-indent: ' + IntToStr(25 * ACurrentLevel) +  'px;" class="text" width="40%">' + xElement.name + '</td>');
+      ABody.Add('<td class="cash" width="25%">' + CurrencyToString(xElement.cashIn, '', False) + '</td>');
+      ABody.Add('<td class="cash" width="35%">' + CurrencyToString(xElement.cashIn + xElement.childsInSum, '', False) + '</td>');
+      ABody.Add('</tr>');
+      Inc(ALineNo);
+      AppendTreeChilds(xElement.childs, ABody, ACurrentLevel + 1, ALineNo);
+    end;
+  end;
+
+var xSumDataset: TADOQuery;
+    xProductsDataset: TADOQuery;
+    xFilter: String;
+    xSql: String;
+    xCurId, xProdId, xProdParentId: TDataGid;
+    xRootList: TSumElementList;
+    xCurrencyElement, xProductParentElement, xProductElement: TSumElement;
+    xBody: TStringList;
+    xCount, xLineNo: Integer;
+begin
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'transactions.idAccount', 'transactions.idCashpoint', 'transactions.idProduct');
+  xSql := Format('select %s as idCurrencyDef, sum(%s) as cash, idProduct from transactions where movementType = ''%s'' %s and regDate between %s and %s group by idProduct, %s',
+                [GetCurrencyField, GetCashField, TCSelectedMovementTypeParams(FParams).movementType,
+                 xFilter, DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False),
+                 GetCurrencyField]);
+  xSumDataset := GDataProvider.OpenSql(xSql);
+  xRootList := TSumElementList.Create(True);
+  xProductsDataset := GDataProvider.OpenSql('select p.idProduct, p.name, p.idParentProduct, x.name as parentName from product p left outer join product x on p.idParentProduct = x.idProduct order by p.created, p.idParentProduct');
+  while not xSumDataset.Eof do begin
+    xCurId := xSumDataset.FieldByName('idCurrencyDef').AsString;
+    xCurrencyElement := xRootList.FindSumObjectByCur(xCurId, False);
+    if xCurrencyElement = Nil then begin
+      xCurrencyElement := TSumElement.Create;
+      xCurrencyElement.idCurrencyDef := xCurId;
+      xCurrencyElement.name := '[' + GCurrencyCache.GetIso(xCurId) + ']';
+      xRootList.Add(xCurrencyElement);
+      xProductsDataset.First;
+      while not xProductsDataset.Eof do begin
+        xProdId := xProductsDataset.FieldByName('idProduct').AsString;
+        xProdParentId := xProductsDataset.FieldByName('idParentProduct').AsString;
+        if xProdParentId <> CEmptyDataGid then begin
+          xProductParentElement := TSumElementList.FindSumObjectByIdRecursive(xProdParentId, xCurrencyElement.childs);
+          if xProductParentElement = Nil then begin
+            xProductParentElement := TSumElement.Create;
+            xProductParentElement.id := xProdParentId;
+            xProductParentElement.name := xProductsDataset.FieldByName('parentName').AsString;
+            xProductParentElement.idCurrencyDef := xCurId;
+            xCurrencyElement.AddChild(xProductParentElement);
+          end;
+        end else begin
+          xProductParentElement := xCurrencyElement;
+        end;
+        xProductElement := TSumElement.Create;
+        xProductElement.id := xProdId;
+        xProductElement.idCurrencyDef := xCurId;
+        xProductElement.name := xProductsDataset.FieldByName('name').AsString;
+        xProductParentElement.AddChild(xProductElement);
+        xProductsDataset.Next;
+      end;
+    end;
+    xProductElement := TSumElementList.FindSumObjectByIdRecursive(xSumDataset.FieldByName('idProduct').AsString, xCurrencyElement.childs);
+    xProductElement.cashIn := xProductElement.cashIn + Abs(xSumDataset.FieldByName('cash').AsCurrency);
+    xSumDataset.Next;
+  end;
+  TSumElementList.DeleteZeroChilds(xRootList);
+  xBody := TStringList.Create;
+  with xBody do begin
+    Add('<table class="base" colspan=3>');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="40%">Nazwa</td>');
+    Add('<td class="headcash" width="25%">Suma kategorii</td>');
+    Add('<td class="headcash" width="35%">Zbiorczo z podkategoriami</td>');
+    Add('</tr>');
+    Add('</table><hr>');
+    for xCount := 0 to xRootList.Count - 1 do begin
+      if xCount > 0 then begin
+        Add('<hr>');
+      end;
+      with xBody do begin
+        Add('<table class="base" colspan=1>');
+        Add('<tr class="subhead">');
+        Add('<td class="subheadtext" width="100%">' + TSumElement(xRootList.Items[xCount]).name + '</td>');
+        Add('</tr>');
+        Add('</table><hr>');
+      end;
+      Add('<table class="base" colspan=3>');
+      xLineNo := 0;
+      AppendTreeChilds(TSumElement(xRootList.Items[xCount]).childs, xBody, 0, xLineNo);
+      Add('</table><hr><table class="base" colspan=3>');
+      Add('<tr class="sum">');
+      Add('<td class="sumtext" width="40%">Razem</td>');
+      Add('<td class="sumcash" width="25%">' + CurrencyToString(TSumElement(xRootList.Items[xCount]).childsInSum, '', False) + '</td>');
+      Add('<td class="sumcash" width="35%"></td>');
+      Add('</tr>');
+      Add('</table>');
+    end;
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+  xRootList.Free;
+  xSumDataset.Free;
+  xProductsDataset.Free;
+end;
+
+function TOperationsTreeCategoryList.GetReportTitle: String;
+begin
+  if TCSelectedMovementTypeParams(FParams).movementType = CInMovement then begin
+    Result := 'Sumy operacji przychodowych w drzewie kategorii  (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+  end else begin
+    Result := 'Sumy operacji rozchodowych w drzewie kategorii (' + GetFormattedDate(FStartDate, CLongDateFormat) + ' - ' + GetFormattedDate(FEndDate, CLongDateFormat) + ')';
+  end;
+end;
+
+function TOperationsTreeCategoryList.PrepareReportConditions: Boolean;
+begin
+  Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView, True);
 end;
 
 initialization

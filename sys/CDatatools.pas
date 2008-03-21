@@ -5,7 +5,7 @@ unit CDatatools;
 interface
 
 uses Windows, SysUtils, Classes, Controls, ShellApi, CDatabase, CComponents, CBackups,
-     DateUtils, AdoDb, VirtualTrees, CXml, Db;
+     DateUtils, AdoDb, VirtualTrees, CXml, Db, Math;
 
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 function GetDefaultBackupFilename(ADatabaseName: String): String;
@@ -126,9 +126,9 @@ begin
     end;
   end;
   if xMustbackup then begin
-    GBackupThread := TBackupThread.Create(GDataProvider.Filename);
+    GBackupThread := TBackupThread.Create(GDataProvider.Filename, IfThen(ACManagerState = CMANAGERSTATE_STARTING, 3000, 0));
     if ACManagerState = CMANAGERSTATE_CLOSING then begin
-      GBackupThread.WaitFor;
+      GBackupThread.WaitFor(True);
       Result := not GBackupThread.IsError;
     end else begin
       Result := True;

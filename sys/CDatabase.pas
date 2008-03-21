@@ -211,6 +211,8 @@ type
     FcashIn: Currency;
     FcashOut: Currency;
     Fchilds: TSumElementList;
+    function GetcashInSum: Currency;
+    function GetcashOutSum: Currency;
   public
     constructor Create;
     destructor Destroy; override;
@@ -221,13 +223,19 @@ type
     property name: String read Fname write Fname;
     property cashIn: Currency read FcashIn write FcashIn;
     property cashOut: Currency read FcashOut write FcashOut;
+    property childsInSum: Currency read GetcashInSum;
+    property childsOutSum: Currency read GetcashOutSum;
     property childs: TSumElementList read Fchilds write Fchilds;
   end;
 
   TSumElementList = class(TObjectList)
   public
     function FindSumObjectById(AId: String; ACreate: Boolean): TSumElement;
+    class function FindSumObjectByIdRecursive(AId: String; AList: TSumElementList): TSumElement;
     function FindSumObjectByCur(AId: String; ACreate: Boolean): TSumElement;
+    class function FindSumObjectByCurRecursive(AId: String; AList: TSumElementList): TSumElement;
+    class function SumelementsRecursive(AList: TSumElementList; AIn: Boolean): Currency;
+    class procedure DeleteZeroChilds(AList: TSumElementList);
   end;
 
 var GDataProvider: TDataProvider;
@@ -1208,6 +1216,83 @@ begin
   end;
 end;
 
+class function TSumElementList.FindSumObjectByIdRecursive(AId: String; AList: TSumElementList): TSumElement;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= AList.Count - 1) and (Result = Nil) do begin
+    if TSumElement(AList.Items[xCount]).id = AId then begin
+      Result := TSumElement(AList.Items[xCount]);
+    end;
+    Inc(xCount);
+  end;
+  if Result = Nil then begin
+    xCount := 0;
+    while (xCount <= AList.Count - 1) and (Result = Nil) do begin
+      Result := FindSumObjectByIdRecursive(AId, TSumElement(AList.Items[xCount]).childs);
+      Inc(xCount);
+    end;
+  end;
+end;
+
+class function TSumElementList.FindSumObjectByCurRecursive(AId: String; AList: TSumElementList): TSumElement;
+var xCount: Integer;
+begin
+  Result := Nil;
+  xCount := 0;
+  while (xCount <= AList.Count - 1) and (Result = Nil) do begin
+    if TSumElement(AList.Items[xCount]).idCurrencyDef = AId then begin
+      Result := TSumElement(AList.Items[xCount]);
+    end;
+    Inc(xCount);
+  end;
+  if Result = Nil then begin
+    xCount := 0;
+    while (xCount <= AList.Count - 1) and (Result = Nil) do begin
+      Result := FindSumObjectByCurRecursive(AId, TSumElement(AList.Items[xCount]).childs);
+      Inc(xCount);
+    end;
+  end;
+end;
+
+function TSumElement.GetcashInSum: Currency;
+begin
+  Result := TSumElementList.SumelementsRecursive(childs, True);
+end;
+
+function TSumElement.GetcashOutSum: Currency;
+begin
+  Result := TSumElementList.SumelementsRecursive(childs, False);
+end;
+
+class function TSumElementList.SumelementsRecursive(AList: TSumElementList; AIn: Boolean): Currency;
+var xCount: Integer;
+    xValue: Currency;
+begin
+  Result := 0;
+  for xCount := 0 to AList.Count - 1 do begin
+    if AIn then begin
+      xValue := TSumElement(AList.Items[xCount]).cashIn;
+    end else begin
+      xValue := TSumElement(AList.Items[xCount]).cashOut;
+    end;
+    Result := Result + xValue + TSumElementList.SumelementsRecursive(TSumElement(AList.Items[xCount]).childs, AIn);
+  end;
+end;
+
+class procedure TSumElementList.DeleteZeroChilds(AList: TSumElementList);
+var xCount: Integer;
+    xElement: TSumElement;
+begin
+  for xCount := AList.Count - 1 downto 0 do begin
+    xElement := TSumElement(AList.Items[xCount]);
+    TSumElementList.DeleteZeroChilds(xElement.childs);
+    if (xElement.childsInSum = 0) and (xElement.cashIn = 0) and (xElement.cashOut = 0) then begin
+      AList.Remove(xElement);
+    end;
+  end;
+end;
 
 initialization
   CoInitialize(Nil);
