@@ -30,6 +30,7 @@ inherited CMovementFrame: TCMovementFrame
       Width = 1
       Height = 146
       Align = alRight
+      AutoSnap = False
     end
     object Panel1: TPanel
       Left = 0
@@ -105,7 +106,7 @@ inherited CMovementFrame: TCMovementFrame
         Width = 335
         Height = 125
         Align = alClient
-        BevelEdges = []
+        BevelEdges = [beRight]
         BevelInner = bvNone
         BevelOuter = bvRaised
         BevelKind = bkFlat
@@ -221,7 +222,7 @@ inherited CMovementFrame: TCMovementFrame
           107
           21)
         object SpeedButtonPatternVisible: TSpeedButton
-          Left = 823
+          Left = 85
           Top = 5
           Width = 13
           Height = 13

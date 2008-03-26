@@ -23,7 +23,7 @@ type
 implementation
 
 uses CDataObjects, CProfileFormUnit, CPluginConsts, CBaseFrameUnit,
-  CDatatools, CTools;
+  CDatatools, CTools, CFrameFormUnit;
 
 {$R *.dfm}
 
@@ -66,10 +66,14 @@ var xMark: TProfile;
 begin
   inherited ReloadDataobjects;
   Dataobjects := TProfile.GetList(TProfile, ProfileProxy, 'select * from profile');
-  xMark := TProfile.Create(True);
-  xMark.id := CEmptyDataGid;
-  xMark.name := '<wyczyœæ aktywny profil>';
-  Dataobjects.Add(xMark);
+  if FrameOwner.InheritsFrom(TCFrameForm) then begin
+    if TCFrameForm(FrameOwner).IsChoice then begin
+      xMark := TProfile.Create(True);
+      xMark.id := CEmptyDataGid;
+      xMark.name := '<wyczyœæ aktywny profil>';
+      Dataobjects.Add(xMark);
+    end;
+  end;
 end;
 
 procedure TCProfileFrame.UpdateButtons(AIsSelectedSomething: Boolean);
