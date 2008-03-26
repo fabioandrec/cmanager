@@ -87,6 +87,24 @@ type
     property isReg: Boolean read FisReg write FisReg;
   end;
 
+  TFramePref = class(TPrefItem)
+  public
+    function GetNodeName: String; override;
+  end;
+
+  TFrameWithSumlistPref = class(TFramePref)
+  private
+    FsumListVisible: Boolean;
+    FsumListHeight: Integer;
+  public
+    property sumListVisible: Boolean read FsumListVisible write FsumListVisible;
+    property sumListHeight: Integer read FsumListHeight write FsumListHeight;
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
+    procedure Clone(APrefItem: TPrefItem); override;
+    constructor Create(APrefname: String); override;
+  end;
+
   TBasePref = class(TPrefItem, IDescTemplateExpander)
   private
     FstartupDatafileMode: Integer;
@@ -129,6 +147,7 @@ type
     function QueryInterface(const IID: TGUID; out Obj): HRESULT; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
+    function GetFramePrefitemClass(APrefname: String): TPrefItemClass;
   public
     function ExpandTemplate(ATemplate: String): String; virtual;
   published
@@ -178,6 +197,7 @@ type
 
 var GViewsPreferences: TPrefList;
     GChartPreferences: TPrefList;
+    GFramePreferences: TPrefList;
     GColumnsPreferences: TPrefList;
     GBackupsPreferences: TPrefList;
     GPluginsPreferences: TPrefList;
@@ -285,6 +305,17 @@ end;
 function TBasePref.GetBackupfilename: String;
 begin
   Result := IncludeTrailingPathDelimiter(backupDirectory) + GBaseTemlatesList.ExpandTemplates(FbackupFileName, Self);
+end;
+
+function TBasePref.GetFramePrefitemClass(APrefname: String): TPrefItemClass;
+begin
+  if APrefname = 'baseMovement' then begin
+    Result := TFrameWithSumlistPref;
+  end else if APrefname = 'plannedDone' then begin
+    Result := TFrameWithSumlistPref;
+  end else begin
+    Result := TFramePref;
+  end;
 end;
 
 function TBasePref.GetNodeName: String;
@@ -926,13 +957,40 @@ begin
   end;
 end;
 
+function TFramePref.GetNodeName: String;
+begin
+  Result := 'framepref';
+end;
+
+procedure TFrameWithSumlistPref.Clone(APrefItem: TPrefItem);
+begin
+  inherited Clone(APrefItem);
+  FsumListVisible := TFrameWithSumlistPref(APrefItem).sumListVisible;
+  FsumListHeight := TFrameWithSumlistPref(APrefItem).sumListHeight;
+end;
+
+constructor TFrameWithSumlistPref.Create(APrefname: String);
+begin
+  inherited Create(APrefname);
+  FsumListVisible := True;
+  FsumListHeight := -1;
+end;
+
+procedure TFrameWithSumlistPref.LoadFromXml(ANode: ICXMLDOMNode);
+begin
+  inherited LoadFromXml(ANode);
+  FsumListVisible := GetXmlAttribute('sumListVisible', ANode, True);
+  FsumListHeight := GetXmlAttribute('sumListHeight', ANode, -1);
+end;
+
+procedure TFrameWithSumlistPref.SaveToXml(ANode: ICXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('sumListVisible', ANode, FsumListVisible);
+  SetXmlAttribute('sumListHeight', ANode, FsumListHeight);
+end;
+
 initialization
-  GDescPatterns := TDescPatterns.Create(True);
-  GViewsPreferences := TPrefList.Create(TViewPref);
-  GColumnsPreferences := TPrefList.Create(TViewColumnPref);
-  GBackupsPreferences := TPrefList.Create(TBackupPref);
-  GPluginsPreferences := TPrefList.Create(TPluginPref);
-  GChartPreferences := TPrefList.Create(TChartPref);
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin
     startupDatafileMode := CStartupFilemodeFirsttime;
@@ -954,6 +1012,7 @@ initialization
     startupCheckUpdates := False;
     workDays := '+++++--';
     backupAction := CBackupActionAsk;
+    backupOnStart := False;
     backupDaysOld := 7;
     backupDirectory := ExpandFileName(ExtractFilePath(ParamStr(0)));
     backupFileName := '@data@ @godz@ @min@.cmb';
@@ -961,6 +1020,13 @@ initialization
     evenListColor := clWindow;
     oddListColor := GetDarkerColor(evenListColor);
   end;
+  GDescPatterns := TDescPatterns.Create(True);
+  GViewsPreferences := TPrefList.Create(TViewPref);
+  GFramePreferences := TPrefList.Create(GBasePreferences.GetFramePrefitemClass);
+  GColumnsPreferences := TPrefList.Create(TViewColumnPref);
+  GBackupsPreferences := TPrefList.Create(TBackupPref);
+  GPluginsPreferences := TPrefList.Create(TPluginPref);
+  GChartPreferences := TPrefList.Create(TChartPref);
 finalization
   if GBackupThread <> Nil then begin
     if GBackupThread.IsRunning then begin
@@ -975,4 +1041,5 @@ finalization
   GChartPreferences.Free;
   GPluginsPreferences.Free;
   GDescPatterns.Free;
+  GFramePreferences.Free;
 end.

@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, CDataObjects, PngImageList, CImageListsUnit, CSchedules, CPreferences;
+  Contnrs, CDataObjects, PngImageList, CImageListsUnit, CSchedules, CPreferences,
+  Buttons;
 
 type
   TDoneFrameAdditionalData = class
@@ -49,6 +50,8 @@ type
     PopupMenuIcons: TPopupMenu;
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
+    MenuItemsumsVisible: TMenuItem;
+    SpeedButtonCloseShortcuts: TSpeedButton;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -73,6 +76,8 @@ type
     procedure DoneListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure MenuItemBigIconsClick(Sender: TObject);
     procedure MenuItemSmallIconsClick(Sender: TObject);
+    procedure MenuItemsumsVisibleClick(Sender: TObject);
+    procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -90,7 +95,10 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
     procedure DoRepaintLists; override;
+    procedure UpdateSumList;
   public
+    procedure LoadFramePreferences; override;
+    procedure SaveFramePreferences; override;
     function GetList: TCList; override;
     procedure ReloadDone;
     procedure ReloadSums;
@@ -925,5 +933,53 @@ begin
                    xDummy);
 end;
 
+
+procedure TCDoneFrame.MenuItemsumsVisibleClick(Sender: TObject);
+begin
+  TFrameWithSumlistPref(FramePreferences).sumListVisible := not MenuItemsumsVisible.Checked;
+  UpdateSumList;
+end;
+
+procedure TCDoneFrame.SpeedButtonCloseShortcutsClick(Sender: TObject);
+begin
+  TFrameWithSumlistPref(FramePreferences).sumListVisible := False;
+  UpdateSumList;
+end;
+
+procedure TCDoneFrame.UpdateSumList;
+begin
+  if TFrameWithSumlistPref(FramePreferences).sumListVisible then begin
+    Splitter1.Enabled := True;
+    Panel2.Visible := True;
+    SumList.Visible := True;
+    MenuItemsumsVisible.Checked := True;
+    if TFrameWithSumlistPref(FramePreferences).sumListHeight <> -1 then begin
+      PanelFrameButtons.AutoSize := False;
+      PanelFrameButtons.Height := TFrameWithSumlistPref(FramePreferences).sumListHeight;
+    end;
+  end else begin
+    TFrameWithSumlistPref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+    PanelFrameButtons.AutoSize := True;
+    SumList.Visible := False;
+    Panel2.Visible := False;
+    Splitter1.Enabled := False;
+    MenuItemsumsVisible.Checked := False;
+  end;
+  SpeedButtonCloseShortcuts.Left := PanelFrameButtons.Width - 16;
+end;
+
+procedure TCDoneFrame.SaveFramePreferences;
+begin
+  if TFrameWithSumlistPref(FramePreferences).sumListVisible then begin
+    TFrameWithSumlistPref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+  end;
+  inherited SaveFramePreferences;
+end;
+
+procedure TCDoneFrame.LoadFramePreferences;
+begin
+  inherited LoadFramePreferences;
+  UpdateSumList;
+end;
 
 end.

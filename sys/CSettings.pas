@@ -21,6 +21,7 @@ function GetSettingsColumns: ICXMLDOMNode;
 function GetSettingsBackups: ICXMLDOMNode;
 function GetSettingsPlugins: ICXMLDOMNode;
 function GetSettingsCharts: ICXMLDOMNode;
+function GetSettingsFrames: ICXMLDOMNode;
 
 implementation
 
@@ -74,6 +75,19 @@ begin
     Result := xRoot.selectSingleNode('columns');
     if Result = Nil then begin
       Result := GSettings.createElement('columns');
+      xRoot.appendChild(Result);
+    end;
+  end;
+end;
+
+function GetSettingsFrames: ICXMLDOMNode;
+var xRoot: ICXMLDOMNode;
+begin
+  if GSettings <> Nil then begin
+    xRoot := GetSettingsPreferences;
+    Result := xRoot.selectSingleNode('frames');
+    if Result = Nil then begin
+      Result := GSettings.createElement('frames');
       xRoot.appendChild(Result);
     end;
   end;
@@ -215,6 +229,7 @@ begin
           end;
           GBasePreferences.configFileVersion := GetXmlAttribute('configFileVersion', GetSettingsRoot, '');
           GViewsPreferences.LoadFromParentNode(GetSettingsPreferences);
+          GFramePreferences.LoadAllFromParentNode(GetSettingsFrames);
           GColumnsPreferences.LoadAllFromParentNode(GetSettingsColumns);
           GBackupsPreferences.LoadAllFromParentNode(GetSettingsBackups);
           GPluginsPreferences.LoadAllFromParentNode(GetSettingsPlugins);
@@ -236,6 +251,7 @@ end;
 procedure SaveSettings;
 begin
   GViewsPreferences.SavetToParentNode(GetSettingsPreferences);
+  GFramePreferences.SavetToParentNode(GetSettingsFrames);
   GColumnsPreferences.SavetToParentNode(GetSettingsColumns);
   GBackupsPreferences.SavetToParentNode(GetSettingsBackups);
   GPluginsPreferences.SavetToParentNode(GetSettingsPlugins);

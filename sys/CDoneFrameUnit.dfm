@@ -84,6 +84,25 @@ inherited CDoneFrame: TCDoneFrame
       Alignment = taLeftJustify
       Caption = '  Sumy niezrealizowanych operacji w wybranym okresie'
       TabOrder = 0
+      DesignSize = (
+        443
+        21)
+      object SpeedButtonCloseShortcuts: TSpeedButton
+        Left = 432
+        Top = 5
+        Width = 11
+        Height = 13
+        Anchors = [akTop, akRight]
+        Caption = 'r'
+        Flat = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -8
+        Font.Name = 'Marlett'
+        Font.Style = []
+        ParentFont = False
+        OnClick = SpeedButtonCloseShortcutsClick
+      end
     end
     object SumList: TCList
       Left = 0
@@ -382,6 +401,13 @@ inherited CDoneFrame: TCDoneFrame
   end
   inherited ImageList: TPngImageList
     Top = 144
+  end
+  inherited ListPopupMenu: TPopupMenu
+    object MenuItemsumsVisible: TMenuItem
+      Caption = 'Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
+      Checked = True
+      OnClick = MenuItemsumsVisibleClick
+    end
   end
   object ActionList: TActionList
     Images = CImageLists.DoneImageList24x24

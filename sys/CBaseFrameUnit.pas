@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus,
-  CConfigFormUnit, CBaseFormUnit, CComponents, ComCtrls;
+  CConfigFormUnit, CBaseFormUnit, CComponents, ComCtrls, CPreferences;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
@@ -38,6 +38,7 @@ type
     procedure Odznaczwszystkie1Click(Sender: TObject);
     procedure Odwrzaznaczenie1Click(Sender: TObject);
   private
+    FFramePreferences: TFramePref;
     FOnCheckChanged: TCheckChanged;
     FAdditionalData: TObject;
     FOutputData: Pointer;
@@ -68,7 +69,9 @@ type
     procedure HideFrame; virtual;
     procedure ShowFrame; virtual;
     procedure SaveColumns;
+    procedure SaveFramePreferences; virtual;
     procedure LoadColumns;
+    procedure LoadFramePreferences; virtual;
     function GetList: TCList; virtual;
     procedure UpdateOutputData; virtual;
     function FindNode(ADataId: TDataGid; AList: TCList): PVirtualNode; virtual;
@@ -98,6 +101,7 @@ type
     property AdditionalData: TObject read FAdditionalData;
     property MultipleChecks: TStringList read FMultipleChecks write FMultipleChecks;
     property FrameOwner: TComponent read FOwner;
+    property FramePreferences: TFramePref read FFramePreferences;
   end;
 
   TRegisteredFrameClass = class(TObject)
@@ -128,7 +132,7 @@ procedure FinalizeFrameGlobals;
 
 implementation
 
-uses CConsts, CListPreferencesFormUnit, CReports, CPreferences, Math,
+uses CConsts, CListPreferencesFormUnit, CReports, Math,
   CDatatools, CInfoFormUnit, CPluginConsts, CPlugins, CFrameFormUnit,
   CTools, CAccountsFrameUnit, CCashpointsFrameUnit, CCurrencydefFrameUnit,
   CCurrencyRateFrameUnit, CDoneFrameUnit, CExtractionItemFrameUnit,
@@ -197,6 +201,7 @@ end;
 
 destructor TCBaseFrame.Destroy;
 begin
+  SaveFramePreferences;
   SaveColumns;
   FinalizeFrame;
   GFrames.Remove(Self);
@@ -256,6 +261,7 @@ begin
     Zaznaczwszystkie1.Visible := AMultipleCheck <> Nil;
     UpdateSelectedItemPlugins;
   end;
+  LoadFramePreferences;
   LoadColumns;
   xViewPref := TViewPref(GViewsPreferences.ByPrefname[GetPrefname]);
   if (xViewPref <> Nil) then begin
@@ -788,6 +794,20 @@ end;
 function TCBaseFrame.GetCheckType(ANode: PVirtualNode): TCheckType;
 begin
   Result := ctCheckBox;
+end;
+
+procedure TCBaseFrame.LoadFramePreferences;
+begin
+  if GetPrefname <> '' then begin
+    FFramePreferences := TFramePref(GFramePreferences.ByPrefname[GetPrefname]);
+    if FFramePreferences = Nil then begin
+      FFramePreferences := TFramePref(GFramePreferences.AppendNewPrefitem(GetPrefname));
+    end;
+  end;
+end;
+
+procedure TCBaseFrame.SaveFramePreferences;
+begin
 end;
 
 initialization

@@ -30,17 +30,22 @@ type
     property Prefname: String read FPrefname write FPrefname;
   end;
 
+  TGetItemClassFunction = function (APrefname: String): TPrefItemClass of object;
+
   TPrefList = class(TObjectList)
   private
     FItemClass: TPrefItemClass;
+    FGetItemClassFunction: TGetItemClassFunction;
     function GetItems(AIndex: Integer): TPrefItem;
     procedure SetItems(AIndex: Integer; const Value: TPrefItem);
     function GetByPrefname(APrefname: String): TPrefItem;
   public
     procedure Clone(APrefList: TPrefList);
-    constructor Create(AItemClass: TPrefItemClass);
+    constructor Create(AItemClass: TPrefItemClass); overload;
+    constructor Create(AGetItemClassFunction: TGetItemClassFunction); overload;
     procedure LoadFromParentNode(AParentNode: ICXMLDOMNode);
     procedure LoadAllFromParentNode(AParentNode: ICXMLDOMNode);
+    function AppendNewPrefitem(APrefname: String): TPrefItem;
     procedure SavetToParentNode(AParentNode: ICXMLDOMNode);
     property Items[AIndex: Integer]: TPrefItem read GetItems write SetItems;
     property ByPrefname[APrefname: String]: TPrefItem read GetByPrefname;
@@ -2354,6 +2359,23 @@ begin
   SaveToXml(xNode);
 end;
 
+function TPrefList.AppendNewPrefitem(APrefname: String): TPrefItem;
+var xItemClass: TPrefItemClass;
+begin
+  Result := ByPrefname[APrefname];
+  if Result = Nil then begin
+    if FItemClass <> Nil then begin
+      xItemClass := FItemClass;
+    end else begin
+      xItemClass := FGetItemClassFunction(APrefname);
+    end;
+    if xItemClass <> Nil then begin
+      Result := xItemClass.Create(APrefname);
+      Add(Result);
+    end;
+  end;
+end;
+
 procedure TPrefList.Clone(APrefList: TPrefList);
 var xCount: Integer;
     xObj: TPrefItem;
@@ -2372,6 +2394,14 @@ constructor TPrefList.Create(AItemClass: TPrefItemClass);
 begin
   inherited Create(True);
   FItemClass := AItemClass;
+  FGetItemClassFunction := Nil;
+end;
+
+constructor TPrefList.Create(AGetItemClassFunction: TGetItemClassFunction);
+begin
+  inherited Create(True);
+  FGetItemClassFunction := AGetItemClassFunction;
+  FItemClass := Nil;
 end;
 
 function TPrefList.GetByPrefname(APrefname: String): TPrefItem;
@@ -2397,12 +2427,22 @@ end;
 procedure TPrefList.LoadAllFromParentNode(AParentNode: ICXMLDOMNode);
 var xNode: ICXMLDOMNode;
     xItem: TPrefItem;
+    xName: String;
+    xItemClass: TPrefItemClass;
 begin
   xNode := AParentNode.firstChild;
   while (xNode <> Nil) do begin
-    xItem := FItemClass.Create(GetXmlAttribute('name', xNode, ''));
-    xItem.LoadFromXml(xNode);
-    Add(xItem);
+    xName := GetXmlAttribute('name', xNode, '');
+    if FItemClass <> Nil then begin
+      xItemClass := FItemClass;
+    end else begin
+      xItemClass := FGetItemClassFunction(xName);
+    end;
+    if xItemClass <> Nil then begin
+      xItem := xItemClass.Create(xName);
+      xItem.LoadFromXml(xNode);
+      Add(xItem);
+    end;
     xNode := xNode.nextSibling;
   end;
 end;

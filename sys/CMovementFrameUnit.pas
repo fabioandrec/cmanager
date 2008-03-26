@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, PngImageList, CImageListsUnit, CDataObjects;
+  Contnrs, PngImageList, CImageListsUnit, CDataObjects, Buttons;
 
 type
   TMovementTreeElementType = (mtObject, mtList);
@@ -69,6 +69,8 @@ type
     PopupMenuIcons: TPopupMenu;
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
+    SpeedButtonCloseShortcuts: TSpeedButton;
+    MenuItemsumsVisible: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -97,6 +99,8 @@ type
     procedure TodayListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure MenuItemBigIconsClick(Sender: TObject);
     procedure MenuItemSmallIconsClick(Sender: TObject);
+    procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
+    procedure MenuItemsumsVisibleClick(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -113,6 +117,7 @@ type
     function FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
     procedure DeleteObjectsWithMovementList(AListId: TDataGid);
   protected
+    procedure UpdateSumList;
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
     function GetSelectedType: Integer; override;
@@ -132,6 +137,8 @@ type
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     class function GetPrefname: String; override;
+    procedure SaveFramePreferences; override;
+    procedure LoadFramePreferences; override;
   end;
 
 implementation
@@ -1174,6 +1181,54 @@ begin
                    ActionList, Nil,
                    FSmallIconsButtonsImageList,
                    xDummy);
+end;
+
+procedure TCMovementFrame.SpeedButtonCloseShortcutsClick(Sender: TObject);
+begin
+  TFrameWithSumlistPref(FramePreferences).sumListVisible := False;
+  UpdateSumList;
+end;
+
+procedure TCMovementFrame.UpdateSumList;
+begin
+  if TFrameWithSumlistPref(FramePreferences).sumListVisible then begin
+    Splitter1.Enabled := True;
+    Panel2.Visible := True;
+    SumList.Visible := True;
+    MenuItemsumsVisible.Checked := True;
+    if TFrameWithSumlistPref(FramePreferences).sumListHeight <> -1 then begin
+      PanelFrameButtons.AutoSize := False;
+      PanelFrameButtons.Height := TFrameWithSumlistPref(FramePreferences).sumListHeight;
+    end;
+  end else begin
+    TFrameWithSumlistPref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+    PanelFrameButtons.AutoSize := True;
+    SumList.Visible := False;
+    Panel2.Visible := False;
+    Splitter1.Enabled := False;
+    MenuItemsumsVisible.Checked := False;
+  end;
+  SpeedButtonCloseShortcuts.Left := PanelFrameButtons.Width - 16;
+end;
+
+procedure TCMovementFrame.MenuItemsumsVisibleClick(Sender: TObject);
+begin
+  TFrameWithSumlistPref(FramePreferences).sumListVisible := not MenuItemsumsVisible.Checked;
+  UpdateSumList;
+end;
+
+procedure TCMovementFrame.SaveFramePreferences;
+begin
+  if TFrameWithSumlistPref(FramePreferences).sumListVisible then begin
+    TFrameWithSumlistPref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+  end;
+  inherited SaveFramePreferences;
+end;
+
+procedure TCMovementFrame.LoadFramePreferences;
+begin
+  inherited LoadFramePreferences;
+  UpdateSumList;
 end;
 
 end.

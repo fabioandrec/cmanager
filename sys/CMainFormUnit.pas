@@ -606,6 +606,7 @@ begin
   ExecuteOnexitPlugins;
   for xCount := 0 to FShortcutsFrames.Count - 1 do begin
     TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveColumns;
+    TCBaseFrame(FShortcutsFrames.Objects[xCount]).SaveFramePreferences;
   end;
   xNode := SaveFormPosition(Self);
   if xNode <> Nil then begin

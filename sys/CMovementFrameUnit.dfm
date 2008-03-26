@@ -92,6 +92,25 @@ inherited CMovementFrame: TCMovementFrame
       Alignment = taLeftJustify
       Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
       TabOrder = 1
+      DesignSize = (
+        443
+        21)
+      object SpeedButtonCloseShortcuts: TSpeedButton
+        Left = 674
+        Top = 5
+        Width = 13
+        Height = 13
+        Anchors = [akTop, akRight]
+        Caption = 'r'
+        Flat = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -8
+        Font.Name = 'Marlett'
+        Font.Style = []
+        ParentFont = False
+        OnClick = SpeedButtonCloseShortcutsClick
+      end
     end
     object SumList: TCList
       Left = 0
@@ -423,6 +442,13 @@ inherited CMovementFrame: TCMovementFrame
   end
   inherited ImageList: TPngImageList
     Top = 144
+  end
+  inherited ListPopupMenu: TPopupMenu
+    object MenuItemsumsVisible: TMenuItem
+      Caption = 'Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
+      Checked = True
+      OnClick = MenuItemsumsVisibleClick
+    end
   end
   object ActionList: TActionList
     Images = CImageLists.OperationsImageList24x24
