@@ -36,7 +36,6 @@ type
 
   TCMovementFrame = class(TCBaseFrame)
     PanelFrameButtons: TPanel;
-    TodayList: TCList;
     ActionList: TActionList;
     ActionMovement: TAction;
     ActionEditMovement: TAction;
@@ -47,30 +46,37 @@ type
     CButtonDel: TCButton;
     Bevel: TBevel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
-    Panel: TPanel;
-    CStaticFilter: TCStatic;
-    Panel2: TPanel;
     Splitter1: TSplitter;
-    SumList: TCList;
-    Label2: TLabel;
-    Label1: TLabel;
-    CStaticPeriod: TCStatic;
-    Label3: TLabel;
-    CDateTimePerStart: TCDateTime;
-    Label4: TLabel;
-    CDateTimePerEnd: TCDateTime;
-    Label5: TLabel;
     ActionAddList: TAction;
     CButton1: TCButton;
-    CStaticViewCurrency: TCStatic;
-    Label6: TLabel;
     PopupMenuSums: TPopupMenu;
     Ustawienialisty2: TMenuItem;
     PopupMenuIcons: TPopupMenu;
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
-    SpeedButtonCloseShortcuts: TSpeedButton;
     MenuItemsumsVisible: TMenuItem;
+    Panel: TPanel;
+    Label2: TLabel;
+    Label1: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    CStaticPeriod: TCStatic;
+    CStaticFilter: TCStatic;
+    CDateTimePerStart: TCDateTime;
+    CDateTimePerEnd: TCDateTime;
+    CStaticViewCurrency: TCStatic;
+    TodayList: TCList;
+    PanelSum: TPanel;
+    SumList: TCList;
+    Panel2: TPanel;
+    SpeedButtonCloseShortcuts: TSpeedButton;
+    MenuItemPatternsVisible: TMenuItem;
+    PanelPatterns: TPanel;
+    Splitter2: TSplitter;
+    Panel3: TPanel;
+    SpeedButtonPatternVisible: TSpeedButton;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -101,6 +107,9 @@ type
     procedure MenuItemSmallIconsClick(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure MenuItemsumsVisibleClick(Sender: TObject);
+    procedure SpeedButtonClosePatternsClick(Sender: TObject);
+    procedure MenuItemPatternsVisibleClick(Sender: TObject);
+    procedure SpeedButtonPatternVisibleClick(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -117,7 +126,7 @@ type
     function FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
     procedure DeleteObjectsWithMovementList(AListId: TDataGid);
   protected
-    procedure UpdateSumList;
+    procedure UpdateSumAndPatterns;
     procedure WndProc(var Message: TMessage); override;
     procedure GetFilterDates(var ADateFrom, ADateTo: TDateTime);
     function GetSelectedType: Integer; override;
@@ -1185,42 +1194,73 @@ end;
 
 procedure TCMovementFrame.SpeedButtonCloseShortcutsClick(Sender: TObject);
 begin
-  TFrameWithSumlistPref(FramePreferences).sumListVisible := False;
-  UpdateSumList;
+  TBaseMovementFramePref(FramePreferences).sumListVisible := False;
+  UpdateSumAndPatterns;
 end;
 
-procedure TCMovementFrame.UpdateSumList;
+procedure TCMovementFrame.UpdateSumAndPatterns;
 begin
-  if TFrameWithSumlistPref(FramePreferences).sumListVisible then begin
-    Splitter1.Enabled := True;
-    Panel2.Visible := True;
-    SumList.Visible := True;
-    MenuItemsumsVisible.Checked := True;
-    if TFrameWithSumlistPref(FramePreferences).sumListHeight <> -1 then begin
+  MenuItemsumsVisible.Checked := TBaseMovementFramePref(FramePreferences).sumListVisible;
+  MenuItemPatternsVisible.Checked := TBaseMovementFramePref(FramePreferences).patternsListVisible;
+  if TBaseMovementFramePref(FramePreferences).sumListVisible and TBaseMovementFramePref(FramePreferences).patternsListVisible then begin
+    PanelSum.Visible := True;
+    PanelPatterns.Visible := True;
+    PanelSum.Align := alClient;
+    PanelPatterns.Align := alRight;
+    Splitter2.Visible := True;
+    if TBaseMovementFramePref(FramePreferences).patternListWidth <> -1 then begin
+      PanelPatterns.Width := TBaseMovementFramePref(FramePreferences).patternListWidth;
+    end;
+  end else if TBaseMovementFramePref(FramePreferences).sumListVisible and not TBaseMovementFramePref(FramePreferences).patternsListVisible then begin
+    TBaseMovementFramePref(FramePreferences).patternListWidth := PanelPatterns.Width;
+    PanelSum.Visible := True;
+    Splitter2.Visible := False;
+    PanelPatterns.Visible := False;
+    PanelSum.Align := alClient;
+    PanelPatterns.Align := alRight;
+  end else if not TBaseMovementFramePref(FramePreferences).sumListVisible and TBaseMovementFramePref(FramePreferences).patternsListVisible then begin
+    TBaseMovementFramePref(FramePreferences).patternListWidth := PanelPatterns.Width;
+    PanelSum.Visible := False;
+    Splitter2.Visible := False;
+    PanelPatterns.Visible := True;
+    PanelPatterns.Align := alClient;
+    PanelSum.Align := alLeft;
+  end else begin
+    TBaseMovementFramePref(FramePreferences).patternListWidth := PanelPatterns.Width;
+    PanelSum.Visible := False;
+    PanelPatterns.Visible := False;
+    PanelSum.Align := alClient;
+    PanelPatterns.Align := alRight;
+    Splitter2.Visible := False;
+  end;
+  if TBaseMovementFramePref(FramePreferences).sumListVisible or TBaseMovementFramePref(FramePreferences).patternsListVisible then begin
+    PanelFrameButtons.AutoSize := False;
+    if TBaseMovementFramePref(FramePreferences).sumListHeight <> -1 then begin
       PanelFrameButtons.AutoSize := False;
-      PanelFrameButtons.Height := TFrameWithSumlistPref(FramePreferences).sumListHeight;
+      PanelFrameButtons.Height := TBaseMovementFramePref(FramePreferences).sumListHeight;
     end;
   end else begin
-    TFrameWithSumlistPref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+    TBaseMovementFramePref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
     PanelFrameButtons.AutoSize := True;
-    SumList.Visible := False;
-    Panel2.Visible := False;
-    Splitter1.Enabled := False;
-    MenuItemsumsVisible.Checked := False;
   end;
-  SpeedButtonCloseShortcuts.Left := PanelFrameButtons.Width - 16;
+  Splitter1.Enabled := TBaseMovementFramePref(FramePreferences).sumListVisible or TBaseMovementFramePref(FramePreferences).patternsListVisible;
+  SpeedButtonCloseShortcuts.Left := Panel2.Width - 16;
+  SpeedButtonPatternVisible.Left := Panel3.Width - 16;
 end;
 
 procedure TCMovementFrame.MenuItemsumsVisibleClick(Sender: TObject);
 begin
-  TFrameWithSumlistPref(FramePreferences).sumListVisible := not MenuItemsumsVisible.Checked;
-  UpdateSumList;
+  TBaseMovementFramePref(FramePreferences).sumListVisible := not MenuItemsumsVisible.Checked;
+  UpdateSumAndPatterns;
 end;
 
 procedure TCMovementFrame.SaveFramePreferences;
 begin
-  if TFrameWithSumlistPref(FramePreferences).sumListVisible then begin
-    TFrameWithSumlistPref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+  if TBaseMovementFramePref(FramePreferences).sumListVisible or TBaseMovementFramePref(FramePreferences).patternsListVisible then begin
+    TBaseMovementFramePref(FramePreferences).sumListHeight := PanelFrameButtons.Height;
+  end;
+  if TBaseMovementFramePref(FramePreferences).patternsListVisible then begin
+    TBaseMovementFramePref(FramePreferences).patternListWidth := PanelPatterns.Width;
   end;
   inherited SaveFramePreferences;
 end;
@@ -1228,7 +1268,25 @@ end;
 procedure TCMovementFrame.LoadFramePreferences;
 begin
   inherited LoadFramePreferences;
-  UpdateSumList;
+  UpdateSumAndPatterns;
+end;
+
+procedure TCMovementFrame.SpeedButtonClosePatternsClick(Sender: TObject);
+begin
+  TBaseMovementFramePref(FramePreferences).patternsListVisible := False;
+  UpdateSumAndPatterns;
+end;
+
+procedure TCMovementFrame.MenuItemPatternsVisibleClick(Sender: TObject);
+begin
+  TBaseMovementFramePref(FramePreferences).patternsListVisible := not MenuItemPatternsVisible.Checked;
+  UpdateSumAndPatterns;
+end;
+
+procedure TCMovementFrame.SpeedButtonPatternVisibleClick(Sender: TObject);
+begin
+  TBaseMovementFramePref(FramePreferences).patternsListVisible := False;
+  UpdateSumAndPatterns;
 end;
 
 end.

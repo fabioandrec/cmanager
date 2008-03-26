@@ -105,6 +105,19 @@ type
     constructor Create(APrefname: String); override;
   end;
 
+  TBaseMovementFramePref = class(TFrameWithSumlistPref)
+  private
+    FpatternsListVisible: Boolean;
+    FpatternListWidth: Integer;
+  public
+    procedure LoadFromXml(ANode: ICXMLDOMNode); override;
+    procedure SaveToXml(ANode: ICXMLDOMNode); override;
+    procedure Clone(APrefItem: TPrefItem); override;
+    constructor Create(APrefname: String); override;
+    property patternsListVisible: Boolean read FpatternsListVisible write FpatternsListVisible;
+    property patternListWidth: Integer read FpatternListWidth write FpatternListWidth;
+  end;
+
   TBasePref = class(TPrefItem, IDescTemplateExpander)
   private
     FstartupDatafileMode: Integer;
@@ -310,7 +323,7 @@ end;
 function TBasePref.GetFramePrefitemClass(APrefname: String): TPrefItemClass;
 begin
   if APrefname = 'baseMovement' then begin
-    Result := TFrameWithSumlistPref;
+    Result := TBaseMovementFramePref;
   end else if APrefname = 'plannedDone' then begin
     Result := TFrameWithSumlistPref;
   end else begin
@@ -988,6 +1001,34 @@ begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('sumListVisible', ANode, FsumListVisible);
   SetXmlAttribute('sumListHeight', ANode, FsumListHeight);
+end;
+
+procedure TBaseMovementFramePref.Clone(APrefItem: TPrefItem);
+begin
+  inherited Clone(APrefItem);
+  FpatternsListVisible := TBaseMovementFramePref(APrefItem).patternsListVisible;
+  FpatternListWidth := TBaseMovementFramePref(APrefItem).patternListWidth;
+end;
+
+constructor TBaseMovementFramePref.Create(APrefname: String);
+begin
+  inherited Create(APrefname);
+  FpatternsListVisible := True;
+  FpatternListWidth := -1;
+end;
+
+procedure TBaseMovementFramePref.LoadFromXml(ANode: ICXMLDOMNode);
+begin
+  inherited LoadFromXml(ANode);
+  FpatternsListVisible := GetXmlAttribute('patternsListVisible', ANode, True);
+  FpatternListWidth := GetXmlAttribute('patternListWidth', ANode, -1);
+end;
+
+procedure TBaseMovementFramePref.SaveToXml(ANode: ICXMLDOMNode);
+begin
+  inherited SaveToXml(ANode);
+  SetXmlAttribute('patternsListVisible', ANode, FpatternsListVisible);
+  SetXmlAttribute('patternListWidth', ANode, FpatternListWidth);
 end;
 
 initialization

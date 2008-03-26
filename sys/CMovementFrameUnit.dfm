@@ -1,9 +1,9 @@
 inherited CMovementFrame: TCMovementFrame
   object Splitter1: TSplitter [0]
     Left = 0
-    Top = 86
+    Top = 87
     Width = 443
-    Height = 2
+    Height = 1
     Cursor = crVSplit
     Align = alBottom
   end
@@ -23,6 +23,13 @@ inherited CMovementFrame: TCMovementFrame
       Height = 3
       Align = alBottom
       Shape = bsBottomLine
+    end
+    object Splitter2: TSplitter
+      Left = 335
+      Top = 0
+      Width = 1
+      Height = 146
+      Align = alRight
     end
     object Panel1: TPanel
       Left = 0
@@ -83,198 +90,163 @@ inherited CMovementFrame: TCMovementFrame
         Action = ActionAddList
       end
     end
-    object Panel2: TPanel
+    object PanelSum: TPanel
       Left = 0
       Top = 0
-      Width = 443
-      Height = 21
-      Align = alTop
-      Alignment = taLeftJustify
-      Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
-      TabOrder = 1
-      DesignSize = (
-        443
-        21)
-      object SpeedButtonCloseShortcuts: TSpeedButton
-        Left = 674
-        Top = 5
-        Width = 13
-        Height = 13
-        Anchors = [akTop, akRight]
-        Caption = 'r'
-        Flat = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -8
-        Font.Name = 'Marlett'
-        Font.Style = []
-        ParentFont = False
-        OnClick = SpeedButtonCloseShortcutsClick
-      end
-    end
-    object SumList: TCList
-      Left = 0
-      Top = 21
-      Width = 443
-      Height = 125
+      Width = 335
+      Height = 146
       Align = alClient
-      BevelEdges = []
-      BevelInner = bvNone
-      BevelOuter = bvRaised
-      BevelKind = bkFlat
-      BorderStyle = bsNone
-      DefaultNodeHeight = 24
-      Header.AutoSizeIndex = -1
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'MS Sans Serif'
-      Header.Font.Style = []
-      Header.Height = 21
-      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-      Header.PopupMenu = VTHeaderPopupMenu
-      Header.Style = hsFlatButtons
-      ParentShowHint = False
-      PopupMenu = PopupMenuSums
-      ShowHint = True
+      AutoSize = True
+      BevelOuter = bvNone
+      TabOrder = 1
+      object SumList: TCList
+        Left = 0
+        Top = 21
+        Width = 335
+        Height = 125
+        Align = alClient
+        BevelEdges = []
+        BevelInner = bvNone
+        BevelOuter = bvRaised
+        BevelKind = bkFlat
+        BorderStyle = bsNone
+        DefaultNodeHeight = 24
+        Header.AutoSizeIndex = -1
+        Header.Font.Charset = DEFAULT_CHARSET
+        Header.Font.Color = clWindowText
+        Header.Font.Height = -11
+        Header.Font.Name = 'MS Sans Serif'
+        Header.Font.Style = []
+        Header.Height = 21
+        Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+        Header.PopupMenu = VTHeaderPopupMenu
+        Header.Style = hsFlatButtons
+        ParentShowHint = False
+        PopupMenu = PopupMenuSums
+        ShowHint = True
+        TabOrder = 0
+        TabStop = False
+        TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+        TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+        TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+        TreeOptions.SelectionOptions = [toFullRowSelect]
+        OnCompareNodes = SumListCompareNodes
+        OnGetText = SumListGetText
+        OnGetHint = TodayListGetHint
+        OnGetNodeDataSize = SumListGetNodeDataSize
+        OnInitChildren = SumListInitChildren
+        OnInitNode = SumListInitNode
+        AutoExpand = True
+        Columns = <
+          item
+            Position = 0
+            Width = 160
+            WideText = 'Konto'
+            WideHint = 'Nazwa kontrahenta'
+          end
+          item
+            Alignment = taRightJustify
+            Position = 1
+            Width = 85
+            WideText = 'Rozch'#243'd'
+          end
+          item
+            Alignment = taRightJustify
+            Position = 2
+            Width = 85
+            WideText = 'Przych'#243'd'
+          end
+          item
+            Alignment = taRightJustify
+            Position = 3
+            Width = 85
+            WideText = 'Saldo'
+          end
+          item
+            Position = 4
+            Width = 10
+            WideText = 'Waluta'
+          end>
+        WideDefaultText = ''
+      end
+      object Panel2: TPanel
+        Left = 0
+        Top = 0
+        Width = 335
+        Height = 21
+        Align = alTop
+        Alignment = taLeftJustify
+        Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
+        TabOrder = 1
+        DesignSize = (
+          335
+          21)
+        object SpeedButtonCloseShortcuts: TSpeedButton
+          Left = 824
+          Top = 5
+          Width = 13
+          Height = 13
+          Anchors = [akTop, akRight]
+          Caption = 'r'
+          Flat = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -8
+          Font.Name = 'Marlett'
+          Font.Style = []
+          ParentFont = False
+          OnClick = SpeedButtonCloseShortcutsClick
+        end
+      end
+    end
+    object PanelPatterns: TPanel
+      Left = 336
+      Top = 0
+      Width = 107
+      Height = 146
+      Align = alRight
+      BevelOuter = bvNone
+      Color = clWindow
       TabOrder = 2
-      TabStop = False
-      TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-      TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-      TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-      TreeOptions.SelectionOptions = [toFullRowSelect]
-      OnCompareNodes = SumListCompareNodes
-      OnGetText = SumListGetText
-      OnGetHint = TodayListGetHint
-      OnGetNodeDataSize = SumListGetNodeDataSize
-      OnInitChildren = SumListInitChildren
-      OnInitNode = SumListInitNode
-      AutoExpand = True
-      Columns = <
-        item
-          Position = 0
-          Width = 200
-          WideText = 'Konto'
-          WideHint = 'Nazwa kontrahenta'
+      object Panel3: TPanel
+        Left = 0
+        Top = 0
+        Width = 107
+        Height = 21
+        Align = alTop
+        Alignment = taLeftJustify
+        Caption = '  Szybka operacja'
+        TabOrder = 0
+        DesignSize = (
+          107
+          21)
+        object SpeedButtonPatternVisible: TSpeedButton
+          Left = 823
+          Top = 5
+          Width = 13
+          Height = 13
+          Anchors = [akTop, akRight]
+          Caption = 'r'
+          Flat = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -8
+          Font.Name = 'Marlett'
+          Font.Style = []
+          ParentFont = False
+          OnClick = SpeedButtonPatternVisibleClick
         end
-        item
-          Alignment = taRightJustify
-          Position = 1
-          Width = 130
-          WideText = 'Rozch'#243'd'
-        end
-        item
-          Alignment = taRightJustify
-          Position = 2
-          Width = 130
-          WideText = 'Przych'#243'd'
-        end
-        item
-          Alignment = taRightJustify
-          Position = 3
-          Width = 130
-          WideText = 'Saldo'
-        end
-        item
-          Position = 4
-          Width = 10
-          WideText = 'Waluta'
-        end>
-      WideDefaultText = ''
+      end
     end
   end
-  object TodayList: TCList [2]
-    Left = 0
-    Top = 21
-    Width = 443
-    Height = 65
-    Align = alClient
-    BevelEdges = []
-    BevelInner = bvNone
-    BevelOuter = bvRaised
-    BevelKind = bkFlat
-    BorderStyle = bsNone
-    ButtonStyle = bsTriangle
-    DefaultNodeHeight = 24
-    Header.AutoSizeIndex = 1
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
-    Header.Font.Style = []
-    Header.Height = 21
-    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
-    Header.PopupMenu = VTHeaderPopupMenu
-    Header.Style = hsFlatButtons
-    HintMode = hmHint
-    Images = CImageLists.MovementIcons16x16
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 1
-    TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
-    TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-    TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-    TreeOptions.SelectionOptions = [toFullRowSelect]
-    OnCompareNodes = TodayListCompareNodes
-    OnDblClick = TodayListDblClick
-    OnFocusChanged = TodayListFocusChanged
-    OnGetText = TodayListGetText
-    OnGetImageIndex = TodayListGetImageIndex
-    OnGetHint = TodayListGetHint
-    OnGetNodeDataSize = TodayListGetNodeDataSize
-    OnInitChildren = TodayListInitChildren
-    OnInitNode = TodayListInitNode
-    AutoExpand = True
-    OnGetRowPreferencesName = TodayListGetRowPreferencesName
-    Columns = <
-      item
-        Alignment = taRightJustify
-        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
-        Position = 0
-        WideText = 'Lp'
-      end
-      item
-        Position = 1
-        Width = 143
-        WideText = 'Opis'
-        WideHint = 'Nazwa kontrahenta'
-      end
-      item
-        Position = 2
-        Width = 100
-        WideText = 'Data'
-      end
-      item
-        Alignment = taRightJustify
-        Position = 3
-        Width = 100
-        WideText = 'Kwota'
-      end
-      item
-        Position = 4
-        WideText = 'Waluta'
-      end
-      item
-        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
-        Position = 5
-        Width = 150
-        WideText = 'Rodzaj'
-      end
-      item
-        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
-        Position = 6
-        WideText = 'Status'
-      end>
-    WideDefaultText = ''
-  end
-  object Panel: TPanel [3]
+  object Panel: TPanel [2]
     Left = 0
     Top = 0
     Width = 443
     Height = 21
     Align = alTop
     Alignment = taLeftJustify
-    TabOrder = 2
+    TabOrder = 1
     object Label2: TLabel
       Left = 8
       Top = 4
@@ -440,6 +412,90 @@ inherited CMovementFrame: TCMovementFrame
       HotTrack = True
     end
   end
+  object TodayList: TCList [3]
+    Left = 0
+    Top = 21
+    Width = 443
+    Height = 66
+    Align = alClient
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvRaised
+    BevelKind = bkFlat
+    BorderStyle = bsNone
+    ButtonStyle = bsTriangle
+    DefaultNodeHeight = 24
+    Header.AutoSizeIndex = 1
+    Header.Font.Charset = DEFAULT_CHARSET
+    Header.Font.Color = clWindowText
+    Header.Font.Height = -11
+    Header.Font.Name = 'MS Sans Serif'
+    Header.Font.Style = []
+    Header.Height = 21
+    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+    Header.PopupMenu = VTHeaderPopupMenu
+    Header.Style = hsFlatButtons
+    HintMode = hmHint
+    Images = CImageLists.MovementIcons16x16
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 2
+    TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+    TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+    TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+    TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnCompareNodes = TodayListCompareNodes
+    OnDblClick = TodayListDblClick
+    OnFocusChanged = TodayListFocusChanged
+    OnGetText = TodayListGetText
+    OnGetImageIndex = TodayListGetImageIndex
+    OnGetHint = TodayListGetHint
+    OnGetNodeDataSize = TodayListGetNodeDataSize
+    OnInitChildren = TodayListInitChildren
+    OnInitNode = TodayListInitNode
+    AutoExpand = True
+    OnGetRowPreferencesName = TodayListGetRowPreferencesName
+    Columns = <
+      item
+        Alignment = taRightJustify
+        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+        Position = 0
+        WideText = 'Lp'
+      end
+      item
+        Position = 1
+        Width = 143
+        WideText = 'Opis'
+        WideHint = 'Nazwa kontrahenta'
+      end
+      item
+        Position = 2
+        Width = 100
+        WideText = 'Data'
+      end
+      item
+        Alignment = taRightJustify
+        Position = 3
+        Width = 100
+        WideText = 'Kwota'
+      end
+      item
+        Position = 4
+        WideText = 'Waluta'
+      end
+      item
+        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 5
+        Width = 150
+        WideText = 'Rodzaj'
+      end
+      item
+        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 6
+        WideText = 'Status'
+      end>
+    WideDefaultText = ''
+  end
   inherited ImageList: TPngImageList
     Top = 144
   end
@@ -448,6 +504,11 @@ inherited CMovementFrame: TCMovementFrame
       Caption = 'Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
       Checked = True
       OnClick = MenuItemsumsVisibleClick
+    end
+    object MenuItemPatternsVisible: TMenuItem
+      Caption = 'Szablony operacji'
+      Checked = True
+      OnClick = MenuItemPatternsVisibleClick
     end
   end
   object ActionList: TActionList
