@@ -55,7 +55,7 @@ inherited CProfileForm: TCProfileForm
       Top = 208
       Width = 337
       Height = 145
-      Caption = ' Definicja zakresu '
+      Caption = ' Dane startowe  '
       TabOrder = 1
       object Label14: TLabel
         Left = 44

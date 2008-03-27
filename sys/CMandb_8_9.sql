@@ -2,6 +2,7 @@ create table quickPattern (
   idQuickPattern uniqueidentifier not null,
   created datetime not null,
   modified datetime,
+  name varchar(40) not null,
   description varchar(200),
   movementType varchar(1) not null,
   idAccount uniqueidentifier null,

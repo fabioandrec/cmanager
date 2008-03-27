@@ -85,7 +85,7 @@ begin
       xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[FDataProvider.Filename]);
       if xBackupPref = Nil then begin
         xBackupPref := TBackupPref.CreateBackupPref(FDataProvider.Filename, Now);
-        GBackupsPreferences.Add(xBackupPref);
+        GBackupsPreferences.Add(xBackupPref, True);
       end else begin
         xBackupPref.lastBackup := Now;
       end;

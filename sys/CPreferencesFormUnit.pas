@@ -415,7 +415,7 @@ begin
       xPref := TPluginPref(FPluginPrefs.ByPrefname[xPlugin.fileName]);
       if xPref = Nil then begin
         xPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xPlugin.pluginConfiguration);
-        FPluginPrefs.Add(xPref);
+        FPluginPrefs.Add(xPref, True);
       end;
       xPref.isEnabled := xNode.CheckState = csCheckedNormal;
       xNode := List.GetNext(xNode);
@@ -606,7 +606,7 @@ begin
   if xPlugin.Configure then begin
     if xPluginPref = Nil then begin
       xPluginPref := TPluginPref.CreatePluginPref(xPlugin.fileName, xPlugin.pluginConfiguration);
-      FPluginPrefs.Add(xPluginPref);
+      FPluginPrefs.Add(xPluginPref, True);
     end;
     xPluginPref.configuration := xPlugin.pluginConfiguration;
   end;

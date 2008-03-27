@@ -415,7 +415,7 @@ begin
       xColumnPref := TViewColumnPref(GColumnsPreferences.ByPrefname[xPrefname]);
       if xColumnPref = Nil then begin
         xColumnPref := TViewColumnPref.Create(xPrefname);
-        GColumnsPreferences.Add(xColumnPref);
+        GColumnsPreferences.Add(xColumnPref, True);
       end;
       xColumn := xList.Header.Columns.Items[xCount];
       xColumnPref.position := xColumn.Position;

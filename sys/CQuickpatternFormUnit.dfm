@@ -1,19 +1,19 @@
 inherited CQuickpatternForm: TCQuickpatternForm
-  Left = 405
-  Top = 291
+  Left = 414
+  Top = 154
   Caption = 'Szybka operacja'
-  ClientHeight = 403
+  ClientHeight = 428
   ClientWidth = 375
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 375
-    Height = 362
+    Height = 387
     object GroupBox2: TGroupBox
       Left = 16
       Top = 16
       Width = 337
-      Height = 177
+      Height = 209
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label1: TLabel
@@ -31,6 +31,14 @@ inherited CQuickpatternForm: TCQuickpatternForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Opis'
+      end
+      object Label5: TLabel
+        Left = 15
+        Top = 172
+        Width = 33
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Rodzaj'
       end
       object EditName: TEdit
         Left = 56
@@ -51,24 +59,42 @@ inherited CQuickpatternForm: TCQuickpatternForm
         BorderStyle = bsNone
         TabOrder = 1
       end
+      object ComboBoxType: TComboBox
+        Left = 56
+        Top = 168
+        Width = 257
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 2
+        Text = 'Rozch'#243'd jednorazowy'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          'Rozch'#243'd jednorazowy'
+          'Przych'#243'd jednorazowy'
+          'Transfer '#347'rodk'#243'w')
+      end
     end
     object GroupBox1: TGroupBox
       Left = 16
-      Top = 208
+      Top = 240
       Width = 337
-      Height = 145
-      Caption = ' Definicja zakresu '
+      Height = 137
+      Caption = ' Dane startowe '
       TabOrder = 1
       object Label14: TLabel
-        Left = 44
+        Left = 21
         Top = 29
-        Width = 28
+        Width = 75
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Konto'
+        Caption = 'Konto '#378'r'#243'd'#322'owe'
       end
       object Label3: TLabel
-        Left = 20
+        Left = 44
         Top = 65
         Width = 52
         Height = 13
@@ -76,17 +102,25 @@ inherited CQuickpatternForm: TCQuickpatternForm
         Caption = 'Kontrahent'
       end
       object Label4: TLabel
-        Left = 27
+        Left = 51
         Top = 101
         Width = 45
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kategoria'
       end
+      object Label6: TLabel
+        Left = 19
+        Top = 65
+        Width = 77
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Konto docelowe'
+      end
       object CStaticAccount: TCStatic
-        Left = 80
+        Left = 104
         Top = 25
-        Width = 233
+        Width = 209
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -102,9 +136,9 @@ inherited CQuickpatternForm: TCQuickpatternForm
         HotTrack = True
       end
       object CStaticCashpoint: TCStatic
-        Left = 80
+        Left = 104
         Top = 61
-        Width = 233
+        Width = 209
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -120,9 +154,9 @@ inherited CQuickpatternForm: TCQuickpatternForm
         HotTrack = True
       end
       object CStaticProducts: TCStatic
-        Left = 80
+        Left = 104
         Top = 97
-        Width = 233
+        Width = 209
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -137,10 +171,28 @@ inherited CQuickpatternForm: TCQuickpatternForm
         OnGetDataId = CStaticProductsGetDataId
         HotTrack = True
       end
+      object CStaticDestAccount: TCStatic
+        Left = 104
+        Top = 61
+        Width = 209
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz konto docelowe z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 3
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz konto docelowe z listy>'
+        OnGetDataId = CStaticAccountGetDataId
+        HotTrack = True
+      end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 362
+    Top = 387
     Width = 375
     inherited BitBtnOk: TBitBtn
       Left = 198

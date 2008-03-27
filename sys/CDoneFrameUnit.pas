@@ -808,7 +808,7 @@ begin
   if xNode <> Nil then begin
     xBase := TPlannedTreeItem(DoneList.GetNodeData(xNode)^);
     xForm := TCMovementForm.Create(Nil);
-    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned));
+    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned, Nil));
     xForm.Free;
     ReloadSums;
   end;

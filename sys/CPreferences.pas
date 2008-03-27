@@ -564,7 +564,7 @@ begin
       xBackupPref := TBackupPref(GBackupsPreferences.ByPrefname[FFilein]);
       if xBackupPref = Nil then begin
         xBackupPref := TBackupPref.CreateBackupPref(FFilein, Now);
-        GBackupsPreferences.Add(xBackupPref);
+        GBackupsPreferences.Add(xBackupPref, True);
       end else begin
         xBackupPref.lastBackup := Now;
       end;
@@ -730,120 +730,120 @@ function GetDefaultViewPreferences: TPrefList;
 var xCount: Integer;
 begin
   Result := TPrefList.Create(TViewPref);
-  Result.Add(TViewPref.Create(TCMovementFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCMovementFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'));
-    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód jednorazowy'));
-    Fontprefs.Add(TFontPref.CreateFontPref('T', 'Transfer œrodków'));
-    Fontprefs.Add(TFontPref.CreateFontPref('CI', 'Planowany przychód'));
-    Fontprefs.Add(TFontPref.CreateFontPref('CO', 'Planowany rozchód'));
-    Fontprefs.Add(TFontPref.CreateFontPref('SI', 'Lista przychodów'));
-    Fontprefs.Add(TFontPref.CreateFontPref('SO', 'Lista rozchodów'));
+    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód jednorazowy'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód jednorazowy'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('T', 'Transfer œrodków'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('CI', 'Planowany przychód'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('CO', 'Planowany rozchód'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('SI', 'Lista przychodów'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('SO', 'Lista rozchodów'), True);
   end;
-  Result.Add(TViewPref.Create(TCDoneFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCDoneFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Gotowe do realizacji'));
-    Fontprefs.Add(TFontPref.CreateFontPref('W', 'Operacje zaleg³e'));
-    Fontprefs.Add(TFontPref.CreateFontPref('DO', 'Wykonane'));
-    Fontprefs.Add(TFontPref.CreateFontPref('DA', 'Uznane za wykonane'));
-    Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Odrzucone jako niezasadne'));
+    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Gotowe do realizacji'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('W', 'Operacje zaleg³e'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('DO', 'Wykonane'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('DA', 'Uznane za wykonane'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Odrzucone jako niezasadne'), True);
   end;
-  Result.Add(TViewPref.Create(TCPlannedFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCPlannedFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód'));
-    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód'));
+    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przychód'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Rozchód'), True);
   end;
-  Result.Add(TViewPref.Create(TCStartupInfoFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCStartupInfoFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('II', 'Zaplanowane operacje przychodowe'));
-    Fontprefs.Add(TFontPref.CreateFontPref('IO', 'Zaplanowane operacje rozchodowe'));
-    Fontprefs.Add(TFontPref.CreateFontPref('OI', 'Zaleg³e operacje przychodowe'));
-    Fontprefs.Add(TFontPref.CreateFontPref('OO', 'Zaleg³e operacje rozchodowe'));
-    Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Elementy grupuj¹ce w/g dat'));
-    Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju'));
-    Fontprefs.Add(TFontPref.CreateFontPref('SL', 'Przekroczone limity'));
-    Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'));
-    Fontprefs.Add(TFontPref.CreateFontPref('UE', 'Nieuzgodnione wyci¹gi'));
+    Fontprefs.Add(TFontPref.CreateFontPref('II', 'Zaplanowane operacje przychodowe'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('IO', 'Zaplanowane operacje rozchodowe'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('OI', 'Zaleg³e operacje przychodowe'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('OO', 'Zaleg³e operacje rozchodowe'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Elementy grupuj¹ce w/g dat'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('SL', 'Przekroczone limity'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('VL', 'Poprawne limity'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('UE', 'Nieuzgodnione wyci¹gi'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesSurpassesLimits));
+  Result.Add(TViewPref.Create(CFontPreferencesSurpassesLimits), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przekroczone limity przychodu'));
-    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Przekroczone limity rozchodu'));
-    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Przekroczone limity salda'));
+    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Przekroczone limity przychodu'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Przekroczone limity rozchodu'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Przekroczone limity salda'), True);
   end;
-  Result.Add(TViewPref.Create(TCExtractionsFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCExtractionsFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'));
-    Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'));
-    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodniona'));
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Otwarte'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('C', 'Zamkniête'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Uzgodniona'), True);
   end;
-  Result.Add(TViewPref.Create(TCReportsFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCReportsFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Raporty'));
-    Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'));
+    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Raporty'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesMovementListSum));
+  Result.Add(TViewPref.Create(CFontPreferencesMovementListSum), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesDoneListSum));
+  Result.Add(TViewPref.Create(CFontPreferencesDoneListSum), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesRatesList));
+  Result.Add(TViewPref.Create(CFontPreferencesRatesList), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesExchangesList));
+  Result.Add(TViewPref.Create(CFontPreferencesExchangesList), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(TCDescTemplatesFrame.GetPrefname));
+  Result.Add(TViewPref.Create(TCDescTemplatesFrame.GetPrefname), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Mnemoniki'));
-    Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'));
+    Fontprefs.Add(TFontPref.CreateFontPref('R', 'Mnemoniki'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('G', 'Elementy grupuj¹ce'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesExtraction));
+  Result.Add(TViewPref.Create(CFontPreferencesExtraction), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Obci¹¿enie'));
-    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Uznanie'));
+    Fontprefs.Add(TFontPref.CreateFontPref('O', 'Obci¹¿enie'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('I', 'Uznanie'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesListFrame));
+  Result.Add(TViewPref.Create(CFontPreferencesListFrame), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesMovementList));
+  Result.Add(TViewPref.Create(CFontPreferencesMovementList), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesParamsDefs));
+  Result.Add(TViewPref.Create(CFontPreferencesParamsDefs), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesShortcuts));
+  Result.Add(TViewPref.Create(CFontPreferencesShortcuts), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'), True);
     TFontPref(Fontprefs.Last).RowHeight := 48;
-    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'), True);
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesFilterdetails));
+  Result.Add(TViewPref.Create(CFontPreferencesFilterdetails), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'), True);
     TFontPref(Fontprefs.Last).RowHeight := 48;
-    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'), True);
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesChartList));
+  Result.Add(TViewPref.Create(CFontPreferencesChartList), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('B', 'Du¿e ikony'), True);
     TFontPref(Fontprefs.Last).RowHeight := 48;
-    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Ma³e ikony'), True);
     TFontPref(Fontprefs.Last).RowHeight := 24;
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesHomelist));
+  Result.Add(TViewPref.Create(CFontPreferencesHomelist), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('BA', 'Akcje - du¿e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('BA', 'Akcje - du¿e ikony'), True);
     with TFontPref(Fontprefs.Last) do begin
       RowHeight := 48;
       Background := clWindow;
@@ -851,7 +851,7 @@ begin
     end;
     FocusedBackgroundColor := clWindow;
     FocusedFontColor := clWindowText;
-    Fontprefs.Add(TFontPref.CreateFontPref('SA', 'Akcje - ma³e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('SA', 'Akcje - ma³e ikony'), True);
     with TFontPref(Fontprefs.Last) do begin
       RowHeight := 24;
       Background := clWindow;
@@ -859,7 +859,7 @@ begin
     end;
     FocusedBackgroundColor := clWindow;
     FocusedFontColor := clWindowText;
-    Fontprefs.Add(TFontPref.CreateFontPref('BG', 'Elementy grupuj¹ce - du¿e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('BG', 'Elementy grupuj¹ce - du¿e ikony'), True);
     with TFontPref(Fontprefs.Last) do begin
       RowHeight := 48;
       Background := clWindow;
@@ -869,7 +869,7 @@ begin
     end;
     FocusedBackgroundColor := clWindow;
     FocusedFontColor := clWindowText;
-    Fontprefs.Add(TFontPref.CreateFontPref('SG', 'Elementy grupuj¹ce - ma³e ikony'));
+    Fontprefs.Add(TFontPref.CreateFontPref('SG', 'Elementy grupuj¹ce - ma³e ikony'), True);
     with TFontPref(Fontprefs.Last) do begin
       RowHeight := 24;
       Background := clWindow;
@@ -880,24 +880,43 @@ begin
     FocusedBackgroundColor := clWindow;
     FocusedFontColor := clWindowText;
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesLoancalc));
+  Result.Add(TViewPref.Create(CFontPreferencesQuickpatternsRun), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+    Fontprefs.Add(TFontPref.CreateFontPref('D', 'W³asne szybkie akcje'), True);
+    with TFontPref(Fontprefs.Last) do begin
+      RowHeight := 24;
+      Background := clWindow;
+      BackgroundEven := clWindow;
+    end;
+    FocusedBackgroundColor := clWindow;
+    FocusedFontColor := clWindowText;
+    Fontprefs.Add(TFontPref.CreateFontPref('S', 'Statystyczne szybkie akcje'), True);
+    with TFontPref(Fontprefs.Last) do begin
+      RowHeight := 24;
+      Background := clWindow;
+      BackgroundEven := clWindow;
+    end;
+    FocusedBackgroundColor := clWindow;
+    FocusedFontColor := clWindowText;
   end;
-  Result.Add(TViewPref.Create(CFontPreferencesDefaultdataElements));
+  Result.Add(TViewPref.Create(CFontPreferencesLoancalc), True);
   with TViewPref(Result.Last) do begin
-    Fontprefs.Add(TFontPref.CreateFontPref('T', 'Rodzaj danych'));
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
+  end;
+  Result.Add(TViewPref.Create(CFontPreferencesDefaultdataElements), True);
+  with TViewPref(Result.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('T', 'Rodzaj danych'), True);
     with TFontPref(Fontprefs.Last) do begin
       Font.Style := Font.Style + [fsUnderline, fsBold];
       Font.Size := 10;
     end;
-    Fontprefs.Add(TFontPref.CreateFontPref('E', 'Dane domyœlne'));
+    Fontprefs.Add(TFontPref.CreateFontPref('E', 'Dane domyœlne'), True);
   end;
   for xCount := 0 to GRegisteredClasses.Count - 1 do begin
     if Result.ByPrefname[TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname] = Nil then begin
-      Result.Add(TViewPref.Create(TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname));
+      Result.Add(TViewPref.Create(TRegisteredFrameClass(GRegisteredClasses.Items[xCount]).frameClass.GetPrefname), True);
       with TViewPref(Result.Last) do begin
-        Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'));
+        Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
       end;
     end;
   end;

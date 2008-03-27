@@ -21,22 +21,30 @@ type
     CStaticAccount: TCStatic;
     CStaticCashpoint: TCStatic;
     CStaticProducts: TCStatic;
+    Label5: TLabel;
+    ComboBoxType: TComboBox;
+    Label6: TLabel;
+    CStaticDestAccount: TCStatic;
     procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticProductsGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ComboBoxTypeChange(Sender: TObject);
   protected
     procedure ReadValues; override;
     function GetDataobjectClass: TDataObjectClass; override;
     procedure FillForm; override;
     function CanAccept: Boolean; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
+    procedure InitializeForm; override;
+    procedure UpdateFrames(ADataGid: ShortString; AMessage: Integer; AOption: Integer); override;
   end;
 
 implementation
 
 uses CDataObjects, CInfoFormUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CAccountsFrameUnit, CProductsFrameUnit, CConsts,
-  CDatatools, CRichtext, CTools, CQuickpatternFrameUnit;
+  CDatatools, CRichtext, CTools, CQuickpatternFrameUnit, StrUtils,
+  CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -52,12 +60,31 @@ end;
 
 procedure TCQuickpatternForm.FillForm;
 begin
-  with TProfile(Dataobject) do begin
+  with TQuickPattern(Dataobject) do begin
     EditName.Text := name;
     SimpleRichText(description, RichEditDesc);
-    if idAccount <> CEmptyDataGid then begin
-      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
-      CStaticAccount.DataId := idAccount;
+    if movementType = CInMovement then begin
+      ComboBoxType.ItemIndex := 1;
+    end else if movementType = COutMovement then begin
+      ComboBoxType.ItemIndex := 0;
+    end else begin
+      ComboBoxType.ItemIndex := 2;
+    end;
+    ComboBoxTypeChange(Nil);
+    if movementType = CTransferMovement then begin
+      if idSourceAccount <> CEmptyDataGid then begin
+        CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idSourceAccount, False)).name;
+        CStaticAccount.DataId := idSourceAccount;
+      end;
+      if idAccount <> CEmptyDataGid then begin
+        CStaticDestAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+        CStaticDestAccount.DataId := idAccount;
+      end;
+    end else begin
+      if idAccount <> CEmptyDataGid then begin
+        CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+        CStaticAccount.DataId := idAccount;
+      end;
     end;
     if idCashPoint <> CEmptyDataGid then begin
       CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
@@ -78,10 +105,22 @@ end;
 procedure TCQuickpatternForm.ReadValues;
 begin
   inherited ReadValues;
-  with TProfile(Dataobject) do begin
+  with TQuickPattern(Dataobject) do begin
     name := EditName.Text;
     description := RichEditDesc.Text;
-    idAccount := CStaticAccount.DataId;
+    if ComboBoxType.ItemIndex = 0 then begin
+      movementType := COutMovement;
+    end else if ComboBoxType.ItemIndex = 1 then begin
+      movementType := CInMovement;
+    end else begin
+      movementType := CTransferMovement;
+    end;
+    if movementType = CTransferMovement then begin
+      idSourceAccount := CStaticAccount.DataId;
+      idAccount := CStaticDestAccount.DataId;
+    end else begin
+      idAccount := CStaticAccount.DataId;
+    end;
     idCashPoint := CStaticCashpoint.DataId;
     idProduct := CStaticProducts.DataId;
   end;
@@ -105,6 +144,28 @@ end;
 function TCQuickpatternForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCQuickpatternFrame;
+end;
+
+procedure TCQuickpatternForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  CStaticCashpoint.Visible := ComboBoxType.ItemIndex <> 2;
+  CStaticProducts.Visible := ComboBoxType.ItemIndex <> 2;
+  Label3.Visible := ComboBoxType.ItemIndex <> 2;
+  Label4.Visible := ComboBoxType.ItemIndex <> 2;
+  CStaticDestAccount.Visible := ComboBoxType.ItemIndex = 2;
+  Label6.Visible := ComboBoxType.ItemIndex = 2;
+end;
+
+procedure TCQuickpatternForm.InitializeForm;
+begin
+  inherited InitializeForm;
+  ComboBoxTypeChange(Nil);
+end;
+
+procedure TCQuickpatternForm.UpdateFrames(ADataGid: ShortString; AMessage, AOption: Integer);
+begin
+  inherited UpdateFrames(ADataGid, AMessage, AOption);
+  SendMessageToFrames(TCMovementFrame, WM_NOTIFYMESSAGE, 0, WMOPT_REFRESHQUICKPATTERNS);
 end;
 
 end.

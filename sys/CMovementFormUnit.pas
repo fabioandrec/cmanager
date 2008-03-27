@@ -13,11 +13,13 @@ type
   private
     FtriggerDate: TDateTime;
     Fplanned: TDataObject;
+    FquickPattern: TQuickPatternElement;
   public
-    constructor Create(ATriggerDate: TDateTime; APlanned: TDataObject);
+    constructor Create(ATriggerDate: TDateTime; APlanned: TDataObject; AQuickPatternElement: TQuickPatternElement);
   published
     property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
     property planned: TDataObject read Fplanned write Fplanned;
+    property quickPattern: TQuickPatternElement read FquickPattern write FquickPattern;
   end;
 
   TCMovementForm = class(TCDataobjectForm)
@@ -197,49 +199,10 @@ begin
 end;
 
 procedure TCMovementForm.ComboBoxTypeChange(Sender: TObject);
-var xProfile: TProfile;
-    xProfileId, xAccountId, xCashpointId, xProductId: TDataGid;
 begin
   Caption := 'Operacja';
   if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
     PageControl.ActivePage := TabSheetInOutOnce;
-    if Operation = coAdd then begin
-      xProductId := GDefaultProductId;
-      xAccountId := GDefaultAccountId;
-      xCashpointId := GDefaultCashpointId;
-      xProfileId := GDefaultProfileId;
-      if GActiveProfileId <> CEmptyDataGid then begin
-        xProfileId := GActiveProfileId;
-      end;
-      GDataProvider.BeginTransaction;
-      if xProfileId <> CEmptyDataGid then begin
-        xProfile := TProfile(TProfile.LoadObject(ProfileProxy, xProfileId, False));
-        Caption := Caption + ' - ' + xProfile.name;
-        if xProfile.idAccount <> CEmptyDataGid then begin
-          xAccountId := xProfile.idAccount;
-        end;
-        if xProfile.idCashPoint <> CEmptyDataGid then begin
-          xCashpointId := xProfile.idCashPoint;
-        end;
-        if xProfile.idProduct <> CEmptyDataGid then begin
-          CStaticInoutOnceCategory.DataId := xProfile.idProduct;
-          CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProfile.idProduct, False)).name;
-        end;
-      end;
-      if xAccountId <> CEmptyDataGid then begin
-        CStaticInoutOnceAccount.DataId := xAccountId;
-        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
-      end;
-      if xCashpointId <> CEmptyDataGid then begin
-        CStaticInoutOnceCashpoint.DataId := xCashpointId;
-        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xCashpointId, False)).name;
-      end;
-      if xProductId <> CEmptyDataGid then begin
-        CStaticInoutOnceCategory.DataId := xProductId;
-        CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProductId, False)).name;
-      end;
-      GDataProvider.RollbackTransaction;
-    end;
   end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
     PageControl.ActivePage := TabSheetInOutCyclic;
   end else if (ComboBoxType.ItemIndex = 2) then begin
@@ -253,6 +216,8 @@ procedure TCMovementForm.InitializeForm;
 var xAdd: TMovementAdditionalData;
     xPlan: TPlannedMovement;
     xText: String;
+    xProductId, xAccountId, xCashpointId, xProfileId: TDataGid;
+    xProfile: TProfile;
 begin
   FillCombo(ComboBoxType, CBaseMovementTypes);
   FOnceRateHelper := Nil;
@@ -277,22 +242,68 @@ begin
     CCurrEditInoutCyclicMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
     CCurrEditTransMovement.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditTransAccount.SetCurrencyDef(CEmptyDataGid, '');
+    if Operation = coAdd then begin
+      xProductId := GDefaultProductId;
+      xAccountId := GDefaultAccountId;
+      xCashpointId := GDefaultCashpointId;
+      xProfileId := GDefaultProfileId;
+      if GActiveProfileId <> CEmptyDataGid then begin
+        xProfileId := GActiveProfileId;
+      end;
+      GDataProvider.BeginTransaction;
+      if xProfileId <> CEmptyDataGid then begin
+        xProfile := TProfile(TProfile.LoadObject(ProfileProxy, xProfileId, False));
+        Caption := Caption + ' - ' + xProfile.name;
+        if xProfile.idAccount <> CEmptyDataGid then begin
+          xAccountId := xProfile.idAccount;
+        end;
+        if xProfile.idCashPoint <> CEmptyDataGid then begin
+          xCashpointId := xProfile.idCashPoint;
+        end;
+        if xProfile.idProduct <> CEmptyDataGid then begin
+          xProductId := xProfile.idProduct;
+        end;
+      end;
+      if AdditionalData <> Nil then begin
+        if TMovementAdditionalData(AdditionalData).quickPattern <> Nil then begin
+          xProductId := TMovementAdditionalData(AdditionalData).quickPattern.idProduct;
+          xCashpointId := TMovementAdditionalData(AdditionalData).quickPattern.idCashPoint;
+          xAccountId := TMovementAdditionalData(AdditionalData).quickPattern.idAccount;
+        end;
+      end;
+      if xAccountId <> CEmptyDataGid then begin
+        CStaticInoutOnceAccount.DataId := xAccountId;
+        CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
+      end;
+      if xCashpointId <> CEmptyDataGid then begin
+        CStaticInoutOnceCashpoint.DataId := xCashpointId;
+        CStaticInoutOnceCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, xCashpointId, False)).name;
+      end;
+      if xProductId <> CEmptyDataGid then begin
+        CStaticInoutOnceCategory.DataId := xProductId;
+        CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProductId, False)).name;
+      end;
+      GDataProvider.RollbackTransaction;
+    end;
     CStaticInoutOnceCategoryChanged(Nil);
     CStaticInoutCyclicCategoryChanged(Nil);
   end;
   if AdditionalData <> Nil then begin
     xAdd := TMovementAdditionalData(AdditionalData);
-    xPlan := TPlannedMovement(xAdd.planned);
-    if xPlan.movementType = CInMovement then begin
-      ComboBoxType.ItemIndex := 4;
-      xText := xPlan.description + ' (wp³yw do ' + Date2StrDate(xAdd.triggerDate) + ')'
-    end else if xPlan.movementType = COutMovement then begin
-      ComboBoxType.ItemIndex := 3;
-      xText := xPlan.description + ' (p³atne do ' + Date2StrDate(xAdd.triggerDate) + ')'
+    if xAdd.planned <> Nil then begin
+      xPlan := TPlannedMovement(xAdd.planned);
+      if xPlan.movementType = CInMovement then begin
+        ComboBoxType.ItemIndex := 4;
+        xText := xPlan.description + ' (wp³yw do ' + Date2StrDate(xAdd.triggerDate) + ')'
+      end else if xPlan.movementType = COutMovement then begin
+        ComboBoxType.ItemIndex := 3;
+        xText := xPlan.description + ' (p³atne do ' + Date2StrDate(xAdd.triggerDate) + ')'
+      end;
+      CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+      CStaticInoutCyclic.Caption := xText;
+      CStaticInoutCyclicChanged(CStaticInoutCyclic);
+    end else if xAdd.quickPattern <> Nil then begin
     end;
-    CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
-    CStaticInoutCyclic.Caption := xText;
-    CStaticInoutCyclicChanged(CStaticInoutCyclic);
   end;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
@@ -813,11 +824,12 @@ begin
   UpdateDescription;
 end;
 
-constructor TMovementAdditionalData.Create(ATriggerDate: TDateTime; APlanned: TDataObject);
+constructor TMovementAdditionalData.Create(ATriggerDate: TDateTime; APlanned: TDataObject; AQuickPatternElement: TQuickPatternElement);
 begin
   inherited Create;
   FtriggerDate := ATriggerDate;
   Fplanned := APlanned;
+  FquickPattern := AQuickPatternElement;
 end;
 
 procedure TCMovementForm.UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer);

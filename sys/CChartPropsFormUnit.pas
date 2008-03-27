@@ -247,7 +247,7 @@ begin
   Fprefs := TChartPref(GChartPreferences.ByPrefname[FprefName]);
   if Fprefs = Nil then begin
     Fprefs := TChartPref.Create(FprefName);
-    GChartPreferences.Add(Fprefs);
+    GChartPreferences.Add(Fprefs, True);
   end;
   with Fprefs do begin
     view := ComboBox.ItemIndex;

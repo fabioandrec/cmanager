@@ -238,6 +238,53 @@ inherited CMovementFrame: TCMovementFrame
           OnClick = SpeedButtonPatternVisibleClick
         end
       end
+      object QuickpatternList: TCDataList
+        Left = 0
+        Top = 21
+        Width = 107
+        Height = 125
+        Align = alClient
+        BevelEdges = []
+        BevelInner = bvNone
+        BevelOuter = bvRaised
+        BevelKind = bkFlat
+        BorderStyle = bsNone
+        ButtonStyle = bsTriangle
+        DefaultNodeHeight = 24
+        Header.AutoSizeIndex = 0
+        Header.Font.Charset = DEFAULT_CHARSET
+        Header.Font.Color = clWindowText
+        Header.Font.Height = -11
+        Header.Font.Name = 'MS Sans Serif'
+        Header.Font.Style = []
+        Header.Height = 21
+        Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
+        Header.Style = hsFlatButtons
+        HintMode = hmHint
+        HotCursor = crHandPoint
+        Images = ImageList
+        ParentShowHint = False
+        PopupMenu = PopupMenuQuickPatterns
+        ShowHint = True
+        TabOrder = 1
+        TabStop = False
+        TreeOptions.AutoOptions = [toAutoExpand, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+        TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+        TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toHotTrack, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages, toAlwaysHideSelection]
+        TreeOptions.SelectionOptions = [toDisableDrawSelection, toFullRowSelect]
+        OnClick = QuickpatternListClick
+        AutoExpand = False
+        OnGetRowPreferencesName = QuickpatternListGetRowPreferencesName
+        OnCDataListReloadTree = QuickpatternListCDataListReloadTree
+        Columns = <
+          item
+            Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+            Position = 0
+            Width = 107
+            WideText = 'Szablony'
+          end>
+        WideDefaultText = ''
+      end
     end
   end
   object Panel: TPanel [2]
@@ -562,6 +609,14 @@ inherited CMovementFrame: TCMovementFrame
       Caption = 'Ma'#322'e ikony'
       RadioItem = True
       OnClick = MenuItemSmallIconsClick
+    end
+  end
+  object PopupMenuQuickPatterns: TPopupMenu
+    Left = 368
+    Top = 168
+    object MenuItemQuickpatterns: TMenuItem
+      Caption = 'Ustawienia listy'
+      OnClick = MenuItemQuickpatternsClick
     end
   end
 end

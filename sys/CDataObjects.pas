@@ -335,9 +335,9 @@ type
     property isStated: Boolean read FisStated write SetisStated;
   end;
 
-
   TQuickPattern = class(TDataObject)
   private
+    Fname: TBaseName;
     Fdescription: TBaseDescription;
     FmovementType: TBaseEnumeration;
     FidAccount: TDataGid;
@@ -350,11 +350,16 @@ type
     procedure SetidSourceAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
+    procedure Setname(const Value: TBaseName);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetElementText: String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
+    property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property idAccount: TDataGid read FidAccount write SetidAccount;
@@ -954,6 +959,30 @@ type
     property quantity: Integer read Fquantity;
     property valueOf: Currency read FvalueOf;
     property overallValue: Currency read GetoverallValue;
+  end;
+
+  TQuickPatternElement = class(TCDataListElementObject)
+  private
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    FmovementType: TBaseEnumeration;
+    FidAccount: TDataGid;
+    FidSourceAccount: TDataGid;
+    FidCashPoint: TDataGid;
+    FidProduct: TDataGid;
+    FisStatistic: Boolean;
+  public
+    constructor Create(AName: TBaseName; ADesc: TBaseDescription; AMovementType: TBaseEnumeration;
+                       AIdAccount, AIdSourceAccount, AIdCashpoint, AIdProduct: TDataGid; AIsStatistic: Boolean);
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetElementHint(AColumnIndex: Integer): String; override;
+  published
+    property movementType: TBaseEnumeration read FmovementType;
+    property idAccount: TDataGid read FidAccount;
+    property idSourceAccount: TDataGid read FidSourceAccount;
+    property idCashPoint: TDataGid read FidCashPoint;
+    property idProduct: TDataGid read FidProduct;
+    property isStatistic: Boolean read FisStatistic write FisStatistic;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -4641,8 +4670,6 @@ begin
   end;
 end;
 
-{ TQuickPattern }
-
 constructor TQuickPattern.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
@@ -4656,6 +4683,7 @@ procedure TQuickPattern.FromDataset(ADataset: TADOQuery);
 begin
   inherited FromDataset(ADataset);
   with ADataset do begin
+    Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
     FmovementType := FieldByName('movementType').AsString;
     FidAccount := FieldByName('idAccount').AsString;
@@ -4663,6 +4691,21 @@ begin
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
   end;
+end;
+
+function TQuickPattern.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  Result := Fname;
+end;
+
+function TQuickPattern.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
+end;
+
+function TQuickPattern.GetElementText: String;
+begin
+  Result := Fname;
 end;
 
 procedure TQuickPattern.Setdescription(const Value: TBaseDescription);
@@ -4713,10 +4756,19 @@ begin
   end;
 end;
 
+procedure TQuickPattern.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TQuickPattern.UpdateFieldList;
 begin
   inherited UpdateFieldList;
   with DataFieldList do begin
+    AddField('name', Fname, True, 'quickPattern');
     AddField('description', Fdescription, True, 'quickPattern');
     AddField('movementType', FmovementType, True, 'quickPattern');
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'quickPattern');
@@ -4724,6 +4776,30 @@ begin
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'quickPattern');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'quickPattern');
   end;
+end;
+
+constructor TQuickPatternElement.Create(AName: TBaseName; ADesc: TBaseDescription; AMovementType: TBaseEnumeration;
+                                        AIdAccount, AIdSourceAccount, AIdCashpoint, AIdProduct: TDataGid; AIsStatistic: Boolean);
+begin
+  inherited Create;
+  Fname := AName;
+  Fdescription := ADesc;
+  FmovementType := AMovementType;
+  FidAccount := AIdAccount;
+  FidSourceAccount := AidSourceAccount;
+  FidCashPoint := AIdCashpoint;
+  FidProduct := AIdProduct;
+  FisStatistic := AIsStatistic;
+end;
+
+function TQuickPatternElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  Result := Fname;
+end;
+
+function TQuickPatternElement.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
 end;
 
 initialization

@@ -63,7 +63,7 @@ end;
 procedure TCQuickpatternFrame.ReloadDataobjects;
 begin
   inherited ReloadDataobjects;
-  Dataobjects := TProfile.GetList(TProfile, ProfileProxy, 'select * from quickPattern');
+  Dataobjects := TQuickPattern.GetList(TQuickPattern, QuickPatternProxy, 'select * from quickPattern');
 end;
 
 end.

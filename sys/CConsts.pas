@@ -22,10 +22,12 @@ const
   WM_STATCLEAR = WM_USER + 15;
   WM_GETSELECTEDID = WM_USER + 16;
   WM_GETSELECTEDTYPE = WM_USER + 17;
+  WM_NOTIFYMESSAGE = WM_USER + 18;
 
   WMOPT_NONE = 0;
   WMOPT_BASEMOVEMENT = 1;
   WMOPT_MOVEMENTLIST = 2;
+  WMOPT_REFRESHQUICKPATTERNS = 3;
 
 const
   CCSSReportFile = 'report.css';
@@ -323,6 +325,7 @@ const
   CFontPreferencesChartList = 'chartList';
   CFontPreferencesDefaultdataElements = 'defaultData';
   CFontPreferencesSurpassesLimits = 'surpassedLimits';
+  CFontPreferencesQuickpatternsRun = 'quickPatternsRun';
 
 implementation
 

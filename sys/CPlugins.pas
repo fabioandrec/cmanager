@@ -339,7 +339,7 @@ begin
     if xAlways then begin
       if xPref = Nil then begin
         xPref := TPluginPref.CreatePluginPref(FParentPlugin.fileName, FParentPlugin.pluginConfiguration);
-        GPluginsPreferences.Add(xPref);
+        GPluginsPreferences.Add(xPref, True);
       end;
       xPref.permitGetConnection := IfThen(xPermit, 1, -1);
     end;

@@ -41,6 +41,7 @@ type
     function GetByPrefname(APrefname: String): TPrefItem;
   public
     procedure Clone(APrefList: TPrefList);
+    function Add(AObject: TObject; ACheckUniqe: Boolean): Integer;
     constructor Create(AItemClass: TPrefItemClass); overload;
     constructor Create(AGetItemClassFunction: TGetItemClassFunction); overload;
     procedure LoadFromParentNode(AParentNode: ICXMLDOMNode);
@@ -2359,6 +2360,24 @@ begin
   SaveToXml(xNode);
 end;
 
+function TPrefList.Add(AObject: TObject; ACheckUniqe: Boolean): Integer;
+var xValid: Boolean;
+begin
+  if ACheckUniqe then begin
+    xValid := ByPrefname[TPrefItem(AObject).Prefname] = Nil;
+    if not xValid then begin
+      raise Exception.Create('Brak unikalnej nazwy dla obiektu klasy PrefItem');
+    end;
+  end else begin
+    xValid := True;
+  end;
+  if xValid then begin
+    Result := inherited Add(AObject);
+  end else begin
+    Result := -1;
+  end;
+end;
+
 function TPrefList.AppendNewPrefitem(APrefname: String): TPrefItem;
 var xItemClass: TPrefItemClass;
 begin
@@ -2371,7 +2390,7 @@ begin
     end;
     if xItemClass <> Nil then begin
       Result := xItemClass.Create(APrefname);
-      Add(Result);
+      Add(Result, True);
     end;
   end;
 end;
@@ -2380,13 +2399,23 @@ procedure TPrefList.Clone(APrefList: TPrefList);
 var xCount: Integer;
     xObj: TPrefItem;
     xSou: TPrefItem;
+    xItemClass: TPrefItemClass;
 begin
-  Clear;
   for xCount := 0 to APrefList.Count - 1 do begin
     xSou := APrefList.Items[xCount];
-    xObj := FItemClass.Create(xSou.FPrefname);
-    xObj.Clone(xSou);
-    Add(xObj);
+    xObj := ByPrefname[xSou.Prefname];
+    if xObj = Nil then begin
+      if FItemClass <> Nil then begin
+        xItemClass := FItemClass;
+      end else begin
+        xItemClass := FGetItemClassFunction(xSou.FPrefname);
+      end;
+      xObj := xItemClass.Create(xSou.FPrefname);
+      xObj.Clone(xSou);
+      Add(xObj, True);
+    end else begin
+      xObj.Clone(xSou);
+    end;
   end;
 end;
 
@@ -2441,7 +2470,7 @@ begin
     if xItemClass <> Nil then begin
       xItem := xItemClass.Create(xName);
       xItem.LoadFromXml(xNode);
-      Add(xItem);
+      Add(xItem, True);
     end;
     xNode := xNode.nextSibling;
   end;

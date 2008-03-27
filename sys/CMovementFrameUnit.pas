@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
-  Contnrs, PngImageList, CImageListsUnit, CDataObjects, Buttons;
+  Contnrs, PngImageList, CImageListsUnit, CDataObjects, Buttons, Math, StrUtils;
 
 type
   TMovementTreeElementType = (mtObject, mtList);
@@ -77,6 +77,9 @@ type
     Splitter2: TSplitter;
     Panel3: TPanel;
     SpeedButtonPatternVisible: TSpeedButton;
+    QuickpatternList: TCDataList;
+    PopupMenuQuickPatterns: TPopupMenu;
+    MenuItemQuickpatterns: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -110,6 +113,10 @@ type
     procedure SpeedButtonClosePatternsClick(Sender: TObject);
     procedure MenuItemPatternsVisibleClick(Sender: TObject);
     procedure SpeedButtonPatternVisibleClick(Sender: TObject);
+    procedure QuickpatternListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+    procedure QuickpatternListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure MenuItemQuickpatternsClick(Sender: TObject);
+    procedure QuickpatternListClick(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -117,6 +124,7 @@ type
     FTodayLists: TDataObjectList;
     FTreeHelper: TTreeObjectList;
     FSumRoot: TSumElement;
+    FQuickPatternElements: TCListDataElement;
     procedure MessageMovementAdded(AId: TDataGid; AOption: Integer);
     procedure MessageMovementEdited(AId: TDataGid; AOption: Integer);
     procedure MessageMovementDeleted(AId: TDataGid; AOption: Integer);
@@ -134,7 +142,8 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedText: String; override;
     procedure DoRepaintLists; override;
-    procedure UpdateIcons; 
+    procedure UpdateIcons;
+    procedure ReloadQuickPatterns;
   public
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
@@ -246,6 +255,7 @@ begin
   FTodayObjects := Nil;
   FTodayLists := Nil;
   FSumRoot := TSumElement.Create;
+  FQuickPatternElements := TCListDataElement.Create(False, QuickpatternList, Nil, True, False);
 end;
 
 procedure TCMovementFrame.TodayListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
@@ -313,8 +323,10 @@ begin
     MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
     UpdateIcons;
   end;
+  QuickpatternList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesQuickpatternsRun]);
   ReloadToday;
   ReloadSums;
+  ReloadQuickPatterns;
 end;
 
 destructor TCMovementFrame.Destroy;
@@ -326,6 +338,7 @@ begin
   FTodayObjects.Free;
   FTodayLists.Free;
   FSumRoot.Free;
+  FQuickPatternElements.Free;
   inherited Destroy;
 end;
 
@@ -566,6 +579,10 @@ begin
     end else if Msg = WM_DATAOBJECTDELETED then begin
       xDataGid := PDataGid(WParam)^;
       MessageMovementDeleted(xDataGid, LParam);
+    end else if Msg = WM_NOTIFYMESSAGE then begin
+      if LParam = WMOPT_REFRESHQUICKPATTERNS then begin
+        ReloadQuickPatterns;
+      end;
     end;
   end;
 end;
@@ -1134,6 +1151,8 @@ begin
   inherited DoRepaintLists;
   SumList.ReinitNode(SumList.RootNode, True);
   SumList.Repaint;
+  QuickpatternList.ReinitNode(QuickpatternList.RootNode, True);
+  QuickpatternList.Repaint;
 end;
 
 procedure TCMovementFrame.Ustawienialisty2Click(Sender: TObject);
@@ -1287,6 +1306,59 @@ procedure TCMovementFrame.SpeedButtonPatternVisibleClick(Sender: TObject);
 begin
   TBaseMovementFramePref(FramePreferences).patternsListVisible := False;
   UpdateSumAndPatterns;
+end;
+
+procedure TCMovementFrame.ReloadQuickPatterns;
+begin
+  QuickpatternList.BeginUpdate;
+  QuickpatternList.ReloadTree;
+  QuickpatternList.EndUpdate;
+end;
+
+procedure TCMovementFrame.QuickpatternListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
+var xQp: TDataObjectList;
+    xCount: Integer;
+    xQuickPattern: TQuickPattern;
+    xElement: TQuickPatternElement;
+begin
+  FQuickPatternElements.Clear;
+  xQp := TQuickPattern.GetAllObjects(QuickPatternProxy);
+  for xCount := 0 to xQp.Count - 1 do begin
+    xQuickPattern := TQuickPattern(xQp.Items[xCount]);
+    xElement := TQuickPatternElement.Create(xQuickPattern.name, xQuickPattern.description, xQuickPattern.movementType,
+                                            xQuickPattern.idAccount, xQuickPattern.idSourceAccount, xQuickPattern.idCashPoint, xQuickPattern.idProduct, False);
+    ARootElement.AppendDataElement(TCListDataElement.Create(False, QuickpatternList, xElement, True, True));
+  end;
+  xQp.Free;
+end;
+
+procedure TCMovementFrame.QuickpatternListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+var xData: TCListDataElement;
+begin
+  xData := TCListDataElement(AHelper);
+  APrefname := IfThen(TQuickPatternElement(xData.Data).isStatistic, 'S', 'D');
+end;
+
+procedure TCMovementFrame.MenuItemQuickpatternsClick(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(QuickpatternList.ViewPref) then begin
+    SendMessageToFrames(TCBaseFrameClass(ClassType), WM_MUSTREPAINT, 0, 0);
+  end;
+  xPrefs.Free;
+end;
+
+procedure TCMovementFrame.QuickpatternListClick(Sender: TObject);
+var xForm: TCMovementForm;
+    xElement: TCListDataElement;
+begin
+  xElement := QuickpatternList.SelectedElement;
+  if (QuickpatternList.FocusedNode <> Nil) and (xElement <> Nil) then begin
+    xForm := TCMovementForm.Create(Nil);
+    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(0, Nil, TQuickPatternElement(xElement.Data)));
+    xForm.Free;
+  end;
 end;
 
 end.

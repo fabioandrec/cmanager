@@ -179,8 +179,11 @@ begin
         xPassword := '';
       end;
       if xProceed then begin
-        if xPassword = '' then begin
+        if GetSwitch('/password') then begin
           xPassword := GetParamValue('/password');
+        end;
+        if GetSwitch('/datafile') then begin
+          xFilename := GetParamValue('/datafile');
         end;
         xProceed := InitializeDataProvider(xFilename, xPassword, GDataProvider) = iprSuccess;
       end;
@@ -204,7 +207,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin
