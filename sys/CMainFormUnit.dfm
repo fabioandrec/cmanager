@@ -698,6 +698,12 @@ object CMainForm: TCMainForm
       Caption = 'Linia polece'#324
       OnExecute = ActionCmdExecute
     end
+    object ActionShortcutQuickpatterns: TAction
+      Category = 'S'#322'owniki'
+      Caption = 'Szybkie operacje'
+      ImageIndex = 20
+      OnExecute = ActionShortcutQuickpatternsExecute
+    end
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'

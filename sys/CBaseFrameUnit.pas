@@ -141,7 +141,7 @@ uses CConsts, CListPreferencesFormUnit, CReports, Math,
   CProfileFrameUnit, CUnitdefFormUnit, CUpdateCurrencyRatesFormUnit,
   CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
   CInvestmentMovementFrameUnit, CInvestmentPortfolioFrameUnit,
-  CReportsFrameUnit;
+  CReportsFrameUnit, CQuickpatternFrameUnit;
 
 {$R *.dfm}
 
@@ -748,6 +748,7 @@ begin
   GRegisteredClasses.AddClass(TCInstrumentValueFrame, CFRAMETYPE_INSTRUMENTVALUE, True);
   GRegisteredClasses.AddClass(TCInvestmentMovementFrame, CFRAMETYPE_INVESTMENTMOVEMENT, True);
   GRegisteredClasses.AddClass(TCInvestmentPortfolioFrame, CFRAMETYPE_INVESTMENTPORTFOLIO, True);
+  GRegisteredClasses.AddClass(TCQuickpatternFrame, CFRAMETYPE_QUICKPATTERNS, True);
   GRegisteredClasses.AddClass(TCReportsFrame, CFRAMETYPE_REPORTS, True);
   xDefaultViewPrefs := GetDefaultViewPreferences;
   GViewsPreferences.Clone(xDefaultViewPrefs);

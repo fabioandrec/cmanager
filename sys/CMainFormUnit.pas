@@ -82,6 +82,7 @@ type
     Ustawienialisty1: TMenuItem;
     ActionPasswordDatafile: TAction;
     ActionCmd: TAction;
+    ActionShortcutQuickpatterns: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -127,6 +128,7 @@ type
     procedure ActionPasswordDatafileExecute(Sender: TObject);
     procedure ActionCmdExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure ActionShortcutQuickpatternsExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -181,7 +183,8 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
-     CImportExportDatafileFormUnit, CChangePasswordFormUnit;
+     CImportExportDatafileFormUnit, CChangePasswordFormUnit,
+  CQuickpatternFrameUnit;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -923,6 +926,8 @@ begin
     Result := TCInvestmentMovementFrame;
   end else if AAction = ActionShortcutInvestmentPortfolio then begin
     Result := TCInvestmentPortfolioFrame;
+  end else if AAction = ActionShortcutQuickpatterns then begin
+    Result := TCQuickpatternFrame;
   end else begin
     Result := TCBaseFrame;
   end;
@@ -1005,6 +1010,11 @@ begin
   if not CheckForBackups(CMANAGERSTATE_CLOSING) then begin
     CanClose := ShowInfo(itWarning, 'Podczas wykonywania kopii zapasowej wyst¹pi³ b³¹d. Czy chcesz zakoñczyæ pracê ?', '', Nil, True);
   end;
+end;
+
+procedure TCMainForm.ActionShortcutQuickpatternsExecute(Sender: TObject);
+begin
+//
 end;
 
 end.

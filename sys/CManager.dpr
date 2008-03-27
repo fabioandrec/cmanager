@@ -143,7 +143,9 @@ uses
   CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
   CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm},
   CChangePasswordFormUnit in 'CChangePasswordFormUnit.pas' {CChangePasswordForm},
-  CHtmlMemoFormUnit in 'CHtmlMemoFormUnit.pas' {CHtmlMemoForm};
+  CHtmlMemoFormUnit in 'CHtmlMemoFormUnit.pas' {CHtmlMemoForm},
+  CQuickpatternFrameUnit in 'CQuickpatternFrameUnit.pas' {CQuickpatternFrame: TFrame},
+  CQuickpatternFormUnit in 'CQuickpatternFormUnit.pas' {CQuickpatternForm};
 
 {$R *.res}
 
@@ -202,7 +204,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

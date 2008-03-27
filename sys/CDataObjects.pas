@@ -335,6 +335,34 @@ type
     property isStated: Boolean read FisStated write SetisStated;
   end;
 
+
+  TQuickPattern = class(TDataObject)
+  private
+    Fdescription: TBaseDescription;
+    FmovementType: TBaseEnumeration;
+    FidAccount: TDataGid;
+    FidSourceAccount: TDataGid;
+    FidCashPoint: TDataGid;
+    FidProduct: TDataGid;
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetmovementType(const Value: TBaseEnumeration);
+    procedure SetidSourceAccount(const Value: TDataGid);
+    procedure SetidCashPoint(const Value: TDataGid);
+    procedure SetidProduct(const Value: TDataGid);
+  public
+    procedure UpdateFieldList; override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    constructor Create(AStatic: Boolean); override;
+  published
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idSourceAccount: TDataGid read FidSourceAccount write SetidSourceAccount;
+    property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+    property idProduct: TDataGid read FidProduct write SetidProduct;
+  end;
+
   TBaseMovement = class(TDataObject)
   private
     Fdescription: TBaseDescription;
@@ -950,6 +978,7 @@ var CashPointProxy: TDataProxy;
     InvestmentItemProxy: TDataProxy;
     InvestmentMovementProxy: TDataProxy;
     InvestmentPortfolioProxy: TDataProxy;
+    QuickPatternProxy: TDataProxy;
 
 var GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
@@ -962,40 +991,40 @@ var GCurrencyCache: TCurrCache;
 const CHASH_INSTRUMENT_SYMBOL = 0;
       CHASH_INSTRUMENT_NAME = 1;
 
-const CDatafileTables: array[0..25] of string =
+const CDatafileTables: array[0..26] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
              'accountCurrencyRule', 'reportDef',
-             'instrument', 'instrumentValue', 'investmentItem', 'investmentMovement');
+             'instrument', 'instrumentValue', 'investmentItem', 'investmentMovement', 'quickPattern');
 
-const CDatafileTablesExportConditions: array[0..25] of string =
+const CDatafileTablesExportConditions: array[0..26] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
              '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
-             '', '', '', '');
+             '', '', '', '', '');
 
-const CDatafileDeletes: array[0..25] of string =
+const CDatafileDeletes: array[0..26] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '', '', '', '', '', '');
+             '', '', '', '', '', '', '');
 
-const CDatafileTablesExportOrders: array[0..25] of string =
+const CDatafileTablesExportOrders: array[0..26] of string =
             ('', '', '', '', '',
              'created', '', '',
              '', '', '', '',
              '', '', '', '',
-             '', '', '', 
              '', '', '',
-             '', '', '', '');
+             '', '', '',
+             '', '', '', '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
@@ -1081,6 +1110,7 @@ begin
   ProductProxy := TDataProxy.Create(ADataProvider, 'product');
   MovementListProxy :=  TDataProxy.Create(ADataProvider, 'movementList');
   BaseMovementProxy := TDataProxy.Create(ADataProvider, 'baseMovement');
+  QuickPatternProxy := TDataProxy.Create(ADataProvider, 'quickPattern');
   PlannedMovementProxy :=  TDataProxy.Create(ADataProvider, 'plannedMovement');
   PlannedDoneProxy :=  TDataProxy.Create(ADataProvider, 'plannedDone');
   MovementFilterProxy :=  TDataProxy.Create(ADataProvider, 'movementFilter');
@@ -4608,6 +4638,91 @@ begin
   inherited DeleteObject;
   if GDefaultAccountId = id then begin
     GDefaultAccountId := CEmptyDataGid;
+  end;
+end;
+
+{ TQuickPattern }
+
+constructor TQuickPattern.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidAccount := CEmptyDataGid;
+  FidSourceAccount := CEmptyDataGid;
+  FidCashPoint := CEmptyDataGid;
+  FidProduct := CEmptyDataGid;
+end;
+
+procedure TQuickPattern.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    Fdescription := FieldByName('description').AsString;
+    FmovementType := FieldByName('movementType').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FidSourceAccount := FieldByName('idSourceAccount').AsString;
+    FidCashPoint := FieldByName('idCashPoint').AsString;
+    FidProduct := FieldByName('idProduct').AsString;
+  end;
+end;
+
+procedure TQuickPattern.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TQuickPattern.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TQuickPattern.SetidCashPoint(const Value: TDataGid);
+begin
+  if FidCashPoint <> Value then begin
+    FidCashPoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TQuickPattern.SetidProduct(const Value: TDataGid);
+begin
+  if FidProduct <> Value then begin
+    FidProduct := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TQuickPattern.SetidSourceAccount(const Value: TDataGid);
+begin
+  if FidSourceAccount <> Value then begin
+    FidSourceAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TQuickPattern.SetmovementType(const Value: TBaseEnumeration);
+begin
+  if FmovementType <> Value then begin
+    FmovementType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TQuickPattern.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('description', Fdescription, True, 'quickPattern');
+    AddField('movementType', FmovementType, True, 'quickPattern');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'quickPattern');
+    AddField('idSourceAccount', DataGidToDatabase(FidSourceAccount), False, 'quickPattern');
+    AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'quickPattern');
+    AddField('idProduct', DataGidToDatabase(FidProduct), False, 'quickPattern');
   end;
 end;
 
