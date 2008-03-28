@@ -307,15 +307,18 @@ begin
       if xTrSourceAccountId <> CEmptyDataGid then begin
         CStaticTransSourceAccount.DataId := xTrSourceAccountId;
         CStaticTransSourceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xTrSourceAccountId, False)).name;
+        FtransSourceState.AccountId := xTrSourceAccountId;
       end;
       if xAccountId <> CEmptyDataGid then begin
         CStaticTransDestAccount.DataId := xAccountId;
         CStaticTransDestAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
+        FtransDestState.AccountId := xAccountId;
       end;
     end else begin
       if xAccountId <> CEmptyDataGid then begin
         CStaticInoutOnceAccount.DataId := xAccountId;
         CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
+        FonceState.AccountId := xAccountId;
       end;
       if xCashpointId <> CEmptyDataGid then begin
         CStaticInoutOnceCashpoint.DataId := xCashpointId;
@@ -333,6 +336,24 @@ begin
     CStaticInoutCyclicCategoryChanged(Nil);
     CStaticInoutCyclicChanged(Nil);
   end;
+  if (xQuickPatternMovementType = '') or (xQuickPatternMovementType = CInMovement) or (xQuickPatternMovementType = COutMovement) then begin
+    if xAccountId <> CEmptyDataGid then begin
+      CStaticInoutOnceAccountChanged(Nil);
+    end;
+    if xProductId <> CEmptyDataGid then begin
+      CStaticInoutOnceCategoryChanged(Nil);
+    end;
+    if xCashpointId <> CEmptyDataGid then begin
+      CStaticInoutOnceCashpointChanged(Nil);
+    end;
+  end else if (xQuickPatternMovementType = CTransferMovement) then begin
+    if xTrSourceAccountId <> CEmptyDataGid then begin
+      CStaticTransSourceAccountChanged(Nil);
+    end;
+    if xAccountId <> CEmptyDataGid then begin
+      CStaticTransDestAccountChanged(Nil);
+    end;
+  end;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
   UpdateCurrencyRates;
@@ -340,10 +361,6 @@ begin
   UpdateState(FcyclicState, ActionStateCyclic, CButtonStateCyclic);
   UpdateState(FtransSourceState, ActionStateTransSource, CButtonStateTransSource);
   UpdateState(FtransDestState, ActionStateTransDest, CButtonStateTransDest);
-  CButtonStateOnce.Enabled := False;
-  CButtonStateCyclic.Enabled := False;
-  CButtonStateTransSource.Enabled := False;
-  CButtonStateTransDest.Enabled := False;
   if (xQuickPatternMovementType = CInMovement) or (xQuickPatternMovementType = COutMovement) then begin
     if xAccountId = CEmptyDataGid then begin
       ActiveControl := CStaticInoutOnceAccount;

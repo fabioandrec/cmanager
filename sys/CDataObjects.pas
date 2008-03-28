@@ -1069,6 +1069,33 @@ implementation
 uses DB, CInfoFormUnit, DateUtils, StrUtils, CPreferences, CBaseFrameUnit,
   CBase64, CDatatools;
 
+procedure UpdateStatistics(AProvider: TDataProvider;
+                           AmovementCount: Integer; Acash: Currency;  AmovementCash: Currency; AmovementType: TBaseEnumeration;
+                           AidAccount: TDataGid; AidSourceAccount: TDataGid; AidCashPoint: TDataGid; AidProduct: TDataGid;
+                           AidAccountCurrencyDef: TDataGid; AidMovementCurrencyDef: TDataGid);
+begin
+  if AProvider.GetSqlInteger(Format('select count(*) from movementStatistics where movementType = ''%s'' and idAccount = %s and idSourceAccount = %s and ' +
+                          'idCashPoint = %s and idProduct = %s and idAccountCurrencyDef = %s and idMovementCurrencyDef = %s',
+                          [AmovementType, DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount),
+                           DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct), DataGidToDatabase(AidAccountCurrencyDef),
+                           DataGidToDatabase(AidMovementCurrencyDef)]), 0) = 0 then begin
+
+    AProvider.ExecuteSql(Format('update movementStatistic set movementCount = movementCount %s, cash = cash %s, movementCash = movementCash %s where movementType = ''%s'' and idAccount = %s and idSourceAccount = %s and ' +
+                          'idCashPoint = %s and idProduct = %s and idAccountCurrencyDef = %s and idMovementCurrencyDef = %s',
+                          [IntToStrWithSign(AmovementCount), CurrencyToDatabaseWithSign(Acash), CurrencyToDatabaseWithSign(AmovementCash), AmovementType, DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount),
+                           DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct), DataGidToDatabase(AidAccountCurrencyDef),
+                           DataGidToDatabase(AidMovementCurrencyDef)]));
+  end else begin
+    AProvider.ExecuteSql(Format('insert into movementStatistic (movementCount, cash, movementType, idAccount, idSourceAccount, idCashPoint, idProduct, idAccountCurrencyDef, idMovementCurrencyDef, movementCash) values (' +
+    '%d, %s, ''%s'', %s, %s, %s, %s, %s, %s, %s)', [AmovementCount, CurrencyToDatabase(Acash), AmovementType,
+      DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount), DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct),
+      DataGidToDatabase(AidAccountCurrencyDef), DataGidToDatabase(AidMovementCurrencyDef), CurrencyToDatabase(AmovementCash)]));
+  end;
+end;
+
+
+
+
 function GetDefsFromDataset(ADataset: TADOQuery; ACurDefFieldname: String): TDataGids;
 var xGid: String;
 begin

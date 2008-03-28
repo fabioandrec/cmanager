@@ -91,6 +91,7 @@ function IsEven(AInt: Integer): Boolean; overload;
 function DataGidToDatabase(ADataGid: String): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function CurrencyToDatabase(ACurrency: Currency): String;
+function CurrencyToDatabaseWithSign(ACurrency: Currency): String;
 function TrimStr(AStr: String; AUnwanted: String): String;
 function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
@@ -646,6 +647,17 @@ begin
   GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
   xFormat.DecimalSeparator := '.';
   Result := CurrToStr(ACurrency, xFormat);
+end;
+
+function CurrencyToDatabaseWithSign(ACurrency: Currency): String;
+var xFormat: TFormatSettings;
+begin
+  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
+  xFormat.DecimalSeparator := '.';
+  Result := CurrToStr(ACurrency, xFormat);
+  if ACurrency >= 0 then begin
+    Result := '+' + Result;
+  end;
 end;
 
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
