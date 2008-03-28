@@ -262,9 +262,11 @@ inherited CMovementFrame: TCMovementFrame
         Header.Style = hsFlatButtons
         HintMode = hmHint
         HotCursor = crHandPoint
-        Images = ImageList
+        Images = CImageLists.MovementIcons16x16
+        Indent = 8
         ParentShowHint = False
         PopupMenu = PopupMenuQuickPatterns
+        ScrollBarOptions.ScrollBars = ssHorizontal
         ShowHint = True
         TabOrder = 1
         TabStop = False
@@ -614,6 +616,19 @@ inherited CMovementFrame: TCMovementFrame
   object PopupMenuQuickPatterns: TPopupMenu
     Left = 368
     Top = 168
+    object MenuItemshowUserQuickpatterns: TMenuItem
+      Caption = 'Pokazuj szablony u'#380'ytkownika'
+      Checked = True
+      OnClick = MenuItemshowUserQuickpatternsClick
+    end
+    object MenuItemStatisticQuickPatterns: TMenuItem
+      Caption = 'Pokazuj szablony najcz'#281#347'ciej u'#380'ywanych operacji'
+      Checked = True
+      OnClick = MenuItemStatisticQuickPatternsClick
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
     object MenuItemQuickpatterns: TMenuItem
       Caption = 'Ustawienia listy'
       OnClick = MenuItemQuickpatternsClick

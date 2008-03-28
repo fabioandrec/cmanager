@@ -216,13 +216,17 @@ procedure TCMovementForm.InitializeForm;
 var xAdd: TMovementAdditionalData;
     xPlan: TPlannedMovement;
     xText: String;
-    xProductId, xAccountId, xCashpointId, xProfileId: TDataGid;
+    xProductId, xAccountId, xCashpointId, xProfileId, xTrSourceAccountId: TDataGid;
     xProfile: TProfile;
+    xQuickPatternMovementType: TBaseEnumeration;
+    xIsCyclic: Boolean;
 begin
   FillCombo(ComboBoxType, CBaseMovementTypes);
   FOnceRateHelper := Nil;
   FCyclicRateHelper := Nil;
   FTransferRateHelper := Nil;
+  xQuickPatternMovementType := '';
+  xIsCyclic := False;
   FonceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   FcyclicState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
   FtransSourceState := TMovementStateRecord.Create(CEmptyDataGid, False, CEmptyDataGid);
@@ -242,35 +246,73 @@ begin
     CCurrEditInoutCyclicMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
     CCurrEditTransMovement.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditTransAccount.SetCurrencyDef(CEmptyDataGid, '');
-    if Operation = coAdd then begin
-      xProductId := GDefaultProductId;
-      xAccountId := GDefaultAccountId;
-      xCashpointId := GDefaultCashpointId;
-      xProfileId := GDefaultProfileId;
-      if GActiveProfileId <> CEmptyDataGid then begin
-        xProfileId := GActiveProfileId;
+    xProductId := GDefaultProductId;
+    xAccountId := GDefaultAccountId;
+    xCashpointId := GDefaultCashpointId;
+    xProfileId := GDefaultProfileId;
+    xTrSourceAccountId := CEmptyDataGid;
+    if GActiveProfileId <> CEmptyDataGid then begin
+      xProfileId := GActiveProfileId;
+    end;
+    GDataProvider.BeginTransaction;
+    if xProfileId <> CEmptyDataGid then begin
+      xProfile := TProfile(TProfile.LoadObject(ProfileProxy, xProfileId, False));
+      Caption := Caption + ' - ' + xProfile.name;
+      if xProfile.idAccount <> CEmptyDataGid then begin
+        xAccountId := xProfile.idAccount;
       end;
-      GDataProvider.BeginTransaction;
-      if xProfileId <> CEmptyDataGid then begin
-        xProfile := TProfile(TProfile.LoadObject(ProfileProxy, xProfileId, False));
-        Caption := Caption + ' - ' + xProfile.name;
-        if xProfile.idAccount <> CEmptyDataGid then begin
-          xAccountId := xProfile.idAccount;
-        end;
-        if xProfile.idCashPoint <> CEmptyDataGid then begin
-          xCashpointId := xProfile.idCashPoint;
-        end;
-        if xProfile.idProduct <> CEmptyDataGid then begin
-          xProductId := xProfile.idProduct;
-        end;
+      if xProfile.idCashPoint <> CEmptyDataGid then begin
+        xCashpointId := xProfile.idCashPoint;
       end;
-      if AdditionalData <> Nil then begin
-        if TMovementAdditionalData(AdditionalData).quickPattern <> Nil then begin
+      if xProfile.idProduct <> CEmptyDataGid then begin
+        xProductId := xProfile.idProduct;
+      end;
+    end;
+    if AdditionalData <> Nil then begin
+      xAdd := TMovementAdditionalData(AdditionalData);
+      if xAdd.planned <> Nil then begin
+        xPlan := TPlannedMovement(xAdd.planned);
+        if xPlan.movementType = CInMovement then begin
+          ComboBoxType.ItemIndex := 4;
+          xText := xPlan.description + ' (wp³yw do ' + Date2StrDate(xAdd.triggerDate) + ')'
+        end else if xPlan.movementType = COutMovement then begin
+          ComboBoxType.ItemIndex := 3;
+          xText := xPlan.description + ' (p³atne do ' + Date2StrDate(xAdd.triggerDate) + ')'
+        end;
+        CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+        CStaticInoutCyclic.Caption := xText;
+        xIsCyclic := True;
+      end else if xAdd.quickPattern <> Nil then begin
+        xQuickPatternMovementType := xAdd.quickPattern.movementType;
+        if xQuickPatternMovementType = CTransferMovement then begin
           xProductId := TMovementAdditionalData(AdditionalData).quickPattern.idProduct;
           xCashpointId := TMovementAdditionalData(AdditionalData).quickPattern.idCashPoint;
           xAccountId := TMovementAdditionalData(AdditionalData).quickPattern.idAccount;
+          xTrSourceAccountId := TMovementAdditionalData(AdditionalData).quickPattern.idSourceAccount;
+          ComboBoxType.ItemIndex := 2;
+        end else if xQuickPatternMovementType = CInMovement then begin
+          xProductId := TMovementAdditionalData(AdditionalData).quickPattern.idProduct;
+          xCashpointId := TMovementAdditionalData(AdditionalData).quickPattern.idCashPoint;
+          xAccountId := TMovementAdditionalData(AdditionalData).quickPattern.idAccount;
+          ComboBoxType.ItemIndex := 1;
+        end else if xQuickPatternMovementType = COutMovement then begin
+          xProductId := TMovementAdditionalData(AdditionalData).quickPattern.idProduct;
+          xCashpointId := TMovementAdditionalData(AdditionalData).quickPattern.idCashPoint;
+          xAccountId := TMovementAdditionalData(AdditionalData).quickPattern.idAccount;
+          ComboBoxType.ItemIndex := 0;
         end;
       end;
+    end;
+    if xQuickPatternMovementType = CTransferMovement then begin
+      if xTrSourceAccountId <> CEmptyDataGid then begin
+        CStaticTransSourceAccount.DataId := xTrSourceAccountId;
+        CStaticTransSourceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xTrSourceAccountId, False)).name;
+      end;
+      if xAccountId <> CEmptyDataGid then begin
+        CStaticTransDestAccount.DataId := xAccountId;
+        CStaticTransDestAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
+      end;
+    end else begin
       if xAccountId <> CEmptyDataGid then begin
         CStaticInoutOnceAccount.DataId := xAccountId;
         CStaticInoutOnceAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, xAccountId, False)).name;
@@ -283,27 +325,13 @@ begin
         CStaticInoutOnceCategory.DataId := xProductId;
         CStaticInoutOnceCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, xProductId, False)).name;
       end;
-      GDataProvider.RollbackTransaction;
     end;
-    CStaticInoutOnceCategoryChanged(Nil);
-    CStaticInoutCyclicCategoryChanged(Nil);
+    GDataProvider.RollbackTransaction;
   end;
-  if AdditionalData <> Nil then begin
-    xAdd := TMovementAdditionalData(AdditionalData);
-    if xAdd.planned <> Nil then begin
-      xPlan := TPlannedMovement(xAdd.planned);
-      if xPlan.movementType = CInMovement then begin
-        ComboBoxType.ItemIndex := 4;
-        xText := xPlan.description + ' (wp³yw do ' + Date2StrDate(xAdd.triggerDate) + ')'
-      end else if xPlan.movementType = COutMovement then begin
-        ComboBoxType.ItemIndex := 3;
-        xText := xPlan.description + ' (p³atne do ' + Date2StrDate(xAdd.triggerDate) + ')'
-      end;
-      CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
-      CStaticInoutCyclic.Caption := xText;
-      CStaticInoutCyclicChanged(CStaticInoutCyclic);
-    end else if xAdd.quickPattern <> Nil then begin
-    end;
+  CStaticInoutOnceCategoryChanged(Nil);
+  if xIsCyclic then begin
+    CStaticInoutCyclicCategoryChanged(Nil);
+    CStaticInoutCyclicChanged(Nil);
   end;
   ComboBoxTypeChange(ComboBoxType);
   UpdateDescription;
@@ -316,6 +344,25 @@ begin
   CButtonStateCyclic.Enabled := False;
   CButtonStateTransSource.Enabled := False;
   CButtonStateTransDest.Enabled := False;
+  if (xQuickPatternMovementType = CInMovement) or (xQuickPatternMovementType = COutMovement) then begin
+    if xAccountId = CEmptyDataGid then begin
+      ActiveControl := CStaticInoutOnceAccount;
+    end else if xProductId = CEmptyDataGid then begin
+      ActiveControl := CStaticInoutOnceCategory;
+    end else if xCashpointId = CEmptyDataGid then begin
+      ActiveControl := CStaticInoutOnceCashpoint;
+    end else begin
+      ActiveControl := CCurrEditInoutOnceMovement;
+    end;
+  end else if xQuickPatternMovementType = CTransferMovement then begin
+    if xTrSourceAccountId = CEmptyDataGid then begin
+      ActiveControl := CStaticTransSourceAccount;
+    end else if xAccountId = CEmptyDataGid then begin
+      ActiveControl := CStaticTransDestAccount;
+    end else begin
+      ActiveControl := CCurrEditTransMovement;
+    end;
+  end;
 end;
 
 procedure TCMovementForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

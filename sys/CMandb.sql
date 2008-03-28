@@ -467,6 +467,26 @@ create table cmanagerInfo (
   created datetime not null
 );
 
+create table movementStatistics (
+  movementCount int not null,
+  cash money not null,
+  movementType varchar(1) not null,
+  idAccount uniqueidentifier not null,
+  idSourceAccount uniqueidentifier null,
+  idCashPoint uniqueidentifier null,
+  idProduct uniqueidentifier null,
+  idAccountCurrencyDef uniqueidentifier not null,
+  idMovementCurrencyDef uniqueidentifier not null,
+  movementCash money not null,
+  constraint ck_statisticsmovementType check (movementType in ('I', 'O', 'T')),
+  constraint fk_statisticsaccount foreign key (idAccount) references account (idAccount),
+  constraint fk_statisticssourceAccount foreign key (idSourceAccount) references account (idAccount),
+  constraint fk_statisticscashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
+  constraint fk_statisticsproduct foreign key (idProduct) references product (idProduct),
+  constraint fk_statisticsmovementAccountCurrencyDef foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_statisticsmovementMovementCurrencyDef foreign key (idMovementCurrencyDef) references currencyDef (idCurrencyDef)
+);
+
 create view transactions as select * from (
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity, idUnitDef from baseMovement where movementType = 'I'
  union all
@@ -500,14 +520,14 @@ create view StnInstrumentValue as
   select v.*, i.idCurrencyDef, i.instrumentType from instrumentValue v
   left join instrument i on i.idInstrument = v.idInstrument;
 
-create view StnInvestmentPortfolio as 
+create view StnInvestmentPortfolio as
   select v.idInstrument, i.idCurrencyDef, i.name as instrumentName, i.instrumentType, v.idAccount,
          a.name as accountName, idInvestmentItem, v.created, v.modified, v.quantity,
          (select top 1 valueOf from instrumentValue where idInstrument = v.idInstrument order by regDateTime desc) as valueOf
     from ((investmentItem v
       left outer join instrument i on i.idInstrument = v.idInstrument)
       left outer join account a on a.idAccount = v.idAccount);
-  
+
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);
 create index ix_baseMovement_movementType on baseMovement (movementType);

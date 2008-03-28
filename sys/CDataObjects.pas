@@ -3,7 +3,7 @@ unit CDataObjects;
 interface
 
 uses CDatabase, SysUtils, AdoDb, Classes, CConsts, CComponents, Math, Contnrs,
-     CTools;
+     CTools, CTemplates;
 
 type
   TBaseName = string[40];
@@ -963,7 +963,7 @@ type
 
   TQuickPatternElement = class(TCDataListElementObject)
   private
-    Fname: TBaseName;
+    Fname: TBaseDescription;
     Fdescription: TBaseDescription;
     FmovementType: TBaseEnumeration;
     FidAccount: TDataGid;
@@ -972,10 +972,11 @@ type
     FidProduct: TDataGid;
     FisStatistic: Boolean;
   public
-    constructor Create(AName: TBaseName; ADesc: TBaseDescription; AMovementType: TBaseEnumeration;
+    constructor Create(AName: TBaseDescription; ADesc: TBaseDescription; AMovementType: TBaseEnumeration;
                        AIdAccount, AIdSourceAccount, AIdCashpoint, AIdProduct: TDataGid; AIsStatistic: Boolean);
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
   published
     property movementType: TBaseEnumeration read FmovementType;
     property idAccount: TDataGid read FidAccount;
@@ -4778,7 +4779,7 @@ begin
   end;
 end;
 
-constructor TQuickPatternElement.Create(AName: TBaseName; ADesc: TBaseDescription; AMovementType: TBaseEnumeration;
+constructor TQuickPatternElement.Create(AName: TBaseDescription; ADesc: TBaseDescription; AMovementType: TBaseEnumeration;
                                         AIdAccount, AIdSourceAccount, AIdCashpoint, AIdProduct: TDataGid; AIsStatistic: Boolean);
 begin
   inherited Create;
@@ -4790,6 +4791,17 @@ begin
   FidCashPoint := AIdCashpoint;
   FidProduct := AIdProduct;
   FisStatistic := AIsStatistic;
+end;
+
+function TQuickPatternElement.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  if FmovementType = CTransferMovement then begin
+    Result := 2;
+  end else if FmovementType = CInMovement then begin
+    Result := 0;
+  end else begin
+    Result := 1;
+  end;
 end;
 
 function TQuickPatternElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;

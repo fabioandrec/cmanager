@@ -109,6 +109,8 @@ type
   private
     FpatternsListVisible: Boolean;
     FpatternListWidth: Integer;
+    FuserPatternsVisible: Boolean;
+    FstatisticPatternsVisible: Boolean;
   public
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     procedure SaveToXml(ANode: ICXMLDOMNode); override;
@@ -116,6 +118,8 @@ type
     constructor Create(APrefname: String); override;
     property patternsListVisible: Boolean read FpatternsListVisible write FpatternsListVisible;
     property patternListWidth: Integer read FpatternListWidth write FpatternListWidth;
+    property userPatternsVisible: Boolean read FuserPatternsVisible write FuserPatternsVisible;
+    property statisticPatternsVisible: Boolean read FstatisticPatternsVisible write FstatisticPatternsVisible;
   end;
 
   TBasePref = class(TPrefItem, IDescTemplateExpander)
@@ -1027,6 +1031,8 @@ begin
   inherited Clone(APrefItem);
   FpatternsListVisible := TBaseMovementFramePref(APrefItem).patternsListVisible;
   FpatternListWidth := TBaseMovementFramePref(APrefItem).patternListWidth;
+  FuserPatternsVisible := TBaseMovementFramePref(APrefItem).userPatternsVisible;
+  FstatisticPatternsVisible := TBaseMovementFramePref(APrefItem).statisticPatternsVisible;
 end;
 
 constructor TBaseMovementFramePref.Create(APrefname: String);
@@ -1034,6 +1040,8 @@ begin
   inherited Create(APrefname);
   FpatternsListVisible := True;
   FpatternListWidth := -1;
+  FuserPatternsVisible := True;
+  FstatisticPatternsVisible := True;
 end;
 
 procedure TBaseMovementFramePref.LoadFromXml(ANode: ICXMLDOMNode);
@@ -1041,6 +1049,8 @@ begin
   inherited LoadFromXml(ANode);
   FpatternsListVisible := GetXmlAttribute('patternsListVisible', ANode, True);
   FpatternListWidth := GetXmlAttribute('patternListWidth', ANode, -1);
+  FuserPatternsVisible := GetXmlAttribute('userPatternsVisible', ANode, True);
+  FstatisticPatternsVisible := GetXmlAttribute('statisticPatternsVisible', ANode, True);
 end;
 
 procedure TBaseMovementFramePref.SaveToXml(ANode: ICXMLDOMNode);
@@ -1048,6 +1058,8 @@ begin
   inherited SaveToXml(ANode);
   SetXmlAttribute('patternsListVisible', ANode, FpatternsListVisible);
   SetXmlAttribute('patternListWidth', ANode, FpatternListWidth);
+  SetXmlAttribute('userPatternsVisible', ANode, FuserPatternsVisible);
+  SetXmlAttribute('statisticPatternsVisible', ANode, FstatisticPatternsVisible);
 end;
 
 initialization

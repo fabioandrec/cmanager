@@ -26,7 +26,7 @@ implementation
 
 uses FileCtrl, CMainFormUnit, CDatatools, CDataObjects, CTools,
   CBaseFrameUnit, CAccountsFrameUnit, CConsts,
-  CInvestmentPortfolioFrameUnit;
+  CInvestmentPortfolioFrameUnit, CMovementFrameUnit;
 
 function TCCheckDatafileForm.DoWork: TDoWorkResult;
 var xText: String;
@@ -76,6 +76,12 @@ begin
         end;
         ProgressBar.StepBy(xStep);
       end;
+      AddToReport('Uaktualnianie statystyk');
+      FDataProvider.ExecuteSql('delete from movementStatistics');
+      FDataProvider.ExecuteSql(
+         'insert into movementStatistics select count(*) as movementCount, sum(cash) as cash, movementType, idAccount, idSourceAccount, idCashPoint, idProduct, ' +
+         'idAccountCurrencyDef, idMovementCurrencyDef, sum(movementCash) as movementCash ' +
+         'from baseMovement group by movementType, idAccount, idSourceAccount, idCashPoint, idProduct, idAccountCurrencyDef, idMovementCurrencyDef;');
     end;
     GDataProvider.CommitTransaction;
     xAccounts.Free;
@@ -110,6 +116,7 @@ procedure TCCheckDatafileForm.FinalizeLabels;
 begin
   if DoWorkResult = dwrSuccess then begin
     LabelInfo.Caption := 'Plik danych zosta³ sprawdzony';
+    SendMessageToFrames(TCMovementFrame, WM_NOTIFYMESSAGE, 0, WMOPT_REFRESHQUICKPATTERNS);
   end else if DoWorkResult = dwrWarning then begin
     LabelInfo.Caption := 'Plik danych zawiera³ niepoprawne dane';
   end else if DoWorkResult = dwrError then begin

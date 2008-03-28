@@ -186,6 +186,7 @@ begin
   Label5.Anchors := [akRight, akTop];
   if AAdditionalData <> Nil then begin
     PanelFrameButtons.Visible := False;
+    MenuItemsumsVisible.Visible := False;
     Splitter1.Visible := False;
     CStaticFilter.HotTrack := False;
     if TDoneFrameAdditionalData(AAdditionalData).movementType = COutMovement then begin

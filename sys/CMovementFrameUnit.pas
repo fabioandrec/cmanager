@@ -80,6 +80,9 @@ type
     QuickpatternList: TCDataList;
     PopupMenuQuickPatterns: TPopupMenu;
     MenuItemQuickpatterns: TMenuItem;
+    N4: TMenuItem;
+    MenuItemshowUserQuickpatterns: TMenuItem;
+    MenuItemStatisticQuickPatterns: TMenuItem;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -117,6 +120,8 @@ type
     procedure QuickpatternListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure MenuItemQuickpatternsClick(Sender: TObject);
     procedure QuickpatternListClick(Sender: TObject);
+    procedure MenuItemshowUserQuickpatternsClick(Sender: TObject);
+    procedure MenuItemStatisticQuickPatternsClick(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -324,6 +329,8 @@ begin
     UpdateIcons;
   end;
   QuickpatternList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesQuickpatternsRun]);
+  MenuItemshowUserQuickpatterns.Checked := TBaseMovementFramePref(FramePreferences).userPatternsVisible;
+  MenuItemStatisticQuickPatterns.Checked := TBaseMovementFramePref(FramePreferences).statisticPatternsVisible;
   ReloadToday;
   ReloadSums;
   ReloadQuickPatterns;
@@ -498,6 +505,9 @@ begin
     xDataobject.Free;
   end;
   ReloadSums;
+  if MenuItemStatisticQuickPatterns.Checked then begin
+    ReloadQuickPatterns;
+  end;
 end;
 
 procedure TCMovementFrame.MessageMovementDeleted(AId: TDataGid; AOption: Integer);
@@ -525,6 +535,9 @@ begin
     TodayList.EndUpdate;
   end;
   ReloadSums;
+  if MenuItemStatisticQuickPatterns.Checked then begin
+    ReloadQuickPatterns;
+  end;
 end;
 
 procedure TCMovementFrame.MessageMovementEdited(AId: TDataGid; AOption: Integer);
@@ -558,6 +571,9 @@ begin
     end;
   end;
   ReloadSums;
+  if MenuItemStatisticQuickPatterns.Checked then begin
+    ReloadQuickPatterns;
+  end;
 end;
 
 function TCMovementFrame.GetList: TCList;
@@ -1320,16 +1336,46 @@ var xQp: TDataObjectList;
     xCount: Integer;
     xQuickPattern: TQuickPattern;
     xElement: TQuickPatternElement;
+    xQe: TADOQuery;
+    xName, xDesc: String;
 begin
   FQuickPatternElements.Clear;
-  xQp := TQuickPattern.GetAllObjects(QuickPatternProxy);
-  for xCount := 0 to xQp.Count - 1 do begin
-    xQuickPattern := TQuickPattern(xQp.Items[xCount]);
-    xElement := TQuickPatternElement.Create(xQuickPattern.name, xQuickPattern.description, xQuickPattern.movementType,
-                                            xQuickPattern.idAccount, xQuickPattern.idSourceAccount, xQuickPattern.idCashPoint, xQuickPattern.idProduct, False);
-    ARootElement.AppendDataElement(TCListDataElement.Create(False, QuickpatternList, xElement, True, True));
+  if TBaseMovementFramePref(FramePreferences).userPatternsVisible then begin
+    xQp := TQuickPattern.GetAllObjects(QuickPatternProxy);
+    for xCount := 0 to xQp.Count - 1 do begin
+      xQuickPattern := TQuickPattern(xQp.Items[xCount]);
+      xElement := TQuickPatternElement.Create(xQuickPattern.name, xQuickPattern.description, xQuickPattern.movementType,
+                                              xQuickPattern.idAccount, xQuickPattern.idSourceAccount, xQuickPattern.idCashPoint, xQuickPattern.idProduct, False);
+      ARootElement.AppendDataElement(TCListDataElement.Create(False, QuickpatternList, xElement, True, True));
+    end;
+    xQp.Free;
   end;
-  xQp.Free;
+  if TBaseMovementFramePref(FramePreferences).statisticPatternsVisible then begin
+    xQe := GDataProvider.OpenSql('select top 5 *, ' +
+                                   '(select name from account where idAccount = x.idAccount) as accountName, ' +
+                                   '(select name from account where idAccount = x.idSourceAccount) as sourceAccountName, ' +
+                                   '(select name from cashpoint where idCashpoint = x.idCashpoint) as cashpointName, ' +
+                                   '(select name from product where idProduct = x.idProduct) as productName ' +
+                                 'from movementStatistics x order by movementCount desc ');
+    while not xQe.Eof do begin
+      if xQe.FieldByName('movementType').AsString = CTransferMovement then begin
+        xName := 'Z ' + xQe.FieldByName('sourceAccountName').AsString + ' do ' + xQe.FieldByName('accountName').AsString;
+        xDesc := xName + ', do tej pory ' + IntToStr(xQe.FieldByName('movementCount').AsInteger) + ' operacji';
+      end else if xQe.FieldByName('movementType').AsString = CInMovement then begin
+        xName := xQe.FieldByName('productName').AsString + ' (' + xQe.FieldByName('accountName').AsString + ')';
+        xDesc := xName + ', do tej pory ' + IntToStr(xQe.FieldByName('movementCount').AsInteger) + ' operacji';
+      end else if xQe.FieldByName('movementType').AsString = COutMovement then begin
+        xName := xQe.FieldByName('productName').AsString + ' (' + xQe.FieldByName('accountName').AsString + ')';
+        xDesc := xName + ', do tej pory ' + IntToStr(xQe.FieldByName('movementCount').AsInteger) + ' operacji';
+      end;
+      xElement := TQuickPatternElement.Create(xName, xDesc, xQe.FieldByName('movementType').AsString,
+                                              xQe.FieldByName('idAccount').AsString, xQe.FieldByName('idSourceAccount').AsString,
+                                              xQe.FieldByName('idCashpoint').AsString, xQe.FieldByName('idProduct').AsString, True);
+      ARootElement.AppendDataElement(TCListDataElement.Create(False, QuickpatternList, xElement, True, True));
+      xQe.Next;
+    end;
+    xQe.Free;
+  end;
 end;
 
 procedure TCMovementFrame.QuickpatternListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
@@ -1359,6 +1405,20 @@ begin
     xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(0, Nil, TQuickPatternElement(xElement.Data)));
     xForm.Free;
   end;
+end;
+
+procedure TCMovementFrame.MenuItemshowUserQuickpatternsClick(Sender: TObject);
+begin
+  MenuItemshowUserQuickpatterns.Checked := not MenuItemshowUserQuickpatterns.Checked;
+  TBaseMovementFramePref(FramePreferences).userPatternsVisible := MenuItemshowUserQuickpatterns.Checked;
+  ReloadQuickPatterns;
+end;
+
+procedure TCMovementFrame.MenuItemStatisticQuickPatternsClick(Sender: TObject);
+begin
+  MenuItemStatisticQuickPatterns.Checked := not MenuItemStatisticQuickPatterns.Checked;
+  TBaseMovementFramePref(FramePreferences).statisticPatternsVisible := MenuItemStatisticQuickPatterns.Checked;
+  ReloadQuickPatterns;
 end;
 
 end.
