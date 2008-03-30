@@ -1356,7 +1356,7 @@ begin
                                    '(select name from account where idAccount = x.idSourceAccount) as sourceAccountName, ' +
                                    '(select name from cashpoint where idCashpoint = x.idCashpoint) as cashpointName, ' +
                                    '(select name from product where idProduct = x.idProduct) as productName ' +
-                                 'from movementStatistics x order by movementCount desc ');
+                                 'from movementStatistics x where x.movementCount > 0 order by movementCount desc ');
     while not xQe.Eof do begin
       if xQe.FieldByName('movementType').AsString = CTransferMovement then begin
         xName := 'Z ' + xQe.FieldByName('sourceAccountName').AsString + ' do ' + xQe.FieldByName('accountName').AsString;

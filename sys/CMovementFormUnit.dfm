@@ -1,6 +1,6 @@
 inherited CMovementForm: TCMovementForm
-  Left = 357
-  Top = 220
+  Left = 309
+  Top = 95
   Caption = 'Operacja'
   ClientHeight = 607
   ClientWidth = 536

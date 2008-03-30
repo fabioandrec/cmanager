@@ -388,6 +388,10 @@ type
     FidMovementList: TDataGid;
     FidAccountCurrencyDef: TDataGid;
     FidMovementCurrencyDef: TDataGid;
+    FprevIdAccountCurrencyDef: TDataGid;
+    FprevIdMovementCurrencyDef: TDataGid;
+    FprevIdCashPoint: TDataGid;
+    FprevIdProduct: TDataGid;
     FidCurrencyRate: TDataGid;
     FcurrencyQuantity: Integer;
     FcurrencyRate: Currency;
@@ -1074,21 +1078,21 @@ procedure UpdateStatistics(AProvider: TDataProvider;
                            AidAccount: TDataGid; AidSourceAccount: TDataGid; AidCashPoint: TDataGid; AidProduct: TDataGid;
                            AidAccountCurrencyDef: TDataGid; AidMovementCurrencyDef: TDataGid);
 begin
-  if AProvider.GetSqlInteger(Format('select count(*) from movementStatistics where movementType = ''%s'' and idAccount = %s and idSourceAccount = %s and ' +
-                          'idCashPoint = %s and idProduct = %s and idAccountCurrencyDef = %s and idMovementCurrencyDef = %s',
-                          [AmovementType, DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount),
-                           DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct), DataGidToDatabase(AidAccountCurrencyDef),
-                           DataGidToDatabase(AidMovementCurrencyDef)]), 0) = 0 then begin
+  if AProvider.GetSqlInteger(Format('select count(*) from movementStatistics where movementType = ''%s'' and idAccount %s and idSourceAccount %s and ' +
+                          'idCashPoint %s and idProduct %s and idAccountCurrencyDef %s and idMovementCurrencyDef %s',
+                          [AmovementType, IsNullCondition(DataGidToDatabase(AidAccount)), IsNullCondition(DataGidToDatabase(AidSourceAccount)),
+                           IsNullCondition(DataGidToDatabase(AidCashPoint)), IsNullCondition(DataGidToDatabase(AidProduct)), IsNullCondition(DataGidToDatabase(AidAccountCurrencyDef)),
+                           IsNullCondition(DataGidToDatabase(AidMovementCurrencyDef))]), 0) > 0 then begin
 
-    AProvider.ExecuteSql(Format('update movementStatistic set movementCount = movementCount %s, cash = cash %s, movementCash = movementCash %s where movementType = ''%s'' and idAccount = %s and idSourceAccount = %s and ' +
-                          'idCashPoint = %s and idProduct = %s and idAccountCurrencyDef = %s and idMovementCurrencyDef = %s',
-                          [IntToStrWithSign(AmovementCount), CurrencyToDatabaseWithSign(Acash), CurrencyToDatabaseWithSign(AmovementCash), AmovementType, DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount),
-                           DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct), DataGidToDatabase(AidAccountCurrencyDef),
-                           DataGidToDatabase(AidMovementCurrencyDef)]));
+    AProvider.ExecuteSql(Format('update movementStatistics set movementCount = movementCount %s, cash = cash %s, movementCash = movementCash %s where movementType = ''%s'' and idAccount %s and idSourceAccount %s and ' +
+                          'idCashPoint %s and idProduct %s and idAccountCurrencyDef %s and idMovementCurrencyDef %s',
+                          [IntToStrWithSign(AmovementCount), CurrencyToDatabaseWithSign(Acash), CurrencyToDatabaseWithSign(AmovementCash), AmovementType, IsNullCondition(DataGidToDatabase(AidAccount)), IsNullCondition(DataGidToDatabase(AidSourceAccount)),
+                           IsNullCondition(DataGidToDatabase(AidCashPoint)), IsNullCondition(DataGidToDatabase(AidProduct)), IsNullCondition(DataGidToDatabase(AidAccountCurrencyDef)),
+                           IsNullCondition(DataGidToDatabase(AidMovementCurrencyDef))]));
   end else begin
-    AProvider.ExecuteSql(Format('insert into movementStatistic (movementCount, cash, movementType, idAccount, idSourceAccount, idCashPoint, idProduct, idAccountCurrencyDef, idMovementCurrencyDef, movementCash) values (' +
+    AProvider.ExecuteSql(Format('insert into movementStatistics (movementCount, cash, movementType, idAccount, idSourceAccount, idCashPoint, idProduct, idAccountCurrencyDef, idMovementCurrencyDef, movementCash) values (' +
     '%d, %s, ''%s'', %s, %s, %s, %s, %s, %s, %s)', [AmovementCount, CurrencyToDatabase(Acash), AmovementType,
-      DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount), DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct),
+      DataGidToDatabase(AidAccount), DataGidToDatabase(AidSourceAccount), DataGidToDatabase(AidCashPoint), DataGidToDatabase(AidProduct),
       DataGidToDatabase(AidAccountCurrencyDef), DataGidToDatabase(AidMovementCurrencyDef), CurrencyToDatabase(AmovementCash)]));
   end;
 end;
@@ -1525,6 +1529,10 @@ begin
     Fquantity := FieldByName('quantity').AsCurrency;
     FisInvestmentMovement := FieldByName('isInvestmentMovement').AsBoolean;
     FprevmovementCash := FmovementCash;
+    FprevIdAccountCurrencyDef := FidAccountCurrencyDef;
+    FprevIdMovementCurrencyDef := FidMovementCurrencyDef;
+    FprevIdCashPoint := FidCashPoint;
+    FprevIdProduct := FidProduct;
   end;
 end;
 
@@ -2517,6 +2525,9 @@ begin
   end else if movementType = COutMovement then begin
     AProxy.DataProvider.ExecuteSql('update account set cash = cash + ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
   end;
+  UpdateStatistics(AProxy.DataProvider, -1, (-1) * Fcash, (-1) * FmovementCash, FmovementType,
+                   FidAccount, FidSourceAccount, FidCashPoint, FidProduct,
+                   FidAccountCurrencyDef, FidMovementCurrencyDef);
 end;
 
 function TBaseMovement.OnInsertObject(AProxy: TDataProxy): Boolean;
@@ -2533,6 +2544,9 @@ begin
   end else if movementType = COutMovement then begin
     AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
   end;
+  UpdateStatistics(AProxy.DataProvider, 1, Fcash, FmovementCash, FmovementType,
+                   FidAccount, FidSourceAccount, FidCashPoint, FidProduct,
+                   FidAccountCurrencyDef, FidMovementCurrencyDef);
 end;
 
 function TBaseMovement.OnUpdateObject(AProxy: TDataProxy): Boolean;
@@ -2569,6 +2583,12 @@ begin
       AProxy.DataProvider.ExecuteSql('update account set cash = cash - ' + CurrencyToDatabase(cash - FprevCash) + ' where idAccount = ' + DataGidToDatabase(idAccount));
     end;
   end;
+  UpdateStatistics(AProxy.DataProvider, -1, (-1) * Fcash, (-1) * FmovementCash, FmovementType,
+                   FprevIdAccount, FprevIdSourceAccount, FprevIdCashPoint, FprevIdProduct,
+                   FprevIdAccountCurrencyDef, FprevIdMovementCurrencyDef);
+  UpdateStatistics(AProxy.DataProvider, 1, Fcash, FmovementCash, FmovementType,
+                   FidAccount, FidSourceAccount, FidCashPoint, FidProduct,
+                   FidAccountCurrencyDef, FidMovementCurrencyDef);
 end;
 
 class function TAccount.GetMovementCount(AIdAccount: TDataGid): Integer;

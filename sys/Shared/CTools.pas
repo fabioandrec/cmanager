@@ -88,7 +88,8 @@ function ReplaceLinebreaks(AText: String; AWith: String = '<br>'): String;
 function CreateNewGuid: String;
 function IsEvenToStr(AInt: Integer): String; overload;
 function IsEven(AInt: Integer): Boolean; overload;
-function DataGidToDatabase(ADataGid: String): String;
+function DataGidToDatabase(ADataGid: String; ANullText: Boolean = True): String;
+function IsNullCondition(AValue: String): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function CurrencyToDatabase(ACurrency: Currency): String;
 function CurrencyToDatabaseWithSign(ACurrency: Currency): String;
@@ -636,9 +637,18 @@ begin
   Result := GUIDToString(xGuid);
 end;
 
-function DataGidToDatabase(ADataGid: String): String;
+function DataGidToDatabase(ADataGid: String; ANullText: Boolean = True): String;
 begin
-  Result := IfThen(ADataGid = CEmptyDataGid, 'Null', '''' + ADataGid + '''');
+  Result := IfThen(ADataGid = CEmptyDataGid, IfThen(ANullText, 'Null', ''''),  '''' + ADataGid + '''');
+end;
+
+function IsNullCondition(AValue: String): String;
+begin
+  if AnsiLowerCase(AValue) = 'null' then begin
+    Result := ' is ' + AValue;
+  end else begin
+    Result := ' = ' + AValue;
+  end;
 end;
 
 function CurrencyToDatabase(ACurrency: Currency): String;
