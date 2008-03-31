@@ -46,6 +46,7 @@ Source: ..\..\docs\changelog; DestDir: {app}; Components: program; Flags: ignore
 Source: ..\..\docs\contrib; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\docs\license; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\docs\plugins; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\docs\colors; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\docs\Help\CManager.chm; DestDir: {app}\Help\; Components: program; Flags: ignoreversion
 Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\bin\CArchive.exe; DestDir: {app}; Components: program; Flags: ignoreversion
