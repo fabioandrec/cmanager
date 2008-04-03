@@ -71,7 +71,7 @@ namespace CHttpListener
                 }
             }
         }
-        private void SendTextResponse(HttpListenerContext context, HttpStatusCode statusCode, string responseText)
+        public void SendTextResponse(HttpListenerContext context, HttpStatusCode statusCode, string responseText)
         {
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;

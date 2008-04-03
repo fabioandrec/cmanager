@@ -12,7 +12,12 @@ namespace CHttpGateConsole
         static void Main(string[] args)
         {
             ICHttpLog httpLog = new CHttpLogConsole(HttpLogLevel.LogInfo);
-            CHttpServer httpServer = new CHttpServer(httpLog, AuthenticationSchemes.Anonymous, new ICHttpRequestHandler[] {new CHttpBasicHandler("d:\\http\\")});
+            CHttpServer httpServer = new CHttpServer(httpLog, AuthenticationSchemes.Anonymous, 
+                                                     new ICHttpRequestHandler[] 
+                                                     {
+                                                         new CHttpBasicHandler("d:\\http\\"),
+                                                         new CHttpManagerHandler()
+                                                     });
             httpServer.StartServer(new string[1] { "http://*:8080/" });
             Console.ReadLine();
             httpServer.StopServer();
