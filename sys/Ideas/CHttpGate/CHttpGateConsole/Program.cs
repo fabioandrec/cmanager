@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Net;
+using System.Threading;
 using CHttpListener;
 
 namespace CHttpGateConsole
@@ -9,8 +11,8 @@ namespace CHttpGateConsole
     {
         static void Main(string[] args)
         {
-            IHttpLog httpLog = new CHttpLogConsole();
-            CHttpServer httpServer = new CHttpServer("d:\\http", httpLog, HttpLogLevel.LogInfo);
+            ICHttpLog httpLog = new CHttpLogConsole(HttpLogLevel.LogInfo);
+            CHttpServer httpServer = new CHttpServer(httpLog, AuthenticationSchemes.Anonymous, new ICHttpRequestHandler[] {new CHttpBasicHandler("d:\\http\\")});
             httpServer.StartServer(new string[1] { "http://*:8080/" });
             Console.ReadLine();
             httpServer.StopServer();

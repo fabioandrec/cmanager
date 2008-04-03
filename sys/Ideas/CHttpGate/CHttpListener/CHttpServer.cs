@@ -6,6 +6,11 @@ using System.Text;
 
 namespace CHttpListener
 {
+    public interface ICHttpRequestHandler
+    {
+        bool ProcessHttpRequest(CHttpServer server, HttpListenerContext context);
+    }
+
     public class CHttpServer
     {
         #region zmienne prywatne
@@ -13,15 +18,15 @@ namespace CHttpListener
         private HttpListener serverListener = null;
         private Thread serverThread = null;
         private bool isRunning = false;
-        private IHttpLog serverLog = null;
-        private HttpLogLevel serverLogLevel = HttpLogLevel.LogError;
-        private string serverRoot = "";
+        private ICHttpLog serverLog = null;
+        private ICHttpRequestHandler[] httpHandlers = null;
+        private AuthenticationSchemes authenticationScheme;
         #endregion
 
         #region metody logujące
         public void LogText(HttpLogLevel level, string text)
         {
-            if ((serverLog != null) && (level >= serverLogLevel))
+            if (serverLog != null)
             {
                 serverLog.LogText(level, text);
             }
@@ -38,18 +43,32 @@ namespace CHttpListener
         #region obsługa zgłoszeń
         private void ProcessRequest(Object stateInfo)
         {
+            bool processed = false;
             HttpListenerContext context = (HttpListenerContext)stateInfo;
-            if (context.Request.HttpMethod.ToUpper() == "GET")
+            string reqId = context.Request.RequestTraceIdentifier.ToString("N");
+            try
             {
-                SendTextResponse((HttpListenerContext)stateInfo, HttpStatusCode.MethodNotAllowed, "Todo GET");
+                if (httpHandlers != null)
+                {
+                    int currentHandlerIndex = 0;
+                    while ((!processed) && (currentHandlerIndex <= httpHandlers.Length - 1))
+                    {
+                        processed = httpHandlers[currentHandlerIndex].ProcessHttpRequest(this, context);
+                        currentHandlerIndex++;
+                    }
+                }
             }
-            else if (context.Request.HttpMethod.ToUpper() == "PUT")
+            catch (Exception e)
             {
-                SendTextResponse((HttpListenerContext)stateInfo, HttpStatusCode.MethodNotAllowed, "Todo PUT");
+                LogText(HttpLogLevel.LogWarning, "Cant handle request " + reqId + " " + e.Message);
             }
-            else
+            finally
             {
-                SendTextResponse((HttpListenerContext)stateInfo, HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                if (!processed)
+                {
+                    LogText(HttpLogLevel.LogWarning, "Request " + reqId + " was not handled by any handler");
+                    SendTextResponse((HttpListenerContext)stateInfo, HttpStatusCode.BadRequest, "Bad request");
+                }
             }
         }
         private void SendTextResponse(HttpListenerContext context, HttpStatusCode statusCode, string responseText)
@@ -77,6 +96,7 @@ namespace CHttpListener
                 try
                 {
                     HttpListenerContext context = serverListener.EndGetContext(iar);
+                    string reqId = context.Request.RequestTraceIdentifier.ToString("N");
                     LogRequest(HttpLogLevel.LogInfo, context.Request);
                     try
                     {
@@ -84,7 +104,7 @@ namespace CHttpListener
                     }
                     catch (Exception e)
                     {
-                        LogText(HttpLogLevel.LogWarning, "Cant queue request " + e.Message);
+                        LogText(HttpLogLevel.LogWarning, "Cant queue request " + reqId + " " + e.Message);
                         SendServiceUnavailable(context);
                     }
                 }
@@ -117,7 +137,7 @@ namespace CHttpListener
         {
             serverHaltEvent = new ManualResetEvent(false);
             serverListener = new HttpListener();
-            //serverListener.AuthenticationSchemes = AuthenticationSchemes.IntegratedWindowsAuthentication;
+            serverListener.AuthenticationSchemes = authenticationScheme;
             LogText(HttpLogLevel.LogInfo, "Starting server...");
             LogText(HttpLogLevel.LogInfo, "Adding prefixes...");
             foreach (string pref in acceptPrefixes) 
@@ -150,11 +170,11 @@ namespace CHttpListener
             isRunning = false;
             LogText(HttpLogLevel.LogInfo, "Server stopped.");
         }
-        public CHttpServer(string rootDirectory, IHttpLog log, HttpLogLevel logLevel)
+        public CHttpServer(ICHttpLog log, AuthenticationSchemes scheme, ICHttpRequestHandler[] handlers)
         {
             serverLog = log;
-            serverLogLevel = logLevel;
-            serverRoot = rootDirectory;
+            authenticationScheme = scheme;
+            httpHandlers = handlers;
         }
         #endregion
 
