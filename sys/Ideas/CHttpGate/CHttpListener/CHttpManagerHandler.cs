@@ -9,6 +9,15 @@ using CHttpListener;
 
 namespace CHttpListener
 {
+    public class CHttpManagerHandler : CHttpHandler
+    {
+        public override bool ProcessRequest(CHttpServer aserver, CHttpRequest arequest)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    
+    /*
     class CHttpManagerSession
     {
     }
@@ -42,4 +51,5 @@ namespace CHttpListener
             sessions = Hashtable.Synchronized(new Hashtable());
         }
     }
+    */
 }

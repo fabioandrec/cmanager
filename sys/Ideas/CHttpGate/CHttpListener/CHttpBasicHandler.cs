@@ -7,6 +7,14 @@ using CHttpListener;
 
 namespace CHttpListener
 {
+    public class CHttpBasicHandler : CHttpHandler
+    {
+        public override bool ProcessRequest(CHttpServer aserver, CHttpRequest arequest)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    /*
     public class CHttpBasicHandler : ICHttpRequestHandler
     {
         private string rootDirectory = "";
@@ -71,4 +79,5 @@ namespace CHttpListener
             rootDirectory = root.TrimEnd('\\');
         }
     }
+    */
 }
