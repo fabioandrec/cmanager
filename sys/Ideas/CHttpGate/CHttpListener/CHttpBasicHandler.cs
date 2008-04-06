@@ -40,7 +40,7 @@ namespace CHttpListener
                                     catch (Exception e)
                                     {
                                         finished = true;
-                                        aserver.ServerLog.LogWarn("Got response write error " + e.Message + " for request " + arequest.ContextId);
+                                        aserver.ServerLog.LogWarn("Got response write error " + e.Message + " for request " + arequest.RequestId);
                                     }
                                 }
                                 else
@@ -48,7 +48,7 @@ namespace CHttpListener
                                     finished = true;
                                 }
                             }
-                            aserver.ServerLog.LogInfo(String.Format("{0} {1} HTTP {2}", arequest.ContextId, arequest.Request.HttpMethod, arequest.Request.Url));
+                            aserver.ServerLog.LogInfo(String.Format("{0} {1} HTTP {2}", arequest.RequestId, arequest.Request.HttpMethod, arequest.Request.Url));
                             return true;
                         }
                         finally
@@ -60,13 +60,13 @@ namespace CHttpListener
                             }
                             catch (Exception e)
                             {
-                                aserver.ServerLog.LogWarn("Got close response error " + e.Message + " for request " + arequest.ContextId);
+                                aserver.ServerLog.LogWarn("Got close response error " + e.Message + " for request " + arequest.RequestId);
                             }
                         }
                     }
                     catch (Exception e)
                     {
-                        aserver.ServerLog.LogWarn("Got processing error " + e.Message + " for request " + arequest.ContextId);
+                        aserver.ServerLog.LogWarn("Got processing error " + e.Message + " for request " + arequest.RequestId);
                     }
 
                 }

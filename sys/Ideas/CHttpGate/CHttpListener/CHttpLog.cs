@@ -97,7 +97,7 @@ namespace CHttpListener
                     levelText = " ";
                     break;
             }
-            return levelText + now.ToShortDateString() + " " + now.ToShortTimeString() + " " + threadId;
+            return levelText + now.ToShortDateString() + " " + now.ToLongTimeString() + " " + threadId;
         }
         private void WriteToLog()
         {

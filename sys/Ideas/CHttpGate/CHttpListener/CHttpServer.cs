@@ -3,8 +3,7 @@ using System.Threading;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Reflection;
-using System.ComponentModel.Design.Serialization;
+using System.Collections.Generic;
 
 namespace CHttpListener
 {
@@ -16,7 +15,7 @@ namespace CHttpListener
     public class CHttpRequest
     {
         private HttpListenerContext context;
-        private string contextId;
+        private string requestId;
         public void SendServerOverloaded()
         {
             throw new NotImplementedException();
@@ -28,11 +27,90 @@ namespace CHttpListener
         public CHttpRequest(HttpListenerContext acontext)
         {
             context = acontext;
-            contextId = context.Request.RequestTraceIdentifier.ToString("N");
+            requestId = context.Request.RequestTraceIdentifier.ToString("N");
         }
-        public string ContextId { get { return contextId; } }
+        public string RequestId { get { return requestId; } }
         public HttpListenerRequest Request { get { return context.Request; } }
         public HttpListenerResponse Response { get { return context.Response; } }
+    }
+
+    public class CHttpSession
+    {
+        private string sessionId = null;
+        private DateTime touchTime;
+        public string SessionId { get { return sessionId; } }
+        public DateTime TouchTime { get { return touchTime; } }
+        public CHttpSession()
+        {
+            sessionId = System.Guid.NewGuid().ToString("N");
+            touchTime = DateTime.Now;
+        }
+    }
+
+    public class CHttpSessions
+    {
+        private ManualResetEvent haltEvent = new ManualResetEvent(true);
+        private ManualResetEvent checkStartedEvent = new ManualResetEvent(false);
+        private ManualResetEvent checkFinishedEvent = new ManualResetEvent(true);
+        private Mutex lockMutex = new Mutex();
+        private Thread expiredThread = null;
+        private List<CHttpSession> list = new List<CHttpSession>();
+        private int checkExpiredPeriod = 2000;
+        private int forceExpiredTimeout = 2000;
+        private int expirationTime = 5000;
+        private CHttpServer parentServer = null;
+        private void CheckExpired()
+        {
+            bool haltPending = false;
+            while (!haltPending)
+            {
+                if (!haltEvent.WaitOne(checkExpiredPeriod, false))
+                {
+                    if (lockMutex.WaitOne(forceExpiredTimeout, false))
+                    {
+                        try
+                        {
+                            for (int counter = list.Count - 1; counter >= 0; --counter)
+                            {
+                                CHttpSession session = list[counter];
+                                if (session.TouchTime.AddMilliseconds(expirationTime) >= DateTime.Now)
+                                {
+                                    parentServer.ServerLog.LogInfo("Removing expired session " + session.SessionId);
+                                    list.RemoveAt(counter);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            checkFinishedEvent.Set();
+                            checkStartedEvent.Reset();
+                            lockMutex.ReleaseMutex();
+                        }
+                    }
+                    else
+                    {
+                        checkFinishedEvent.Reset();
+                        checkStartedEvent.Set();
+                    }
+                }
+                else
+                {
+                    haltPending = true;
+                }
+            }
+        }
+        public void InitializeSessions(CHttpServer aserver)
+        {
+            parentServer = aserver;
+            haltEvent.Reset();
+            expiredThread = new Thread(new ThreadStart(CheckExpired));
+            expiredThread.Start();
+        }
+        public void FinalizeSessions()
+        {
+            haltEvent.Set();
+            expiredThread.Join();
+        }
     }
 
     public class CHttpServer
@@ -42,12 +120,14 @@ namespace CHttpListener
         private HttpListener serverListener = null;
         private Thread serverThread = null;
         private CHttpLog serverLog = null;
-        private AuthenticationSchemes authenticationScheme;
-        private Type[] handlerTypes;
+        private AuthenticationSchemes authenticationScheme = AuthenticationSchemes.Anonymous;
+        private Type[] handlerTypes = null;
+        private CHttpSessions serverSessions = new CHttpSessions();
         #endregion
 
         #region zmienne publiczne
         public CHttpLog ServerLog { get { return serverLog; } }
+        public CHttpSessions ServerSessions { get { return serverSessions; } }
         public bool IsRunning { get { return !serverHaltEvent.WaitOne(0, false); } }
         #endregion
 
@@ -72,7 +152,7 @@ namespace CHttpListener
             }
             catch (Exception e)
             {
-                serverLog.LogError("Got error while processing " + request.ContextId + " " + e.Message);
+                serverLog.LogError("Got error while processing " + request.RequestId + " " + e.Message);
                 request.SendServerError();
             }
         }
@@ -139,6 +219,8 @@ namespace CHttpListener
                     serverLog.LogInfo("   " + pref + " is invalid, ignored");
                 }
             }
+            serverLog.LogInfo("Initializing sessions");
+            serverSessions.InitializeSessions(this);
             serverLog.LogInfo("Initializing listener");
             serverListener.Start();
             serverThread = new Thread(new ThreadStart(Listen));
@@ -153,6 +235,8 @@ namespace CHttpListener
             serverThread.Join();
             serverLog.LogInfo("Closing listener");
             serverListener.Close();
+            serverLog.LogInfo("Finalizing sessions");
+            serverSessions.FinalizeSessions();
             serverLog.LogInfo("Server halted");
         }
         public CHttpServer(CHttpLog alog, AuthenticationSchemes ascheme, Type[] ahandlerTypes)
