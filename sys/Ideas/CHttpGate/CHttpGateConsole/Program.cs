@@ -15,9 +15,10 @@ namespace CHttpGateConsole
             CHttpLog log = new CHttpLog(logWriter, HttpLogLevel.LogInfo);
             log.StartLog();
             log.LogInfo("Log initialized");
+            CHttpBasicHandler.RootDirectory = "d:\\Zrodla\\cmanager\\head\\docs\\Homepage\\";
             CHttpServer httpServer = new CHttpServer(log, 
                 AuthenticationSchemes.Anonymous,
-                new Type[] { typeof(CHttpManagerHandler), typeof(CHttpBasicHandler) });
+                new Type[] { typeof(CHttpBasicHandler) });
             httpServer.StartServer(new string[1] { "http://*:8080/" });
             Console.ReadLine();
             httpServer.StopServer();

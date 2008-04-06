@@ -9,22 +9,13 @@ namespace CHttpListener
 {
     public class CHttpBasicHandler : CHttpHandler
     {
+        private static string rootDirectory = "";
+        public static string RootDirectory { get { return rootDirectory; } set { rootDirectory = value.TrimEnd('\\'); } }
         public override bool ProcessRequest(CHttpServer aserver, CHttpRequest arequest)
         {
-            throw new NotImplementedException();
-        }
-    }
-    /*
-    public class CHttpBasicHandler : ICHttpRequestHandler
-    {
-        private string rootDirectory = "";
-        public bool ProcessHttpRequest(CHttpServer server, HttpListenerContext context)
-        {
-            HttpListenerRequest req = context.Request;
-            HttpListenerResponse res = context.Response;
-            if (req.HttpMethod.ToUpper() == "GET")
+            if (arequest.Request.HttpMethod.ToUpper() == "GET")
             {
-                string fileName = rootDirectory + req.Url.LocalPath.Replace("/", "\\");
+                string fileName = rootDirectory + arequest.Request.Url.LocalPath.Replace("/", "\\");
                 if (File.Exists(fileName))
                 {
                     try
@@ -37,19 +28,19 @@ namespace CHttpListener
                         int bytesRead;
                         try
                         {
-                            while (!finished)
+                            while ((!finished) && (aserver.IsRunning))
                             {
                                 bytesRead = responseReader.Read(byteBuffer, 0, 8192);
                                 if (bytesRead > 0)
                                 {
                                     try
                                     {
-                                        res.OutputStream.Write(byteBuffer, 0, bytesRead);
+                                        arequest.Response.OutputStream.Write(byteBuffer, 0, bytesRead);
                                     }
                                     catch (Exception e)
                                     {
                                         finished = true;
-                                        server.LogText(HttpLogLevel.LogWarning, this.ToString() + " request " + req.RequestTraceIdentifier.ToString("N") + " response write error " + e.Message);
+                                        aserver.ServerLog.LogWarn("Got response write error " + e.Message + " for request " + arequest.ContextId);
                                     }
                                 }
                                 else
@@ -57,27 +48,30 @@ namespace CHttpListener
                                     finished = true;
                                 }
                             }
+                            aserver.ServerLog.LogInfo(String.Format("{0} {1} HTTP {2}", arequest.ContextId, arequest.Request.HttpMethod, arequest.Request.Url));
                             return true;
                         }
                         finally
                         {
                             fileStream.Close();
-                            res.Close();
+                            try
+                            {
+                                arequest.Response.Close();
+                            }
+                            catch (Exception e)
+                            {
+                                aserver.ServerLog.LogWarn("Got close response error " + e.Message + " for request " + arequest.ContextId);
+                            }
                         }
                     }
                     catch (Exception e)
                     {
-                        server.LogText(HttpLogLevel.LogWarning, this.ToString() + " request " + req.RequestTraceIdentifier.ToString("N") + " processing error " + e.Message);
+                        aserver.ServerLog.LogWarn("Got processing error " + e.Message + " for request " + arequest.ContextId);
                     }
 
                 }
             }
             return false;
         }
-        public CHttpBasicHandler(string root)
-        {
-            rootDirectory = root.TrimEnd('\\');
-        }
     }
-    */
 }

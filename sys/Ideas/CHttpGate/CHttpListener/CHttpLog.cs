@@ -22,7 +22,7 @@ namespace CHttpListener
             Console.WriteLine(ainformation);
         }
         public void InitializeWriter()
-        {
+        {    
         }
         public void FinalizeWriter()
         {
@@ -223,10 +223,6 @@ namespace CHttpListener
                     }
                     repeats++;
                     running = runEvent.WaitOne(0, false) && !stopEvent.WaitOne(0, false);
-                }
-                if (!queued)
-                {
-                    Console.WriteLine(running + " " + repeats + " " + waitResult);
                 }
             }
             return queued;

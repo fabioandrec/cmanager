@@ -31,6 +31,8 @@ namespace CHttpListener
             contextId = context.Request.RequestTraceIdentifier.ToString("N");
         }
         public string ContextId { get { return contextId; } }
+        public HttpListenerRequest Request { get { return context.Request; } }
+        public HttpListenerResponse Response { get { return context.Response; } }
     }
 
     public class CHttpServer
@@ -44,11 +46,15 @@ namespace CHttpListener
         private Type[] handlerTypes;
         #endregion
 
+        #region zmienne publiczne
+        public CHttpLog ServerLog { get { return serverLog; } }
+        public bool IsRunning { get { return !serverHaltEvent.WaitOne(0, false); } }
+        #endregion
+
         #region obsługa zgłoszeń
         private object CreateHandler(Type atype)
         {
-            ConstructorInfo ci = atype.GetConstructor(new Type[] { });
-            return new InstanceDescriptor(ci, null, false);
+            return Activator.CreateInstance(atype);
         }
         private void ProcessRequest(Object stateInfo)
         {
