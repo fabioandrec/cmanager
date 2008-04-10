@@ -1,0 +1,19 @@
+body {
+color: black;
+font-family: Verdana, Arial;
+font-size: 12px;
+background-color: white;
+margin-left: 10px;
+margin-right: 10px;
+margin-top: 10px;
+}
+.clickableHighlited
+{
+border: 1px dotted silver;
+cursor: hand;
+}
+.clickableNormalized
+{
+border: none;
+cursor: default;
+}

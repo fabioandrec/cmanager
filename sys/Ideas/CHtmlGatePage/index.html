@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=Windows-1250">
+		<link type="text/css" rel="stylesheet" href="style.css">
+		<script type="text/javascript" src="Scripts\base.js"></script>				
+		<script language="javascript">
+			function initializePage()
+			{
+				makeClickable("chooseDatafile")				
+			}
+		</script>		
+	</head >
+	<body onload="initializePage()">
+		<table width="100%">
+			<tr>
+				<td align="left">
+					<table>
+						<tr>
+							<td><img src="logo.jpg" alt="C"></td>
+							<td>Manager - Wybierz plik danych</td>
+						</tr>
+					</table>
+				</td>
+				<td align="right">
+					<table>
+						<tr>
+							<td><img style="visibility: hidden;" id="waitMarker" src="wait.gif" alt="Wait..."></td>
+						</tr>
+					</table>
+				</td>				
+			</tr>
+		</table>
+		<hr size="1"><br>
+		<form action="">
+		<table width="100%">
+			<tr/>
+			<tr/>
+			<tr/>
+			<tr/>
+			<tr/>
+			<tr>
+				<td width="20%" align="right"><img src="security.png"></td>
+				<td width="10%" align="right">Alias pliku danych</td>
+				<td width="10%" align="left"><input type="text" name="firstname" size="20"/></td>
+				<td width="40%" align="left"><img style="padding: 3px;" id="chooseDatafile" src="search.png"></td>
+			</tr>
+			<tr>
+				<td width="20%" align="right"></td>
+				<td width="10%" align="right">Hasło dostępu</td>
+				<td width="10%" align="left"><input type="password" name="lastname" size="20"/></td>
+				<td width="40%" align="left"></td>
+			</tr>
+		</table>
+		</form>		
+	</body>
+</html>
