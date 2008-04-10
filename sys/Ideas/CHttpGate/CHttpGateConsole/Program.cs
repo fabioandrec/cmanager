@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Net;
 using System.Threading;
 using CHttpListener;
@@ -15,10 +16,11 @@ namespace CHttpGateConsole
             CHttpLog log = new CHttpLog(logWriter, HttpLogLevel.LogInfo);
             log.StartLog();
             log.LogInfo("Log initialized");
-            CHttpBasicHandler.RootDirectory = "d:\\Zrodla\\cmanager\\head\\docs\\Homepage\\";
+            CHttpBasicHandler.RootDirectory = Directory.GetCurrentDirectory() + "\\Gate";
             CHttpServer httpServer = new CHttpServer(log, 
                 AuthenticationSchemes.Anonymous,
-                new Type[] { typeof(CHttpBasicHandler) });
+                new Type[] { typeof(CHttpBasicHandler), 
+                             typeof(CHttpManagerHandler) });
             httpServer.StartServer(new string[1] { "http://*:8080/" });
             Console.ReadLine();
             httpServer.StopServer();

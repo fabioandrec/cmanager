@@ -9,41 +9,218 @@ namespace CHttpListener
 {
     public abstract class CHttpHandler
     {
-        abstract public bool ProcessRequest(CHttpServer aserver, CHttpRequest arequest);
+        abstract public bool ProcessRequest(CHttpRequest arequest);
     }
 
     public class CHttpRequest
     {
         private HttpListenerContext context;
         private string requestId;
-        public void SendServerOverloaded()
+        private CHttpSession session = null;
+        private CHttpServer server = null;
+        public void SendServerOverloaded(CHttpRequest arequest)
         {
-            throw new NotImplementedException();
+            CHttpResponse response = new CHttpTextResponse("Sever overloaded");
+            response.SendResponse(HttpStatusCode.ServiceUnavailable, arequest);
         }
-        public void SendServerError()
+        public void SendServerExpired(CHttpRequest arequest)
         {
-            throw new NotImplementedException();
+            CHttpResponse response = new CHttpTextResponse("Session expired");
+            response.SendResponse(HttpStatusCode.Forbidden, arequest);
         }
-        public CHttpRequest(HttpListenerContext acontext)
+        public void SendServerError(CHttpRequest arequest)
+        {
+            CHttpResponse response = new CHttpTextResponse("Server error");
+            response.SendResponse(HttpStatusCode.InternalServerError, arequest);
+        }
+        public CHttpRequest(CHttpServer aserver, HttpListenerContext acontext)
         {
             context = acontext;
             requestId = context.Request.RequestTraceIdentifier.ToString("N");
+            server = aserver;
         }
         public string RequestId { get { return requestId; } }
         public HttpListenerRequest Request { get { return context.Request; } }
         public HttpListenerResponse Response { get { return context.Response; } }
+        public CHttpSession Session { get { return session; } set { session = value; } }
+        public CHttpServer Server { get { return server; } }
+        public HttpListenerContext Context { get { return context; } }
+    }
+
+    public abstract class CHttpResponse
+    {
+        public abstract bool SendResponse(HttpStatusCode acode, CHttpRequest arequest);
+    }
+
+    public class CHttpTextResponse : CHttpResponse
+    {
+        private string text = "";
+        public CHttpTextResponse(string atext)
+        {
+            text = atext;
+        }
+        public override bool SendResponse(HttpStatusCode acode, CHttpRequest arequest)
+        {
+            bool result = false;
+            arequest.Response.StatusCode = (int)acode;
+            try
+            {
+                StreamWriter writer = new StreamWriter(arequest.Response.OutputStream);
+                writer.WriteLine(text);
+                writer.Close();
+            }
+            finally
+            {
+                try
+                {
+                    arequest.Response.Close();
+                    result = true;
+                }
+                catch (Exception e)
+                {
+                    arequest.Server.ServerLog.LogWarn("Got close response error " + e.Message + " for request " + arequest.RequestId);
+                }
+            }
+            return result;
+        }
+    }
+
+    public class CHttpFileResponse : CHttpResponse
+    {
+        private string fileName = "";
+        public CHttpFileResponse(string afileName)
+        {
+            fileName = afileName;
+        }
+        public override bool SendResponse(HttpStatusCode acode, CHttpRequest arequest)
+        {
+            bool result = false;
+            arequest.Response.StatusCode = (int)acode;
+            if (File.Exists(fileName))
+            {
+                try
+                {
+                    FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                    BinaryReader responseReader = new BinaryReader(fileStream);
+                    long bytesLeft = fileStream.Length;
+                    byte[] byteBuffer = new byte[8192];
+                    bool finished = false;
+                    int bytesRead;
+                    try
+                    {
+                        while ((!finished) && (arequest.Server.IsRunning))
+                        {
+                            bytesRead = responseReader.Read(byteBuffer, 0, 8192);
+                            if (bytesRead > 0)
+                            {
+                                try
+                                {
+                                    arequest.Response.OutputStream.Write(byteBuffer, 0, bytesRead);
+                                }
+                                catch (Exception e)
+                                {
+                                    finished = true;
+                                    arequest.Server.ServerLog.LogWarn("Got response write error " + e.Message + " for request " + arequest.RequestId);
+                                }
+                            }
+                            else
+                            {
+                                finished = true;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        fileStream.Close();
+                        try
+                        {
+                            arequest.Response.Close();
+                            result = true;
+                        }
+                        catch (Exception e)
+                        {
+                            arequest.Server.ServerLog.LogWarn("Got close response error " + e.Message + " for request " + arequest.RequestId);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    arequest.Server.ServerLog.LogWarn("Got processing error " + e.Message + " for request " + arequest.RequestId);
+                }
+            }
+            return result;
+        }
     }
 
     public class CHttpSession
     {
         private string sessionId = null;
         private DateTime touchTime;
+        private bool isUsed = false;
         public string SessionId { get { return sessionId; } }
-        public DateTime TouchTime { get { return touchTime; } }
-        public CHttpSession()
+        public DateTime TouchTime
+        {
+            get
+            {
+                DateTime result;
+                Monitor.Enter(this);
+                try
+                {
+                    result = touchTime;
+                }
+                finally
+                {
+                    Monitor.Exit(this);
+                }
+                return result;
+            }
+            set
+            {
+                Monitor.Enter(this);
+                try
+                {
+                    touchTime = value;
+                }
+                finally
+                {
+                    Monitor.Exit(this);
+                }
+            }
+        }
+        public bool IsUsed
+        {
+            get
+            {
+                bool result;
+                Monitor.Enter(this);
+                try
+                {
+                    result = isUsed;
+                }
+                finally
+                {
+                    Monitor.Exit(this);
+                }
+                return result;
+            }
+            set
+            {
+                Monitor.Enter(this);
+                try
+                {
+                    isUsed = value;
+                }
+                finally
+                {
+                    Monitor.Exit(this);
+                }
+            }
+        }
+        public CHttpSession(bool aisUsed)
         {
             sessionId = System.Guid.NewGuid().ToString("N");
             touchTime = DateTime.Now;
+            isUsed = aisUsed;
         }
     }
 
@@ -55,9 +232,11 @@ namespace CHttpListener
         private Mutex lockMutex = new Mutex();
         private Thread expiredThread = null;
         private List<CHttpSession> list = new List<CHttpSession>();
-        private int checkExpiredPeriod = 2000;
+        private int checkExpiredPeriod = 10000;
         private int forceExpiredTimeout = 2000;
-        private int expirationTime = 5000;
+        private int expirationTime = 10000;
+        private int getSessionRepeats = 3;
+        private int getSessionTimeout = 1000;
         private CHttpServer parentServer = null;
         private void CheckExpired()
         {
@@ -73,7 +252,7 @@ namespace CHttpListener
                             for (int counter = list.Count - 1; counter >= 0; --counter)
                             {
                                 CHttpSession session = list[counter];
-                                if (session.TouchTime.AddMilliseconds(expirationTime) >= DateTime.Now)
+                                if (session.TouchTime.AddMilliseconds(expirationTime) <= DateTime.Now)
                                 {
                                     parentServer.ServerLog.LogInfo("Removing expired session " + session.SessionId);
                                     list.RemoveAt(counter);
@@ -98,6 +277,61 @@ namespace CHttpListener
                     haltPending = true;
                 }
             }
+        }
+        public CHttpSession GetSession(string asessionId)
+        {
+            CHttpSession result = null;
+            int repeats = 0;
+            int waitResult = 0;
+            bool alreadyChecked = false;
+            bool running = !haltEvent.WaitOne(0, false);
+            WaitHandle[] listLocks = new WaitHandle[] { lockMutex, haltEvent, checkStartedEvent };
+            WaitHandle[] flushLocks = new WaitHandle[] { haltEvent, checkFinishedEvent };
+            while (running && (repeats <= getSessionRepeats) && (result == null) && !alreadyChecked)
+            {
+                waitResult = WaitHandle.WaitAny(listLocks, getSessionTimeout, false);
+                if (waitResult == 0)
+                {
+                    try
+                    {
+                        if (asessionId == "")
+                        {
+                            result = new CHttpSession(true);
+                            result.IsUsed = true;
+                            list.Add(result);
+                        }
+                        else
+                        {
+                            result = list.Find(session => session.SessionId == asessionId);
+                            if (result != null)
+                            {
+                                if ((result.TouchTime.AddMilliseconds(expirationTime) <= DateTime.Now) && !result.IsUsed)
+                                {
+                                    parentServer.ServerLog.LogInfo("Removing expired session " + result.SessionId);
+                                    list.Remove(result);
+                                    result = null;
+                                }
+                                else
+                                {
+                                    result.IsUsed = true;
+                                }
+                            }
+                        }
+                        alreadyChecked = true;
+                    }
+                    finally
+                    {
+                        lockMutex.ReleaseMutex();
+                    }
+                }
+                else if (waitResult == 2)
+                {
+                    WaitHandle.WaitAny(flushLocks, 5000, false);
+                }
+                repeats++;
+                running = !haltEvent.WaitOne(0, false);
+            }
+            return result;
         }
         public void InitializeSessions(CHttpServer aserver)
         {
@@ -146,14 +380,24 @@ namespace CHttpListener
                 while ((!processed) && (counter <= handlerTypes.Length - 1))
                 {
                     CHttpHandler handler = (CHttpHandler)CreateHandler(handlerTypes[counter]);
-                    processed = handler.ProcessRequest(this, request);
+                    processed = handler.ProcessRequest(request);
+                    if (processed)
+                    {
+                        serverLog.LogInfo("Request " + request.RequestId + " HTTP " + request.Request.HttpMethod + " " + request.Request.Url + " was handled by " + handler.ToString());
+                    }
                     counter++;
+                }
+                if (!processed)
+                {
+                    CHttpResponse response = new CHttpTextResponse("Sorry, request not handled");
+                    response.SendResponse(HttpStatusCode.OK, request);
+                    serverLog.LogWarn("Request " + request.RequestId + " was not handled by any handler");
                 }
             }
             catch (Exception e)
             {
                 serverLog.LogError("Got error while processing " + request.RequestId + " " + e.Message);
-                request.SendServerError();
+                request.SendServerError(request);
             }
         }
         #endregion
@@ -166,7 +410,7 @@ namespace CHttpListener
                 try
                 {
                     HttpListenerContext context = serverListener.EndGetContext(iar);
-                    CHttpRequest request = new CHttpRequest(context);
+                    CHttpRequest request = new CHttpRequest(this, context);
                     try
                     {
                         ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessRequest), request);
@@ -174,7 +418,7 @@ namespace CHttpListener
                     catch (Exception e)
                     {
                         serverLog.LogError("Cant queue request " + context.Request.RequestTraceIdentifier.ToString("N") + " " + e.Message);
-                        request.SendServerOverloaded();
+                        request.SendServerOverloaded(request);
                     }
                 }
                 catch (Exception e)

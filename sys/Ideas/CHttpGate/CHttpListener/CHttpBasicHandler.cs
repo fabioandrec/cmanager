@@ -11,67 +11,18 @@ namespace CHttpListener
     {
         private static string rootDirectory = "";
         public static string RootDirectory { get { return rootDirectory; } set { rootDirectory = value.TrimEnd('\\'); } }
-        public override bool ProcessRequest(CHttpServer aserver, CHttpRequest arequest)
+        public override bool ProcessRequest(CHttpRequest arequest)
         {
             if (arequest.Request.HttpMethod.ToUpper() == "GET")
             {
                 string fileName = rootDirectory + arequest.Request.Url.LocalPath.Replace("/", "\\");
-                if (File.Exists(fileName))
-                {
-                    try
-                    {
-                        FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                        BinaryReader responseReader = new BinaryReader(fileStream);
-                        long bytesLeft = fileStream.Length;
-                        byte[] byteBuffer = new byte[8192];
-                        bool finished = false;
-                        int bytesRead;
-                        try
-                        {
-                            while ((!finished) && (aserver.IsRunning))
-                            {
-                                bytesRead = responseReader.Read(byteBuffer, 0, 8192);
-                                if (bytesRead > 0)
-                                {
-                                    try
-                                    {
-                                        arequest.Response.OutputStream.Write(byteBuffer, 0, bytesRead);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        finished = true;
-                                        aserver.ServerLog.LogWarn("Got response write error " + e.Message + " for request " + arequest.RequestId);
-                                    }
-                                }
-                                else
-                                {
-                                    finished = true;
-                                }
-                            }
-                            aserver.ServerLog.LogInfo(String.Format("{0} {1} HTTP {2}", arequest.RequestId, arequest.Request.HttpMethod, arequest.Request.Url));
-                            return true;
-                        }
-                        finally
-                        {
-                            fileStream.Close();
-                            try
-                            {
-                                arequest.Response.Close();
-                            }
-                            catch (Exception e)
-                            {
-                                aserver.ServerLog.LogWarn("Got close response error " + e.Message + " for request " + arequest.RequestId);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        aserver.ServerLog.LogWarn("Got processing error " + e.Message + " for request " + arequest.RequestId);
-                    }
-
-                }
+                CHttpFileResponse response = new CHttpFileResponse(fileName);
+                return response.SendResponse(HttpStatusCode.OK, arequest);
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
     }
 }
