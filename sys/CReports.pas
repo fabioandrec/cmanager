@@ -2361,6 +2361,7 @@ begin
           xInOperations.Next;
         end;
         xInSerie.AddXY(xCurDate, xGbSum);
+        xInSerie.XLabel[xInSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
         end else if FGroupBy = CGroupByMonth then begin
@@ -2368,7 +2369,6 @@ begin
         end else begin
           xCurDate := IncDay(xCurDate, 1);
         end;
-        xInSerie.XLabel[xInSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
       end;
     end;
     if xOutMovements then begin
@@ -2400,6 +2400,7 @@ begin
           xOutOperations.Next;
         end;
         xOutSerie.AddXY(xCurDate, xGbSum);
+        xOutSerie.XLabel[xOutSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
         end else if FGroupBy = CGroupByMonth then begin
@@ -2407,7 +2408,6 @@ begin
         end else begin
           xCurDate := IncDay(xCurDate, 1);
         end;
-        xOutSerie.XLabel[xOutSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
       end;
     end;
     with xChart do begin
@@ -2428,6 +2428,7 @@ begin
           Minimum := FStartDate;
           Increment := DateTimeStep[dtOneDay];
         end;
+        ExactDateTime := True;
         LabelsAngle := 90;
         MinorTickCount := 0;
         Title.Caption := xName
@@ -3940,6 +3941,7 @@ begin
           xBalance := 0;
         end;
         xSerie.AddXY(xCurDate, xBalance);
+        xSerie.XLabel[xSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
         end else if FGroupBy = CGroupByMonth then begin
@@ -3947,7 +3949,6 @@ begin
         end else begin
           xCurDate := IncDay(xCurDate, 1);
         end;
-        xSerie.XLabel[xSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
       end;
       xChart.AddSeries(xSerie);
     end;
