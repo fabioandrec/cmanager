@@ -7,13 +7,13 @@ margin-left: 10px;
 margin-right: 10px;
 margin-top: 10px;
 }
-.clickableHighlited
+.clickableTextHighlited
 {
-border: 1px dotted silver;
-cursor: hand;
+color: Navy;
+cursor: pointer;
 }
-.clickableNormalized
+.clickableTextNormalized
 {
-border: none;
+color: black;
 cursor: default;
 }

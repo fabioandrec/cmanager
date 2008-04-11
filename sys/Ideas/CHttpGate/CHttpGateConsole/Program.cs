@@ -16,7 +16,7 @@ namespace CHttpGateConsole
             CHttpLog log = new CHttpLog(logWriter, HttpLogLevel.LogInfo);
             log.StartLog();
             log.LogInfo("Log initialized");
-            CHttpBasicHandler.RootDirectory = Directory.GetCurrentDirectory() + "\\Gate";
+            CHttpBasicHandler.RootDirectory = Directory.GetCurrentDirectory();
             CHttpServer httpServer = new CHttpServer(log, 
                 AuthenticationSchemes.Anonymous,
                 new Type[] { typeof(CHttpBasicHandler), 

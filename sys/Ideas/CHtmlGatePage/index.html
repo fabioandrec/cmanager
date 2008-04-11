@@ -2,12 +2,13 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=Windows-1250">
-		<link type="text/css" rel="stylesheet" href="style.css">
+		<link type="text/css" rel="stylesheet" href="Styles\style.css">
 		<script type="text/javascript" src="Scripts\base.js"></script>				
 		<script language="javascript">
 			function initializePage()
 			{
-				makeClickable("chooseDatafile")				
+				makeClickable("chooseDatafile")
+				makeClickable("login")
 			}
 		</script>		
 	</head >
@@ -15,41 +16,43 @@
 		<table width="100%">
 			<tr>
 				<td align="left">
-					<table>
-						<tr>
-							<td><img src="logo.jpg" alt="C"></td>
-							<td>Manager - Wybierz plik danych</td>
-						</tr>
-					</table>
+							<img src="Images\security.png" alt="" style="vertical-align: middle"/>Wybierz 
+                                plik danych
 				</td>
 				<td align="right">
-					<table>
-						<tr>
-							<td><img style="visibility: hidden;" id="waitMarker" src="wait.gif" alt="Wait..."></td>
-						</tr>
-					</table>
+                    <img id="logo" src="Images\logo.jpg" alt="" style="vertical-align: middle"/>				
 				</td>				
 			</tr>
 		</table>
 		<hr size="1"><br>
 		<form action="">
 		<table width="100%">
-			<tr/>
-			<tr/>
-			<tr/>
-			<tr/>
-			<tr/>
 			<tr>
-				<td width="20%" align="right"><img src="security.png"></td>
-				<td width="10%" align="right">Alias pliku danych</td>
-				<td width="10%" align="left"><input type="text" name="firstname" size="20"/></td>
-				<td width="40%" align="left"><img style="padding: 3px;" id="chooseDatafile" src="search.png"></td>
+				<td width="35%" align="right">Alias pliku danych</td>
+				<td width="30%" align="center"><input type="text" name="datafile" size="30" 
+                        style="border: 1px solid silver;"/></td>
+				<td width="35%" align="left"><div id="chooseDatafile" style="font-size: smaller;" onclick="toggleWait()"><img style="padding: 3px; vertical-align: middle;" src="Images\search.png" alt=""/>Wybierz 
+                    plik danych z listy</div></td>
 			</tr>
 			<tr>
-				<td width="20%" align="right"></td>
-				<td width="10%" align="right">Hasło dostępu</td>
-				<td width="10%" align="left"><input type="password" name="lastname" size="20"/></td>
-				<td width="40%" align="left"></td>
+				<td width="35%" align="right">Hasło dostępu</td>
+				<td width="30%" align="center">
+                    <input type="password" name="password" size="30" 
+                        style="border: 1px solid silver;"/></td>
+				<td width="35%" align="left"></td>
+			</tr>
+			<tr>
+				<td width="35%" align="right">&nbsp;</td>
+				<td width="30%" align="center">
+                    &nbsp;</td>
+				<td width="35%" align="left">&nbsp;</td>
+			</tr>
+			<tr>
+				<td width="35%" align="right">&nbsp;</td>
+				<td width="30%" align="center">
+                    <input id="login" type="submit" value="Uruchom" 
+                        style="border: 1px solid #C0C0C0; background-color: white;" /></td>
+				<td width="35%" align="left">&nbsp;</td>
 			</tr>
 		</table>
 		</form>		

@@ -115,6 +115,7 @@ function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
 function ChangeColorsToRgb(AString: String): String;
 function ColorToHtmlColor(AColor: TColor): String;
+procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
 
 implementation
 
@@ -1165,6 +1166,12 @@ begin
     xRgb := ColorToHtmlColor(CSupportedColors[xCount]);
     Result := StringReplace(Result, xText, xRgb, [rfReplaceAll, rfIgnoreCase]);
   end;
+end;
+
+procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
+begin
+  SetLength(AList, Length(AList) + 1);
+  AList[High(AList)] := AValue;
 end;
 
 end.

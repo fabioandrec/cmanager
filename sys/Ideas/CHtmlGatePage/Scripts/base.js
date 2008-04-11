@@ -18,17 +18,31 @@ function toggleVisible(aid)
 
 function toggleWait()
 {
-	toggleVisible("waitMarker")
+    element = $("logo")
+    if (element != null)
+    {
+        element.src = "Images/wait.gif"
+        element.id = "wait"
+    }
+    else
+    {
+        element = $("wait")
+        if (element != null)
+        {
+            element.src = "Images/logo.jpg"
+            element.id = "logo"            
+        }
+    }    
 }
 
 function makeHighlited(aelement)
 {
-	aelement.className = "clickableHighlited"
+	aelement.className = "clickableTextHighlited"
 }
 
 function makeNormalized(aelement)
 {
-	aelement.className = "clickableNormalized"
+	aelement.className = "clickableTextNormalized"
 }
 
 function makeClickable(aname)

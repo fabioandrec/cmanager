@@ -3,9 +3,9 @@ unit CReports;
 interface
 
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
-     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins, 
+     GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins,
      CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects,
-     CXml, TeEngine;
+     CXml, TeEngine, Types;
 
 type
   TReportDialogParamsDefs = class;
@@ -2250,7 +2250,7 @@ end;
 procedure TCashSumReportChart.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
 begin
   if ASender.Marks.Style = smsLabel then begin
-    AMarkText := GetDescription(FGroupBy, ASender.XValue[AValueIndex]);
+    AMarkText := ASender.XLabel[AValueIndex];
   end;
 end;
 
@@ -2346,7 +2346,6 @@ begin
         Marks.ArrowLength := 0;
         Marks.Style := smsValue;
         HorizAxis := aBottomAxis;
-        XValues.DateTime := True;
       end;
       while (xCurDate <= FEndDate) do begin
         xInOperations.Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False) +
@@ -2360,7 +2359,7 @@ begin
           end;
           xInOperations.Next;
         end;
-        xInSerie.AddXY(xCurDate, xGbSum);
+        xInSerie.AddXY(xInSerie.XValues.Count, xGbSum);
         xInSerie.XLabel[xInSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
@@ -2385,7 +2384,6 @@ begin
         Marks.ArrowLength := 0;
         Marks.Style := smsValue;
         HorizAxis := aBottomAxis;
-        XValues.DateTime := True;
       end;
       while (xCurDate <= FEndDate) do begin
         xOutOperations.Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False) +
@@ -2399,7 +2397,7 @@ begin
           end;
           xOutOperations.Next;
         end;
-        xOutSerie.AddXY(xCurDate, xGbSum);
+        xOutSerie.AddXY(xOutSerie.XValues.Count, xGbSum);
         xOutSerie.XLabel[xOutSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
@@ -2412,23 +2410,6 @@ begin
     end;
     with xChart do begin
       with BottomAxis do begin
-        Automatic := False;
-        AutomaticMaximum := False;
-        AutomaticMinimum := False;
-        if FGroupBy = CGroupByWeek then begin
-          Maximum := EndOfTheWeek(FEndDate);
-          Minimum := StartOfTheWeek(FStartDate);
-          Increment := DateTimeStep[dtOneWeek];
-        end else if FGroupBy = CGroupByMonth then begin
-          Maximum := EndOfTheMonth(FEndDate);
-          Minimum := StartOfTheMonth(FStartDate);
-          Increment := DateTimeStep[dtOneMonth];
-        end else begin
-          Maximum := FEndDate;
-          Minimum := FStartDate;
-          Increment := DateTimeStep[dtOneDay];
-        end;
-        ExactDateTime := True;
         LabelsAngle := 90;
         MinorTickCount := 0;
         Title.Caption := xName
@@ -3831,7 +3812,7 @@ end;
 procedure TSumBySomethingChart.GetMarkText(ASender: TChartSeries; AValueIndex: Integer; var AMarkText: String);
 begin
   if ASender.Marks.Style = smsLabel then begin
-    AMarkText := GetDescription(FGroupBy, ASender.XValue[AValueIndex]);
+    AMarkText := ASender.XLabel[AValueIndex];
   end;
 end;
 
@@ -3920,7 +3901,6 @@ begin
         Marks.ArrowLength := 0;
         Marks.Style := smsValue;
         HorizAxis := aBottomAxis;
-        XValues.DateTime := True;
       end;
       if FGroupBy = CGroupByWeek then begin
         xCurDate := StartOfTheWeek(FStartDate);
@@ -3940,7 +3920,7 @@ begin
         end else begin
           xBalance := 0;
         end;
-        xSerie.AddXY(xCurDate, xBalance);
+        xSerie.AddXY(xSerie.Count, xBalance);
         xSerie.XLabel[xSerie.Count - 1] := GetDescription(FGroupBy, xCurDate);
         if FGroupBy = CGroupByWeek then begin
           xCurDate := IncWeek(xCurDate, 1);
@@ -3954,22 +3934,6 @@ begin
     end;
     with xChart do begin
       with BottomAxis do begin
-        Automatic := False;
-        AutomaticMaximum := False;
-        AutomaticMinimum := False;
-        if FGroupBy = CGroupByWeek then begin
-          Maximum := EndOfTheWeek(FEndDate);
-          Minimum := StartOfTheWeek(FStartDate);
-          Increment := DateTimeStep[dtOneWeek];
-        end else if FGroupBy = CGroupByMonth then begin
-          Maximum := EndOfTheMonth(FEndDate);
-          Minimum := StartOfTheMonth(FStartDate);
-          Increment := DateTimeStep[dtOneMonth];
-        end else begin
-          Maximum := FEndDate;
-          Minimum := FStartDate;
-          Increment := DateTimeStep[dtOneDay];
-        end;
         LabelsAngle := 90;
         MinorTickCount := 0;
         LabelStyle := talText;
