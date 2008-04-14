@@ -4672,9 +4672,9 @@ end;
 function TInvestmentPortfolio.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
   if AColumnIndex = 0 then begin
-    Result := FinstrumentName;
-  end else if AColumnIndex = 1 then begin
     Result := FaccountName;
+  end else if AColumnIndex = 1 then begin
+    Result := FinstrumentName;
   end else if AColumnIndex = 2 then begin
     Result := IntToStr(Fquantity);
   end else if AColumnIndex = 3 then begin

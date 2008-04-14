@@ -51,7 +51,7 @@ begin
       Result := TInstrument(TInstrument.LoadObject(InstrumentProxy, SelectedId, False)).idCurrencyDef <> CEmptyDataGid;
       GDataProvider.RollbackTransaction;
       if not Result then begin
-        ShowInfo(itWarning, 'Musisz wybraæ instrument ze zdefiniowan¹ walutê notowañ', '');
+        ShowInfo(itWarning, 'Musisz wybraæ instrument ze zdefiniowan¹ walut¹ notowañ', '');
       end;
     end;
   end;
