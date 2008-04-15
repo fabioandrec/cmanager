@@ -6,9 +6,17 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDatabase,
-  CDataObjectFormUnit, DateUtils, CImageListsUnit;
+  CDataObjectFormUnit, DateUtils, CImageListsUnit, AdoDb;
 
 type
+  TCInvestmentFrameAdditionalData = class(TCDataobjectFrameData)
+  private
+    FAccountId: TDataGid;
+    FInstrumentId: TDataGid;
+  public
+    constructor Create(AAccountId, AInstrumentId: TDataGid);
+  end;
+
   TCInvestmentMovementFrame = class(TCDataobjectFrame)
     Label1: TLabel;
     CStaticPeriod: TCStatic;
@@ -32,6 +40,7 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
     procedure AfterDeleteObject(ADataobject: TDataObject); override;
+    procedure DoAddingNewDataobject(ADataobject: TDataObject); override;
   public
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -49,7 +58,7 @@ implementation
 
 uses CDataObjects, CInvestmentMovementFormUnit, CPluginConsts, CConsts,
   CTools, CFrameFormUnit, CListFrameUnit, CBaseFrameUnit,
-  CMovementFrameUnit;
+  CMovementFrameUnit, DB;
 
 {$R *.dfm}
 
@@ -123,14 +132,31 @@ end;
 
 class function TCInvestmentMovementFrame.GetTitle: String;
 begin
-  Result := 'Inwestycje';
+  Result := 'Operacje inwestycyjne';
 end;
 
 procedure TCInvestmentMovementFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
+var xSql: String;
+    xQuery: TADOQuery;
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   CStaticPeriod.DataId := '1';
   UpdateCustomPeriod;
+  if AdditionalData <> Nil then begin
+    with TCInvestmentFrameAdditionalData(AdditionalData) do begin
+      xSql := Format('select min(regDateTime) as minDate, max(regDateTime) as maxDate from investmentMovement where idAccount = %s and idInstrument = %s',
+              [DataGidToDatabase(FAccountId), DataGidToDatabase(FInstrumentId)]);
+      xQuery := GDataProvider.OpenSql(xSql);
+      if not xQuery.IsEmpty then begin
+        CStaticPeriod.DataId := '7';
+        CStaticPeriod.Caption := '<dowolny>';
+        CDateTimePerStart.Value := xQuery.FieldByName('minDate').AsDateTime;
+        CDateTimePerEnd.Value := xQuery.FieldByName('maxDate').AsDateTime;
+        UpdateCustomPeriod;
+      end;
+      xQuery.Free;
+    end;
+  end;
   Label5.Left := FilterPanel.Width - 8;
   CDateTimePerEnd.Left := Label5.Left - CDateTimePerEnd.Width;
   Label4.Left := CDateTimePerEnd.Left - 15;
@@ -156,18 +182,29 @@ begin
   GetFilterDates(xDf, xDt);
   Result := ((inherited IsValidFilteredObject(AObject)) or (CStaticFilter.DataId = TInvestmentMovement(AObject).movementType)) and
             (xDf <= TInvestmentMovement(AObject).regDateTime) and (TInvestmentMovement(AObject).regDateTime <= xDt);
+  if Result and (AdditionalData <> Nil) then begin
+    with TCInvestmentFrameAdditionalData(AdditionalData) do begin
+      Result := (TInvestmentMovement(AObject).idAccount = FAccountId) and (TInvestmentMovement(AObject).idInstrument = FInstrumentId); 
+    end;
+  end;
 end;
 
 procedure TCInvestmentMovementFrame.ReloadDataobjects;
 var xCondition: String;
     xDf, xDt: TDateTime;
 begin
+  inherited ReloadDataobjects;
   GetFilterDates(xDf, xDt);
   xCondition := Format('regDateTime between %s and %s', [DatetimeToDatabase(xDf, True), DatetimeToDatabase(xDt, True)]);
   if CStaticFilter.DataId = CInvestmentSellMovement then begin
     xCondition := xCondition + Format(' and movementType = ''%s''', [CInvestmentSellMovement]);
   end else if CStaticFilter.DataId = CInvestmentBuyMovement then begin
     xCondition := xCondition + Format(' and movementType = ''%s''', [CInvestmentBuyMovement]);
+  end;
+  if AdditionalData <> Nil then begin
+    with TCInvestmentFrameAdditionalData(AdditionalData) do begin
+      xCondition := xCondition + Format(' and idAccount = %s and idInstrument = %s', [DataGidToDatabase(FAccountId), DataGidToDatabase(FInstrumentId)]);
+    end;
   end;
   Dataobjects := TDataObject.GetList(TInvestmentMovement, InvestmentMovementProxy, 'select * from investmentMovement where ' + xCondition + ' order by created');
 end;
@@ -254,5 +291,24 @@ begin
   inherited AfterDeleteObject(ADataobject);
 end;
 
+constructor TCInvestmentFrameAdditionalData.Create(AAccountId, AInstrumentId: TDataGid);
+begin
+  inherited CreateNew;
+  FAccountId := AAccountId;
+  FInstrumentId := AInstrumentId;
+end;
+
+procedure TCInvestmentMovementFrame.DoAddingNewDataobject(ADataobject: TDataObject);
+begin
+  inherited DoAddingNewDataobject(ADataobject);
+  if AdditionalData <> Nil then begin
+    if TInvestmentMovement(ADataobject).regDateTime < CDateTimePerStart.Value then begin
+      CDateTimePerStart.Value := TInvestmentMovement(ADataobject).regDateTime;
+    end;
+    if TInvestmentMovement(ADataobject).regDateTime > CDateTimePerEnd.Value then begin
+      CDateTimePerEnd.Value := TInvestmentMovement(ADataobject).regDateTime;
+    end;
+  end;
+end;
+
 end.
- 

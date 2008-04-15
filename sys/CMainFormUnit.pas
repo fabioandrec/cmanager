@@ -72,7 +72,6 @@ type
     ActionShortcutInstruments: TAction;
     ActionShortcutExch: TAction;
     ActionImportStockExchanges: TAction;
-    ActionShortcutInvestments: TAction;
     ActionShortcutInvestmentPortfolio: TAction;
     PopupMenuShortcutView: TPopupMenu;
     MenuItemSmallShortcut: TMenuItem;
@@ -227,6 +226,7 @@ begin
   if GBasePreferences.shortcutBarSmall then begin
     MenuItemSmallShortcut.Click;
   end;
+  TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := False;
   PerformShortcutAction(ActionShortcutStart);
 end;
 
@@ -922,8 +922,6 @@ begin
     Result := TCInstrumentFrame;
   end else if AAction = ActionShortcutExch then begin
     Result := TCInstrumentValueFrame;
-  end else if AAction = ActionShortcutInvestments then begin
-    Result := TCInvestmentMovementFrame;
   end else if AAction = ActionShortcutInvestmentPortfolio then begin
     Result := TCInvestmentPortfolioFrame;
   end else if AAction = ActionShortcutQuickpatterns then begin

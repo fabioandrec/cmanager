@@ -6,31 +6,32 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFrameUnit, ActnList, VTHeaderPopup, Menus, ImgList,
   PngImageList, CComponents, VirtualTrees, StdCtrls, ExtCtrls, CDatabase,
-  CDataobjectFormUnit;
+  CDataobjectFormUnit, CImageListsUnit;
 
 type
   TCInvestmentPortfolioFrame = class(TCDataobjectFrame)
+    CButtonAll: TCButton;
+    ActionAllInvestmentMovements: TAction;
+    procedure ActionAllInvestmentMovementsExecute(Sender: TObject);
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
+    procedure DoActionEditExecute; override;
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     function GetStaticFilter: TStringList; override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
-    {
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
-    function GetHistoryText: String; override;
-    procedure ShowHistory(AGid: ShortString); override;
-    }
   end;
 
 implementation
 
-uses CPluginConsts, CDataObjects, CConsts;
+uses CPluginConsts, CDataObjects, CConsts, CFrameFormUnit,
+  CInvestmentMovementFrameUnit, CInvestmentMovementFormUnit;
 
 {$R *.dfm}
 
@@ -58,13 +59,6 @@ begin
   Result := 'Portfel inwestycyjny';
 end;
 
-procedure TCInvestmentPortfolioFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
-begin
-  Bevel.Visible := False;
-  ButtonPanel.Visible := False;
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
-end;
-
 function TCInvestmentPortfolioFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
 begin
   Result := (APluginSelectedItemTypes and CSELECTEDITEM_INVESTPORTFOLIO) = CSELECTEDITEM_INVESTPORTFOLIO;
@@ -86,6 +80,41 @@ begin
     xCondition := ' where instrumentType = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TDataObject.GetList(TInvestmentPortfolio, InvestmentPortfolioProxy, 'select * from StnInvestmentPortfolio' + xCondition);
+end;
+
+procedure TCInvestmentPortfolioFrame.ActionAllInvestmentMovementsExecute(Sender: TObject);
+var xGid, xText: String;
+begin
+  TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, nil, nil, nil, nil, False);
+end;
+
+procedure TCInvestmentPortfolioFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  CButtonDelete.Visible := False;
+end;
+
+class function TCInvestmentPortfolioFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
+begin
+  Result := TInvestmentMovement;
+end;
+
+function TCInvestmentPortfolioFrame.GetDataobjectForm(AOption: Integer): TCDataobjectFormClass;
+begin
+  Result := TCInvestmentMovementForm;
+end;
+
+class function TCInvestmentPortfolioFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
+begin
+  Result := InvestmentMovementProxy;
+end;
+
+procedure TCInvestmentPortfolioFrame.DoActionEditExecute;
+var xGid, xText, xIdAccount, xIdInstrument: String;
+begin
+  xIdAccount := TInvestmentPortfolio(List.SelectedElement.Data).idAccount;
+  xIdInstrument := TInvestmentPortfolio(List.SelectedElement.Data).idInstrument;
+  TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, TCInvestmentFrameAdditionalData.Create(xIdAccount, xIdInstrument), nil, nil, nil, False);
 end;
 
 end.

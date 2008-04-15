@@ -496,14 +496,9 @@ object CMainForm: TCMainForm
       Caption = 'Wyci'#261'gi'
       ImageIndex = 13
     end
-    object ActionShortcutInvestments: TAction
-      Category = 'Skr'#243'ty'
-      Caption = 'Operacje inwestycyjne'
-      ImageIndex = 16
-    end
     object ActionShortcutInvestmentPortfolio: TAction
       Category = 'Skr'#243'ty'
-      Caption = 'Inwestycje'
+      Caption = 'Portfel inwestycyjny'
       ImageIndex = 17
     end
     object ActionShortcutProducts: TAction

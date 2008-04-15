@@ -72,6 +72,9 @@ type
     procedure DoActionEditExecute; virtual;
     procedure DoActionDeleteExecute; virtual;
     procedure AfterDeleteObject(ADataobject: TDataObject); virtual;
+    procedure DoAddingNewDataobject(ADataobject: TDataObject); virtual;
+    procedure DoEditingNewDataobject(ADataobject: TDataObject); virtual;
+    procedure DoDeletingNewDataobject(ADataobject: TDataObject); virtual;
   public
     Dataobjects: TDataObjectList;
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
@@ -212,6 +215,7 @@ var xDataobject: TDataObject;
     xNode: PVirtualNode;
 begin
   xDataobject := GetDataobjectClass(AOptions).LoadObject(GetDataobjectProxy(AOptions), AId, True);
+  DoAddingNewDataobject(xDataobject);
   if IsValidFilteredObject(xDataobject) then begin
     xElement := TCListDataElement.Create(MultipleChecks <> Nil, List, xDataobject);
     Dataobjects.Add(xDataobject);
@@ -227,7 +231,14 @@ begin
 end;
 
 procedure TCDataobjectFrame.MessageMovementDeleted(AId: TDataGid; AOptions: Integer);
+var xElement: TCListDataElement;
+    xDataobject: TDataObject;
 begin
+  xElement := List.RootElement.FindDataElement(AId, GetDataobjectClass(WMOPT_NONE).ClassName);
+  if xElement <> Nil then begin
+    xDataobject := xElement.Data as TDataObject;
+    DoDeletingNewDataobject(xDataobject);
+  end;
   List.RootElement.DeleteDataElement(AId, GetDataobjectClass(WMOPT_NONE).ClassName);
   ReloadSums;
 end;
@@ -239,6 +250,7 @@ begin
   xElement := List.RootElement.FindDataElement(AId, GetDataobjectClass(WMOPT_NONE).ClassName);
   if xElement <> Nil then begin
     xDataobject := xElement.Data as TDataObject;
+    DoEditingNewDataobject(xDataobject);
     if IsValidFilteredObject(xDataobject) then begin
       List.RootElement.RefreshDataElement(AId, xDataobject.ClassName);
     end else begin
@@ -503,8 +515,7 @@ begin
                    MenuItemBigIcons, MenuItemSmallIcons,
                    FBigIconsButtonsImageList, FBigIconsHistoryImageList,
                    ActionListButtons, ActionListHistory,
-                   FSmallIconsButtonsImageList,
-                   FSmallIconsHistoryImageList);
+                   FSmallIconsButtonsImageList, FSmallIconsHistoryImageList);
 end;
 
 procedure TCDataobjectFrame.MenuItemBigIconsClick(Sender: TObject);
@@ -527,6 +538,18 @@ begin
     end;
     UpdateIcons;
   end;
+end;
+
+procedure TCDataobjectFrame.DoAddingNewDataobject(ADataobject: TDataObject);
+begin
+end;
+
+procedure TCDataobjectFrame.DoDeletingNewDataobject(ADataobject: TDataObject);
+begin
+end;
+
+procedure TCDataobjectFrame.DoEditingNewDataobject(ADataobject: TDataObject);
+begin
 end;
 
 end.

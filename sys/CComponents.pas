@@ -2800,7 +2800,7 @@ begin
         ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
       end;
       AActionList_1.Images := ASmallIcons_1;
-      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) and (ASmallIcons_2 = Nil) then begin
         ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
         AActionList_2.Images := ASmallIcons_2;
       end;
@@ -2834,7 +2834,7 @@ begin
         ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
       end;
       AActionList_1.Images := ASmallIcons_1;
-      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) and (ASmallIcons_2 = Nil) then begin
         ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
         AActionList_2.Images := ASmallIcons_2;
       end;
