@@ -2346,6 +2346,7 @@ begin
         Marks.ArrowLength := 0;
         Marks.Style := smsValue;
         HorizAxis := aBottomAxis;
+        SeriesColor := clGreen;
       end;
       while (xCurDate <= FEndDate) do begin
         xInOperations.Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False) +
@@ -2384,6 +2385,7 @@ begin
         Marks.ArrowLength := 0;
         Marks.Style := smsValue;
         HorizAxis := aBottomAxis;
+        SeriesColor := clRed;
       end;
       while (xCurDate <= FEndDate) do begin
         xOutOperations.Filter := xGb + ' = ' + DatetimeToDatabase(xCurDate, False) +
