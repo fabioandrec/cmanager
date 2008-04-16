@@ -26,6 +26,7 @@ type
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
   end;
 
 implementation
@@ -115,6 +116,12 @@ begin
   xIdAccount := TInvestmentPortfolio(List.SelectedElement.Data).idAccount;
   xIdInstrument := TInvestmentPortfolio(List.SelectedElement.Data).idInstrument;
   TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, TCInvestmentFrameAdditionalData.Create(xIdAccount, xIdInstrument), nil, nil, nil, False);
+end;
+
+procedure TCInvestmentPortfolioFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
+begin
+  inherited;
+  Usu1.Visible := CButtonDelete.Visible;
 end;
 
 end.

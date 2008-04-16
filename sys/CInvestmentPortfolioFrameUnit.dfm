@@ -34,7 +34,6 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
   inherited ButtonPanel: TPanel
     inherited CButtonAdd: TCButton
       Width = 124
-      Caption = 'Dodaj operacj'#281
     end
     inherited CButtonEdit: TCButton
       Width = 196
@@ -56,7 +55,7 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
   inherited ActionListButtons: TActionList
     Images = CImageLists.InvestmentImageList24x24
     inherited ActionAdd: TAction
-      Caption = 'Nowa operacja gie'#322'dowa'
+      Caption = 'Dodaj operacj'#281
       ImageIndex = 1
     end
     inherited ActionEdit: TAction
