@@ -139,11 +139,10 @@ procedure TCInvestmentMovementFrame.InitializeFrame(AOwner: TComponent; AAdditio
 var xSql: String;
     xQuery: TADOQuery;
 begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   CStaticPeriod.DataId := '1';
   UpdateCustomPeriod;
-  if AdditionalData <> Nil then begin
-    with TCInvestmentFrameAdditionalData(AdditionalData) do begin
+  if AAdditionalData <> Nil then begin
+    with TCInvestmentFrameAdditionalData(AAdditionalData) do begin
       xSql := Format('select min(regDateTime) as minDate, max(regDateTime) as maxDate from investmentMovement where idAccount = %s and idInstrument = %s',
               [DataGidToDatabase(FAccountId), DataGidToDatabase(FInstrumentId)]);
       xQuery := GDataProvider.OpenSql(xSql);
@@ -157,6 +156,7 @@ begin
       xQuery.Free;
     end;
   end;
+  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   Label5.Left := FilterPanel.Width - 8;
   CDateTimePerEnd.Left := Label5.Left - CDateTimePerEnd.Width;
   Label4.Left := CDateTimePerEnd.Left - 15;
