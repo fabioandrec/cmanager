@@ -38,6 +38,11 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
     inherited CButtonEdit: TCButton
       Width = 196
     end
+    inherited CButtonDelete: TCButton
+      Left = 253
+      Width = 156
+      Caption = 'Usu'#324' inwestycj'#281
+    end
     object CButtonAll: TCButton
       Left = 301
       Top = 4
@@ -59,7 +64,7 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       ImageIndex = 1
     end
     inherited ActionEdit: TAction
-      Caption = 'Poka'#380' histori'#281' portfela'
+      Caption = 'Poka'#380' histori'#281
       ImageIndex = 0
     end
     object ActionAllInvestmentMovements: TAction
@@ -67,5 +72,8 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       ImageIndex = 3
       OnExecute = ActionAllInvestmentMovementsExecute
     end
+  end
+  inherited ActionListHistory: TActionList
+    Top = 152
   end
 end

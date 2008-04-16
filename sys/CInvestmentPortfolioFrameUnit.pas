@@ -17,22 +17,22 @@ type
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
     procedure DoActionEditExecute; override;
+    procedure DoActionDeleteExecute; override;
   public
     class function GetTitle: String; override;
     procedure ReloadDataobjects; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     function GetStaticFilter: TStringList; override;
-    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
   end;
 
 implementation
 
 uses CPluginConsts, CDataObjects, CConsts, CFrameFormUnit,
-  CInvestmentMovementFrameUnit, CInvestmentMovementFormUnit;
+  CInvestmentMovementFrameUnit, CInvestmentMovementFormUnit, CInfoFormUnit,
+  CBaseFrameUnit;
 
 {$R *.dfm}
 
@@ -89,12 +89,6 @@ begin
   TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, nil, nil, nil, nil, False);
 end;
 
-procedure TCInvestmentPortfolioFrame.UpdateButtons(AIsSelectedSomething: Boolean);
-begin
-  inherited UpdateButtons(AIsSelectedSomething);
-  CButtonDelete.Visible := False;
-end;
-
 class function TCInvestmentPortfolioFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
 begin
   Result := TInvestmentMovement;
@@ -118,10 +112,21 @@ begin
   TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, TCInvestmentFrameAdditionalData.Create(xIdAccount, xIdInstrument), nil, nil, nil, False);
 end;
 
-procedure TCInvestmentPortfolioFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
+procedure TCInvestmentPortfolioFrame.DoActionDeleteExecute;
+var xData: TDataObject;
+    xBase: TDataObject;
 begin
-  inherited;
-  Usu1.Visible := CButtonDelete.Visible;
+  xBase := TDataObject(List.SelectedElement.Data);
+  if xBase.CanBeDeleted(xBase.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ inwestycjê "' + xBase.GetElementText + '" ?' +
+                           '\nPamiêtaj, ¿e usuniêcie wybranej inwestycji spowoduje usuniêcie\nwszystkich zwi¹zanych z ni¹ operacji inwestycyjnych.', '') then begin
+      xData := TInvestmentItem.LoadObject(InvestmentItemProxy, xBase.id, False);
+      xData.DeleteObject;
+      GDataProvider.CommitTransaction;
+      AfterDeleteObject(xBase);
+      SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAREFRESH, 0, 0);
+    end;
+  end;
 end;
 
 end.

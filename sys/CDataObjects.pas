@@ -844,6 +844,8 @@ type
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetidAccount(const Value: TDataGid);
     procedure Setquantity(const Value: Integer);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure UpdateFieldList; override;
@@ -4393,14 +4395,14 @@ begin
     FmonthDate := FieldByName('monthDate').AsDateTime;
     FyearDate := FieldByName('yearDate').AsDateTime;
     FidInstrument := FieldByName('idInstrument').AsString;
-    FprevIdInstrument := FidInstrument;
     FidInstrumentCurrencyDef := FieldByName('idInstrumentCurrencyDef').AsString;
     Fquantity := FieldByName('quantity').AsInteger;
-    FprevQuantity := Fquantity;
     FidInstrumentValue := FieldByName('idInstrumentValue').AsString;
     FvalueOf := FieldByName('valueOf').AsCurrency;
     FsummaryOf := FieldByName('summaryOf').AsCurrency;
     FidAccount := FieldByName('idAccount').AsString;
+    FprevIdInstrument := FidInstrument;
+    FprevQuantity := Fquantity;
     FprevIdAccount := FidAccount;
     FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
     FvalueOfAccount := FieldByName('valueOfAccount').AsCurrency;
@@ -5152,6 +5154,12 @@ begin
     AddField('dueNextDatetime', DatetimeToDatabase(FdueNextDatetime, False), False, 'depositInvestment');
     AddField('dueAction', FdueAction, True, 'depositInvestment');
   end;
+end;
+
+function TInvestmentItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql(Format('delete from investmentMovement where idAccount = %s and idInstrument = %s', [DataGidToDatabase(FidAccount), DataGidToDatabase(FidInstrument)]));
 end;
 
 initialization

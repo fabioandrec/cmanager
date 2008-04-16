@@ -192,8 +192,15 @@ begin
       xCurDbversion := FFromDbversion;
       while Result and (xCurDbversion <> FToDbversion) do begin
         SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), DbSqllogfile);
-        xCommand := GetStringFromResources(Format('SQLUPD_%d_%d', [xCurDbversion, xCurDbversion + 1]), RT_RCDATA);
-        Result := DbExecuteSql(FConnection, xCommand, False, xError);
+        try
+          xCommand := GetStringFromResources(Format('SQLUPD_%d_%d', [xCurDbversion, xCurDbversion + 1]), RT_RCDATA);
+          Result := DbExecuteSql(FConnection, xCommand, False, xError);
+        except
+          on E: Exception do begin
+            xError := E.Message;
+            Result := False;
+          end;
+        end;
         Inc(xCurDbversion);
         ProgressBar.StepBy(1);
       end;
