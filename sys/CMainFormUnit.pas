@@ -82,6 +82,7 @@ type
     ActionPasswordDatafile: TAction;
     ActionCmd: TAction;
     ActionShortcutQuickpatterns: TAction;
+    ActionShortcutDepositInvestment: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -183,7 +184,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
      CImportExportDatafileFormUnit, CChangePasswordFormUnit,
-  CQuickpatternFrameUnit;
+  CQuickpatternFrameUnit, CDepositInvestmentFrameUnit;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -924,6 +925,8 @@ begin
     Result := TCInstrumentValueFrame;
   end else if AAction = ActionShortcutInvestmentPortfolio then begin
     Result := TCInvestmentPortfolioFrame;
+  end else if AAction = ActionShortcutDepositInvestment then begin
+    Result := TCDepositInvestmentFrame;  
   end else if AAction = ActionShortcutQuickpatterns then begin
     Result := TCQuickpatternFrame;
   end else begin

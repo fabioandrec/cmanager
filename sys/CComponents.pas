@@ -2796,7 +2796,7 @@ begin
         AActionList_2.Images := ABigIcons_2;
       end;
     end else begin
-      if ASmallIcons_1 = Nil then begin
+      if (ASmallIcons_1 = Nil) and (ABigIcons_1 <> Nil) then begin
         ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
       end;
       AActionList_1.Images := ASmallIcons_1;
@@ -2805,13 +2805,15 @@ begin
         AActionList_2.Images := ASmallIcons_2;
       end;
     end;
-    APanel.Height := AActionList_1.Images.Height + 8;
-    APanel.Update;
-    xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
-    for xCount := 0 to APanel.ControlCount - 1 do begin
-      if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
-        APanel.Controls[xCount].Top := xTop;
-        APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+    if AActionList_1.Images <> Nil then begin
+      APanel.Height := AActionList_1.Images.Height + 8;
+      APanel.Update;
+      xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
+      for xCount := 0 to APanel.ControlCount - 1 do begin
+        if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
+          APanel.Controls[xCount].Top := xTop;
+          APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+        end;
       end;
     end;
   end;
@@ -2830,7 +2832,7 @@ begin
         AActionList_2.Images := ABigIcons_2;
       end;
     end else begin
-      if ASmallIcons_1 = Nil then begin
+      if (ASmallIcons_1 = Nil) and (ABigIcons_1 <> Nil) then begin
         ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
       end;
       AActionList_1.Images := ASmallIcons_1;
@@ -2839,13 +2841,15 @@ begin
         AActionList_2.Images := ASmallIcons_2;
       end;
     end;
-    APanel.Height := AActionList_1.Images.Height + 8;
-    APanel.Update;
-    xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
-    for xCount := 0 to APanel.ControlCount - 1 do begin
-      if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
-        APanel.Controls[xCount].Top := xTop;
-        APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+    if AActionList_1.Images <> Nil then begin
+      APanel.Height := AActionList_1.Images.Height + 8;
+      APanel.Update;
+      xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
+      for xCount := 0 to APanel.ControlCount - 1 do begin
+        if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
+          APanel.Controls[xCount].Top := xTop;
+          APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+        end;
       end;
     end;
   end;

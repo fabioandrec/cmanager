@@ -990,6 +990,75 @@ type
     property isStatistic: Boolean read FisStatistic write FisStatistic;
   end;
 
+  TDepositInvestment = class(TDataObject)
+  private
+    FdepositState: TBaseEnumeration;
+    Fname: TBaseName;
+    Fdescription: TBaseDescription;
+    FidAccount: TDataGid;
+    FidCashPoint: TDataGid;
+    FidCurrencyDef: TDataGid;
+    FinitialCash: Currency;
+    FcurrentCash: Currency;
+    FinterestRate: Currency;
+    FnoncapitalizedInterest: Currency;
+    FperiodCount: Integer;
+    FperiodType: TBaseEnumeration;
+    FperiodLastDatetime: TDateTime;
+    FperiodNextDatetime: TDateTime;
+    FperiodAction: TBaseEnumeration;
+    FdueCount: Integer;
+    FdueType: TBaseEnumeration;
+    FdueLastDatetime: TDateTime;
+    FdueNextDatetime: TDateTime;
+    FdueAction: TBaseEnumeration;
+    procedure SetcurrentCash(const Value: Currency);
+    procedure SetdepositState(const Value: TBaseEnumeration);
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetdueAction(const Value: TBaseEnumeration);
+    procedure SetdueCount(const Value: Integer);
+    procedure SetdueLastDatetime(const Value: TDateTime);
+    procedure SetdueNextDatetime(const Value: TDateTime);
+    procedure SetdueType(const Value: TBaseEnumeration);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetidCashPoint(const Value: TDataGid);
+    procedure SetidCurrencyDef(const Value: TDataGid);
+    procedure SetinitialCash(const Value: Currency);
+    procedure SetinterestRate(const Value: Currency);
+    procedure Setname(const Value: TBaseName);
+    procedure SetnoncapitalizedInterest(const Value: Currency);
+    procedure SetperiodAction(const Value: TBaseEnumeration);
+    procedure SetperiodCount(const Value: Integer);
+    procedure SetperiodLastDatetime(const Value: TDateTime);
+    procedure SetperiodNextDatetime(const Value: TDateTime);
+    procedure SetperiodType(const Value: TBaseEnumeration);
+  public
+    constructor Create(AStatic: Boolean); override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    procedure UpdateFieldList; override;
+  published
+    property depositState: TBaseEnumeration read FdepositState write SetdepositState;
+    property name: TBaseName read Fname write Setname;
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
+    property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
+    property initialCash: Currency read FinitialCash write SetinitialCash;
+    property currentCash: Currency read FcurrentCash write SetcurrentCash;
+    property interestRate: Currency read FinterestRate write SetinterestRate;
+    property noncapitalizedInterest: Currency read FnoncapitalizedInterest write SetnoncapitalizedInterest;
+    property periodCount: Integer read FperiodCount write SetperiodCount;
+    property periodType: TBaseEnumeration read FperiodType write SetperiodType;
+    property periodLastDatetime: TDateTime read FperiodLastDatetime write SetperiodLastDatetime;
+    property periodNextDatetime: TDateTime read FperiodNextDatetime write SetperiodNextDatetime;
+    property periodAction: TBaseEnumeration read FperiodAction write SetperiodAction;
+    property dueCount: Integer read FdueCount write SetdueCount;
+    property dueType: TBaseEnumeration read FdueType write SetdueType;
+    property dueLastDatetime: TDateTime read FdueLastDatetime write SetdueLastDatetime;
+    property dueNextDatetime: TDateTime read FdueNextDatetime write SetdueNextDatetime;
+    property dueAction: TBaseEnumeration read FdueAction write SetdueAction;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -1013,6 +1082,7 @@ var CashPointProxy: TDataProxy;
     InvestmentMovementProxy: TDataProxy;
     InvestmentPortfolioProxy: TDataProxy;
     QuickPatternProxy: TDataProxy;
+    DepositInvestmentProxy: TDataProxy;
 
 var GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
@@ -1025,40 +1095,40 @@ var GCurrencyCache: TCurrCache;
 const CHASH_INSTRUMENT_SYMBOL = 0;
       CHASH_INSTRUMENT_NAME = 1;
 
-const CDatafileTables: array[0..26] of string =
+const CDatafileTables: array[0..27] of string =
             ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
              'product', 'plannedMovement', 'plannedDone',
              'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
              'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
              'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
              'accountCurrencyRule', 'reportDef',
-             'instrument', 'instrumentValue', 'investmentItem', 'investmentMovement', 'quickPattern');
+             'instrument', 'instrumentValue', 'investmentItem', 'investmentMovement', 'quickPattern', 'depositInvestment');
 
-const CDatafileTablesExportConditions: array[0..26] of string =
+const CDatafileTablesExportConditions: array[0..27] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', 'isBase <> True', '',
              '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
-             '', '', '', '', '');
+             '', '', '', '', '', '');
 
-const CDatafileDeletes: array[0..26] of string =
+const CDatafileDeletes: array[0..27] of string =
             ('', '', '', '', '',
              '', '', '',
              '', '', '', '',
              '', '', '', 'cmanagerInfo',
              'cmanagerParams', '', '', '',
-             '', '', '', '', '', '', '');
+             '', '', '', '', '', '', '', '');
 
-const CDatafileTablesExportOrders: array[0..26] of string =
+const CDatafileTablesExportOrders: array[0..27] of string =
             ('', '', '', '', '',
              'created', '', '',
              '', '', '', '',
              '', '', '', '',
              '', '', '',
              '', '', '',
-             '', '', '', '', '');
+             '', '', '', '', '', '');
 
 const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
 
@@ -1189,6 +1259,7 @@ begin
   InvestmentItemProxy := TDataProxy.Create(ADataProvider, 'investmentItem');
   InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
   InvestmentPortfolioProxy := TDataProxy.Create(ADataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
+  DepositInvestmentProxy := TDataProxy.Create(ADataProvider, 'depositInvestment');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -4859,6 +4930,228 @@ end;
 function TQuickPatternElement.GetElementHint(AColumnIndex: Integer): String;
 begin
   Result := Fdescription;
+end;
+
+constructor TDepositInvestment.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidAccount := CEmptyDataGid;
+  FidCashPoint := CEmptyDataGid;
+  FidCurrencyDef := CEmptyDataGid;
+end;
+
+procedure TDepositInvestment.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FdepositState := FieldByName('depositState').AsString;
+    Fname := FieldByName('name').AsString;
+    Fdescription := FieldByName('description').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FidCashPoint := FieldByName('idCashPoint').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    FinitialCash := FieldByName('initialCash').AsCurrency;
+    FcurrentCash := FieldByName('currentCash').AsCurrency;
+    FinterestRate := FieldByName('interestRate').AsCurrency;
+    FnoncapitalizedInterest := FieldByName('noncapitalizedInterest').AsCurrency;
+    FperiodCount := FieldByName('periodCount').AsInteger;
+    FperiodType := FieldByName('periodType').AsString;
+    FperiodLastDatetime := FieldByName('periodLastDatetime').AsDateTime;
+    FperiodNextDatetime := FieldByName('periodNextDatetime').AsDateTime;
+    FperiodAction := FieldByName('periodAction').AsString;
+    FdueCount := FieldByName('dueCount').AsInteger;
+    FdueType := FieldByName('dueType').AsString;
+    FdueLastDatetime := FieldByName('dueLastDatetime').AsDateTime;
+    FdueNextDatetime := FieldByName('dueNextDatetime').AsDateTime;
+    FdueAction := FieldByName('dueAction').AsString;
+  end;
+end;
+
+procedure TDepositInvestment.SetcurrentCash(const Value: Currency);
+begin
+  if FcurrentCash <> Value then begin
+    FcurrentCash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetdepositState(const Value: TBaseEnumeration);
+begin
+  if FdepositState <> Value then begin
+    FdepositState := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetdueAction(const Value: TBaseEnumeration);
+begin
+  if FdueAction <> Value then begin
+    FdueAction := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetdueCount(const Value: Integer);
+begin
+  if FdueCount <> Value then begin
+    FdueCount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetdueLastDatetime(const Value: TDateTime);
+begin
+  if FdueLastDatetime <> Value then begin
+    FdueLastDatetime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetdueNextDatetime(const Value: TDateTime);
+begin
+  if FdueNextDatetime <> Value then begin
+    FdueNextDatetime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetdueType(const Value: TBaseEnumeration);
+begin
+  if FdueType <> Value then begin
+    FdueType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetidCashPoint(const Value: TDataGid);
+begin
+  if FidCashPoint <> Value then begin
+    FidCashPoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetidCurrencyDef(const Value: TDataGid);
+begin
+  if FidCurrencyDef <> Value then begin
+    FidCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetinitialCash(const Value: Currency);
+begin
+  if FinitialCash <> Value then begin
+    FinitialCash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetinterestRate(const Value: Currency);
+begin
+  if FinterestRate <> Value then begin
+    FinterestRate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.Setname(const Value: TBaseName);
+begin
+  if Fname <> Value then begin
+    Fname := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetnoncapitalizedInterest(const Value: Currency);
+begin
+  if FnoncapitalizedInterest <> Value then begin
+    FnoncapitalizedInterest := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetperiodAction(const Value: TBaseEnumeration);
+begin
+  if FperiodAction <> Value then begin
+    FperiodAction := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetperiodCount(const Value: Integer);
+begin
+  if FperiodCount <> Value then begin
+    FperiodCount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetperiodLastDatetime(const Value: TDateTime);
+begin
+  if FperiodLastDatetime <> Value then begin
+    FperiodLastDatetime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetperiodNextDatetime(const Value: TDateTime);
+begin
+  if FperiodNextDatetime <> Value then begin
+    FperiodNextDatetime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetperiodType(const Value: TBaseEnumeration);
+begin
+  if FperiodType <> Value then begin
+    FperiodType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('depositState', FdepositState, True, 'depositInvestment');
+    AddField('name', Fname, True, 'depositInvestment');
+    AddField('description', Fdescription, True, 'depositInvestment');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'depositInvestment');
+    AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'depositInvestment');
+    AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'depositInvestment');
+    AddField('initialCash', CurrencyToDatabase(FinitialCash), False, 'depositInvestment');
+    AddField('currentCash', CurrencyToDatabase(FcurrentCash), False, 'depositInvestment');
+    AddField('interestRate', CurrencyToDatabase(FinterestRate), False, 'depositInvestment');
+    AddField('noncapitalizedInterest', CurrencyToDatabase(FnoncapitalizedInterest), False, 'depositInvestment');
+    AddField('periodCount', IntToStr(FperiodCount), False, 'depositInvestment');
+    AddField('periodType', FperiodType, True, 'depositInvestment');
+    AddField('periodLastDatetime', DatetimeToDatabase(FperiodLastDatetime, False), False, 'depositInvestment');
+    AddField('periodNextDatetime', DatetimeToDatabase(FperiodNextDatetime, False), False, 'depositInvestment');
+    AddField('periodAction', FperiodAction, True, 'depositInvestment');
+    AddField('dueCount', IntToStr(FdueCount), False, 'depositInvestment');
+    AddField('dueType', FdueType, True, 'depositInvestment');
+    AddField('dueLastDatetime', DatetimeToDatabase(FdueLastDatetime, False), False, 'depositInvestment');
+    AddField('dueNextDatetime', DatetimeToDatabase(FdueNextDatetime, False), False, 'depositInvestment');
+    AddField('dueAction', FdueAction, True, 'depositInvestment');
+  end;
 end;
 
 initialization

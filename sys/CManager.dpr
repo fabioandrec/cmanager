@@ -145,7 +145,8 @@ uses
   CChangePasswordFormUnit in 'CChangePasswordFormUnit.pas' {CChangePasswordForm},
   CHtmlMemoFormUnit in 'CHtmlMemoFormUnit.pas' {CHtmlMemoForm},
   CQuickpatternFrameUnit in 'CQuickpatternFrameUnit.pas' {CQuickpatternFrame: TFrame},
-  CQuickpatternFormUnit in 'CQuickpatternFormUnit.pas' {CQuickpatternForm};
+  CQuickpatternFormUnit in 'CQuickpatternFormUnit.pas' {CQuickpatternForm},
+  CDepositInvestmentFrameUnit in 'CDepositInvestmentFrameUnit.pas' {CDepositInvestmentFrame: TFrame};
 
 {$R *.res}
 
@@ -207,7 +208,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

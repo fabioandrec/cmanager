@@ -433,7 +433,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionBug
                 Caption = '&Zg'#322'o'#347' b'#322#261'd'
-                ImageIndex = 18
+                ImageIndex = 19
               end
               item
                 Action = ActionFutureRequest
@@ -452,7 +452,7 @@ object CMainForm: TCMainForm
               item
                 Action = ActionCheckUpdates
                 Caption = 'S&prawd'#378' aktualizacje'
-                ImageIndex = 19
+                ImageIndex = 20
               end
               item
                 Action = ActionAbout
@@ -496,6 +496,11 @@ object CMainForm: TCMainForm
       Caption = 'Wyci'#261'gi'
       ImageIndex = 13
     end
+    object ActionShortcutDepositInvestment: TAction
+      Category = 'Skr'#243'ty'
+      Caption = 'Lokaty'
+      ImageIndex = 18
+    end
     object ActionShortcutInvestmentPortfolio: TAction
       Category = 'Skr'#243'ty'
       Caption = 'Portfel inwestycyjny'
@@ -529,7 +534,7 @@ object CMainForm: TCMainForm
     object ActionCheckUpdates: TAction
       Category = 'Pomoc'
       Caption = 'Sprawd'#378' aktualizacje'
-      ImageIndex = 19
+      ImageIndex = 20
       OnExecute = ActionCheckUpdatesExecute
     end
     object ActionAbout: TAction
@@ -625,7 +630,7 @@ object CMainForm: TCMainForm
     object ActionBug: TAction
       Category = 'Pomoc'
       Caption = 'Zg'#322'o'#347' b'#322#261'd'
-      ImageIndex = 18
+      ImageIndex = 19
       OnExecute = ActionBugExecute
     end
     object ActionFutureRequest: TAction
@@ -696,7 +701,7 @@ object CMainForm: TCMainForm
     object ActionShortcutQuickpatterns: TAction
       Category = 'S'#322'owniki'
       Caption = 'Szybkie operacje'
-      ImageIndex = 20
+      ImageIndex = 21
       OnExecute = ActionShortcutQuickpatternsExecute
     end
   end
