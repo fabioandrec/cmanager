@@ -40,6 +40,7 @@ type
     InvestmentImageList24x24: TPngImageList;
     ChartImageList16x16: TPngImageList;
     QuickpatternImageList24x24: TPngImageList;
+    DepositImageList24x24: TPngImageList;
   private
     { Private declarations }
   public

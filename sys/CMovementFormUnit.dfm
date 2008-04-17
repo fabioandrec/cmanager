@@ -143,7 +143,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 264
-        ActivePage = TabSheetInOutOnce
+        ActivePage = TabSheetInOutCyclic
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0

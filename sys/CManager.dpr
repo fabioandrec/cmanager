@@ -146,7 +146,8 @@ uses
   CHtmlMemoFormUnit in 'CHtmlMemoFormUnit.pas' {CHtmlMemoForm},
   CQuickpatternFrameUnit in 'CQuickpatternFrameUnit.pas' {CQuickpatternFrame: TFrame},
   CQuickpatternFormUnit in 'CQuickpatternFormUnit.pas' {CQuickpatternForm},
-  CDepositInvestmentFrameUnit in 'CDepositInvestmentFrameUnit.pas' {CDepositInvestmentFrame: TFrame};
+  CDepositInvestmentFrameUnit in 'CDepositInvestmentFrameUnit.pas' {CDepositInvestmentFrame: TFrame},
+  CDepositInvestmentFormUnit in 'CDepositInvestmentFormUnit.pas' {CDepositInvestmentForm};
 
 {$R *.res}
 

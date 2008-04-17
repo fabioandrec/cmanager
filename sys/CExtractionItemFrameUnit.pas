@@ -26,7 +26,6 @@ type
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     class function GetPrefname: String; override;
-    procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
   end;
 
 implementation
@@ -62,11 +61,6 @@ end;
 class function TCExtractionItemFrame.GetTitle: String;
 begin
   Result := 'Operacje wyci¹gu';
-end;
-
-procedure TCExtractionItemFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
-begin
-  inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, False);
 end;
 
 function TCExtractionItemFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
