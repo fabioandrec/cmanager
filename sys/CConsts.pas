@@ -181,6 +181,11 @@ const
   CInstrumentTypeFundretDesc = 'Fundusz emerytalny';
   CInstrumentTypeUndefinedDesc = 'Nieokreœlony';
 
+  CDepositInvestmentActive = 'A';
+  CDepositInvestmentClosed = 'C';
+  CDepositInvestmentInactive = 'I';
+
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

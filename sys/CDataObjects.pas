@@ -1038,6 +1038,7 @@ type
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure UpdateFieldList; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
@@ -4966,6 +4967,38 @@ begin
     FdueLastDatetime := FieldByName('dueLastDatetime').AsDateTime;
     FdueNextDatetime := FieldByName('dueNextDatetime').AsDateTime;
     FdueAction := FieldByName('dueAction').AsString;
+  end;
+end;
+
+function TDepositInvestment.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  Result := '';
+  if AColumnIndex = 0 then begin
+    Result := Fname;
+  end else if AColumnIndex = 1 then begin
+    if FdepositState = CDepositInvestmentActive then begin
+      Result := 'Aktywna';
+    end else if FdepositState = CDepositInvestmentClosed then begin
+      Result := 'Nieaktywna';
+    end else begin
+      Result := 'Zamkniêta';
+    end;
+  end else if AColumnIndex = 2 then begin
+    Result := CurrencyToString(FcurrentCash);
+  end else if AColumnIndex = 3 then begin
+    Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
+  end else if AColumnIndex = 4 then begin
+    if FdepositState = CDepositInvestmentActive then begin
+      Result := Date2StrDate(FperiodNextDatetime);
+    end else begin
+      Result := '';
+    end;
+  end else if AColumnIndex = 5 then begin
+    if FdepositState = CDepositInvestmentActive then begin
+      Result := Date2StrDate(FdueNextDatetime);
+    end else begin
+      Result := '';
+    end;
   end;
 end;
 

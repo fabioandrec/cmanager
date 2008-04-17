@@ -26,7 +26,7 @@ create table depositInvestment (
   constraint fk_accountdepositInvestment foreign key (idAccount) references account (idAccount),
   constraint fk_cashPointdepositInvestment foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_currencyDefdepositInvestment foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),  
-  constraint ck_depositState check (depositState in ('A', 'R', 'C')),
+  constraint ck_depositState check (depositState in ('A', 'I', 'C')),
   constraint ck_depositPeriodType check (periodType in ('D', 'W', 'M', 'Y')),
   constraint ck_duePeriodType check (dueType in ('E', 'D', 'W', 'M', 'Y')),
   constraint ck_depositperiodAction check (dueAction in ('A', 'L')),

@@ -71,7 +71,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Text = 'Aktywna'
         Items.Strings = (
           'Aktywna'
-          'Zlikwidowana'
+          'Zamkni'#281'ta'
           'Nieaktywna')
       end
       object EditName: TEdit
