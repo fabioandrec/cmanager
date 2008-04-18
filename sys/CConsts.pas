@@ -185,6 +185,22 @@ const
   CDepositInvestmentClosed = 'C';
   CDepositInvestmentInactive = 'I';
 
+  CDepositPeriodTypeDay = 'D';
+  CDepositPeriodTypeWeek = 'W';
+  CDepositPeriodTypeMonth = 'M';
+  CDepositPeriodTypeYear = 'Y';
+
+  CDepositPeriodActionAutoRenew = 'A';
+  CDepositPeriodActionChangeInactive = 'L';
+
+  CDepositDueTypeOnDepositEnd = 'E';
+  CDepositDueTypeDay = 'D';
+  CDepositDueTypeWeek = 'W';
+  CDepositDueTypeMonth = 'M';
+  CDepositDueTypeYear = 'Y';
+
+  CDepositDueActionAutoCapitalisation = 'A';
+  CDepositDueActionLeaveUncapitalised = 'L';
 
 const
   CInMovementDescription = 'Przychód';
