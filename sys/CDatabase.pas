@@ -280,6 +280,7 @@ begin
     ADataProvider.Password := xPassword;
     GBasePreferences.lastOpenedDatafilename := ADataProvider.Filename;
     ADataProvider.ReloadCaches;
+    TDepositInvestment.UpdateDepositInvestments(ADataProvider);
   end;
 end;
 

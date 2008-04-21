@@ -39,5 +39,11 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
     inherited ActionAdd: TAction
       Caption = 'Za'#322#243#380' lokat'#281
     end
+    inherited ActionEdit: TAction
+      Caption = 'Edytuj lokat'#281
+    end
+    inherited ActionDelete: TAction
+      Caption = 'Usu'#324' lokat'#281
+    end
   end
 end

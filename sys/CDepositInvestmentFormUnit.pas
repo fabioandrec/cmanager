@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
   CComponents, CDatabase, CBaseFrameUnit, ActnList, ActnMan, CImageListsUnit,
-  Contnrs, CDataObjects, XPStyleActnCtrls;
+  Contnrs, CDataObjects, XPStyleActnCtrls, Math;
 
 type
   TCDepositInvestmentForm = class(TCDataobjectForm)
@@ -73,6 +73,7 @@ type
     procedure EditNameChange(Sender: TObject);
     procedure ComboBoxStateChange(Sender: TObject);
     procedure CCurrEditCapitalChange(Sender: TObject);
+    procedure ComboBoxTemplateChange(Sender: TObject);
   private
     procedure UpdateNextPeriodDatetime;
     procedure UpdateNextCapitalisationDatetime;
@@ -129,6 +130,7 @@ begin
   if Operation = coAdd then begin
     CCurrEditActualCash.Enabled := False;
     CCurrEditActualInterest.Enabled := False;
+    ComboBoxState.Enabled := False;
   end else begin
     CCurrEditCapital.Enabled := False;
   end;
@@ -159,11 +161,12 @@ begin
     periodCount := CIntEditPeriodCount.Value;
     dueCount := CIntEditDueCount.Value;
     if Operation = coAdd then begin
-      dueLastDatetime := 0;
-      periodLastDatetime := 0;
+      dueLastDate := 0;
+      periodLastDate := 0;
+      openDate := CDateTime.Value;
     end;
-    dueNextDatetime := CDateTimeNextDue.Value;
-    periodNextDatetime := CDateTimeDepositEndDate.Value;
+    dueNextDate := CDateTimeNextDue.Value;
+    periodNextDate := CDateTimeDepositEndDate.Value;
     dueType := formDueType;
     if ComboBoxDueAction.ItemIndex = 0 then begin
       dueAction := CDepositDueActionAutoCapitalisation;
@@ -419,16 +422,20 @@ end;
 procedure TCDepositInvestmentForm.FillForm;
 begin
   with TDepositInvestment(Dataobject) do begin
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     EditName.Text := name;
     SimpleRichText(description, RichEditDesc);
     CCurrEditActualCash.Value := currentCash;
     CCurrEditCapital.Value := initialCash;
+    CDateTime.Value := openDate;
+    CDateTime.Enabled := (dueLastDate = 0);
+    CCurrEditCapital.Enabled := (dueLastDate = 0);
     CCurrEditActualInterest.Value := noncapitalizedInterest;
     CCurrEditRate.Value := interestRate;
     CIntEditPeriodCount.Value := periodCount;
     CIntEditDueCount.Value := dueCount;
-    CDateTimeNextDue.Value := dueNextDatetime;
-    CDateTimeDepositEndDate.Value := periodNextDatetime;
+    CDateTimeNextDue.Value := dueNextDate;
+    CDateTimeDepositEndDate.Value := periodNextDate;
     GDataProvider.BeginTransaction;
     if idAccount <> CEmptyDataGid then begin
       CStaticAccount.DataId := idAccount;
@@ -496,6 +503,11 @@ begin
   end else if Value = CDepositPeriodTypeYear then begin
     ComboBoxPeriodType.ItemIndex := 3;
   end;
+end;
+
+procedure TCDepositInvestmentForm.ComboBoxTemplateChange(Sender: TObject);
+begin
+  UpdateDescription;
 end;
 
 end.

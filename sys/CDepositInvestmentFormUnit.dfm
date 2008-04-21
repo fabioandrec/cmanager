@@ -1,14 +1,14 @@
 inherited CDepositInvestmentForm: TCDepositInvestmentForm
-  Left = 279
-  Top = 153
+  Left = 191
+  Top = 5
   Caption = 'Lokata'
-  ClientHeight = 728
+  ClientHeight = 702
   ClientWidth = 627
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 627
-    Height = 687
+    Height = 661
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -92,12 +92,12 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       Left = 16
       Top = 512
       Width = 593
-      Height = 169
+      Height = 145
       Caption = ' Opis '
       TabOrder = 2
       object CButton1: TCButton
         Left = 326
-        Top = 126
+        Top = 102
         Width = 115
         Height = 25
         Cursor = crHandPoint
@@ -110,7 +110,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object CButton2: TCButton
         Left = 444
-        Top = 126
+        Top = 102
         Width = 129
         Height = 25
         Cursor = crHandPoint
@@ -125,14 +125,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Left = 24
         Top = 28
         Width = 545
-        Height = 89
+        Height = 61
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 0
       end
       object ComboBoxTemplate: TComboBox
         Left = 24
-        Top = 128
+        Top = 104
         Width = 97
         Height = 21
         BevelInner = bvNone
@@ -142,6 +142,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ItemIndex = 1
         TabOrder = 1
         Text = 'W/g szablonu'
+        OnChange = ComboBoxTemplateChange
         Items.Strings = (
           'W'#322'asny'
           'W/g szablonu')
@@ -151,7 +152,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       Left = 16
       Top = 136
       Width = 593
-      Height = 361
+      Height = 357
       Caption = ' Szczeg'#243#322'y lokaty '
       Color = clBtnFace
       ParentColor = False
@@ -530,7 +531,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 687
+    Top = 661
     Width = 627
     inherited BitBtnOk: TBitBtn
       Left = 450
