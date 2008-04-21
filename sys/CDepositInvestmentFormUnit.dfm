@@ -1,6 +1,6 @@
 inherited CDepositInvestmentForm: TCDepositInvestmentForm
-  Left = 275
-  Top = 71
+  Left = 279
+  Top = 153
   Caption = 'Lokata'
   ClientHeight = 728
   ClientWidth = 627
@@ -54,6 +54,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         TabOrder = 0
         TabStop = True
         Transparent = False
+        OnChanged = CDateTimeChanged
         HotTrack = True
         Withtime = False
       end
@@ -69,6 +70,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ItemIndex = 0
         TabOrder = 1
         Text = 'Aktywna'
+        OnChange = ComboBoxStateChange
         Items.Strings = (
           'Aktywna'
           'Zamkni'#281'ta'
@@ -83,6 +85,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         BorderStyle = bsNone
         MaxLength = 40
         TabOrder = 2
+        OnChange = EditNameChange
       end
     end
     object GroupBox2: TGroupBox
@@ -150,6 +153,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       Width = 593
       Height = 361
       Caption = ' Szczeg'#243#322'y lokaty '
+      Color = clBtnFace
+      ParentColor = False
       TabOrder = 1
       object Label14: TLabel
         Left = 20
@@ -278,6 +283,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto z listy>'
+        OnGetDataId = CStaticAccountGetDataId
+        OnChanged = CStaticAccountChanged
         HotTrack = True
       end
       object CStaticCashpoint: TCStatic
@@ -295,6 +302,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
+        OnGetDataId = CStaticCashpointGetDataId
+        OnChanged = CStaticCashpointChanged
         HotTrack = True
       end
       object CStaticCurrency: TCStatic
@@ -312,6 +321,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281'>'
+        OnGetDataId = CStaticCurrencyGetDataId
+        OnChanged = CStaticCurrencyChanged
         HotTrack = True
       end
       object CCurrEditCapital: TCCurrEdit
@@ -321,6 +332,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Height = 21
         BorderStyle = bsNone
         TabOrder = 3
+        OnChange = CCurrEditCapitalChange
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
@@ -350,6 +362,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         MaxLength = 4
         TabOrder = 7
         Text = '1'
+        OnChange = CIntEditPeriodCountChange
       end
       object ComboBoxPeriodType: TComboBox
         Left = 200
@@ -363,6 +376,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ItemIndex = 2
         TabOrder = 8
         Text = 'miesi'#281'cy'
+        OnChange = ComboBoxPeriodTypeChange
         Items.Strings = (
           'dni'
           'tygodni'
@@ -397,6 +411,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ItemIndex = 0
         TabOrder = 11
         Text = 'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
+        OnChange = ComboBoxDueModeChange
         Items.Strings = (
           'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
           'wielokrotnie, co wskazany okres czasu')
@@ -411,6 +426,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         MaxLength = 4
         TabOrder = 12
         Text = '1'
+        OnChange = CIntEditDueCountChange
       end
       object ComboBoxDueType: TComboBox
         Left = 200
@@ -424,6 +440,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ItemIndex = 2
         TabOrder = 13
         Text = 'miesi'#281'cy'
+        OnChange = ComboBoxDueTypeChange
         Items.Strings = (
           'dni'
           'tygodni'
@@ -448,36 +465,40 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object CDateTimeDepositEndDate: TCDateTime
         Left = 408
-        Top = 168
+        Top = 170
         Width = 161
-        Height = 21
-        Cursor = crHandPoint
+        Height = 18
         AutoSize = False
+        BevelInner = bvNone
         BevelKind = bkTile
+        BevelOuter = bvNone
+        BorderStyle = sbsSunken
         Caption = '<wybierz dat'#281' >'
-        Color = clWindow
+        Color = clBtnFace
         ParentColor = False
         TabOrder = 9
         TabStop = True
         Transparent = False
-        HotTrack = True
+        HotTrack = False
         Withtime = False
       end
       object CDateTimeNextDue: TCDateTime
         Left = 408
-        Top = 276
+        Top = 278
         Width = 161
-        Height = 21
-        Cursor = crHandPoint
+        Height = 18
         AutoSize = False
+        BevelInner = bvNone
         BevelKind = bkTile
+        BevelOuter = bvNone
+        BorderStyle = sbsSunken
         Caption = '<wybierz dat'#281' >'
-        Color = clWindow
+        Color = clBtnFace
         ParentColor = False
         TabOrder = 14
         TabStop = True
         Transparent = False
-        HotTrack = True
+        HotTrack = False
         Withtime = False
       end
       object CCurrEditActualCash: TCCurrEdit
@@ -526,10 +547,12 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'
       ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
 end

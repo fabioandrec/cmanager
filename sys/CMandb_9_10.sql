@@ -32,3 +32,5 @@ create table depositInvestment (
   constraint ck_depositperiodAction check (dueAction in ('A', 'L')),
   constraint ck_depositdueAction check (dueAction in ('A', 'L'))
 );
+
+insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@ - @stan@');

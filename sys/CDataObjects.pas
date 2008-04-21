@@ -1041,6 +1041,7 @@ type
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     class function NextPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
     class function NextDueDatetime(APeriodLastDatetime, ADueLastDatetime: TDateTime; APeriodCount, ADueCount: Integer; APeriodType, ADueType: TBaseEnumeration): TDateTime;
+    function GetElementHint(AColumnIndex: Integer): String; override;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
@@ -5002,6 +5003,11 @@ begin
       Result := '';
     end;
   end;
+end;
+
+function TDepositInvestment.GetElementHint(AColumnIndex: Integer): String;
+begin
+  Result := Fdescription;
 end;
 
 class function TDepositInvestment.NextDueDatetime(APeriodLastDatetime, ADueLastDatetime: TDateTime; APeriodCount, ADueCount: Integer; APeriodType, ADueType: TBaseEnumeration): TDateTime;

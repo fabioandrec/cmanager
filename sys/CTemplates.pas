@@ -45,6 +45,7 @@ var GBaseTemlatesList: TDescTemplateList;
     GExtractionItemTemplatesList: TDescTemplateList;
     GInstrumentValueTemplatesList: TDescTemplateList;
     GInvestmentMovementTemplatesList: TDescTemplateList;
+    GDepositInvestmentTemplatesList: TDescTemplateList;
 
 implementation
 
@@ -109,6 +110,7 @@ initialization
   GCurrencydefTemplatesList := TDescTemplateList.Create('Mnemoniki kursów walut');
   GInstrumentValueTemplatesList := TDescTemplateList.Create('Mnemoniki notowañ instrumentów inwestycyjnych');
   GInvestmentMovementTemplatesList := TDescTemplateList.Create('Mnemoniki operacji inwestycyjnych');
+  GDepositInvestmentTemplatesList :=  TDescTemplateList.Create('Mnemoniki lokat');
   with GBaseTemlatesList do begin
     AddTemplate('@godz@', 'aktualna godzina w formacie HH');
     AddTemplate('@min@', 'aktualna minuta w formacie MM');
@@ -212,7 +214,22 @@ initialization
     AddTemplate('@kategoria@', 'nazwa kategorii wybranej w operacji');
     AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej w operacji');
   end;
+  with GDepositInvestmentTemplatesList do begin
+    AddTemplate('@data@', 'data otwarcia lokaty w formacie RRRR-MM-DD');
+    AddTemplate('@stan@', 'stan lokaty');
+    AddTemplate('@nazwa@', 'nazwa lokaty');
+    AddTemplate('@konto@', 'nazwa konta stowarzyszonego');
+    AddTemplate('@kontrahent@', 'nazwa kontrahenta prowadz¹cego lokatê');
+    AddTemplate('@isowaluty@', 'iso waluty lokaty');
+    AddTemplate('@symbolwaluty@', 'symbol waluty lokaty');
+    AddTemplate('@iloscOkres@', 'czas trwania lokaty, iloœæ okresów');
+    AddTemplate('@typOkres@', 'czas trwania lokaty, typ okresu');
+    AddTemplate('@iloscOdsetki@', 'naliczaj odsetki, iloœæ okresów');
+    AddTemplate('@typOdsetki@', 'naliczaj odsetki, typ okresu');
+  end;
+  
 finalization
+  GDepositInvestmentTemplatesList.Free;
   GInstrumentValueTemplatesList.Free;
   GMovementListElementsTemplatesList.Free;
   GBaseTemlatesList.Free;

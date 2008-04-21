@@ -359,12 +359,13 @@ type
   TCIntEdit = class(TEdit)
   private
     function GetValue: Integer;
+    procedure SetValue(const Value: Integer);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure DoExit; override;
     procedure DoEnter; override;
   public
-    property Value: Integer read GetValue;
+    property Value: Integer read GetValue write SetValue;
   end;
 
   TCDataList = class;
@@ -1627,7 +1628,6 @@ begin
   if Message.Msg = WM_PAINT then begin
     if FInternalIsFocused and CanFocus then begin
       xRect := ClientRect;
-      //InflateRect(xRect, -1, -1);
       DrawFocusRect(FCanvas.Handle, xRect);
     end;
   end else if Message.Msg = WM_SETFOCUS then begin
@@ -2855,6 +2855,11 @@ begin
   end;
 end;
 
+
+procedure TCIntEdit.SetValue(const Value: Integer);
+begin
+  Text := IntToStr(Value);
+end;
 
 initialization
   CurrencyComponents := TObjectList.Create(False);
