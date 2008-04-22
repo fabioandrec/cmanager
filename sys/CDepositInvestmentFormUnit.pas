@@ -32,8 +32,6 @@ type
     EditName: TEdit;
     Label10: TLabel;
     CStaticCurrency: TCStatic;
-    Label18: TLabel;
-    CCurrEditCapital: TCCurrEdit;
     Label4: TLabel;
     CCurrEditRate: TCCurrEdit;
     Label6: TLabel;
@@ -72,7 +70,6 @@ type
     procedure ActionTemplateExecute(Sender: TObject);
     procedure EditNameChange(Sender: TObject);
     procedure ComboBoxStateChange(Sender: TObject);
-    procedure CCurrEditCapitalChange(Sender: TObject);
     procedure ComboBoxTemplateChange(Sender: TObject);
   private
     procedure UpdateNextPeriodDatetime;
@@ -124,15 +121,11 @@ begin
   ComboBoxDueModeChange(ComboBoxDueMode);
   CStaticCurrency.DataId := CCurrencyDefGid_PLN;
   CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
-  CCurrEditCapital.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
   CCurrEditActualCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
   CCurrEditActualInterest.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
   if Operation = coAdd then begin
-    CCurrEditActualCash.Enabled := False;
     CCurrEditActualInterest.Enabled := False;
     ComboBoxState.Enabled := False;
-  end else begin
-    CCurrEditCapital.Enabled := False;
   end;
   UpdateNextPeriodDatetime;
   UpdateNextCapitalisationDatetime;
@@ -155,14 +148,16 @@ begin
     idCashPoint := CStaticCashpoint.DataId;
     idCurrencyDef := CStaticCurrency.DataId;
     currentCash := CCurrEditActualCash.Value;
-    initialCash := CCurrEditCapital.Value;
+    if Operation = coAdd then begin
+      initialCash := CCurrEditActualCash.Value;
+    end;
     noncapitalizedInterest := CCurrEditActualInterest.Value;
     interestRate := CCurrEditRate.Value;
     periodCount := CIntEditPeriodCount.Value;
     dueCount := CIntEditDueCount.Value;
     if Operation = coAdd then begin
-      dueLastDate := 0;
-      periodLastDate := 0;
+      dueLastDate := CDateTime.Value;
+      periodLastDate := CDateTime.Value;
       openDate := CDateTime.Value;
     end;
     dueNextDate := CDateTimeNextDue.Value;
@@ -183,13 +178,14 @@ begin
 end;
 
 procedure TCDepositInvestmentForm.UpdateNextCapitalisationDatetime;
+var xNextDue: TDateTime;
 begin
-  CDateTimeNextDue.Value := TDepositInvestment.NextDueDatetime(
-             CDateTime.Value,
-             CDateTime.Value,
-             CIntEditPeriodCount.Value,
-             CIntEditDueCount.Value,
-             formPeriodType, formDueType);
+  if ComboBoxDueMode.ItemIndex = 0 then begin
+    xNextDue := CDateTimeDepositEndDate.Value;
+  end else begin
+    xNextDue := TDepositInvestment.NextDueDatetime(CDateTime.Value, CIntEditDueCount.Value, formDueType);
+  end;
+  CDateTimeNextDue.Value := xNextDue;
 end;
 
 procedure TCDepositInvestmentForm.UpdateNextPeriodDatetime;
@@ -278,7 +274,6 @@ end;
 
 procedure TCDepositInvestmentForm.CStaticCurrencyChanged(Sender: TObject);
 begin
-  CCurrEditCapital.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
   CCurrEditActualCash.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
   CCurrEditActualInterest.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
   UpdateDescription;
@@ -380,13 +375,6 @@ begin
   UpdateDescription;
 end;
 
-procedure TCDepositInvestmentForm.CCurrEditCapitalChange(Sender: TObject);
-begin
-  if Operation = coAdd then begin
-    CCurrEditActualCash.Value := CCurrEditCapital.Value;
-  end;
-end;
-
 function TCDepositInvestmentForm.CanAccept: Boolean;
 begin
   Result := inherited CanAccept;
@@ -400,8 +388,7 @@ begin
       CStaticCurrency.DoGetDataId;
     end;
   end else if ComboBoxDueMode.ItemIndex <> 0 then begin
-    if (ComboBoxDueType.ItemIndex > ComboBoxPeriodType.ItemIndex) or
-       ((ComboBoxDueType.ItemIndex = ComboBoxPeriodType.ItemIndex) and (CIntEditDueCount.Value > CIntEditPeriodCount.Value)) then begin
+    if CDateTimeNextDue.Value > CDateTimeDepositEndDate.Value then begin
       Result := False;
       ShowInfo(itError, 'Okres naliczania odsetek nie byæ wiêkszy od czasu trwania lokaty', '');
       ComboBoxDueType.SetFocus;
@@ -426,10 +413,8 @@ begin
     EditName.Text := name;
     SimpleRichText(description, RichEditDesc);
     CCurrEditActualCash.Value := currentCash;
-    CCurrEditCapital.Value := initialCash;
     CDateTime.Value := openDate;
     CDateTime.Enabled := (dueLastDate = 0);
-    CCurrEditCapital.Enabled := (dueLastDate = 0);
     CCurrEditActualInterest.Value := noncapitalizedInterest;
     CCurrEditRate.Value := interestRate;
     CIntEditPeriodCount.Value := periodCount;
@@ -448,7 +433,6 @@ begin
     CStaticCurrency.DataId := idCurrencyDef;
     CStaticCurrency.Caption := GCurrencyCache.GetIso(idCurrencyDef);
     GDataProvider.RollbackTransaction;
-    CCurrEditCapital.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     CCurrEditActualCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     CCurrEditActualInterest.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     if periodAction = CDepositPeriodActionAutoRenew then begin

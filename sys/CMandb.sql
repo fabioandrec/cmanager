@@ -524,6 +524,20 @@ create table depositInvestment (
   constraint ck_depositdueAction check (dueAction in ('A', 'L'))
 );
 
+create table depositMovement (
+  idDepositMovement uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  movementType varchar(1) not null,
+  regDate datetime not null,
+  description varchar(200),
+  previousCash money not null,
+  currentCash money not null,
+  idDepositInvestment uniqueidentifier not null, 
+  primary key (idDepositMovement),
+  constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment)
+);
+
 create view transactions as select * from (
  select idBaseMovement, movementType, description, idProduct, idCashpoint, idAccount, regDate, created, weekDate, monthDate, yearDate, cash as cash, movementCash as movementCash, idAccountCurrencyDef, idMovementCurrencyDef, quantity, idUnitDef from baseMovement where movementType = 'I'
  union all

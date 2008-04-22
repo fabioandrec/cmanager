@@ -35,3 +35,17 @@ create table depositInvestment (
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@ - @stan@');
+
+create table depositMovement (
+  idDepositMovement uniqueidentifier not null,
+  created datetime not null,
+  modified datetime,
+  movementType varchar(1) not null,
+  regDate datetime not null,
+  description varchar(200),
+  previousCash money not null,
+  currentCash money not null,
+  idDepositInvestment uniqueidentifier not null, 
+  primary key (idDepositMovement),
+  constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment)
+);

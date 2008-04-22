@@ -1042,7 +1042,7 @@ type
     procedure UpdateFieldList; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
     class function NextPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
-    class function NextDueDatetime(APeriodLastDatetime, ADueLastDatetime: TDateTime; APeriodCount, ADueCount: Integer; APeriodType, ADueType: TBaseEnumeration): TDateTime;
+    class function NextDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
     function GetElementHint(AColumnIndex: Integer): String; override;
     class procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
     procedure UpdateDepositInvestment(AToDate: TDateTime);
@@ -1070,6 +1070,33 @@ type
     property openDate: TDateTime read FopenDate write SetopenDate;
   end;
 
+  TDepositMovement = class(TDataObject)
+  private
+    FmovementType: TBaseEnumeration;
+    FregDate: TDateTime;
+    Fdescription: TBaseDescription;
+    FpreviousCash: Currency;
+    FcurrentCash: Currency;
+    FidDepositInvestment: TDataGid;
+    procedure SetcurrentCash(const Value: Currency);
+    procedure Setdescription(const Value: TBaseDescription);
+    procedure SetidDepositInvestment(const Value: TDataGid);
+    procedure SetmovementType(const Value: TBaseEnumeration);
+    procedure SetpreviousCash(const Value: Currency);
+    procedure SetregDate(const Value: TDateTime);
+  public
+    constructor Create(AStatic: Boolean); override;
+    procedure FromDataset(ADataset: TADOQuery); override;
+    procedure UpdateFieldList; override;
+  published
+    property movementType: TBaseEnumeration read FmovementType write SetmovementType;
+    property regDate: TDateTime read FregDate write SetregDate;
+    property description: TBaseDescription read Fdescription write Setdescription;
+    property previousCash: Currency read FpreviousCash write SetpreviousCash;
+    property currentCash: Currency read FcurrentCash write SetcurrentCash;
+    property idDepositInvestment: TDataGid read FidDepositInvestment write SetidDepositInvestment;
+  end;
+
 var CashPointProxy: TDataProxy;
     AccountProxy: TDataProxy;
     ProductProxy: TDataProxy;
@@ -1094,6 +1121,7 @@ var CashPointProxy: TDataProxy;
     InvestmentPortfolioProxy: TDataProxy;
     QuickPatternProxy: TDataProxy;
     DepositInvestmentProxy: TDataProxy;
+    DepositMovementProxy: TDataProxy;
 
 var GCurrencyCache: TCurrCache;
     GUnitdefCache: TCurrCache;
@@ -1271,6 +1299,7 @@ begin
   InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
   InvestmentPortfolioProxy := TDataProxy.Create(ADataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
   DepositInvestmentProxy := TDataProxy.Create(ADataProvider, 'depositInvestment');
+  DepositMovementProxy := TDataProxy.Create(ADataProvider, 'depositMovement');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -5016,24 +5045,18 @@ begin
   Result := Fdescription;
 end;
 
-class function TDepositInvestment.NextDueDatetime(APeriodLastDatetime, ADueLastDatetime: TDateTime; APeriodCount, ADueCount: Integer; APeriodType, ADueType: TBaseEnumeration): TDateTime;
-var xNextPeriodDatetime: TDateTime;
+class function TDepositInvestment.NextDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
 begin
-  Result := ADueLastDatetime;
-  if ADueLastDatetime = 0 then begin
-    Result := APeriodLastDatetime;
-  end;
-  xNextPeriodDatetime := NextPeriodDatetime(APeriodLastDatetime, APeriodCount, APeriodType);
   if ADueType = CDepositDueTypeDay then begin
-    Result := Min(IncDay(Result, ADueCount), xNextPeriodDatetime);
+    Result := IncDay(ADueLastDatetime, ADueCount);
   end else if ADueType = CDepositDueTypeWeek then begin
-    Result := Min(IncWeek(Result, ADueCount), xNextPeriodDatetime);
+    Result := IncWeek(ADueLastDatetime, ADueCount);
   end else if ADueType = CDepositDueTypeMonth then begin
-    Result := Min(IncMonth(Result, ADueCount), xNextPeriodDatetime);
+    Result := IncMonth(ADueLastDatetime, ADueCount);
   end else if ADueType = CDepositDueTypeYear then begin
-    Result := Min(IncYear(Result, ADueCount), xNextPeriodDatetime);
-  end else if ADueType = CDepositDueTypeOnDepositEnd then begin
-    Result := xNextPeriodDatetime;
+    Result := IncYear(ADueLastDatetime, ADueCount);
+  end else begin
+    Result := 0;
   end;
 end;
 
@@ -5268,6 +5291,86 @@ function TInvestmentItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
   Result := inherited OnDeleteObject(AProxy);
   AProxy.DataProvider.ExecuteSql(Format('delete from investmentMovement where idAccount = %s and idInstrument = %s', [DataGidToDatabase(FidAccount), DataGidToDatabase(FidInstrument)]));
+end;
+
+constructor TDepositMovement.Create(AStatic: Boolean);
+begin
+  inherited Create(AStatic);
+  FidDepositInvestment := CEmptyDataGid;
+end;
+
+procedure TDepositMovement.FromDataset(ADataset: TADOQuery);
+begin
+  inherited FromDataset(ADataset);
+  with ADataset do begin
+    FmovementType := FieldByName('movementType').AsString;
+    FregDate := FieldByName('regDate').AsDateTime;
+    Fdescription := FieldByName('description').AsString;
+    FpreviousCash := FieldByName('previousCash').AsCurrency;
+    FcurrentCash := FieldByName('currentCash').AsCurrency;
+    FidDepositInvestment := FieldByName('idDepositInvestment').AsString;
+  end;
+end;
+
+procedure TDepositMovement.SetcurrentCash(const Value: Currency);
+begin
+  if FcurrentCash <> Value then begin
+    FcurrentCash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.Setdescription(const Value: TBaseDescription);
+begin
+  if Fdescription <> Value then begin
+    Fdescription := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetidDepositInvestment(const Value: TDataGid);
+begin
+  if FidDepositInvestment <> Value then begin
+    FidDepositInvestment := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetmovementType(const Value: TBaseEnumeration);
+begin
+  if FmovementType <> Value then begin
+    FmovementType := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetpreviousCash(const Value: Currency);
+begin
+  if FpreviousCash <> Value then begin
+    FpreviousCash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetregDate(const Value: TDateTime);
+begin
+  if FregDate <> Value then begin
+    FregDate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.UpdateFieldList;
+begin
+  inherited UpdateFieldList;
+  with DataFieldList do begin
+    AddField('movementType', FmovementType, True, 'depositMovement');
+    AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'depositMovement');
+    AddField('description', Fdescription, True, 'depositMovement');
+    AddField('previousCash', CurrencyToDatabase(FpreviousCash), False, 'depositMovement');
+    AddField('currentCash', CurrencyToDatabase(FcurrentCash), False, 'depositMovement');
+    AddField('idDepositInvestment', DataGidToDatabase(FidDepositInvestment), False, 'depositMovement');
+  end;
 end;
 
 initialization

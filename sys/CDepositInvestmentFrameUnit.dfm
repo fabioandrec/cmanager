@@ -30,7 +30,7 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
       item
         Position = 5
         Width = 10
-        WideText = 'Nast'#281'pne naliczanie odsetek'
+        WideText = 'Kolejne naliczanie'
       end>
     WideDefaultText = ''
   end
