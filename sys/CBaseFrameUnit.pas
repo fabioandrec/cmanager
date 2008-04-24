@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, Contnrs, CDatabase, VirtualTrees, PngImageList, Menus,
-  CConfigFormUnit, CBaseFormUnit, CComponents, ComCtrls, CPreferences;
+  CConfigFormUnit, CBaseFormUnit, CComponents, ComCtrls, CPreferences, ExtCtrls,
+  ActnList, ActnMan;
 
 type
   TCBaseFrameClass = class of TCBaseFrame;
@@ -129,6 +130,15 @@ function FindDataobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 procedure InitializeFrameGlobals;
 procedure FinalizeFrameGlobals;
+
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionList;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionManager;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
 
 implementation
 
@@ -810,6 +820,78 @@ end;
 
 procedure TCBaseFrame.SaveFramePreferences;
 begin
+end;
+
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionList;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList);
+var xCount, xTop: Integer;
+begin
+  if APanel.Visible then begin
+    if AMenuItemBig.Checked then begin
+      AActionList_1.Images := ABigIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+        AActionList_2.Images := ABigIcons_2;
+      end;
+    end else begin
+      if (ASmallIcons_1 = Nil) and (ABigIcons_1 <> Nil) then begin
+        ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
+      end;
+      AActionList_1.Images := ASmallIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) and (ASmallIcons_2 = Nil) then begin
+        ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
+        AActionList_2.Images := ASmallIcons_2;
+      end;
+    end;
+    if AActionList_1.Images <> Nil then begin
+      APanel.Height := AActionList_1.Images.Height + 8;
+      APanel.Update;
+      xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
+      for xCount := 0 to APanel.ControlCount - 1 do begin
+        if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
+          APanel.Controls[xCount].Top := xTop;
+          APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+                           ABigIcons_1, ABigIcons_2: TPngImageList;
+                           AActionList_1, AActionList_2: TActionManager;
+                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
+var xCount, xTop: Integer;
+begin
+  if APanel.Visible then begin
+    if AMenuItemBig.Checked then begin
+      AActionList_1.Images := ABigIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
+        AActionList_2.Images := ABigIcons_2;
+      end;
+    end else begin
+      if (ASmallIcons_1 = Nil) and (ABigIcons_1 <> Nil) then begin
+        ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
+      end;
+      AActionList_1.Images := ASmallIcons_1;
+      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) and (ASmallIcons_2 = Nil) then begin
+        ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
+        AActionList_2.Images := ASmallIcons_2;
+      end;
+    end;
+    if AActionList_1.Images <> Nil then begin
+      APanel.Height := AActionList_1.Images.Height + 8;
+      APanel.Update;
+      xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
+      for xCount := 0 to APanel.ControlCount - 1 do begin
+        if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
+          APanel.Controls[xCount].Top := xTop;
+          APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
+        end;
+      end;
+    end;
+  end;
 end;
 
 initialization

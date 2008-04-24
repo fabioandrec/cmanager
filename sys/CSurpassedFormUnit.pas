@@ -28,6 +28,8 @@ type
     SurpassedList: TCDataList;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
     procedure SurpassedListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure SurpassedListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure Zaznaczwszystkie1Click(Sender: TObject);

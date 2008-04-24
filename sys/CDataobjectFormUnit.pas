@@ -59,7 +59,7 @@ begin
     BitBtnCancel.Default := True;
     BitBtnCancel.Caption := '&Wyjœcie';
   end;
-  if Operation = coEdit then begin
+  if (Operation = coEdit) or ((Dataobject <> Nil) and (Operation = coNone)) then begin
     FillForm;
   end;
   if not CanModifyValues then begin
@@ -75,8 +75,10 @@ begin
   Result := CEmptyDataGid;
   FAdditionalData := AAdditionalData;
   InitializeForm;
-  if AOperation = coEdit then begin
+  if AOperation <> coAdd then begin
     FDataobject := ADataobject;
+  end else begin
+    FDataobject := Nil;
   end;
   if ShowConfig(AOperation) then begin
     if Operation = coAdd then begin

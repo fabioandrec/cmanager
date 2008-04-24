@@ -1,14 +1,14 @@
 inherited CDepositInvestmentForm: TCDepositInvestmentForm
-  Left = 191
-  Top = 5
+  Left = 295
+  Top = 117
   Caption = 'Lokata'
-  ClientHeight = 678
+  ClientHeight = 728
   ClientWidth = 627
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 627
-    Height = 637
+    Height = 687
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -17,20 +17,12 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       Caption = ' Dane podstawowe '
       TabOrder = 0
       object Label3: TLabel
-        Left = 17
+        Left = 43
         Top = 28
-        Width = 103
+        Width = 77
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Data za'#322'o'#380'enia lokaty'
-      end
-      object Label5: TLabel
-        Left = 242
-        Top = 28
-        Width = 22
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Stan'
+        Caption = 'Data utworzenia'
       end
       object Label2: TLabel
         Left = 56
@@ -39,6 +31,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Height = 13
         Alignment = taRightJustify
         Caption = 'Nazwa lokaty'
+      end
+      object Label12: TLabel
+        Left = 253
+        Top = 28
+        Width = 75
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Tryb utworzenia'
       end
       object CDateTime: TCDateTime
         Left = 128
@@ -58,24 +58,6 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         HotTrack = True
         Withtime = False
       end
-      object ComboBoxState: TComboBox
-        Left = 272
-        Top = 24
-        Width = 297
-        Height = 21
-        BevelInner = bvNone
-        BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 0
-        TabOrder = 1
-        Text = 'Aktywna'
-        OnChange = ComboBoxStateChange
-        Items.Strings = (
-          'Aktywna'
-          'Zamkni'#281'ta'
-          'Nieaktywna')
-      end
       object EditName: TEdit
         Left = 128
         Top = 60
@@ -84,13 +66,30 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 40
-        TabOrder = 2
+        TabOrder = 1
         OnChange = EditNameChange
+      end
+      object ComboBoxType: TComboBox
+        Left = 336
+        Top = 24
+        Width = 233
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 2
+        Text = 'Za'#322'o'#380'enie lokaty'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          'Za'#322'o'#380'enie lokaty'
+          'Rejestracja lokaty')
       end
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 484
+      Top = 536
       Width = 593
       Height = 145
       Caption = ' Opis '
@@ -150,23 +149,15 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
     end
     object GroupBox3: TGroupBox
       Left = 16
-      Top = 136
+      Top = 132
       Width = 593
-      Height = 329
+      Height = 389
       Caption = ' Szczeg'#243#322'y lokaty '
       Color = clBtnFace
       ParentColor = False
       TabOrder = 1
-      object Label14: TLabel
-        Left = 20
-        Top = 28
-        Width = 100
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Konto stowarzyszone'
-      end
       object Label1: TLabel
-        Left = 310
+        Left = 30
         Top = 28
         Width = 90
         Height = 13
@@ -198,8 +189,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = 'Czas trwania lokaty'
       end
       object Label7: TLabel
-        Left = 44
-        Top = 172
+        Left = 324
+        Top = 136
         Width = 76
         Height = 13
         Alignment = taRightJustify
@@ -207,7 +198,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object Label8: TLabel
         Left = 46
-        Top = 208
+        Top = 172
         Width = 74
         Height = 13
         Alignment = taRightJustify
@@ -215,35 +206,19 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object Label9: TLabel
         Left = 107
-        Top = 244
+        Top = 208
         Width = 13
         Height = 13
         Alignment = taRightJustify
         Caption = 'Co'
       end
       object Label11: TLabel
-        Left = 57
-        Top = 280
+        Left = 337
+        Top = 208
         Width = 63
         Height = 13
         Alignment = taRightJustify
         Caption = 'Po naliczeniu'
-      end
-      object Label12: TLabel
-        Left = 344
-        Top = 136
-        Width = 56
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Data ko'#324'ca'
-      end
-      object Label13: TLabel
-        Left = 315
-        Top = 244
-        Width = 85
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Kolejne naliczanie'
       end
       object Label15: TLabel
         Left = 335
@@ -253,37 +228,58 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Alignment = taRightJustify
         Caption = 'Kapita'#322' lokaty'
       end
-      object Label16: TLabel
-        Left = 332
-        Top = 100
+      object Label5: TLabel
+        Left = 44
+        Top = 244
+        Width = 76
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Prognoza lokaty'
+      end
+      object Label14: TLabel
+        Left = 52
+        Top = 280
         Width = 68
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Wolne odsetki'
+        Caption = 'Konto operacji'
       end
-      object CStaticAccount: TCStatic
-        Left = 128
-        Top = 24
-        Width = 161
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz konto z listy>'
-        Color = clWindow
-        ParentColor = False
-        TabOrder = 0
-        TabStop = True
-        Transparent = False
-        TextOnEmpty = '<wybierz konto z listy>'
-        OnGetDataId = CStaticAccountGetDataId
-        OnChanged = CStaticAccountChanged
-        HotTrack = True
+      object Label17: TLabel
+        Left = 336
+        Top = 281
+        Width = 64
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Waluta konta'
+      end
+      object Label22: TLabel
+        Left = 70
+        Top = 317
+        Width = 50
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Przelicznik'
+      end
+      object Label21: TLabel
+        Left = 320
+        Top = 317
+        Width = 80
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'W walucie konta'
+      end
+      object Label13: TLabel
+        Left = 75
+        Top = 353
+        Width = 45
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Kategoria'
       end
       object CStaticCashpoint: TCStatic
-        Left = 408
+        Left = 128
         Top = 24
-        Width = 161
+        Width = 441
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -291,7 +287,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = '<wybierz kontrahenta z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 1
+        TabOrder = 0
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kontrahenta z listy>'
@@ -310,7 +306,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = '<wybierz walut'#281'>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 2
+        TabOrder = 1
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281'>'
@@ -324,7 +320,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 161
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 4
+        TabOrder = 3
         Decimals = 4
         ThousandSep = True
         CurrencyStr = '%'
@@ -339,7 +335,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 6
+        TabOrder = 4
         Text = '1'
         OnChange = CIntEditPeriodCountChange
       end
@@ -353,7 +349,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 7
+        TabOrder = 5
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxPeriodTypeChange
         Items.Strings = (
@@ -363,16 +359,16 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
           'lat')
       end
       object ComboBoxPeriodAction: TComboBox
-        Left = 128
-        Top = 168
-        Width = 177
+        Left = 408
+        Top = 132
+        Width = 161
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 9
+        TabOrder = 6
         Text = 'zmie'#324' status na nieaktywna'
         Items.Strings = (
           'zmie'#324' status na nieaktywna'
@@ -380,7 +376,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object ComboBoxDueMode: TComboBox
         Left = 128
-        Top = 204
+        Top = 168
         Width = 441
         Height = 21
         BevelInner = bvNone
@@ -388,7 +384,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 10
+        TabOrder = 7
         Text = 'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
         OnChange = ComboBoxDueModeChange
         Items.Strings = (
@@ -397,19 +393,19 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object CIntEditDueCount: TCIntEdit
         Left = 128
-        Top = 240
+        Top = 204
         Width = 57
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 11
+        TabOrder = 8
         Text = '1'
         OnChange = CIntEditDueCountChange
       end
       object ComboBoxDueType: TComboBox
         Left = 200
-        Top = 240
+        Top = 204
         Width = 97
         Height = 21
         BevelInner = bvNone
@@ -417,7 +413,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 12
+        TabOrder = 9
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxDueTypeChange
         Items.Strings = (
@@ -427,58 +423,20 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
           'lat')
       end
       object ComboBoxDueAction: TComboBox
-        Left = 128
-        Top = 276
-        Width = 169
+        Left = 408
+        Top = 204
+        Width = 161
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 14
+        TabOrder = 10
         Text = 'dopisz odsetki do kapita'#322'u'
         Items.Strings = (
           'dopisz odsetki do kapita'#322'u'
-          'pozostaw gotowe do wyp'#322'aty')
-      end
-      object CDateTimeDepositEndDate: TCDateTime
-        Left = 408
-        Top = 134
-        Width = 161
-        Height = 18
-        AutoSize = False
-        BevelInner = bvNone
-        BevelKind = bkTile
-        BevelOuter = bvNone
-        BorderStyle = sbsSunken
-        Caption = '<wybierz dat'#281' >'
-        Color = clBtnFace
-        ParentColor = False
-        TabOrder = 8
-        TabStop = True
-        Transparent = False
-        HotTrack = False
-        Withtime = False
-      end
-      object CDateTimeNextDue: TCDateTime
-        Left = 408
-        Top = 242
-        Width = 161
-        Height = 18
-        AutoSize = False
-        BevelInner = bvNone
-        BevelKind = bkTile
-        BevelOuter = bvNone
-        BorderStyle = sbsSunken
-        Caption = '<wybierz dat'#281' >'
-        Color = clBtnFace
-        ParentColor = False
-        TabOrder = 13
-        TabStop = True
-        Transparent = False
-        HotTrack = False
-        Withtime = False
+          'pozostaw do wyp'#322'aty')
       end
       object CCurrEditActualCash: TCCurrEdit
         Left = 408
@@ -486,30 +444,125 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 161
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 3
+        TabOrder = 2
+        OnChange = CCurrEditActualCashChange
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
       end
-      object CCurrEditActualInterest: TCCurrEdit
+      object CStaticFuture: TCStatic
+        Left = 128
+        Top = 240
+        Width = 441
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 11
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
+        OnGetDataId = CStaticAccountGetDataId
+        OnChanged = CStaticAccountChanged
+        HotTrack = True
+      end
+      object CStaticAccount: TCStatic
+        Left = 128
+        Top = 276
+        Width = 169
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz konto z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 12
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz konto z listy>'
+        OnGetDataId = CStaticAccountGetDataId
+        OnChanged = CStaticAccountChanged
+        HotTrack = True
+      end
+      object CStaticAccountCurrency: TCStatic
         Left = 408
-        Top = 96
+        Top = 277
+        Width = 161
+        Height = 21
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<brak konta>'
+        Color = clWindow
+        Enabled = False
+        ParentColor = False
+        TabOrder = 13
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<brak konta>'
+        HotTrack = False
+      end
+      object CStaticCurrencyRate: TCStatic
+        Left = 128
+        Top = 313
+        Width = 169
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz przelicznik kursu z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 14
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz przelicznik kursu z listy>'
+        OnGetDataId = CStaticCurrencyRateGetDataId
+        OnChanged = CStaticCurrencyRateChanged
+        HotTrack = True
+      end
+      object CCurrEditAccount: TCCurrEdit
+        Left = 408
+        Top = 313
         Width = 161
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 5
+        Enabled = False
+        TabOrder = 15
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile
         WithCalculator = True
+      end
+      object CStaticCategory: TCStatic
+        Left = 128
+        Top = 349
+        Width = 441
+        Height = 21
+        Cursor = crHandPoint
+        AutoSize = False
+        BevelKind = bkTile
+        Caption = '<wybierz kategori'#281' z listy>'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 16
+        TabStop = True
+        Transparent = False
+        TextOnEmpty = '<wybierz kategori'#281' z listy>'
+        OnGetDataId = CStaticCategoryGetDataId
+        OnChanged = CStaticCategoryChanged
+        HotTrack = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 637
+    Top = 687
     Width = 627
     inherited BitBtnOk: TBitBtn
       Left = 450

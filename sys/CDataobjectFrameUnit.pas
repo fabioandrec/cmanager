@@ -19,7 +19,7 @@ type
   end;
 
   TCDataobjectFrame = class(TCBaseFrame)
-    FilterPanel: TPanel;
+    FilterPanel: TCPanel;
     List: TCDataList;
     Bevel: TBevel;
     ButtonPanel: TPanel;

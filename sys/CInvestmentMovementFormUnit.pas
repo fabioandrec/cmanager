@@ -95,7 +95,8 @@ uses CFrameFormUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
   CAccountsFrameUnit, CCurrencyRateFrameUnit, CProductsFrameUnit, CTools,
   CConsts, CInvestmentMovementFrameUnit, CConfigFormUnit,
   CDescpatternFormUnit, CPreferences, CTemplates, CRichtext, CInfoFormUnit,
-  CInvestmentPortfolioFrameUnit, DateUtils, CMovementFrameUnit;
+  CInvestmentPortfolioFrameUnit, DateUtils, CMovementFrameUnit,
+  CSurpassedFormUnit;
 
 {$R *.dfm}
 
@@ -200,7 +201,7 @@ begin
     if CStaticCurrencyRate.Enabled then begin
       GDataProvider.BeginTransaction;
       xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate,
-                                                   IfThen(ComboBoxType.ItemIndex in [0, 2], CInvestmentBuyMovement, CInvestmentSellMovement),
+                                                   IfThen(ComboBoxType.ItemIndex in [0, 2], COutMovement, CInMovement),
                                                    CStaticInstrumentCurrency.DataId, CStaticAccountCurrency.DataId);
       if xRate <> Nil then begin
         if FRateHelper = Nil then begin
@@ -245,7 +246,6 @@ begin
   if not CStaticCategory.Enabled then begin
     CStaticCategory.DataId := CEmptyDataGid;
   end;
-  //UpdateCurrencyRates;
   UpdateDescription;
 end;
 
@@ -484,6 +484,7 @@ end;
 function TCInvestmentMovementForm.CanAccept: Boolean;
 var xIlosc: Integer;
     xInvestment: TInvestmentItem;
+    xPrevCash: Currency;
 begin
   Result := True;
   if CStaticInstrument.DataId = CEmptyDataGid then begin
@@ -550,6 +551,16 @@ begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCategory.DoGetDataId;
+    end else begin
+    if Operation = coEdit then begin
+      xPrevCash := TInvestmentMovement(Dataobject).valueOf;
+    end else begin
+      xPrevCash := 0;
+    end;
+    Result := CheckSurpassedLimits(IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CDateTime.Value,
+                                   TDataGids.CreateFromGid(CStaticAccount.DataId),
+                                   TDataGids.CreateFromGid(CEmptyDataGid),
+                                   TSumList.CreateWithSum(CStaticCategory.DataId, CCurrMovement.Value - xPrevCash, CStaticInstrumentCurrency.DataId));
     end;
   end;
 end;

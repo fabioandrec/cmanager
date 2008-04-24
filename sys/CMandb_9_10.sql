@@ -4,13 +4,10 @@ create table depositInvestment (
   modified datetime,
   depositState varchar(1) not null,
   name varchar(40) not null,
-  openDate datetime not null,
   description varchar(200),
-  idAccount uniqueidentifier null,
-  idCashPoint uniqueidentifier null,
+  idCashPoint uniqueidentifier not null,
   idCurrencyDef uniqueidentifier not null,
-  initialCash money not null,
-  currentCash money not null,
+  cash money not null,
   interestRate money not null,
   noncapitalizedInterest money not null,
   periodCount int not null,
@@ -24,17 +21,14 @@ create table depositInvestment (
   dueNextDate datetime not null,
   dueAction varchar(1) not null,
   primary key (idDepositInvestment),
-  constraint fk_accountdepositInvestment foreign key (idAccount) references account (idAccount),
   constraint fk_cashPointdepositInvestment foreign key (idCashPoint) references cashPoint (idCashPoint),
-  constraint fk_currencyDefdepositInvestment foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),  
+  constraint fk_currencyDefdepositInvestment foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),
   constraint ck_depositState check (depositState in ('A', 'I', 'C')),
   constraint ck_depositPeriodType check (periodType in ('D', 'W', 'M', 'Y')),
   constraint ck_duePeriodType check (dueType in ('E', 'D', 'W', 'M', 'Y')),
   constraint ck_depositperiodAction check (dueAction in ('A', 'L')),
   constraint ck_depositdueAction check (dueAction in ('A', 'L'))
 );
-
-insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@ - @stan@');
 
 create table depositMovement (
   idDepositMovement uniqueidentifier not null,
@@ -43,9 +37,24 @@ create table depositMovement (
   movementType varchar(1) not null,
   regDate datetime not null,
   description varchar(200),
-  previousCash money not null,
-  currentCash money not null,
-  idDepositInvestment uniqueidentifier not null, 
+  cash money not null,
+  idDepositInvestment uniqueidentifier not null,
+  idAccount uniqueidentifier null,
+  idAccountCurrencyDef uniqueidentifier null,
+  accountCash money null,
+  idCurrencyRate uniqueidentifier,
+  currencyQuantity int,
+  currencyRate money null,
+  rateDescription varchar(200),
+  idProduct uniqueidentifier null,
   primary key (idDepositMovement),
-  constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment)
+  constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment),
+  constraint fk_movementDepositAccount foreign key (idAccount) references account (idAccount),
+  constraint fk_movementDepositProduct foreign key (idProduct) references product (idProduct),
+  constraint fk_movementDepositAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_movementDepositRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate)
 );
+
+insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@');
+
+update baseMovement set isInvestmentMovement = 0 where idBaseMovement not in (select idBaseMovement from investmentMovement where idBaseMovement is not null);

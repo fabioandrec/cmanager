@@ -52,7 +52,8 @@ inherited CDescpatternForm: TCDescpatternForm
           'Wyci'#261'gi bankowe'
           'Elementy wyci'#261'g'#243'w'
           'Notowania instrument'#243'w'
-          'Inwestycje')
+          'Inwestycje'
+          'Tworzenie lokat')
       end
       object ComboBoxType: TComboBox
         Left = 304

@@ -13,6 +13,8 @@ program CManager;
 {%File 'CMandb_6_7.sql'}
 {%File 'CMandb_7_8.sql'}
 {%File 'CMandf.sql'}
+{%File 'CMandb_9_10.sql'}
+{%File 'CMandb_8_9.sql'}
 
 uses
   MemCheck in 'MemCheck.pas',
@@ -147,7 +149,8 @@ uses
   CQuickpatternFrameUnit in 'CQuickpatternFrameUnit.pas' {CQuickpatternFrame: TFrame},
   CQuickpatternFormUnit in 'CQuickpatternFormUnit.pas' {CQuickpatternForm},
   CDepositInvestmentFrameUnit in 'CDepositInvestmentFrameUnit.pas' {CDepositInvestmentFrame: TFrame},
-  CDepositInvestmentFormUnit in 'CDepositInvestmentFormUnit.pas' {CDepositInvestmentForm};
+  CDepositInvestmentFormUnit in 'CDepositInvestmentFormUnit.pas' {CDepositInvestmentForm},
+  CInvestmentPortfolioFormUnit in 'CInvestmentPortfolioFormUnit.pas' {CInvestmentPortfolioForm};
 
 {$R *.res}
 
@@ -209,7 +212,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

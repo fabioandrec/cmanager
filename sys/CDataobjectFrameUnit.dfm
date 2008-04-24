@@ -7,7 +7,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Align = alBottom
     Shape = bsBottomLine
   end
-  object FilterPanel: TPanel [1]
+  object FilterPanel: TCPanel [1]
     Left = 0
     Top = 0
     Width = 443
@@ -15,6 +15,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 2
+    BevelEdges = [beLeft, beTop, beBottom]
     object Label2: TLabel
       Left = 11
       Top = 4
@@ -27,7 +28,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Left = 49
       Top = 4
       Width = 136
-      Height = 15
+      Height = 13
       Cursor = crHandPoint
       AutoSize = False
       BevelInner = bvNone

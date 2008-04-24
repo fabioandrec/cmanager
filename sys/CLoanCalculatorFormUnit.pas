@@ -36,6 +36,8 @@ type
     ActionList: TActionList;
     Action1: TAction;
     CButton1: TCButton;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
     procedure ComboBoxPeriodChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CCurrEditCashChange(Sender: TObject);

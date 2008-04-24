@@ -457,7 +457,7 @@ insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementBu
 insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementSell', '@rodzaj@ - @instrument@');
 insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementBuyFree', '@rodzaj@ - @instrument@');
 insert into cmanagerParams (paramName, paramValue) values ('InvestmentMovementSellFree', '@rodzaj@ - @instrument@');
-insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@ - @stan@');
+insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@');
 
 insert into currencyDef (idcurrencyDef, created, modified, name, symbol, iso, description, isBase) values ('{00000000-0000-0000-0000-000000000001}', #2007-04-18 10:33:02#, #2007-04-18 10:33:02#, 'z³oty polski', 'z³', 'PLN', 'z³oty polski', 1);
 insert into reportDef (idreportDef, created, modified, name, description, queryText, paramsDefs, xsltText, xsltType) values ('{00000000-0000-0000-0000-000000000001}', #2007-09-02 12:13:53#, #2007-09-03 21:10:41#, 'Lista kont - raport w³asny', 'Jest to przyk³ad definiowalnego raportu z wykorzystaniem prezentacji wyników raportu w postaci dokumentu XML', 'eNorTs1JTS5R0FJIK8rPVUhMTs4vzSsBAFJRB6w=', 'eNqzsa/IzVEoSy0qzszPs1Uy1DNQUkjNS85PycxLt1UKz8xLyS8v1jU0MjVQsrfj5bIpSCxKzC12SU0r1gdyAXd2EyU=', '', 'S');
@@ -494,13 +494,10 @@ create table depositInvestment (
   modified datetime,
   depositState varchar(1) not null,
   name varchar(40) not null,
-  openDate datetime not null,
   description varchar(200),
-  idAccount uniqueidentifier null,
-  idCashPoint uniqueidentifier null,
+  idCashPoint uniqueidentifier not null,
   idCurrencyDef uniqueidentifier not null,
-  initialCash money not null,
-  currentCash money not null,
+  cash money not null,
   interestRate money not null,
   noncapitalizedInterest money not null,
   periodCount int not null,
@@ -514,9 +511,8 @@ create table depositInvestment (
   dueNextDate datetime not null,
   dueAction varchar(1) not null,
   primary key (idDepositInvestment),
-  constraint fk_accountdepositInvestment foreign key (idAccount) references account (idAccount),
   constraint fk_cashPointdepositInvestment foreign key (idCashPoint) references cashPoint (idCashPoint),
-  constraint fk_currencyDefdepositInvestment foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),  
+  constraint fk_currencyDefdepositInvestment foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),
   constraint ck_depositState check (depositState in ('A', 'I', 'C')),
   constraint ck_depositPeriodType check (periodType in ('D', 'W', 'M', 'Y')),
   constraint ck_duePeriodType check (dueType in ('E', 'D', 'W', 'M', 'Y')),
@@ -531,11 +527,22 @@ create table depositMovement (
   movementType varchar(1) not null,
   regDate datetime not null,
   description varchar(200),
-  previousCash money not null,
-  currentCash money not null,
-  idDepositInvestment uniqueidentifier not null, 
+  cash money not null,
+  idDepositInvestment uniqueidentifier not null,
+  idAccount uniqueidentifier null,
+  idAccountCurrencyDef uniqueidentifier null,
+  accountCash money null,
+  idCurrencyRate uniqueidentifier,
+  currencyQuantity int,
+  currencyRate money null,
+  rateDescription varchar(200),
+  idProduct uniqueidentifier null,
   primary key (idDepositMovement),
-  constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment)
+  constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment),
+  constraint fk_movementDepositAccount foreign key (idAccount) references account (idAccount),
+  constraint fk_movementDepositProduct foreign key (idProduct) references product (idProduct),
+  constraint fk_movementDepositAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
+  constraint fk_movementDepositRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate)
 );
 
 create view transactions as select * from (

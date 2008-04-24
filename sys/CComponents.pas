@@ -2,10 +2,10 @@ unit CComponents;
 
 interface
 
-uses Windows, Messages, Graphics, Controls, ActnList, Classes, CommCtrl, ImgList,
+uses Windows, Messages, Graphics, Controls, Classes, CommCtrl, ImgList,
      Buttons, StdCtrls, ExtCtrls, SysUtils, ComCtrls, IntfUIHandlers, ShDocVw,
      ActiveX, PngImageList, VirtualTrees, GraphUtil, Contnrs, Types, RichEdit,
-     ShellApi, CXml, PngImage, Menus, ActnMan, Dialogs;
+     ShellApi, CXml, PngImage, Menus, Dialogs, ActnList, Themes;
 
 type
   TPicturePosition = (ppLeft, ppTop, ppRight);
@@ -443,6 +443,13 @@ type
     property OnGetRowPreferencesName: TGetRowPreferencesName read FOnGetRowPreferencesName write FOnGetRowPreferencesName;
   end;
 
+  TCPanel = class(TPanel)
+  protected
+    procedure Paint; override;
+  published
+    property BevelEdges;
+  end;
+
   TCDataListOnReloadTree = procedure (Sender: TCDataList; ARootElement: TCListDataElement) of object;
 
   TCDataList = class(TCList)
@@ -525,14 +532,6 @@ procedure SetEvenListColors(AColorEven, AColorOdd: TColor);
 function GetDarkerColor(ABaseColor: TColor): TColor;
 function GetBrighterColor(ABaseColor: TColor): TColor;
 function GetScaledPngImageList(APngImageList: TPngImageList; ANewWidth, ANewHeight: Integer): TPngImageList;
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
-                           ABigIcons_1, ABigIcons_2: TPngImageList;
-                           AActionList_1, AActionList_2: TActionList;
-                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
-                           ABigIcons_1, ABigIcons_2: TPngImageList;
-                           AActionList_1, AActionList_2: TActionManager;
-                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
 
 
 var CurrencyComponents: TObjectList;
@@ -550,7 +549,7 @@ var LOddColor: TColor;
 
 procedure Register;
 begin
-  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit]);
+  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit, TCPanel]);
 end;
 
 function GetBrighterColor(ABaseColor: TColor): TColor;
@@ -2783,82 +2782,67 @@ begin
   end;
 end;
 
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
-                           ABigIcons_1, ABigIcons_2: TPngImageList;
-                           AActionList_1, AActionList_2: TActionList;
-                           var ASmallIcons_1, ASmallIcons_2: TPngImageList);
-var xCount, xTop: Integer;
-begin
-  if APanel.Visible then begin
-    if AMenuItemBig.Checked then begin
-      AActionList_1.Images := ABigIcons_1;
-      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
-        AActionList_2.Images := ABigIcons_2;
-      end;
-    end else begin
-      if (ASmallIcons_1 = Nil) and (ABigIcons_1 <> Nil) then begin
-        ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
-      end;
-      AActionList_1.Images := ASmallIcons_1;
-      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) and (ASmallIcons_2 = Nil) then begin
-        ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
-        AActionList_2.Images := ASmallIcons_2;
-      end;
-    end;
-    if AActionList_1.Images <> Nil then begin
-      APanel.Height := AActionList_1.Images.Height + 8;
-      APanel.Update;
-      xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
-      for xCount := 0 to APanel.ControlCount - 1 do begin
-        if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
-          APanel.Controls[xCount].Top := xTop;
-          APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
-        end;
-      end;
-    end;
-  end;
-end;
-
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
-                           ABigIcons_1, ABigIcons_2: TPngImageList;
-                           AActionList_1, AActionList_2: TActionManager;
-                           var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
-var xCount, xTop: Integer;
-begin
-  if APanel.Visible then begin
-    if AMenuItemBig.Checked then begin
-      AActionList_1.Images := ABigIcons_1;
-      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) then begin
-        AActionList_2.Images := ABigIcons_2;
-      end;
-    end else begin
-      if (ASmallIcons_1 = Nil) and (ABigIcons_1 <> Nil) then begin
-        ASmallIcons_1 := GetScaledPngImageList(ABigIcons_1, 16, 16);
-      end;
-      AActionList_1.Images := ASmallIcons_1;
-      if (AActionList_2 <> Nil) and (ABigIcons_2 <> Nil) and (ASmallIcons_2 = Nil) then begin
-        ASmallIcons_2 := GetScaledPngImageList(ABigIcons_2, 16, 16);
-        AActionList_2.Images := ASmallIcons_2;
-      end;
-    end;
-    if AActionList_1.Images <> Nil then begin
-      APanel.Height := AActionList_1.Images.Height + 8;
-      APanel.Update;
-      xTop := ((APanel.Height - AActionList_1.Images.Height + 2) div 2) - 2;
-      for xCount := 0 to APanel.ControlCount - 1 do begin
-        if APanel.Controls[xCount].InheritsFrom(TCButton) then begin
-          APanel.Controls[xCount].Top := xTop;
-          APanel.Controls[xCount].Height := AActionList_1.Images.Height + 2;
-        end;
-      end;
-    end;
-  end;
-end;
-
-
 procedure TCIntEdit.SetValue(const Value: Integer);
 begin
   Text := IntToStr(Value);
+end;
+
+procedure TCPanel.Paint;
+const
+  Alignments: array[TAlignment] of Longint = (DT_LEFT, DT_RIGHT, DT_CENTER);
+var
+  Rect: TRect;
+  TopColor, BottomColor: TColor;
+  FontHeight: Integer;
+  Flags: Longint;
+
+  procedure AdjustColors(Bevel: TPanelBevel);
+  begin
+    TopColor := clBtnHighlight;
+    if Bevel = bvLowered then TopColor := clBtnShadow;
+    BottomColor := clBtnShadow;
+    if Bevel = bvLowered then BottomColor := clBtnHighlight;
+  end;
+
+begin
+  Rect := GetClientRect;
+  if not (beRight in BevelEdges) then begin
+    Rect.Right := Rect.Right + 2;
+  end;
+  if not (beLeft in BevelEdges) then begin
+    Rect.Left := Rect.Left - 2;
+  end;
+  if not (beTop in BevelEdges) then begin
+    Rect.Top := Rect.Top - 2;
+  end;
+  if not (beBottom in BevelEdges) then begin
+    Rect.Bottom := Rect.Bottom + 2;
+  end;
+  if BevelOuter <> bvNone then begin
+    AdjustColors(BevelOuter);
+    Frame3D(Canvas, Rect, TopColor, BottomColor, BevelWidth);
+  end;
+  Frame3D(Canvas, Rect, Color, Color, BorderWidth);
+  if BevelInner <> bvNone then begin
+    AdjustColors(BevelInner);
+    Frame3D(Canvas, Rect, TopColor, BottomColor, BevelWidth);
+  end;
+  with Canvas do begin
+    if not ThemeServices.ThemesEnabled or not ParentBackground then begin
+      Brush.Color := Color;
+      FillRect(Rect);
+    end;
+    Brush.Style := bsClear;
+    Font := Self.Font;
+    FontHeight := TextHeight('W');
+    with Rect do begin
+      Top := ((Bottom + Top) - FontHeight) div 2;
+      Bottom := Top + FontHeight;
+    end;
+    Flags := DT_EXPANDTABS or DT_VCENTER or Alignments[Alignment];
+    Flags := DrawTextBiDiModeFlags(Flags);
+    DrawText(Handle, PChar(Caption), -1, Rect, Flags);
+  end;
 end;
 
 initialization

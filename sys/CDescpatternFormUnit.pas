@@ -77,7 +77,7 @@ begin
   inherited FormShow(Sender);
   if FKeyName <> '' then begin
     xO := GDescPatterns.GetPatternOperation(FKeyName);
-    xT := GDescPatterns.GetPattetnType(FKeyName);
+    xT := GDescPatterns.GetPatternType(FKeyName);
     if xO <> -1 then begin
       ComboBoxOperation.ItemIndex := xO;
     end;
@@ -143,6 +143,8 @@ begin
     xData.Add(GInstrumentValueTemplatesList);
   end else if ComboBoxOperation.ItemIndex = 8 then begin
     xData.Add(GInvestmentMovementTemplatesList);
+  end else if ComboBoxOperation.ItemIndex = 9 then begin
+    xData.Add(GDepositInvestmentTemplatesList);
   end;
   EditAddTemplate(xData, Self, RichEditDesc, False);
   xData.Free;

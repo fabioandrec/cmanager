@@ -10,9 +10,9 @@ uses
 
 type
   TCInvestmentPortfolioFrame = class(TCDataobjectFrame)
-    CButtonAll: TCButton;
-    ActionAllInvestmentMovements: TAction;
-    procedure ActionAllInvestmentMovementsExecute(Sender: TObject);
+    CButtonDetails: TCButton;
+    ActionDetails: TAction;
+    procedure ActionDetailsExecute(Sender: TObject);
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
@@ -26,13 +26,16 @@ type
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; override;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; override;
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
   end;
 
 implementation
 
 uses CPluginConsts, CDataObjects, CConsts, CFrameFormUnit,
   CInvestmentMovementFrameUnit, CInvestmentMovementFormUnit, CInfoFormUnit,
-  CBaseFrameUnit;
+  CBaseFrameUnit, CInvestmentPortfolioFormUnit, CConfigFormUnit;
 
 {$R *.dfm}
 
@@ -83,10 +86,12 @@ begin
   Dataobjects := TDataObject.GetList(TInvestmentPortfolio, InvestmentPortfolioProxy, 'select * from StnInvestmentPortfolio' + xCondition);
 end;
 
-procedure TCInvestmentPortfolioFrame.ActionAllInvestmentMovementsExecute(Sender: TObject);
-var xGid, xText: String;
+procedure TCInvestmentPortfolioFrame.ActionDetailsExecute(Sender: TObject);
+var xForm: TCInvestmentPortfolioForm;
 begin
-  TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, nil, nil, nil, nil, False);
+  xForm := TCInvestmentPortfolioForm.Create(Nil);
+  xForm.ShowDataobject(coNone, InvestmentPortfolioProxy, TDataObject(List.SelectedElement.Data), False, Nil);
+  xForm.Free;
 end;
 
 class function TCInvestmentPortfolioFrame.GetDataobjectClass(AOption: Integer): TDataObjectClass;
@@ -127,6 +132,24 @@ begin
       SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAREFRESH, 0, 0);
     end;
   end;
+end;
+
+function TCInvestmentPortfolioFrame.GetHistoryText: String;
+begin
+  Result := 'Wszystkie operacje';
+end;
+
+procedure TCInvestmentPortfolioFrame.ShowHistory(AGid: ShortString);
+var xGid, xText: String;
+begin
+  TCFrameForm.ShowFrame(TCInvestmentMovementFrame, xGid, xText, nil, nil, nil, nil, False);
+end;
+
+procedure TCInvestmentPortfolioFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  ActionHistory.Enabled := True;
+  ActionDetails.Enabled := AIsSelectedSomething;
 end;
 
 end.

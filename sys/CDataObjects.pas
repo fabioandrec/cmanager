@@ -997,12 +997,9 @@ type
     FdepositState: TBaseEnumeration;
     Fname: TBaseName;
     Fdescription: TBaseDescription;
-    FopenDate: TDateTime;
-    FidAccount: TDataGid;
     FidCashPoint: TDataGid;
     FidCurrencyDef: TDataGid;
-    FinitialCash: Currency;
-    FcurrentCash: Currency;
+    Fcash: Currency;
     FinterestRate: Currency;
     FnoncapitalizedInterest: Currency;
     FperiodCount: Integer;
@@ -1015,7 +1012,7 @@ type
     FdueLastDate: TDateTime;
     FdueNextDate: TDateTime;
     FdueAction: TBaseEnumeration;
-    procedure SetcurrentCash(const Value: Currency);
+    procedure Setcash(const Value: Currency);
     procedure SetdepositState(const Value: TBaseEnumeration);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetdueAction(const Value: TBaseEnumeration);
@@ -1023,10 +1020,8 @@ type
     procedure SetdueLastDate(const Value: TDateTime);
     procedure SetdueNextDate(const Value: TDateTime);
     procedure SetdueType(const Value: TBaseEnumeration);
-    procedure SetidAccount(const Value: TDataGid);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetidCurrencyDef(const Value: TDataGid);
-    procedure SetinitialCash(const Value: Currency);
     procedure SetinterestRate(const Value: Currency);
     procedure Setname(const Value: TBaseName);
     procedure SetnoncapitalizedInterest(const Value: Currency);
@@ -1035,7 +1030,6 @@ type
     procedure SetperiodLastDate(const Value: TDateTime);
     procedure SetperiodNextDate(const Value: TDateTime);
     procedure SetperiodType(const Value: TBaseEnumeration);
-    procedure SetopenDate(const Value: TDateTime);
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -1050,11 +1044,9 @@ type
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
     property description: TBaseDescription read Fdescription write Setdescription;
-    property idAccount: TDataGid read FidAccount write SetidAccount;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
     property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
-    property initialCash: Currency read FinitialCash write SetinitialCash;
-    property currentCash: Currency read FcurrentCash write SetcurrentCash;
+    property cash: Currency read Fcash write Setcash;
     property interestRate: Currency read FinterestRate write SetinterestRate;
     property noncapitalizedInterest: Currency read FnoncapitalizedInterest write SetnoncapitalizedInterest;
     property periodCount: Integer read FperiodCount write SetperiodCount;
@@ -1067,7 +1059,6 @@ type
     property dueLastDate: TDateTime read FdueLastDate write SetdueLastDate;
     property dueNextDate: TDateTime read FdueNextDate write SetdueNextDate;
     property dueAction: TBaseEnumeration read FdueAction write SetdueAction;
-    property openDate: TDateTime read FopenDate write SetopenDate;
   end;
 
   TDepositMovement = class(TDataObject)
@@ -1075,15 +1066,29 @@ type
     FmovementType: TBaseEnumeration;
     FregDate: TDateTime;
     Fdescription: TBaseDescription;
-    FpreviousCash: Currency;
-    FcurrentCash: Currency;
+    Fcash: Currency;
     FidDepositInvestment: TDataGid;
-    procedure SetcurrentCash(const Value: Currency);
+    FidAccount: TDataGid;
+    FidAccountCurrencyDef: TDataGid;
+    FaccountCash: Currency;
+    FidCurrencyRate: TDataGid;
+    FcurrencyQuantity: Integer;
+    FcurrencyRate: Currency;
+    FrateDescription: TBaseDescription;
+    FidProduct: TDataGid;
+    procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidDepositInvestment(const Value: TDataGid);
     procedure SetmovementType(const Value: TBaseEnumeration);
-    procedure SetpreviousCash(const Value: Currency);
     procedure SetregDate(const Value: TDateTime);
+    procedure SetaccountCash(const Value: Currency);
+    procedure SetcurrencyQuantity(const Value: Integer);
+    procedure SetcurrencyRate(const Value: Currency);
+    procedure SetidAccount(const Value: TDataGid);
+    procedure SetidAccountCurrencyDef(const Value: TDataGid);
+    procedure SetidCurrencyRate(const Value: TDataGid);
+    procedure SetidProduct(const Value: TDataGid);
+    procedure SetrateDescription(const Value: TBaseDescription);
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -1092,9 +1097,16 @@ type
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property regDate: TDateTime read FregDate write SetregDate;
     property description: TBaseDescription read Fdescription write Setdescription;
-    property previousCash: Currency read FpreviousCash write SetpreviousCash;
-    property currentCash: Currency read FcurrentCash write SetcurrentCash;
+    property cash: Currency read Fcash write Setcash;
     property idDepositInvestment: TDataGid read FidDepositInvestment write SetidDepositInvestment;
+    property idAccount: TDataGid read FidAccount write SetidAccount;
+    property idAccountCurrencyDef: TDataGid read FidAccountCurrencyDef write SetidAccountCurrencyDef;
+    property accountCash: Currency read FaccountCash write SetaccountCash;
+    property idCurrencyRate: TDataGid read FidCurrencyRate write SetidCurrencyRate;
+    property currencyQuantity: Integer read FcurrencyQuantity write SetcurrencyQuantity;
+    property currencyRate: Currency read FcurrencyRate write SetcurrencyRate;
+    property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
+    property idProduct: TDataGid read FidProduct write SetidProduct;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -4517,6 +4529,10 @@ begin
                  [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * Fquantity),
                   DataGidToDatabase(FidInstrument), DataGidToDatabase(FidAccount)]);
   AProxy.DataProvider.ExecuteSql(xSql);
+  if idBaseMovement <> CEmptyDataGid then begin
+    xSql := 'update baseMovement set isInvestmentMovement = 0 where idBaseMovement = ' + DataGidToDatabase(idBaseMovement);
+    AProxy.DataProvider.ExecuteSql(xSql);
+  end;
 end;
 
 function TInvestmentMovement.OnInsertObject(AProxy: TDataProxy): Boolean;
@@ -4975,7 +4991,6 @@ end;
 constructor TDepositInvestment.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
-  FidAccount := CEmptyDataGid;
   FidCashPoint := CEmptyDataGid;
   FidCurrencyDef := CEmptyDataGid;
 end;
@@ -4987,11 +5002,9 @@ begin
     FdepositState := FieldByName('depositState').AsString;
     Fname := FieldByName('name').AsString;
     Fdescription := FieldByName('description').AsString;
-    FidAccount := FieldByName('idAccount').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
-    FinitialCash := FieldByName('initialCash').AsCurrency;
-    FcurrentCash := FieldByName('currentCash').AsCurrency;
+    Fcash := FieldByName('cash').AsCurrency;
     FinterestRate := FieldByName('interestRate').AsCurrency;
     FnoncapitalizedInterest := FieldByName('noncapitalizedInterest').AsCurrency;
     FperiodCount := FieldByName('periodCount').AsInteger;
@@ -5004,7 +5017,6 @@ begin
     FdueLastDate := FieldByName('dueLastDate').AsDateTime;
     FdueNextDate := FieldByName('dueNextDate').AsDateTime;
     FdueAction := FieldByName('dueAction').AsString;
-    FopenDate := FieldByName('openDate').AsDateTime;
   end;
 end;
 
@@ -5022,7 +5034,7 @@ begin
       Result := 'Zamkniêta';
     end;
   end else if AColumnIndex = 2 then begin
-    Result := CurrencyToString(FcurrentCash);
+    Result := CurrencyToString(Fcash);
   end else if AColumnIndex = 3 then begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
   end else if AColumnIndex = 4 then begin
@@ -5074,10 +5086,10 @@ begin
   end;
 end;
 
-procedure TDepositInvestment.SetcurrentCash(const Value: Currency);
+procedure TDepositInvestment.Setcash(const Value: Currency);
 begin
-  if FcurrentCash <> Value then begin
-    FcurrentCash := Value;
+  if Fcash <> Value then begin
+    Fcash := Value;
     SetState(msModified);
   end;
 end;
@@ -5138,14 +5150,6 @@ begin
   end;
 end;
 
-procedure TDepositInvestment.SetidAccount(const Value: TDataGid);
-begin
-  if FidAccount <> Value then begin
-    FidAccount := Value;
-    SetState(msModified);
-  end;
-end;
-
 procedure TDepositInvestment.SetidCashPoint(const Value: TDataGid);
 begin
   if FidCashPoint <> Value then begin
@@ -5158,14 +5162,6 @@ procedure TDepositInvestment.SetidCurrencyDef(const Value: TDataGid);
 begin
   if FidCurrencyDef <> Value then begin
     FidCurrencyDef := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TDepositInvestment.SetinitialCash(const Value: Currency);
-begin
-  if FinitialCash <> Value then begin
-    FinitialCash := Value;
     SetState(msModified);
   end;
 end;
@@ -5190,14 +5186,6 @@ procedure TDepositInvestment.SetnoncapitalizedInterest(const Value: Currency);
 begin
   if FnoncapitalizedInterest <> Value then begin
     FnoncapitalizedInterest := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TDepositInvestment.SetopenDate(const Value: TDateTime);
-begin
-  if FopenDate <> Value then begin
-    FopenDate := Value;
     SetState(msModified);
   end;
 end;
@@ -5266,11 +5254,9 @@ begin
     AddField('depositState', FdepositState, True, 'depositInvestment');
     AddField('name', Fname, True, 'depositInvestment');
     AddField('description', Fdescription, True, 'depositInvestment');
-    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'depositInvestment');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'depositInvestment');
     AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'depositInvestment');
-    AddField('initialCash', CurrencyToDatabase(FinitialCash), False, 'depositInvestment');
-    AddField('currentCash', CurrencyToDatabase(FcurrentCash), False, 'depositInvestment');
+    AddField('cash', CurrencyToDatabase(Fcash), False, 'depositInvestment');
     AddField('interestRate', CurrencyToDatabase(FinterestRate), False, 'depositInvestment');
     AddField('noncapitalizedInterest', CurrencyToDatabase(FnoncapitalizedInterest), False, 'depositInvestment');
     AddField('periodCount', IntToStr(FperiodCount), False, 'depositInvestment');
@@ -5283,13 +5269,13 @@ begin
     AddField('dueLastDate', DatetimeToDatabase(FdueLastDate, False), False, 'depositInvestment');
     AddField('dueNextDate', DatetimeToDatabase(FdueNextDate, False), False, 'depositInvestment');
     AddField('dueAction', FdueAction, True, 'depositInvestment');
-    AddField('openDate', DatetimeToDatabase(FopenDate, False), False, 'depositInvestment');
   end;
 end;
 
 function TInvestmentItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
   Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql(Format('update baseMovement set isInvestmentMovement = 0 where idBaseMovement in (select idBaseMovement from investmentMovement where idAccount = %s and idInstrument = %s and idBaseMovement is not null)', [DataGidToDatabase(FidAccount), DataGidToDatabase(FidInstrument)]));
   AProxy.DataProvider.ExecuteSql(Format('delete from investmentMovement where idAccount = %s and idInstrument = %s', [DataGidToDatabase(FidAccount), DataGidToDatabase(FidInstrument)]));
 end;
 
@@ -5297,6 +5283,10 @@ constructor TDepositMovement.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
   FidDepositInvestment := CEmptyDataGid;
+  FidAccount := CEmptyDataGid;
+  FidAccountCurrencyDef := CEmptyDataGid;
+  FidCurrencyRate := CEmptyDataGid;
+  FidProduct := CEmptyDataGid;
 end;
 
 procedure TDepositMovement.FromDataset(ADataset: TADOQuery);
@@ -5306,16 +5296,47 @@ begin
     FmovementType := FieldByName('movementType').AsString;
     FregDate := FieldByName('regDate').AsDateTime;
     Fdescription := FieldByName('description').AsString;
-    FpreviousCash := FieldByName('previousCash').AsCurrency;
-    FcurrentCash := FieldByName('currentCash').AsCurrency;
+    Fcash := FieldByName('cash').AsCurrency;
     FidDepositInvestment := FieldByName('idDepositInvestment').AsString;
+    FidAccount := FieldByName('idAccount').AsString;
+    FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
+    FaccountCash := FieldByName('accountCash').AsCurrency;
+    FidCurrencyRate := FieldByName('idCurrencyRate').AsString;
+    FcurrencyQuantity := FieldByName('currencyQuantity').AsInteger;
+    FcurrencyRate := FieldByName('currencyRate').AsCurrency;
+    FrateDescription := FieldByName('rateDescription').AsString;
+    FidProduct := FieldByName('idProduct').AsString;
   end;
 end;
 
-procedure TDepositMovement.SetcurrentCash(const Value: Currency);
+procedure TDepositMovement.SetaccountCash(const Value: Currency);
 begin
-  if FcurrentCash <> Value then begin
-    FcurrentCash := Value;
+  if FaccountCash <> Value then begin
+    FaccountCash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.Setcash(const Value: Currency);
+begin
+  if Fcash <> Value then begin
+    Fcash := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetcurrencyQuantity(const Value: Integer);
+begin
+  if FcurrencyQuantity <> Value then begin
+    FcurrencyQuantity := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetcurrencyRate(const Value: Currency);
+begin
+  if FcurrencyRate <> Value then begin
+    FcurrencyRate := Value;
     SetState(msModified);
   end;
 end;
@@ -5328,10 +5349,42 @@ begin
   end;
 end;
 
+procedure TDepositMovement.SetidAccount(const Value: TDataGid);
+begin
+  if FidAccount <> Value then begin
+    FidAccount := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetidAccountCurrencyDef(const Value: TDataGid);
+begin
+  if FidAccountCurrencyDef <> Value then begin
+    FidAccountCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetidCurrencyRate(const Value: TDataGid);
+begin
+  if FidCurrencyRate <> Value then begin
+    FidCurrencyRate := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TDepositMovement.SetidDepositInvestment(const Value: TDataGid);
 begin
   if FidDepositInvestment <> Value then begin
     FidDepositInvestment := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetidProduct(const Value: TDataGid);
+begin
+  if FidProduct <> Value then begin
+    FidProduct := Value;
     SetState(msModified);
   end;
 end;
@@ -5344,10 +5397,10 @@ begin
   end;
 end;
 
-procedure TDepositMovement.SetpreviousCash(const Value: Currency);
+procedure TDepositMovement.SetrateDescription(const Value: TBaseDescription);
 begin
-  if FpreviousCash <> Value then begin
-    FpreviousCash := Value;
+  if FrateDescription <> Value then begin
+    FrateDescription := Value;
     SetState(msModified);
   end;
 end;
@@ -5367,9 +5420,16 @@ begin
     AddField('movementType', FmovementType, True, 'depositMovement');
     AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'depositMovement');
     AddField('description', Fdescription, True, 'depositMovement');
-    AddField('previousCash', CurrencyToDatabase(FpreviousCash), False, 'depositMovement');
-    AddField('currentCash', CurrencyToDatabase(FcurrentCash), False, 'depositMovement');
+    AddField('cash', CurrencyToDatabase(Fcash), False, 'depositMovement');
     AddField('idDepositInvestment', DataGidToDatabase(FidDepositInvestment), False, 'depositMovement');
+    AddField('idAccount', DataGidToDatabase(FidAccount), False, 'depositMovement');
+    AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'depositMovement');
+    AddField('accountCash', CurrencyToDatabase(FaccountCash), False, 'depositMovement');
+    AddField('idCurrencyRate', DataGidToDatabase(FidCurrencyRate), False, 'depositMovement');
+    AddField('currencyQuantity', IntToStr(FcurrencyQuantity), False, 'depositMovement');
+    AddField('currencyRate', CurrencyToDatabase(FcurrencyRate), False, 'depositMovement');
+    AddField('rateDescription', FrateDescription, True, 'depositMovement');
+    AddField('idProduct', DataGidToDatabase(FidProduct), False, 'depositMovement');
   end;
 end;
 

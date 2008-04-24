@@ -19,6 +19,8 @@ type
     Panel3: TPanel;
     CButton1: TCButton;
     CButton2: TCButton;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
     procedure Action1Execute(Sender: TObject);
     procedure Action2Execute(Sender: TObject);
   private

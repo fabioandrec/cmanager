@@ -1,6 +1,6 @@
 inherited CFrameForm: TCFrameForm
-  Left = 144
-  Top = 47
+  Left = 295
+  Top = 184
   Caption = 'CFrameForm'
   ClientHeight = 621
   ClientWidth = 877
@@ -22,11 +22,19 @@ inherited CFrameForm: TCFrameForm
       TabOrder = 0
       object BevelBottom: TBevel
         Left = 1
-        Top = 568
+        Top = 569
         Width = 871
-        Height = 2
+        Height = 1
         Align = alBottom
-        Shape = bsBottomLine
+        Shape = bsTopLine
+      end
+      object Bevel1: TBevel
+        Left = 871
+        Top = 1
+        Width = 1
+        Height = 568
+        Align = alRight
+        Shape = bsRightLine
         Style = bsRaised
       end
     end

@@ -216,11 +216,28 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
+        object Bevel1: TBevel
+          Left = 1
+          Top = 190
+          Width = 511
+          Height = 1
+          Align = alBottom
+          Shape = bsTopLine
+        end
+        object Bevel2: TBevel
+          Left = 511
+          Top = 1
+          Width = 1
+          Height = 189
+          Align = alRight
+          Shape = bsRightLine
+          Style = bsRaised
+        end
         object RepaymentList: TCList
           Left = 1
           Top = 1
-          Width = 511
-          Height = 190
+          Width = 510
+          Height = 189
           Align = alClient
           BevelEdges = []
           BevelInner = bvNone
@@ -285,7 +302,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
             item
               Alignment = taRightJustify
               Position = 5
-              Width = 126
+              Width = 125
               WideText = 'Pozosta'#322'o'
             end>
           WideDefaultText = ''

@@ -1,4 +1,6 @@
 inherited CStartupInfoForm: TCStartupInfoForm
+  Left = 304
+  Top = 323
   Width = 639
   Height = 468
   Caption = 'CManager - Powiadomienia na dzi'#347
@@ -25,6 +27,23 @@ inherited CStartupInfoForm: TCStartupInfoForm
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
+      object Bevel1: TBevel
+        Left = 625
+        Top = 1
+        Width = 1
+        Height = 397
+        Align = alRight
+        Shape = bsRightLine
+        Style = bsRaised
+      end
+      object Bevel2: TBevel
+        Left = 1
+        Top = 398
+        Width = 625
+        Height = 1
+        Align = alBottom
+        Shape = bsTopLine
+      end
     end
     object Panel3: TPanel
       Left = 0

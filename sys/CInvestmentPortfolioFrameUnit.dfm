@@ -1,5 +1,13 @@
 inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
+  Width = 654
+  inherited Bevel: TBevel
+    Width = 654
+  end
+  inherited FilterPanel: TPanel
+    Width = 654
+  end
   inherited List: TCDataList
+    Width = 654
     Header.MainColumn = 0
     Columns = <
       item
@@ -26,35 +34,44 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       end
       item
         Position = 4
-        Width = 10
+        Width = 129
         WideText = 'Waluta'
       end>
     WideDefaultText = ''
   end
   inherited ButtonPanel: TPanel
+    Width = 654
     inherited CButtonAdd: TCButton
       Width = 124
     end
     inherited CButtonEdit: TCButton
-      Width = 196
+      Left = 269
+      Width = 116
     end
     inherited CButtonDelete: TCButton
-      Left = 253
+      Left = 381
       Width = 156
       Caption = 'Usu'#324' inwestycj'#281
     end
-    object CButtonAll: TCButton
-      Left = 301
+    inherited CButtonHistory: TCButton
+      Left = 549
+    end
+    object CButtonDetails: TCButton
+      Left = 125
       Top = 4
-      Width = 133
+      Width = 148
       Height = 30
       Cursor = crHandPoint
       PicPosition = ppLeft
       PicOffset = 10
       TxtOffset = 15
       Framed = False
-      Action = ActionAllInvestmentMovements
-      Anchors = [akTop, akRight]
+      Action = ActionDetails
+    end
+  end
+  inherited ListPopupMenu: TPopupMenu
+    inherited Usu1: TMenuItem
+      Caption = 'Usu'#324' inwestycj'#281
     end
   end
   inherited ActionListButtons: TActionList
@@ -67,10 +84,10 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       Caption = 'Poka'#380' histori'#281
       ImageIndex = 0
     end
-    object ActionAllInvestmentMovements: TAction
-      Caption = 'Wszystkie operacje'
+    object ActionDetails: TAction
+      Caption = 'Szczeg'#243#322'y inwestycji'
       ImageIndex = 3
-      OnExecute = ActionAllInvestmentMovementsExecute
+      OnExecute = ActionDetailsExecute
     end
   end
   inherited ActionListHistory: TActionList

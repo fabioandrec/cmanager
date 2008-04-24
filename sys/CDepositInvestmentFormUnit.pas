@@ -22,10 +22,6 @@ type
     CButton2: TCButton;
     ComboBoxTemplate: TComboBox;
     CDateTime: TCDateTime;
-    Label5: TLabel;
-    ComboBoxState: TComboBox;
-    Label14: TLabel;
-    CStaticAccount: TCStatic;
     Label1: TLabel;
     CStaticCashpoint: TCStatic;
     Label2: TLabel;
@@ -46,14 +42,22 @@ type
     ComboBoxDueType: TComboBox;
     Label11: TLabel;
     ComboBoxDueAction: TComboBox;
-    Label12: TLabel;
-    CDateTimeDepositEndDate: TCDateTime;
-    Label13: TLabel;
-    CDateTimeNextDue: TCDateTime;
     Label15: TLabel;
     CCurrEditActualCash: TCCurrEdit;
-    Label16: TLabel;
-    CCurrEditActualInterest: TCCurrEdit;
+    Label5: TLabel;
+    CStaticFuture: TCStatic;
+    Label12: TLabel;
+    ComboBoxType: TComboBox;
+    Label14: TLabel;
+    CStaticAccount: TCStatic;
+    Label17: TLabel;
+    CStaticAccountCurrency: TCStatic;
+    Label22: TLabel;
+    CStaticCurrencyRate: TCStatic;
+    Label21: TLabel;
+    CCurrEditAccount: TCCurrEdit;
+    Label13: TLabel;
+    CStaticCategory: TCStatic;
     procedure CDateTimeChanged(Sender: TObject);
     procedure ComboBoxPeriodTypeChange(Sender: TObject);
     procedure CIntEditPeriodCountChange(Sender: TObject);
@@ -69,12 +73,23 @@ type
     procedure ActionAddExecute(Sender: TObject);
     procedure ActionTemplateExecute(Sender: TObject);
     procedure EditNameChange(Sender: TObject);
-    procedure ComboBoxStateChange(Sender: TObject);
     procedure ComboBoxTemplateChange(Sender: TObject);
+    procedure CStaticCategoryChanged(Sender: TObject);
+    procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ComboBoxTypeChange(Sender: TObject);
+    procedure CStaticCurrencyRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CCurrEditActualCashChange(Sender: TObject);
+    procedure CStaticCurrencyRateChanged(Sender: TObject);
   private
+    FNextPeriodDate: TDateTime;
+    FNextDueDate: TDateTime;
+    FRateHelper: TCurrencyRateHelper;
     procedure UpdateNextPeriodDatetime;
     procedure UpdateNextCapitalisationDatetime;
     procedure UpdateDescription;
+    procedure UpdateCurrencyRates(AUpdateCurEdit: Boolean = True);
+    procedure UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
+    procedure UpdateFuture;
     function GetPeriodType: TBaseEnumeration;
     function GetDueType: TBaseEnumeration;
     procedure SetDueType(const Value: TBaseEnumeration);
@@ -85,11 +100,12 @@ type
     function CanAccept: Boolean; override;
     function GetDataobjectClass: TDataObjectClass; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
-    procedure FillForm; override;
+    procedure AfterCommitData; override;
   public
     property formPeriodType: TBaseEnumeration read GetPeriodType write SetPeriodType;
     property formDueType: TBaseEnumeration read GetDueType write SetDueType;
     function ExpandTemplate(ATemplate: String): String; override;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -97,7 +113,7 @@ implementation
 uses CConsts, CConfigFormUnit, CFrameFormUnit, CCurrencydefFrameUnit,
   CAccountsFrameUnit, CCashpointFormUnit, CCashpointsFrameUnit, CTemplates,
   CDescpatternFormUnit, CPreferences, CRichtext, CTools, CInfoFormUnit,
-  CDepositInvestmentFrameUnit;
+  CDepositInvestmentFrameUnit, CCurrencyRateFrameUnit;
 
 {$R *.dfm}
 
@@ -117,51 +133,36 @@ end;
 procedure TCDepositInvestmentForm.InitializeForm;
 begin
   inherited InitializeForm;
+  FRateHelper := nil;
   CDateTime.Value := Now;
-  ComboBoxDueModeChange(ComboBoxDueMode);
   CStaticCurrency.DataId := CCurrencyDefGid_PLN;
   CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
   CCurrEditActualCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
-  CCurrEditActualInterest.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
-  if Operation = coAdd then begin
-    CCurrEditActualInterest.Enabled := False;
-    ComboBoxState.Enabled := False;
-  end;
+  ComboBoxDueModeChange(ComboBoxDueMode);
+  ComboBoxTypeChange(ComboBoxType);
   UpdateNextPeriodDatetime;
   UpdateNextCapitalisationDatetime;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.ReadValues;
 begin
   inherited ReadValues;
   with TDepositInvestment(Dataobject) do begin
-    if ComboBoxState.ItemIndex = 0 then begin
-      depositState := CDepositInvestmentActive;
-    end else if ComboBoxState.ItemIndex = 1 then begin
-      depositState := CDepositInvestmentClosed;
-    end else begin
-      depositState := CDepositInvestmentInactive;
-    end;
+    depositState := CDepositInvestmentActive;
     name := EditName.Text;
     description := RichEditDesc.Text;
-    idAccount := CStaticAccount.DataId;
     idCashPoint := CStaticCashpoint.DataId;
     idCurrencyDef := CStaticCurrency.DataId;
-    currentCash := CCurrEditActualCash.Value;
-    if Operation = coAdd then begin
-      initialCash := CCurrEditActualCash.Value;
-    end;
-    noncapitalizedInterest := CCurrEditActualInterest.Value;
+    cash := CCurrEditActualCash.Value;
+    noncapitalizedInterest := 0;
     interestRate := CCurrEditRate.Value;
     periodCount := CIntEditPeriodCount.Value;
     dueCount := CIntEditDueCount.Value;
-    if Operation = coAdd then begin
-      dueLastDate := CDateTime.Value;
-      periodLastDate := CDateTime.Value;
-      openDate := CDateTime.Value;
-    end;
-    dueNextDate := CDateTimeNextDue.Value;
-    periodNextDate := CDateTimeDepositEndDate.Value;
+    dueLastDate := CDateTime.Value;
+    periodLastDate := CDateTime.Value;
+    dueNextDate := FNextDueDate;
+    periodNextDate := FNextPeriodDate;
     dueType := formDueType;
     if ComboBoxDueAction.ItemIndex = 0 then begin
       dueAction := CDepositDueActionAutoCapitalisation;
@@ -181,16 +182,16 @@ procedure TCDepositInvestmentForm.UpdateNextCapitalisationDatetime;
 var xNextDue: TDateTime;
 begin
   if ComboBoxDueMode.ItemIndex = 0 then begin
-    xNextDue := CDateTimeDepositEndDate.Value;
+    xNextDue := FNextPeriodDate;
   end else begin
     xNextDue := TDepositInvestment.NextDueDatetime(CDateTime.Value, CIntEditDueCount.Value, formDueType);
   end;
-  CDateTimeNextDue.Value := xNextDue;
+  FNextDueDate := xNextDue;
 end;
 
 procedure TCDepositInvestmentForm.UpdateNextPeriodDatetime;
 begin
-  CDateTimeDepositEndDate.Value := TDepositInvestment.NextPeriodDatetime(CDateTime.Value, CIntEditPeriodCount.Value, formPeriodType)
+  FNextPeriodDate := TDepositInvestment.NextPeriodDatetime(CDateTime.Value, CIntEditPeriodCount.Value, formPeriodType)
 end;
 
 procedure TCDepositInvestmentForm.CDateTimeChanged(Sender: TObject);
@@ -198,6 +199,7 @@ begin
   UpdateNextPeriodDatetime;
   UpdateNextCapitalisationDatetime;
   UpdateDescription;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.UpdateDescription;
@@ -218,6 +220,7 @@ begin
   UpdateNextPeriodDatetime;
   UpdateNextCapitalisationDatetime;
   UpdateDescription;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.CIntEditPeriodCountChange(Sender: TObject);
@@ -225,6 +228,7 @@ begin
   UpdateNextPeriodDatetime;
   UpdateNextCapitalisationDatetime;
   UpdateDescription;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.ComboBoxDueModeChange(Sender: TObject);
@@ -236,18 +240,21 @@ begin
   ComboBoxDueAction.Enabled := ComboBoxDueMode.ItemIndex = 1;
   UpdateNextCapitalisationDatetime;
   UpdateDescription;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.CIntEditDueCountChange(Sender: TObject);
 begin
   UpdateNextCapitalisationDatetime;
   UpdateDescription;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.ComboBoxDueTypeChange(Sender: TObject);
 begin
   UpdateNextCapitalisationDatetime;
   UpdateDescription;
+  UpdateFuture;
 end;
 
 function TCDepositInvestmentForm.GetDueType: TBaseEnumeration;
@@ -275,12 +282,24 @@ end;
 procedure TCDepositInvestmentForm.CStaticCurrencyChanged(Sender: TObject);
 begin
   CCurrEditActualCash.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
-  CCurrEditActualInterest.SetCurrencyDef(CStaticCurrency.DataId, GCurrencyCache.GetSymbol(CStaticCurrency.DataId));
   UpdateDescription;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.CStaticAccountChanged(Sender: TObject);
+var xCurrencyId: TDataGid;
 begin
+  if CStaticAccount.DataId <> CEmptyDataGid then begin
+    xCurrencyId := TAccount.GetCurrencyDefinition(CStaticAccount.DataId);
+    CStaticAccountCurrency.DataId := xCurrencyId;
+    CStaticAccountCurrency.Caption := GCurrencyCache.GetIso(xCurrencyId);
+    CCurrEditAccount.SetCurrencyDef(xCurrencyId, GCurrencyCache.GetSymbol(xCurrencyId));
+  end else begin
+    CStaticAccountCurrency.DataId := CEmptyDataGid;
+    CCurrEditAccount.SetCurrencyDef(CEmptyDataGid, '');
+  end;
+  CStaticCurrencyRate.DataId := CEmptyDataGid;
+  UpdateCurrencyRates;
   UpdateDescription;
 end;
 
@@ -322,8 +341,6 @@ begin
   Result := inherited ExpandTemplate(ATemplate);
   if ATemplate = '@data@' then begin
     Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
-  end else if ATemplate = '@stan@' then begin
-    Result := ComboBoxState.Text;
   end else if ATemplate = '@nazwa@' then begin
     if EditName.Text = '' then begin
       Result := '<nazwa lokaty>';
@@ -339,6 +356,18 @@ begin
     Result := '<prowadz¹cy lokatê>';
     if CStaticCashpoint.DataId <> CEmptyDataGid then begin
       Result := CStaticCashpoint.Caption;
+    end;
+  end else if ATemplate = '@kategoria@' then begin
+    Result := '<kategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      Result := CStaticCategory.Caption;
+    end;
+  end else if ATemplate = '@pelnakategoria@' then begin
+    Result := '<pelnakategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).treeDesc;
+      GDataProvider.RollbackTransaction;
     end;
   end else if ATemplate = '@isowaluty@' then begin
     Result := '<iso waluty lokaty>';
@@ -370,11 +399,6 @@ begin
   UpdateDescription;
 end;
 
-procedure TCDepositInvestmentForm.ComboBoxStateChange(Sender: TObject);
-begin
-  UpdateDescription;
-end;
-
 function TCDepositInvestmentForm.CanAccept: Boolean;
 begin
   Result := inherited CanAccept;
@@ -382,13 +406,18 @@ begin
     Result := False;
     ShowInfo(itError, 'Nazwa lokaty nie mo¿e byæ pusta', '');
     EditName.SetFocus;
+  end else if CStaticCashpoint.DataId = CEmptyDataGid then begin
+    Result := False;
+    if ShowInfo(itQuestion, 'Nie kontrahenta prowadz¹cego lokatê. Czy wyœwietliæ listê teraz ?', '') then begin
+      CStaticCashpoint.DoGetDataId;
+    end;
   end else if CStaticCurrency.DataId = CEmptyDataGid then begin
     Result := False;
     if ShowInfo(itQuestion, 'Nie wybrano waluty lokaty. Czy wyœwietliæ listê teraz ?', '') then begin
       CStaticCurrency.DoGetDataId;
     end;
   end else if ComboBoxDueMode.ItemIndex <> 0 then begin
-    if CDateTimeNextDue.Value > CDateTimeDepositEndDate.Value then begin
+    if FNextDueDate > FNextPeriodDate then begin
       Result := False;
       ShowInfo(itError, 'Okres naliczania odsetek nie byæ wiêkszy od czasu trwania lokaty', '');
       ComboBoxDueType.SetFocus;
@@ -404,57 +433,6 @@ end;
 function TCDepositInvestmentForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCDepositInvestmentFrame;
-end;
-
-procedure TCDepositInvestmentForm.FillForm;
-begin
-  with TDepositInvestment(Dataobject) do begin
-    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
-    EditName.Text := name;
-    SimpleRichText(description, RichEditDesc);
-    CCurrEditActualCash.Value := currentCash;
-    CDateTime.Value := openDate;
-    CDateTime.Enabled := (dueLastDate = 0);
-    CCurrEditActualInterest.Value := noncapitalizedInterest;
-    CCurrEditRate.Value := interestRate;
-    CIntEditPeriodCount.Value := periodCount;
-    CIntEditDueCount.Value := dueCount;
-    CDateTimeNextDue.Value := dueNextDate;
-    CDateTimeDepositEndDate.Value := periodNextDate;
-    GDataProvider.BeginTransaction;
-    if idAccount <> CEmptyDataGid then begin
-      CStaticAccount.DataId := idAccount;
-      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
-    end;
-    if idCashPoint <> CEmptyDataGid then begin
-      CStaticCashpoint.DataId := idAccount;
-      CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
-    end;
-    CStaticCurrency.DataId := idCurrencyDef;
-    CStaticCurrency.Caption := GCurrencyCache.GetIso(idCurrencyDef);
-    GDataProvider.RollbackTransaction;
-    CCurrEditActualCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
-    CCurrEditActualInterest.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
-    if periodAction = CDepositPeriodActionAutoRenew then begin
-      ComboBoxPeriodAction.ItemIndex := 0;
-    end else if periodAction = CDepositPeriodActionChangeInactive then begin
-      ComboBoxPeriodAction.ItemIndex := 1;
-    end;
-    if dueAction = CDepositDueActionAutoCapitalisation then begin
-      ComboBoxDueAction.ItemIndex := 0;
-    end else if dueAction = CDepositDueActionLeaveUncapitalised then begin
-      ComboBoxDueAction.ItemIndex := 1;
-    end;
-    if depositState = CDepositInvestmentActive then begin
-      ComboBoxState.ItemIndex := 0;
-    end else if depositState = CDepositInvestmentClosed then begin
-      ComboBoxState.ItemIndex := 1;
-    end else if depositState = CDepositInvestmentInactive then begin
-      ComboBoxState.ItemIndex := 2;
-    end;
-    formDueType := dueType;
-    formPeriodType := periodType;
-  end;
 end;
 
 procedure TCDepositInvestmentForm.SetDueType(const Value: TBaseEnumeration);
@@ -491,6 +469,139 @@ end;
 
 procedure TCDepositInvestmentForm.ComboBoxTemplateChange(Sender: TObject);
 begin
+  UpdateDescription;
+end;
+
+procedure TCDepositInvestmentForm.AfterCommitData;
+var xMove: TDepositMovement;
+    xDeposit: TDepositInvestment;
+begin
+  inherited AfterCommitData;
+  if Operation = coAdd then begin
+    xDeposit := TDepositInvestment(Dataobject);
+    GDataProvider.BeginTransaction;
+    xMove := TDepositMovement.CreateObject(DepositMovementProxy, False);
+    xMove.movementType := CDepositMovementCreate;
+    xMove.regDate := xDeposit.periodLastDate;
+    xMove.description := RichEditDesc.Text;
+    xMove.cash := xDeposit.cash;
+    xMove.idDepositInvestment := xDeposit.id;
+    GDataProvider.CommitTransaction;
+  end;
+end;
+
+procedure TCDepositInvestmentForm.UpdateFuture;
+var xFuture: String;
+begin
+  xFuture := 'Data koñca lokaty ' + Date2StrDate(FNextPeriodDate, False) + ', naliczanie odsetek ' + Date2StrDate(FNextDueDate, False);
+  CStaticFuture.Caption := xFuture;
+end;
+
+procedure TCDepositInvestmentForm.CStaticCategoryChanged(Sender: TObject);
+begin
+  UpdateDescription;
+end;
+
+procedure TCDepositInvestmentForm.CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCashpointsFrame, ADataGid, AText);
+end;
+
+procedure TCDepositInvestmentForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  Label14.Enabled := ComboBoxType.ItemIndex = 0;
+  CStaticAccount.Enabled := ComboBoxType.ItemIndex = 0;
+  Label17.Enabled := ComboBoxType.ItemIndex = 0;
+  Label22.Enabled := ComboBoxType.ItemIndex = 0;
+  CStaticCurrencyRate.Enabled := ComboBoxType.ItemIndex = 0;
+  Label21.Enabled := ComboBoxType.ItemIndex = 0;
+  Label13.Enabled := ComboBoxType.ItemIndex = 0;
+  CStaticCategory.Enabled := ComboBoxType.ItemIndex = 0;
+  if ComboBoxType.ItemIndex = 0 then begin
+    UpdateCurrencyRates(False);
+  end;
+end;
+
+procedure TCDepositInvestmentForm.UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
+begin
+  if ASourceEdit.CurrencyId <> ATargetEdit.CurrencyId then begin
+    if ARate.DataId <> CEmptyDataGid then begin
+      if AHelper <> Nil then begin
+        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value, ASourceEdit.CurrencyId, ATargetEdit.CurrencyId);
+      end else begin
+        ATargetEdit.Value := 0;
+      end;
+    end else begin
+      ATargetEdit.Value := 0;
+    end;
+  end else begin
+    if (ASourceEdit.CurrencyId <> CEmptyDataGid) and (ATargetEdit.CurrencyId <> CEmptyDataGid) then begin
+      ATargetEdit.Value := ASourceEdit.Value;
+    end;
+  end;
+end;
+
+procedure TCDepositInvestmentForm.UpdateCurrencyRates(AUpdateCurEdit: Boolean);
+var xRate: TCurrencyRate;
+begin
+  if not (csLoading in ComponentState) then begin
+    CStaticCurrencyRate.Enabled :=
+      (CStaticCurrency.DataId <> CStaticAccountCurrency.DataId) and
+      (CStaticCurrency.DataId <> CEmptyDataGid) and
+      (CStaticAccountCurrency.DataId <> CEmptyDataGid);
+    CStaticCurrencyRate.HotTrack := CStaticCurrencyRate.Enabled;
+    Label22.Enabled := CStaticCurrencyRate.Enabled;
+    if CStaticCurrencyRate.Enabled then begin
+      GDataProvider.BeginTransaction;
+      xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate,
+                                                   COutMovement,
+                                                   CStaticCurrency.DataId, CStaticAccountCurrency.DataId);
+      if xRate <> Nil then begin
+        if FRateHelper = Nil then begin
+          FRateHelper := TCurrencyRateHelper.Create(0, 0, '', '', '');
+        end;
+        FRateHelper.Assign(xRate.quantity, xRate.rate, xRate.description, xRate.idSourceCurrencyDef, xRate.idTargetCurrencyDef);
+        CStaticCurrencyRate.DataId := xRate.id;
+        CStaticCurrencyRate.Caption := xRate.description;
+      end;
+      GDataProvider.RollbackTransaction;
+    end;
+    if AUpdateCurEdit then begin
+      UpdateAccountCurEdit(CStaticCurrencyRate, CCurrEditActualCash, CCurrEditAccount, FRateHelper);
+    end;
+  end;
+end;
+
+procedure TCDepositInvestmentForm.CStaticCurrencyRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xCurrencyRate: TCurrencyRate;
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencyRateFrame, ADataGid, AText);
+  if AAccepted then begin
+    xCurrencyRate := TCurrencyRate(TCurrencyRate.LoadObject(CurrencyRateProxy, ADataGid, False));
+    if FRateHelper = Nil then begin
+      FRateHelper := TCurrencyRateHelper.Create(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description, xCurrencyRate.idSourceCurrencyDef, xCurrencyRate.idTargetCurrencyDef);
+    end else begin
+      FRateHelper.Assign(xCurrencyRate.quantity, xCurrencyRate.rate, xCurrencyRate.description, xCurrencyRate.idSourceCurrencyDef, xCurrencyRate.idTargetCurrencyDef);
+    end;
+  end;
+end;
+
+destructor TCDepositInvestmentForm.Destroy;
+begin
+  if FRateHelper <> Nil then begin
+    FRateHelper.Free;
+  end;
+  inherited Destroy;
+end;
+
+procedure TCDepositInvestmentForm.CCurrEditActualCashChange(Sender: TObject);
+begin
+  UpdateCurrencyRates;
+end;
+
+procedure TCDepositInvestmentForm.CStaticCurrencyRateChanged(Sender: TObject);
+begin
+  UpdateCurrencyRates;
   UpdateDescription;
 end;
 

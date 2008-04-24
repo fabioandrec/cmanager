@@ -209,7 +209,7 @@ type
     function GetPattern(AName, ADefault: String): String;
     procedure SetPattern(AName, APattern: String);
     function GetPatternOperation(AName: String): Integer;
-    function GetPattetnType(AName: String): Integer;
+    function GetPatternType(AName: String): Integer;
   end;
 
 var GViewsPreferences: TPrefList;
@@ -455,7 +455,7 @@ begin
   end;
 end;
 
-function TDescPatterns.GetPattetnType(AName: String): Integer;
+function TDescPatterns.GetPatternType(AName: String): Integer;
 var xO, xT: Integer;
 begin
   xO := Low(CDescPatternsKeys);

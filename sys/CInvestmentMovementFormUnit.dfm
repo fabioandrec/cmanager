@@ -2,17 +2,17 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
   Left = 224
   Top = 103
   Caption = 'Inwestycja'
-  ClientHeight = 689
-  ClientWidth = 555
+  ClientHeight = 653
+  ClientWidth = 560
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 555
-    Height = 648
+    Width = 560
+    Height = 612
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 521
+      Width = 529
       Height = 65
       Caption = ' Dane podstawowe '
       TabOrder = 0
@@ -35,7 +35,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       object ComboBoxType: TComboBox
         Left = 304
         Top = 24
-        Width = 193
+        Width = 201
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -72,13 +72,13 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 472
-      Width = 521
+      Top = 436
+      Width = 529
       Height = 169
       Caption = ' Opis '
       TabOrder = 2
       object CButton1: TCButton
-        Left = 254
+        Left = 262
         Top = 126
         Width = 115
         Height = 25
@@ -91,7 +91,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Color = clBtnFace
       end
       object CButton2: TCButton
-        Left = 372
+        Left = 380
         Top = 126
         Width = 129
         Height = 25
@@ -106,7 +106,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       object RichEditDesc: TCRichedit
         Left = 24
         Top = 28
-        Width = 473
+        Width = 481
         Height = 89
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -132,8 +132,8 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
     object GroupBox3: TGroupBox
       Left = 16
       Top = 96
-      Width = 521
-      Height = 361
+      Width = 529
+      Height = 325
       Caption = ' Szczeg'#243#322'y operacji '
       TabOrder = 1
       object Label4: TLabel
@@ -153,7 +153,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Instrument'
       end
       object Label15: TLabel
-        Left = 322
+        Left = 330
         Top = 141
         Width = 22
         Height = 13
@@ -169,7 +169,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'W/g notowania'
       end
       object Label6: TLabel
-        Left = 242
+        Left = 250
         Top = 177
         Width = 103
         Height = 13
@@ -177,7 +177,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Warto'#347#263' jednostkowa'
       end
       object Label9: TLabel
-        Left = 256
+        Left = 264
         Top = 214
         Width = 88
         Height = 13
@@ -186,14 +186,14 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       end
       object Label8: TLabel
         Left = 43
-        Top = 321
+        Top = 285
         Width = 45
         Height = 13
         Alignment = taRightJustify
         Caption = 'Kategoria'
       end
       object Label20: TLabel
-        Left = 266
+        Left = 274
         Top = 69
         Width = 78
         Height = 13
@@ -209,7 +209,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Przelicznik'
       end
       object Label17: TLabel
-        Left = 280
+        Left = 288
         Top = 105
         Width = 64
         Height = 13
@@ -217,8 +217,8 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Caption = 'Waluta konta'
       end
       object Label21: TLabel
-        Left = 264
-        Top = 285
+        Left = 272
+        Top = 249
         Width = 80
         Height = 13
         Alignment = taRightJustify
@@ -291,7 +291,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       end
       object CCurrEditValue: TCCurrEdit
         Tag = 1
-        Left = 352
+        Left = 360
         Top = 173
         Width = 145
         Height = 21
@@ -305,7 +305,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         WithCalculator = True
       end
       object CCurrMovement: TCCurrEdit
-        Left = 352
+        Left = 360
         Top = 209
         Width = 145
         Height = 21
@@ -320,8 +320,8 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       end
       object CStaticCategory: TCStatic
         Left = 96
-        Top = 317
-        Width = 401
+        Top = 281
+        Width = 409
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -338,7 +338,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         HotTrack = True
       end
       object CStaticInstrumentCurrency: TCStatic
-        Left = 352
+        Left = 360
         Top = 65
         Width = 145
         Height = 21
@@ -359,7 +359,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       object CStaticCurrencyRate: TCStatic
         Left = 96
         Top = 245
-        Width = 401
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -376,11 +376,10 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         HotTrack = True
       end
       object CStaticAccountCurrency: TCStatic
-        Left = 352
+        Left = 360
         Top = 101
         Width = 145
         Height = 21
-        Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
         Caption = '<brak konta>'
@@ -395,8 +394,8 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         HotTrack = False
       end
       object CCurrEditAccount: TCCurrEdit
-        Left = 352
-        Top = 281
+        Left = 360
+        Top = 245
         Width = 145
         Height = 21
         BorderStyle = bsNone
@@ -411,7 +410,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       object CStaticPortfolio: TCStatic
         Left = 96
         Top = 29
-        Width = 401
+        Width = 409
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -428,7 +427,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         HotTrack = True
       end
       object CIntQuantity: TCIntEdit
-        Left = 352
+        Left = 360
         Top = 136
         Width = 145
         Height = 21
@@ -441,13 +440,13 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 648
-    Width = 555
+    Top = 612
+    Width = 560
     inherited BitBtnOk: TBitBtn
-      Left = 378
+      Left = 383
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 466
+      Left = 471
     end
   end
   object ActionManager: TActionManager

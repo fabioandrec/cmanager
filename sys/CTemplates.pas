@@ -216,10 +216,11 @@ initialization
   end;
   with GDepositInvestmentTemplatesList do begin
     AddTemplate('@data@', 'data otwarcia lokaty w formacie RRRR-MM-DD');
-    AddTemplate('@stan@', 'stan lokaty');
     AddTemplate('@nazwa@', 'nazwa lokaty');
-    AddTemplate('@konto@', 'nazwa konta stowarzyszonego');
+    AddTemplate('@konto@', 'nazwa konta operacji');
     AddTemplate('@kontrahent@', 'nazwa kontrahenta prowadz¹cego lokatê');
+    AddTemplate('@kategoria@', 'nazwa kategorii wybranej przy zak³adaniu lokaty');
+    AddTemplate('@pelnakategoria@', 'pe³na nazwa kategorii wybranej przy zak³adaniu lokaty');
     AddTemplate('@isowaluty@', 'iso waluty lokaty');
     AddTemplate('@symbolwaluty@', 'symbol waluty lokaty');
     AddTemplate('@iloscOkres@', 'czas trwania lokaty, iloœæ okresów');

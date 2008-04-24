@@ -1,10 +1,12 @@
 inherited CSurpassedForm: TCSurpassedForm
-  Left = 380
-  Top = 245
+  Left = 266
+  Top = 196
   Caption = 'Przekroczone limity'
+  ClientWidth = 594
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
+    Width = 594
     object Label1: TLabel
       Left = 16
       Top = 12
@@ -15,8 +17,8 @@ inherited CSurpassedForm: TCSurpassedForm
         'w'
     end
     object Label2: TLabel
-      Left = 158
-      Top = 360
+      Left = 162
+      Top = 356
       Width = 421
       Height = 13
       Alignment = taRightJustify
@@ -27,20 +29,37 @@ inherited CSurpassedForm: TCSurpassedForm
     object PanelFrame: TPanel
       Left = 2
       Top = 40
-      Width = 591
+      Width = 588
       Height = 301
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
+      object Bevel1: TBevel
+        Left = 1
+        Top = 299
+        Width = 586
+        Height = 1
+        Align = alBottom
+        Shape = bsTopLine
+      end
+      object Bevel2: TBevel
+        Left = 586
+        Top = 1
+        Width = 1
+        Height = 298
+        Align = alRight
+        Shape = bsRightLine
+        Style = bsRaised
+      end
       object SurpassedList: TCDataList
         Left = 1
         Top = 1
-        Width = 589
-        Height = 299
+        Width = 585
+        Height = 298
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
-        BevelOuter = bvRaised
+        BevelOuter = bvSpace
         BevelKind = bkFlat
         BorderStyle = bsNone
         ButtonStyle = bsTriangle
@@ -89,11 +108,20 @@ inherited CSurpassedForm: TCSurpassedForm
           end
           item
             Position = 4
-            Width = 114
+            Width = 110
             WideText = 'Status'
           end>
         WideDefaultText = ''
       end
+    end
+  end
+  inherited PanelButtons: TPanel
+    Width = 594
+    inherited BitBtnOk: TBitBtn
+      Left = 417
+    end
+    inherited BitBtnCancel: TBitBtn
+      Left = 505
     end
   end
   object PopupMenu1: TPopupMenu

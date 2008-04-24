@@ -217,9 +217,7 @@ begin
   StatusbarVisible := GBasePreferences.showStatusBar;
   ActionShortcuts.Checked := ShortcutsVisible;
   ActionStatusbar.Checked := StatusbarVisible;
-  {$IFNDEF DEBUG}
-  ActionRandom.Visible := False;
-  {$ENDIF}
+  ActionRandom.Visible := GDebugMode;
   UpdateShortcutList;
   UpdateDictionaryList;
   UpdateStatusbar;
