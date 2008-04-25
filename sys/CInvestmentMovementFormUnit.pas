@@ -547,20 +547,22 @@ begin
       end;
     end;
   end;
-  if Result and (ComboBoxType.ItemIndex in [0, 1]) and (CStaticCategory.DataId = CEmptyDataGid) then begin
-    Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticCategory.DoGetDataId;
+  if Result and (ComboBoxType.ItemIndex in [0, 1]) then begin
+    if CStaticCategory.DataId = CEmptyDataGid then begin
+      Result := False;
+      if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticCategory.DoGetDataId;
+      end;
     end else begin
-    if Operation = coEdit then begin
-      xPrevCash := TInvestmentMovement(Dataobject).valueOf;
-    end else begin
-      xPrevCash := 0;
-    end;
-    Result := CheckSurpassedLimits(IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CDateTime.Value,
-                                   TDataGids.CreateFromGid(CStaticAccount.DataId),
-                                   TDataGids.CreateFromGid(CEmptyDataGid),
-                                   TSumList.CreateWithSum(CStaticCategory.DataId, CCurrMovement.Value - xPrevCash, CStaticInstrumentCurrency.DataId));
+      if Operation = coEdit then begin
+        xPrevCash := TInvestmentMovement(Dataobject).valueOf;
+      end else begin
+        xPrevCash := 0;
+      end;
+      Result := CheckSurpassedLimits(IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CDateTime.Value,
+                                     TDataGids.CreateFromGid(CStaticAccount.DataId),
+                                     TDataGids.CreateFromGid(CEmptyDataGid),
+                                     TSumList.CreateWithSum(CStaticCategory.DataId, CCurrMovement.Value - xPrevCash, CStaticInstrumentCurrency.DataId));
     end;
   end;
 end;
@@ -656,6 +658,7 @@ begin
     xBase.idMovementCurrencyDef := CStaticInstrumentCurrency.DataId;
     xBase.cash := CCurrEditAccount.Value;
     xBase.isInvestmentMovement := True;
+    xBase.isDepositMovement := False;
     xBaseId := xBase.id;
     GDataProvider.CommitTransaction;
     GDataProvider.ExecuteSql('update investmentMovement set idBaseMovement = ' + DataGidToDatabase(xBaseId) + ' where idInvestmentMovement = ' + DataGidToDatabase(Dataobject.id));

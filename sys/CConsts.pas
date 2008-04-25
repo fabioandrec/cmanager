@@ -203,6 +203,8 @@ const
   CDepositDueActionLeaveUncapitalised = 'L';
 
   CDepositMovementCreate = 'C';
+  CDepositMovementInactivate = 'I';
+  CDepositMovementRenew = 'R';
 
 const
   CInMovementDescription = 'Przychód';

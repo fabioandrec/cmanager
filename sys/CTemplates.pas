@@ -216,6 +216,8 @@ initialization
   end;
   with GDepositInvestmentTemplatesList do begin
     AddTemplate('@data@', 'data otwarcia lokaty w formacie RRRR-MM-DD');
+    AddTemplate('@stan@', 'stan lokaty');
+    AddTemplate('@operacja@', 'nazwa operacji');
     AddTemplate('@nazwa@', 'nazwa lokaty');
     AddTemplate('@konto@', 'nazwa konta operacji');
     AddTemplate('@kontrahent@', 'nazwa kontrahenta prowadz¹cego lokatê');

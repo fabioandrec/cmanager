@@ -405,6 +405,7 @@ type
     Fquantity: Currency;
     FidUnitDef: TDataGid;
     FisInvestmentMovement: Boolean;
+    FisDepositMovement: Boolean;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -429,6 +430,7 @@ type
     procedure Setquantity(const Value: Currency);
     procedure SetidUnitDef(const Value: TDataGid);
     procedure SetisInvestmentMovement(const Value: Boolean);
+    procedure SetidDepositMovement(const Value: Boolean);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
     function OnInsertObject(AProxy: TDataProxy): Boolean; override;
@@ -466,6 +468,7 @@ type
     property quantity: Currency read Fquantity write Setquantity;
     property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
     property isInvestmentMovement: Boolean read FisInvestmentMovement write SetisInvestmentMovement;
+    property isDepositMovement: Boolean read FisDepositMovement write SetidDepositMovement;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -1004,21 +1007,21 @@ type
     FnoncapitalizedInterest: Currency;
     FperiodCount: Integer;
     FperiodType: TBaseEnumeration;
-    FperiodLastDate: TDateTime;
-    FperiodNextDate: TDateTime;
+    FperiodStartDate: TDateTime;
+    FperiodEndDate: TDateTime;
     FperiodAction: TBaseEnumeration;
     FdueCount: Integer;
     FdueType: TBaseEnumeration;
-    FdueLastDate: TDateTime;
-    FdueNextDate: TDateTime;
+    FdueStartDate: TDateTime;
+    FdueEndDate: TDateTime;
     FdueAction: TBaseEnumeration;
     procedure Setcash(const Value: Currency);
     procedure SetdepositState(const Value: TBaseEnumeration);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetdueAction(const Value: TBaseEnumeration);
     procedure SetdueCount(const Value: Integer);
-    procedure SetdueLastDate(const Value: TDateTime);
-    procedure SetdueNextDate(const Value: TDateTime);
+    procedure SetdueStartDate(const Value: TDateTime);
+    procedure SetdueEndDate(const Value: TDateTime);
     procedure SetdueType(const Value: TBaseEnumeration);
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetidCurrencyDef(const Value: TDataGid);
@@ -1027,19 +1030,20 @@ type
     procedure SetnoncapitalizedInterest(const Value: Currency);
     procedure SetperiodAction(const Value: TBaseEnumeration);
     procedure SetperiodCount(const Value: Integer);
-    procedure SetperiodLastDate(const Value: TDateTime);
-    procedure SetperiodNextDate(const Value: TDateTime);
+    procedure SetperiodStartDate(const Value: TDateTime);
+    procedure SetperiodEndDate(const Value: TDateTime);
     procedure SetperiodType(const Value: TBaseEnumeration);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure UpdateFieldList; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
-    class function NextPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
-    class function NextDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
+    class function EndPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
+    class function EndDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
     function GetElementHint(AColumnIndex: Integer): String; override;
-    class procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
-    procedure UpdateDepositInvestment(AToDate: TDateTime);
+    function GetElementText: String; override;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
@@ -1051,13 +1055,13 @@ type
     property noncapitalizedInterest: Currency read FnoncapitalizedInterest write SetnoncapitalizedInterest;
     property periodCount: Integer read FperiodCount write SetperiodCount;
     property periodType: TBaseEnumeration read FperiodType write SetperiodType;
-    property periodLastDate: TDateTime read FperiodLastDate write SetperiodLastDate;
-    property periodNextDate: TDateTime read FperiodNextDate write SetperiodNextDate;
+    property periodStartDate: TDateTime read FperiodStartDate write SetperiodStartDate;
+    property periodEndDate: TDateTime read FperiodEndDate write SetperiodEndDate;
     property periodAction: TBaseEnumeration read FperiodAction write SetperiodAction;
     property dueCount: Integer read FdueCount write SetdueCount;
     property dueType: TBaseEnumeration read FdueType write SetdueType;
-    property dueLastDate: TDateTime read FdueLastDate write SetdueLastDate;
-    property dueNextDate: TDateTime read FdueNextDate write SetdueNextDate;
+    property dueStartDate: TDateTime read FdueStartDate write SetdueStartDate;
+    property dueEndDate: TDateTime read FdueEndDate write SetdueEndDate;
     property dueAction: TBaseEnumeration read FdueAction write SetdueAction;
   end;
 
@@ -1076,6 +1080,7 @@ type
     FcurrencyRate: Currency;
     FrateDescription: TBaseDescription;
     FidProduct: TDataGid;
+    FidBaseMovement: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidDepositInvestment(const Value: TDataGid);
@@ -1089,6 +1094,9 @@ type
     procedure SetidCurrencyRate(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
     procedure SetrateDescription(const Value: TBaseDescription);
+    procedure SetidBaseMovement(const Value: TDataGid);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -1107,6 +1115,7 @@ type
     property currencyRate: Currency read FcurrencyRate write SetcurrencyRate;
     property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
     property idProduct: TDataGid read FidProduct write SetidProduct;
+    property idBaseMovement: TDataGid read FidBaseMovement write SetidBaseMovement;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -1651,6 +1660,7 @@ begin
     FidUnitDef := FieldByName('idUnitDef').AsString;
     Fquantity := FieldByName('quantity').AsCurrency;
     FisInvestmentMovement := FieldByName('isInvestmentMovement').AsBoolean;
+    FisDepositMovement := FieldByName('isDepositMovement').AsBoolean;
     FprevmovementCash := FmovementCash;
     FprevIdAccountCurrencyDef := FidAccountCurrencyDef;
     FprevIdMovementCurrencyDef := FidMovementCurrencyDef;
@@ -1741,6 +1751,7 @@ begin
     AddField('quantity', CurrencyToDatabase(Fquantity), False, 'baseMovement');
     AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'baseMovement');
     AddField('isInvestmentMovement', IntToStr(Integer(FisInvestmentMovement)), False, 'baseMovement');
+    AddField('isDepositMovement', IntToStr(Integer(FisDepositMovement)), False, 'baseMovement');
   end;
 end;
 
@@ -5009,13 +5020,13 @@ begin
     FnoncapitalizedInterest := FieldByName('noncapitalizedInterest').AsCurrency;
     FperiodCount := FieldByName('periodCount').AsInteger;
     FperiodType := FieldByName('periodType').AsString;
-    FperiodLastDate := FieldByName('periodLastDate').AsDateTime;
-    FperiodNextDate := FieldByName('periodNextDate').AsDateTime;
+    FperiodStartDate := FieldByName('periodStartDate').AsDateTime;
+    FperiodEndDate := FieldByName('periodEndDate').AsDateTime;
     FperiodAction := FieldByName('periodAction').AsString;
     FdueCount := FieldByName('dueCount').AsInteger;
     FdueType := FieldByName('dueType').AsString;
-    FdueLastDate := FieldByName('dueLastDate').AsDateTime;
-    FdueNextDate := FieldByName('dueNextDate').AsDateTime;
+    FdueStartDate := FieldByName('dueStartDate').AsDateTime;
+    FdueEndDate := FieldByName('dueEndDate').AsDateTime;
     FdueAction := FieldByName('dueAction').AsString;
   end;
 end;
@@ -5039,13 +5050,13 @@ begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
   end else if AColumnIndex = 4 then begin
     if FdepositState = CDepositInvestmentActive then begin
-      Result := Date2StrDate(FperiodNextDate);
+      Result := Date2StrDate(FperiodEndDate);
     end else begin
       Result := '';
     end;
   end else if AColumnIndex = 5 then begin
     if FdepositState = CDepositInvestmentActive then begin
-      Result := Date2StrDate(FdueNextDate);
+      Result := Date2StrDate(FdueEndDate);
     end else begin
       Result := '';
     end;
@@ -5057,8 +5068,14 @@ begin
   Result := Fdescription;
 end;
 
-class function TDepositInvestment.NextDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
+function TDepositInvestment.GetElementText: String;
 begin
+  Result := Fname;
+end;
+
+class function TDepositInvestment.EndDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
+begin
+  Result := ADueLastDatetime;
   if ADueType = CDepositDueTypeDay then begin
     Result := IncDay(ADueLastDatetime, ADueCount);
   end else if ADueType = CDepositDueTypeWeek then begin
@@ -5067,12 +5084,11 @@ begin
     Result := IncMonth(ADueLastDatetime, ADueCount);
   end else if ADueType = CDepositDueTypeYear then begin
     Result := IncYear(ADueLastDatetime, ADueCount);
-  end else begin
-    Result := 0;
   end;
+  Result := IncDay(Result, -1);
 end;
 
-class function TDepositInvestment.NextPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
+class function TDepositInvestment.EndPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
 begin
   Result := APeriodLastDatetime;
   if APeriodType = CDepositPeriodTypeDay then begin
@@ -5084,6 +5100,14 @@ begin
   end else if APeriodType = CDepositPeriodTypeYear then begin
     Result := IncYear(Result, APeriodCount);
   end;
+  Result := IncDay(Result, -1);
+end;
+
+function TDepositInvestment.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  AProxy.DataProvider.ExecuteSql(Format('update baseMovement set isDepositMovement = 0 where idBaseMovement in (select idBaseMovement from depositMovement where idDepositInvestment = %s and idBaseMovement is not null)', [DataGidToDatabase(id)]));
+  AProxy.DataProvider.ExecuteSql(Format('delete from depositMovement where idDepositInvestment = %s', [DataGidToDatabase(id)]));
 end;
 
 procedure TDepositInvestment.Setcash(const Value: Currency);
@@ -5126,18 +5150,18 @@ begin
   end;
 end;
 
-procedure TDepositInvestment.SetdueLastDate(const Value: TDateTime);
+procedure TDepositInvestment.SetdueStartDate(const Value: TDateTime);
 begin
-  if FdueLastDate <> Value then begin
-    FdueLastDate := Value;
+  if FdueStartDate <> Value then begin
+    FdueStartDate := Value;
     SetState(msModified);
   end;
 end;
 
-procedure TDepositInvestment.SetdueNextDate(const Value: TDateTime);
+procedure TDepositInvestment.SetdueEndDate(const Value: TDateTime);
 begin
-  if FdueNextDate <> Value then begin
-    FdueNextDate := Value;
+  if FdueEndDate <> Value then begin
+    FdueEndDate := Value;
     SetState(msModified);
   end;
 end;
@@ -5206,18 +5230,18 @@ begin
   end;
 end;
 
-procedure TDepositInvestment.SetperiodLastDate(const Value: TDateTime);
+procedure TDepositInvestment.SetperiodEndDate(const Value: TDateTime);
 begin
-  if FperiodLastDate <> Value then begin
-    FperiodLastDate := Value;
+  if FperiodEndDate <> Value then begin
+    FperiodEndDate := Value;
     SetState(msModified);
   end;
 end;
 
-procedure TDepositInvestment.SetperiodNextDate(const Value: TDateTime);
+procedure TDepositInvestment.SetperiodStartDate(const Value: TDateTime);
 begin
-  if FperiodNextDate <> Value then begin
-    FperiodNextDate := Value;
+  if FperiodStartDate <> Value then begin
+    FperiodStartDate := Value;
     SetState(msModified);
   end;
 end;
@@ -5228,23 +5252,6 @@ begin
     FperiodType := Value;
     SetState(msModified);
   end;
-end;
-
-procedure TDepositInvestment.UpdateDepositInvestment(AToDate: TDateTime);
-begin
-end;
-
-class procedure TDepositInvestment.UpdateDepositInvestments(ADataProvider: TDataProvider);
-var xList: TDataObjectList;
-    xCount: Integer;
-begin
-  ADataProvider.BeginTransaction;
-  xList := TDepositInvestment.GetList(TDepositInvestment, DepositInvestmentProxy, 'select * from depositInvestment where depositState = ' + QuotedStr(CDepositInvestmentActive));
-  for xCount := 0 to xList.Count - 1 do begin
-    TDepositInvestment(xList).UpdateDepositInvestment(GWorkDate);
-  end;
-  xList.Free;
-  ADataProvider.CommitTransaction;
 end;
 
 procedure TDepositInvestment.UpdateFieldList;
@@ -5261,13 +5268,13 @@ begin
     AddField('noncapitalizedInterest', CurrencyToDatabase(FnoncapitalizedInterest), False, 'depositInvestment');
     AddField('periodCount', IntToStr(FperiodCount), False, 'depositInvestment');
     AddField('periodType', FperiodType, True, 'depositInvestment');
-    AddField('periodLastDate', DatetimeToDatabase(FperiodLastDate, False), False, 'depositInvestment');
-    AddField('periodNextDate', DatetimeToDatabase(FperiodNextDate, False), False, 'depositInvestment');
+    AddField('periodStartDate', DatetimeToDatabase(FperiodStartDate, False), False, 'depositInvestment');
+    AddField('periodEndDate', DatetimeToDatabase(FperiodEndDate, False), False, 'depositInvestment');
     AddField('periodAction', FperiodAction, True, 'depositInvestment');
     AddField('dueCount', IntToStr(FdueCount), False, 'depositInvestment');
     AddField('dueType', FdueType, True, 'depositInvestment');
-    AddField('dueLastDate', DatetimeToDatabase(FdueLastDate, False), False, 'depositInvestment');
-    AddField('dueNextDate', DatetimeToDatabase(FdueNextDate, False), False, 'depositInvestment');
+    AddField('dueStartDate', DatetimeToDatabase(FdueStartDate, False), False, 'depositInvestment');
+    AddField('dueEndDate', DatetimeToDatabase(FdueEndDate, False), False, 'depositInvestment');
     AddField('dueAction', FdueAction, True, 'depositInvestment');
   end;
 end;
@@ -5306,6 +5313,17 @@ begin
     FcurrencyRate := FieldByName('currencyRate').AsCurrency;
     FrateDescription := FieldByName('rateDescription').AsString;
     FidProduct := FieldByName('idProduct').AsString;
+    FidBaseMovement := FieldByName('idBaseMovement').AsString;
+  end;
+end;
+
+function TDepositMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
+var xSql: String;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  if FidBaseMovement <> CEmptyDataGid then begin
+    xSql := 'update baseMovement set isDepositMovement = 0 where idBaseMovement = ' + DataGidToDatabase(idBaseMovement);
+    AProxy.DataProvider.ExecuteSql(xSql);
   end;
 end;
 
@@ -5361,6 +5379,14 @@ procedure TDepositMovement.SetidAccountCurrencyDef(const Value: TDataGid);
 begin
   if FidAccountCurrencyDef <> Value then begin
     FidAccountCurrencyDef := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetidBaseMovement(const Value: TDataGid);
+begin
+  if FidBaseMovement <> Value then begin
+    FidBaseMovement := Value;
     SetState(msModified);
   end;
 end;
@@ -5430,6 +5456,15 @@ begin
     AddField('currencyRate', CurrencyToDatabase(FcurrencyRate), False, 'depositMovement');
     AddField('rateDescription', FrateDescription, True, 'depositMovement');
     AddField('idProduct', DataGidToDatabase(FidProduct), False, 'depositMovement');
+    AddField('idBaseMovement', DataGidToDatabase(FidBaseMovement), False, 'depositMovement');
+  end;
+end;
+
+procedure TBaseMovement.SetidDepositMovement(const Value: Boolean);
+begin
+  if FisDepositMovement <> Value then begin
+    FisDepositMovement := Value;
+    SetState(msModified);
   end;
 end;
 

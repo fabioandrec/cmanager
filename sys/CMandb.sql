@@ -242,6 +242,7 @@ create table baseMovement (
   quantity money not null,
   idUnitdef uniqueidentifier,
   isInvestmentMovement bit not null,
+  isDepositMovement bit not null,
   primary key (idBaseMovement),
   constraint ck_movementType check (movementType in ('I', 'O', 'T')),
   constraint fk_account foreign key (idAccount) references account (idAccount),
@@ -502,13 +503,13 @@ create table depositInvestment (
   noncapitalizedInterest money not null,
   periodCount int not null,
   periodType varchar(1) not null,
-  periodLastDate datetime null,
-  periodNextDate datetime not null,
+  periodStartDate datetime not null,
+  periodEndDate datetime not null,
   periodAction varchar(1) not null,
   dueCount int not null,
   dueType varchar(1) not null,
-  dueLastDate datetime null,
-  dueNextDate datetime not null,
+  dueStartDate datetime not null,
+  dueEndDate datetime not null,
   dueAction varchar(1) not null,
   primary key (idDepositInvestment),
   constraint fk_cashPointdepositInvestment foreign key (idCashPoint) references cashPoint (idCashPoint),
@@ -537,12 +538,14 @@ create table depositMovement (
   currencyRate money null,
   rateDescription varchar(200),
   idProduct uniqueidentifier null,
+  idBaseMovement uniqueidentifier null,
   primary key (idDepositMovement),
   constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment),
   constraint fk_movementDepositAccount foreign key (idAccount) references account (idAccount),
   constraint fk_movementDepositProduct foreign key (idProduct) references product (idProduct),
   constraint fk_movementDepositAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
-  constraint fk_movementDepositRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate)
+  constraint fk_movementDepositRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),
+  constraint fk_movementDepositBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement)
 );
 
 create view transactions as select * from (

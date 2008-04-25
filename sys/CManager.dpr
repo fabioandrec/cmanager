@@ -150,7 +150,8 @@ uses
   CQuickpatternFormUnit in 'CQuickpatternFormUnit.pas' {CQuickpatternForm},
   CDepositInvestmentFrameUnit in 'CDepositInvestmentFrameUnit.pas' {CDepositInvestmentFrame: TFrame},
   CDepositInvestmentFormUnit in 'CDepositInvestmentFormUnit.pas' {CDepositInvestmentForm},
-  CInvestmentPortfolioFormUnit in 'CInvestmentPortfolioFormUnit.pas' {CInvestmentPortfolioForm};
+  CInvestmentPortfolioFormUnit in 'CInvestmentPortfolioFormUnit.pas' {CInvestmentPortfolioForm},
+  CDeposits in 'CDeposits.pas';
 
 {$R *.res}
 
@@ -212,7 +213,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

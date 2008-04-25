@@ -217,7 +217,11 @@ var xBase: TMovementTreeElement;
 begin
   xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
   if xBase.elementType = mtObject then begin
-    if not TBaseMovement(xBase.Dataobject).isInvestmentMovement then begin
+    if TBaseMovement(xBase.Dataobject).isInvestmentMovement then begin
+      ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji inwestycyjnej', '')
+    end else if TBaseMovement(xBase.Dataobject).isDepositMovement then begin
+      ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji lokat', '')
+    end else begin
       if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
         xIdTemp1 := xBase.Dataobject.id;
         xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
@@ -238,8 +242,6 @@ begin
           SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
         end;
       end;
-    end else begin
-      ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji inwestycyjnej', '')
     end;
   end else if xBase.elementType = mtList then begin
     if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ listê operacji ?', '') then begin
