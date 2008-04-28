@@ -540,6 +540,7 @@ create table depositMovement (
   idProduct uniqueidentifier null,
   idBaseMovement uniqueidentifier null,
   primary key (idDepositMovement),
+  constraint ck_movementDepositMovementType check (movementType in ('C', 'S', 'I', 'R', 'D')),
   constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment),
   constraint fk_movementDepositAccount foreign key (idAccount) references account (idAccount),
   constraint fk_movementDepositProduct foreign key (idProduct) references product (idProduct),

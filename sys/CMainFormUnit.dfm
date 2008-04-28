@@ -398,7 +398,10 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionLoanCalc
-                Caption = '&Kalkulator kredytowy'
+                Caption = '&Kalkulator kredyt'#243'w'
+              end
+              item
+                Action = ActionDepositCalc
               end
               item
                 Action = ActionCss
@@ -445,6 +448,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionCmd
+                Caption = '&Linia polece'#324
               end
               item
                 Caption = '-'
@@ -599,7 +603,7 @@ object CMainForm: TCMainForm
     end
     object ActionLoanCalc: TAction
       Category = 'Narz'#281'dzia'
-      Caption = 'Kalkulator kredytowy'
+      Caption = 'Kalkulator kredyt'#243'w'
       OnExecute = ActionLoanCalcExecute
     end
     object ActionRandom: TAction
@@ -703,6 +707,11 @@ object CMainForm: TCMainForm
       Caption = 'Szybkie operacje'
       ImageIndex = 21
       OnExecute = ActionShortcutQuickpatternsExecute
+    end
+    object ActionDepositCalc: TAction
+      Category = 'Narz'#281'dzia'
+      Caption = 'Kalkulator lokat'
+      OnExecute = ActionDepositCalcExecute
     end
   end
   object OpenDialog: TOpenDialog

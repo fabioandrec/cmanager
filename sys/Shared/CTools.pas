@@ -116,6 +116,7 @@ function GetSystemPathname(AFilename: String): String;
 function ChangeColorsToRgb(AString: String): String;
 function ColorToHtmlColor(AColor: TColor): String;
 procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
+function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
 
 implementation
 
@@ -1172,6 +1173,11 @@ procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
 begin
   SetLength(AList, Length(AList) + 1);
   AList[High(AList)] := AValue;
+end;
+
+function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
+begin
+  Result := IncDay(ADate, Sign(ADate) * DaysInMonth(ADate));
 end;
 
 end.

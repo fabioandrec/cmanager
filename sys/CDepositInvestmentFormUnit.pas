@@ -114,20 +114,20 @@ uses CConsts, CConfigFormUnit, CFrameFormUnit, CCurrencydefFrameUnit,
   CAccountsFrameUnit, CCashpointFormUnit, CCashpointsFrameUnit, CTemplates,
   CDescpatternFormUnit, CPreferences, CRichtext, CTools, CInfoFormUnit,
   CDepositInvestmentFrameUnit, CCurrencyRateFrameUnit, CMovementFrameUnit,
-  CSurpassedFormUnit, CProductsFrameUnit;
+  CSurpassedFormUnit, CProductsFrameUnit, StrUtils;
 
 {$R *.dfm}
 
 function TCDepositInvestmentForm.GetPeriodType: TBaseEnumeration;
 begin
   if ComboBoxPeriodType.ItemIndex = 0 then begin
-    Result := CDepositPeriodTypeDay;
+    Result := CDepositTypeDay;
   end else if ComboBoxPeriodType.ItemIndex = 1 then begin
-    Result := CDepositPeriodTypeWeek;
+    Result := CDepositTypeWeek;
   end else if ComboBoxPeriodType.ItemIndex = 2 then begin
-    Result := CDepositPeriodTypeMonth;
+    Result := CDepositTypeMonth;
   end else begin
-    Result := CDepositPeriodTypeYear;
+    Result := CDepositTypeYear;
   end;
 end;
 
@@ -171,7 +171,7 @@ begin
       dueAction := CDepositDueActionLeaveUncapitalised;
     end;
     periodType := formPeriodType;
-    if ComboBoxPeriodAction.ItemIndex = 0 then begin
+    if ComboBoxPeriodAction.ItemIndex = 1 then begin
       periodAction := CDepositPeriodActionAutoRenew;
     end else begin
       periodAction := CDepositPeriodActionChangeInactive;
@@ -264,13 +264,13 @@ begin
     Result := CDepositDueTypeOnDepositEnd;
   end else begin
     if ComboBoxDueType.ItemIndex = 0 then begin
-      Result := CDepositDueTypeDay;
+      Result := CDepositTypeDay;
     end else if ComboBoxDueType.ItemIndex = 1 then begin
-      Result := CDepositDueTypeWeek;
+      Result := CDepositTypeWeek;
     end else if ComboBoxDueType.ItemIndex = 2 then begin
-      Result := CDepositDueTypeMonth;
+      Result := CDepositTypeMonth;
     end else begin
-      Result := CDepositDueTypeYear;
+      Result := CDepositTypeYear;
     end;
   end;
 end;
@@ -470,13 +470,13 @@ begin
     ComboBoxDueMode.ItemIndex := 0;
   end else begin
     ComboBoxDueMode.ItemIndex := 1;
-    if Value = CDepositDueTypeDay then begin
+    if Value = CDepositTypeDay then begin
       ComboBoxDueType.ItemIndex := 0;
-    end else if Value = CDepositDueTypeWeek then begin
+    end else if Value = CDepositTypeWeek then begin
       ComboBoxDueType.ItemIndex := 1;
-    end else if Value = CDepositDueTypeMonth then begin
+    end else if Value = CDepositTypeMonth then begin
       ComboBoxDueType.ItemIndex := 2;
-    end else if Value = CDepositDueTypeYear then begin
+    end else if Value = CDepositTypeYear then begin
       ComboBoxDueType.ItemIndex := 3;
     end;
   end;
@@ -485,13 +485,13 @@ end;
 
 procedure TCDepositInvestmentForm.SetPeriodType(const Value: TBaseEnumeration);
 begin
-  if Value = CDepositPeriodTypeDay then begin
+  if Value = CDepositTypeDay then begin
     ComboBoxPeriodType.ItemIndex := 0;
-  end else if Value = CDepositPeriodTypeWeek then begin
+  end else if Value = CDepositTypeWeek then begin
     ComboBoxPeriodType.ItemIndex := 1;
-  end else if Value = CDepositPeriodTypeMonth then begin
+  end else if Value = CDepositTypeMonth then begin
     ComboBoxPeriodType.ItemIndex := 2;
-  end else if Value = CDepositPeriodTypeYear then begin
+  end else if Value = CDepositTypeYear then begin
     ComboBoxPeriodType.ItemIndex := 3;
   end;
 end;
@@ -515,8 +515,8 @@ begin
     GDataProvider.BeginTransaction;
     xMove := TDepositMovement.CreateObject(DepositMovementProxy, False);
     xMoveId := xMove.id;
-    xMove.movementType := CDepositMovementCreate;
-    xMove.regDate := xDeposit.periodEndDate;
+    xMove.movementType := IfThen(ComboBoxType.ItemIndex = 0, CDepositMovementCreate, CDepositMovementRegister);
+    xMove.regDate := GWorkDate;
     xMove.description := RichEditDesc.Text;
     xMove.cash := xDeposit.cash;
     xMove.idDepositInvestment := xDeposit.id;

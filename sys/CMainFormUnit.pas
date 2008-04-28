@@ -83,6 +83,7 @@ type
     ActionCmd: TAction;
     ActionShortcutQuickpatterns: TAction;
     ActionShortcutDepositInvestment: TAction;
+    ActionDepositCalc: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -129,6 +130,7 @@ type
     procedure ActionCmdExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ActionShortcutQuickpatternsExecute(Sender: TObject);
+    procedure ActionDepositCalcExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -184,7 +186,8 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
      CImportExportDatafileFormUnit, CChangePasswordFormUnit,
-  CQuickpatternFrameUnit, CDepositInvestmentFrameUnit;
+  CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
+  CDepositCalculatorFormUnit;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -1014,6 +1017,11 @@ end;
 procedure TCMainForm.ActionShortcutQuickpatternsExecute(Sender: TObject);
 begin
 //
+end;
+
+procedure TCMainForm.ActionDepositCalcExecute(Sender: TObject);
+begin
+  ShowDepositCalculator(False);
 end;
 
 end.

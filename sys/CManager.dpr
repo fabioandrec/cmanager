@@ -151,7 +151,8 @@ uses
   CDepositInvestmentFrameUnit in 'CDepositInvestmentFrameUnit.pas' {CDepositInvestmentFrame: TFrame},
   CDepositInvestmentFormUnit in 'CDepositInvestmentFormUnit.pas' {CDepositInvestmentForm},
   CInvestmentPortfolioFormUnit in 'CInvestmentPortfolioFormUnit.pas' {CInvestmentPortfolioForm},
-  CDeposits in 'CDeposits.pas';
+  CDeposits in 'CDeposits.pas',
+  CDepositCalculatorFormUnit in 'CDepositCalculatorFormUnit.pas' {CDepositCalculatorForm};
 
 {$R *.res}
 

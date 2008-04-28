@@ -5076,13 +5076,13 @@ end;
 class function TDepositInvestment.EndDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
 begin
   Result := ADueLastDatetime;
-  if ADueType = CDepositDueTypeDay then begin
+  if ADueType = CDepositTypeDay then begin
     Result := IncDay(ADueLastDatetime, ADueCount);
-  end else if ADueType = CDepositDueTypeWeek then begin
+  end else if ADueType = CDepositTypeWeek then begin
     Result := IncWeek(ADueLastDatetime, ADueCount);
-  end else if ADueType = CDepositDueTypeMonth then begin
-    Result := IncMonth(ADueLastDatetime, ADueCount);
-  end else if ADueType = CDepositDueTypeYear then begin
+  end else if ADueType = CDepositTypeMonth then begin
+    Result := CustomIncMonth(ADueLastDatetime, ADueCount);
+  end else if ADueType = CDepositTypeYear then begin
     Result := IncYear(ADueLastDatetime, ADueCount);
   end;
   Result := IncDay(Result, -1);
@@ -5091,13 +5091,13 @@ end;
 class function TDepositInvestment.EndPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
 begin
   Result := APeriodLastDatetime;
-  if APeriodType = CDepositPeriodTypeDay then begin
+  if APeriodType = CDepositTypeDay then begin
     Result := IncDay(Result, APeriodCount);
-  end else if APeriodType = CDepositPeriodTypeWeek then begin
+  end else if APeriodType = CDepositTypeWeek then begin
     Result := IncWeek(Result, APeriodCount);
-  end else if APeriodType = CDepositPeriodTypeMonth then begin
-    Result := IncMonth(Result, APeriodCount);
-  end else if APeriodType = CDepositPeriodTypeYear then begin
+  end else if APeriodType = CDepositTypeMonth then begin
+    Result := CustomIncMonth(Result, APeriodCount);
+  end else if APeriodType = CDepositTypeYear then begin
     Result := IncYear(Result, APeriodCount);
   end;
   Result := IncDay(Result, -1);
