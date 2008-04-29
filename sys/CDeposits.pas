@@ -337,7 +337,7 @@ end;
 
 function TDeposit.GetrateOfReturn: Currency;
 begin
-  Result := SimpleRoundTo(100 * (Fcash / FinitialCash));
+  Result := SimpleRoundTo((100 * (Fcash + FnoncapitalizedInterest) / FinitialCash), -4);
 end;
 
 function TDeposit.IsSumObject(ANumber: Integer): Boolean;
