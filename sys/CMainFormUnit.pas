@@ -667,10 +667,10 @@ begin
           GPlugins.GetCountOfType(CPLUGINTYPE_JUSTEXECUTE) +
           GPlugins.GetCountOfType(CPLUGINTYPE_EXTRACTION) +
           GPlugins.GetCountOfType(CPLUGINTYPE_STOCKEXCHANGE);
-  if xMax > 0 then begin
-    xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
-    xPluginBand.Items.Clear;
-    if xPluginBand <> Nil then begin
+  xPluginBand :=  FindActionClientByCaption(ActionManager.ActionBars.ActionBars[1].Items, 'Wtyczki');
+  if xPluginBand <> Nil then begin
+    if xMax > 0 then begin
+      xPluginBand.Items.Clear;
       for xCount := 0 to GPlugins.Count - 1 do begin
         xPlugin := TCPlugin(GPlugins.Items[xCount]);
         if (xPlugin.isTypeof[CPLUGINTYPE_CURRENCYRATE] or
@@ -687,6 +687,8 @@ begin
           end;
         end;
       end;
+    end else begin
+      xPluginBand.Visible := False;
     end;
   end;
 end;
