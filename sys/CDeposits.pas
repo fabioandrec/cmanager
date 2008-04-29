@@ -52,12 +52,10 @@ type
     FperiodEndDate: TDateTime;
     FdueStartDate: TDateTime;
     FdueEndDate: TDateTime;
-    FrateOfReturn: Currency;
     FprogEndDate: TDateTime;
     FdepositState: TBaseEnumeration;
     function GetItems(AIndex: Integer): TDepositProgItem;
     procedure SetItems(AIndex: Integer; const Value: TDepositProgItem);
-    procedure SetrateOfReturn(const Value: Currency);
     function GetrateOfReturn: Currency;
   public
     function CalculateProg: Boolean;
@@ -264,12 +262,12 @@ begin
         Add(xItem);
       end;
       if xCurDate = FperiodEndDate then begin
-        if (FdueStartDate < FperiodEndDate) and (FdueEndDate > FperiodEndDate) then begin
+        if (FdueStartDate <= FperiodEndDate) and (FdueEndDate >= FperiodEndDate) then begin
           xDaysBetween := DaysBetween(FperiodEndDate, FdueStartDate);
           xItem := TDepositProgItem.Create(CDepositMovementDue);
           xItem.date := xCurDate;
           xItem.dueStart := FdueStartDate;
-          xItem.dueEnd := FdueEndDate;
+          xItem.dueEnd := FperiodEndDate;
           xItem.periodStart := FperiodStartDate;
           xItem.periodEnd := FperiodEndDate;
           xItem.caption := IntToStr(Count + 1);
@@ -354,11 +352,6 @@ constructor TDepositProgItem.Create(AType: TBaseEnumeration);
 begin
   inherited Create;
   FmovementType := AType;
-end;
-
-procedure TDeposit.SetrateOfReturn(const Value: Currency);
-begin
-  FrateOfReturn := Value;
 end;
 
 end.
