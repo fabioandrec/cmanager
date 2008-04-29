@@ -3,12 +3,12 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   Top = 182
   Caption = 'Kalkulator kredytowy'
   ClientHeight = 523
-  ClientWidth = 578
+  ClientWidth = 576
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 578
+    Width = 576
     Height = 482
     object GroupBox1: TGroupBox
       Left = 16
@@ -188,7 +188,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       Caption = ' Dane szczeg'#243#322'owe i harmonogram  '
       TabOrder = 1
       object Label8: TLabel
-        Left = 207
+        Left = 199
         Top = 241
         Width = 202
         Height = 13
@@ -209,9 +209,9 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Color = clBtnFace
       end
       object Panel1: TPanel
-        Left = 16
+        Left = 24
         Top = 27
-        Width = 513
+        Width = 497
         Height = 192
         BevelOuter = bvLowered
         Caption = 'Panel1'
@@ -219,13 +219,13 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         object Bevel1: TBevel
           Left = 1
           Top = 190
-          Width = 511
+          Width = 495
           Height = 1
           Align = alBottom
           Shape = bsTopLine
         end
         object Bevel2: TBevel
-          Left = 511
+          Left = 495
           Top = 1
           Width = 1
           Height = 189
@@ -236,7 +236,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         object RepaymentList: TCList
           Left = 1
           Top = 1
-          Width = 510
+          Width = 494
           Height = 189
           Align = alClient
           BevelEdges = []
@@ -302,7 +302,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
             item
               Alignment = taRightJustify
               Position = 5
-              Width = 125
+              Width = 109
               WideText = 'Pozosta'#322'o'
             end>
           WideDefaultText = ''
@@ -325,7 +325,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         end
       end
       object Panel2: TPanel
-        Left = 413
+        Left = 405
         Top = 232
         Width = 129
         Height = 33
@@ -352,12 +352,12 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   end
   inherited PanelButtons: TPanel
     Top = 482
-    Width = 578
+    Width = 576
     inherited BitBtnOk: TBitBtn
-      Left = 401
+      Left = 399
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 489
+      Left = 487
     end
   end
   object PopupMenu1: TPopupMenu

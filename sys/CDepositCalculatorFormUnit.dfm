@@ -1,82 +1,227 @@
 inherited CDepositCalculatorForm: TCDepositCalculatorForm
-  Left = 336
-  Top = 182
+  Left = 231
+  Top = 217
   Caption = 'Kalkulator kredytowy'
-  ClientHeight = 523
-  ClientWidth = 578
+  ClientHeight = 579
+  ClientWidth = 805
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Width = 578
-    Height = 482
+    Width = 805
+    Height = 538
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
-      Width = 545
-      Height = 161
+      Width = 769
+      Height = 217
       Caption = ' Dane podstawowe '
       TabOrder = 0
-      object Label3: TLabel
-        Left = 300
-        Top = 96
-        Width = 101
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Data pierwszej sp'#322'aty'
-      end
-      object Label5: TLabel
-        Left = 17
-        Top = 28
-        Width = 85
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Sp'#322'ata kredytu co'
-      end
-      object Label1: TLabel
-        Left = 294
-        Top = 28
-        Width = 107
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Rodzaj sp'#322'acanych rat'
-      end
-      object Label4: TLabel
-        Left = 65
-        Top = 96
-        Width = 37
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Ilo'#347#263' rat'
-      end
-      object Label2: TLabel
-        Left = 285
-        Top = 62
-        Width = 116
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Roczne oprocentowanie'
-      end
       object Label6: TLabel
-        Left = 37
-        Top = 62
-        Width = 68
+        Left = 13
+        Top = 68
+        Width = 91
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Kwota kredytu'
+        Caption = 'Czas trwania lokaty'
       end
       object Label7: TLabel
-        Left = 270
-        Top = 130
-        Width = 131
+        Left = 308
+        Top = 68
+        Width = 76
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Suma prowizji i innych op'#322'at'
+        Caption = 'Po zako'#324'czeniu'
       end
-      object CDateTime: TCDateTime
-        Left = 409
-        Top = 92
-        Width = 112
+      object Label1: TLabel
+        Left = 30
+        Top = 104
+        Width = 74
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Naliczaj odsetki'
+      end
+      object Label9: TLabel
+        Left = 563
+        Top = 104
+        Width = 13
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Co'
+      end
+      object Label11: TLabel
+        Left = 41
+        Top = 140
+        Width = 63
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Po naliczeniu'
+      end
+      object Label3: TLabel
+        Left = 27
+        Top = 32
+        Width = 77
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Data utworzenia'
+      end
+      object Label2: TLabel
+        Left = 592
+        Top = 68
+        Width = 56
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Data ko'#324'ca'
+      end
+      object Label15: TLabel
+        Left = 319
+        Top = 32
+        Width = 65
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Kapita'#322' lokaty'
+      end
+      object Label4: TLabel
+        Left = 570
+        Top = 32
+        Width = 78
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Oprocentowanie'
+      end
+      object Label5: TLabel
+        Left = 586
+        Top = 174
+        Width = 62
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Prognozuj do'
+      end
+      object Label10: TLabel
+        Left = 599
+        Top = 140
+        Width = 49
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Naliczanie'
+      end
+      object CIntEditPeriodCount: TCIntEdit
+        Left = 112
+        Top = 64
+        Width = 57
+        Height = 21
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        MaxLength = 4
+        TabOrder = 2
+        Text = '1'
+        OnChange = CIntEditPeriodCountChange
+      end
+      object ComboBoxPeriodType: TComboBox
+        Left = 184
+        Top = 64
+        Width = 105
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 2
+        TabOrder = 3
+        Text = 'miesi'#281'cy'
+        OnChange = ComboBoxPeriodTypeChange
+        Items.Strings = (
+          'dni'
+          'tygodni'
+          'miesi'#281'cy'
+          'lat')
+      end
+      object ComboBoxPeriodAction: TComboBox
+        Left = 392
+        Top = 64
+        Width = 161
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 4
+        Text = 'zmie'#324' status na nieaktywna'
+        OnChange = ComboBoxPeriodActionChange
+        Items.Strings = (
+          'zmie'#324' status na nieaktywna'
+          'automatycznie odn'#243'w lokat'#281)
+      end
+      object ComboBoxDueMode: TComboBox
+        Left = 112
+        Top = 100
+        Width = 441
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 5
+        Text = 'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
+        OnChange = ComboBoxDueModeChange
+        Items.Strings = (
+          'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
+          'wielokrotnie, co wskazany okres czasu')
+      end
+      object CIntEditDueCount: TCIntEdit
+        Left = 584
+        Top = 100
+        Width = 57
+        Height = 21
+        BevelKind = bkTile
+        BorderStyle = bsNone
+        MaxLength = 4
+        TabOrder = 6
+        Text = '1'
+        OnChange = CIntEditDueCountChange
+      end
+      object ComboBoxDueType: TComboBox
+        Left = 656
+        Top = 100
+        Width = 89
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 2
+        TabOrder = 7
+        Text = 'miesi'#281'cy'
+        OnChange = ComboBoxDueTypeChange
+        Items.Strings = (
+          'dni'
+          'tygodni'
+          'miesi'#281'cy'
+          'lat')
+      end
+      object ComboBoxDueAction: TComboBox
+        Left = 112
+        Top = 136
+        Width = 441
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 8
+        Text = 'dopisz odsetki do kapita'#322'u'
+        OnChange = ComboBoxDueActionChange
+        Items.Strings = (
+          'dopisz odsetki do kapita'#322'u'
+          'pozostaw do wyp'#322'aty')
+      end
+      object CDateTimeStart: TCDateTime
+        Left = 112
+        Top = 28
+        Width = 177
         Height = 21
         Cursor = crHandPoint
         AutoSize = False
@@ -84,119 +229,111 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
-        TabOrder = 5
+        TabOrder = 9
         TabStop = True
         Transparent = False
-        OnChanged = CDateTimeChanged
+        OnChanged = CDateTimeStartChanged
         HotTrack = True
         Withtime = False
       end
-      object ComboBoxType: TComboBox
-        Left = 409
-        Top = 24
-        Width = 112
+      object CDateTimeEnd: TCDateTime
+        Left = 656
+        Top = 64
+        Width = 89
         Height = 21
-        BevelInner = bvNone
+        AutoSize = False
         BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 1
-        TabOrder = 1
-        Text = 'malej'#261'ce'
-        OnChange = ComboBoxTypeChange
-        Items.Strings = (
-          'sta'#322'e'
-          'malej'#261'ce')
+        Caption = '<wybierz dat'#281' >'
+        Color = clWindow
+        Enabled = False
+        ParentColor = False
+        TabOrder = 10
+        TabStop = True
+        Transparent = False
+        HotTrack = False
+        Withtime = False
       end
-      object ComboBoxPeriod: TComboBox
-        Left = 110
-        Top = 24
-        Width = 123
+      object CCurrEditActualCash: TCCurrEdit
+        Left = 392
+        Top = 28
+        Width = 161
         Height = 21
-        BevelInner = bvNone
-        BevelKind = bkTile
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 0
+        BorderStyle = bsNone
         TabOrder = 0
-        Text = 'miesi'#261'c'
-        OnChange = ComboBoxPeriodChange
-        Items.Strings = (
-          'miesi'#261'c'
-          'tydzie'#324)
-      end
-      object CIntEditTimes: TCIntEdit
-        Left = 110
-        Top = 92
-        Width = 123
-        Height = 21
+        OnChange = CCurrEditActualCashChange
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
         BevelKind = bkTile
-        BorderStyle = bsNone
-        MaxLength = 4
-        TabOrder = 4
-        Text = '0'
-        OnChange = CIntEditTimesChange
+        WithCalculator = True
       end
-      object CCurrEditTax: TCCurrEdit
-        Left = 409
-        Top = 59
-        Width = 112
+      object CCurrEditRate: TCCurrEdit
+        Left = 656
+        Top = 28
+        Width = 89
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 3
-        OnChange = CCurrEditTaxChange
+        TabOrder = 1
+        OnChange = CCurrEditRateChange
         Decimals = 4
         ThousandSep = True
         CurrencyStr = '%'
         BevelKind = bkTile
         WithCalculator = True
       end
-      object CCurrEditCash: TCCurrEdit
-        Left = 110
-        Top = 59
-        Width = 123
+      object CDateTimeProg: TCDateTime
+        Left = 656
+        Top = 170
+        Width = 89
         Height = 21
-        BorderStyle = bsNone
-        TabOrder = 2
-        OnChange = CCurrEditCashChange
-        Decimals = 2
-        ThousandSep = True
-        CurrencyStr = 'z'#322
+        Cursor = crHandPoint
+        AutoSize = False
         BevelKind = bkTile
-        WithCalculator = True
+        Caption = '<wybierz dat'#281' >'
+        Color = clWindow
+        ParentColor = False
+        TabOrder = 11
+        TabStop = True
+        Transparent = False
+        OnChanged = CDateTimeProgChanged
+        HotTrack = True
+        Withtime = False
       end
-      object CCurrEditOthers: TCCurrEdit
-        Left = 409
-        Top = 127
-        Width = 112
+      object CDateTimeDueEnd: TCDateTime
+        Left = 656
+        Top = 136
+        Width = 89
         Height = 21
-        BorderStyle = bsNone
-        TabOrder = 6
-        OnChange = CCurrEditCashChange
-        Decimals = 2
-        ThousandSep = True
-        CurrencyStr = 'z'#322
+        AutoSize = False
         BevelKind = bkTile
-        WithCalculator = True
+        Caption = '<wybierz dat'#281' >'
+        Color = clWindow
+        Enabled = False
+        ParentColor = False
+        TabOrder = 12
+        TabStop = True
+        Transparent = False
+        HotTrack = False
+        Withtime = False
       end
     end
     object GroupBox2: TGroupBox
       Left = 16
-      Top = 200
-      Width = 545
-      Height = 273
-      Caption = ' Dane szczeg'#243#322'owe i harmonogram  '
+      Top = 252
+      Width = 769
+      Height = 277
+      Caption = ' Prognoza lokaty '
       TabOrder = 1
       object Label8: TLabel
-        Left = 207
+        Left = 563
         Top = 241
-        Width = 202
+        Width = 62
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Rzeczywista roczna stopa oprocentowania'
+        Caption = 'Stopa zwrotu'
       end
       object CButton1: TCButton
-        Left = 16
+        Left = 24
         Top = 235
         Width = 105
         Height = 25
@@ -209,9 +346,9 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Color = clBtnFace
       end
       object Panel1: TPanel
-        Left = 16
+        Left = 24
         Top = 27
-        Width = 513
+        Width = 721
         Height = 192
         BevelOuter = bvLowered
         Caption = 'Panel1'
@@ -219,13 +356,13 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         object Bevel1: TBevel
           Left = 1
           Top = 190
-          Width = 511
+          Width = 719
           Height = 1
           Align = alBottom
           Shape = bsTopLine
         end
         object Bevel2: TBevel
-          Left = 511
+          Left = 719
           Top = 1
           Width = 1
           Height = 189
@@ -236,7 +373,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         object RepaymentList: TCList
           Left = 1
           Top = 1
-          Width = 510
+          Width = 718
           Height = 189
           Align = alClient
           BevelEdges = []
@@ -245,7 +382,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
           BevelKind = bkFlat
           BorderStyle = bsNone
           DefaultNodeHeight = 24
-          Header.AutoSizeIndex = 5
+          Header.AutoSizeIndex = -1
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11
@@ -264,11 +401,12 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
           TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
           OnGetText = RepaymentListGetText
+          OnGetHint = RepaymentListGetHint
           AutoExpand = True
           Columns = <
             item
               Alignment = taRightJustify
-              Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 0
               WideText = 'Lp'
             end
@@ -279,41 +417,43 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
               WideText = 'Data'
             end
             item
-              Alignment = taRightJustify
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 2
-              Width = 90
-              WideText = 'Kwota sp'#322'aty'
+              Width = 200
+              WideText = 'Operacja'
             end
             item
-              Alignment = taRightJustify
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 3
-              Width = 90
+              Width = 75
               WideText = 'Kapita'#322
             end
             item
-              Alignment = taRightJustify
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 4
-              Width = 80
+              Width = 75
               WideText = 'Odsetki'
             end
             item
-              Alignment = taRightJustify
               Position = 5
-              Width = 125
-              WideText = 'Pozosta'#322'o'
+              Width = 75
+              WideText = 'Razem'
+            end
+            item
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+              Position = 6
+              Width = 168
+              WideText = 'Nieskapitalizowane odsetki'
             end>
           WideDefaultText = ''
         end
         object PanelError: TPanel
-          Left = 96
+          Left = 200
           Top = 40
           Width = 321
           Height = 41
           BevelOuter = bvNone
-          Caption = 'Brak danych do utworzenia harmonogramu'
+          Caption = 'Brak danych do utworzenia prognozy'
           Color = clWindow
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clGrayText
@@ -325,14 +465,14 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         end
       end
       object Panel2: TPanel
-        Left = 413
+        Left = 629
         Top = 232
         Width = 129
         Height = 33
         BevelOuter = bvNone
         Enabled = False
         TabOrder = 1
-        object CCurrEditRrso: TCCurrEdit
+        object CCurrEditRor: TCCurrEdit
           Left = 5
           Top = 4
           Width = 112
@@ -340,7 +480,6 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
           BorderStyle = bsNone
           Enabled = False
           TabOrder = 0
-          OnChange = CCurrEditTaxChange
           Decimals = 4
           ThousandSep = True
           CurrencyStr = '%'
@@ -351,13 +490,13 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
     end
   end
   inherited PanelButtons: TPanel
-    Top = 482
-    Width = 578
+    Top = 538
+    Width = 805
     inherited BitBtnOk: TBitBtn
-      Left = 401
+      Left = 628
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 489
+      Left = 716
     end
   end
   object PopupMenu1: TPopupMenu

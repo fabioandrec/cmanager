@@ -2,7 +2,84 @@ unit CDeposits;
 
 interface
 
-uses CDataObjects, CDatabase, SysUtils, CConsts, DateUtils, Contnrs;
+uses CDataObjects, CDatabase, SysUtils, CConsts, DateUtils, Contnrs, StrUtils;
+
+type
+  TDepositProgItem = class(TObject)
+  private
+    Fcaption: String;
+    Fdate: TDateTime;
+    Foperation: String;
+    Fcash: Currency;
+    Finterest: Currency;
+    FnoncapitalizedInterest: Currency;
+    FcashInterest: Currency;
+    FdueStart: TDateTime;
+    FdueEnd: TDateTime;
+    FperiodStart: TDateTime;
+    FperiodEnd: TDateTime;
+    FmovementType: TBaseEnumeration;
+  public
+    constructor Create(AType: TBaseEnumeration);
+  published
+    property date: TDateTime read Fdate write Fdate;
+    property caption: String read Fcaption write Fcaption;
+    property operation: String read Foperation write Foperation;
+    property cash: Currency read Fcash write Fcash;
+    property interest: Currency read Finterest write Finterest;
+    property noncapitalizedInterest: Currency read FnoncapitalizedInterest write FnoncapitalizedInterest;
+    property cashInterest: Currency read FcashInterest write FcashInterest;
+    property dueStart: TDateTime read FdueStart write FdueStart;
+    property dueEnd: TDateTime read FdueEnd write FdueEnd;
+    property periodStart: TDateTime read FperiodStart write FperiodStart;
+    property periodEnd: TDateTime read FperiodEnd write FperiodEnd;
+    property movementType: TBaseEnumeration read FmovementType write FmovementType;
+  end;
+
+  TDeposit = class(TObjectList)
+  private
+    FinitialCash: Currency;
+    Fcash: Currency;
+    FinterestRate: Currency;
+    FnoncapitalizedInterest: Currency;
+    FperiodCount: Integer;
+    FperiodType: TBaseEnumeration;
+    FperiodAction: TBaseEnumeration;
+    FdueCount: Integer;
+    FdueType: TBaseEnumeration;
+    FdueAction: TBaseEnumeration;
+    FperiodStartDate: TDateTime;
+    FperiodEndDate: TDateTime;
+    FdueStartDate: TDateTime;
+    FdueEndDate: TDateTime;
+    FrateOfReturn: Currency;
+    FprogEndDate: TDateTime;
+    FdepositState: TBaseEnumeration;
+    function GetItems(AIndex: Integer): TDepositProgItem;
+    procedure SetItems(AIndex: Integer; const Value: TDepositProgItem);
+    procedure SetrateOfReturn(const Value: Currency);
+    function GetrateOfReturn: Currency;
+  public
+    function CalculateProg: Boolean;
+    function IsSumObject(ANumber: Integer): Boolean;
+    property Items[AIndex: Integer]: TDepositProgItem read GetItems write SetItems;
+  published
+    property cash: Currency read Fcash write Fcash;
+    property interestRate: Currency read FinterestRate write FinterestRate;
+    property noncapitalizedInterest: Currency read FnoncapitalizedInterest write FnoncapitalizedInterest;
+    property periodCount: Integer read FperiodCount write FperiodCount;
+    property periodType: TBaseEnumeration read FperiodType write FperiodType;
+    property periodAction: TBaseEnumeration read FperiodAction write FperiodAction;
+    property dueCount: Integer read FdueCount write FdueCount;
+    property dueType: TBaseEnumeration read FdueType write FdueType;
+    property dueAction: TBaseEnumeration read FdueAction write FdueAction;
+    property periodStartDate: TDateTime read FperiodStartDate write FperiodStartDate;
+    property periodEndDate: TDateTime read FperiodEndDate write FperiodEndDate;
+    property progEndDate: TDateTime read FprogEndDate write FprogEndDate;
+    property rateOfReturn: Currency read GetrateOfReturn;
+    property dueStartDate: TDateTime read FdueStartDate write FdueStartDate;
+    property dueEndDate: TDateTime read FdueEndDate write FdueEndDate;
+  end;
 
 procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
 
@@ -119,6 +196,169 @@ begin
   end;
   ADataProvider.CommitTransaction;
   xList.Free;
+end;
+
+function TDeposit.CalculateProg: Boolean;
+var xRateDivider, xDaysBetween: Integer;
+    xRatePeriodType: TBaseEnumeration;
+    xRatePeriodCount: Integer;
+    xCurDate: TDateTime;
+    xItem: TDepositProgItem;
+    xCalcInterest: Currency;
+begin
+  Clear;
+  FinitialCash := Fcash;
+  FdepositState := CDepositInvestmentActive;
+  Result := False;
+  xRatePeriodCount := FperiodCount;
+  xRatePeriodType := FperiodType;
+  if FdueType <> CDepositDueTypeOnDepositEnd then begin
+    xRatePeriodCount := FdueCount;
+    xRatePeriodType := FdueType;
+  end;
+  if xRatePeriodType = CDepositTypeDay then begin
+    xRateDivider := DaysInYear(FperiodStartDate);
+  end else if xRatePeriodType = CDepositTypeWeek then begin
+    xRateDivider := WeeksInYear(FperiodStartDate);
+  end else if xRatePeriodType = CDepositTypeMonth then begin
+    xRateDivider := MonthsPerYear;
+  end else begin
+    xRateDivider := 1;
+  end;
+  xCurDate := FperiodStartDate;
+  try
+    while (xCurDate <= FprogEndDate) and (FdepositState = CDepositInvestmentActive) do begin
+      if xCurDate = FdueEndDate then begin
+        xItem := TDepositProgItem.Create(CDepositMovementDue);
+        xItem.date := xCurDate;
+        xItem.caption := IntToStr(Count + 1);
+        xItem.dueStart := FdueStartDate;
+        xItem.dueEnd := FdueEndDate;
+        xItem.periodStart := FperiodStartDate;
+        xItem.periodEnd := FperiodEndDate;
+        if FdueAction = CDepositDueActionAutoCapitalisation then begin
+          xItem.operation := 'Kapitalizacja naliczonych odsetek';
+        end else begin
+          xItem.operation := 'Naliczenie odsetek';
+        end;
+        xCalcInterest := SimpleRoundTo((xRatePeriodCount * Fcash * FinterestRate) / (100 * xRateDivider), -2);
+        if FdueType <> CDepositDueTypeOnDepositEnd then begin
+          FdueStartDate := IncDay(dueEndDate, 1);
+          FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, dueType);
+        end else begin
+          FdueStartDate := IncDay(periodEndDate, 1);
+          FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, periodType);
+        end;
+        xItem.cash := Fcash;
+        xItem.interest := xCalcInterest;
+        if FdueAction = CDepositDueActionAutoCapitalisation then begin
+          xItem.cashInterest := Fcash + xCalcInterest;
+          xItem.noncapitalizedInterest := 0;
+          FnoncapitalizedInterest := 0;
+          Fcash := Fcash + xCalcInterest;
+        end else begin
+          xItem.cashInterest := Fcash;
+          xItem.noncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
+          FnoncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
+        end;
+        Add(xItem);
+      end;
+      if xCurDate = FperiodEndDate then begin
+        if (FdueStartDate < FperiodEndDate) and (FdueEndDate > FperiodEndDate) then begin
+          xDaysBetween := DaysBetween(FperiodEndDate, FdueStartDate);
+          xItem := TDepositProgItem.Create(CDepositMovementDue);
+          xItem.date := xCurDate;
+          xItem.dueStart := FdueStartDate;
+          xItem.dueEnd := FdueEndDate;
+          xItem.periodStart := FperiodStartDate;
+          xItem.periodEnd := FperiodEndDate;
+          xItem.caption := IntToStr(Count + 1);
+          if FdueAction = CDepositDueActionAutoCapitalisation then begin
+            xItem.operation := 'Kapitalizacja naliczonych odsetek';
+          end else begin
+            xItem.operation := 'Naliczenie odsetek';
+          end;
+          Add(xItem);
+          FdueStartDate := FperiodStartDate;
+          if FdueType <> CDepositDueTypeOnDepositEnd then begin
+            FdueStartDate := IncDay(dueEndDate, 1);
+            FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, dueType);
+          end else begin
+            FdueStartDate := IncDay(periodEndDate, 1);
+            FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, periodType);
+          end;
+          xCalcInterest := SimpleRoundTo((xDaysBetween * Fcash * FinterestRate) / (100 * DaysInYear(FperiodStartDate)), -2);
+          xItem.cash := Fcash;
+          xItem.interest := xCalcInterest;
+          if FdueAction = CDepositDueActionAutoCapitalisation then begin
+            xItem.cashInterest := Fcash + xCalcInterest;
+            xItem.noncapitalizedInterest := 0;
+            FnoncapitalizedInterest := 0;
+          end else begin
+            xItem.cashInterest := Fcash;
+            xItem.noncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
+            FnoncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
+          end;
+        end;
+        xItem := TDepositProgItem.Create(IfThen(FperiodAction = CDepositPeriodActionAutoRenew, CDepositMovementRenew, CDepositMovementInactivate));
+        xItem.date := xCurDate;
+        xItem.dueStart := FdueStartDate;
+        xItem.dueEnd := FdueEndDate;
+        xItem.periodStart := FperiodStartDate;
+        xItem.periodEnd := FperiodEndDate;
+        xItem.caption := IntToStr(Count + 1);
+        xItem.cash := Fcash;
+        xItem.cashInterest := Fcash;
+        xItem.interest := 0;
+        xItem.noncapitalizedInterest := FnoncapitalizedInterest;
+        if FperiodAction = CDepositPeriodActionChangeInactive then begin
+          xItem.operation := 'Koniec czasu trwania lokaty';
+          FdepositState := CDepositInvestmentInactive;
+        end else begin
+          xItem.operation := 'Automatyczne odnowienie lokaty';
+          FdepositState := CDepositInvestmentActive;
+          FperiodStartDate := IncDay(FperiodEndDate, 1);
+          FperiodEndDate := TDepositInvestment.EndPeriodDatetime(FperiodStartDate, FperiodCount, periodType);
+        end;
+        Add(xItem);
+      end;
+      xCurDate := IncDay(xCurDate, 1);
+    end;
+    Result := True;
+  except
+    Clear;
+  end;
+end;
+
+function TDeposit.GetItems(AIndex: Integer): TDepositProgItem;
+begin
+  Result := TDepositProgItem(inherited Items[AIndex]);
+end;
+
+function TDeposit.GetrateOfReturn: Currency;
+begin
+  Result := SimpleRoundTo(100 * (Fcash / FinitialCash));
+end;
+
+function TDeposit.IsSumObject(ANumber: Integer): Boolean;
+begin
+  Result := StrToIntDef(Items[ANumber].caption, -1) <> -1;
+end;
+
+procedure TDeposit.SetItems(AIndex: Integer; const Value: TDepositProgItem);
+begin
+  inherited Items[AIndex] := Value;
+end;
+
+constructor TDepositProgItem.Create(AType: TBaseEnumeration);
+begin
+  inherited Create;
+  FmovementType := AType;
+end;
+
+procedure TDeposit.SetrateOfReturn(const Value: Currency);
+begin
+  FrateOfReturn := Value;
 end;
 
 end.

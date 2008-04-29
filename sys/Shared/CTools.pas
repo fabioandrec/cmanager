@@ -1176,8 +1176,14 @@ begin
 end;
 
 function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
+var xCount: Integer;
 begin
-  Result := IncDay(ADate, Sign(ADate) * DaysInMonth(ADate));
+  xCount := 0;
+  Result := ADate;
+  while (xCount < ADelta) do begin
+    Result := IncDay(Result, Sign(Result) * DaysInMonth(Result));
+    Inc(xCount);
+  end;
 end;
 
 end.

@@ -1040,7 +1040,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure UpdateFieldList; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
-    class function EndPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
+    class function EndPeriodDatetime(APeriodStartDateTime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
     class function EndDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
     function GetElementHint(AColumnIndex: Integer): String; override;
     function GetElementText: String; override;
@@ -5088,9 +5088,9 @@ begin
   Result := IncDay(Result, -1);
 end;
 
-class function TDepositInvestment.EndPeriodDatetime(APeriodLastDatetime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
+class function TDepositInvestment.EndPeriodDatetime(APeriodStartDateTime: TDateTime; APeriodCount: Integer; APeriodType: TBaseEnumeration): TDateTime;
 begin
-  Result := APeriodLastDatetime;
+  Result := APeriodStartDateTime;
   if APeriodType = CDepositTypeDay then begin
     Result := IncDay(Result, APeriodCount);
   end else if APeriodType = CDepositTypeWeek then begin

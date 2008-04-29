@@ -237,8 +237,6 @@ begin
   Label9.Enabled := ComboBoxDueMode.ItemIndex = 1;
   CIntEditDueCount.Enabled := ComboBoxDueMode.ItemIndex = 1;
   ComboBoxDueType.Enabled := ComboBoxDueMode.ItemIndex = 1;
-  Label11.Enabled := ComboBoxDueMode.ItemIndex = 1;
-  ComboBoxDueAction.Enabled := ComboBoxDueMode.ItemIndex = 1;
   UpdateEndCapitalisationDatetime;
   UpdateDescription;
   UpdateFuture;

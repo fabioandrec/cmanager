@@ -344,6 +344,7 @@ const
   CFontPreferencesShortcuts = 'shortcutsList';
   CFontPreferencesHomelist = 'shortcutHomelist';
   CFontPreferencesLoancalc = 'loanCalc';
+  CFontPreferencesDepositcalc = 'depositCalc';
   CFontPreferencesFilterdetails = 'filterDetails';
   CFontPreferencesChartList = 'chartList';
   CFontPreferencesDefaultdataElements = 'defaultData';
