@@ -21,6 +21,8 @@ type
     FInfoBevel: TBevel;
     FAccepted: Boolean;
     FOperation: TConfigOperation;
+    FFilling: Integer;
+    function GetIsFilling: Boolean;
   protected
     function CanAccept: Boolean; virtual;
     function CanModifyValues: Boolean; virtual;
@@ -29,12 +31,16 @@ type
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
     procedure ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
+  protected
+    procedure BeginFilling; virtual;
+    procedure EndFilling; virtual;
   public
     function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False; ANoneButtonCaption: String = ''): Boolean; virtual;
     constructor Create(AOwner: TComponent); override;
   published
     property Operation: TConfigOperation read FOperation write FOperation;
     property Accepted: Boolean read FAccepted write FAccepted;
+    property Filling: Boolean read GetIsFilling;
   end;
 
 implementation
@@ -70,7 +76,9 @@ begin
       BitBtnCancel.Caption := ANoneButtonCaption;
     end;
   end;
+  BeginFilling;
   FillForm;
+  EndFilling;
   if not CanModifyValues then begin
     DisableComponents;
   end;
@@ -130,6 +138,7 @@ begin
   FInfoBevel.Parent := FInfoPanel;
   FInfoBevel.Align := alBottom;
   FInfoBevel.Height := 3;
+  FFilling := 0;
 end;
 
 procedure TCConfigForm.ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
@@ -151,6 +160,21 @@ begin
     FAccepted := True;
     Close;
   end;
+end;
+
+procedure TCConfigForm.BeginFilling;
+begin
+  Inc(FFilling);
+end;
+
+procedure TCConfigForm.EndFilling;
+begin
+  Dec(FFilling);
+end;
+
+function TCConfigForm.GetIsFilling: Boolean;
+begin
+  Result := FFilling > 0;
 end;
 
 end.

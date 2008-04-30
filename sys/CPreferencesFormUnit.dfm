@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 478
           Height = 422
-          ActivePage = TabSheetBase
+          ActivePage = TabSheetPlugins
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -837,66 +837,6 @@ inherited CPreferencesForm: TCPreferencesForm
         BevelOuter = bvLowered
         Color = clWindow
         TabOrder = 1
-        object CButton1: TCButton
-          Left = 16
-          Top = 40
-          Width = 100
-          Height = 57
-          Cursor = crHandPoint
-          PicPosition = ppTop
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action1
-        end
-        object CButton2: TCButton
-          Left = 16
-          Top = 112
-          Width = 100
-          Height = 57
-          Cursor = crHandPoint
-          PicPosition = ppTop
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action2
-        end
-        object CButton3: TCButton
-          Left = 16
-          Top = 184
-          Width = 100
-          Height = 57
-          Cursor = crHandPoint
-          PicPosition = ppTop
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action3
-        end
-        object CButton9: TCButton
-          Left = 16
-          Top = 256
-          Width = 100
-          Height = 57
-          Cursor = crHandPoint
-          PicPosition = ppTop
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action8
-        end
-        object CButton13: TCButton
-          Left = 16
-          Top = 328
-          Width = 100
-          Height = 57
-          Cursor = crHandPoint
-          PicPosition = ppTop
-          PicOffset = 10
-          TxtOffset = 15
-          Framed = False
-          Action = Action12
-        end
         object Panel2: TPanel
           Left = 1
           Top = 1
@@ -912,6 +852,56 @@ inherited CPreferencesForm: TCPreferencesForm
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+        end
+        object ShortcutList: TCList
+          Left = 1
+          Top = 22
+          Width = 127
+          Height = 422
+          Align = alClient
+          BevelEdges = []
+          BevelInner = bvNone
+          BevelOuter = bvRaised
+          BevelKind = bkFlat
+          BorderStyle = bsNone
+          ButtonStyle = bsTriangle
+          Colors.HotColor = clNavy
+          Colors.UnfocusedSelectionColor = clHighlight
+          DefaultNodeHeight = 60
+          Header.AutoSizeIndex = -1
+          Header.Font.Charset = DEFAULT_CHARSET
+          Header.Font.Color = clWindowText
+          Header.Font.Height = -11
+          Header.Font.Name = 'MS Sans Serif'
+          Header.Font.Style = []
+          Header.Height = 21
+          Header.Options = [hoAutoResize, hoDrag, hoShowSortGlyphs]
+          Header.SortColumn = 0
+          Header.Style = hsFlatButtons
+          HintMode = hmHint
+          Images = CategoryImageList
+          Indent = 20
+          Margin = 15
+          ParentShowHint = False
+          PopupMenu = PopupMenuShortcutView
+          ShowHint = True
+          TabOrder = 1
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes]
+          TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+          TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages]
+          TreeOptions.SelectionOptions = [toFullRowSelect]
+          OnClick = ShortcutListClick
+          OnGetText = ShortcutListGetText
+          OnGetImageIndex = ShortcutListGetImageIndex
+          OnHotChange = ShortcutListHotChange
+          AutoExpand = True
+          Columns = <
+            item
+              Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
+              Position = 0
+              Width = 127
+            end>
+          WideDefaultText = ''
         end
       end
     end
@@ -1671,5 +1661,13 @@ inherited CPreferencesForm: TCPreferencesForm
     Options = [cdFullOpen]
     Left = 342
     Top = 428
+  end
+  object PopupMenuShortcutView: TPopupMenu
+    Left = 48
+    Top = 305
+    object Ustawienialisty1: TMenuItem
+      Caption = 'Ustawienia listy'
+      OnClick = Ustawienialisty1Click
+    end
   end
 end

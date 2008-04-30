@@ -911,6 +911,11 @@ begin
   with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
   end;
+  Result.Add(TViewPref.Create(CFontPreferencesPreferencesShortcut), True);
+  with TViewPref(Result.Last) do begin
+    Fontprefs.Add(TFontPref.CreateFontPref('*', 'Wszystkie elementy'), True);
+    TFontPref(Fontprefs.Last).RowHeight := 48;
+  end;
   Result.Add(TViewPref.Create(CFontPreferencesDefaultdataElements), True);
   with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('T', 'Rodzaj danych'), True);

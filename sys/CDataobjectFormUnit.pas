@@ -60,7 +60,9 @@ begin
     BitBtnCancel.Caption := '&Wyjœcie';
   end;
   if (Operation = coEdit) or ((Dataobject <> Nil) and (Operation = coNone)) then begin
+    BeginFilling;
     FillForm;
+    EndFilling;
   end;
   if not CanModifyValues then begin
     DisableComponents;

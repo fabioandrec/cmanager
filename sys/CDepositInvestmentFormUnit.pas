@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
   CComponents, CDatabase, CBaseFrameUnit, ActnList, ActnMan, CImageListsUnit,
-  Contnrs, CDataObjects, XPStyleActnCtrls, Math;
+  Contnrs, CDataObjects, XPStyleActnCtrls, Math, CDeposits;
 
 type
   TCDepositInvestmentForm = class(TCDataobjectForm)
@@ -80,7 +80,10 @@ type
     procedure CStaticCurrencyRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CCurrEditActualCashChange(Sender: TObject);
     procedure CStaticCurrencyRateChanged(Sender: TObject);
+    procedure CCurrEditRateChange(Sender: TObject);
+    procedure CStaticFutureGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
+    FDeposit: TDeposit;
     FPeriodEndDate: TDateTime;
     FDueEndDate: TDateTime;
     FRateHelper: TCurrencyRateHelper;
@@ -101,6 +104,7 @@ type
     function GetDataobjectClass: TDataObjectClass; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure AfterCommitData; override;
+    procedure EndFilling; override;
   public
     property formPeriodType: TBaseEnumeration read GetPeriodType write SetPeriodType;
     property formDueType: TBaseEnumeration read GetDueType write SetDueType;
@@ -114,7 +118,8 @@ uses CConsts, CConfigFormUnit, CFrameFormUnit, CCurrencydefFrameUnit,
   CAccountsFrameUnit, CCashpointFormUnit, CCashpointsFrameUnit, CTemplates,
   CDescpatternFormUnit, CPreferences, CRichtext, CTools, CInfoFormUnit,
   CDepositInvestmentFrameUnit, CCurrencyRateFrameUnit, CMovementFrameUnit,
-  CSurpassedFormUnit, CProductsFrameUnit, StrUtils;
+  CSurpassedFormUnit, CProductsFrameUnit, StrUtils,
+  CDepositCalculatorFormUnit, CDatatools;
 
 {$R *.dfm}
 
@@ -134,6 +139,7 @@ end;
 procedure TCDepositInvestmentForm.InitializeForm;
 begin
   inherited InitializeForm;
+  FDeposit := TDeposit.Create;
   FRateHelper := nil;
   CDateTime.Value := Now;
   CStaticCurrency.DataId := CCurrencyDefGid_PLN;
@@ -584,8 +590,38 @@ end;
 procedure TCDepositInvestmentForm.UpdateFuture;
 var xFuture: String;
 begin
-  xFuture := 'Data koñca lokaty ' + Date2StrDate(FPeriodEndDate, False) + ', naliczanie odsetek ' + Date2StrDate(FDueEndDate, False);
-  CStaticFuture.Caption := xFuture;
+  if not (csLoading in ComponentState) and (not Filling) then begin
+    with FDeposit do begin
+      cash := CCurrEditActualCash.Value;
+      interestRate := CCurrEditRate.Value;
+      noncapitalizedInterest := 0;
+      periodCount := CIntEditPeriodCount.Value;
+      periodType := formPeriodType;
+      dueType := formDueType;
+      dueCount := CIntEditDueCount.Value;
+      periodStartDate := CDateTime.Value;
+      periodEndDate := FPeriodEndDate;
+      dueStartDate := CDateTime.Value;
+      dueEndDate := FDueEndDate;
+      progEndDate := FPeriodEndDate;
+      if ComboBoxPeriodAction.ItemIndex = 1 then begin
+        periodAction := CDepositPeriodActionAutoRenew;
+      end else begin
+        periodAction := CDepositPeriodActionChangeInactive;
+      end;
+      if ComboBoxDueAction.ItemIndex = 0 then begin
+        dueAction := CDepositDueActionAutoCapitalisation;
+      end else begin
+        dueAction := CDepositDueActionLeaveUncapitalised;
+      end;
+    end;
+    if FDeposit.CalculateProg then begin
+      xFuture := 'Data koñca ' + Date2StrDate(FPeriodEndDate, False) + ', do wyp³aty ' + CurrencyToString(FDeposit.cash + FDeposit.noncapitalizedInterest, CStaticCurrency.DataId);
+    end else begin
+      xFuture := '<brak danych do utworzenia prognozy>';
+    end;
+    CStaticFuture.Caption := xFuture;
+  end;
 end;
 
 procedure TCDepositInvestmentForm.CStaticCategoryChanged(Sender: TObject);
@@ -682,18 +718,82 @@ begin
   if FRateHelper <> Nil then begin
     FRateHelper.Free;
   end;
+  FDeposit.Free;
   inherited Destroy;
 end;
 
 procedure TCDepositInvestmentForm.CCurrEditActualCashChange(Sender: TObject);
 begin
   UpdateCurrencyRates;
+  UpdateFuture;
 end;
 
 procedure TCDepositInvestmentForm.CStaticCurrencyRateChanged(Sender: TObject);
 begin
   UpdateCurrencyRates;
   UpdateDescription;
+end;
+
+procedure TCDepositInvestmentForm.CCurrEditRateChange(Sender: TObject);
+begin
+  UpdateFuture;
+end;
+
+procedure TCDepositInvestmentForm.CStaticFutureGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  with FDeposit do begin
+    cash := CCurrEditActualCash.Value;
+    interestRate := CCurrEditRate.Value;
+    noncapitalizedInterest := 0;
+    periodCount := CIntEditPeriodCount.Value;
+    periodType := formPeriodType;
+    dueType := formDueType;
+    dueCount := CIntEditDueCount.Value;
+    periodStartDate := CDateTime.Value;
+    periodEndDate := FPeriodEndDate;
+    dueStartDate := CDateTime.Value;
+    dueEndDate := FDueEndDate;
+    progEndDate := FPeriodEndDate;
+    if ComboBoxPeriodAction.ItemIndex = 1 then begin
+      periodAction := CDepositPeriodActionAutoRenew;
+    end else begin
+      periodAction := CDepositPeriodActionChangeInactive;
+    end;
+    if ComboBoxDueAction.ItemIndex = 0 then begin
+      dueAction := CDepositDueActionAutoCapitalisation;
+    end else begin
+      dueAction := CDepositDueActionLeaveUncapitalised;
+    end;
+    if ShowDepositCalculator(True, FDeposit) then begin
+      BeginFilling;
+      CCurrEditActualCash.Value := cash;
+      CCurrEditRate.Value := interestRate;
+      CIntEditPeriodCount.Value := periodCount;
+      CIntEditDueCount.Value := dueCount;
+      CDateTime.Value := periodStartDate;
+      FPeriodEndDate := periodEndDate;
+      FDueEndDate := dueEndDate;
+      formPeriodType := periodType;
+      formDueType := dueType;
+      if periodAction = CDepositPeriodActionAutoRenew then begin
+        ComboBoxPeriodAction.ItemIndex := 1;
+      end else begin
+        ComboBoxPeriodAction.ItemIndex := 0;
+      end;
+      if dueAction = CDepositDueActionAutoCapitalisation then begin
+        ComboBoxDueAction.ItemIndex := 0;
+      end else begin
+        ComboBoxDueAction.ItemIndex := 1;
+      end;
+      EndFilling;
+    end;
+  end;
+end;
+
+procedure TCDepositInvestmentForm.EndFilling;
+begin
+  inherited EndFilling;
+  UpdateFuture;
 end;
 
 end.

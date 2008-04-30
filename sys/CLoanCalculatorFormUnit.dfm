@@ -189,15 +189,15 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       TabOrder = 1
       object Label8: TLabel
         Left = 199
-        Top = 241
+        Top = 237
         Width = 202
         Height = 13
         Alignment = taRightJustify
         Caption = 'Rzeczywista roczna stopa oprocentowania'
       end
       object CButton1: TCButton
-        Left = 16
-        Top = 235
+        Left = 24
+        Top = 231
         Width = 105
         Height = 25
         Cursor = crHandPoint
@@ -324,29 +324,20 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
           TabOrder = 1
         end
       end
-      object Panel2: TPanel
-        Left = 405
+      object CCurrEditRrso: TCCurrEdit
+        Left = 409
         Top = 232
-        Width = 129
-        Height = 33
-        BevelOuter = bvNone
+        Width = 112
+        Height = 21
+        BorderStyle = bsNone
         Enabled = False
         TabOrder = 1
-        object CCurrEditRrso: TCCurrEdit
-          Left = 5
-          Top = 4
-          Width = 112
-          Height = 21
-          BorderStyle = bsNone
-          Enabled = False
-          TabOrder = 0
-          OnChange = CCurrEditTaxChange
-          Decimals = 4
-          ThousandSep = True
-          CurrencyStr = '%'
-          BevelKind = bkTile
-          WithCalculator = True
-        end
+        OnChange = CCurrEditTaxChange
+        Decimals = 4
+        ThousandSep = True
+        CurrencyStr = '%'
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
   end

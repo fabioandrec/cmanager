@@ -1023,7 +1023,7 @@ end;
 
 procedure TCMainForm.ActionDepositCalcExecute(Sender: TObject);
 begin
-  ShowDepositCalculator(False);
+  ShowDepositCalculator(False, Nil);
 end;
 
 end.

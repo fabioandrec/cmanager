@@ -29,8 +29,6 @@ type
     Label7: TLabel;
     CCurrEditOthers: TCCurrEdit;
     Label8: TLabel;
-    Panel2: TPanel;
-    CCurrEditRrso: TCCurrEdit;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
     ActionList: TActionList;
@@ -38,6 +36,7 @@ type
     CButton1: TCButton;
     Bevel1: TBevel;
     Bevel2: TBevel;
+    CCurrEditRrso: TCCurrEdit;
     procedure ComboBoxPeriodChange(Sender: TObject);
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CCurrEditCashChange(Sender: TObject);

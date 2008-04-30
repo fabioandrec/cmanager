@@ -7,7 +7,7 @@ interface
 uses  CConfigFormUnit, StdCtrls, Dialogs, ImgList, Controls,
   PngImageList, Classes, ActnList, XPStyleActnCtrls, ActnMan, CComponents,
   ComCtrls, Buttons, ExtCtrls, Windows, Messages, SysUtils, Variants, Graphics,
-  Forms, VirtualTrees, CPreferences, Contnrs;
+  Forms, VirtualTrees, CPreferences, Contnrs, Menus;
 
 const
   CPreferencesFirstTab = 0;
@@ -20,12 +20,10 @@ type
     Panel1: TPanel;
     Panel2: TPanel;
     PageControl: TPageControl;
-    CButton1: TCButton;
     ActionManager1: TActionManager;
     Action1: TAction;
     CategoryImageList: TPngImageList;
     Action2: TAction;
-    CButton2: TCButton;
     TabSheetBase: TTabSheet;
     TabSheetView: TTabSheet;
     GroupBox1: TGroupBox;
@@ -37,7 +35,6 @@ type
     GroupBox2: TGroupBox;
     CheckBoxShortcutVisible: TCheckBox;
     CheckBoxStatusVisible: TCheckBox;
-    CButton3: TCButton;
     Action3: TAction;
     TabSheetAutostart: TTabSheet;
     GroupBox3: TGroupBox;
@@ -88,7 +85,6 @@ type
     CheckBoxCanOverwrite: TCheckBox;
     TabSheetPlugins: TTabSheet;
     Action8: TAction;
-    CButton9: TCButton;
     Panel3: TPanel;
     List: TCDataList;
     CButton10: TCButton;
@@ -104,7 +100,6 @@ type
     CButton12: TCButton;
     Action11: TAction;
     Label7: TLabel;
-    CButton13: TCButton;
     Action12: TAction;
     TabSheetOperations: TTabSheet;
     GroupBox8: TGroupBox;
@@ -118,6 +113,9 @@ type
     CStaticProfile: TCStatic;
     Label12: TLabel;
     ComboBoxWhen: TComboBox;
+    ShortcutList: TCList;
+    PopupMenuShortcutView: TPopupMenu;
+    Ustawienialisty1: TMenuItem;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -146,6 +144,11 @@ type
     procedure CStaticCategoryGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCashpointGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticProfileGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    procedure ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+    procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+    procedure ShortcutListClick(Sender: TObject);
+    procedure Ustawienialisty1Click(Sender: TObject);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -175,7 +178,7 @@ uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CTemplates, CDescpatternFormUnit, CPlugins, CExtractionItemFormUnit,
   CExtractionsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
   CProductsFrameUnit, CCashpointsFrameUnit, CProfileFrameUnit, CDatabase,
-  CDataObjects, CTools, Math;
+  CDataObjects, CTools, Math, CImageListsUnit;
 
 {$R *.dfm}
 
@@ -191,6 +194,8 @@ begin
   FBasePrefs.Clone(GBasePreferences);
   FPluginPrefs.Clone(GPluginsPreferences);
   FRestartInfo := '';
+  ShortcutList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesPreferencesShortcut]);
+  ShortcutList.RootNodeCount := 5;
   Result := ShowConfig(coEdit);
   if Result then begin
     GViewsPreferences.Clone(FViewPrefs);
@@ -673,6 +678,47 @@ end;
 procedure TCPreferencesForm.CStaticProfileGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := TCFrameForm.ShowFrame(TCProfileFrame, ADataGid, AText);
+end;
+
+procedure TCPreferencesForm.ShortcutListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+begin
+  CellText := TAction(ActionManager1.Actions[Node.Index]).Caption;
+end;
+
+procedure TCPreferencesForm.ShortcutListHotChange(Sender: TBaseVirtualTree; OldNode, NewNode: PVirtualNode);
+begin
+  if NewNode <> Nil then begin
+    if NewNode.Index <> 0 then begin
+      Sender.Cursor := crHandPoint;
+    end;
+  end else begin
+    Sender.Cursor := crDefault;
+  end;
+end;
+
+procedure TCPreferencesForm.ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
+begin
+  ImageIndex := TAction(ActionManager1.Actions[Node.Index]).ImageIndex;
+end;
+
+procedure TCPreferencesForm.ShortcutListClick(Sender: TObject);
+var xAction: TAction;
+begin
+  if (ShortcutList.FocusedNode <> Nil) then begin
+    xAction := TAction(ActionManager1.Actions[ShortcutList.FocusedNode.Index]);
+    xAction.Execute;
+  end;
+end;
+
+procedure TCPreferencesForm.Ustawienialisty1Click(Sender: TObject);
+var xPrefs: TCListPreferencesForm;
+begin
+  xPrefs := TCListPreferencesForm.Create(Nil);
+  if xPrefs.ShowListPreferences(ShortcutList.ViewPref) then begin
+    ShortcutList.ReinitNode(ShortcutList.RootNode, True);
+    ShortcutList.Repaint;
+  end;
+  xPrefs.Free;
 end;
 
 end.

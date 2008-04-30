@@ -5,7 +5,7 @@ interface
 uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windows,
      GraphUtil, CDatabase, Db, VirtualTrees, SysUtils, CLoans, CPlugins,
      CComponents, CChartReportFormUnit, CTemplates, ShDocVW, CTools, CDataObjects,
-     CXml, TeEngine, Types;
+     CXml, TeEngine, Types, CDeposits;
 
 type
   TReportDialogParamsDefs = class;
@@ -543,7 +543,23 @@ type
     property loan: TLoan read Floan write Floan;
   end;
 
+  TDepositReportParams = class(TCReportParams)
+  private
+    Fdeposit: TDeposit;
+  public
+    constructor Create(ADeposit: TDeposit);
+  published
+    property deposit: TDeposit read Fdeposit write Fdeposit;
+  end;
+
   TLoanReport = class(TCHtmlReport)
+  protected
+    function GetReportBody: String; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
+  TDepositReport = class(TCHtmlReport)
   protected
     function GetReportBody: String; override;
   public
@@ -5357,6 +5373,94 @@ end;
 function TOperationsTreeCategoryList.PrepareReportConditions: Boolean;
 begin
   Result := ChoosePeriodFilterByForm(FStartDate, FEndDate, FIdFilter, @CurrencyView, True);
+end;
+
+constructor TDepositReportParams.Create(ADeposit: TDeposit);
+begin
+  inherited Create;
+  Fdeposit := ADeposit;
+end;
+
+function TDepositReport.GetReportBody: String;
+var xD: TDeposit;
+    xBody: TStringList;
+    xCount: Integer;
+    xTemp: String;
+begin
+  xD := TDepositReportParams(FParams).deposit;
+  xBody := TStringList.Create;
+  with xBody do begin
+    Add('<table class="base">');
+    Add('<tr class="head">');
+    Add('<td class="headleft" width="100%">Dane o lokacie</td>');
+    Add('</tr></table><hr>');
+    Add('<table class="base" colspan="2">');
+    Add('<tr class="base"><td class="left" width="30%">Kapita³ lokaty</td><td class="left" width="70%">' + CurrencyToString(xD.initialCash, '', False) + '</td></tr>');
+    Add('<tr class="base"><td class="left" width="30%">Roczne oprocentowanie</td><td class="left" width="70%">' + CurrencyToString(xD.interestRate, '', False, 4) + '%</td></tr>');
+    xTemp := IntToStr(xD.periodCount) + ' ' + xD.periodTypeAsString;
+    Add('<tr class="base"><td class="left" width="30%">Czas trwania lokaty</td><td class="left" width="70%">' + xTemp + '</td></tr>');
+    Add('<tr class="base"><td class="left" width="30%">Data utworzenia lokaty</td><td class="left" width="70%">' + Date2StrDate(xD.initialPeriodStartDate) + '</td></tr>');
+    if xD.periodAction = CDepositPeriodActionAutoRenew then begin
+      Add('<tr class="base"><td class="left" width="30%">Data koñca lokaty</td><td class="left" width="70%">automatycznie odnawiana (najbli¿sza data koñca ' + Date2StrDate(xD.initialPeriodEndDate) + ')</td></tr>');
+    end else begin
+      Add('<tr class="base"><td class="left" width="30%">Data koñca lokaty</td><td class="left" width="70%">' + Date2StrDate(xD.initialPeriodEndDate) + '</td></tr>');
+    end;
+    if xD.dueType = CDepositDueTypeOnDepositEnd then begin
+      Add('<tr class="base"><td class="left" width="30%">Naliczanie odsetek</td><td class="left" width="70%">jednorazowo, po zakoñczeniu czasu trwania lokaty</td></tr>');
+    end else begin
+      Add('<tr class="base"><td class="left" width="30%">Naliczanie odsetek</td><td class="left" width="70%">wielokrotnie, co ' + IntToStr(xD.dueCount) + ' ' + xD.dueTypeAsString + '</td></tr>');
+    end;
+    if xD.dueAction = CDepositDueActionAutoCapitalisation then begin
+      xTemp := 'dopisz odsetki do kapita³u';
+    end else begin
+      xTemp := 'pozostaw do wyp³aty';
+    end;
+    Add('<tr class="base"><td class="left" width="30%">Naliczone odsetki</td><td class="left" width="70%">' + xTemp + '</td></tr>');
+    Add('</table>');
+    Add('<hr>');
+    Add('<p class="reptitle">Prognoza lokaty w okresie od ' + Date2StrDate(xD.initialPeriodStartDate) + ' do ' + Date2StrDate(xD.progEndDate) + '<hr>');
+    Add('<table class="base" colspan="7">');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="5%">Lp</td>');
+    Add('<td class="headtext" width="15%">Data</td>');
+    Add('<td class="headtext" width="35%">Operacja</td>');
+    Add('<td class="headcash" width="10%">Kapita³</td>');
+    Add('<td class="headcash" width="10%">Odsetki</td>');
+    Add('<td class="headcash" width="10%">Razem</td>');
+    Add('<td class="headcash" width="15%">Wolne odsetki</td>');
+    Add('</tr>');
+    Add('</table>');
+    Add('<hr>');
+    Add('<table class="base" colspan="7">');
+    for xCount := 0 to xD.Count - 1 do begin
+      if xD.IsSumObject(xCount) then begin
+        Add('<tr class="' + IsEvenToStr(xCount) + 'base">');
+        Add('<td class="text" width="5%">' + IntToStr(xCount + 1) + '</td>');
+        Add('<td class="text" width="15%">' + Date2StrDate(xD.Items[xCount].date) + '</td>');
+        Add('<td class="text" width="35%">' + xD.Items[xCount].operation + '</td>');
+        Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].cash, '', False) + '</td>');
+        Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].interest, '', False) + '</td>');
+        Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].cashInterest, '', False) + '</td>');
+        Add('<td class="cash" width="15%">' + CurrencyToString(xD.Items[xCount].noncapitalizedInterest, '', False) + '</td>');
+        Add('</tr>');
+      end;
+    end;
+    Add('</table><hr>');
+    Add('<table class="base">');
+    Add('<tr class="sum">');
+    Add('<td class="sumtext" width="55%">Razem do wyp³aty</td>');
+    Add('<td class="sumcash" width="10%">' + CurrencyToString(xD.cash + xD.noncapitalizedInterest, '', False) + '</td>');
+    Add('<td class="sumcash" width="35%"></td>');
+    Add('</tr>');
+    Add('</table>');
+  end;
+  Result := xBody.Text;
+  xBody.Free;
+end;
+
+function TDepositReport.GetReportTitle: String;
+begin
+  Result := 'Informacje o lokacie';
 end;
 
 initialization

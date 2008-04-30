@@ -350,6 +350,7 @@ const
   CFontPreferencesDefaultdataElements = 'defaultData';
   CFontPreferencesSurpassesLimits = 'surpassedLimits';
   CFontPreferencesQuickpatternsRun = 'quickPatternsRun';
+  CFontPreferencesPreferencesShortcut = 'prefPreferencesShortcut';
 
 implementation
 

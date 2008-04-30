@@ -68,6 +68,18 @@ padding-left: 8px;
 padding-right: 8px;
 text-align: center;
 }
+td.left
+{
+padding-left: 8px;
+padding-right: 8px;
+text-align: left;
+}
+td.right
+{
+padding-left: 8px;
+padding-right: 8px;
+text-align: right;
+}
 td.infotext
 {
 padding-left: 8px;
@@ -88,6 +100,13 @@ padding-left: 8px;
 padding-right: 8px;
 font-weight: bold;
 text-align: center;
+}
+td.headleft
+{
+padding-left: 8px;
+padding-right: 8px;
+font-weight: bold;
+text-align: left;
 }
 td.headcash
 {

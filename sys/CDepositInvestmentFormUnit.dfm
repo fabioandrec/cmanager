@@ -66,7 +66,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 40
-        TabOrder = 1
+        TabOrder = 2
         OnChange = EditNameChange
       end
       object ComboBoxType: TComboBox
@@ -79,7 +79,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 2
+        TabOrder = 1
         Text = 'Za'#322'o'#380'enie lokaty'
         OnChange = ComboBoxTypeChange
         Items.Strings = (
@@ -321,6 +321,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Height = 21
         BorderStyle = bsNone
         TabOrder = 3
+        OnChange = CCurrEditRateChange
         Decimals = 4
         ThousandSep = True
         CurrencyStr = '%'
@@ -467,8 +468,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         TabStop = True
         Transparent = False
         TextOnEmpty = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
-        OnGetDataId = CStaticAccountGetDataId
-        OnChanged = CStaticAccountChanged
+        OnGetDataId = CStaticFutureGetDataId
         HotTrack = True
       end
       object CStaticAccount: TCStatic

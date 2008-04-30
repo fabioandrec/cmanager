@@ -1,15 +1,15 @@
 inherited CDepositCalculatorForm: TCDepositCalculatorForm
-  Left = 231
-  Top = 217
+  Left = 244
+  Top = 175
   Caption = 'Kalkulator kredytowy'
-  ClientHeight = 579
+  ClientHeight = 573
   ClientWidth = 805
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
     Width = 805
-    Height = 538
+    Height = 532
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -113,7 +113,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 2
+        TabOrder = 3
         Text = '1'
         OnChange = CIntEditPeriodCountChange
       end
@@ -127,7 +127,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 3
+        TabOrder = 4
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxPeriodTypeChange
         Items.Strings = (
@@ -146,7 +146,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 4
+        TabOrder = 5
         Text = 'zmie'#324' status na nieaktywna'
         OnChange = ComboBoxPeriodActionChange
         Items.Strings = (
@@ -163,7 +163,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 5
+        TabOrder = 7
         Text = 'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
         OnChange = ComboBoxDueModeChange
         Items.Strings = (
@@ -178,7 +178,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 6
+        TabOrder = 8
         Text = '1'
         OnChange = CIntEditDueCountChange
       end
@@ -192,7 +192,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 7
+        TabOrder = 9
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxDueTypeChange
         Items.Strings = (
@@ -211,7 +211,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 8
+        TabOrder = 10
         Text = 'dopisz odsetki do kapita'#322'u'
         OnChange = ComboBoxDueActionChange
         Items.Strings = (
@@ -229,7 +229,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
-        TabOrder = 9
+        TabOrder = 0
         TabStop = True
         Transparent = False
         OnChanged = CDateTimeStartChanged
@@ -247,7 +247,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Color = clWindow
         Enabled = False
         ParentColor = False
-        TabOrder = 10
+        TabOrder = 6
         TabStop = True
         Transparent = False
         HotTrack = False
@@ -259,7 +259,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Width = 161
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 0
+        TabOrder = 1
         OnChange = CCurrEditActualCashChange
         Decimals = 2
         ThousandSep = True
@@ -273,7 +273,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Width = 89
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 1
+        TabOrder = 2
         OnChange = CCurrEditRateChange
         Decimals = 4
         ThousandSep = True
@@ -292,7 +292,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
-        TabOrder = 11
+        TabOrder = 12
         TabStop = True
         Transparent = False
         OnChanged = CDateTimeProgChanged
@@ -310,7 +310,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Color = clWindow
         Enabled = False
         ParentColor = False
-        TabOrder = 12
+        TabOrder = 11
         TabStop = True
         Transparent = False
         HotTrack = False
@@ -321,12 +321,12 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
       Left = 16
       Top = 252
       Width = 769
-      Height = 277
+      Height = 273
       Caption = ' Prognoza lokaty '
       TabOrder = 1
       object Label8: TLabel
         Left = 563
-        Top = 241
+        Top = 237
         Width = 62
         Height = 13
         Alignment = taRightJustify
@@ -334,7 +334,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
       end
       object CButton1: TCButton
         Left = 24
-        Top = 235
+        Top = 231
         Width = 105
         Height = 25
         Cursor = crHandPoint
@@ -344,6 +344,14 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Framed = False
         Action = Action1
         Color = clBtnFace
+      end
+      object Label12: TLabel
+        Left = 345
+        Top = 237
+        Width = 88
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Razem do wyp'#322'aty'
       end
       object Panel1: TPanel
         Left = 24
@@ -443,7 +451,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
               Options = [coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
               Position = 6
               Width = 168
-              WideText = 'Nieskapitalizowane odsetki'
+              WideText = 'Wolne odsetki'
             end>
           WideDefaultText = ''
         end
@@ -464,33 +472,38 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
           TabOrder = 1
         end
       end
-      object Panel2: TPanel
-        Left = 629
-        Top = 232
-        Width = 129
-        Height = 33
-        BevelOuter = bvNone
+      object CCurrEditRor: TCCurrEdit
+        Left = 633
+        Top = 233
+        Width = 112
+        Height = 21
+        BorderStyle = bsNone
         Enabled = False
         TabOrder = 1
-        object CCurrEditRor: TCCurrEdit
-          Left = 5
-          Top = 4
-          Width = 112
-          Height = 21
-          BorderStyle = bsNone
-          Enabled = False
-          TabOrder = 0
-          Decimals = 4
-          ThousandSep = True
-          CurrencyStr = '%'
-          BevelKind = bkTile
-          WithCalculator = True
-        end
+        Decimals = 4
+        ThousandSep = True
+        CurrencyStr = '%'
+        BevelKind = bkTile
+        WithCalculator = True
+      end
+      object CCurrEditReadyCash: TCCurrEdit
+        Left = 441
+        Top = 233
+        Width = 112
+        Height = 21
+        BorderStyle = bsNone
+        Enabled = False
+        TabOrder = 2
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
   end
   inherited PanelButtons: TPanel
-    Top = 538
+    Top = 532
     Width = 805
     inherited BitBtnOk: TBitBtn
       Left = 628

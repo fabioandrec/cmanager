@@ -15,8 +15,6 @@ type
     RepaymentList: TCList;
     PanelError: TPanel;
     Label8: TLabel;
-    Panel2: TPanel;
-    CCurrEditRor: TCCurrEdit;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;
     ActionList: TActionList;
@@ -48,6 +46,9 @@ type
     CDateTimeProg: TCDateTime;
     Label10: TLabel;
     CDateTimeDueEnd: TCDateTime;
+    CCurrEditRor: TCCurrEdit;
+    Label12: TLabel;
+    CCurrEditReadyCash: TCCurrEdit;
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure FormCreate(Sender: TObject);
     procedure Action1Execute(Sender: TObject);
@@ -75,35 +76,42 @@ type
     procedure UpdateDueEndPeriod;
     procedure UpdateProgDateEnd;
     procedure UpdateDues;
+    procedure EndFilling; override;
   public
     property deposit: TDeposit read Fdeposit write Fdeposit;
     property formPeriodType: TBaseEnumeration read GetPeriodType;
     property formDueType: TBaseEnumeration read GetDueType;
   end;
 
-function ShowDepositCalculator(ACanAccept: Boolean): TDeposit;
+function ShowDepositCalculator(ACanAccept: Boolean; ADeposit: TDeposit): Boolean;
 
 implementation
 
-uses CReports, CPreferences, CConsts, CListPreferencesFormUnit, CDatatools;
+uses CReports, CPreferences, CConsts, CListPreferencesFormUnit, CDatatools,
+  Math;
 
 {$R *.dfm}
 
-function ShowDepositCalculator(ACanAccept: Boolean): TDeposit;
+function ShowDepositCalculator(ACanAccept: Boolean; ADeposit: TDeposit): Boolean;
 var xForm: TCDepositCalculatorForm;
     xOperation: TConfigOperation;
+    xDeposit: TDeposit;
 begin
-  Result := TDeposit.Create;
+  if ADeposit = Nil then begin
+    xDeposit := TDeposit.Create;
+  end else begin
+    xDeposit := ADeposit;
+  end;
   xForm := TCDepositCalculatorForm.Create(Application);
-  xForm.deposit := Result;
+  xForm.deposit := xDeposit;
   if ACanAccept then begin
     xOperation := coAdd;
   end else begin
     xOperation := coNone;
   end;
-  xForm.UpdateDepositData;
-  if not xForm.ShowConfig(xOperation) then begin
-    FreeAndNil(Result);
+  Result := xForm.ShowConfig(xOperation);
+  if ADeposit = Nil then begin
+    FreeAndNil(xDeposit);
   end;
   xForm.Free;
 end;
@@ -111,7 +119,7 @@ end;
 procedure TCDepositCalculatorForm.UpdateDepositData;
 var xValid: Boolean;
 begin
-  if not (csLoading in componentState) then begin
+  if not (csLoading in componentState) and (not Filling)then begin
     xValid := (CCurrEditActualCash.Value > 0) and (CIntEditPeriodCount.Value > 0) and
               (CDateTimeStart.Value <> 0) and (CDateTimeEnd.Value <> 0) and (CDateTimeProg.Value <> 0);
     if xValid then begin
@@ -142,7 +150,6 @@ begin
       xValid := Fdeposit.CalculateProg;
     end;
     if xValid then begin
-      CCurrEditRor.Value := Fdeposit.rateOfReturn;
       PanelError.Visible := False;
       with RepaymentList do begin
         BeginUpdate;
@@ -151,6 +158,7 @@ begin
         Header.Options := Header.Options + [hoVisible];
       end;
       CCurrEditRor.Value := Fdeposit.rateOfReturn;
+      CCurrEditReadyCash.Value := Fdeposit.cash + Fdeposit.noncapitalizedInterest;
     end else begin
       PanelError.Visible := True;
       with RepaymentList do begin
@@ -197,22 +205,19 @@ procedure TCDepositCalculatorForm.FormCreate(Sender: TObject);
 begin
   inherited;
   CCurrEditActualCash.CurrencyStr := '';
+  CCurrEditReadyCash.CurrencyStr := '';
   RepaymentList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDepositcalc]);
 end;
 
 procedure TCDepositCalculatorForm.Action1Execute(Sender: TObject);
-{
-var xParams: TLoanReportParams;
-    xReport: TLoanReport;
-    }
+var xParams: TDepositReportParams;
+    xReport: TDepositReport;
 begin
-{
-  xParams := TLoanReportParams.Create(Floan);
-  xReport := TLoanReport.CreateReport(xParams);
+  xParams := TDepositReportParams.Create(Fdeposit);
+  xReport := TDepositReport.CreateReport(xParams);
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
-  }
 end;
 
 procedure TCDepositCalculatorForm.Zaznaczwszystkie1Click(Sender: TObject);
@@ -323,11 +328,40 @@ end;
 procedure TCDepositCalculatorForm.FillForm;
 begin
   inherited FillForm;
-  CDateTimeStart.Value := GWorkDate;
+  ComboBoxPeriodAction.ItemIndex := IfThen(Fdeposit.periodAction = CDepositPeriodActionAutoRenew, 1, 0);
+  ComboBoxDueAction.ItemIndex := IfThen(Fdeposit.dueAction = CDepositDueActionAutoCapitalisation, 0, 1);
+  if Fdeposit.periodType = CDepositTypeDay then begin
+    ComboBoxPeriodType.ItemIndex := 0;
+  end else if Fdeposit.periodType = CDepositTypeWeek then begin
+    ComboBoxPeriodType.ItemIndex := 1;
+  end else if Fdeposit.periodType = CDepositTypeMonth then begin
+    ComboBoxPeriodType.ItemIndex := 2;
+  end else begin
+    ComboBoxPeriodType.ItemIndex := 3;
+  end;
+  if Fdeposit.dueType = CDepositDueTypeOnDepositEnd then begin
+    ComboBoxDueMode.ItemIndex := 0;
+  end else begin
+    ComboBoxDueMode.ItemIndex := 1;
+    if Fdeposit.dueType = CDepositTypeDay then begin
+      ComboBoxDueType.ItemIndex := 0;
+    end else if Fdeposit.dueType = CDepositTypeWeek then begin
+      ComboBoxDueType.ItemIndex := 1;
+    end else if Fdeposit.dueType = CDepositTypeMonth then begin
+      ComboBoxDueType.ItemIndex := 2;
+    end else begin
+      ComboBoxDueType.ItemIndex := 3;
+    end;
+  end;
+  CDateTimeStart.Value := Fdeposit.periodStartDate;
+  CCurrEditActualCash.Value := Fdeposit.cash;
+  CCurrEditRate.Value := Fdeposit.interestRate;
+  CIntEditPeriodCount.Value := Fdeposit.periodCount;
+  CDateTimeEnd.Value := Fdeposit.periodEndDate;
+  CDateTimeDueEnd.Value := Fdeposit.dueEndDate;
+  CDateTimeProg.Value := Fdeposit.progEndDate;
+  CIntEditDueCount.Value := Fdeposit.dueCount;
   UpdateDues;
-  UpdatePeriodEndDate;
-  UpdateProgDateEnd;
-  UpdateDueEndPeriod;
 end;
 
 procedure TCDepositCalculatorForm.UpdatePeriodEndDate;
@@ -383,6 +417,12 @@ begin
   Label9.Enabled := ComboBoxDueMode.ItemIndex = 1;
   CIntEditDueCount.Enabled := ComboBoxDueMode.ItemIndex = 1;
   ComboBoxDueType.Enabled := ComboBoxDueMode.ItemIndex = 1;
+end;
+
+procedure TCDepositCalculatorForm.EndFilling;
+begin
+  inherited EndFilling;
+  UpdateDepositData;
 end;
 
 end.

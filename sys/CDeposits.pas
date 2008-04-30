@@ -39,6 +39,8 @@ type
   TDeposit = class(TObjectList)
   private
     FinitialCash: Currency;
+    FinitialPeriodStartDate: TDateTime;
+    FinitialPeriodEndDate: TDateTime;
     Fcash: Currency;
     FinterestRate: Currency;
     FnoncapitalizedInterest: Currency;
@@ -57,7 +59,10 @@ type
     function GetItems(AIndex: Integer): TDepositProgItem;
     procedure SetItems(AIndex: Integer; const Value: TDepositProgItem);
     function GetrateOfReturn: Currency;
+    function GetPeriodTypeAsString: String;
+    function GetdueTypeAsString: String;
   public
+    constructor Create;
     function CalculateProg: Boolean;
     function IsSumObject(ANumber: Integer): Boolean;
     property Items[AIndex: Integer]: TDepositProgItem read GetItems write SetItems;
@@ -77,6 +82,11 @@ type
     property rateOfReturn: Currency read GetrateOfReturn;
     property dueStartDate: TDateTime read FdueStartDate write FdueStartDate;
     property dueEndDate: TDateTime read FdueEndDate write FdueEndDate;
+    property initialCash: Currency read FinitialCash;
+    property initialPeriodStartDate: TDateTime read FinitialPeriodStartDate;
+    property initialPeriodEndDate: TDateTime read FinitialPeriodEndDate;
+    property periodTypeAsString: String read GetPeriodTypeAsString;
+    property dueTypeAsString: String read GetdueTypeAsString;
   end;
 
 procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
@@ -206,6 +216,8 @@ var xRateDivider, xDaysBetween: Integer;
 begin
   Clear;
   FinitialCash := Fcash;
+  FinitialPeriodStartDate := FperiodStartDate;
+  FinitialPeriodEndDate := FperiodEndDate;
   FdepositState := CDepositInvestmentActive;
   Result := False;
   xRatePeriodCount := FperiodCount;
@@ -328,14 +340,64 @@ begin
   end;
 end;
 
+constructor TDeposit.Create;
+begin
+  inherited Create;
+  FinitialCash := 0;
+  Fcash := 0;
+  FinterestRate := 0;
+  FnoncapitalizedInterest := 0;
+  FperiodCount := 1;
+  FperiodType := CDepositTypeMonth;
+  FperiodAction := CDepositPeriodActionAutoRenew;
+  FdueCount := 1;
+  FdueType := CDepositDueTypeOnDepositEnd;
+  FdueAction := CDepositDueActionAutoCapitalisation;
+  FperiodStartDate := GWorkDate;
+  FperiodEndDate := TDepositInvestment.EndPeriodDatetime(FperiodStartDate, FperiodCount, FperiodType);
+  FdueStartDate := FperiodStartDate;
+  FdueEndDate := FperiodEndDate;
+  FprogEndDate := FperiodEndDate;
+  FdepositState := CDepositInvestmentActive;
+end;
+
+function TDeposit.GetdueTypeAsString: String;
+begin
+  Result := '';
+  if FdueType = CDepositDueTypeOnDepositEnd then begin
+    Result := 'Koniec czasy trwania lokaty';
+  end else if FdueType = CDepositTypeDay then begin
+    Result := 'Dzieñ';
+  end else if FdueType = CDepositTypeWeek then begin
+    Result := 'Tydzieñ';
+  end else if FdueType = CDepositTypeMonth then begin
+    Result := 'Miesi¹c';
+  end else begin
+    Result := 'Rok';
+  end;
+end;
+
 function TDeposit.GetItems(AIndex: Integer): TDepositProgItem;
 begin
   Result := TDepositProgItem(inherited Items[AIndex]);
 end;
 
+function TDeposit.GetPeriodTypeAsString: String;
+begin
+  if FperiodType = CDepositTypeDay then begin
+    Result := 'Dzieñ';
+  end else if FperiodType = CDepositTypeWeek then begin
+    Result := 'Tydzieñ';
+  end else if FperiodType = CDepositTypeMonth then begin
+    Result := 'Miesi¹c';
+  end else begin
+    Result := 'Rok';
+  end;
+end;
+
 function TDeposit.GetrateOfReturn: Currency;
 begin
-  Result := SimpleRoundTo((100 * (Fcash + FnoncapitalizedInterest) / FinitialCash), -4);
+  Result := SimpleRoundTo((100 * (Fcash + FnoncapitalizedInterest) / FinitialCash), -4) - 100;
 end;
 
 function TDeposit.IsSumObject(ANumber: Integer): Boolean;
