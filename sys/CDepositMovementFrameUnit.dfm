@@ -153,7 +153,7 @@ inherited CDepositMovementFrame: TCDepositMovementFrame
     end
   end
   inherited ActionListButtons: TActionList
-    Images = CImageLists.InvestmentImageList24x24
+    Images = CImageLists.DepositMovementImageList24x24
     inherited ActionAdd: TAction
       Caption = 'Dodaj operacj'#281
       ImageIndex = 1

@@ -42,6 +42,8 @@ type
     QuickpatternImageList24x24: TPngImageList;
     DepositImageList24x24: TPngImageList;
     DepositStateImageList16x16: TPngImageList;
+    DepositMovementImageList24x24: TPngImageList;
+    PortfolioImagesList24x24: TPngImageList;
   private
     { Private declarations }
   public

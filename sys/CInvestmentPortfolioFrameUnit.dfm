@@ -1,13 +1,5 @@
 inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
-  Width = 654
-  inherited Bevel: TBevel
-    Width = 654
-  end
-  inherited FilterPanel: TPanel
-    Width = 654
-  end
   inherited List: TCDataList
-    Width = 654
     Header.MainColumn = 0
     Columns = <
       item
@@ -34,13 +26,12 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       end
       item
         Position = 4
-        Width = 129
+        Width = 10
         WideText = 'Waluta'
       end>
     WideDefaultText = ''
   end
   inherited ButtonPanel: TPanel
-    Width = 654
     inherited CButtonAdd: TCButton
       Width = 124
     end
@@ -75,7 +66,7 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
     end
   end
   inherited ActionListButtons: TActionList
-    Images = CImageLists.InvestmentImageList24x24
+    Images = CImageLists.PortfolioImagesList24x24
     inherited ActionAdd: TAction
       Caption = 'Dodaj operacj'#281
       ImageIndex = 1
@@ -84,9 +75,12 @@ inherited CInvestmentPortfolioFrame: TCInvestmentPortfolioFrame
       Caption = 'Poka'#380' histori'#281
       ImageIndex = 0
     end
+    inherited ActionDelete: TAction
+      ImageIndex = 3
+    end
     object ActionDetails: TAction
       Caption = 'Szczeg'#243#322'y inwestycji'
-      ImageIndex = 3
+      ImageIndex = 2
       OnExecute = ActionDetailsExecute
     end
   end
