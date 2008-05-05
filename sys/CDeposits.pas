@@ -240,7 +240,7 @@ begin
     while (xCurDate <= FprogEndDate) and (FdepositState = CDepositInvestmentActive) do begin
       if xCurDate = FdueEndDate then begin
         xItem := TDepositProgItem.Create(CDepositMovementDue);
-        xItem.date := xCurDate;
+        xItem.date := FdueEndDate;
         xItem.caption := IntToStr(Count + 1);
         xItem.dueStart := FdueStartDate;
         xItem.dueEnd := FdueEndDate;
@@ -253,11 +253,11 @@ begin
         end;
         xCalcInterest := SimpleRoundTo((xRatePeriodCount * Fcash * FinterestRate) / (100 * xRateDivider), -2);
         if FdueType <> CDepositDueTypeOnDepositEnd then begin
-          FdueStartDate := IncDay(dueEndDate, 1);
-          FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, dueType);
+          FdueStartDate := IncDay(FdueEndDate, 1);
+          FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, FdueType);
         end else begin
           FdueStartDate := IncDay(periodEndDate, 1);
-          FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, periodType);
+          FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, FperiodType);
         end;
         xItem.cash := Fcash;
         xItem.interest := xCalcInterest;
@@ -277,7 +277,7 @@ begin
         if (FdueStartDate <= FperiodEndDate) and (FdueEndDate >= FperiodEndDate) then begin
           xDaysBetween := DaysBetween(FperiodEndDate, FdueStartDate);
           xItem := TDepositProgItem.Create(CDepositMovementDue);
-          xItem.date := xCurDate;
+          xItem.date := FperiodEndDate;
           xItem.dueStart := FdueStartDate;
           xItem.dueEnd := FperiodEndDate;
           xItem.periodStart := FperiodStartDate;
@@ -292,10 +292,10 @@ begin
           FdueStartDate := FperiodStartDate;
           if FdueType <> CDepositDueTypeOnDepositEnd then begin
             FdueStartDate := IncDay(dueEndDate, 1);
-            FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, dueType);
+            FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, FdueType);
           end else begin
             FdueStartDate := IncDay(periodEndDate, 1);
-            FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, periodType);
+            FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, FperiodType);
           end;
           xCalcInterest := SimpleRoundTo((xDaysBetween * Fcash * FinterestRate) / (100 * DaysInYear(FperiodStartDate)), -2);
           xItem.cash := Fcash;
@@ -311,7 +311,7 @@ begin
           end;
         end;
         xItem := TDepositProgItem.Create(IfThen(FperiodAction = CDepositPeriodActionAutoRenew, CDepositMovementRenew, CDepositMovementInactivate));
-        xItem.date := xCurDate;
+        xItem.date := FperiodEndDate;
         xItem.dueStart := FdueStartDate;
         xItem.dueEnd := FdueEndDate;
         xItem.periodStart := FperiodStartDate;

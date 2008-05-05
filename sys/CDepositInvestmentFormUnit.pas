@@ -105,6 +105,7 @@ type
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     procedure AfterCommitData; override;
     procedure EndFilling; override;
+    procedure FillForm; override;
   public
     property formPeriodType: TBaseEnumeration read GetPeriodType write SetPeriodType;
     property formDueType: TBaseEnumeration read GetDueType write SetDueType;
@@ -156,31 +157,33 @@ procedure TCDepositInvestmentForm.ReadValues;
 begin
   inherited ReadValues;
   with TDepositInvestment(Dataobject) do begin
-    depositState := CDepositInvestmentActive;
     name := EditName.Text;
     description := RichEditDesc.Text;
     idCashPoint := CStaticCashpoint.DataId;
-    idCurrencyDef := CStaticCurrency.DataId;
     cash := CCurrEditActualCash.Value;
-    noncapitalizedInterest := 0;
     interestRate := CCurrEditRate.Value;
-    periodCount := CIntEditPeriodCount.Value;
-    dueCount := CIntEditDueCount.Value;
-    dueStartDate := CDateTime.Value;
-    periodStartDate := CDateTime.Value;
-    dueEndDate := FDueEndDate;
-    periodEndDate := FPeriodEndDate;
-    dueType := formDueType;
-    if ComboBoxDueAction.ItemIndex = 0 then begin
-      dueAction := CDepositDueActionAutoCapitalisation;
-    end else begin
-      dueAction := CDepositDueActionLeaveUncapitalised;
-    end;
-    periodType := formPeriodType;
-    if ComboBoxPeriodAction.ItemIndex = 1 then begin
-      periodAction := CDepositPeriodActionAutoRenew;
-    end else begin
-      periodAction := CDepositPeriodActionChangeInactive;
+    if Operation = coAdd then begin
+      depositState := CDepositInvestmentActive;
+      idCurrencyDef := CStaticCurrency.DataId;
+      noncapitalizedInterest := 0;
+      periodCount := CIntEditPeriodCount.Value;
+      dueCount := CIntEditDueCount.Value;
+      dueStartDate := CDateTime.Value;
+      periodStartDate := CDateTime.Value;
+      dueEndDate := FDueEndDate;
+      periodEndDate := FPeriodEndDate;
+      dueType := formDueType;
+      if ComboBoxDueAction.ItemIndex = 0 then begin
+        dueAction := CDepositDueActionAutoCapitalisation;
+      end else begin
+        dueAction := CDepositDueActionLeaveUncapitalised;
+      end;
+      periodType := formPeriodType;
+      if ComboBoxPeriodAction.ItemIndex = 1 then begin
+        periodAction := CDepositPeriodActionAutoRenew;
+      end else begin
+        periodAction := CDepositPeriodActionChangeInactive;
+      end;
     end;
   end;
 end;
@@ -240,9 +243,9 @@ end;
 
 procedure TCDepositInvestmentForm.ComboBoxDueModeChange(Sender: TObject);
 begin
-  Label9.Enabled := ComboBoxDueMode.ItemIndex = 1;
-  CIntEditDueCount.Enabled := ComboBoxDueMode.ItemIndex = 1;
-  ComboBoxDueType.Enabled := ComboBoxDueMode.ItemIndex = 1;
+  Label9.Enabled := (ComboBoxDueMode.ItemIndex = 1) and (Operation = coAdd);
+  CIntEditDueCount.Enabled := (ComboBoxDueMode.ItemIndex = 1) and (Operation = coAdd);
+  ComboBoxDueType.Enabled := (ComboBoxDueMode.ItemIndex = 1) and (Operation = coAdd);
   UpdateEndCapitalisationDatetime;
   UpdateDescription;
   UpdateFuture;
@@ -437,7 +440,7 @@ begin
       CStaticCurrencyRate.DoGetDataId;
     end;
   end;
-  if Result and (ComboBoxType.ItemIndex = 0) then begin
+  if Result and (ComboBoxType.ItemIndex = 0) and (Operation = coAdd) then begin
     if CStaticCategory.DataId = CEmptyDataGid then begin
       Result := False;
       if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
@@ -764,7 +767,7 @@ begin
     end else begin
       dueAction := CDepositDueActionLeaveUncapitalised;
     end;
-    if ShowDepositCalculator(True, FDeposit) then begin
+    if ShowDepositCalculator(Operation = coAdd, FDeposit) then begin
       BeginFilling;
       CCurrEditActualCash.Value := cash;
       CCurrEditRate.Value := interestRate;
@@ -794,6 +797,63 @@ procedure TCDepositInvestmentForm.EndFilling;
 begin
   inherited EndFilling;
   UpdateFuture;
+end;
+
+procedure TCDepositInvestmentForm.FillForm;
+begin
+  with TDepositInvestment(Dataobject) do begin
+    CDateTime.Enabled := False;
+    Label12.Visible := False;
+    ComboBoxType.Visible := False;
+    Label14.Visible := False;
+    CStaticAccount.Visible := False;
+    Label17.Visible := False;
+    CStaticAccountCurrency.Visible := False;
+    Label22.Visible := False;
+    CStaticCurrencyRate.Visible := False;
+    Label21.Visible := False;
+    CCurrEditAccount.Visible := False;
+    Label13.Visible := False;
+    CStaticCategory.Visible := False;
+    CStaticCurrency.Enabled := False;
+    CIntEditPeriodCount.Enabled := False;
+    ComboBoxPeriodType.Enabled := False;
+    ComboBoxPeriodAction.Enabled := False;
+    ComboBoxDueMode.Enabled := False;
+    CIntEditDueCount.Enabled := False;
+    ComboBoxDueType.Enabled := False;
+    ComboBoxDueAction.Enabled := False;
+    GroupBox3.Height := 281;
+    GroupBox2.Top := GroupBox3.Top + GroupBox3.Height + 16;
+    Height := Height - 106;
+    SimpleRichText(description, RichEditDesc);
+    EditName.Text := name;
+    GDataProvider.BeginTransaction;
+    CStaticCashpoint.DataId := idCashPoint;
+    CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
+    CStaticCurrency.DataId := idCurrencyDef;
+    CStaticCurrency.Caption := GCurrencyCache.GetIso(idCurrencyDef);
+    CCurrEditActualCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
+    GDataProvider.RollbackTransaction;
+    CCurrEditRate.Value := interestRate;
+    CCurrEditActualCash.Value := cash;
+    CDateTime.Value := periodStartDate;
+    CIntEditPeriodCount.Value := periodCount;
+    CIntEditDueCount.Value := dueCount;
+    formPeriodType := periodType;
+    formDueType := dueType;
+    if dueAction = CDepositDueActionAutoCapitalisation then begin
+      ComboBoxDueAction.ItemIndex := 0;
+    end else begin
+      ComboBoxDueAction.ItemIndex := 1;
+    end;
+    if periodAction = CDepositPeriodActionAutoRenew then begin
+      ComboBoxPeriodAction.ItemIndex := 1;
+    end else begin
+      ComboBoxPeriodAction.ItemIndex := 0;
+    end;
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
+  end;
 end;
 
 end.

@@ -1044,6 +1044,7 @@ type
     class function EndDueDatetime(ADueLastDatetime: TDateTime; ADueCount: Integer; ADueType: TBaseEnumeration): TDateTime;
     function GetElementHint(AColumnIndex: Integer): String; override;
     function GetElementText: String; override;
+    function GetColumnImage(AColumnIndex: Integer): Integer; override;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
@@ -5039,13 +5040,13 @@ begin
   end else if AColumnIndex = 1 then begin
     if FdepositState = CDepositInvestmentActive then begin
       Result := 'Aktywna';
-    end else if FdepositState = CDepositInvestmentClosed then begin
+    end else if FdepositState = CDepositInvestmentInactive then begin
       Result := 'Nieaktywna';
     end else begin
       Result := 'Zamkniêta';
     end;
   end else if AColumnIndex = 2 then begin
-    Result := CurrencyToString(Fcash);
+    Result := CurrencyToString(Fcash, '', False);
   end else if AColumnIndex = 3 then begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
   end else if AColumnIndex = 4 then begin
@@ -5465,6 +5466,20 @@ begin
   if FisDepositMovement <> Value then begin
     FisDepositMovement := Value;
     SetState(msModified);
+  end;
+end;
+
+function TDepositInvestment.GetColumnImage(AColumnIndex: Integer): Integer;
+begin
+  Result := inherited GetColumnImage(AColumnIndex);
+  if AColumnIndex = 1 then begin
+    if FdepositState = CDepositInvestmentActive then begin
+      Result := 0;
+    end else if FdepositState = CDepositInvestmentClosed then begin
+      Result := 1;
+    end else begin
+      Result := 2;
+    end;
   end;
 end;
 

@@ -152,7 +152,8 @@ uses
   CDepositInvestmentFormUnit in 'CDepositInvestmentFormUnit.pas' {CDepositInvestmentForm},
   CInvestmentPortfolioFormUnit in 'CInvestmentPortfolioFormUnit.pas' {CInvestmentPortfolioForm},
   CDeposits in 'CDeposits.pas',
-  CDepositCalculatorFormUnit in 'CDepositCalculatorFormUnit.pas' {CDepositCalculatorForm};
+  CDepositCalculatorFormUnit in 'CDepositCalculatorFormUnit.pas' {CDepositCalculatorForm},
+  CDepositMovementFrameUnit in 'CDepositMovementFrameUnit.pas' {CDepositMovementFrame: TFrame};
 
 {$R *.res}
 
@@ -214,7 +215,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

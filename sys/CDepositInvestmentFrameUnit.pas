@@ -10,6 +10,9 @@ uses
 
 type
   TCDepositInvestmentFrame = class(TCDataobjectFrame)
+    CButtonDetails: TCButton;
+    ActionDetails: TAction;
+    procedure ActionDetailsExecute(Sender: TObject);
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
@@ -21,11 +24,15 @@ type
     function GetDataobjectForm(AOption: Integer): TCDataobjectFormClass; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
     procedure ReloadDataobjects; override;
+    function GetHistoryText: String; override;
+    procedure ShowHistory(AGid: ShortString); override;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
   end;
 
 implementation
 
-uses CPluginConsts, CConsts, CDepositInvestmentFormUnit;
+uses CPluginConsts, CConsts, CDepositInvestmentFormUnit,
+  CDepositMovementFrameUnit, CFrameFormUnit;
 
 {$R *.dfm}
 
@@ -42,6 +49,11 @@ end;
 class function TCDepositInvestmentFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
 begin
   Result := DepositInvestmentProxy;
+end;
+
+function TCDepositInvestmentFrame.GetHistoryText: String;
+begin
+  Result := 'Wszystkie operacje';
 end;
 
 function TCDepositInvestmentFrame.GetSelectedType: Integer;
@@ -90,6 +102,26 @@ begin
     xCondition := ' where depositState = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TDepositInvestment.GetList(TDepositInvestment, DepositInvestmentProxy, 'select * from depositInvestment' + xCondition);
+end;
+
+procedure TCDepositInvestmentFrame.ShowHistory(AGid: ShortString);
+var xGid, xText: String;
+begin
+  TCFrameForm.ShowFrame(TCDepositMovementFrame, xGid, xText, nil, nil, nil, nil, False);
+end;
+
+procedure TCDepositInvestmentFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  ActionHistory.Enabled := True;
+  ActionDetails.Enabled := AIsSelectedSomething;
+end;
+
+procedure TCDepositInvestmentFrame.ActionDetailsExecute(Sender: TObject);
+var xGid, xText, xIdDeposit: String;
+begin
+  xIdDeposit := TDepositInvestment(List.SelectedElement.Data).id;
+  TCFrameForm.ShowFrame(TCDepositMovementFrame, xGid, xText, TCDepositFrameAdditionalData.Create(xIdDeposit), nil, nil, nil, False);
 end;
 
 end.
