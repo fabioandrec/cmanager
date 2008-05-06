@@ -523,7 +523,8 @@ begin
     xMove := TDepositMovement.CreateObject(DepositMovementProxy, False);
     xMoveId := xMove.id;
     xMove.movementType := IfThen(ComboBoxType.ItemIndex = 0, CDepositMovementCreate, CDepositMovementRegister);
-    xMove.regDate := GWorkDate;
+    xMove.regDateTime := CDateTime.Value;
+    xMove.regOrder := -1;
     xMove.description := RichEditDesc.Text;
     xMove.cash := xDeposit.cash;
     xMove.idDepositInvestment := xDeposit.id;

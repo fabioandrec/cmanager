@@ -2,7 +2,7 @@ unit CDeposits;
 
 interface
 
-uses CDataObjects, CDatabase, SysUtils, CConsts, DateUtils, Contnrs, StrUtils;
+uses CDataObjects, CDatabase, SysUtils, CConsts, DateUtils, Contnrs, StrUtils, AdoDb;
 
 type
   TDepositProgItem = class(TObject)
@@ -19,6 +19,7 @@ type
     FperiodStart: TDateTime;
     FperiodEnd: TDateTime;
     FmovementType: TBaseEnumeration;
+    FregOrder: Integer;
   public
     constructor Create(AType: TBaseEnumeration);
   published
@@ -34,6 +35,7 @@ type
     property periodStart: TDateTime read FperiodStart write FperiodStart;
     property periodEnd: TDateTime read FperiodEnd write FperiodEnd;
     property movementType: TBaseEnumeration read FmovementType write FmovementType;
+    property regOrder: Integer read FregOrder write FregOrder;
   end;
 
   TDeposit = class(TObjectList)
@@ -93,102 +95,71 @@ procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
 
 implementation
 
-uses CTools, Math;
+uses CTools, Math, Classes, CPlugins, CDebug;
 
 procedure UpdateDepositInvestmentDues(ADepositInvestment: TDepositInvestment; AToDate: TDateTime);
 begin
 end;
 
 procedure UpdateDepositInvestmentPeriods(ADi: TDepositInvestment; AToDate: TDateTime);
-{
-var xMove: TDepositMovement;
-    xRatePeriodCount, xRateDivider: Integer;
-    xRatePeriodType: TBaseEnumeration;
-    xDueDate: TDateTime;
-    xCalculatedInterest: Currency;
-}
+var xDepositCalculator: TDeposit;
+    xFromDate: TDateTime;
+    xMovements: TADOQuery;
+    xCount: Integer;
+    xProgItem: TDepositProgItem;
+    xMove: TDepositMovement;
 begin
-{
-  xRatePeriodCount := ADi.periodCount;
-  xRatePeriodType := ADi.periodType;
-  if ADi.dueType <> CDepositDueTypeOnDepositEnd then begin
-    xRatePeriodCount := ADi.dueCount;
-    xRatePeriodType := ADi.dueType;
-  end;
-  if xRatePeriodType = CDepositTypeDay then begin
-    xRateDivider := DaysInYear(ADi.periodEndDate);
-  end else if xRatePeriodType = CDepositTypeWeek then begin
-    xRateDivider := WeeksInYear(ADi.periodEndDate);
-  end else if xRatePeriodType = CDepositTypeMonth then begin
-    xRateDivider := MonthsPerYear;
-  end else begin
-    xRateDivider := 1;
-  end;
-  if ADi.dueType <> CDepositDueTypeOnDepositEnd then begin
-    //przeliczyæ odsetki z okresu nierozliczonego
-  end;
-
-  while (ADi.periodEndDate <= AToDate) and (ADi.depositState = CDepositInvestmentActive) do begin
-    if ADi.dueType = CDepositDueTypeOnDepositEnd then begin
-      xDueDate := ADi.periodEndDate;
-      xCalculatedInterest := SimpleRoundTo((ADi.cash * xRatePeriodCount * ADi.interestRate) / (100 * xRateDivider), -2);
-    end else begin
-      //przeliczyæ odsetki z okresu nierozliczonego
-      xDueDate := 0;
-    end;
-    if xDueDate <> 0 then begin
-      xMove := TDepositMovement.CreateObject(DepositMovementProxy, False);
-      xMove.regDate := xDueDate;
-      xMove.cash := xCalculatedInterest;
-      xMove.idDepositInvestment := ADi.id;
-      xMove.idAccount := CEmptyDataGid;
-      xMove.idAccountCurrencyDef := CEmptyDataGid;
-      xMove.accountCash := 0;
-      xMove.idCurrencyRate := CEmptyDataGid;
-      xMove.currencyQuantity := 0;
-      xMove.currencyRate := 0;
-      xMove.rateDescription := '';
-      xMove.idProduct := CEmptyDataGid;
-      xMove.idBaseMovement := CEmptyDataGid;
-      xMove.movementType := CDepositMovementDue;
-      xMove.description := 'Naliczenie odsetek dla lokaty ' + ADi.name;
-      ADi.noncapitalizedInterest := xCalculatedInterest;
-      if ADi.dueAction = CDepositDueActionAutoCapitalisation then begin
-        ADi.cash := ADi.cash + ADi.noncapitalizedInterest;
-        ADi.noncapitalizedInterest := 0;
+  xFromDate := Min(ADi.periodStartDate, ADi.dueStartDate);
+  xDepositCalculator := TDeposit.Create;
+  xDepositCalculator.cash := ADi.cash;
+  xDepositCalculator.interestRate := ADi.interestRate;
+  xDepositCalculator.noncapitalizedInterest := ADi.noncapitalizedInterest;
+  xDepositCalculator.periodCount := ADi.periodCount;
+  xDepositCalculator.periodType := ADi.periodType;
+  xDepositCalculator.dueType := ADi.dueType;
+  xDepositCalculator.dueCount := ADi.dueCount;
+  xDepositCalculator.periodStartDate := ADi.periodStartDate;
+  xDepositCalculator.periodEndDate := ADi.periodEndDate;
+  xDepositCalculator.dueStartDate := ADi.dueStartDate;
+  xDepositCalculator.dueEndDate := ADi.dueEndDate;
+  xDepositCalculator.progEndDate := AToDate;
+  xDepositCalculator.periodAction := ADi.periodAction;
+  xDepositCalculator.dueAction := ADi.dueAction;
+  if xDepositCalculator.CalculateProg and (xDepositCalculator.Count > 0) then begin
+    xMovements := GDataProvider.OpenSql(Format(
+      'select movementType, regDateTime from depositMovement where idDepositInvestment = %s and regDateTime between %s and %s',
+      [DataGidToDatabase(ADi.id), DatetimeToDatabase(xFromDate, False), DatetimeToDatabase(AToDate, False)]));
+    for xCount := 0 to xDepositCalculator.Count - 1 do begin
+      xProgItem := xDepositCalculator.Items[xCount];
+      xMovements.Filter := Format('movementType = ''%s'' and regDateTime = %s', [xProgItem.movementType, DatetimeToDatabase(xProgItem.date, False)]);
+      xMovements.Filtered := True;
+      if xMovements.IsEmpty then begin
+        xMove := TDepositMovement.CreateObject(DepositMovementProxy, False);
+        xMove.movementType := xProgItem.movementType;
+        xMove.regDateTime := xProgItem.date;
+        xMove.description := xProgItem.operation;
+        xMove.cash := xProgItem.cash;
+        xMove.idDepositInvestment := ADi.id;
+        xMove.idAccount := CEmptyDataGid;
+        xMove.idAccountCurrencyDef := CEmptyDataGid;
+        xMove.idProduct := CEmptyDataGid;
+        xMove.idCurrencyRate := CEmptyDataGid;
+        xMove.rateDescription := '';
+        xMove.currencyQuantity := 1;
+        xMove.currencyRate := 1;
+        xMove.accountCash := xProgItem.cash;
+        xMove.regOrder := xProgItem.regOrder;
       end;
     end;
-    xMove := TDepositMovement.CreateObject(DepositMovementProxy, False);
-    xMove.regDate := ADi.periodEndDate;
-    xMove.cash := ADi.cash;
-    xMove.idDepositInvestment := ADi.id;
-    xMove.idAccount := CEmptyDataGid;
-    xMove.idAccountCurrencyDef := CEmptyDataGid;
-    xMove.accountCash := 0;
-    xMove.idCurrencyRate := CEmptyDataGid;
-    xMove.currencyQuantity := 0;
-    xMove.currencyRate := 0;
-    xMove.rateDescription := '';
-    xMove.idProduct := CEmptyDataGid;
-    xMove.idBaseMovement := CEmptyDataGid;
-    if ADi.periodAction = CDepositPeriodActionAutoRenew then begin
-      xMove.movementType := CDepositMovementRenew;
-      xMove.description := 'Odnowienie lokaty ' + ADi.name;
-    end else begin
-      xMove.movementType := CDepositMovementInactivate;
-      xMove.description := 'Zakoñczenie lokaty ' + ADi.name;
-      ADi.depositState := CDepositInvestmentInactive;
-    end;
-    ADi.periodStartDate := IncDay(ADi.periodEndDate, 1);
-    ADi.periodEndDate := ADi.EndPeriodDatetime(ADi.periodStartDate, ADi.periodCount, ADi.periodType);
-    if (ADi.depositState = CDepositInvestmentActive) then begin
-      if (ADi.dueType = CDepositDueTypeOnDepositEnd) then begin
-        ADi.dueStartDate := ADi.periodStartDate;
-        ADi.dueEndDate := ADi.periodEndDate;
-      end;
-    end;
+    xMovements.Free;
+    ADi.cash := xDepositCalculator.cash;
+    ADi.noncapitalizedInterest := xDepositCalculator.noncapitalizedInterest;
+    ADi.periodStartDate := xDepositCalculator.periodStartDate;
+    ADi.periodEndDate := xDepositCalculator.periodEndDate;
+    ADi.dueStartDate := xDepositCalculator.dueStartDate;
+    ADi.dueEndDate := xDepositCalculator.dueEndDate;
   end;
-}
+  xDepositCalculator.Free;
 end;
 
 procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
@@ -196,6 +167,7 @@ var xList: TDataObjectList;
     xCount: Integer;
     xDeposit: TDepositInvestment;
 begin
+  DebugStartTickCount('UpdateDepositInvestments');
   ADataProvider.BeginTransaction;
   xList := TDepositInvestment.GetList(TDepositInvestment, DepositInvestmentProxy, 'select * from depositInvestment where depositState = ' + QuotedStr(CDepositInvestmentActive));
   for xCount := 0 to xList.Count - 1 do begin
@@ -204,6 +176,7 @@ begin
   end;
   ADataProvider.CommitTransaction;
   xList.Free;
+  DebugEndTickCounting('UpdateDepositInvestments');
 end;
 
 function TDeposit.CalculateProg: Boolean;
@@ -241,6 +214,7 @@ begin
       if xCurDate = FdueEndDate then begin
         xItem := TDepositProgItem.Create(CDepositMovementDue);
         xItem.date := FdueEndDate;
+        xItem.regOrder := Count;
         xItem.caption := IntToStr(Count + 1);
         xItem.dueStart := FdueStartDate;
         xItem.dueEnd := FdueEndDate;
@@ -283,6 +257,7 @@ begin
           xItem.periodStart := FperiodStartDate;
           xItem.periodEnd := FperiodEndDate;
           xItem.caption := IntToStr(Count + 1);
+          xItem.regOrder := Count;
           if FdueAction = CDepositDueActionAutoCapitalisation then begin
             xItem.operation := 'Kapitalizacja naliczonych odsetek';
           end else begin
@@ -312,6 +287,7 @@ begin
         end;
         xItem := TDepositProgItem.Create(IfThen(FperiodAction = CDepositPeriodActionAutoRenew, CDepositMovementRenew, CDepositMovementInactivate));
         xItem.date := FperiodEndDate;
+        xItem.regOrder := Count;
         xItem.dueStart := FdueStartDate;
         xItem.dueEnd := FdueEndDate;
         xItem.periodStart := FperiodStartDate;
