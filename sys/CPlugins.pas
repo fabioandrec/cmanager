@@ -94,7 +94,6 @@ type
 var GPlugins: TCPluginList;
     GPluginlogfile: String = '';
     GCmanagerState: Integer;
-    GDebugMode: Boolean;
 
 implementation
 
@@ -104,7 +103,8 @@ uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
   CProductsFrameUnit, CMovementFrameUnit, CPlannedFrameUnit,
   CDoneFrameUnit, CFilterFrameUnit, CProfileFormUnit, CProfileFrameUnit,
   CLimitsFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
-  CExtractionsFrameUnit, CExtractionItemFrameUnit, CUnitDefFrameUnit, Math;
+  CExtractionsFrameUnit, CExtractionItemFrameUnit, CUnitDefFrameUnit, Math,
+  CDebug;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -295,6 +295,7 @@ var xS: WIN32_FIND_DATA;
     xPlugin: TCPlugin;
     xPref: TPluginPref;
 begin
+  DebugStartTickCount('ScanForPlugins');
   xHandle := FindFirstFile(PChar(FPluginPath + '*.dll'), xS);
   if xHandle <> INVALID_HANDLE_VALUE then begin
     repeat
@@ -313,6 +314,7 @@ begin
     until not xRes;
   end;
   Windows.FindClose(xHandle);
+  DebugEndTickCounting('ScanForPlugins');
 end;
 
 function TCManagerInterfaceObject.GetConnection: IInterface;

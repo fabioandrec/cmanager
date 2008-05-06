@@ -33,7 +33,7 @@ uses Variants, ComObj, CConsts, CWaitFormUnit, ZLib, CProgressFormUnit,
   CTools, StrUtils, CPreferences, CUpdateCurrencyRatesFormUnit,
   CAdox, CDataobjectFormUnit, CExtractionFormUnit, CConfigFormUnit,
   CExtractionItemFormUnit, CUpdateExchangesFormUnit,
-  CInitializeProviderFormUnit, CPluginConsts;
+  CInitializeProviderFormUnit, CPluginConsts, CDebug;
 
 function RestoreDatabase(AFilename, ATargetFilename: String; var AError: String; AOverwrite: Boolean; AProgressEvent: TProgressEvent = Nil): Boolean;
 var xTool: TBackupRestore;
@@ -62,6 +62,7 @@ end;
 function CheckPendingInformations: Boolean;
 var xInfo: TCStartupInfoForm;
 begin
+  DebugStartTickCount('CheckPendingInformations');
   if GDataProvider.IsConnected then begin
     xInfo := TCStartupInfoForm.Create(Nil);
     Result := xInfo.PrepareInfoFrame;
@@ -72,17 +73,20 @@ begin
   end else begin
     Result := False;
   end;
+  DebugEndTickCounting('CheckPendingInformations');
 end;
 
 procedure CheckForUpdates(AQuiet: Boolean);
 var xQuiet: String;
 begin
+  DebugStartTickCount('CheckForUpdates');
   if AQuiet then begin
     xQuiet := '/quiet';
   end else begin
     xQuiet := '';
   end;
-  ShellExecute(0, 'open', PChar('cupdate.exe'), PChar(xQuiet), '.', SW_SHOW)
+  ShellExecute(0, 'open', PChar('cupdate.exe'), PChar(xQuiet), '.', SW_SHOW);
+  DebugEndTickCounting('CheckForUpdates');
 end;
 
 procedure CopyListToTreeHelper(AList: TDataObjectList; ARootElement: TCListDataElement; ACheckSupport: Boolean);

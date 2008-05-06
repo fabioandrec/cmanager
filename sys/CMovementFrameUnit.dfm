@@ -143,7 +143,7 @@ inherited CMovementFrame: TCMovementFrame
             Position = 0
             Width = 160
             WideText = 'Konto'
-            WideHint = 'Nazwa kontrahenta'
+            WideHint = 'Konto'
           end
           item
             Alignment = taRightJustify
@@ -516,7 +516,7 @@ inherited CMovementFrame: TCMovementFrame
         Position = 1
         Width = 143
         WideText = 'Opis'
-        WideHint = 'Nazwa kontrahenta'
+        WideHint = 'Opis'
       end
       item
         Position = 2

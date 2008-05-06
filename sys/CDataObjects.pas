@@ -1069,7 +1069,8 @@ type
   TDepositMovement = class(TDataObject)
   private
     FmovementType: TBaseEnumeration;
-    FregDate: TDateTime;
+    FregDateTime: TDateTime;
+    FregOrder: Integer;
     Fdescription: TBaseDescription;
     Fcash: Currency;
     FidDepositInvestment: TDataGid;
@@ -1086,7 +1087,7 @@ type
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidDepositInvestment(const Value: TDataGid);
     procedure SetmovementType(const Value: TBaseEnumeration);
-    procedure SetregDate(const Value: TDateTime);
+    procedure SetregDateTime(const Value: TDateTime);
     procedure SetaccountCash(const Value: Currency);
     procedure SetcurrencyQuantity(const Value: Integer);
     procedure SetcurrencyRate(const Value: Currency);
@@ -1096,15 +1097,18 @@ type
     procedure SetidProduct(const Value: TDataGid);
     procedure SetrateDescription(const Value: TBaseDescription);
     procedure SetidBaseMovement(const Value: TDataGid);
+    procedure SetregOrder(const Value: Integer);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure UpdateFieldList; override;
+    function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
   published
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
-    property regDate: TDateTime read FregDate write SetregDate;
+    property regDateTime: TDateTime read FregDateTime write SetregDateTime;
+    property regOrder: Integer read FregOrder write SetregOrder;
     property description: TBaseDescription read Fdescription write Setdescription;
     property cash: Currency read Fcash write Setcash;
     property idDepositInvestment: TDataGid read FidDepositInvestment write SetidDepositInvestment;
@@ -5302,7 +5306,8 @@ begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     FmovementType := FieldByName('movementType').AsString;
-    FregDate := FieldByName('regDate').AsDateTime;
+    FregDateTime := FieldByName('regDateTime').AsDateTime;
+    FregOrder := FieldByName('regOrder').AsInteger;
     Fdescription := FieldByName('description').AsString;
     Fcash := FieldByName('cash').AsCurrency;
     FidDepositInvestment := FieldByName('idDepositInvestment').AsString;
@@ -5315,6 +5320,28 @@ begin
     FrateDescription := FieldByName('rateDescription').AsString;
     FidProduct := FieldByName('idProduct').AsString;
     FidBaseMovement := FieldByName('idBaseMovement').AsString;
+  end;
+end;
+
+function TDepositMovement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
+begin
+  Result := '';
+  if AColumnIndex = 1 then begin
+    Result := Date2StrDate(FregDateTime, False);
+  end else if AColumnIndex = 2 then begin
+    Result := GetDescText(Fdescription);
+  end else if AColumnIndex = 3 then begin
+    if FmovementType = CDepositMovementCreate then begin
+      Result := 'Za³o¿enie';
+    end else if FmovementType = CDepositMovementRegister then begin
+      Result := 'Rejestracja';
+    end else if FmovementType = CDepositMovementInactivate then begin
+      Result := 'Zakoñczenie';
+    end else if FmovementType = CDepositMovementRenew then begin
+      Result := 'Odnowienie';
+    end else if FmovementType = CDepositMovementDue then begin
+      Result := 'Naliczenie';
+    end;
   end;
 end;
 
@@ -5432,10 +5459,18 @@ begin
   end;
 end;
 
-procedure TDepositMovement.SetregDate(const Value: TDateTime);
+procedure TDepositMovement.SetregDateTime(const Value: TDateTime);
 begin
-  if FregDate <> Value then begin
-    FregDate := Value;
+  if FregDateTime <> Value then begin
+    FregDateTime := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetregOrder(const Value: Integer);
+begin
+  if FregOrder <> Value then begin
+    FregOrder := Value;
     SetState(msModified);
   end;
 end;
@@ -5445,7 +5480,8 @@ begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('movementType', FmovementType, True, 'depositMovement');
-    AddField('regDate', DatetimeToDatabase(FregDate, False), False, 'depositMovement');
+    AddField('regDateTime', DatetimeToDatabase(FregDateTime, False), False, 'depositMovement');
+    AddField('regOrder', IntToStr(FregOrder), False, 'depositMovement');
     AddField('description', Fdescription, True, 'depositMovement');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'depositMovement');
     AddField('idDepositInvestment', DataGidToDatabase(FidDepositInvestment), False, 'depositMovement');

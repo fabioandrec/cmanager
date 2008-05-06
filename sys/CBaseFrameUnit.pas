@@ -151,7 +151,8 @@ uses CConsts, CListPreferencesFormUnit, CReports, Math,
   CProfileFrameUnit, CUnitdefFormUnit, CUpdateCurrencyRatesFormUnit,
   CUnitDefFrameUnit, CInstrumentFrameUnit, CInstrumentValueFrameUnit,
   CInvestmentMovementFrameUnit, CInvestmentPortfolioFrameUnit,
-  CReportsFrameUnit, CQuickpatternFrameUnit, CDepositInvestmentFrameUnit;
+  CReportsFrameUnit, CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
+  CDepositMovementFrameUnit, CDebug;
 
 {$R *.dfm}
 
@@ -738,6 +739,7 @@ end;
 procedure InitializeFrameGlobals;
 var xDefaultViewPrefs: TPrefList;
 begin
+  DebugStartTickCount('InitializeFrameGlobals');
   GFrames := TObjectList.Create(False);
   GRegisteredClasses := TRegisteredFrameClasses.Create(True);
   GRegisteredClasses.AddClass(TCAccountsFrame, CFRAMETYPE_ACCOUNTSFRAME, True);
@@ -760,10 +762,12 @@ begin
   GRegisteredClasses.AddClass(TCInvestmentPortfolioFrame, CFRAMETYPE_INVESTMENTPORTFOLIO, True);
   GRegisteredClasses.AddClass(TCQuickpatternFrame, CFRAMETYPE_QUICKPATTERNS, True);
   GRegisteredClasses.AddClass(TCDepositInvestmentFrame, CFRAMETYPE_DEPOSITINVESTMENTFRAME, True);
+  GRegisteredClasses.AddClass(TCDepositMovementFrame, CFRAMETYPE_DEPOSITMOVEMENTFRAME, True);
   GRegisteredClasses.AddClass(TCReportsFrame, CFRAMETYPE_REPORTS, True);
   xDefaultViewPrefs := GetDefaultViewPreferences;
   GViewsPreferences.Clone(xDefaultViewPrefs);
   xDefaultViewPrefs.Free;
+  DebugEndTickCounting('InitializeFrameGlobals');
 end;
 
 procedure FinalizeFrameGlobals;

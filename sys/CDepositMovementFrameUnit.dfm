@@ -96,46 +96,28 @@ inherited CDepositMovementFrame: TCDepositMovementFrame
     end
   end
   inherited List: TCDataList
-    Header.AutoSizeIndex = 1
+    Header.AutoSizeIndex = 2
     Header.MainColumn = 0
     Images = CImageLists.MovementIcons16x16
     Columns = <
       item
         Alignment = taRightJustify
-        Options = [coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
         Position = 0
         WideText = 'Lp'
       end
       item
         Position = 1
-        Width = 93
-        WideText = 'Opis'
-        WideHint = 'Nazwa kontrahenta'
-      end
-      item
-        Position = 2
         Width = 100
         WideText = 'Data'
       end
       item
-        Alignment = taRightJustify
+        Position = 2
+        Width = 193
+        WideText = 'Opis'
+        WideHint = 'Opis'
+      end
+      item
         Position = 3
-        Width = 70
-        WideText = 'Ilo'#347#263
-      end
-      item
-        Alignment = taRightJustify
-        Position = 4
-        Width = 80
-        WideText = 'Kwota'
-      end
-      item
-        Position = 5
-        WideText = 'Waluta'
-      end
-      item
-        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
-        Position = 6
         Width = 100
         WideText = 'Rodzaj'
       end>
@@ -151,6 +133,10 @@ inherited CDepositMovementFrame: TCDepositMovementFrame
     inherited CButtonDelete: TCButton
       Width = 132
     end
+  end
+  inherited ImageList: TPngImageList
+    Left = 168
+    Top = 8
   end
   inherited ActionListButtons: TActionList
     Images = CImageLists.DepositMovementImageList24x24

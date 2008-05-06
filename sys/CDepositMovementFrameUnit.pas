@@ -137,7 +137,7 @@ begin
   UpdateCustomPeriod;
   if AAdditionalData <> Nil then begin
     with TCDepositFrameAdditionalData(AAdditionalData) do begin
-      xSql := Format('select min(regDate) as minDate, max(regDate) as maxDate from depositMovement where idDepositInvestment = %s',
+      xSql := Format('select min(regDateTime) as minDate, max(regDateTime) as maxDate from depositMovement where idDepositInvestment = %s',
               [DataGidToDatabase(FDepositId)]);
       xQuery := GDataProvider.OpenSql(xSql);
       if not xQuery.IsEmpty then begin
@@ -173,7 +173,7 @@ var xDf, xDt: TDateTime;
 begin
   GetFilterDates(xDf, xDt);
   Result := ((inherited IsValidFilteredObject(AObject)) or (CStaticFilter.DataId = TDepositMovement(AObject).movementType)) and
-            (xDf <= TDepositMovement(AObject).regDate) and (TDepositMovement(AObject).regDate <= xDt);
+            (xDf <= TDepositMovement(AObject).regDateTime) and (TDepositMovement(AObject).regDateTime <= xDt);
   if Result and (AdditionalData <> Nil) then begin
     with TCDepositFrameAdditionalData(AdditionalData) do begin
       Result := (TDepositMovement(AObject).idDepositInvestment = FDepositId);
@@ -187,7 +187,7 @@ var xCondition: String;
 begin
   inherited ReloadDataobjects;
   GetFilterDates(xDf, xDt);
-  xCondition := Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+  xCondition := Format('regDateTime between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if CStaticFilter.DataId = CInvestmentSellMovement then begin
     xCondition := xCondition + Format(' and movementType = ''%s''', [CInvestmentSellMovement]);
   end else if CStaticFilter.DataId = CInvestmentBuyMovement then begin
@@ -198,7 +198,7 @@ begin
       xCondition := xCondition + Format(' and idDepositInvestment = %s', [DataGidToDatabase(FDepositId)]);
     end;
   end;
-  Dataobjects := TDataObject.GetList(TDepositMovement, DepositMovementProxy, 'select * from depositMovement where ' + xCondition + ' order by created');
+  Dataobjects := TDataObject.GetList(TDepositMovement, DepositMovementProxy, 'select * from depositMovement where ' + xCondition + ' order by regDateTime, regOrder');
 end;
 
 procedure TCDepositMovementFrame.ShowHistory(AGid: ShortString);
@@ -283,11 +283,11 @@ procedure TCDepositMovementFrame.DoAddingNewDataobject(ADataobject: TDataObject)
 begin
   inherited DoAddingNewDataobject(ADataobject);
   if AdditionalData <> Nil then begin
-    if TDepositMovement(ADataobject).regDate < CDateTimePerStart.Value then begin
-      CDateTimePerStart.Value := TDepositMovement(ADataobject).regDate;
+    if TDepositMovement(ADataobject).regDateTime < CDateTimePerStart.Value then begin
+      CDateTimePerStart.Value := TDepositMovement(ADataobject).regDateTime;
     end;
-    if TDepositMovement(ADataobject).regDate > CDateTimePerEnd.Value then begin
-      CDateTimePerEnd.Value := TDepositMovement(ADataobject).regDate;
+    if TDepositMovement(ADataobject).regDateTime > CDateTimePerEnd.Value then begin
+      CDateTimePerEnd.Value := TDepositMovement(ADataobject).regDateTime;
     end;
   end;
 end;

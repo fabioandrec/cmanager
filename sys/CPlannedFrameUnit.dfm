@@ -98,7 +98,7 @@ inherited CPlannedFrame: TCPlannedFrame
         Position = 1
         Width = 193
         WideText = 'Opis'
-        WideHint = 'Nazwa kontrahenta'
+        WideHint = 'Opis'
       end
       item
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]

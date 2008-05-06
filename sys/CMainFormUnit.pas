@@ -187,7 +187,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
      CImportExportDatafileFormUnit, CChangePasswordFormUnit,
   CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
-  CDepositCalculatorFormUnit;
+  CDepositCalculatorFormUnit, CDebug;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -211,6 +211,7 @@ end;
 
 procedure TCMainForm.FormCreate(Sender: TObject);
 begin
+  DebugStartTickCount('TCMainForm.FormCreate');
   Application.OnException := UnhandledException;
   Application.OnHelp := CallHelp;
   FShortcutsFrames := TStringList.Create;
@@ -230,6 +231,7 @@ begin
   end;
   TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := False;
   PerformShortcutAction(ActionShortcutStart);
+  DebugEndTickCounting('TCMainForm.FormCreate');
 end;
 
 function TCMainForm.GetShortcutsVisible: Boolean;

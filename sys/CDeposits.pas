@@ -214,7 +214,7 @@ begin
       if xCurDate = FdueEndDate then begin
         xItem := TDepositProgItem.Create(CDepositMovementDue);
         xItem.date := FdueEndDate;
-        xItem.regOrder := Count;
+        xItem.regOrder := Count + 1;
         xItem.caption := IntToStr(Count + 1);
         xItem.dueStart := FdueStartDate;
         xItem.dueEnd := FdueEndDate;
@@ -257,7 +257,7 @@ begin
           xItem.periodStart := FperiodStartDate;
           xItem.periodEnd := FperiodEndDate;
           xItem.caption := IntToStr(Count + 1);
-          xItem.regOrder := Count;
+          xItem.regOrder := Count + 1;
           if FdueAction = CDepositDueActionAutoCapitalisation then begin
             xItem.operation := 'Kapitalizacja naliczonych odsetek';
           end else begin
@@ -287,7 +287,7 @@ begin
         end;
         xItem := TDepositProgItem.Create(IfThen(FperiodAction = CDepositPeriodActionAutoRenew, CDepositMovementRenew, CDepositMovementInactivate));
         xItem.date := FperiodEndDate;
-        xItem.regOrder := Count;
+        xItem.regOrder := Count + 1;
         xItem.dueStart := FdueStartDate;
         xItem.dueEnd := FdueEndDate;
         xItem.periodStart := FperiodStartDate;

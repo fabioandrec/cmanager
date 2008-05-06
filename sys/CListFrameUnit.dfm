@@ -40,7 +40,7 @@ inherited CListFrame: TCListFrame
         Position = 0
         Width = 443
         WideText = 'Nazwa'
-        WideHint = 'Nazwa kontrahenta'
+        WideHint = 'Nazwa'
       end>
     WideDefaultText = ''
   end

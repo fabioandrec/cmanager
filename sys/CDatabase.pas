@@ -249,7 +249,7 @@ implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
      CPreferences, CTools, CDataObjects,
-     CAdotools, CUpdateDatafileFormUnit, CDeposits;
+     CAdotools, CUpdateDatafileFormUnit, CDeposits, CDebug;
 
 function InitializeDataProvider(ADatabaseName: String; APassword: String; ADataProvider: TDataProvider): TInitializeProviderResult;
 var xCommand: String;
@@ -258,6 +258,7 @@ var xCommand: String;
     xDatabaseName: String;
     xPassword: String;
 begin
+  DebugStartTickCount('InitializeDataProvider');
   xCommand := '';
   xDatabaseName := ExpandFileName(ADatabaseName);
   if ADataProvider.IsConnected then begin
@@ -282,6 +283,7 @@ begin
     ADataProvider.ReloadCaches;
     UpdateDepositInvestments(ADataProvider);
   end;
+  DebugEndTickCounting('InitializeDataProvider');
 end;
 
 procedure FinalizeDataProvider(ADataProvider: TDataProvider);

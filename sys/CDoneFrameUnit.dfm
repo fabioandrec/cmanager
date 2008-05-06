@@ -147,7 +147,7 @@ inherited CDoneFrame: TCDoneFrame
           Position = 0
           Width = 10
           WideText = 'Konto'
-          WideHint = 'Nazwa kontrahenta'
+          WideHint = 'Konto'
         end
         item
           Alignment = taRightJustify
@@ -226,7 +226,7 @@ inherited CDoneFrame: TCDoneFrame
         Position = 1
         Width = 200
         WideText = 'Opis'
-        WideHint = 'Nazwa kontrahenta'
+        WideHint = 'Opis'
       end
       item
         Position = 2

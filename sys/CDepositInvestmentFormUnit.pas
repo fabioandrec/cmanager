@@ -524,7 +524,7 @@ begin
     xMoveId := xMove.id;
     xMove.movementType := IfThen(ComboBoxType.ItemIndex = 0, CDepositMovementCreate, CDepositMovementRegister);
     xMove.regDateTime := CDateTime.Value;
-    xMove.regOrder := -1;
+    xMove.regOrder := 0;
     xMove.description := RichEditDesc.Text;
     xMove.cash := xDeposit.cash;
     xMove.idDepositInvestment := xDeposit.id;

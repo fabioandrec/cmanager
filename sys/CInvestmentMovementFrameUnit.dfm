@@ -1,5 +1,5 @@
 inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
-  inherited FilterPanel: TPanel
+  inherited FilterPanel: TCPanel
     object Label1: TLabel [1]
       Left = 194
       Top = 4
@@ -145,7 +145,7 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
         Position = 1
         Width = 93
         WideText = 'Opis'
-        WideHint = 'Nazwa kontrahenta'
+        WideHint = 'Opis'
       end
       item
         Position = 2

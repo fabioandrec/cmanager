@@ -22,6 +22,7 @@ uses
   Windows,
   SysUtils,
   Classes,
+  CDebug in 'CDebug.pas',
   CBaseFrameUnit in 'CBaseFrameUnit.pas' {CBaseFrame: TFrame},
   CDatabase in 'CDatabase.pas',
   CDataObjects in 'CDataObjects.pas',
@@ -169,6 +170,19 @@ begin
   {$ENDIF}
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
+  DebugStartTickCount('CManager');
+  xFilename := GetParamValue('/savequery');
+  if xFilename <> '' then begin
+    DbSqllogfile := GetSystemPathname(xFilename);
+  end;
+  xFilename := GetParamValue('/saveplugin');
+  if xFilename <> '' then begin
+    GPluginlogfile := GetSystemPathname(xFilename);
+  end;
+  xFilename := GetParamValue('/savedebug');
+  if xFilename <> '' then begin
+    GDebugLog := GetSystemPathname(xFilename);
+  end;
   InitializeFrameGlobals;
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     InitializeProxies(GDataProvider);
@@ -203,19 +217,11 @@ begin
         xProceed := CheckPendingInformations;
       end;
       if xProceed then begin
-        xFilename := GetParamValue('/savequery');
-        if xFilename <> '' then begin
-          DbSqllogfile := GetSystemPathname(xFilename);
-        end;
-        xFilename := GetParamValue('/saveplugin');
-        if xFilename <> '' then begin
-          GPluginlogfile := GetSystemPathname(xFilename);
-        end;
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

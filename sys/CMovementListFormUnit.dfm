@@ -331,7 +331,7 @@ inherited CMovementListForm: TCMovementListForm
               Position = 1
               Width = 255
               WideText = 'Opis'
-              WideHint = 'Nazwa kontrahenta'
+              WideHint = 'Opis'
             end
             item
               Alignment = taRightJustify
