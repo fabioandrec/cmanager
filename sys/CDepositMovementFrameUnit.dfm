@@ -117,8 +117,15 @@ inherited CDepositMovementFrame: TCDepositMovementFrame
         WideHint = 'Opis'
       end
       item
+        Alignment = taRightJustify
         Position = 3
         Width = 100
+        WideText = 'Kwota'
+      end
+      item
+        Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark]
+        Position = 4
+        Width = 10
         WideText = 'Rodzaj'
       end>
     WideDefaultText = ''

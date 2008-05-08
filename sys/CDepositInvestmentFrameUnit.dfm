@@ -1,16 +1,13 @@
 inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
-  Width = 631
-  Height = 274
+  Width = 730
   inherited Bevel: TBevel
-    Top = 231
-    Width = 631
+    Width = 730
   end
   inherited FilterPanel: TCPanel
-    Width = 631
+    Width = 730
   end
   inherited List: TCDataList
-    Width = 631
-    Height = 210
+    Width = 730
     Header.MainColumn = 0
     Images = CImageLists.DepositStateImageList16x16
     Columns = <
@@ -41,22 +38,24 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
       end
       item
         Position = 5
-        Width = 31
+        Width = 130
         WideText = 'Data zapadalno'#347'ci odsetek'
       end>
     WideDefaultText = ''
   end
   inherited ButtonPanel: TPanel
-    Top = 234
-    Width = 631
+    Width = 730
+    inherited CButtonEdit: TCButton
+      Left = 245
+    end
     inherited CButtonDelete: TCButton
-      Left = 357
+      Left = 469
     end
     inherited CButtonHistory: TCButton
-      Left = 453
+      Left = 565
     end
     object CButtonDetails: TCButton
-      Left = 245
+      Left = 357
       Top = 4
       Width = 116
       Height = 30
@@ -66,6 +65,18 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
       TxtOffset = 15
       Framed = False
       Action = ActionDetails
+    end
+    object CButton1: TCButton
+      Left = 117
+      Top = 4
+      Width = 124
+      Height = 30
+      Cursor = crHandPoint
+      PicPosition = ppLeft
+      PicOffset = 10
+      TxtOffset = 15
+      Framed = False
+      Action = ActionPay
     end
   end
   inherited ActionListButtons: TActionList
@@ -83,6 +94,11 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
       Caption = 'Poka'#380' histori'#281
       ImageIndex = 3
       OnExecute = ActionDetailsExecute
+    end
+    object ActionPay: TAction
+      Caption = 'Operacja lokaty'
+      ImageIndex = 4
+      OnExecute = ActionPayExecute
     end
   end
 end
