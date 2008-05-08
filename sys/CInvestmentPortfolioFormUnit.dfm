@@ -50,6 +50,7 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         BevelKind = bkTile
         Caption = '<wybierz konto z listy>'
         Color = clWindow
+        Enabled = False
         ParentColor = False
         TabOrder = 0
         TabStop = True
@@ -66,6 +67,7 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         BevelKind = bkTile
         Caption = '<wybierz z listy>'
         Color = clWindow
+        Enabled = False
         ParentColor = False
         TabOrder = 1
         TabStop = True
@@ -80,6 +82,7 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
+        Enabled = False
         MaxLength = 40
         TabOrder = 2
       end
@@ -115,6 +118,7 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
+        Enabled = False
         TabOrder = 0
         Text = '1'
       end
@@ -125,6 +129,7 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Width = 121
         Height = 21
         BorderStyle = bsNone
+        Enabled = False
         TabOrder = 1
         Decimals = 4
         ThousandSep = True
