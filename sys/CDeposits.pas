@@ -138,7 +138,11 @@ begin
         xMove.movementType := xProgItem.movementType;
         xMove.regDateTime := xProgItem.date;
         xMove.description := xProgItem.operation;
-        xMove.cash := xProgItem.cash;
+        if xProgItem.movementType = CDepositMovementDue then begin
+          xMove.cash := xProgItem.interest;
+        end else begin
+          xMove.cash := xProgItem.cash;
+        end;
         xMove.idDepositInvestment := ADi.id;
         xMove.idAccount := CEmptyDataGid;
         xMove.idAccountCurrencyDef := CEmptyDataGid;

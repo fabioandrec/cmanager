@@ -12,7 +12,10 @@ type
   TCDepositInvestmentFrame = class(TCDataobjectFrame)
     CButtonDetails: TCButton;
     ActionDetails: TAction;
+    CButton1: TCButton;
+    ActionPay: TAction;
     procedure ActionDetailsExecute(Sender: TObject);
+    procedure ActionPayExecute(Sender: TObject);
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
@@ -32,7 +35,8 @@ type
 implementation
 
 uses CPluginConsts, CConsts, CDepositInvestmentFormUnit,
-  CDepositMovementFrameUnit, CFrameFormUnit;
+  CDepositMovementFrameUnit, CFrameFormUnit, CDepositInvestmentPayFormUnit,
+  CConfigFormUnit;
 
 {$R *.dfm}
 
@@ -115,6 +119,7 @@ begin
   inherited UpdateButtons(AIsSelectedSomething);
   ActionHistory.Enabled := True;
   ActionDetails.Enabled := AIsSelectedSomething;
+  ActionPay.Enabled := AIsSelectedSomething;
 end;
 
 procedure TCDepositInvestmentFrame.ActionDetailsExecute(Sender: TObject);
@@ -124,5 +129,12 @@ begin
   TCFrameForm.ShowFrame(TCDepositMovementFrame, xGid, xText, TCDepositFrameAdditionalData.Create(xIdDeposit), nil, nil, nil, False);
 end;
 
+procedure TCDepositInvestmentFrame.ActionPayExecute(Sender: TObject);
+var xForm: TCDepositInvestmentPayForm;
+begin
+  xForm := TCDepositInvestmentPayForm.Create(Nil);
+  xForm.ShowDataobject(coEdit, DepositInvestmentProxy, TDataObject(List.SelectedElement.Data), False, Nil);
+  xForm.Free;
+end;
+
 end.
- 

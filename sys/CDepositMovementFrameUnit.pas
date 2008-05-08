@@ -198,7 +198,7 @@ begin
       xCondition := xCondition + Format(' and idDepositInvestment = %s', [DataGidToDatabase(FDepositId)]);
     end;
   end;
-  Dataobjects := TDataObject.GetList(TDepositMovement, DepositMovementProxy, 'select * from depositMovement where ' + xCondition + ' order by regDateTime, regOrder');
+  Dataobjects := TDataObject.GetList(TDepositMovement, DepositMovementProxy, 'select * from StnDepositMovement where ' + xCondition + ' order by regDateTime, regOrder');
 end;
 
 procedure TCDepositMovementFrame.ShowHistory(AGid: ShortString);
