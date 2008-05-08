@@ -63,3 +63,7 @@ insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', 
 update baseMovement set isInvestmentMovement = 0 where idBaseMovement not in (select idBaseMovement from investmentMovement where idBaseMovement is not null);
 alter table baseMovement add isDepositMovement bit not null;
 update baseMovement set isDepositMovement = 0;
+
+create view StnDepositMovement as
+  select v.*, d.idCurrencyDef from depositMovement v
+  left join depositInvestment d on d.idDepositInvestment = v.idDepositInvestment;
