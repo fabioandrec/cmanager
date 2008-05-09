@@ -228,7 +228,7 @@ const
   CDescPatternsKeys: array[0..9, 0..4] of string =
     (('BaseMovementOut', 'BaseMovementIn', 'BaseMovementTr', 'BaseMovementPlannedOut', 'BaseMovementPlannedIn'),
      ('MovementListOut', 'MovementListIn', '', '', ''),
-     ('PlannedMovementOut', 'PlannedMovementIn', '', '', ''),
+     ('PlannedMovementOut', 'PlannedMovementIn', 'PlannedMovementTransfer', '', ''),
      ('MovementListElement', '', '', '', ''),
      ('Currencyrate', '', '', '', ''),
      ('AccountExctraction', '', '', '', ''),
@@ -240,7 +240,7 @@ const
   CDescPatternsNames: array[0..9, 0..4] of string =
     (('Rozchód jednorazowy', 'Przychód jednorazowy', 'Transfer', 'Planowany rozchód', 'Planowany przychód'),
      ('Rozchód', 'Przychód', '', '', ''),
-     ('Rozchód', 'Przychód', '', '', ''),
+     ('Rozchód', 'Przychód', 'Transfer', '', ''),
      ('Wszystkie elementy', '', '', '', ''),
      ('Wszystkie elementy', '', '', '', ''),
      ('Wszystkie elementy', '', '', '', ''),
