@@ -590,6 +590,10 @@ create view StnInvestmentPortfolio as
     from ((investmentItem v
       left outer join instrument i on i.idInstrument = v.idInstrument)
       left outer join account a on a.idAccount = v.idAccount);
+	  
+create view StnDepositMovement as
+  select v.*, d.idCurrencyDef from depositMovement v
+  left join depositInvestment d on d.idDepositInvestment = v.idDepositInvestment;
 
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);

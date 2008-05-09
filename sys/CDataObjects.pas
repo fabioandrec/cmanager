@@ -1083,6 +1083,7 @@ type
     FrateDescription: TBaseDescription;
     FidProduct: TDataGid;
     FidBaseMovement: TDataGid;
+    FidCurrencyDef: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidDepositInvestment(const Value: TDataGid);
@@ -1121,6 +1122,7 @@ type
     property rateDescription: TBaseDescription read FrateDescription write SetrateDescription;
     property idProduct: TDataGid read FidProduct write SetidProduct;
     property idBaseMovement: TDataGid read FidBaseMovement write SetidBaseMovement;
+    property idCurrencyDef: TDataGid read FidCurrencyDef;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -1325,7 +1327,7 @@ begin
   InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
   InvestmentPortfolioProxy := TDataProxy.Create(ADataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
   DepositInvestmentProxy := TDataProxy.Create(ADataProvider, 'depositInvestment');
-  DepositMovementProxy := TDataProxy.Create(ADataProvider, 'depositMovement');
+  DepositMovementProxy := TDataProxy.Create(ADataProvider, 'depositMovement', 'StnDepositMovement');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -5320,6 +5322,7 @@ begin
     FrateDescription := FieldByName('rateDescription').AsString;
     FidProduct := FieldByName('idProduct').AsString;
     FidBaseMovement := FieldByName('idBaseMovement').AsString;
+    FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
   end;
 end;
 
@@ -5331,16 +5334,18 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := GetDescText(Fdescription);
   end else if AColumnIndex = 3 then begin
+    Result := CurrencyToString(Fcash, FidCurrencyDef);
+  end else if AColumnIndex = 4 then begin
     if FmovementType = CDepositMovementCreate then begin
-      Result := 'Za³o¿enie';
+      Result := 'Za³o¿enie lokaty';
     end else if FmovementType = CDepositMovementRegister then begin
-      Result := 'Rejestracja';
+      Result := 'Rejestracja lokaty';
     end else if FmovementType = CDepositMovementInactivate then begin
-      Result := 'Zakoñczenie';
+      Result := 'Zakoñczenie lokaty';
     end else if FmovementType = CDepositMovementRenew then begin
-      Result := 'Odnowienie';
+      Result := 'Odnowienie lokaty';
     end else if FmovementType = CDepositMovementDue then begin
-      Result := 'Naliczenie';
+      Result := 'Naliczenie odsetek';
     end;
   end;
 end;
