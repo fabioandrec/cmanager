@@ -67,3 +67,20 @@ update baseMovement set isDepositMovement = 0;
 create view StnDepositMovement as
   select v.*, d.idCurrencyDef from depositMovement v
   left join depositInvestment d on d.idDepositInvestment = v.idDepositInvestment;
+  
+ insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementTransfer', 'Planowany transfer z @kontozrodlowe@ do @kontodocelowe@');
+
+alter table plannedMovement drop constraint ck_plannedType;
+alter table plannedMovement add constraint ck_plannedType check (movementType in ('I', 'O', 'T'));
+
+alter table plannedMovement add idDestAccount uniqueidentifier;
+alter table plannedMovement add constraint fk_plannedMovementDestAccount foreign key (idDestAccount) references account (idAccount);
+
+alter table plannedMovement drop constraint fk_plannedMovementProduct;
+alter table plannedMovement add column idProduct_temp uniqueidentifier null;
+update plannedMovement set idProduct_temp = idProduct;
+alter table plannedMovement drop column idProduct;
+alter table plannedMovement add column idProduct uniqueidentifier null;
+update plannedMovement set idProduct = idProduct_temp;
+alter table plannedMovement drop column idProduct_temp;
+alter table plannedMovement add constraint fk_plannedMovementProduct foreign key (idProduct) references product (idProduct);
