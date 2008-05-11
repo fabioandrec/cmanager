@@ -6,6 +6,9 @@ inherited CChoosePeriodRatesHistoryForm: TCChoosePeriodRatesHistoryForm
   TextHeight = 13
   inherited PanelConfig: TPanel
     Height = 335
+    inherited GroupBoxView: TGroupBox
+      TabOrder = 2
+    end
     object GroupBox2: TGroupBox
       Left = 16
       Top = 152

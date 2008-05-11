@@ -125,7 +125,7 @@ create table plannedMovement (
   isActive bit not null,
   idAccount uniqueidentifier,
   idCashPoint uniqueidentifier,
-  idProduct uniqueidentifier not null,
+  idProduct uniqueidentifier,
   scheduleType varchar(1) not null,
   scheduleDate datetime not null,
   endCondition varchar(1) not null,
@@ -137,10 +137,12 @@ create table plannedMovement (
   idMovementCurrencyDef uniqueidentifier not null,
   quantity money not null,
   idUnitdef uniqueidentifier,
+  idDestAccount uniqueidentifier,
   primary key (idPlannedMovement),
-  constraint ck_plannedType check (movementType in ('I', 'O')),
+  constraint ck_plannedType check (movementType in ('I', 'O', 'T')),
   constraint ck_freeDays check (freeDays in ('E', 'D', 'I')),
   constraint fk_plannedMovementAccount foreign key (idAccount) references account (idAccount),
+  constraint fk_plannedMovementDestAccount foreign key (idDestAccount) references account (idAccount),
   constraint fk_plannedMovementCashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_plannedMovementProduct foreign key (idProduct) references product (idProduct),
   constraint ck_scheduleType check (scheduleType in ('O', 'C')),
@@ -450,6 +452,7 @@ insert into cmanagerParams (paramName, paramValue) values ('MovementListOut', '@
 insert into cmanagerParams (paramName, paramValue) values ('MovementListIn', '@kontrahent@');
 insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementOut', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementIn', '@kategoria@');
+insert into cmanagerParams (paramName, paramValue) values ('PlannedMovementTransfer', 'Planowany transfer z @kontozrodlowe@ do @kontodocelowe@');
 insert into cmanagerParams (paramName, paramValue) values ('MovementListElement', '@kategoria@');
 insert into cmanagerParams (paramName, paramValue) values ('Currencyrate', '@isobazowej@/@isodocelowej@');
 insert into cmanagerParams (paramName, paramValue) values ('AccountExctraction', '@konto@ - wyci¹g z dnia @datawyciagu@');

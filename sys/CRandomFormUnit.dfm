@@ -40,13 +40,14 @@ inherited CRandomForm: TCRandomForm
       Height = 21
       AutoSize = False
       BevelKind = bkTile
-      Caption = '<wybierz dat'#281'>'
+      Caption = '<wybierz dat'#281' >'
       Color = clWindow
       ParentColor = False
       TabOrder = 0
       TabStop = True
       Transparent = False
       HotTrack = True
+      Withtime = False
     end
     object CDateTime2: TCDateTime
       Left = 275
@@ -55,13 +56,14 @@ inherited CRandomForm: TCRandomForm
       Height = 21
       AutoSize = False
       BevelKind = bkTile
-      Caption = '<wybierz dat'#281'>'
+      Caption = '<wybierz dat'#281' >'
       Color = clWindow
       ParentColor = False
       TabOrder = 1
       TabStop = True
       Transparent = False
       HotTrack = True
+      Withtime = False
     end
   end
   object GroupBox2: TGroupBox

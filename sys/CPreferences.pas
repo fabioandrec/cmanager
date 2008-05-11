@@ -140,6 +140,8 @@ type
     FstartupInfoOldIn: Boolean;
     FstartupInfoOut: Boolean;
     FstartupInfoOldOut: Boolean;
+    FstartupInfoTran: Boolean;
+    FstartupInfoOldTran: Boolean;
     FstartupInfoAlways: Boolean;
     FstartupCheckUpdates: Boolean;
     FstartupInfoSurpassedLimit: Boolean;
@@ -182,8 +184,10 @@ type
     property startupInfoDays: Integer read FstartupInfoDays write FstartupInfoDays;
     property startupInfoIn: Boolean read FstartupInfoIn write FstartupInfoIn;
     property startupInfoOut: Boolean read FstartupInfoOut write FstartupInfoOut;
+    property startupInfoTran: Boolean read FstartupInfoTran write FstartupInfoTran;
     property startupInfoOldIn: Boolean read FstartupInfoOldIn write FstartupInfoOldIn;
     property startupInfoOldOut: Boolean read FstartupInfoOldOut write FstartupInfoOldOut;
+    property startupInfoOldTran: Boolean read FstartupInfoOldTran write FstartupInfoOldTran;
     property startupInfoAlways: Boolean read FstartupInfoAlways write FstartupInfoAlways;
     property startupCheckUpdates: Boolean read FstartupCheckUpdates write FstartupCheckUpdates;
     property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
@@ -269,6 +273,8 @@ begin
   FstartupInfoDays := TBasePref(APrefItem).startupInfoDays;
   FstartupInfoIn := TBasePref(APrefItem).startupInfoIn;
   FstartupInfoOut := TBasePref(APrefItem).startupInfoOut;
+  FstartupInfoTran := TBasePref(APrefItem).startupInfoTran;
+  FstartupInfoOldTran := TBasePref(APrefItem).startupInfoOldTran;
   FstartupInfoAlways := TBasePref(APrefItem).startupInfoAlways;
   FstartupInfoOldIn := TBasePref(APrefItem).startupInfoOldIn;
   FstartupInfoOldOut := TBasePref(APrefItem).startupInfoOldOut;
@@ -357,8 +363,10 @@ begin
   FstartupInfoDays := GetXmlAttribute('startupInfoDays', ANode, 1);
   FstartupInfoIn := GetXmlAttribute('startupInfoIn', ANode, True);
   FstartupInfoOut := GetXmlAttribute('startupInfoOut', ANode, True);
+  FstartupInfoTran := GetXmlAttribute('startupInfoTran', ANode, True);
   FstartupInfoOldIn := GetXmlAttribute('startupInfoOldIn', ANode, True);
   FstartupInfoOldOut := GetXmlAttribute('startupInfoOldOut', ANode, True);
+  FstartupInfoOldTran := GetXmlAttribute('startupInfoOldTran', ANode, True);
   FstartupInfoAlways := GetXmlAttribute('startupInfoAlways', ANode, True);
   FstartupCheckUpdates := GetXmlAttribute('startupCheckUpdates', ANode, False);
   FstartupInfoSurpassedLimit := GetXmlAttribute('startupInfoSurpassedLimit', ANode, False);
@@ -403,9 +411,11 @@ begin
   SetXmlAttribute('startupInfoType', ANode, FstartupInfoType);
   SetXmlAttribute('startupInfoDays', ANode, FstartupInfoDays);
   SetXmlAttribute('startupInfoIn', ANode, FstartupInfoIn);
+  SetXmlAttribute('startupInfoTran', ANode, FstartupInfoTran);
   SetXmlAttribute('startupInfoOut', ANode, FstartupInfoOut);
   SetXmlAttribute('startupInfoOldIn', ANode, FstartupInfoOldIn);
   SetXmlAttribute('startupInfoOldOut', ANode, FstartupInfoOldOut);
+  SetXmlAttribute('startupInfoOldTran', ANode, FstartupInfoOldTran);
   SetXmlAttribute('startupInfoAlways', ANode, FstartupInfoAlways);
   SetXmlAttribute('startupCheckUpdates', ANode, FstartupCheckUpdates);
   SetXmlAttribute('startupInfoSurpassedLimit', ANode, FstartupInfoSurpassedLimit);
@@ -761,8 +771,10 @@ begin
   with TViewPref(Result.Last) do begin
     Fontprefs.Add(TFontPref.CreateFontPref('II', 'Zaplanowane operacje przychodowe'), True);
     Fontprefs.Add(TFontPref.CreateFontPref('IO', 'Zaplanowane operacje rozchodowe'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('IT', 'Zaplanowane transfery'), True);
     Fontprefs.Add(TFontPref.CreateFontPref('OI', 'Zaleg³e operacje przychodowe'), True);
     Fontprefs.Add(TFontPref.CreateFontPref('OO', 'Zaleg³e operacje rozchodowe'), True);
+    Fontprefs.Add(TFontPref.CreateFontPref('OT', 'Zaleg³e transfery'), True);
     Fontprefs.Add(TFontPref.CreateFontPref('DD', 'Elementy grupuj¹ce w/g dat'), True);
     Fontprefs.Add(TFontPref.CreateFontPref('TT', 'Elementy grupuj¹ce w/g stanu i rodzaju'), True);
     Fontprefs.Add(TFontPref.CreateFontPref('SL', 'Przekroczone limity'), True);

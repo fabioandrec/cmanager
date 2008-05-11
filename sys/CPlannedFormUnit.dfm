@@ -76,156 +76,276 @@ inherited CPlannedForm: TCPlannedForm
       Height = 177
       Caption = ' Szczeg'#243#322'y operacji '
       TabOrder = 1
-      object Label15: TLabel
-        Left = 354
-        Top = 65
-        Width = 22
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Ilo'#347#263
-      end
-      object Label4: TLabel
-        Left = 36
-        Top = 29
-        Width = 68
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Konto operacji'
-      end
-      object Label2: TLabel
-        Left = 59
-        Top = 65
-        Width = 45
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Kategoria'
-      end
-      object Label6: TLabel
-        Left = 52
-        Top = 101
-        Width = 52
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Kontrahent'
-      end
-      object Label9: TLabel
-        Left = 306
-        Top = 139
-        Width = 70
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Kwota operacji'
-      end
-      object Label17: TLabel
-        Left = 30
-        Top = 138
-        Width = 74
-        Height = 13
-        Alignment = taRightJustify
-        Caption = 'Waluta operacji'
-      end
-      object CCurrEditQuantity: TCCurrEdit
-        Tag = 1
-        Left = 384
-        Top = 61
-        Width = 89
-        Height = 21
-        BorderStyle = bsNone
-        TabOrder = 2
-        Decimals = 2
-        ThousandSep = True
-        CurrencyStr = 'z'#322
-        BevelKind = bkTile
-        WithCalculator = True
-      end
-      object CStaticAccount: TCStatic
-        Left = 112
-        Top = 25
-        Width = 361
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
-        Color = clWindow
-        ParentColor = False
+      object PageControl: TPageControl
+        Left = 2
+        Top = 15
+        Width = 501
+        Height = 160
+        ActivePage = TabSheetTransfer
+        Align = alClient
+        Style = tsFlatButtons
         TabOrder = 0
-        TabStop = True
-        Transparent = False
-        TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
-        OnGetDataId = CStaticAccountGetDataId
-        OnChanged = CStaticAccountChanged
-        HotTrack = True
-      end
-      object CStaticCategory: TCStatic
-        Left = 112
-        Top = 61
-        Width = 169
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz kategori'#281' z listy>'
-        Color = clWindow
-        ParentColor = False
-        TabOrder = 1
-        TabStop = True
-        Transparent = False
-        TextOnEmpty = '<wybierz kategori'#281' z listy>'
-        OnGetDataId = CStaticCategoryGetDataId
-        OnChanged = CStaticCategoryChanged
-        HotTrack = True
-      end
-      object CStaticCashpoint: TCStatic
-        Left = 112
-        Top = 97
-        Width = 361
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz kontrahenta z listy>'
-        Color = clWindow
-        ParentColor = False
-        TabOrder = 3
-        TabStop = True
-        Transparent = False
-        TextOnEmpty = '<wybierz kontrahenta z listy>'
-        OnGetDataId = CStaticCashpointGetDataId
-        OnChanged = CStaticAccountChanged
-        HotTrack = True
-      end
-      object CCurrEdit: TCCurrEdit
-        Left = 384
-        Top = 135
-        Width = 89
-        Height = 21
-        BorderStyle = bsNone
-        TabOrder = 5
-        Decimals = 2
-        ThousandSep = True
-        CurrencyStr = 'z'#322
-        BevelKind = bkTile
-        WithCalculator = True
-      end
-      object CStaticCurrency: TCStatic
-        Left = 112
-        Top = 135
-        Width = 169
-        Height = 21
-        Cursor = crHandPoint
-        AutoSize = False
-        BevelKind = bkTile
-        Caption = '<wybierz walut'#281' z listy>'
-        Color = clWindow
-        ParentColor = False
-        TabOrder = 4
-        TabStop = True
-        Transparent = False
-        TextOnEmpty = '<wybierz walut'#281' z listy>'
-        OnGetDataId = CStaticCurrencyGetDataId
-        OnChanged = CStaticCurrencyChanged
-        HotTrack = True
+        object TabSheetInOut: TTabSheet
+          Caption = 'TabSheetInOut'
+          TabVisible = False
+          object Label4: TLabel
+            Left = 28
+            Top = 9
+            Width = 68
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Konto operacji'
+          end
+          object Label2: TLabel
+            Left = 51
+            Top = 45
+            Width = 45
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Kategoria'
+          end
+          object Label15: TLabel
+            Left = 346
+            Top = 45
+            Width = 22
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Ilo'#347#263
+          end
+          object Label6: TLabel
+            Left = 44
+            Top = 81
+            Width = 52
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Kontrahent'
+          end
+          object Label17: TLabel
+            Left = 22
+            Top = 117
+            Width = 74
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Waluta operacji'
+          end
+          object Label9: TLabel
+            Left = 298
+            Top = 117
+            Width = 70
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Kwota operacji'
+          end
+          object CCurrEditQuantity: TCCurrEdit
+            Tag = 1
+            Left = 376
+            Top = 41
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            TabOrder = 2
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
+          end
+          object CStaticAccount: TCStatic
+            Left = 104
+            Top = 5
+            Width = 361
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 0
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+            OnGetDataId = CStaticAccountGetDataId
+            OnChanged = CStaticAccountChanged
+            HotTrack = True
+          end
+          object CStaticCategory: TCStatic
+            Left = 104
+            Top = 41
+            Width = 169
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz kategori'#281' z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 1
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz kategori'#281' z listy>'
+            OnGetDataId = CStaticCategoryGetDataId
+            OnChanged = CStaticCategoryChanged
+            HotTrack = True
+          end
+          object CStaticCashpoint: TCStatic
+            Left = 104
+            Top = 77
+            Width = 361
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz kontrahenta z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 3
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz kontrahenta z listy>'
+            OnGetDataId = CStaticCashpointGetDataId
+            OnChanged = CStaticAccountChanged
+            HotTrack = True
+          end
+          object CStaticCurrency: TCStatic
+            Left = 104
+            Top = 113
+            Width = 169
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz walut'#281' z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 4
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz walut'#281' z listy>'
+            OnGetDataId = CStaticCurrencyGetDataId
+            OnChanged = CStaticCurrencyChanged
+            HotTrack = True
+          end
+          object CCurrEdit: TCCurrEdit
+            Left = 376
+            Top = 113
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            TabOrder = 5
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
+          end
+        end
+        object TabSheetTransfer: TTabSheet
+          Caption = 'TabSheetTransfer'
+          ImageIndex = 1
+          TabVisible = False
+          object Label3: TLabel
+            Left = 28
+            Top = 9
+            Width = 68
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Konto operacji'
+          end
+          object Label8: TLabel
+            Left = 22
+            Top = 45
+            Width = 74
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Waluta operacji'
+          end
+          object Label10: TLabel
+            Left = 298
+            Top = 45
+            Width = 70
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Kwota operacji'
+          end
+          object Label11: TLabel
+            Left = 19
+            Top = 81
+            Width = 77
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Konto docelowe'
+          end
+          object CStaticAccoutTransferSource: TCStatic
+            Left = 104
+            Top = 5
+            Width = 361
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 0
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+            OnGetDataId = CStaticAccoutTransferSourceGetDataId
+            OnChanged = CStaticAccoutTransferSourceChanged
+            HotTrack = True
+          end
+          object CStaticSourceCurrencyDefTransfer: TCStatic
+            Left = 104
+            Top = 41
+            Width = 169
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<brak konta>'
+            Color = clWindow
+            Enabled = False
+            ParentColor = False
+            TabOrder = 1
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<brak konta>'
+            HotTrack = False
+          end
+          object CCurrEditTransfer: TCCurrEdit
+            Left = 376
+            Top = 41
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            TabOrder = 2
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
+          end
+          object CStaticAccoutTransferDest: TCStatic
+            Left = 104
+            Top = 77
+            Width = 361
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz konto docelowe z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 3
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz konto docelowe z listy>'
+            OnGetDataId = CStaticAccoutTransferDestGetDataId
+            OnChanged = CStaticAccoutTransferDestChanged
+            HotTrack = True
+          end
+        end
       end
     end
     object GroupBox1: TGroupBox
@@ -274,7 +394,8 @@ inherited CPlannedForm: TCPlannedForm
         OnChange = ComboBoxTypeChange
         Items.Strings = (
           'Rozch'#243'd'
-          'Przych'#243'd')
+          'Przych'#243'd'
+          'Transfer')
       end
       object ComboBoxStatus: TComboBox
         Left = 328
@@ -316,6 +437,9 @@ inherited CPlannedForm: TCPlannedForm
   inherited PanelButtons: TPanel
     Top = 500
     Width = 536
+    DesignSize = (
+      536
+      41)
     inherited BitBtnOk: TBitBtn
       Left = 359
     end

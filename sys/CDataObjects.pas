@@ -492,6 +492,7 @@ type
     FidMovementCurrencyDef: TDataGid;
     Fquantity: Currency;
     FidUnitDef: TDataGid;
+    FidDestAccount: TDataGid;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -510,6 +511,7 @@ type
     procedure SetidMovementCurrencyDef(const Value: TDataGid);
     procedure Setquantity(const Value: Currency);
     procedure SetidUnitDef(const Value: TDataGid);
+    procedure SetidDestAccount(const Value: TDataGid);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -536,6 +538,7 @@ type
     property idMovementCurrencyDef: TDataGid read FidMovementCurrencyDef write SetidMovementCurrencyDef;
     property quantity: Currency read Fquantity write Setquantity;
     property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
+    property idDestAccount: TDataGid read FidDestAccount write SetidDestAccount;
   end;
 
   TPlannedDone = class(TDataObject)
@@ -1837,6 +1840,7 @@ begin
     FmovementType := FieldByName('movementType').AsString;
     FisActive := FieldByName('isActive').AsBoolean;
     FidAccount := FieldByName('idAccount').AsString;
+    FidDestAccount := FieldByName('idDestAccount').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidProduct := FieldByName('idProduct').AsString;
     FscheduleType := FieldByName('scheduleType').AsString;
@@ -1929,6 +1933,14 @@ procedure TPlannedMovement.SetidCashPoint(const Value: TDataGid);
 begin
   if FidCashPoint <> Value then begin
     FidCashPoint := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TPlannedMovement.SetidDestAccount(const Value: TDataGid);
+begin
+  if FidDestAccount <> Value then begin
+    FidDestAccount := Value;
     SetState(msModified);
   end;
 end;
@@ -2035,6 +2047,7 @@ begin
     AddField('idMovementCurrencyDef', DataGidToDatabase(FidMovementCurrencyDef), False, 'plannedMovement');
     AddField('quantity', CurrencyToDatabase(Fquantity), False, 'plannedMovement');
     AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'plannedMovement');
+    AddField('idDestAccount', DataGidToDatabase(FidDestAccount), False, 'plannedMovement');
   end;
 end;
 

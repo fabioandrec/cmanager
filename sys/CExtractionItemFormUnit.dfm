@@ -147,6 +147,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
         Transparent = False
         OnChanged = CDateTimeChanged
         HotTrack = True
+        Withtime = False
       end
       object CStaticMovementCurrency: TCStatic
         Left = 104
@@ -196,6 +197,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
         Transparent = False
         OnChanged = CDateTimeAccChanged
         HotTrack = True
+        Withtime = False
       end
     end
   end

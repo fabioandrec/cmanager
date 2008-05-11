@@ -10,7 +10,7 @@ uses
 
 type
   TStartupHelperType = (shtGroup, shtDate, shtPlannedItem, shtLimit, shtExtraction);
-  TStartupHelperGroup = (shgIntimeIn, shgIntimeOut, shgOvertimeIn, shgOvertimeOut, shgLimit, shgExtraction);
+  TStartupHelperGroup = (shgIntimeIn, shgIntimeOut, shgIntimeTran, shgOvertimeIn, shgOvertimeOut, shgOvertimeTran, shgLimit, shgExtraction);
   TStartupHelperList = class;
   TStartupHelper = class;
 
@@ -139,7 +139,10 @@ begin
     if startupInfoOut or startupInfoOldOut then begin
       xTypes := xTypes + 'O';
     end;
-    if startupInfoOldIn or startupInfoOldOut then begin
+    if startupInfoTran or startupInfoOldTran then begin
+      xTypes := xTypes + 'T';
+    end;
+    if startupInfoOldIn or startupInfoOldOut or startupInfoOldTran then begin
       xDf := IncDay(xDf, (-3) * DaysInMonth(xDf));
     end;
     xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
@@ -164,20 +167,26 @@ begin
       if (xPlannedTreeItem.done = Nil) and (xPlannedTreeItem.triggerDate < GWorkDate) then begin
         if xPlannedTreeItem.planned.movementType = CInMovement then begin
           xItemGroup := shgOvertimeIn;
-        end else begin
+        end else if xPlannedTreeItem.planned.movementType = COutMovement then begin
           xItemGroup := shgOvertimeOut;
+        end else begin
+          xItemGroup := shgOvertimeTran;
         end;
       end else begin
         if xPlannedTreeItem.planned.movementType = CInMovement then begin
           xItemGroup := shgIntimeIn;
-        end else begin
+        end else if xPlannedTreeItem.planned.movementType = COutMovement then begin
           xItemGroup := shgIntimeOut;
+        end else begin
+          xItemGroup := shgIntimeTran;
         end;
       end;
       if ((xItemGroup = shgIntimeIn) and startupInfoIn) or
          ((xItemGroup = shgOvertimeIn) and startupInfoOldIn) or
          ((xItemGroup = shgIntimeOut) and startupInfoOut) or
-         ((xItemGroup = shgOvertimeOut) and startupInfoOldOut) then begin
+         ((xItemGroup = shgOvertimeOut) and startupInfoOldOut) or
+         ((xItemGroup = shgIntimeTran) and startupInfoTran) or
+         ((xItemGroup = shgOvertimeTran) and startupInfoOldTran) then begin
         xGroup := FHelperList.ByGroup(xItemGroup, True);
         xDate := xGroup.childs.ByDate(xPlannedTreeItem.triggerDate, xItemGroup, True);
         if xPlannedTreeItem.done <> Nil then begin
@@ -349,8 +358,10 @@ begin
         case xData.group of
           shgIntimeIn: CellText := 'Zaplanowane operacje przychodowe';
           shgIntimeOut: CellText := 'Zaplanowane operacje rozchodowe';
+          shgIntimeTran: CellText := 'Zaplanowane transfery';
           shgOvertimeIn: CellText := 'Zaleg쿮 operacje przychodowe';
           shgOvertimeOut: CellText := 'Zaleg쿮 operacje rozchodowe';
+          shgOvertimeTran: CellText := 'Zaleg쿮 transfery';
           shgLimit: CellText := 'Limity';
           shgExtraction: CellText := 'Nieuzgodnione wyci퉓i';
         end;
@@ -387,6 +398,8 @@ begin
           CellText := CInMovementDescription;
         end else if (TPlannedTreeItem(xData.item).planned.movementType = COutMovement) then begin
           CellText := COutMovementDescription;
+        end else if (TPlannedTreeItem(xData.item).planned.movementType = CTransferMovement) then begin
+          CellText := CTransferMovementDescription;
         end;
       end else if xData.helperType = shtLimit then begin
         if TMovementLimit(xData.item).sumType = CLimitSumtypeOut then begin
@@ -494,6 +507,8 @@ begin
         ImageIndex := 0;
       end else if TPlannedTreeItem(xData.item).planned.movementType = COutMovement then begin
         ImageIndex := 1;
+      end else if TPlannedTreeItem(xData.item).planned.movementType = CTransferMovement then begin
+        ImageIndex := 10;
       end;
     end else if xData.helperType = shtLimit then begin
       if TMovementLimit(xData.item).sumType = CLimitSumtypeOut then begin

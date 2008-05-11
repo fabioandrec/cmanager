@@ -1,6 +1,6 @@
 inherited CMovementForm: TCMovementForm
-  Left = 309
-  Top = 95
+  Left = 339
+  Top = 239
   Caption = 'Operacja'
   ClientHeight = 607
   ClientWidth = 536
@@ -143,7 +143,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 264
-        ActivePage = TabSheetInOutCyclic
+        ActivePage = TabSheetTrans
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -884,6 +884,9 @@ inherited CMovementForm: TCMovementForm
   inherited PanelButtons: TPanel
     Top = 566
     Width = 536
+    DesignSize = (
+      536
+      41)
     inherited BitBtnOk: TBitBtn
       Left = 359
     end

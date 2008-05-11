@@ -141,6 +141,8 @@ begin
     xSqlPlanned := xSqlPlanned + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
     xSqlPlanned := xSqlPlanned + Format(' and movementType = ''%s''', [CInMovement]);
+  end else if CStaticFilter.DataId = '4' then begin
+    xSqlPlanned := xSqlPlanned + Format(' and movementType = ''%s''', [CTransferMovement]);
   end;
   GetFilterDates(xDf, xDt);
   xSqlPlanned := xSqlPlanned + Format(' and (' +
@@ -192,9 +194,12 @@ begin
     if TDoneFrameAdditionalData(AAdditionalData).movementType = COutMovement then begin
       CStaticFilter.DataId := '2';
       CStaticFilter.Caption := '<rozchód>';
-    end else begin
+    end else if TDoneFrameAdditionalData(AAdditionalData).movementType = CInMovement then begin
       CStaticFilter.DataId := '3';
       CStaticFilter.Caption := '<przychód>';
+    end else if TDoneFrameAdditionalData(AAdditionalData).movementType = CTransferMovement then begin
+      CStaticFilter.DataId := '4';
+      CStaticFilter.Caption := '<transfer>';
     end;
   end;
   SumList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesDoneListSum]);
@@ -261,6 +266,8 @@ begin
       CellText := CInMovementDescription;
     end else if (xData.planned.movementType = COutMovement) then begin
       CellText := COutMovementDescription;
+    end else if (xData.planned.movementType = CTransferMovement) then begin
+      CellText := CTransferMovementDescription;
     end;
   end else if Column = 5 then begin
     if (xData.done <> Nil) then begin
@@ -369,6 +376,8 @@ begin
     xFt := COutMovement;
   end else if CStaticFilter.DataId = '3' then begin
     xFt := CInMovement;
+  end else if CStaticFilter.DataId = '4' then begin
+    xFt := CTransferMovement;
   end else begin
     xFt := '';
   end;
@@ -388,6 +397,7 @@ begin
   xList.Add('1=<dowolny typ>');
   xList.Add('2=<rozchód>');
   xList.Add('3=<przychód>');
+  xList.Add('4=<transfer>');
   xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 200, 300);
@@ -611,8 +621,10 @@ begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
     if xData.planned.movementType = COutMovement then begin
       Result := xData.planned.description + ' (p³atne do ' + Date2StrDate(xData.triggerDate) + ')';
-    end else begin
+    end else if xData.planned.movementType = CInMovement then begin
       Result := xData.planned.description + ' (wp³yw do ' + Date2StrDate(xData.triggerDate) + ')';
+    end else if xData.planned.movementType = CTransferMovement then begin
+      Result := xData.planned.description + ' (transfer do ' + Date2StrDate(xData.triggerDate) + ')';
     end;
   end;
 end;
@@ -721,10 +733,12 @@ begin
     while (not xMultiCurrency) and (xCount <= FTreeObjects.Count - 1) do begin
       xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
       if xElement.done = Nil then begin
-        if xOneCurrency = CEmptyDataGid then begin
-          xOneCurrency := xElement.planned.idMovementCurrencyDef;
-        end else begin
-          xMultiCurrency := xOneCurrency <> xElement.planned.idMovementCurrencyDef;
+        if xElement.planned.movementType <> CTransferMovement then begin
+          if xOneCurrency = CEmptyDataGid then begin
+            xOneCurrency := xElement.planned.idMovementCurrencyDef;
+          end else begin
+            xMultiCurrency := xOneCurrency <> xElement.planned.idMovementCurrencyDef;
+          end;
         end;
       end;
       Inc(xCount);
@@ -734,15 +748,17 @@ begin
       for xCount := 0 to FTreeObjects.Count - 1 do begin
         xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
         if xElement.done = Nil then begin
-          xSum := FSumRoot.childs.FindSumObjectByCur(xElement.planned.idMovementCurrencyDef, False);
-          if xSum = Nil then begin
-            xSum := TSumElement.Create;
-            xSum.id := '*';
-            xSum.idCurrencyDef := xElement.planned.idMovementCurrencyDef;
-            xSum.cashIn := 0;
-            xSum.cashOut := 0;
-            xSum.name := 'Razem w ' + GCurrencyCache.GetSymbol(xElement.planned.idMovementCurrencyDef);
-            FSumRoot.AddChild(xSum);
+          if xElement.planned.movementType <> CTransferMovement then begin
+            xSum := FSumRoot.childs.FindSumObjectByCur(xElement.planned.idMovementCurrencyDef, False);
+            if xSum = Nil then begin
+              xSum := TSumElement.Create;
+              xSum.id := '*';
+              xSum.idCurrencyDef := xElement.planned.idMovementCurrencyDef;
+              xSum.cashIn := 0;
+              xSum.cashOut := 0;
+              xSum.name := 'Razem w ' + GCurrencyCache.GetSymbol(xElement.planned.idMovementCurrencyDef);
+              FSumRoot.AddChild(xSum);
+            end;
           end;
         end;
       end;
@@ -758,28 +774,30 @@ begin
     for xCount := 0 to FTreeObjects.Count - 1 do begin
       xElement := TPlannedTreeItem(FTreeObjects.Items[xCount]);
       if xElement.done = Nil then begin
-        if xMultiCurrency then begin
-          xPar := FSumRoot.childs.FindSumObjectByCur(xElement.planned.idMovementCurrencyDef, False);
-        end else begin
-          xPar := FSumRoot;
-        end;
-        if xPar <> Nil then begin
-          xSum := xPar.childs.FindSumObjectById(xElement.planned.idAccount, False);
-          if xSum = Nil then begin
-            xSum := TSumElement.Create;
-            xSum.id := xElement.planned.idAccount;
-            xSum.idCurrencyDef := xElement.planned.idMovementCurrencyDef;
-            if xSum.id = CEmptyDataGid then begin
-              xSum.name := 'Bez zdefiniowanego konta';
-            end else begin
-              xSum.name := TAccount(TAccount.LoadObject(AccountProxy, xElement.planned.idAccount, False)).name;
-            end;
-            xPar.AddChild(xSum);
+        if xElement.planned.movementType <> CTransferMovement then begin
+          if xMultiCurrency then begin
+            xPar := FSumRoot.childs.FindSumObjectByCur(xElement.planned.idMovementCurrencyDef, False);
+          end else begin
+            xPar := FSumRoot;
           end;
-          xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
-          xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
-          xPar.cashIn := xPar.cashIn + xSum.cashIn;
-          xPar.cashOut := xPar.cashOut + xSum.cashOut;
+          if xPar <> Nil then begin
+            xSum := xPar.childs.FindSumObjectById(xElement.planned.idAccount, False);
+            if xSum = Nil then begin
+              xSum := TSumElement.Create;
+              xSum.id := xElement.planned.idAccount;
+              xSum.idCurrencyDef := xElement.planned.idMovementCurrencyDef;
+              if xSum.id = CEmptyDataGid then begin
+                xSum.name := 'Bez zdefiniowanego konta';
+              end else begin
+                xSum.name := TAccount(TAccount.LoadObject(AccountProxy, xElement.planned.idAccount, False)).name;
+              end;
+              xPar.AddChild(xSum);
+            end;
+            xSum.cashIn := xSum.cashIn + IfThen(xElement.planned.movementType = CInMovement, xElement.planned.cash, 0);
+            xSum.cashOut := xSum.cashOut + IfThen(xElement.planned.movementType = COutMovement, xElement.planned.cash, 0);
+            xPar.cashIn := xPar.cashIn + xSum.cashIn;
+            xPar.cashOut := xPar.cashOut + xSum.cashOut;
+          end;
         end;
       end;
     end;
@@ -824,6 +842,8 @@ begin
       ImageIndex := 0;
     end else if xBase.planned.movementType = COutMovement then begin
       ImageIndex := 1;
+    end else if xBase.planned.movementType = CTransferMovement then begin
+      ImageIndex := 10;
     end;
   end else if Column = 5 then begin
     xBase := TPlannedTreeItem(DoneList.GetNodeData(Node)^);

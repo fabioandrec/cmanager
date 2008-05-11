@@ -9,13 +9,13 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
     inherited GroupBox1: TGroupBox
       Caption = ' Zakres dat dla podstawy prognozy  '
     end
-    inherited GroupBox2: TGroupBox
-      Top = 288
-      TabOrder = 2
-    end
     inherited GroupBoxView: TGroupBox
       Top = 384
       TabOrder = 3
+    end
+    inherited GroupBox2: TGroupBox
+      Top = 288
+      TabOrder = 2
     end
     object GroupBox3: TGroupBox
       Left = 16
@@ -86,6 +86,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
       object CDateTime4: TCDateTime
         Left = 219
@@ -101,6 +102,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
         TabStop = True
         Transparent = False
         HotTrack = True
+        Withtime = False
       end
     end
   end

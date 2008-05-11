@@ -146,6 +146,8 @@ begin
       CellText := CInMovementDescription;
     end else if (xData.movementType = COutMovement) then begin
       CellText := COutMovementDescription;
+    end else if (xData.movementType = CTransferMovement) then begin
+      CellText := CTransferMovementDescription;
     end;
   end else if Column = 3 then begin
     CellText := CurrencyToString(xData.cash, '', False);
@@ -322,6 +324,8 @@ begin
       ImageIndex := 0;
     end else if xBase.movementType = COutMovement then begin
       ImageIndex := 1;
+    end else if xBase.movementType = CTransferMovement then begin
+      ImageIndex := 2;
     end;
   end;
 end;

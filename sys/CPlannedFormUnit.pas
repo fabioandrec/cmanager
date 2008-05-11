@@ -16,14 +16,6 @@ type
     GroupBox1: TGroupBox;
     Label5: TLabel;
     ComboBoxType: TComboBox;
-    Label4: TLabel;
-    CStaticAccount: TCStatic;
-    Label2: TLabel;
-    CStaticCategory: TCStatic;
-    Label6: TLabel;
-    CStaticCashpoint: TCStatic;
-    Label9: TLabel;
-    CCurrEdit: TCCurrEdit;
     Label7: TLabel;
     ComboBoxStatus: TComboBox;
     Label1: TLabel;
@@ -34,10 +26,29 @@ type
     CButton1: TCButton;
     CButton2: TCButton;
     ComboBoxTemplate: TComboBox;
-    Label17: TLabel;
-    CStaticCurrency: TCStatic;
+    PageControl: TPageControl;
+    TabSheetInOut: TTabSheet;
+    Label4: TLabel;
+    CStaticAccount: TCStatic;
+    Label2: TLabel;
+    CStaticCategory: TCStatic;
     Label15: TLabel;
     CCurrEditQuantity: TCCurrEdit;
+    Label6: TLabel;
+    CStaticCashpoint: TCStatic;
+    Label17: TLabel;
+    CStaticCurrency: TCStatic;
+    Label9: TLabel;
+    CCurrEdit: TCCurrEdit;
+    TabSheetTransfer: TTabSheet;
+    Label3: TLabel;
+    CStaticAccoutTransferSource: TCStatic;
+    Label8: TLabel;
+    CStaticSourceCurrencyDefTransfer: TCStatic;
+    Label10: TLabel;
+    CCurrEditTransfer: TCCurrEdit;
+    Label11: TLabel;
+    CStaticAccoutTransferDest: TCStatic;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure CStaticAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticInoutCyclicAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -56,6 +67,10 @@ type
     procedure CStaticCurrencyChanged(Sender: TObject);
     procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CStaticCategoryChanged(Sender: TObject);
+    procedure CStaticAccoutTransferSourceChanged(Sender: TObject);
+    procedure CStaticAccoutTransferSourceGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticAccoutTransferDestGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticAccoutTransferDestChanged(Sender: TObject);
   private
     FSchedule: TSchedule;
   protected
@@ -91,6 +106,7 @@ end;
 
 procedure TCPlannedForm.ComboBoxTypeChange(Sender: TObject);
 begin
+  PageControl.ActivePageIndex := IfThen(ComboBoxType.ItemIndex = 2, 1, 0);
   UpdateDescription;
 end;
 
@@ -192,15 +208,32 @@ end;
 function TCPlannedForm.CanAccept: Boolean;
 begin
   Result := True;
-  if CStaticCategory.DataId = CEmptyDataGid then begin
-    Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticCategory.DoGetDataId;
+  if ComboBoxType.ItemIndex = 2 then begin
+    if CStaticAccoutTransferSource.DataId = CEmptyDataGid then begin
+      Result := False;
+      if ShowInfo(itQuestion, 'Nie wybrano konta Ÿród³owego operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticAccoutTransferSource.DoGetDataId;
+      end;
+    end else if CStaticAccoutTransferDest.DataId = CEmptyDataGid then begin
+      Result := False;
+      if ShowInfo(itQuestion, 'Nie wybrano konta docelowego operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticAccoutTransferDest.DoGetDataId;
+      end;
+    end else if CStaticAccoutTransferSource.DataId = CStaticAccoutTransferDest.DataId then begin
+      ShowInfo(itError, 'Konto Ÿród³owe nie mo¿e byæ kontem docelowym', '');
+      Result := False;
     end;
-  end else if CStaticCurrency.DataId = CEmptyDataGid then begin
-    Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano waluty operacji. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticCurrency.DoGetDataId;
+  end else begin
+    if CStaticCategory.DataId = CEmptyDataGid then begin
+      Result := False;
+      if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticCategory.DoGetDataId;
+      end;
+    end else if CStaticCurrency.DataId = CEmptyDataGid then begin
+      Result := False;
+      if ShowInfo(itQuestion, 'Nie wybrano waluty operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticCurrency.DoGetDataId;
+      end;
     end;
   end;
 end;
@@ -210,19 +243,14 @@ begin
   with TPlannedMovement(Dataobject) do begin
     ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
     SimpleRichText(description, RichEditDesc);
-    CCurrEdit.Value := cash;
-    ComboBoxType.ItemIndex := IfThen(movementType = COutMovement, 0, 1);
+    if movementType = COutMovement then begin
+      ComboBoxType.ItemIndex := 0;
+    end else if movementType = CInMovement then begin
+      ComboBoxType.ItemIndex := 1;
+    end else if movementType = CTransferMovement then begin
+      ComboBoxType.ItemIndex := 2;
+    end;
     ComboBoxStatus.ItemIndex := IfThen(isActive, 0, 1);
-    CStaticAccount.DataId := idAccount;
-    if idAccount <> CEmptyDataGid then begin
-      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
-    end;
-    CStaticCashpoint.DataId := idCashPoint;
-    if idCashPoint <> CEmptyDataGid then begin
-      CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
-    end;
-    CStaticCategory.DataId := idProduct;
-    CStaticCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
     FSchedule.scheduleType := scheduleType;
     FSchedule.scheduleDate := scheduleDate;
     FSchedule.endCondition := endCondition;
@@ -231,16 +259,44 @@ begin
     FSchedule.triggerType := triggerType;
     FSchedule.triggerDay := triggerDay;
     FSchedule.freeDays := freeDays;
-    ComboBoxTypeChange(ComboBoxType);
     CStaticSchedule.Caption := FSchedule.AsString;
-    CStaticCashpoint.DataId := idCashPoint;
-    CStaticCurrency.DataId := idMovementCurrencyDef;
-    CCurrEditQuantity.Value := quantity;
-    if idMovementCurrencyDef <> CEmptyDataGid then begin
-      CStaticCurrency.Caption := GCurrencyCache.GetIso(idMovementCurrencyDef);
+    if movementType = CTransferMovement then begin
+      CCurrEditTransfer.Value := cash;
+      CStaticAccoutTransferSource.DataId := idAccount;
+      if idAccount <> CEmptyDataGid then begin
+        CStaticAccoutTransferSource.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+      end;
+      CStaticAccoutTransferDest.DataId := idDestAccount;
+      if idDestAccount <> CEmptyDataGid then begin
+        CStaticAccoutTransferDest.Caption := TAccount(TAccount.LoadObject(AccountProxy, idDestAccount, False)).name;
+      end;
+      CStaticSourceCurrencyDefTransfer.DataId := idMovementCurrencyDef;
+      if idMovementCurrencyDef <> CEmptyDataGid then begin
+        CStaticSourceCurrencyDefTransfer.Caption := GCurrencyCache.GetIso(idMovementCurrencyDef);
+      end;
+      CCurrEditTransfer.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
+    end else begin
+      CCurrEdit.Value := cash;
+      CStaticAccount.DataId := idAccount;
+      if idAccount <> CEmptyDataGid then begin
+        CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).name;
+      end;
+      CStaticCashpoint.DataId := idCashPoint;
+      if idCashPoint <> CEmptyDataGid then begin
+        CStaticCashpoint.Caption := TCashPoint(TCashPoint.LoadObject(CashPointProxy, idCashPoint, False)).name;
+      end;
+      CStaticCategory.DataId := idProduct;
+      CStaticCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).name;
+      CStaticCashpoint.DataId := idCashPoint;
+      CStaticCurrency.DataId := idMovementCurrencyDef;
+      CCurrEditQuantity.Value := quantity;
+      if idMovementCurrencyDef <> CEmptyDataGid then begin
+        CStaticCurrency.Caption := GCurrencyCache.GetIso(idMovementCurrencyDef);
+      end;
+      CStaticCategoryChanged(Nil);
+      CCurrEdit.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
     end;
-    CStaticCategoryChanged(Nil);
-    CCurrEdit.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
+    ComboBoxTypeChange(Nil);
   end;
 end;
 
@@ -253,12 +309,14 @@ procedure TCPlannedForm.ReadValues;
 begin
   with TPlannedMovement(Dataobject) do begin
     description := RichEditDesc.Text;
-    cash := CCurrEdit.Value;
-    movementType := IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement);
+    if ComboBoxType.ItemIndex = 0 then begin
+      movementType := COutMovement;
+    end else if ComboBoxType.ItemIndex = 0 then begin
+      movementType := CInMovement;
+    end else begin
+      movementType := CTransferMovement;
+    end;
     isActive := ComboBoxStatus.ItemIndex = 0;
-    idAccount := CStaticAccount.DataId;
-    idCashPoint := CStaticCashpoint.DataId;
-    idProduct := CStaticCategory.DataId;
     scheduleType := FSchedule.scheduleType;
     scheduleDate := FSchedule.scheduleDate;
     endCondition := FSchedule.endCondition;
@@ -267,9 +325,24 @@ begin
     triggerType := FSchedule.triggerType;
     triggerDay := FSchedule.triggerDay;
     freeDays := FSchedule.freeDays;
-    idMovementCurrencyDef := CStaticCurrency.DataId;
-    quantity := CCurrEditQuantity.Value;
-    idUnitDef := TProduct.HasQuantity(idProduct);
+    if ComboBoxType.ItemIndex <> 2 then begin
+      cash := CCurrEdit.Value;
+      idAccount := CStaticAccount.DataId;
+      idCashPoint := CStaticCashpoint.DataId;
+      idProduct := CStaticCategory.DataId;
+      idMovementCurrencyDef := CStaticCurrency.DataId;
+      quantity := CCurrEditQuantity.Value;
+      idUnitDef := TProduct.HasQuantity(idProduct);
+    end else begin
+      cash := CCurrEditTransfer.Value;
+      idAccount := CStaticAccoutTransferSource.DataId;
+      idDestAccount := CStaticAccoutTransferDest.DataId;
+      idCashPoint := CEmptyDataGid;
+      idProduct := CEmptyDataGid;
+      idMovementCurrencyDef := CStaticSourceCurrencyDefTransfer.DataId;
+      quantity := 1;
+      idUnitDef := CEmptyDataGid;
+    end;
   end;
 end;
 
@@ -325,8 +398,19 @@ begin
     Result := ComboBoxType.Text;
   end else if ATemplate = '@kontozrodlowe@' then begin
     Result := '<konto Ÿród³owe>';
-    if CStaticAccount.DataId <> CEmptyDataGid then begin
-      Result := CStaticAccount.Caption;
+    if ComboBoxType.ItemIndex = 2 then begin
+      if CStaticAccoutTransferSource.DataId <> CEmptyDataGid then begin
+        Result := CStaticAccoutTransferSource.Caption;
+      end;
+    end else begin
+      if CStaticAccount.DataId <> CEmptyDataGid then begin
+        Result := CStaticAccount.Caption;
+      end;
+    end;
+  end else if ATemplate = '@kontodocelowe@' then begin
+    Result := '<konto docelowe>';
+    if CStaticAccoutTransferDest.DataId <> CEmptyDataGid then begin
+      Result := CStaticAccoutTransferDest.Caption;
     end;
   end else if ATemplate = '@kategoria@' then begin
     Result := '<kategoria>';
@@ -369,6 +453,36 @@ begin
   xHasQuant := TProduct.HasQuantity(CStaticCategory.DataId);
   CStaticCategory.Width := IfThen(xHasQuant = CEmptyDataGid, 361, 169);
   SetComponentUnitdef(xHasQuant, CCurrEditQuantity);
+  UpdateDescription;
+end;
+
+procedure TCPlannedForm.CStaticAccoutTransferSourceChanged(Sender: TObject);
+var xCurrencyId: TDataGid;
+begin
+  if CStaticAccoutTransferSource.DataId <> CEmptyDataGid then begin
+    xCurrencyId := TAccount.GetCurrencyDefinition(CStaticAccoutTransferSource.DataId);
+    CStaticSourceCurrencyDefTransfer.DataId := xCurrencyId;
+    CStaticSourceCurrencyDefTransfer.Caption := GCurrencyCache.GetIso(xCurrencyId);
+    CCurrEditTransfer.SetCurrencyDef(CStaticSourceCurrencyDefTransfer.DataId, GCurrencyCache.GetSymbol(CStaticSourceCurrencyDefTransfer.DataId));
+  end else begin
+    CStaticSourceCurrencyDefTransfer.DataId := CEmptyDataGid;
+    CCurrEditTransfer.SetCurrencyDef(CEmptyDataGid, '');
+  end;
+  UpdateDescription;
+end;
+
+procedure TCPlannedForm.CStaticAccoutTransferSourceGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := ChooseAccount(ADataGid, AText);
+end;
+
+procedure TCPlannedForm.CStaticAccoutTransferDestGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := ChooseAccount(ADataGid, AText);
+end;
+
+procedure TCPlannedForm.CStaticAccoutTransferDestChanged(Sender: TObject);
+begin
   UpdateDescription;
 end;
 

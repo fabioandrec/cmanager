@@ -1157,8 +1157,6 @@ begin
       (CStaticInOutOnceMovementCurrency.DataId <> CEmptyDataGid);
     CStaticInOutOnceRate.HotTrack := CStaticInOutOnceRate.Enabled;
     Label22.Enabled := CStaticInOutOnceRate.Enabled;
-    Label17.Enabled := CStaticInOutOnceRate.Enabled;
-    Label21.Enabled := CStaticInOutOnceRate.Enabled;
     if CStaticInOutOnceRate.Enabled then begin
       GDataProvider.BeginTransaction;
       xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, IfThen(xI = 0, COutMovement, CInMovement), CStaticInoutOnceAccount.DataId, CStaticInOutOnceMovementCurrency.DataId);
@@ -1181,10 +1179,7 @@ begin
       (CStaticTransCurrencySource.DataId <> CEmptyDataGid) and
       (CStaticTransCurrencyDest.DataId <> CEmptyDataGid);
     CStaticTransRate.HotTrack := CStaticTransRate.Enabled;
-    Label8.Enabled := CStaticTransRate.Enabled;
     Label26.Enabled := CStaticTransRate.Enabled;
-    Label27.Enabled := CStaticTransRate.Enabled;
-    Label28.Enabled := CStaticTransRate.Enabled;
     if CStaticTransRate.Enabled then begin
       GDataProvider.BeginTransaction;
       xRate := TAccountCurrencyRule.FindRateByRule(GWorkDate, CTransferMovement, CStaticTransSourceAccount.DataId, CStaticTransCurrencyDest.DataId);
@@ -1208,8 +1203,6 @@ begin
       (CStaticInOutCyclicMovementCurrency.DataId <> CEmptyDataGid);
     CStaticInOutCyclicRate.HotTrack := CStaticInOutCyclicRate.Enabled;
     Label23.Enabled := CStaticInOutCyclicRate.Enabled;
-    Label24.Enabled := CStaticInOutCyclicRate.Enabled;
-    Label25.Enabled := CStaticInOutCyclicRate.Enabled;
     if AUpdateCurEdit then begin
       UpdateAccountCurEdit(CStaticInOutCyclicRate, CCurrEditInoutCyclicMovement, CCurrEditInoutCyclicAccount, FCyclicRateHelper);
     end;
