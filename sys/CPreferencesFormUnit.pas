@@ -38,16 +38,12 @@ type
     Action3: TAction;
     TabSheetAutostart: TTabSheet;
     GroupBox3: TGroupBox;
-    CheckBoxAutostartOperations: TCheckBox;
     ComboBoxDays: TComboBox;
     Label4: TLabel;
     CIntEditDays: TCIntEdit;
     CheckBoxAutoIn: TCheckBox;
     CheckBoxAutoOut: TCheckBox;
-    CheckBoxAutoAlways: TCheckBox;
     Label1: TLabel;
-    CheckBoxAutoOldIn: TCheckBox;
-    CheckBoxAutoOldOut: TCheckBox;
     GroupBox4: TGroupBox;
     PngImageList: TPngImageList;
     CButton4: TCButton;
@@ -60,8 +56,6 @@ type
     CButton6: TCButton;
     CButton7: TCButton;
     CheckBoxCheckForupdates: TCheckBox;
-    CheckBoxSurpassed: TCheckBox;
-    CheckBoxValid: TCheckBox;
     GroupBox5: TGroupBox;
     CheckBoxMon: TCheckBox;
     CheckBoxFri: TCheckBox;
@@ -89,7 +83,6 @@ type
     List: TCDataList;
     CButton10: TCButton;
     Action9: TAction;
-    CheckBoxExtractions: TCheckBox;
     CButton11: TCButton;
     Action10: TAction;
     GroupBox7: TGroupBox;
@@ -116,6 +109,19 @@ type
     ShortcutList: TCList;
     PopupMenuShortcutView: TPopupMenu;
     Ustawienialisty1: TMenuItem;
+    GroupBox9: TGroupBox;
+    CheckBoxAutostartOperations: TCheckBox;
+    CheckBoxAutoAlways: TCheckBox;
+    CheckBoxAutoTrans: TCheckBox;
+    Label13: TLabel;
+    GroupBox10: TGroupBox;
+    CheckBoxAutoOldIn: TCheckBox;
+    CheckBoxAutoOldOut: TCheckBox;
+    CheckBoxAutoOldTrans: TCheckBox;
+    GroupBox11: TGroupBox;
+    CheckBoxSurpassed: TCheckBox;
+    CheckBoxValid: TCheckBox;
+    CheckBoxExtractions: TCheckBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -126,8 +132,6 @@ type
     procedure Action5Execute(Sender: TObject);
     procedure Action6Execute(Sender: TObject);
     procedure Action7Execute(Sender: TObject);
-    procedure CheckBoxSurpassedClick(Sender: TObject);
-    procedure CheckBoxValidClick(Sender: TObject);
     procedure ComboBoxBackupActionChange(Sender: TObject);
     procedure ActionAddExecute(Sender: TObject);
     procedure CStaticBackupCatGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
@@ -288,9 +292,11 @@ begin
     CIntEditDays.Text := IntToStr(startupInfoDays);
     CheckBoxAutoIn.Checked := startupInfoIn;
     CheckBoxAutoOut.Checked := startupInfoOut;
+    CheckBoxAutoTrans.Checked := startupInfoTran;
     CheckBoxAutoAlways.Checked := startupInfoAlways;
     CheckBoxAutoOldIn.Checked := startupInfoOldIn;
     CheckBoxAutoOldOut.Checked := startupInfoOldOut;
+    CheckBoxAutoOldTrans.Checked := startupInfoOldTran;
     CheckBoxCheckForupdates.Checked := startupCheckUpdates;
     CheckBoxSurpassed.Checked := startupInfoSurpassedLimit;
     CheckBoxValid.Checked := startupInfoValidLimits;
@@ -331,7 +337,6 @@ begin
     CStaticProfile.Caption := TProfile(TProfile.LoadObject(ProfileProxy, GDefaultProfileId, False)).name;
   end;
   GDataProvider.RollbackTransaction;
-  ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
   CheckBoxAutostartOperationsClick(Nil);
   ComboBoxBackupActionChange(Nil);
   UpdateFilenameState;
@@ -378,9 +383,11 @@ begin
     startupInfoDays := CIntEditDays.Value;
     startupInfoIn := CheckBoxAutoIn.Checked;
     startupInfoOut := CheckBoxAutoOut.Checked;
+    startupInfoTran := CheckBoxAutoTrans.Checked;
     startupInfoAlways := CheckBoxAutoAlways.Checked;
     startupInfoOldIn := CheckBoxAutoOldIn.Checked;
     startupInfoOldOut := CheckBoxAutoOldOut.Checked;
+    startupInfoOldTran := CheckBoxAutoOldTrans.Checked;
     startupCheckUpdates := CheckBoxCheckForupdates.Checked;
     startupInfoSurpassedLimit := CheckBoxSurpassed.Checked;
     startupInfoValidLimits := CheckBoxValid.Checked;
@@ -440,25 +447,14 @@ end;
 
 procedure TCPreferencesForm.ComboBoxDaysChange(Sender: TObject);
 begin
-  CIntEditDays.Enabled := (ComboBoxDays.ItemIndex = ComboBoxDays.Items.Count - 1) and (CheckBoxAutostartOperations.Checked);
+  CIntEditDays.Enabled := (ComboBoxDays.ItemIndex = ComboBoxDays.Items.Count - 1);
   Label4.Enabled := CIntEditDays.Enabled;
   Label1.Enabled := CIntEditDays.Enabled;
 end;
 
 procedure TCPreferencesForm.CheckBoxAutostartOperationsClick(Sender: TObject);
 begin
-  ComboBoxDays.Enabled := CheckBoxAutostartOperations.Checked;
-  CheckBoxAutoIn.Enabled := ComboBoxDays.Enabled;
-  CheckBoxAutoOut.Enabled := ComboBoxDays.Enabled;
-  CheckBoxAutoOldIn.Enabled := ComboBoxDays.Enabled;
-  CheckBoxAutoOldOut.Enabled := ComboBoxDays.Enabled;
-  CheckBoxSurpassed.Enabled := CheckBoxAutostartOperations.Checked;
-  CheckBoxValid.Enabled := CheckBoxAutostartOperations.Checked;
-  CheckBoxExtractions.Enabled := CheckBoxAutostartOperations.Checked;
-  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
-                                CheckBoxSurpassed.Checked or
-                                CheckBoxValid.Checked or
-                                CheckBoxExtractions.Checked;
+  CheckBoxAutoAlways.Enabled := CheckBoxAutostartOperations.Checked;
   ComboBoxDaysChange(Nil);
 end;
 
@@ -500,20 +496,6 @@ begin
     SendMessageToFrames(TCStartupInfoFrame, WM_MUSTREPAINT, 0, 0);
   end;
   xPrefs.Free;
-end;
-
-procedure TCPreferencesForm.CheckBoxSurpassedClick(Sender: TObject);
-begin
-  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
-                                CheckBoxSurpassed.Checked or
-                                CheckBoxValid.Checked;
-end;
-
-procedure TCPreferencesForm.CheckBoxValidClick(Sender: TObject);
-begin
-  CheckBoxAutoAlways.Enabled := ComboBoxDays.Enabled or
-                                CheckBoxSurpassed.Checked or
-                                CheckBoxValid.Checked;
 end;
 
 function TCPreferencesForm.CanAccept: Boolean;

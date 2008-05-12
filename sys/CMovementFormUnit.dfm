@@ -50,7 +50,8 @@ inherited CMovementForm: TCMovementForm
           'Przych'#243'd jednorazowy'
           'Transfer '#347'rodk'#243'w'
           'Planowany rozch'#243'd'
-          'Planowany przych'#243'd')
+          'Planowany przych'#243'd'
+          'Planowany transfer '#347'rodk'#243'w')
       end
       object CDateTime: TCDateTime
         Left = 48
@@ -241,7 +242,7 @@ inherited CMovementForm: TCMovementForm
             PicOffset = 10
             TxtOffset = 15
             Framed = False
-            Action = ActionStateTransSource
+            Action = ActionStateOnceTransSource
             Color = clBtnFace
           end
           object CCurrEditCyclicQuantity: TCCurrEdit
@@ -481,7 +482,7 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'W walucie konta'
           end
-          object CButtonStateTransSource: TCButton
+          object CButtonStateOnceTransSource: TCButton
             Left = 366
             Top = 3
             Width = 107
@@ -491,10 +492,10 @@ inherited CMovementForm: TCMovementForm
             PicOffset = 10
             TxtOffset = 15
             Framed = False
-            Action = ActionStateTransSource
+            Action = ActionStateOnceTransSource
             Color = clBtnFace
           end
-          object CButtonStateTransDest: TCButton
+          object CButtonStateOnceTransDest: TCButton
             Left = 366
             Top = 39
             Width = 107
@@ -504,10 +505,10 @@ inherited CMovementForm: TCMovementForm
             PicOffset = 10
             TxtOffset = 15
             Framed = False
-            Action = ActionStateTransDest
+            Action = ActionStateOnceTransDest
             Color = clBtnFace
           end
-          object CStaticTransSourceAccount: TCStatic
+          object CStaticOnceTransSourceAccount: TCStatic
             Left = 112
             Top = 5
             Width = 257
@@ -522,11 +523,11 @@ inherited CMovementForm: TCMovementForm
             TabStop = True
             Transparent = False
             TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
-            OnGetDataId = CStaticTransSourceAccountGetDataId
-            OnChanged = CStaticTransSourceAccountChanged
+            OnGetDataId = CStaticOnceTransSourceAccountGetDataId
+            OnChanged = CStaticOnceTransSourceAccountChanged
             HotTrack = True
           end
-          object CStaticTransDestAccount: TCStatic
+          object CStaticOnceTransDestAccount: TCStatic
             Left = 112
             Top = 41
             Width = 257
@@ -541,11 +542,11 @@ inherited CMovementForm: TCMovementForm
             TabStop = True
             Transparent = False
             TextOnEmpty = '<wybierz konto docelowe z listy>'
-            OnGetDataId = CStaticTransDestAccountGetDataId
-            OnChanged = CStaticTransDestAccountChanged
+            OnGetDataId = CStaticOnceTransDestAccountGetDataId
+            OnChanged = CStaticOnceTransDestAccountChanged
             HotTrack = True
           end
-          object CStaticTransCurrencySource: TCStatic
+          object CStaticOnceTransCurrencySource: TCStatic
             Left = 112
             Top = 113
             Width = 169
@@ -564,21 +565,21 @@ inherited CMovementForm: TCMovementForm
             OnGetDataId = CStaticInOutOnceCurrencyAccountGetDataId
             HotTrack = False
           end
-          object CCurrEditTransMovement: TCCurrEdit
+          object CCurrEditOnceTransMovement: TCCurrEdit
             Left = 384
             Top = 113
             Width = 89
             Height = 21
             BorderStyle = bsNone
             TabOrder = 3
-            OnChange = CCurrEditTransMovementChange
+            OnChange = CCurrEditOnceTransMovementChange
             Decimals = 2
             ThousandSep = True
             CurrencyStr = 'z'#322
             BevelKind = bkTile
             WithCalculator = True
           end
-          object CStaticTransRate: TCStatic
+          object CStaticOnceTransRate: TCStatic
             Left = 112
             Top = 149
             Width = 361
@@ -593,11 +594,11 @@ inherited CMovementForm: TCMovementForm
             TabStop = True
             Transparent = False
             TextOnEmpty = '<wybierz przelicznik kursu z listy>'
-            OnGetDataId = CStaticTransRateGetDataId
-            OnChanged = CStaticTransRateChanged
+            OnGetDataId = CStaticOnceTransRateGetDataId
+            OnChanged = CStaticOnceTransRateChanged
             HotTrack = True
           end
-          object CStaticTransCurrencyDest: TCStatic
+          object CStaticOnceTransCurrencyDest: TCStatic
             Left = 112
             Top = 185
             Width = 169
@@ -616,7 +617,7 @@ inherited CMovementForm: TCMovementForm
             OnGetDataId = CStaticInOutOnceCurrencyAccountGetDataId
             HotTrack = False
           end
-          object CCurrEditTransAccount: TCCurrEdit
+          object CCurrEditOnceTransAccount: TCCurrEdit
             Left = 384
             Top = 185
             Width = 89
@@ -717,7 +718,7 @@ inherited CMovementForm: TCMovementForm
             PicOffset = 10
             TxtOffset = 15
             Framed = False
-            Action = ActionStateTransSource
+            Action = ActionStateOnceTransSource
             Color = clBtnFace
           end
           object CCurrEditOnceQuantity: TCCurrEdit
@@ -878,6 +879,38 @@ inherited CMovementForm: TCMovementForm
             HotTrack = True
           end
         end
+        object TabSheetTransCyclic: TTabSheet
+          Caption = 'TabSheetTransCyclic'
+          ImageIndex = 3
+          TabVisible = False
+          object Label29: TLabel
+            Left = 61
+            Top = 9
+            Width = 43
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Operacja'
+          end
+          object CStaticCyclicTrans: TCStatic
+            Left = 112
+            Top = 5
+            Width = 361
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 0
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
+            OnGetDataId = CStaticCyclicTransGetDataId
+            OnChanged = CStaticInoutCyclicChanged
+            HotTrack = True
+          end
+        end
       end
     end
   end
@@ -920,15 +953,15 @@ inherited CMovementForm: TCMovementForm
       ImageIndex = 1
       OnExecute = ActionStateOnceExecute
     end
-    object ActionStateTransSource: TAction
+    object ActionStateOnceTransSource: TAction
       Caption = 'Do uzgodnienia'
       ImageIndex = 1
-      OnExecute = ActionStateTransSourceExecute
+      OnExecute = ActionStateOnceTransSourceExecute
     end
-    object ActionStateTransDest: TAction
+    object ActionStateOnceTransDest: TAction
       Caption = 'Do uzgodnienia'
       ImageIndex = 1
-      OnExecute = ActionStateTransDestExecute
+      OnExecute = ActionStateOnceTransDestExecute
     end
     object ActionStateCyclic: TAction
       Caption = 'Do uzgodnienia'

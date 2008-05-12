@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 313
-  Top = 226
+  Left = 306
+  Top = 166
   Caption = 'Preferencje'
   ClientHeight = 486
   ClientWidth = 609
@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 478
           Height = 422
-          ActivePage = TabSheetPlugins
+          ActivePage = TabSheetAutostart
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -473,44 +473,43 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 449
-              Height = 305
-              Caption = ' Powiadomienia o operacjach i limitach '
+              Height = 97
+              Caption = ' Zaplanowane operacje '
               TabOrder = 0
               object Label4: TLabel
-                Left = 265
-                Top = 66
+                Left = 273
+                Top = 28
                 Width = 39
                 Height = 13
                 Alignment = taRightJustify
                 Caption = 'Ilo'#347#263' dni'
               end
               object Label1: TLabel
-                Left = 352
-                Top = 66
-                Width = 78
+                Left = 360
+                Top = 28
+                Width = 50
                 Height = 13
-                Caption = '(w'#322#261'cznie z dzi'#347')'
+                Caption = '(w'#322'. z dzi'#347')'
               end
-              object CheckBoxAutostartOperations: TCheckBox
-                Left = 16
-                Top = 32
-                Width = 242
-                Height = 17
-                Caption = 'Powiadamiaj przy starcie systemu o planach na'
-                TabOrder = 0
-                OnClick = CheckBoxAutostartOperationsClick
+              object Label13: TLabel
+                Left = 18
+                Top = 28
+                Width = 66
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'W/g planu na'
               end
               object ComboBoxDays: TComboBox
-                Left = 264
-                Top = 28
-                Width = 169
+                Left = 92
+                Top = 24
+                Width = 173
                 Height = 21
                 BevelInner = bvNone
                 BevelKind = bkTile
                 Style = csDropDownList
                 ItemHeight = 13
                 ItemIndex = 0
-                TabOrder = 1
+                TabOrder = 0
                 Text = 'Dzi'#347
                 OnChange = ComboBoxDaysChange
                 Items.Strings = (
@@ -523,83 +522,127 @@ inherited CPreferencesForm: TCPreferencesForm
                   'Okre'#347'lon'#261' ilo'#347#263' kolejnych dni')
               end
               object CIntEditDays: TCIntEdit
-                Left = 312
-                Top = 62
+                Left = 320
+                Top = 24
                 Width = 33
                 Height = 21
                 BevelKind = bkTile
                 BorderStyle = bsNone
-                TabOrder = 2
+                TabOrder = 1
                 Text = '0'
               end
               object CheckBoxAutoIn: TCheckBox
-                Left = 16
-                Top = 104
-                Width = 313
+                Left = 18
+                Top = 58
+                Width = 135
                 Height = 17
-                Caption = 'Powiadamiaj o zaplanowanych operacjach przychodowych'
-                TabOrder = 3
+                Caption = 'Operacje przychodowe'
+                TabOrder = 2
               end
               object CheckBoxAutoOut: TCheckBox
-                Left = 16
-                Top = 152
-                Width = 313
+                Left = 162
+                Top = 58
+                Width = 127
                 Height = 17
-                Caption = 'Powiadamiaj o zaplanowanych operacjach rozchodowych'
-                TabOrder = 5
+                Caption = 'Operacje rozchodowe'
+                TabOrder = 3
+              end
+              object CheckBoxAutoTrans: TCheckBox
+                Left = 298
+                Top = 58
+                Width = 63
+                Height = 17
+                Caption = 'Transfery'
+                TabOrder = 4
+              end
+            end
+            object GroupBox9: TGroupBox
+              Left = 8
+              Top = 280
+              Width = 449
+              Height = 89
+              Caption = ' Przy starcie systemu '
+              TabOrder = 1
+              object CheckBoxAutostartOperations: TCheckBox
+                Left = 16
+                Top = 24
+                Width = 417
+                Height = 17
+                Caption = 'Wy'#347'wietlaj okno powiadomie'#324' na dzi'#347' przy starcie systemu'
+                TabOrder = 0
+                OnClick = CheckBoxAutostartOperationsClick
               end
               object CheckBoxAutoAlways: TCheckBox
                 Left = 16
-                Top = 272
-                Width = 417
+                Top = 52
+                Width = 297
                 Height = 17
-                Caption = 
-                  'Wy'#347'wietlaj okno powiadomienia nawet gdy nie ma '#380'adnych informacj' +
-                  'i'
-                TabOrder = 9
+                Caption = 'Nawet je'#380'eli nie ma '#380'adnych powiadomie'#324' do wy'#347'wietlenia'
+                TabOrder = 1
               end
+            end
+            object GroupBox10: TGroupBox
+              Left = 8
+              Top = 120
+              Width = 449
+              Height = 65
+              Caption = ' Zaleg'#322'e operacje '
+              TabOrder = 2
               object CheckBoxAutoOldIn: TCheckBox
-                Left = 16
-                Top = 128
-                Width = 313
+                Left = 18
+                Top = 26
+                Width = 142
                 Height = 17
-                Caption = 'Powiadamiaj o zaleg'#322'ych operacjach przychodowych'
-                TabOrder = 4
+                Caption = 'Operacje przychodowe'
+                TabOrder = 0
               end
               object CheckBoxAutoOldOut: TCheckBox
-                Left = 16
-                Top = 176
-                Width = 313
+                Left = 162
+                Top = 26
+                Width = 127
                 Height = 17
-                Caption = 'Powiadamiaj o zaleg'#322'ych operacjach rozchodowych'
-                TabOrder = 6
+                Caption = 'Operacje rozchodowe'
+                TabOrder = 1
               end
-              object CheckBoxSurpassed: TCheckBox
-                Left = 16
-                Top = 200
-                Width = 313
+              object CheckBoxAutoOldTrans: TCheckBox
+                Left = 298
+                Top = 26
+                Width = 81
                 Height = 17
-                Caption = 'Powiadamiaj o przekroczonych limitach'
-                TabOrder = 7
-                OnClick = CheckBoxSurpassedClick
+                Caption = 'Transfery'
+                TabOrder = 2
+              end
+            end
+            object GroupBox11: TGroupBox
+              Left = 8
+              Top = 200
+              Width = 449
+              Height = 65
+              Caption = ' Inne '
+              TabOrder = 3
+              object CheckBoxSurpassed: TCheckBox
+                Left = 162
+                Top = 26
+                Width = 119
+                Height = 17
+                Caption = 'Przekroczone limity'
+                TabOrder = 0
               end
               object CheckBoxValid: TCheckBox
-                Left = 16
-                Top = 224
-                Width = 233
+                Left = 298
+                Top = 26
+                Width = 103
                 Height = 17
-                Caption = 'Powiadamiaj o poprawnych limitach'
-                TabOrder = 8
-                OnClick = CheckBoxValidClick
+                Caption = 'Poprawne limity'
+                TabOrder = 1
               end
               object CheckBoxExtractions: TCheckBox
-                Left = 16
-                Top = 248
-                Width = 233
+                Left = 18
+                Top = 26
+                Width = 135
                 Height = 17
-                Caption = 'Powiadamiaj nieuzgodnionych wyci'#261'gach'
-                TabOrder = 10
-                OnClick = CheckBoxValidClick
+                Caption = 'Nieuzgodnione wyci'#261'gi'
+                TabOrder = 2
               end
             end
           end

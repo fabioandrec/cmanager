@@ -1095,11 +1095,13 @@ initialization
     startupInfoType := CStartupInfoToday;
     startupInfoDays := 1;
     startupInfoIn := True;
+    startupInfoTran := True;
     startupInfoOut := True;
     startupInfoOldIn := True;
     startupInfoOldOut := True;
+    startupInfoOldTran := True;
     startupInfoAlways := True;
-    startupInfoSurpassedLimit := False;
+    startupInfoSurpassedLimit := True;
     startupUncheckedExtractions := False;
     startupInfoValidLimits := False;
     startupCheckUpdates := False;

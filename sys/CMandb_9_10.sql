@@ -84,3 +84,5 @@ alter table plannedMovement add column idProduct uniqueidentifier null;
 update plannedMovement set idProduct = idProduct_temp;
 alter table plannedMovement drop column idProduct_temp;
 alter table plannedMovement add constraint fk_plannedMovementProduct foreign key (idProduct) references product (idProduct);
+
+insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');
