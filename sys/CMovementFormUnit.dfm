@@ -891,6 +891,88 @@ inherited CMovementForm: TCMovementForm
             Alignment = taRightJustify
             Caption = 'Operacja'
           end
+          object Label30: TLabel
+            Left = 29
+            Top = 45
+            Width = 75
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Konto '#378'r'#243'd'#322'owe'
+          end
+          object Label31: TLabel
+            Left = 27
+            Top = 81
+            Width = 77
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Konto docelowe'
+          end
+          object CButtonStateCyclicTransDest: TCButton
+            Left = 366
+            Top = 75
+            Width = 107
+            Height = 25
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = ActionStateCyclicTransDest
+            Color = clBtnFace
+          end
+          object CButtonStateCyclicTransSource: TCButton
+            Left = 366
+            Top = 39
+            Width = 107
+            Height = 25
+            Cursor = crHandPoint
+            PicPosition = ppLeft
+            PicOffset = 10
+            TxtOffset = 15
+            Framed = False
+            Action = ActionStateCyclicTransSource
+            Color = clBtnFace
+          end
+          object Label32: TLabel
+            Left = 30
+            Top = 116
+            Width = 74
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Waluta operacji'
+          end
+          object Label33: TLabel
+            Left = 306
+            Top = 117
+            Width = 70
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Kwota operacji'
+          end
+          object Label34: TLabel
+            Left = 54
+            Top = 153
+            Width = 50
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Przelicznik'
+          end
+          object Label35: TLabel
+            Left = 21
+            Top = 188
+            Width = 83
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Waluta docelowa'
+          end
+          object Label36: TLabel
+            Left = 296
+            Top = 189
+            Width = 80
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'W walucie konta'
+          end
           object CStaticCyclicTrans: TCStatic
             Left = 112
             Top = 5
@@ -907,7 +989,128 @@ inherited CMovementForm: TCMovementForm
             Transparent = False
             TextOnEmpty = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
             OnGetDataId = CStaticCyclicTransGetDataId
-            OnChanged = CStaticInoutCyclicChanged
+            HotTrack = True
+          end
+          object CStaticCyclicTransSourceAccount: TCStatic
+            Left = 112
+            Top = 41
+            Width = 257
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 1
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz konto '#378'r'#243'd'#322'owe z listy>'
+            OnGetDataId = CStaticCyclicTransSourceAccountGetDataId
+            OnChanged = CStaticCyclicTransSourceAccountChanged
+            HotTrack = True
+          end
+          object CStaticCyclicTransDestAccount: TCStatic
+            Left = 112
+            Top = 77
+            Width = 257
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz konto docelowe z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 2
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz konto docelowe z listy>'
+            OnGetDataId = CStaticCyclicTransDestAccountGetDataId
+            OnChanged = CStaticCyclicTransDestAccountChanged
+            HotTrack = True
+          end
+          object CStaticCyclicTransCurrencySource: TCStatic
+            Left = 112
+            Top = 113
+            Width = 169
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<brak konta>'
+            Color = clWindow
+            Enabled = False
+            ParentColor = False
+            TabOrder = 3
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<brak konta>'
+            OnGetDataId = CStaticCyclicTransCurrencySourceGetDataId
+            HotTrack = False
+          end
+          object CCurrEditCyclicTransMovement: TCCurrEdit
+            Left = 384
+            Top = 113
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            TabOrder = 4
+            OnChange = CCurrEditCyclicTransMovementChange
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
+          end
+          object CStaticCyclicTransCurrencyDest: TCStatic
+            Left = 112
+            Top = 185
+            Width = 169
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<brak konta>'
+            Color = clWindow
+            Enabled = False
+            ParentColor = False
+            TabOrder = 5
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<brak konta>'
+            OnGetDataId = CStaticCyclicTransCurrencyDestGetDataId
+            HotTrack = False
+          end
+          object CCurrEditCyclicTransAccount: TCCurrEdit
+            Left = 384
+            Top = 185
+            Width = 89
+            Height = 21
+            BorderStyle = bsNone
+            Enabled = False
+            TabOrder = 6
+            Decimals = 2
+            ThousandSep = True
+            CurrencyStr = 'z'#322
+            BevelKind = bkTile
+            WithCalculator = True
+          end
+          object CStaticCyclicTransRate: TCStatic
+            Left = 112
+            Top = 149
+            Width = 361
+            Height = 21
+            Cursor = crHandPoint
+            AutoSize = False
+            BevelKind = bkTile
+            Caption = '<wybierz przelicznik kursu z listy>'
+            Color = clWindow
+            ParentColor = False
+            TabOrder = 7
+            TabStop = True
+            Transparent = False
+            TextOnEmpty = '<wybierz przelicznik kursu z listy>'
+            OnGetDataId = CStaticCyclicTransRateGetDataId
             HotTrack = True
           end
         end
@@ -967,6 +1170,16 @@ inherited CMovementForm: TCMovementForm
       Caption = 'Do uzgodnienia'
       ImageIndex = 1
       OnExecute = ActionStateCyclicExecute
+    end
+    object ActionStateCyclicTransSource: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateCyclicTransSourceExecute
+    end
+    object ActionStateCyclicTransDest: TAction
+      Caption = 'Do uzgodnienia'
+      ImageIndex = 1
+      OnExecute = ActionStateCyclicTransDestExecute
     end
   end
 end

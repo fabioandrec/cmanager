@@ -562,7 +562,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Width = 449
               Height = 89
               Caption = ' Przy starcie systemu '
-              TabOrder = 1
+              TabOrder = 3
               object CheckBoxAutostartOperations: TCheckBox
                 Left = 16
                 Top = 24
@@ -587,7 +587,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Width = 449
               Height = 65
               Caption = ' Zaleg'#322'e operacje '
-              TabOrder = 2
+              TabOrder = 1
               object CheckBoxAutoOldIn: TCheckBox
                 Left = 18
                 Top = 26
@@ -619,14 +619,14 @@ inherited CPreferencesForm: TCPreferencesForm
               Width = 449
               Height = 65
               Caption = ' Inne '
-              TabOrder = 3
+              TabOrder = 2
               object CheckBoxSurpassed: TCheckBox
                 Left = 162
                 Top = 26
                 Width = 119
                 Height = 17
                 Caption = 'Przekroczone limity'
-                TabOrder = 0
+                TabOrder = 1
               end
               object CheckBoxValid: TCheckBox
                 Left = 298
@@ -634,7 +634,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Width = 103
                 Height = 17
                 Caption = 'Poprawne limity'
-                TabOrder = 1
+                TabOrder = 2
               end
               object CheckBoxExtractions: TCheckBox
                 Left = 18
@@ -642,7 +642,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 Width = 135
                 Height = 17
                 Caption = 'Nieuzgodnione wyci'#261'gi'
-                TabOrder = 2
+                TabOrder = 0
               end
             end
           end
