@@ -180,6 +180,7 @@ type
   protected
     procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
     procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure CMTextchanged(var Message: TMessage); message CM_TEXTCHANGED;
     procedure Loaded; override;
     procedure Click; override;
     procedure DoEnter; override;
@@ -811,6 +812,11 @@ begin
   end;
 end;
 
+procedure TCStatic.CMTextchanged(var Message: TMessage);
+begin
+  Hint := Caption;
+end;
+
 constructor TCStatic.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -897,6 +903,7 @@ begin
   if FDataId = '' then begin
     Caption := FTextOnEmpty;
   end;
+  ShowHint := True;
 end;
 
 procedure TCStatic.SetDataId(const Value: string);

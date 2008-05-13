@@ -144,7 +144,7 @@ inherited CMovementForm: TCMovementForm
         Top = 15
         Width = 501
         Height = 264
-        ActivePage = TabSheetTrans
+        ActivePage = TabSheetTransCyclic
         Align = alClient
         Style = tsFlatButtons
         TabOrder = 0
@@ -989,6 +989,7 @@ inherited CMovementForm: TCMovementForm
             Transparent = False
             TextOnEmpty = '<wybierz operacj'#281' z listy zaplanowanych operacji>'
             OnGetDataId = CStaticCyclicTransGetDataId
+            OnChanged = CStaticCyclicTransChanged
             HotTrack = True
           end
           object CStaticCyclicTransSourceAccount: TCStatic
@@ -1111,6 +1112,7 @@ inherited CMovementForm: TCMovementForm
             Transparent = False
             TextOnEmpty = '<wybierz przelicznik kursu z listy>'
             OnGetDataId = CStaticCyclicTransRateGetDataId
+            OnChanged = CStaticCyclicTransRateChanged
             HotTrack = True
           end
         end
