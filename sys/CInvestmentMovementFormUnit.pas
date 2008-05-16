@@ -195,7 +195,7 @@ begin
     CStaticCurrencyRate.Enabled :=
       (CStaticInstrumentCurrency.DataId <> CStaticAccountCurrency.DataId) and
       (CStaticInstrumentCurrency.DataId <> CEmptyDataGid) and
-      (CStaticAccountCurrency.DataId <> CEmptyDataGid);
+      (CStaticAccountCurrency.DataId <> CEmptyDataGid) and (ComboBoxType.ItemIndex in [0, 1]);
     CStaticCurrencyRate.HotTrack := CStaticCurrencyRate.Enabled;
     Label22.Enabled := CStaticCurrencyRate.Enabled;
     if CStaticCurrencyRate.Enabled then begin
@@ -243,6 +243,9 @@ begin
   CStaticCategory.Enabled := ComboBoxType.ItemIndex <= 1;
   CStaticCategory.HotTrack := CStaticCategory.Enabled;
   Label8.Enabled := CStaticCategory.Enabled;
+  Label22.Enabled := CStaticCategory.Enabled;
+  CStaticCurrencyRate.Enabled := CStaticCategory.Enabled;
+  Label21.Enabled := CStaticCategory.Enabled;
   if not CStaticCategory.Enabled then begin
     CStaticCategory.DataId := CEmptyDataGid;
   end;
@@ -607,7 +610,7 @@ var xInvest: TInvestmentMovement;
     xInstrument: TInstrument;
     xAccount: TAccount;
     xProduct: TProduct;
-    xBaseId: TDataGid;
+    xBaseId, xAccountId: TDataGid;
 begin
   inherited AfterCommitData;
   if CStaticCategory.DataId <> CEmptyDataGid then begin
@@ -660,6 +663,7 @@ begin
     xBase.isInvestmentMovement := True;
     xBase.isDepositMovement := False;
     xBaseId := xBase.id;
+    xAccountId := xBase.idAccount;
     GDataProvider.CommitTransaction;
     GDataProvider.ExecuteSql('update investmentMovement set idBaseMovement = ' + DataGidToDatabase(xBaseId) + ' where idInvestmentMovement = ' + DataGidToDatabase(Dataobject.id));
     if Operation = coEdit then begin
@@ -667,9 +671,9 @@ begin
     end else begin
       SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTADDED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
     end;
-    SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
-    SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xAccountId), WMOPT_NONE);
   end;
+  SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
 end;
 
 end.

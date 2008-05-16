@@ -850,13 +850,12 @@ type
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetidAccount(const Value: TDataGid);
     procedure Setquantity(const Value: Integer);
-  protected
-    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     class function FindInvestmentItem(AIdInstrument, AIdAccount: TDataGid; AMinimumQuantity: Integer = -1): TInvestmentItem;
+    function GetInvestmentItems: TDataObjectList;
   published
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
@@ -1309,10 +1308,7 @@ begin
   CashPointProxy := TDataProxy.Create(ADataProvider, 'cashPoint');
   AccountProxy := TDataProxy.Create(ADataProvider, 'account');
   ProductProxy := TDataProxy.Create(ADataProvider, 'product');
-  MovementListProxy :=  TDataProxy.Create(ADataProvider, 'movementList');
-  BaseMovementProxy := TDataProxy.Create(ADataProvider, 'baseMovement');
   QuickPatternProxy := TDataProxy.Create(ADataProvider, 'quickPattern');
-  PlannedMovementProxy :=  TDataProxy.Create(ADataProvider, 'plannedMovement');
   PlannedDoneProxy :=  TDataProxy.Create(ADataProvider, 'plannedDone');
   MovementFilterProxy :=  TDataProxy.Create(ADataProvider, 'movementFilter');
   ProfileProxy :=  TDataProxy.Create(ADataProvider, 'profile');
@@ -1327,10 +1323,13 @@ begin
   InstrumentProxy := TDataProxy.Create(ADataProvider, 'instrument');
   InstrumentValueProxy := TDataProxy.Create(ADataProvider, 'instrumentValue', 'StnInstrumentValue');
   InvestmentItemProxy := TDataProxy.Create(ADataProvider, 'investmentItem');
-  InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
   InvestmentPortfolioProxy := TDataProxy.Create(ADataProvider, '', 'StnInvestmentPortfolio', 'idInvestmentItem');
   DepositInvestmentProxy := TDataProxy.Create(ADataProvider, 'depositInvestment');
+  InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
   DepositMovementProxy := TDataProxy.Create(ADataProvider, 'depositMovement', 'StnDepositMovement');
+  BaseMovementProxy := TDataProxy.Create(ADataProvider, 'baseMovement');
+  MovementListProxy :=  TDataProxy.Create(ADataProvider, 'movementList');
+  PlannedMovementProxy :=  TDataProxy.Create(ADataProvider, 'plannedMovement');
 end;
 
 class function TCashPoint.CanBeDeleted(AId: ShortString): Boolean;
@@ -4560,10 +4559,6 @@ begin
                  [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * Fquantity),
                   DataGidToDatabase(FidInstrument), DataGidToDatabase(FidAccount)]);
   AProxy.DataProvider.ExecuteSql(xSql);
-  if idBaseMovement <> CEmptyDataGid then begin
-    xSql := 'update baseMovement set isInvestmentMovement = 0 where idBaseMovement = ' + DataGidToDatabase(idBaseMovement);
-    AProxy.DataProvider.ExecuteSql(xSql);
-  end;
 end;
 
 function TInvestmentMovement.OnInsertObject(AProxy: TDataProxy): Boolean;
@@ -5299,13 +5294,6 @@ begin
   end;
 end;
 
-function TInvestmentItem.OnDeleteObject(AProxy: TDataProxy): Boolean;
-begin
-  Result := inherited OnDeleteObject(AProxy);
-  AProxy.DataProvider.ExecuteSql(Format('update baseMovement set isInvestmentMovement = 0 where idBaseMovement in (select idBaseMovement from investmentMovement where idAccount = %s and idInstrument = %s and idBaseMovement is not null)', [DataGidToDatabase(FidAccount), DataGidToDatabase(FidInstrument)]));
-  AProxy.DataProvider.ExecuteSql(Format('delete from investmentMovement where idAccount = %s and idInstrument = %s', [DataGidToDatabase(FidAccount), DataGidToDatabase(FidInstrument)]));
-end;
-
 constructor TDepositMovement.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
@@ -5535,6 +5523,12 @@ begin
       Result := 2;
     end;
   end;
+end;
+
+function TInvestmentItem.GetInvestmentItems: TDataObjectList;
+begin
+  Result := TInvestmentMovement.GetList(TInvestmentMovement, InvestmentMovementProxy,
+     Format('select * from investmentMovement where idInstrument = %s and idAccount = %s', [DataGidToDatabase(idInstrument), DataGidToDatabase(idAccount)]));
 end;
 
 initialization

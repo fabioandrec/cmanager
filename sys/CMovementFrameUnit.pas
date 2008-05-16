@@ -601,6 +601,9 @@ begin
       if LParam = WMOPT_REFRESHQUICKPATTERNS then begin
         ReloadQuickPatterns;
       end;
+    end else if Msg = WM_DATAREFRESH then begin
+      ReloadToday;
+      ReloadSums;
     end;
   end;
 end;

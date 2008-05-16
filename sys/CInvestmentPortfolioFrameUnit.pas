@@ -35,7 +35,8 @@ implementation
 
 uses CPluginConsts, CDataObjects, CConsts, CFrameFormUnit,
   CInvestmentMovementFrameUnit, CInvestmentMovementFormUnit, CInfoFormUnit,
-  CBaseFrameUnit, CInvestmentPortfolioFormUnit, CConfigFormUnit;
+  CBaseFrameUnit, CInvestmentPortfolioFormUnit, CConfigFormUnit, CTools,
+  CAccountsFrameUnit, CMovementFrameUnit;
 
 {$R *.dfm}
 
@@ -118,18 +119,35 @@ begin
 end;
 
 procedure TCInvestmentPortfolioFrame.DoActionDeleteExecute;
-var xData: TDataObject;
+var xData: TInvestmentItem;
     xBase: TDataObject;
+    xCount: Integer;
+    xMovements: TDataObjectList;
+    xImove: TInvestmentMovement;
+    xBmove: TBaseMovement;
 begin
   xBase := TDataObject(List.SelectedElement.Data);
   if xBase.CanBeDeleted(xBase.id) then begin
     if ShowInfo(itQuestion, 'Czy chcesz usun¹æ inwestycjê "' + xBase.GetElementText + '" ?' +
                            '\nPamiêtaj, ¿e usuniêcie wybranej inwestycji spowoduje usuniêcie\nwszystkich zwi¹zanych z ni¹ operacji inwestycyjnych.', '') then begin
-      xData := TInvestmentItem.LoadObject(InvestmentItemProxy, xBase.id, False);
+      xData := TInvestmentItem(TInvestmentItem.LoadObject(InvestmentItemProxy, xBase.id, False));
+      xMovements := xData.GetInvestmentItems;
+      for xCount := 0 to xMovements.Count - 1 do begin
+        xImove := TInvestmentMovement(xMovements.Items[xCount]);
+        xImove.DeleteObject;
+        if xImove.idBaseMovement <> CEmptyDataGid then begin
+          xBmove := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xImove.idBaseMovement, False));
+          xBmove.DeleteObject;
+        end;
+      end;
       xData.DeleteObject;
       GDataProvider.CommitTransaction;
+      xMovements.Free;
       AfterDeleteObject(xBase);
-      SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAREFRESH, 0, 0);
+      SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, 0);
+      SendMessageToFrames(TCInvestmentMovementFrame, WM_DATAREFRESH, 0, 0);
+      SendMessageToFrames(TCMovementFrame, WM_DATAREFRESH, 0, 0);
+      SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
     end;
   end;
 end;

@@ -12,10 +12,11 @@ type
   TDataMemoryState = (msValid, msModified, msDeleted);
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
+  TDataObjectList = class;
 
   TDataGids = class(TStringList)
   public
-    constructor Create; 
+    constructor Create;
     constructor CreateFromGid(ADataGid: TDataGid);
     procedure MergeWithDataGids(AGids: TDataGids);
   end;
@@ -136,6 +137,7 @@ type
     FDataProxy: TDataProxy;
     FDataFieldList: TDataFieldList;
     FIsRegistered: Boolean;
+    FTouchTime: TDateTime;
   protected
     function GetHash(AHashId: Integer): String; virtual;
     function OnDeleteObject(AProxy: TDataProxy): Boolean; virtual;
@@ -143,6 +145,7 @@ type
     function OnInsertObject(AProxy: TDataProxy): Boolean; virtual;
     procedure SetState(AState: TDataMemoryState);
     procedure SetMode(AMode: TDataCreationMode);
+    procedure SetTouchTime(ADateTime: TDateTime);
   public
     procedure DeleteObject; virtual;
     constructor Create(AStatic: Boolean); virtual;
@@ -406,6 +409,7 @@ begin
   FDataFieldList := TDataFieldList.Create(True);
   Fcreated := Now;
   Fmodified := 0;
+  FTouchTime := 0;
   FIsStatic := AStatic;
   FIsRegistered := False;
 end;
@@ -424,6 +428,7 @@ end;
 procedure TDataObject.DeleteObject;
 begin
   FMemoryState := msDeleted;
+  SetTouchTime(Now);
 end;
 
 destructor TDataObject.Destroy;
@@ -970,6 +975,14 @@ begin
   if FMemoryState <> AState then begin
     FModified := Now;
     FMemoryState := AState;
+    SetTouchTime(Now);
+  end;
+end;
+
+procedure TDataObject.SetTouchTime(ADateTime: TDateTime);
+begin
+  if FTouchTime = 0 then begin
+    FTouchTime := ADateTime;
   end;
 end;
 

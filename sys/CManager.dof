@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=10
 Release=1
-Build=24
+Build=26
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.10.1.24
+FileVersion=1.10.1.26
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -154,9 +154,9 @@ Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\..\..\Trash
-Item1=..\..\Trash
+Item0=..\..\Trash
+Item1=..\..\..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\Bin
+Item0=..\..\Bin
+Item1=..\..\..\..\Bin\Wtyczki

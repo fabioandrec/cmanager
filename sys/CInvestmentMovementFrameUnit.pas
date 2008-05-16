@@ -58,7 +58,8 @@ implementation
 
 uses CDataObjects, CInvestmentMovementFormUnit, CPluginConsts, CConsts,
   CTools, CFrameFormUnit, CListFrameUnit, CBaseFrameUnit,
-  CMovementFrameUnit, DB;
+  CMovementFrameUnit, DB, CAccountsFrameUnit, CInvestmentPortfolioFormUnit,
+  CInvestmentPortfolioFrameUnit;
 
 {$R *.dfm}
 
@@ -278,15 +279,19 @@ procedure TCInvestmentMovementFrame.AfterDeleteObject(ADataobject: TDataObject);
 var xInvest: TInvestmentMovement;
     xMovement: TBaseMovement;
     xBaseId: TDataGid;
+    xAccountId: TDataGid;
 begin
   xInvest := TInvestmentMovement(ADataobject);
   xBaseId := xInvest.idBaseMovement;
+  xAccountId := xInvest.idAccount;
   if (xBaseId <> CEmptyDataGid) then begin
     GDataProvider.BeginTransaction;
     xMovement := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xInvest.idBaseMovement, False));
     xMovement.DeleteObject;
     GDataProvider.CommitTransaction;
     SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+    SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xAccountId), WMOPT_NONE);
+    SendMessageToFrames(TCInvestmentPortfolioFrame, WM_DATAREFRESH, 0, WMOPT_NONE);
   end;
   inherited AfterDeleteObject(ADataobject);
 end;
