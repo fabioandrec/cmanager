@@ -1,13 +1,5 @@
 inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
-  Width = 730
-  inherited Bevel: TBevel
-    Width = 730
-  end
-  inherited FilterPanel: TCPanel
-    Width = 730
-  end
   inherited List: TCDataList
-    Width = 730
     Header.MainColumn = 0
     Images = CImageLists.DepositStateImageList16x16
     Columns = <
@@ -38,13 +30,12 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
       end
       item
         Position = 5
-        Width = 130
+        Width = 10
         WideText = 'Data zapadalno'#347'ci odsetek'
       end>
     WideDefaultText = ''
   end
   inherited ButtonPanel: TPanel
-    Width = 730
     inherited CButtonEdit: TCButton
       Left = 245
     end

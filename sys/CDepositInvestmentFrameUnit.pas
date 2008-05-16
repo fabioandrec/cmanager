@@ -19,6 +19,7 @@ type
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
+    procedure DoActionDeleteExecute; override;
   public
     class function GetTitle: String; override;
     function GetStaticFilter: TStringList; override;
@@ -36,7 +37,8 @@ implementation
 
 uses CPluginConsts, CConsts, CDepositInvestmentFormUnit,
   CDepositMovementFrameUnit, CFrameFormUnit, CDepositInvestmentPayFormUnit,
-  CConfigFormUnit;
+  CConfigFormUnit, CBaseFrameUnit, CMovementFrameUnit, CAccountsFrameUnit,
+  CInfoFormUnit, CTools;
 
 {$R *.dfm}
 
@@ -135,6 +137,37 @@ begin
   xForm := TCDepositInvestmentPayForm.Create(Nil);
   xForm.ShowDataobject(coEdit, DepositInvestmentProxy, TDataObject(List.SelectedElement.Data), False, Nil);
   xForm.Free;
+end;
+
+procedure TCDepositInvestmentFrame.DoActionDeleteExecute;
+var xData: TDepositInvestment;
+    xCount: Integer;
+    xMovements: TDataObjectList;
+    xImove: TDepositMovement;
+    xBmove: TBaseMovement;
+begin
+  xData := TDepositInvestment(List.SelectedElement.Data);
+  if xData.CanBeDeleted(xData.id) then begin
+    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ lokatê "' + xData.GetElementText + '" ?' +
+                           '\nPamiêtaj, ¿e usuniêcie wybranej lokaty spowoduje usuniêcie\nwszystkich zwi¹zanych z ni¹ operacji.', '') then begin
+      xMovements := xData.GetDepositMovements;
+      for xCount := 0 to xMovements.Count - 1 do begin
+        xImove := TDepositMovement(xMovements.Items[xCount]);
+        xImove.DeleteObject;
+        if xImove.idBaseMovement <> CEmptyDataGid then begin
+          xBmove := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xImove.idBaseMovement, False));
+          xBmove.DeleteObject;
+        end;
+      end;
+      xData.DeleteObject;
+      GDataProvider.CommitTransaction;
+      xMovements.Free;
+      AfterDeleteObject(xData);
+      SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
+      SendMessageToFrames(TCMovementFrame, WM_DATAREFRESH, 0, 0);
+      SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
+    end;
+  end;
 end;
 
 end.

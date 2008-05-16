@@ -1047,6 +1047,7 @@ type
     function GetElementHint(AColumnIndex: Integer): String; override;
     function GetElementText: String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
+    function GetDepositMovements: TDataObjectList;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
@@ -1101,8 +1102,6 @@ type
     procedure SetrateDescription(const Value: TBaseDescription);
     procedure SetidBaseMovement(const Value: TDataGid);
     procedure SetregOrder(const Value: Integer);
-  protected
-    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -5351,16 +5350,6 @@ begin
   end;
 end;
 
-function TDepositMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
-var xSql: String;
-begin
-  Result := inherited OnDeleteObject(AProxy);
-  if FidBaseMovement <> CEmptyDataGid then begin
-    xSql := 'update baseMovement set isDepositMovement = 0 where idBaseMovement = ' + DataGidToDatabase(idBaseMovement);
-    AProxy.DataProvider.ExecuteSql(xSql);
-  end;
-end;
-
 procedure TDepositMovement.SetaccountCash(const Value: Currency);
 begin
   if FaccountCash <> Value then begin
@@ -5529,6 +5518,12 @@ function TInvestmentItem.GetInvestmentItems: TDataObjectList;
 begin
   Result := TInvestmentMovement.GetList(TInvestmentMovement, InvestmentMovementProxy,
      Format('select * from investmentMovement where idInstrument = %s and idAccount = %s', [DataGidToDatabase(idInstrument), DataGidToDatabase(idAccount)]));
+end;
+
+function TDepositInvestment.GetDepositMovements: TDataObjectList;
+begin
+  Result := TDepositMovement.GetList(TDepositMovement, DepositMovementProxy,
+     Format('select * from StnDepositMovement where idDepositInvestment = %s', [DataGidToDatabase(id)]));
 end;
 
 initialization
