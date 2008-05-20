@@ -533,7 +533,7 @@ procedure SetEvenListColors(AColorEven, AColorOdd: TColor);
 function GetDarkerColor(ABaseColor: TColor): TColor;
 function GetBrighterColor(ABaseColor: TColor): TColor;
 function GetScaledPngImageList(APngImageList: TPngImageList; ANewWidth, ANewHeight: Integer): TPngImageList;
-
+procedure SetSystemCustomColors(AColorDialog: TColorDialog);
 
 var CurrencyComponents: TObjectList;
     ListComponents: TObjectList;
@@ -2849,6 +2849,29 @@ begin
     Flags := DT_EXPANDTABS or DT_VCENTER or Alignments[Alignment];
     Flags := DrawTextBiDiModeFlags(Flags);
     DrawText(Handle, PChar(Caption), -1, Rect, Flags);
+  end;
+end;
+
+procedure SetSystemCustomColors(AColorDialog: TColorDialog);
+begin
+  with AColorDialog.CustomColors do begin
+    Clear;
+    Add('ColorA=' + IntToHex(ColorToRGB(clWindow), 6));
+    Add('ColorB=' + IntToHex(ColorToRGB(clBtnFace), 6));
+    Add('ColorC=' + IntToHex(ColorToRGB(clWindowText), 6));
+    Add('ColorD=' + IntToHex(ColorToRGB(clInactiveCaption), 6));
+    Add('ColorE=' + IntToHex(ColorToRGB(clActiveCaption), 6));
+    Add('ColorF=' + IntToHex(ColorToRGB(clAppWorkSpace), 6));
+    Add('ColorG=' + IntToHex(ColorToRGB(clHighlight), 6));
+    Add('ColorH=' + IntToHex(ColorToRGB(clBtnShadow), 6));
+    Add('ColorI=' + IntToHex(ColorToRGB(clHotLight), 6));
+    Add('ColorJ=' + IntToHex(ColorToRGB(clMenuBar), 6));
+    Add('ColorK=' + IntToHex(ColorToRGB(clMenuHighlight), 6));
+    Add('ColorL=' + IntToHex(ColorToRGB(clGrayText), 6));
+    Add('ColorM=' + IntToHex(ColorToRGB(clActiveBorder), 6));
+    Add('ColorN=' + IntToHex(ColorToRGB(clBackground), 6));
+    Add('ColorO=' + IntToHex(ColorToRGB(clBtnHighlight), 6));
+    Add('ColorP=' + IntToHex(ColorToRGB(clScrollBar), 6));
   end;
 end;
 

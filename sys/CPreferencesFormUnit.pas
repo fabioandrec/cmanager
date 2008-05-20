@@ -258,6 +258,7 @@ begin
   FBasePrefs := TBasePref.Create('baseprefs');
   FViewPrefs := TPrefList.Create(TViewPref);
   FPluginPrefs := TPrefList.Create(TPluginPref);
+  SetSystemCustomColors(ColorDialog);
 end;
 
 destructor TCPreferencesForm.Destroy;

@@ -69,6 +69,7 @@ begin
   ExampleList.ViewPref := FViewPref;
   ExampleList.ReloadTree;
   ComboBoxTypeChange(Nil);
+  SetSystemCustomColors(ColorDialog);
   Result := ShowConfig(coEdit);
   if Result then begin
     AViewPref.Clone(FViewPref);
