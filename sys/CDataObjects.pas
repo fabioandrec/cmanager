@@ -1048,6 +1048,7 @@ type
     function GetElementText: String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
     function GetDepositMovements: TDataObjectList;
+    class function GetCurrencyDefinition(AIdDepositInvestment: TDataGid): TDataGid;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
     property name: TBaseName read Fname write Setname;
@@ -5524,6 +5525,11 @@ function TDepositInvestment.GetDepositMovements: TDataObjectList;
 begin
   Result := TDepositMovement.GetList(TDepositMovement, DepositMovementProxy,
      Format('select * from StnDepositMovement where idDepositInvestment = %s', [DataGidToDatabase(id)]));
+end;
+
+class function TDepositInvestment.GetCurrencyDefinition(AIdDepositInvestment: TDataGid): TDataGid;
+begin
+  Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from depositInvestment where idDepositInvestment = %s', [DataGidToDatabase(AIdDepositInvestment)]), '');
 end;
 
 initialization

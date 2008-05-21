@@ -11,6 +11,16 @@ type
 
   TAdditionalData = class(TObject);
 
+  TAdditionalDataWithId = class(TAdditionalData)
+  private
+    Fid: TDataGid;
+  public
+    constructor CreateId(AId: TDataGid);
+  published
+    property id: TDataGid read Fid write Fid;
+  end;
+
+
   TCDataobjectForm = class(TCConfigForm)
     procedure FormDestroy(Sender: TObject);
   private
@@ -120,6 +130,14 @@ end;
 function TCDataobjectForm.GetUpdateFrameOption: Integer;
 begin
   Result := WMOPT_NONE;
+end;
+
+{ TAdditionalDataWithId }
+
+constructor TAdditionalDataWithId.CreateId(AId: TDataGid);
+begin
+  inherited Create;
+  Fid := AId;
 end;
 
 end.

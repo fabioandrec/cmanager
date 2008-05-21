@@ -106,7 +106,7 @@ procedure TCProductsFrame.ActionAddSubcategoryExecute(Sender: TObject);
 var xForm: TCProductForm;
 begin
   xForm := TCProductForm.Create(Nil);
-  xForm.ShowDataobject(coAdd, ProductProxy, Nil, True, TCProductAdditionalData.Create(List.SelectedId, ''));
+  xForm.ShowDataobject(coAdd, ProductProxy, Nil, True, TProductAdditionalData.Create(List.SelectedId, ''));
   xForm.Free;
 end;
 

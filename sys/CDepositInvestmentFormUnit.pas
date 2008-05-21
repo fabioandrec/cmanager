@@ -651,6 +651,7 @@ begin
   if ComboBoxType.ItemIndex = 0 then begin
     UpdateCurrencyRates(False);
   end;
+  UpdateDescription;
 end;
 
 procedure TCDepositInvestmentForm.UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);

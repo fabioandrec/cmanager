@@ -123,7 +123,7 @@ end;
 procedure TCInvestmentMovementForm.CStaticCurrencyRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 var xCurrencyRate: TCurrencyRate;
 begin
-  AAccepted := TCFrameForm.ShowFrame(TCCurrencyRateFrame, ADataGid, AText);
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencyRateFrame, ADataGid, AText, TRateFrameAdditionalData.CreateRateData(CStaticAccountCurrency.DataId, CStaticInstrumentCurrency.DataId));
   if AAccepted then begin
     xCurrencyRate := TCurrencyRate(TCurrencyRate.LoadObject(CurrencyRateProxy, ADataGid, False));
     if FRateHelper = Nil then begin

@@ -8,7 +8,7 @@ uses
   CBaseFrameUnit, CComponents;
 
 type
-  TCProductAdditionalData = class(TAdditionalData)
+  TProductAdditionalData = class(TAdditionalData)
   private
     FParentGid: TDataGid;
     FProductType: String;
@@ -96,8 +96,8 @@ begin
   inherited InitializeForm;
   ComboBoxType.Enabled := AdditionalData = Nil;
   if AdditionalData <> Nil then begin
-    xIdParent := TCProductAdditionalData(AdditionalData).ParentGid;
-    xProductType := TCProductAdditionalData(AdditionalData).ProductType;
+    xIdParent := TProductAdditionalData(AdditionalData).ParentGid;
+    xProductType := TProductAdditionalData(AdditionalData).ProductType;
     if xIdParent <> '' then begin
       xProd := TProduct(TProduct.LoadObject(ProductProxy, xIdParent, True));
       if xProd.productType = CInProduct then begin
@@ -128,13 +128,13 @@ begin
       productType := CInProduct;
     end;
     if AdditionalData <> Nil then begin
-      idParentProduct := TCProductAdditionalData(AdditionalData).ParentGid;
+      idParentProduct := TProductAdditionalData(AdditionalData).ParentGid;
     end;
     idUnitDef := CStaticUnitdef.DataId;
   end;
 end;
 
-constructor TCProductAdditionalData.Create(AParentGid: TDataGid; AProductType: String);
+constructor TProductAdditionalData.Create(AParentGid: TDataGid; AProductType: String);
 begin
   inherited Create;
   FParentGid := AParentGid;
