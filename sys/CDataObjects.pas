@@ -544,6 +544,7 @@ type
   TPlannedDone = class(TDataObject)
   private
     FtriggerDate: TDateTime;
+    FdueDate: TDateTime;
     FdoneDate: TDateTime;
     FidPlannedMovement: TDataGid;
     FdoneState: TBaseEnumeration;
@@ -557,12 +558,14 @@ type
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setcash(const Value: Currency);
     procedure SetidDoneCurrencyDef(const Value: TDataGid);
+    procedure SetdueDate(const Value: TDateTime);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
     constructor Create(AStatic: Boolean); override;
   published
     property triggerDate: TDateTime read FtriggerDate write SettriggerDate;
+    property dueDate: TDateTime read FdueDate write SetdueDate;
     property idPlannedMovement: TDataGid read FidPlannedMovement write SetidPlannedMovement;
     property doneState: TBaseEnumeration read FdoneState write SetdoneState;
     property doneDate: TDateTime read FdoneDate write SetdoneDate;
@@ -2061,6 +2064,7 @@ begin
   inherited FromDataset(ADataset);
   with ADataset do begin
     FtriggerDate := FieldByName('triggerDate').AsDateTime;
+    FdueDate := FieldByName('dueDate').AsDateTime;
     FdoneDate := FieldByName('doneDate').AsDateTime;
     FidPlannedMovement := FieldByName('idPlannedMovement').AsString;
     FdoneState := FieldByName('doneState').AsString;
@@ -2102,6 +2106,14 @@ begin
   end;
 end;
 
+procedure TPlannedDone.SetdueDate(const Value: TDateTime);
+begin
+  if FdueDate <> Value then begin
+    FdueDate := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TPlannedDone.SetidDoneCurrencyDef(const Value: TDataGid);
 begin
   if FidDoneCurrencyDef <> Value then begin
@@ -2131,6 +2143,7 @@ begin
   inherited UpdateFieldList;
   with DataFieldList do begin
     AddField('triggerDate', DatetimeToDatabase(FtriggerDate, False), False, 'plannedDone');
+    AddField('dueDate', DatetimeToDatabase(FdueDate, False), False, 'plannedDone');
     AddField('doneDate', DatetimeToDatabase(FdoneDate, False), False, 'plannedDone');
     AddField('idPlannedMovement', DataGidToDatabase(FidPlannedMovement), False, 'plannedDone');
     AddField('doneState', FdoneState, True, 'plannedDone');

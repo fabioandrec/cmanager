@@ -9,14 +9,14 @@ inherited CXmlFrame: TCXmlFrame
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
-    object Panel2: TPanel
+    object Panel2: TCPanel
       Left = 0
       Top = 0
       Width = 443
       Height = 40
       Align = alTop
-      BevelOuter = bvNone
       TabOrder = 0
+      BevelEdges = [beBottom]
       object Label1: TLabel
         Left = 16
         Top = 12
@@ -33,18 +33,19 @@ inherited CXmlFrame: TCXmlFrame
       Width = 443
       Height = 237
       Align = alClient
-      BevelOuter = bvLowered
+      BevelOuter = bvNone
       Caption = 'Panel3'
       TabOrder = 1
       object List: TCDataList
-        Left = 1
-        Top = 1
-        Width = 441
-        Height = 235
+        Left = 0
+        Top = 0
+        Width = 443
+        Height = 237
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
         BevelOuter = bvNone
+        BevelKind = bkFlat
         BorderStyle = bsNone
         ButtonStyle = bsTriangle
         CheckImageKind = ckDarkTick
@@ -72,7 +73,7 @@ inherited CXmlFrame: TCXmlFrame
         Columns = <
           item
             Position = 0
-            Width = 441
+            Width = 443
             WideText = 'Nazwa'
           end>
         WideDefaultText = ''

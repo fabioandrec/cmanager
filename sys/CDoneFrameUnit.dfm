@@ -310,6 +310,7 @@ inherited CDoneFrame: TCDoneFrame
       Top = 4
       Width = 74
       Height = 15
+      Hint = '<dowolny typ>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -323,6 +324,8 @@ inherited CDoneFrame: TCDoneFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       TabStop = True
       Transparent = False
@@ -338,6 +341,7 @@ inherited CDoneFrame: TCDoneFrame
       Width = 118
       Height = 15
       Cursor = crHandPoint
+      Hint = '<w tym tygodniu>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -351,6 +355,8 @@ inherited CDoneFrame: TCDoneFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       TabStop = True
       Transparent = False

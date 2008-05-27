@@ -86,3 +86,6 @@ alter table plannedMovement drop column idProduct_temp;
 alter table plannedMovement add constraint fk_plannedMovementProduct foreign key (idProduct) references product (idProduct);
 
 insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedTr', 'Transfer z @kontozrodlowe@ do @kontodocelowe@');
+
+alter table plannedDone add dueDate datetime not null;
+update plannedDone set dueDate = triggerDate;

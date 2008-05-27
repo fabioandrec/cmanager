@@ -32,7 +32,7 @@ type
 
   TCXmlFrame = class(TCBaseFrame)
     Panel1: TPanel;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     Panel3: TPanel;
     List: TCDataList;
     Label1: TLabel;
@@ -63,7 +63,7 @@ var xDataId, xText: String;
 begin
   xAdditional := TXmlAdditionalData.Create(AXml);
   xRect := Rect(0, 0, 500, 400);
-  Result := TCFrameForm.ShowFrame(TCXmlFrame, xDataId, xText, xAdditional, @xRect, Nil, AChecks, True, Nil, False, False);
+  Result := TCFrameForm.ShowFrame(TCXmlFrame, xDataId, xText, xAdditional, @xRect, Nil, AChecks, True, Nil, True, True);
 end;
 
 constructor TXmlListElement.Create(ANode: ICXMLDOMNode);
@@ -131,7 +131,9 @@ procedure TCXmlFrame.ListCDataListReloadTree(Sender: TCDataList; ARootElement: T
   end;
 
 begin
-  AppendChildren(ARootElement, TXmlAdditionalData(AdditionalData).Xml.documentElement.childNodes);
+  if TXmlAdditionalData(AdditionalData).Xml <> Nil then begin
+    AppendChildren(ARootElement, TXmlAdditionalData(AdditionalData).Xml.documentElement.childNodes);
+  end;
 end;
 
 function TXmlListElement.GetElementHint(AColumnIndex: Integer): String;

@@ -1407,7 +1407,7 @@ begin
   xElement := QuickpatternList.SelectedElement;
   if (QuickpatternList.FocusedNode <> Nil) and (xElement <> Nil) then begin
     xForm := TCMovementForm.Create(Nil);
-    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(0, Nil, TQuickPatternElement(xElement.Data)));
+    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(0, 0, Nil, TQuickPatternElement(xElement.Data)));
     xForm.Free;
   end;
 end;

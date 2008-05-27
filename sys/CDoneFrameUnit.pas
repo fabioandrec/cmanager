@@ -511,11 +511,13 @@ begin
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
   xList.Add('6=<ostatnie 30 dni>');
+  xList.Add('13=<od pocz¹tku roku>');
   xList.Add('7=<w przysz³ym tygodni>');
   xList.Add('8=<w przysz³ym miesi¹cu>');
   xList.Add('9=<nastêpne 7 dni>');
   xList.Add('10=<nastêpne 14 dni>');
   xList.Add('11=<nastêpne 30 dni>');
+  xList.Add('14=<do koñca roku>');
   xList.Add('12=<dowolny>');
   xGid := CEmptyDataGid;
   xText := '';
@@ -569,6 +571,12 @@ begin
   end else if xId = '12' then begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
+  end else if xId = '13' then begin
+    ADateFrom := StartOfTheYear(CDateTimePerStart.Value);
+    ADateTo := CDateTimePerEnd.Value;
+  end else if xId = '14' then begin
+    ADateFrom := CDateTimePerStart.Value;
+    ADateTo := EndOfTheYear(CDateTimePerEnd.Value);
   end;
 end;
 
@@ -607,7 +615,7 @@ var xData: TPlannedTreeItem;
 begin
   if DoneList.FocusedNode <> Nil then begin
     xData := TPlannedTreeItem(DoneList.GetNodeData(DoneList.FocusedNode)^);
-    Result := xData.planned.id + '|' + DatetimeToDatabase(xData.triggerDate, False);
+    Result := xData.planned.id + '|' + DatetimeToDatabase(xData.triggerDate, False) + '|' + DatetimeToDatabase(xData.dueDate, False);
   end else begin
     Result := CEmptyDataGid;
   end;
@@ -659,12 +667,14 @@ end;
 function TCDoneFrame.FindNode(ADataId: ShortString; AList: TCList): PVirtualNode;
 var xCurNode: PVirtualNode;
     xDataobject: TPlannedTreeItem;
+    xNodeId: TDataGid;
 begin
   Result := Nil;
   xCurNode := AList.GetFirst;
   while (Result = Nil) and (xCurNode <> Nil) do begin
     xDataobject := TPlannedTreeItem(AList.GetNodeData(xCurNode)^);
-    if (xDataobject.planned.id + '|' + DatetimeToDatabase(xDataobject.triggerDate, False)) = ADataId then begin
+    xNodeId := xDataobject.planned.id + '|' + DatetimeToDatabase(xDataobject.triggerDate, False) + '|' + DatetimeToDatabase(xDataobject.dueDate, False);
+    if xNodeId = ADataId then begin
       Result := xCurNode;
     end else begin
       xCurNode := AList.GetNext(xCurNode);
@@ -696,6 +706,7 @@ begin
           FDoneObjects.Add(xData.done);
           xData.done.idPlannedMovement := xData.planned.id;
           xData.done.triggerDate := xData.triggerDate;
+          xData.done.dueDate := xData.dueDate;
         end;
         xData.done.doneDate := xForm.CDateTime.Value;
         xData.done.description := xForm.RichEditDesc.Text;
@@ -827,7 +838,7 @@ begin
   if xNode <> Nil then begin
     xBase := TPlannedTreeItem(DoneList.GetNodeData(xNode)^);
     xForm := TCMovementForm.Create(Nil);
-    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.planned, Nil));
+    xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True, TMovementAdditionalData.Create(xBase.triggerDate, xBase.dueDate, xBase.planned, Nil));
     xForm.Free;
     ReloadSums;
   end;

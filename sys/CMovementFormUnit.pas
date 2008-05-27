@@ -12,12 +12,14 @@ type
   TMovementAdditionalData = class(TAdditionalData)
   private
     FtriggerDate: TDateTime;
+    FdueDate: TDateTime;
     Fplanned: TDataObject;
     FquickPattern: TQuickPatternElement;
   public
-    constructor Create(ATriggerDate: TDateTime; APlanned: TDataObject; AQuickPatternElement: TQuickPatternElement);
+    constructor Create(ATriggerDate, ADueDate: TDateTime; APlanned: TDataObject; AQuickPatternElement: TQuickPatternElement);
   published
     property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
+    property dueDate: TDateTime read FdueDate write FdueDate;
     property planned: TDataObject read Fplanned write Fplanned;
     property quickPattern: TQuickPatternElement read FquickPattern write FquickPattern;
   end;
@@ -319,19 +321,19 @@ begin
         if xCyclicMovementType = CInMovement then begin
           ComboBoxType.ItemIndex := 4;
           xText := xPlan.description + ' (wp³yw do ' + Date2StrDate(xAdd.triggerDate) + ')';
-          CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+          CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False) + '|' + DatetimeToDatabase(xAdd.dueDate, False);
           CStaticInoutCyclic.Caption := xText;
           FcyclicState.AccountId := xPlan.idAccount;
         end else if xCyclicMovementType = COutMovement then begin
           ComboBoxType.ItemIndex := 3;
           xText := xPlan.description + ' (p³atne do ' + Date2StrDate(xAdd.triggerDate) + ')';
-          CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+          CStaticInoutCyclic.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False) + '|' + DatetimeToDatabase(xAdd.dueDate, False);
           CStaticInoutCyclic.Caption := xText;
           FcyclicState.AccountId := xPlan.idAccount;
         end else if xCyclicMovementType = CTransferMovement then begin
           ComboBoxType.ItemIndex := 5;
           xText := xPlan.description + ' (transfer do ' + Date2StrDate(xAdd.triggerDate) + ')';
-          CStaticCyclicTrans.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False);
+          CStaticCyclicTrans.DataId := xPlan.id + '|' + DatetimeToDatabase(xAdd.triggerDate, False) + '|' + DatetimeToDatabase(xAdd.dueDate, False);
           CStaticCyclicTrans.Caption := xText;
           FtransCyclicSourceState.AccountId := xPlan.idAccount;
           FtransCyclicDestState.AccountId := xPlan.idDestAccount;
@@ -854,7 +856,7 @@ end;
 procedure TCMovementForm.ReadValues;
 var xI: Integer;
     xDone: TPlannedDone;
-    xTrDate: TDateTime;
+    xTrDate, xDueDate: TDateTime;
     xTrMove: TDataGid;
     xPos: Integer;
 begin
@@ -939,10 +941,12 @@ begin
       if Operation = coAdd then begin
         xPos := Pos('|', CStaticInoutCyclic.DataId);
         xTrMove := Copy(CStaticInoutCyclic.DataId, 1, xPos - 1);
-        xTrDate := DatabaseToDatetime(Copy(CStaticInoutCyclic.DataId, xPos + 1, MaxInt));
+        xTrDate := DatabaseToDatetime(Copy(CStaticInoutCyclic.DataId, xPos + 1, 12));
+        xDueDate := DatabaseToDatetime(Copy(CStaticInoutCyclic.DataId, xPos + 14, 12));
         xDone := TPlannedDone.CreateObject(PlannedDoneProxy, False);
         xDone.idPlannedMovement := xTrMove;
         xDone.triggerDate := xTrDate;
+        xDone.dueDate := xDueDate;
         xDone.doneState := CDoneOperation;
         xDone.doneDate := regDate;
         xDone.description := description;
@@ -988,10 +992,12 @@ begin
       if Operation = coAdd then begin
         xPos := Pos('|', CStaticCyclicTrans.DataId);
         xTrMove := Copy(CStaticCyclicTrans.DataId, 1, xPos - 1);
-        xTrDate := DatabaseToDatetime(Copy(CStaticCyclicTrans.DataId, xPos + 1, MaxInt));
+        xTrDate := DatabaseToDatetime(Copy(CStaticCyclicTrans.DataId, xPos + 1, 12));
+        xDueDate := DatabaseToDatetime(Copy(CStaticInoutCyclic.DataId, xPos + 14, 10));
         xDone := TPlannedDone.CreateObject(PlannedDoneProxy, False);
         xDone.idPlannedMovement := xTrMove;
         xDone.triggerDate := xTrDate;
+        xDone.dueDate := xDueDate;
         xDone.doneState := CDoneOperation;
         xDone.doneDate := regDate;
         xDone.description := description;
@@ -1064,10 +1070,11 @@ begin
   UpdateDescription;
 end;
 
-constructor TMovementAdditionalData.Create(ATriggerDate: TDateTime; APlanned: TDataObject; AQuickPatternElement: TQuickPatternElement);
+constructor TMovementAdditionalData.Create(ATriggerDate, ADueDate: TDateTime; APlanned: TDataObject; AQuickPatternElement: TQuickPatternElement);
 begin
   inherited Create;
   FtriggerDate := ATriggerDate;
+  FdueDate := ADueDate;
   Fplanned := APlanned;
   FquickPattern := AQuickPatternElement;
 end;

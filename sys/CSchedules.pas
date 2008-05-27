@@ -10,12 +10,14 @@ type
     FPlanned: TPlannedMovement;
     FDone: TPlannedDone;
     FtriggerDate: TDateTime;
+    FdueDate: TDateTime;
   public
-    constructor Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
+    constructor Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime; ADueDate: TDateTime);
   published
     property planned: TPlannedMovement read FPlanned write FPlanned;
     property done: TPlannedDone read FDone write FDone;
     property triggerDate: TDateTime read FtriggerDate write FtriggerDate;
+    property dueDate: TDateTime read FdueDate write FdueDate;
   end;
 
   TScheduledObjectStates = (sosPlanned, sosDone, sosBoth);
@@ -41,17 +43,18 @@ begin
   end;
 end;
 
-constructor TPlannedTreeItem.Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime);
+constructor TPlannedTreeItem.Create(APlanned: TPlannedMovement; ADone: TPlannedDone; ATriggerDate: TDateTime; ADueDate: TDateTime);
 begin
   inherited Create(False, Nil, Nil, False, False);
   FPlanned := APlanned;
   FDone := ADone;
   FtriggerDate := ATriggerDate;
+  FdueDate := ADueDate;
 end;
 
 procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects: TDataObjectList; ADateFrom, ADateTo: TDateTime; AScheduledObjectStates: TScheduledObjectStates);
 
-  function FindPlannedDone(APlannedMovement: TPlannedMovement; ATriggerDate: TDateTime): TPlannedDone;
+  function FindPlannedDone(APlannedMovement: TPlannedMovement; ADueDate: TDateTime): TPlannedDone;
   var xCount: Integer;
       xCur: TPlannedDone;
   begin
@@ -59,7 +62,7 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
     xCount := 0;
     while (Result = Nil) and (xCount <= ADoneObjects.Count - 1) do begin
       xCur := TPlannedDone(ADoneObjects.Items[xCount]);
-      if (xCur.idPlannedMovement = APlannedMovement.id) and (xCur.triggerDate = ATriggerDate) then begin
+      if (xCur.idPlannedMovement = APlannedMovement.id) and (xCur.dueDate = ADueDate) then begin
         Result := xCur;
       end;
       Inc(xCount);
@@ -73,21 +76,24 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
       xElement: TPlannedTreeItem;
       xDone: TPlannedDone;
       xM, xY, xD: Word;
-      xTriggerDate: TDateTime;
+      xTriggerDate, xDueDate: TDateTime;
   begin
     xCurDate := AFromDate;
     xTimes := AMovement.doneCount;
     while (xCurDate <= AToDate) do begin
       DecodeDate(xCurDate, xY, xM, xD);
+      xDueDate := 0;
       if AMovement.scheduleType = CScheduleTypeOnce then begin
         xValid := AMovement.scheduleDate = xCurDate;
         xTriggerDate := xCurDate;
+        xDueDate := xCurDate;
       end else begin
         xValid := xCurDate >= AMovement.scheduleDate;
         if xValid then begin
           if AMovement.triggerType = CTriggerTypeWeekly then begin
             xValid := DayOfTheWeek(xCurDate) = (AMovement.triggerDay + 1);
             xTriggerDate := xCurDate;
+            xDueDate := xCurDate;
           end else begin
             if AMovement.triggerDay = 0 then begin
               xD := DaysInMonth(xCurDate);
@@ -95,8 +101,9 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
               xD := AMovement.triggerDay;
             end;
             if TryEncodeDate(xY, xM, xD, xTriggerDate) then begin
+              xDueDate := xTriggerDate;
               xTriggerDate := AMovement.GetboundaryDate(xTriggerDate);
-              xValid := xCurDate = xTriggerDate;
+              xValid := (xCurDate = xDueDate) and (xTriggerDate <= AToDate);
             end else begin
               xValid := False;
             end;
@@ -113,10 +120,10 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
           end;
         end;
       end;
-      if xValid then begin
-        xDone := FindPlannedDone(AMovement, xTriggerDate);
+      if xValid and (xDueDate <> 0) then begin
+        xDone := FindPlannedDone(AMovement, xDueDate);
         if ((xDone <> Nil) and (AScheduledObjectStates in [sosBoth, sosDone])) or ((xDone = Nil) and (AScheduledObjectStates in [sosBoth, sosPlanned])) then begin
-          xElement := TPlannedTreeItem.Create(AMovement, xDone, xTriggerDate);
+          xElement := TPlannedTreeItem.Create(AMovement, xDone, xTriggerDate, xDueDate);
           AList.Add(xElement);
         end;
       end;

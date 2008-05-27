@@ -158,6 +158,7 @@ create table plannedDone (
   created datetime not null,
   modified datetime,
   triggerDate datetime not null,
+  dueDate datetime not null,
   doneDate datetime not null,
   doneState varchar(1) not null,
   idPlannedMovement uniqueidentifier not null,
