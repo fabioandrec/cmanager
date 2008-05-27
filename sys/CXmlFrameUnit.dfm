@@ -9,38 +9,20 @@ inherited CXmlFrame: TCXmlFrame
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
-    object Panel2: TCPanel
+    object Panel3: TPanel
       Left = 0
       Top = 0
       Width = 443
-      Height = 40
-      Align = alTop
-      TabOrder = 0
-      BevelEdges = [beBottom]
-      object Label1: TLabel
-        Left = 16
-        Top = 12
-        Width = 417
-        Height = 13
-        Caption = 
-          'Zaznacz tylko te dane domy'#347'lne, kt'#243're powinny by'#263' zapami'#281'tane w ' +
-          'nowym pliku danych'
-      end
-    end
-    object Panel3: TPanel
-      Left = 0
-      Top = 40
-      Width = 443
-      Height = 237
+      Height = 277
       Align = alClient
       BevelOuter = bvNone
       Caption = 'Panel3'
-      TabOrder = 1
+      TabOrder = 0
       object List: TCDataList
         Left = 0
         Top = 0
         Width = 443
-        Height = 237
+        Height = 277
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone

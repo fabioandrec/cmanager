@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFrameUnit, Menus, ImgList, PngImageList, VirtualTrees,
-  CComponents, CXml, CTools, CDatabase, ExtCtrls, StdCtrls;
+  CComponents, CXml, CTools, CDatabase, ExtCtrls, StdCtrls, CBaseFormUnit;
 
 type
   TXmlAdditionalData = class(TObject)
@@ -32,10 +32,8 @@ type
 
   TCXmlFrame = class(TCBaseFrame)
     Panel1: TPanel;
-    Panel2: TCPanel;
     Panel3: TPanel;
     List: TCDataList;
-    Label1: TLabel;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
   private
@@ -46,6 +44,7 @@ type
     function FindNodeId(ANode: PVirtualNode): ShortString; override;
     function GetCheckType(ANode: PVirtualNode): TCheckType; override;
     class function GetPrefname: String; override;
+    procedure UpdateFrameForm(AFormInstance: TCBaseForm); override;
   end;
 
 function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList): Boolean;
@@ -155,6 +154,15 @@ end;
 procedure TCXmlFrame.ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
 begin
   APrefname := IfThen(TXmlListElement(TCListDataElement(AHelper).Data).isElement, 'E', 'T');
+end;
+
+procedure TCXmlFrame.UpdateFrameForm(AFormInstance: TCBaseForm);
+begin
+  inherited UpdateFrameForm(AFormInstance);
+  with TCFrameForm(AFormInstance) do begin
+    PanelTopInfo.Caption := '  Zaznacz tylko te dane domyœlne, które powinny byæ zapamiêtane w nowym pliku danych';
+    PanelTopInfo.Visible := True;
+  end;
 end;
 
 end.

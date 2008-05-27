@@ -78,7 +78,7 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
       xM, xY, xD: Word;
       xTriggerDate, xDueDate: TDateTime;
   begin
-    xCurDate := AFromDate;
+    xCurDate := IncDay(AFromDate, -3);
     xTimes := AMovement.doneCount;
     while (xCurDate <= AToDate) do begin
       DecodeDate(xCurDate, xY, xM, xD);
@@ -103,7 +103,7 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
             if TryEncodeDate(xY, xM, xD, xTriggerDate) then begin
               xDueDate := xTriggerDate;
               xTriggerDate := AMovement.GetboundaryDate(xTriggerDate);
-              xValid := (xCurDate = xDueDate) and (xTriggerDate <= AToDate);
+              xValid := (xCurDate = xDueDate);
             end else begin
               xValid := False;
             end;
@@ -120,7 +120,7 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
           end;
         end;
       end;
-      if xValid and (xDueDate <> 0) then begin
+      if xValid and (xDueDate <> 0) and (xTriggerDate <= AToDate) and (xTriggerDate >= AFromDate) then begin
         xDone := FindPlannedDone(AMovement, xDueDate);
         if ((xDone <> Nil) and (AScheduledObjectStates in [sosBoth, sosDone])) or ((xDone = Nil) and (AScheduledObjectStates in [sosBoth, sosPlanned])) then begin
           xElement := TPlannedTreeItem.Create(AMovement, xDone, xTriggerDate, xDueDate);

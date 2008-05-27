@@ -184,7 +184,7 @@ begin
     GDebugLog := GetSystemPathname(xFilename);
   end;
   InitializeFrameGlobals;
-  ShowXmlFile(Nil, Nil);
+//  ShowXmlFile(Nil, Nil);
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     InitializeProxies(GDataProvider);
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin

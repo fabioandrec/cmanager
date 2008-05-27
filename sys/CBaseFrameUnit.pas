@@ -94,6 +94,7 @@ type
     property OnCheckChanged: TCheckChanged read FOnCheckChanged write SetOnCheckChanged;
     class function GetDataobjectClass(AOption: Integer): TDataObjectClass; virtual; abstract;
     class function GetDataobjectProxy(AOption: Integer): TDataProxy; virtual; abstract;
+    procedure UpdateFrameForm(AFormInstance: TCBaseForm); virtual;
   published
     property SelectedId: TDataGid read GetSelectedId write SetSelectedId;
     property SelectedText: String read GetSelectedText;
@@ -895,6 +896,14 @@ begin
         end;
       end;
     end;
+  end;
+end;
+
+procedure TCBaseFrame.UpdateFrameForm(AFormInstance: TCBaseForm);
+begin
+  with TCFrameForm(AFormInstance) do begin
+    PanelTopInfo.Visible := False;
+    PanelBottomInfo.Visible := False;
   end;
 end;
 

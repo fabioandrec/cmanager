@@ -12,30 +12,59 @@ inherited CFrameForm: TCFrameForm
     DesignSize = (
       877
       580)
-    object PanelFrame: TPanel
+    object PanelBase: TPanel
       Left = 2
       Top = 2
       Width = 873
-      Height = 571
+      Height = 576
       Anchors = [akLeft, akTop, akRight, akBottom]
-      BevelOuter = bvLowered
+      BevelOuter = bvNone
       TabOrder = 0
-      object BevelBottom: TBevel
-        Left = 1
-        Top = 569
-        Width = 871
-        Height = 1
-        Align = alBottom
-        Shape = bsTopLine
+      object PanelTopInfo: TPanel
+        Left = 0
+        Top = 0
+        Width = 873
+        Height = 41
+        Align = alTop
+        Alignment = taLeftJustify
+        BevelOuter = bvNone
+        TabOrder = 0
       end
-      object Bevel1: TBevel
-        Left = 871
-        Top = 1
-        Width = 1
-        Height = 568
-        Align = alRight
-        Shape = bsRightLine
-        Style = bsRaised
+      object PanelBottomInfo: TPanel
+        Left = 0
+        Top = 535
+        Width = 873
+        Height = 41
+        Align = alBottom
+        Alignment = taLeftJustify
+        BevelOuter = bvNone
+        TabOrder = 1
+      end
+      object PanelFrame: TPanel
+        Left = 0
+        Top = 41
+        Width = 873
+        Height = 494
+        Align = alClient
+        BevelOuter = bvLowered
+        TabOrder = 2
+        object BevelBottom: TBevel
+          Left = 1
+          Top = 492
+          Width = 871
+          Height = 1
+          Align = alBottom
+          Shape = bsTopLine
+        end
+        object Bevel1: TBevel
+          Left = 871
+          Top = 1
+          Width = 1
+          Height = 491
+          Align = alRight
+          Shape = bsRightLine
+          Style = bsRaised
+        end
       end
     end
   end

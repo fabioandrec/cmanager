@@ -11,6 +11,9 @@ type
   TCFrameFormClass = class of TCFrameForm;
 
   TCFrameForm = class(TCConfigForm)
+    PanelBase: TPanel;
+    PanelTopInfo: TPanel;
+    PanelBottomInfo: TPanel;
     PanelFrame: TPanel;
     BevelBottom: TBevel;
     Bevel1: TBevel;
@@ -59,6 +62,7 @@ begin
   FFrame.Visible := False;
   FFrame.DisableAlign;
   FFrame.InitializeFrame(Self, AAdditionalData, AOutData, AMultipleCheck, AWithButtons);
+  FFrame.UpdateFrameForm(Self);
   if FFrame.GetList <> Nil then begin
     FFrame.GetList.TabStop := True;
   end;
