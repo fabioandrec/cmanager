@@ -135,7 +135,7 @@ procedure TCDepositInvestmentFrame.ActionPayExecute(Sender: TObject);
 var xForm: TCDepositInvestmentPayForm;
 begin
   xForm := TCDepositInvestmentPayForm.Create(Nil);
-  xForm.ShowDataobject(coAdd, DepositInvestmentProxy, Nil, False, TDepositAdditionalData.Create(TDepositInvestment(List.SelectedElement.Data)));
+  xForm.ShowDataobject(coAdd, DepositMovementProxy, Nil, True, TDepositAdditionalData.Create(TDepositInvestment(List.SelectedElement.Data)));
   xForm.Free;
 end;
 

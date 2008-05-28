@@ -1090,7 +1090,7 @@ begin
                         '  (endCondition = ''' + CEndConditionDate + ''' and endDate >= %s) or ' +
                         '  (endCondition = ''' + CEndConditionTimes + ''' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
                         ' )', [DatetimeToDatabase(FStartDate, False)]);
-  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(FStartDate, False), DatetimeToDatabase(FEndDate, False)]);
+  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(IncDay(FStartDate, -3), False), DatetimeToDatabase(IncDay(FEndDate, 3), False)]);
   xPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
   xDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
   xOverallInSum := TSumList.Create(True);

@@ -40,7 +40,8 @@ procedure TCDoneForm.FillForm;
 begin
   GDataProvider.BeginTransaction;
   CDateTimePlanned.Value := FData.triggerDate;
-  RichEditOperation.Text := FData.planned.description;
+  AssignRichText(FData.planned.description, RichEditOperation);
+  AssignRichText(FData.planned.description, RichEditDesc);
   CDateTime.Value := GWorkDate;
   CCurrCash.Value := FData.planned.cash;
   if FData.done = Nil then begin

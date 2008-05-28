@@ -1,4 +1,6 @@
 inherited CDoneForm: TCDoneForm
+  Left = 461
+  Top = 214
   Caption = 'Zaplanowana operacja'
   ClientHeight = 502
   ClientWidth = 405
@@ -71,7 +73,7 @@ inherited CDoneForm: TCDoneForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 1
@@ -117,7 +119,7 @@ inherited CDoneForm: TCDoneForm
         Cursor = crHandPoint
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         Enabled = False
         ParentColor = False

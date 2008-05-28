@@ -27,7 +27,7 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
 
 implementation
 
-uses DateUtils, CConsts, CPreferences;
+uses DateUtils, CConsts, CPreferences, CDatatools, CTools;
 
 function SortTreeHelperByDate(Item1, Item2: Pointer): Integer;
 var xI1, xI2: TPlannedTreeItem;
@@ -76,11 +76,12 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
       xElement: TPlannedTreeItem;
       xDone: TPlannedDone;
       xM, xY, xD: Word;
-      xTriggerDate, xDueDate: TDateTime;
+      xTriggerDate, xDueDate, xToDate: TDateTime;
   begin
     xCurDate := IncDay(AFromDate, -3);
+    xToDate :=  IncDay(AToDate, 3);
     xTimes := AMovement.doneCount;
-    while (xCurDate <= AToDate) do begin
+    while (xCurDate <= xToDate) do begin
       DecodeDate(xCurDate, xY, xM, xD);
       xDueDate := 0;
       if AMovement.scheduleType = CScheduleTypeOnce then begin
@@ -134,10 +135,12 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
 var xCount: Integer;
 begin
   AList.Clear;
-  for xCount := 0 to APlannedObjects.Count - 1 do begin
-    RecreatePlannedMovements(TPlannedMovement(APlannedObjects.Items[xCount]), ADateFrom, ADateTo);
+  if APlannedObjects.Count > 0 then begin
+    for xCount := 0 to APlannedObjects.Count - 1 do begin
+      RecreatePlannedMovements(TPlannedMovement(APlannedObjects.Items[xCount]), ADateFrom, ADateTo);
+    end;
+    AList.Sort(SortTreeHelperByDate);
   end;
-  AList.Sort(SortTreeHelperByDate);
 end;
 
 end.

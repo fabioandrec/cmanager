@@ -155,7 +155,7 @@ begin
                         '  (endCondition = ''%s'' and endDate >= %s) or ' +
                         '  (endCondition = ''%s'' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
                         ' )', [CEndConditionNever, CEndConditionDate, DatetimeToDatabase(xDf, False), CEndConditionTimes]);
-  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+  xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(IncDay(xDf, -3), False), DatetimeToDatabase(IncDay(xDt, 3), False)]);
   if FPlannedObjects <> Nil then begin
     FreeAndNil(FPlannedObjects);
   end;
@@ -508,6 +508,7 @@ begin
   xList.Add('1=<tylko dziœ>');
   xList.Add('2=<w tym tygodniu>');
   xList.Add('3=<w tym miesi¹cu>');
+  xList.Add('15=<w tym roku>');
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
   xList.Add('6=<ostatnie 30 dni>');
@@ -576,6 +577,9 @@ begin
     ADateTo := CDateTimePerEnd.Value;
   end else if xId = '14' then begin
     ADateFrom := CDateTimePerStart.Value;
+    ADateTo := EndOfTheYear(CDateTimePerEnd.Value);
+  end else if xId = '15' then begin
+    ADateFrom := StartOfTheYear(CDateTimePerStart.Value);
     ADateTo := EndOfTheYear(CDateTimePerEnd.Value);
   end;
 end;

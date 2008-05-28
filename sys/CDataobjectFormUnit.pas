@@ -132,8 +132,6 @@ begin
   Result := WMOPT_NONE;
 end;
 
-{ TAdditionalDataWithId }
-
 constructor TAdditionalDataWithId.CreateId(AId: TDataGid);
 begin
   inherited Create;

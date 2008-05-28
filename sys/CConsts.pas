@@ -203,6 +203,9 @@ const
   CDepositMovementInactivate = 'I';
   CDepositMovementRenew = 'R';
   CDepositMovementDue = 'D';
+  CDepositMovementAddCash = 'A';
+  CDepositMovementClose = 'K';
+  CDepositMovementGetInterest = 'G';
 
 const
   CInMovementDescription = 'Przychód';

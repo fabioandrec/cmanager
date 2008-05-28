@@ -143,7 +143,7 @@ begin
       xTypes := xTypes + 'T';
     end;
     if startupInfoOldIn or startupInfoOldOut or startupInfoOldTran then begin
-      xDf := IncDay(xDf, (-3) * DaysInMonth(xDf));
+      xDf := IncYear(xDf, -1);
     end;
     xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
     if Length(xTypes) = 1 then begin
@@ -158,7 +158,7 @@ begin
                           '  (endCondition = ''' + CEndConditionDate + ''' and endDate >= %s) or ' +
                           '  (endCondition = ''' + CEndConditionTimes + ''' and endCount > (select count(*) from plannedDone where plannedDone.idPlannedMovement = plannedMovement.idPlannedMovement)) ' +
                           ' )', [DatetimeToDatabase(xDf, False)]);
-    xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+    xSqlDone := Format('select * from plannedDone where triggerDate between %s and %s', [DatetimeToDatabase(IncDay(xDf, -3), False), DatetimeToDatabase(IncDay(xDt, 3), False)]);
     FPlannedObjects := TDataObject.GetList(TPlannedMovement, PlannedMovementProxy, xSqlPlanned);
     FDoneObjects := TDataObject.GetList(TPlannedDone, PlannedDoneProxy, xSqlDone);
     GetScheduledObjects(FScheduledObjects, FPlannedObjects, FDoneObjects, xDF, xDT, sosPlanned);

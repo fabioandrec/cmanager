@@ -5315,6 +5315,7 @@ begin
   FidAccountCurrencyDef := CEmptyDataGid;
   FidCurrencyRate := CEmptyDataGid;
   FidProduct := CEmptyDataGid;
+  idBaseMovement := CEmptyDataGid;
 end;
 
 procedure TDepositMovement.FromDataset(ADataset: TADOQuery);

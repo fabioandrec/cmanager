@@ -458,7 +458,6 @@ begin
                                      TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditActualCash.Value, CStaticCurrency.DataId));
     end;
   end;
-
 end;
 
 function TCDepositInvestmentForm.GetDataobjectClass: TDataObjectClass;
