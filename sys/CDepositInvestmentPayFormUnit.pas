@@ -374,7 +374,7 @@ begin
     xInvest := TDepositMovement(Dataobject);
     xDepositId := CStaticDeposit.DataId;
     GDataProvider.BeginTransaction;
-    xDeposit := TDepositAdditionalData(AdditionalData).deposit;
+    xDeposit := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False));
     xAccount := TAccount(TAccount.LoadObject(AccountProxy, CStaticAccount.DataId, False));
     xProduct := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False));
     if Operation = coAdd then begin

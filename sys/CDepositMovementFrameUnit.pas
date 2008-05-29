@@ -52,7 +52,8 @@ type
 implementation
 
 uses CDataObjects, CPluginConsts, CConsts, CTools, CFrameFormUnit, CListFrameUnit, CBaseFrameUnit,
-  CMovementFrameUnit, DB;
+  CMovementFrameUnit, DB, CDepositInvestmentPayFormUnit,
+  CDepositInvestmentFrameUnit;
 
 {$R *.dfm}
 
@@ -63,7 +64,7 @@ end;
 
 function TCDepositMovementFrame.GetDataobjectForm(AOption: Integer): TCDataobjectFormClass;
 begin
-  //Result := TCInvestmentMovementForm;
+  Result := TCDepositInvestmentPayForm;
 end;
 
 class function TCDepositMovementFrame.GetDataobjectProxy(AOption: Integer): TDataProxy;
@@ -259,16 +260,18 @@ end;
 procedure TCDepositMovementFrame.AfterDeleteObject(ADataobject: TDataObject);
 var xInvest: TDepositMovement;
     xMovement: TBaseMovement;
-    xBaseId: TDataGid;
+    xBaseId, xDepositId: TDataGid;
 begin
   xInvest := TDepositMovement(ADataobject);
   xBaseId := xInvest.idBaseMovement;
+  xDepositId := xInvest.idDepositInvestment;
   if (xBaseId <> CEmptyDataGid) then begin
     GDataProvider.BeginTransaction;
     xMovement := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, xInvest.idBaseMovement, False));
     xMovement.DeleteObject;
     GDataProvider.CommitTransaction;
     SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xBaseId), WMOPT_BASEMOVEMENT);
+    SendMessageToFrames(TCDepositInvestmentFrame, WM_DATAOBJECTEDITED, Integer(@xDepositId), WMOPT_BASEMOVEMENT);
   end;
   inherited AfterDeleteObject(ADataobject);
 end;
