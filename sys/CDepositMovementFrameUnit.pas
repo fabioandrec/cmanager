@@ -47,6 +47,7 @@ type
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
+    procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
   end;
 
 implementation
@@ -292,6 +293,18 @@ begin
     if TDepositMovement(ADataobject).regDateTime > CDateTimePerEnd.Value then begin
       CDateTimePerEnd.Value := TDepositMovement(ADataobject).regDateTime;
     end;
+  end;
+end;
+
+procedure TCDepositMovementFrame.UpdateButtons(AIsSelectedSomething: Boolean);
+var xMt: TBaseEnumeration;
+
+begin
+  inherited UpdateButtons(AIsSelectedSomething);
+  if AIsSelectedSomething then begin
+    xMt := TDepositMovement(List.SelectedElement.Data).movementType;
+    ActionDelete.Enabled := AIsSelectedSomething and
+                          ((xMt = CDepositMovementAddCash) or (xMt = CDepositMovementGetInterest));
   end;
 end;
 
