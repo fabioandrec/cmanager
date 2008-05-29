@@ -18,7 +18,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       TabOrder = 0
       object Label3: TLabel
         Left = 57
-        Top = 28
+        Top = 64
         Width = 63
         Height = 13
         Alignment = taRightJustify
@@ -26,7 +26,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       end
       object Label2: TLabel
         Left = 87
-        Top = 64
+        Top = 28
         Width = 33
         Height = 13
         Alignment = taRightJustify
@@ -34,7 +34,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       end
       object Label12: TLabel
         Left = 255
-        Top = 28
+        Top = 64
         Width = 73
         Height = 13
         Alignment = taRightJustify
@@ -50,7 +50,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       end
       object CDateTime: TCDateTime
         Left = 128
-        Top = 24
+        Top = 60
         Width = 89
         Height = 21
         Cursor = crHandPoint
@@ -59,7 +59,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
-        TabOrder = 0
+        TabOrder = 1
         TabStop = True
         Transparent = False
         HotTrack = True
@@ -67,7 +67,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       end
       object ComboBoxType: TComboBox
         Left = 336
-        Top = 24
+        Top = 60
         Width = 233
         Height = 21
         BevelInner = bvNone
@@ -75,7 +75,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 1
+        TabOrder = 2
         Text = 'Dop'#322'ata do lokaty'
         OnChange = ComboBoxTypeChange
         Items.Strings = (
@@ -85,16 +85,19 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       end
       object CStaticDeposit: TCStatic
         Left = 128
-        Top = 60
+        Top = 24
         Width = 441
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz lokat'#281' z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz lokat'#281' z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 2
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 0
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz lokat'#281' z listy>'
@@ -107,12 +110,15 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Top = 96
         Width = 233
         Height = 21
+        Hint = '<brak lokaty>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<brak lokaty>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 3
         TabStop = True
         Transparent = False
@@ -274,11 +280,14 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Width = 169
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz konto z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz konto z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 5
         TabStop = True
         Transparent = False
@@ -292,12 +301,15 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Top = 139
         Width = 161
         Height = 21
+        Hint = '<brak konta>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<brak konta>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 6
         TabStop = True
         Transparent = False
@@ -310,11 +322,14 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Width = 169
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz przelicznik kursu z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz przelicznik kursu z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 7
         TabStop = True
         Transparent = False
@@ -343,11 +358,14 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
         Width = 441
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz kategori'#281' z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz kategori'#281' z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 9
         TabStop = True
         Transparent = False
@@ -446,10 +464,12 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
     object ActionAdd: TAction
       Caption = 'Wstaw mnemonik'
       ImageIndex = 0
+      OnExecute = ActionAddExecute
     end
     object ActionTemplate: TAction
       Caption = 'Konfiguruj szablony'
       ImageIndex = 1
+      OnExecute = ActionTemplateExecute
     end
   end
 end

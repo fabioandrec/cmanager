@@ -447,6 +447,8 @@ type
   TCPanel = class(TPanel)
   protected
     procedure Paint; override;
+  public
+    function GetTextLeft: Integer;
   published
     property BevelEdges;
   end;
@@ -2792,6 +2794,19 @@ end;
 procedure TCIntEdit.SetValue(const Value: Integer);
 begin
   Text := IntToStr(Value);
+end;
+
+function TCPanel.GetTextLeft: Integer;
+var xWidth: Integer;
+begin
+  xWidth := Canvas.TextWidth(Caption);
+  if Alignment = taLeftJustify then begin
+    Result := 0;
+  end else if Alignment = taRightJustify then begin
+    Result := Width - xWidth;
+  end else begin
+    Result := (Width - xWidth) div 2;
+  end;
 end;
 
 procedure TCPanel.Paint;

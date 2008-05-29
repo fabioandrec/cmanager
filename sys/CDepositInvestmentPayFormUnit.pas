@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CDataobjectFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, StrUtils,
   ComCtrls, ActnList, XPStyleActnCtrls, ActnMan, CTools, CDatatools, CDatabase, CDataObjects, DateUtils,
-  CBaseFrameUnit;
+  CBaseFrameUnit, Contnrs;
 
 type
   TDepositAdditionalData = class(TAdditionalData)
@@ -67,6 +67,8 @@ type
     procedure CStaticCurrencyRateChanged(Sender: TObject);
     procedure CStaticCurrencyRateGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure CCurrEditCashChange(Sender: TObject);
+    procedure ActionAddExecute(Sender: TObject);
+    procedure ActionTemplateExecute(Sender: TObject);
   private
     FRateHelper: TCurrencyRateHelper;
     procedure UpdateDescription;
@@ -82,6 +84,7 @@ type
     procedure ReadValues; override;
   public
     destructor Destroy; override;
+    function ExpandTemplate(ATemplate: String): String; override;
   end;
 
 implementation
@@ -309,7 +312,7 @@ begin
 end;
 
 function TCDepositInvestmentPayForm.CanAccept: Boolean;
-var xNoncapInt: Currency;
+var xNoncapInt, xPrevCash: Currency;
 begin
   Result := True;
   if CStaticDeposit.DataId = CEmptyDataGid then begin
@@ -345,10 +348,15 @@ begin
         CStaticAccount.DoGetDataId;
       end;
     end else begin
+      if Operation = coEdit then begin
+        xPrevCash := TDepositMovement(Dataobject).cash;
+      end else begin
+        xPrevCash := 0;
+      end;
       Result := CheckSurpassedLimits(IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticAccount.DataId),
                                      TDataGids.CreateFromGid(CEmptyDataGid),
-                                     TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditCash.Value, CStaticDepositCurrency.DataId));
+                                     TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditCash.Value - xPrevCash, CStaticDepositCurrency.DataId));
     end;
   end;
 end;
@@ -369,7 +377,11 @@ begin
     xDeposit := TDepositAdditionalData(AdditionalData).deposit;
     xAccount := TAccount(TAccount.LoadObject(AccountProxy, CStaticAccount.DataId, False));
     xProduct := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False));
-    xBase := TBaseMovement.CreateObject(BaseMovementProxy, False);
+    if Operation = coAdd then begin
+      xBase := TBaseMovement.CreateObject(BaseMovementProxy, False);
+    end else begin
+      xBase := TBaseMovement(TBaseMovement.LoadObject(BaseMovementProxy, TDepositMovement(Dataobject).idBaseMovement, False));
+    end;
     xBase.regDate := DateOf(xInvest.regDateTime);
     if xInvest.movementType = CDepositMovementAddCash then begin
       xBase.movementType := COutMovement;
@@ -427,7 +439,6 @@ begin
   end;
 end;
 
-
 procedure TCDepositInvestmentPayForm.ReadValues;
 begin
   with TDepositMovement(Dataobject) do begin
@@ -469,6 +480,76 @@ end;
 function TCDepositInvestmentPayForm.GetUpdateFrameClass: TCBaseFrameClass;
 begin
   Result := TCDepositMovementFrame;
+end;
+
+procedure TCDepositInvestmentPayForm.ActionAddExecute(Sender: TObject);
+var xData: TObjectList;
+begin
+  xData := TObjectList.Create(False);
+  xData.Add(GBaseTemlatesList);
+  xData.Add(GDepositInvestmentTemplatesList);
+  EditAddTemplate(xData, Self, RichEditDesc, True);
+  xData.Free;
+end;
+
+procedure TCDepositInvestmentPayForm.ActionTemplateExecute(Sender: TObject);
+var xPattern: String;
+begin
+  if EditDescPattern(CDescPatternsKeys[9][0], xPattern) then begin
+    UpdateDescription;
+  end;
+end;
+
+function TCDepositInvestmentPayForm.ExpandTemplate(ATemplate: String): String;
+begin
+  Result := inherited ExpandTemplate(ATemplate);
+  if ATemplate = '@data@' then begin
+    Result := GetFormattedDate(CDateTime.Value, 'yyyy-MM-dd');
+  end else if ATemplate = '@stan@' then begin
+    Result := 'Aktywna';
+  end else if ATemplate = '@operacja@' then begin
+    Result := ComboBoxType.Text;
+  end else if ATemplate = '@nazwa@' then begin
+    if CStaticDeposit.DataId = '' then begin
+      Result := '<nazwa lokaty>';
+    end else begin
+      Result := CStaticDeposit.Caption;
+    end;
+  end else if ATemplate = '@konto@' then begin
+    Result := '<konto stowarzyszone>';
+    if CStaticAccount.DataId <> CEmptyDataGid then begin
+      Result := CStaticAccount.Caption;
+    end;
+  end else if ATemplate = '@kontrahent@' then begin
+    Result := '<prowadz¹cy lokatê>';
+    if CStaticDeposit.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False)).GetDepositCashpointName;
+      GDataProvider.RollbackTransaction;
+    end;
+  end else if ATemplate = '@kategoria@' then begin
+    Result := '<kategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      Result := CStaticCategory.Caption;
+    end;
+  end else if ATemplate = '@pelnakategoria@' then begin
+    Result := '<pelnakategoria>';
+    if CStaticCategory.DataId <> CEmptyDataGid then begin
+      GDataProvider.BeginTransaction;
+      Result := TProduct(TProduct.LoadObject(ProductProxy, CStaticCategory.DataId, False)).treeDesc;
+      GDataProvider.RollbackTransaction;
+    end;
+  end else if ATemplate = '@isowaluty@' then begin
+    Result := '<iso waluty lokaty>';
+    if CStaticDepositCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetIso(CStaticDepositCurrency.DataId);
+    end;
+  end else if ATemplate = '@symbolwaluty@' then begin
+    Result := '<symbol waluty lokaty>';
+    if CStaticDepositCurrency.DataId <> CEmptyDataGid then begin
+      Result := GCurrencyCache.GetSymbol(CStaticDepositCurrency.DataId);
+    end;
+  end;
 end;
 
 end.

@@ -1694,10 +1694,10 @@ begin
   Result := inherited CanModifyValues;
   if Result and (Operation = coEdit) then begin
     if TBaseMovement(Dataobject).isInvestmentMovement then begin
-      ShowInfoPanel(50, 'Edycja operacji powsta쿮j na bazie operacji inwestycyjnej nie jest mo퓄iwa', clWindowText, [fsBold]);
+      ShowInfoPanel(50, 'Edycja operacji powsta쿮j na bazie operacji inwestycyjnej nie jest mo퓄iwa', clWindowText, [fsBold], iitNone);
       Result := False;
     end else if TBaseMovement(Dataobject).isDepositMovement then begin
-      ShowInfoPanel(50, 'Edycja operacji powsta쿮j na bazie operacji lokat nie jest mo퓄iwa', clWindowText, [fsBold]);
+      ShowInfoPanel(50, 'Edycja operacji powsta쿮j na bazie operacji lokat nie jest mo퓄iwa', clWindowText, [fsBold], iitNone);
       Result := False;
     end;
   end;

@@ -40,6 +40,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Alignment = taRightJustify
         Caption = 'Tryb utworzenia'
       end
+      object LabelState: TLabel
+        Left = 275
+        Top = 28
+        Width = 53
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Stan lokaty'
+      end
       object CDateTime: TCDateTime
         Left = 128
         Top = 24
@@ -85,6 +93,25 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Items.Strings = (
           'Za'#322'o'#380'enie lokaty'
           'Rejestracja lokaty')
+      end
+      object ComboBoxDepositState: TComboBox
+        Left = 336
+        Top = 24
+        Width = 233
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        Enabled = False
+        ItemHeight = 13
+        ItemIndex = 0
+        TabOrder = 3
+        Text = 'Aktywna'
+        OnChange = ComboBoxTypeChange
+        Items.Strings = (
+          'Aktywna'
+          'Nieaktywna'
+          'Zlikwidowana')
       end
     end
     object GroupBox2: TGroupBox
@@ -282,11 +309,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 441
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz kontrahenta z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz kontrahenta z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 0
         TabStop = True
         Transparent = False
@@ -301,11 +331,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 161
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz walut'#281'>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz walut'#281'>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
         TabStop = True
         Transparent = False
@@ -459,11 +492,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 441
         Height = 21
         Cursor = crHandPoint
+        Hint = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 11
         TabStop = True
         Transparent = False
@@ -477,11 +513,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 169
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz konto z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz konto z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 12
         TabStop = True
         Transparent = False
@@ -495,12 +534,15 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Top = 277
         Width = 161
         Height = 21
+        Hint = '<brak konta>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<brak konta>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 13
         TabStop = True
         Transparent = False
@@ -513,11 +555,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 169
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz przelicznik kursu z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz przelicznik kursu z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 14
         TabStop = True
         Transparent = False
@@ -546,11 +591,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Width = 441
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz kategori'#281' z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz kategori'#281' z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 16
         TabStop = True
         Transparent = False

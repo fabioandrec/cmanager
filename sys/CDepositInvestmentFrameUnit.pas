@@ -121,7 +121,11 @@ begin
   inherited UpdateButtons(AIsSelectedSomething);
   ActionHistory.Enabled := True;
   ActionDetails.Enabled := AIsSelectedSomething;
-  ActionPay.Enabled := AIsSelectedSomething;
+  if AIsSelectedSomething then begin
+    ActionPay.Enabled :=  TDepositInvestment(List.SelectedElement.Data).depositState = CDepositInvestmentActive;
+  end else begin
+    ActionPay.Enabled := AIsSelectedSomething;
+  end;
 end;
 
 procedure TCDepositInvestmentFrame.ActionDetailsExecute(Sender: TObject);

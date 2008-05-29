@@ -59,7 +59,7 @@ create table depositMovement (
   constraint fk_movementDepositBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement)
 );
 
-insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@nazwa@');
+insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@operacja@ - @nazwa@');
 update baseMovement set isInvestmentMovement = 0 where idBaseMovement not in (select idBaseMovement from investmentMovement where idBaseMovement is not null);
 alter table baseMovement add isDepositMovement bit not null;
 update baseMovement set isDepositMovement = 0;

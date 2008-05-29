@@ -58,6 +58,8 @@ type
     CCurrEditAccount: TCCurrEdit;
     Label13: TLabel;
     CStaticCategory: TCStatic;
+    LabelState: TLabel;
+    ComboBoxDepositState: TComboBox;
     procedure CDateTimeChanged(Sender: TObject);
     procedure ComboBoxPeriodTypeChange(Sender: TObject);
     procedure CIntEditPeriodCountChange(Sender: TObject);
@@ -106,6 +108,7 @@ type
     procedure AfterCommitData; override;
     procedure EndFilling; override;
     procedure FillForm; override;
+    function CanModifyValues: Boolean; override;
   public
     property formPeriodType: TBaseEnumeration read GetPeriodType write SetPeriodType;
     property formDueType: TBaseEnumeration read GetDueType write SetDueType;
@@ -146,6 +149,8 @@ begin
   CStaticCurrency.DataId := CCurrencyDefGid_PLN;
   CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
   CCurrEditActualCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+  LabelState.Visible := False;
+  ComboBoxDepositState.Visible := False;
   ComboBoxDueModeChange(ComboBoxDueMode);
   ComboBoxTypeChange(ComboBoxType);
   UpdateEndPeriodDatetime;
@@ -412,6 +417,7 @@ begin
 end;
 
 function TCDepositInvestmentForm.CanAccept: Boolean;
+var xPrevCash: Currency;
 begin
   Result := inherited CanAccept;
   if Trim(EditName.Text) = '' then begin
@@ -452,10 +458,15 @@ begin
         CStaticAccount.DoGetDataId;
       end;
     end else begin
+      if Operation = coEdit then begin
+        xPrevCash := TDepositMovement(Dataobject).cash;
+      end else begin
+        xPrevCash := 0;
+      end;
       Result := CheckSurpassedLimits(COutMovement, CDateTime.Value,
                                      TDataGids.CreateFromGid(CStaticAccount.DataId),
                                      TDataGids.CreateFromGid(CStaticCashpoint.DataId),
-                                     TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditActualCash.Value, CStaticCurrency.DataId));
+                                     TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditActualCash.Value - xPrevCash, CStaticCurrency.DataId));
     end;
   end;
 end;
@@ -803,6 +814,15 @@ end;
 procedure TCDepositInvestmentForm.FillForm;
 begin
   with TDepositInvestment(Dataobject) do begin
+    LabelState.Visible := True;
+    ComboBoxDepositState.Visible := True;
+    if depositState = CDepositInvestmentActive then begin
+      ComboBoxDepositState.ItemIndex := 0;
+    end else if depositState = CDepositInvestmentInactive then begin
+      ComboBoxDepositState.ItemIndex := 1;
+    end else begin
+      ComboBoxDepositState.ItemIndex := 2;
+    end;
     CDateTime.Enabled := False;
     Label12.Visible := False;
     ComboBoxType.Visible := False;
@@ -854,6 +874,17 @@ begin
       ComboBoxPeriodAction.ItemIndex := 0;
     end;
     ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
+  end;
+end;
+
+function TCDepositInvestmentForm.CanModifyValues: Boolean;
+begin
+  Result := inherited CanModifyValues;
+  if Result and (Operation = coEdit) then begin
+    if TDepositInvestment(Dataobject).depositState <> CDepositInvestmentActive then begin
+      ShowInfoPanel(50, 'Edycja lokaty nieaktywnej lub wyp³aconej nie jest mo¿liwa', clWindowText, [fsBold], iitNone);
+      Result := False;
+    end;
   end;
 end;
 

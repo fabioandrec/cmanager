@@ -207,6 +207,10 @@ const
   CDepositMovementClose = 'K';
   CDepositMovementGetInterest = 'G';
 
+  CDepositInvestmentStateActive = 'A';
+  CDepositInvestmentStateInactive = 'I';
+  CDepositInvestmentStateClosed = 'C';
+
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';

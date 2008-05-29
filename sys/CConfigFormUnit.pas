@@ -5,9 +5,11 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, ComCtrls, StdCtrls, ExtCtrls, Buttons, Themes,
-  ImgList;
+  ImgList, CComponents;
 
 type
+  TInfoIconType = (iitNone, iitWarning, iitError, iitInfo, iitQuestion);
+
   TConfigOperation = (coNone, coAdd, coEdit);
   TCConfigForm = class(TCBaseForm)
     PanelConfig: TPanel;
@@ -17,7 +19,8 @@ type
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
   private
-    FInfoPanel: TPanel;
+    FInfoPanel: TCPanel;
+    FInfoIcon: TImage;
     FInfoBevel: TBevel;
     FAccepted: Boolean;
     FOperation: TConfigOperation;
@@ -30,7 +33,7 @@ type
     procedure FillForm; virtual;
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
-    procedure ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
+    procedure ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles; AInfoIconType: TInfoIconType);
   protected
     procedure BeginFilling; virtual;
     procedure EndFilling; virtual;
@@ -129,7 +132,7 @@ end;
 constructor TCConfigForm.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FInfoPanel := TPanel.Create(Self);
+  FInfoPanel := TCPanel.Create(Self);
   FInfoPanel.BorderStyle := bsNone;
   FInfoPanel.BevelInner := bvNone;
   FInfoPanel.BevelOuter := bvNone;
@@ -138,20 +141,52 @@ begin
   FInfoBevel.Parent := FInfoPanel;
   FInfoBevel.Align := alBottom;
   FInfoBevel.Height := 3;
+  FInfoIcon := TImage.Create(Self);
+  FInfoIcon.Name := 'InfoPanelImage';
+  FInfoIcon.Parent := FInfoPanel;
+  FInfoIcon.Left := 16;
+  FInfoIcon.Top := 8;
+  FInfoIcon.Width := 32;
+  FInfoIcon.Height := 32;
   FFilling := 0;
 end;
 
-procedure TCConfigForm.ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles);
+procedure TCConfigForm.ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles; AInfoIconType: TInfoIconType);
+var xIconRes: PChar;
 begin
   FInfoPanel.Align := alTop;
   FInfoPanel.Height := AHeight;
   FInfoPanel.Caption := AText;
   FInfoPanel.Font.Color := AFontColor;
   FInfoPanel.Font.Style := AFontStyle;
+  case AInfoIconType of
+    iitWarning: begin
+      xIconRes := IDI_EXCLAMATION;
+    end;
+    iitError: begin
+      xIconRes := IDI_HAND;
+    end;
+    iitInfo: begin
+      xIconRes := IDI_ASTERISK;
+    end;
+    iitQuestion: begin
+      xIconRes := IDI_QUESTION;
+    end;
+    else begin
+      xIconRes := Nil;
+    end;
+  end;
   DisableAlign;
   Height := Height + FInfoPanel.Height;
-  FInfoPanel.Parent := Self;
   EnableAlign;
+  FInfoPanel.Parent := Self;
+  if xIconRes <> Nil then begin
+    FInfoIcon.Picture.Icon.Handle := LoadIcon(0, xIconRes);
+    FInfoIcon.Left := FInfoPanel.GetTextLeft - FInfoIcon.Width - 40;
+    FInfoIcon.Visible := True;
+  end else begin
+    FInfoIcon.Visible := False;
+  end;
 end;
 
 procedure TCConfigForm.DoAccept;

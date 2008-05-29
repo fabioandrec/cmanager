@@ -1051,6 +1051,7 @@ type
     function GetElementText: String; override;
     function GetColumnImage(AColumnIndex: Integer): Integer; override;
     function GetDepositMovements: TDataObjectList;
+    function GetDepositCashpointName: String;
     class function GetCurrencyDefinition(AIdDepositInvestment: TDataGid): TDataGid;
   published
     property depositState: TBaseEnumeration read FdepositState write SetdepositState;
@@ -1106,6 +1107,8 @@ type
     procedure SetrateDescription(const Value: TBaseDescription);
     procedure SetidBaseMovement(const Value: TDataGid);
     procedure SetregOrder(const Value: Integer);
+  protected
+    function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
     constructor Create(AStatic: Boolean); override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -1225,7 +1228,6 @@ begin
                           [AmovementType, IsNullCondition(DataGidToDatabase(AidAccount)), IsNullCondition(DataGidToDatabase(AidSourceAccount)),
                            IsNullCondition(DataGidToDatabase(AidCashPoint)), IsNullCondition(DataGidToDatabase(AidProduct)), IsNullCondition(DataGidToDatabase(AidAccountCurrencyDef)),
                            IsNullCondition(DataGidToDatabase(AidMovementCurrencyDef))]), 0) > 0 then begin
-
     AProvider.ExecuteSql(Format('update movementStatistics set movementCount = movementCount %s, cash = cash %s, movementCash = movementCash %s where movementType = ''%s'' and idAccount %s and idSourceAccount %s and ' +
                           'idCashPoint %s and idProduct %s and idAccountCurrencyDef %s and idMovementCurrencyDef %s',
                           [IntToStrWithSign(AmovementCount), CurrencyToDatabaseWithSign(Acash), CurrencyToDatabaseWithSign(AmovementCash), AmovementType, IsNullCondition(DataGidToDatabase(AidAccount)), IsNullCondition(DataGidToDatabase(AidSourceAccount)),
@@ -5361,7 +5363,23 @@ begin
       Result := 'Odnowienie lokaty';
     end else if FmovementType = CDepositMovementDue then begin
       Result := 'Naliczenie odsetek';
+    end else if FmovementType = CDepositMovementAddCash then begin
+      Result := 'Dop³ata do lokaty';
+    end else if FmovementType = CDepositMovementClose then begin
+      Result := 'Likwidacja lokaty';
+    end else if FmovementType = CDepositMovementGetInterest then begin
+      Result := 'Wyp³ata odsetek';
     end;
+  end;
+end;
+
+function TDepositMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
+begin
+  Result := inherited OnDeleteObject(AProxy);
+  if (movementType = CDepositMovementAddCash) then begin
+    AProxy.DataProvider.ExecuteSql('update depositInvestment set cash = cash - ' + CurrencyToDatabase(cash) + ' where idDepositInvestment = ' + DataGidToDatabase(idDepositInvestment));
+  end else if (movementType = CDepositMovementgetInterest) then begin
+    AProxy.DataProvider.ExecuteSql('update depositInvestment set noncapitalizedInterest = noncapitalizedInterest + ' + CurrencyToDatabase(cash) + ' where idDepositInvestment = ' + DataGidToDatabase(idDepositInvestment));
   end;
 end;
 
@@ -5544,6 +5562,11 @@ end;
 class function TDepositInvestment.GetCurrencyDefinition(AIdDepositInvestment: TDataGid): TDataGid;
 begin
   Result := GDataProvider.GetSqlString(Format('select idCurrencyDef from depositInvestment where idDepositInvestment = %s', [DataGidToDatabase(AIdDepositInvestment)]), '');
+end;
+
+function TDepositInvestment.GetDepositCashpointName: String;
+begin
+  Result := GDataProvider.GetSqlString(Format('select name from cashpoint where idCashpoint = %s', [DataGidToDatabase(idCashPoint)]), '');
 end;
 
 initialization
