@@ -60,6 +60,8 @@ type
     CStaticCategory: TCStatic;
     LabelState: TLabel;
     ComboBoxDepositState: TComboBox;
+    Label16: TLabel;
+    CCurrEditNoncapitalized: TCCurrEdit;
     procedure CDateTimeChanged(Sender: TObject);
     procedure ComboBoxPeriodTypeChange(Sender: TObject);
     procedure CIntEditPeriodCountChange(Sender: TObject);
@@ -150,6 +152,8 @@ begin
   CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
   CCurrEditActualCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
   LabelState.Visible := False;
+  Label16.Visible := Operation = coEdit;
+  CCurrEditNoncapitalized.Visible := Operation = coEdit;
   ComboBoxDepositState.Visible := False;
   ComboBoxDueModeChange(ComboBoxDueMode);
   ComboBoxTypeChange(ComboBoxType);
@@ -170,7 +174,6 @@ begin
     if Operation = coAdd then begin
       depositState := CDepositInvestmentActive;
       idCurrencyDef := CStaticCurrency.DataId;
-      noncapitalizedInterest := 0;
       periodCount := CIntEditPeriodCount.Value;
       dueCount := CIntEditDueCount.Value;
       dueStartDate := CDateTime.Value;
@@ -178,6 +181,7 @@ begin
       dueEndDate := FDueEndDate;
       periodEndDate := FPeriodEndDate;
       dueType := formDueType;
+      noncapitalizedInterest := CCurrEditNoncapitalized.Value;
       if ComboBoxDueAction.ItemIndex = 0 then begin
         dueAction := CDepositDueActionAutoCapitalisation;
       end else begin
@@ -537,6 +541,8 @@ begin
     xMove.regOrder := 0;
     xMove.description := RichEditDesc.Text;
     xMove.cash := xDeposit.cash;
+    xMove.depositState := CDepositInvestmentActive;
+    xMove.interest := 0;
     xMove.idDepositInvestment := xDeposit.id;
     xMove.idAccount := CStaticAccount.DataId;
     xMove.idAccountCurrencyDef := CStaticAccountCurrency.DataId;
@@ -598,6 +604,9 @@ begin
       end;
     end;
     SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
+    if CDateTime.Value <= GWorkDate then begin
+      UpdateDepositInvestments(GDataProvider);
+    end;
   end;
 end;
 
@@ -845,6 +854,7 @@ begin
     ComboBoxDueType.Enabled := False;
     ComboBoxDueAction.Enabled := False;
     GroupBox3.Height := 281;
+    CCurrEditNoncapitalized.Value := noncapitalizedInterest;
     GroupBox2.Top := GroupBox3.Top + GroupBox3.Height + 16;
     Height := Height - 106;
     SimpleRichText(description, RichEditDesc);

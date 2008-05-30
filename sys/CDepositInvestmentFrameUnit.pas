@@ -31,6 +31,7 @@ type
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
+    function CanAcceptSelectedObject: Boolean; override;
   end;
 
 implementation
@@ -132,7 +133,7 @@ procedure TCDepositInvestmentFrame.ActionDetailsExecute(Sender: TObject);
 var xGid, xText, xIdDeposit: String;
 begin
   xIdDeposit := TDepositInvestment(List.SelectedElement.Data).id;
-  TCFrameForm.ShowFrame(TCDepositMovementFrame, xGid, xText, TCDepositFrameAdditionalData.Create(xIdDeposit), nil, nil, nil, False);
+  TCFrameForm.ShowFrame(TCDepositMovementFrame, xGid, xText, TCDepositFrameAdditionalData.Create(xIdDeposit, False), nil, nil, nil, False);
 end;
 
 procedure TCDepositInvestmentFrame.ActionPayExecute(Sender: TObject);
@@ -170,6 +171,19 @@ begin
       SendMessageToFrames(TCBaseFrameClass(ClassType), WM_DATAOBJECTDELETED, Integer(@xData.id), 0);
       SendMessageToFrames(TCMovementFrame, WM_DATAREFRESH, 0, 0);
       SendMessageToFrames(TCAccountsFrame, WM_DATAREFRESH, 0, 0);
+    end;
+  end;
+end;
+
+function TCDepositInvestmentFrame.CanAcceptSelectedObject: Boolean;
+begin
+  Result := inherited CanAcceptSelectedObject;
+  if Result and (AdditionalData <> Nil) then begin
+    if TCDepositFrameAdditionalData(AdditionalData).OnlyActive then begin
+      Result := TDepositInvestment(List.SelectedElement.Data).depositState = CDepositInvestmentActive;
+      if not Result then begin
+        ShowInfo(itWarning, 'Wybrana lokata nie jest aktywna. Operacje mo¿na dodawaæ tylko dla aktywnych lokat', '');
+      end;
     end;
   end;
 end;

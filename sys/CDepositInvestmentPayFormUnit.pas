@@ -244,7 +244,7 @@ end;
 
 procedure TCDepositInvestmentPayForm.CStaticDepositGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
-  AAccepted := TCFrameForm.ShowFrame(TCDepositInvestmentFrame, ADataGid, AText);
+  AAccepted := TCFrameForm.ShowFrame(TCDepositInvestmentFrame, ADataGid, AText, TCDepositFrameAdditionalData.Create(CEmptyDataGid, True));
 end;
 
 procedure TCDepositInvestmentPayForm.CStaticCategoryChanged(Sender: TObject);
@@ -445,7 +445,17 @@ begin
     regDateTime := CDateTime.Value;
     regOrder := 0;
     description := RichEditDesc.Text;
-    cash := CCurrEditCash.Value;
+    if ComboBoxType.ItemIndex = 0 then begin
+      cash := CCurrEditCash.Value;
+      interest := 0;
+    end else if ComboBoxType.ItemIndex = 1 then begin
+      cash := CCurrEditBeforeCap.Value;
+      interest := CCurrEditBeforeInt.Value;
+    end else if ComboBoxType.ItemIndex = 2 then begin
+      cash := 0;
+      interest := CCurrEditCash.Value;
+    end;
+    depositState := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False)).depositState;
     idDepositInvestment := CStaticDeposit.DataId;
     idAccount := CStaticAccount.DataId;
     idAccountCurrencyDef := CStaticAccountCurrency.DataId;

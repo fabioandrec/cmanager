@@ -12,8 +12,12 @@ type
   TCDepositFrameAdditionalData = class(TCDataobjectFrameData)
   private
     FDepositId: TDataGid;
+    FOnlyActive: Boolean;
   public
-    constructor Create(ADepositId: TDataGid);
+    constructor Create(ADepositId: TDataGid; AOnlyActive: Boolean);
+  published
+    property DepositId: TDataGid read FDepositId;
+    property OnlyActive: Boolean read FOnlyActive;
   end;
 
   TCDepositMovementFrame = class(TCDataobjectFrame)
@@ -36,6 +40,8 @@ type
     function GetSelectedType: Integer; override;
     procedure AfterDeleteObject(ADataobject: TDataObject); override;
     procedure DoAddingNewDataobject(ADataobject: TDataObject); override;
+  private
+    FCanAdd: Boolean;
   public
     class function GetTitle: String; override;
     function IsValidFilteredObject(AObject: TDataObject): Boolean; override;
@@ -151,6 +157,9 @@ begin
       end;
       xQuery.Free;
     end;
+    FCanAdd := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, TCDepositFrameAdditionalData(AAdditionalData).FDepositId, False)).depositState = CDepositInvestmentActive;
+  end else begin
+    FCanAdd := True;
   end;
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   Label5.Left := FilterPanel.Width - 8;
@@ -200,7 +209,7 @@ begin
       xCondition := xCondition + Format(' and idDepositInvestment = %s', [DataGidToDatabase(FDepositId)]);
     end;
   end;
-  Dataobjects := TDataObject.GetList(TDepositMovement, DepositMovementProxy, 'select * from StnDepositMovement where ' + xCondition + ' order by regDateTime, regOrder, created');
+  Dataobjects := TDataObject.GetList(TDepositMovement, DepositMovementProxy, 'select * from StnDepositMovement where ' + xCondition + ' order by regDateTime, created, regOrder');
 end;
 
 procedure TCDepositMovementFrame.ShowHistory(AGid: ShortString);
@@ -277,10 +286,11 @@ begin
   inherited AfterDeleteObject(ADataobject);
 end;
 
-constructor TCDepositFrameAdditionalData.Create(ADepositId: TDataGid);
+constructor TCDepositFrameAdditionalData.Create(ADepositId: TDataGid; AOnlyActive: Boolean);
 begin
   inherited CreateNew;
   FDepositId := ADepositId;
+  FOnlyActive := AOnlyActive;
 end;
 
 procedure TCDepositMovementFrame.DoAddingNewDataobject(ADataobject: TDataObject);
@@ -303,8 +313,21 @@ begin
   inherited UpdateButtons(AIsSelectedSomething);
   if AIsSelectedSomething then begin
     xMt := TDepositMovement(List.SelectedElement.Data).movementType;
-    ActionDelete.Enabled := AIsSelectedSomething and
-                          ((xMt = CDepositMovementAddCash) or (xMt = CDepositMovementGetInterest));
+    if (xMt = CDepositMovementAddCash) or (xMt = CDepositMovementGetInterest) then begin
+      ActionDelete.Enabled := True;
+      ActionEdit.Caption := 'Edytuj operacjê';
+    end else begin
+      ActionDelete.Enabled := (xMt = CDepositMovementClose);
+      ActionEdit.Caption := 'Poka¿ operacjê';
+    end;
+    CButtonEdit.Repaint;
+  end else begin
+    if FCanAdd then begin
+      ActionEdit.Caption := 'Edytuj operacjê';
+    end else begin
+      ActionEdit.Caption := 'Poka¿ operacjê';
+    end;
+    CButtonEdit.Repaint;
   end;
 end;
 

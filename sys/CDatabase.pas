@@ -933,12 +933,15 @@ var xDataset: TADOQuery;
 begin
   xDataset := ADataProxy.GetLoadObjectDataset(AId);
   Result := CreateObject(ADataProxy, AIsStatic);
-  if not xDataset.IsEmpty then begin
-    Result.FromDataset(xDataset);
-  end else begin
-    raise Exception.Create('Metoda LoadObject zwróci³a pusty zbiór danych');
+  try
+    if not xDataset.IsEmpty then begin
+      Result.FromDataset(xDataset);
+    end else begin
+      raise Exception.Create('Metoda LoadObject zwróci³a pusty zbiór danych');
+    end;
+  finally
+    xDataset.Free;
   end;
-  xDataset.Free;
 end;
 
 function TDataObject.OnDeleteObject(AProxy: TDataProxy): Boolean;
@@ -960,8 +963,11 @@ procedure TDataObject.ReloadObject;
 var xDataset: TADOQuery;
 begin
   xDataset := FDataProxy.GetLoadObjectDataset(id);
-  FromDataset(xDataset);
-  xDataset.Free;
+  try
+    FromDataset(xDataset);
+  finally
+    xDataset.Free;
+  end;
 end;
 
 procedure TDataObject.SetMode(AMode: TDataCreationMode);

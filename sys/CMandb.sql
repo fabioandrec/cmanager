@@ -535,6 +535,8 @@ create table depositMovement (
   regOrder int not null,
   description varchar(200),
   cash money not null,  
+  interest money not null,
+  depositState varchar(1) not null,
   idDepositInvestment uniqueidentifier not null,
   idAccount uniqueidentifier null,
   idAccountCurrencyDef uniqueidentifier null,
@@ -552,7 +554,8 @@ create table depositMovement (
   constraint fk_movementDepositProduct foreign key (idProduct) references product (idProduct),
   constraint fk_movementDepositAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_movementDepositRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),
-  constraint fk_movementDepositBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement)
+  constraint fk_movementDepositBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement),
+  constraint ck_movementDepositdepositState check (depositState in ('A', 'I', 'C'))
 );
 
 create view transactions as select * from (

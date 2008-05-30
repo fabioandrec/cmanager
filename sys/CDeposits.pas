@@ -13,12 +13,12 @@ type
     Fcash: Currency;
     Finterest: Currency;
     FnoncapitalizedInterest: Currency;
-    FcashInterest: Currency;
     FdueStart: TDateTime;
     FdueEnd: TDateTime;
     FperiodStart: TDateTime;
     FperiodEnd: TDateTime;
     FmovementType: TBaseEnumeration;
+    FdepositState: TBaseEnumeration;
     FregOrder: Integer;
   public
     constructor Create(AType: TBaseEnumeration);
@@ -29,13 +29,13 @@ type
     property cash: Currency read Fcash write Fcash;
     property interest: Currency read Finterest write Finterest;
     property noncapitalizedInterest: Currency read FnoncapitalizedInterest write FnoncapitalizedInterest;
-    property cashInterest: Currency read FcashInterest write FcashInterest;
     property dueStart: TDateTime read FdueStart write FdueStart;
     property dueEnd: TDateTime read FdueEnd write FdueEnd;
     property periodStart: TDateTime read FperiodStart write FperiodStart;
     property periodEnd: TDateTime read FperiodEnd write FperiodEnd;
     property movementType: TBaseEnumeration read FmovementType write FmovementType;
     property regOrder: Integer read FregOrder write FregOrder;
+    property depositState: TBaseEnumeration read FdepositState write FdepositState;
   end;
 
   TDeposit = class(TObjectList)
@@ -139,9 +139,11 @@ begin
         xMove.regDateTime := xProgItem.date;
         xMove.description := xProgItem.operation;
         if xProgItem.movementType = CDepositMovementDue then begin
-          xMove.cash := xProgItem.interest;
+          xMove.cash := 0;
+          xMove.interest := xProgItem.interest;
         end else begin
           xMove.cash := xProgItem.cash;
+          xMove.interest := 0;
         end;
         xMove.idDepositInvestment := ADi.id;
         xMove.idAccount := CEmptyDataGid;
@@ -153,6 +155,10 @@ begin
         xMove.currencyRate := 1;
         xMove.accountCash := xProgItem.cash;
         xMove.regOrder := xProgItem.regOrder;
+        xMove.depositState := xProgItem.depositState;
+        if xProgItem.movementType = CDepositMovementInactivate then begin
+          ADi.depositState := CDepositInvestmentInactive;
+        end;
       end;
     end;
     xMovements.Free;
@@ -224,6 +230,7 @@ begin
         xItem.dueEnd := FdueEndDate;
         xItem.periodStart := FperiodStartDate;
         xItem.periodEnd := FperiodEndDate;
+        xItem.depositState := FdepositState;
         if FdueAction = CDepositDueActionAutoCapitalisation then begin
           xItem.operation := 'Kapitalizacja naliczonych odsetek';
         end else begin
@@ -240,12 +247,12 @@ begin
         xItem.cash := Fcash;
         xItem.interest := xCalcInterest;
         if FdueAction = CDepositDueActionAutoCapitalisation then begin
-          xItem.cashInterest := Fcash + xCalcInterest;
+          xItem.interest := xCalcInterest;
           xItem.noncapitalizedInterest := 0;
           FnoncapitalizedInterest := 0;
           Fcash := Fcash + xCalcInterest;
         end else begin
-          xItem.cashInterest := Fcash;
+          xItem.interest := xCalcInterest;
           xItem.noncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
           FnoncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
         end;
@@ -262,6 +269,7 @@ begin
           xItem.periodEnd := FperiodEndDate;
           xItem.caption := IntToStr(Count + 1);
           xItem.regOrder := Count + 1;
+          xItem.depositState := FdepositState;
           if FdueAction = CDepositDueActionAutoCapitalisation then begin
             xItem.operation := 'Kapitalizacja naliczonych odsetek';
           end else begin
@@ -280,11 +288,9 @@ begin
           xItem.cash := Fcash;
           xItem.interest := xCalcInterest;
           if FdueAction = CDepositDueActionAutoCapitalisation then begin
-            xItem.cashInterest := Fcash + xCalcInterest;
             xItem.noncapitalizedInterest := 0;
             FnoncapitalizedInterest := 0;
           end else begin
-            xItem.cashInterest := Fcash;
             xItem.noncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
             FnoncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
           end;
@@ -298,9 +304,9 @@ begin
         xItem.periodEnd := FperiodEndDate;
         xItem.caption := IntToStr(Count + 1);
         xItem.cash := Fcash;
-        xItem.cashInterest := Fcash;
         xItem.interest := 0;
         xItem.noncapitalizedInterest := FnoncapitalizedInterest;
+        xItem.depositState := FdepositState;
         if FperiodAction = CDepositPeriodActionChangeInactive then begin
           xItem.operation := 'Koniec czasu trwania lokaty';
           FdepositState := CDepositInvestmentInactive;

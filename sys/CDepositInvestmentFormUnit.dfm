@@ -303,6 +303,14 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Alignment = taRightJustify
         Caption = 'Kategoria'
       end
+      object Label16: TLabel
+        Left = 332
+        Top = 100
+        Width = 68
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Wolne odsetki'
+      end
       object CStaticCashpoint: TCStatic
         Left = 128
         Top = 24
@@ -369,7 +377,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 4
+        TabOrder = 5
         Text = '1'
         OnChange = CIntEditPeriodCountChange
       end
@@ -383,7 +391,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 5
+        TabOrder = 6
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxPeriodTypeChange
         Items.Strings = (
@@ -402,7 +410,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 6
+        TabOrder = 7
         Text = 'zmie'#324' status na nieaktywna'
         Items.Strings = (
           'zmie'#324' status na nieaktywna'
@@ -418,7 +426,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 7
+        TabOrder = 8
         Text = 'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
         OnChange = ComboBoxDueModeChange
         Items.Strings = (
@@ -433,7 +441,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 8
+        TabOrder = 9
         Text = '1'
         OnChange = CIntEditDueCountChange
       end
@@ -447,7 +455,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 9
+        TabOrder = 10
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxDueTypeChange
         Items.Strings = (
@@ -466,7 +474,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 10
+        TabOrder = 11
         Text = 'dopisz odsetki do kapita'#322'u'
         Items.Strings = (
           'dopisz odsetki do kapita'#322'u'
@@ -500,7 +508,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 11
+        TabOrder = 12
         TabStop = True
         Transparent = False
         TextOnEmpty = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
@@ -521,7 +529,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 12
+        TabOrder = 13
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto z listy>'
@@ -543,7 +551,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 13
+        TabOrder = 14
         TabStop = True
         Transparent = False
         TextOnEmpty = '<brak konta>'
@@ -563,7 +571,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 14
+        TabOrder = 15
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz przelicznik kursu z listy>'
@@ -578,7 +586,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Height = 21
         BorderStyle = bsNone
         Enabled = False
-        TabOrder = 15
+        TabOrder = 16
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
@@ -599,13 +607,27 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 16
+        TabOrder = 17
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
         OnGetDataId = CStaticCategoryGetDataId
         OnChanged = CStaticCategoryChanged
         HotTrack = True
+      end
+      object CCurrEditNoncapitalized: TCCurrEdit
+        Left = 408
+        Top = 96
+        Width = 161
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 4
+        OnChange = CCurrEditActualCashChange
+        Decimals = 2
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
   end

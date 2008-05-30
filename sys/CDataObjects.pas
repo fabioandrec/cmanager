@@ -1081,6 +1081,8 @@ type
     FregOrder: Integer;
     Fdescription: TBaseDescription;
     Fcash: Currency;
+    Finterest: Currency;
+    FdepositState: TBaseEnumeration;
     FidDepositInvestment: TDataGid;
     FidAccount: TDataGid;
     FidAccountCurrencyDef: TDataGid;
@@ -1107,6 +1109,8 @@ type
     procedure SetrateDescription(const Value: TBaseDescription);
     procedure SetidBaseMovement(const Value: TDataGid);
     procedure SetregOrder(const Value: Integer);
+    procedure SetdepositState(const Value: TBaseEnumeration);
+    procedure Setinterest(const Value: Currency);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
@@ -1114,6 +1118,7 @@ type
     procedure FromDataset(ADataset: TADOQuery); override;
     procedure UpdateFieldList; override;
     function GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String; override;
+    function GetElementText: String; override;
   published
     property movementType: TBaseEnumeration read FmovementType write SetmovementType;
     property regDateTime: TDateTime read FregDateTime write SetregDateTime;
@@ -1131,6 +1136,8 @@ type
     property idProduct: TDataGid read FidProduct write SetidProduct;
     property idBaseMovement: TDataGid read FidBaseMovement write SetidBaseMovement;
     property idCurrencyDef: TDataGid read FidCurrencyDef;
+    property interest: Currency read Finterest write Setinterest;
+    property depositState: TBaseEnumeration read FdepositState write SetdepositState;
   end;
 
 var CashPointProxy: TDataProxy;
@@ -5329,6 +5336,8 @@ begin
     FregOrder := FieldByName('regOrder').AsInteger;
     Fdescription := FieldByName('description').AsString;
     Fcash := FieldByName('cash').AsCurrency;
+    Finterest := FieldByName('interest').AsCurrency;
+    FdepositState := FieldByName('depositState').AsString;
     FidDepositInvestment := FieldByName('idDepositInvestment').AsString;
     FidAccount := FieldByName('idAccount').AsString;
     FidAccountCurrencyDef := FieldByName('idAccountCurrencyDef').AsString;
@@ -5351,7 +5360,7 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := GetDescText(Fdescription);
   end else if AColumnIndex = 3 then begin
-    Result := CurrencyToString(Fcash, FidCurrencyDef);
+    Result := CurrencyToString(Fcash + Finterest, FidCurrencyDef);
   end else if AColumnIndex = 4 then begin
     if FmovementType = CDepositMovementCreate then begin
       Result := 'Za³o¿enie lokaty';
@@ -5373,13 +5382,22 @@ begin
   end;
 end;
 
+function TDepositMovement.GetElementText: String;
+begin
+  Result := Fdescription;
+end;
+
 function TDepositMovement.OnDeleteObject(AProxy: TDataProxy): Boolean;
 begin
   Result := inherited OnDeleteObject(AProxy);
   if (movementType = CDepositMovementAddCash) then begin
     AProxy.DataProvider.ExecuteSql('update depositInvestment set cash = cash - ' + CurrencyToDatabase(cash) + ' where idDepositInvestment = ' + DataGidToDatabase(idDepositInvestment));
-  end else if (movementType = CDepositMovementgetInterest) then begin
-    AProxy.DataProvider.ExecuteSql('update depositInvestment set noncapitalizedInterest = noncapitalizedInterest + ' + CurrencyToDatabase(cash) + ' where idDepositInvestment = ' + DataGidToDatabase(idDepositInvestment));
+  end else if (movementType = CDepositMovementGetInterest) then begin
+    AProxy.DataProvider.ExecuteSql('update depositInvestment set noncapitalizedInterest = noncapitalizedInterest + ' + CurrencyToDatabase(interest) + ' where idDepositInvestment = ' + DataGidToDatabase(idDepositInvestment));
+  end else if (movementType = CDepositMovementClose) then begin
+    AProxy.DataProvider.ExecuteSql('update depositInvestment set noncapitalizedInterest = ' + CurrencyToDatabase(interest) + ', ' +
+                                   'cash = ' + CurrencyToDatabase(cash) + ', depositState = ''' + FdepositState + '''' +
+                                   ' where idDepositInvestment = ' + DataGidToDatabase(idDepositInvestment));
   end;
 end;
 
@@ -5411,6 +5429,14 @@ procedure TDepositMovement.SetcurrencyRate(const Value: Currency);
 begin
   if FcurrencyRate <> Value then begin
     FcurrencyRate := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositMovement.SetdepositState(const Value: TBaseEnumeration);
+begin
+  if FdepositState <> Value then begin
+    FdepositState := Value;
     SetState(msModified);
   end;
 end;
@@ -5471,6 +5497,14 @@ begin
   end;
 end;
 
+procedure TDepositMovement.Setinterest(const Value: Currency);
+begin
+  if Finterest <> Value then begin
+    Finterest := Value;
+    SetState(msModified);
+  end;
+end;
+
 procedure TDepositMovement.SetmovementType(const Value: TBaseEnumeration);
 begin
   if FmovementType <> Value then begin
@@ -5512,6 +5546,8 @@ begin
     AddField('regOrder', IntToStr(FregOrder), False, 'depositMovement');
     AddField('description', Fdescription, True, 'depositMovement');
     AddField('cash', CurrencyToDatabase(Fcash), False, 'depositMovement');
+    AddField('interest', CurrencyToDatabase(Finterest), False, 'depositMovement');
+    AddField('depositState', FdepositState, True, 'depositMovement');
     AddField('idDepositInvestment', DataGidToDatabase(FidDepositInvestment), False, 'depositMovement');
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'depositMovement');
     AddField('idAccountCurrencyDef', DataGidToDatabase(FidAccountCurrencyDef), False, 'depositMovement');

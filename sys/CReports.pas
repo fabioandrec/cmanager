@@ -5440,7 +5440,7 @@ begin
         Add('<td class="text" width="35%">' + xD.Items[xCount].operation + '</td>');
         Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].cash, '', False) + '</td>');
         Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].interest, '', False) + '</td>');
-        Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].cashInterest, '', False) + '</td>');
+        Add('<td class="cash" width="10%">' + CurrencyToString(xD.Items[xCount].cash + xD.Items[xCount].interest, '', False) + '</td>');
         Add('<td class="cash" width="15%">' + CurrencyToString(xD.Items[xCount].noncapitalizedInterest, '', False) + '</td>');
         Add('</tr>');
       end;

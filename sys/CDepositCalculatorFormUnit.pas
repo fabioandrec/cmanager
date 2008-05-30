@@ -192,7 +192,7 @@ begin
     end;
   end else if Column = 5 then begin
     if xObj.movementType = CDepositMovementDue then begin
-      CellText := CurrencyToString(xObj.cashInterest, '', False);
+      CellText := CurrencyToString(xObj.cash + xObj.interest, '', False);
     end else begin
       CellText := '';
     end;

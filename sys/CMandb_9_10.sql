@@ -38,7 +38,9 @@ create table depositMovement (
   regDateTime datetime not null,
   regOrder int not null,
   description varchar(200),
-  cash money not null,
+  cash money not null,  
+  interest money not null,
+  depositState varchar(1) not null,
   idDepositInvestment uniqueidentifier not null,
   idAccount uniqueidentifier null,
   idAccountCurrencyDef uniqueidentifier null,
@@ -50,13 +52,14 @@ create table depositMovement (
   idProduct uniqueidentifier null,
   idBaseMovement uniqueidentifier null,
   primary key (idDepositMovement),
-  constraint ck_movementDepositMovementType check (movementType in ('C', 'S', 'I', 'R', 'D', 'A', 'K', 'G')),  
+  constraint ck_movementDepositMovementType check (movementType in ('C', 'S', 'I', 'R', 'D', 'A', 'K', 'G')),
   constraint fk_movementDepositInvestment foreign key (idDepositInvestment) references depositInvestment (idDepositInvestment),
   constraint fk_movementDepositAccount foreign key (idAccount) references account (idAccount),
   constraint fk_movementDepositProduct foreign key (idProduct) references product (idProduct),
   constraint fk_movementDepositAccountCurrency foreign key (idAccountCurrencyDef) references currencyDef (idCurrencyDef),
   constraint fk_movementDepositRate foreign key (idCurrencyRate) references currencyRate (idCurrencyRate),
-  constraint fk_movementDepositBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement)
+  constraint fk_movementDepositBaseMovement foreign key (idBaseMovement) references baseMovement (idBaseMovement),
+  constraint ck_movementDepositdepositState check (depositState in ('A', 'I', 'C'))
 );
 
 insert into cmanagerParams (paramName, paramValue) values ('DepositInvestment', '@operacja@ - @nazwa@');
