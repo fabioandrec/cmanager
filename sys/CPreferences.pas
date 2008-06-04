@@ -143,6 +143,7 @@ type
     FstartupInfoTran: Boolean;
     FstartupInfoOldTran: Boolean;
     FstartupInfoAlways: Boolean;
+    FstartupInfoOldDays: Integer;
     FstartupCheckUpdates: Boolean;
     FstartupInfoSurpassedLimit: Boolean;
     FstartupInfoValidLimits: Boolean;
@@ -193,6 +194,7 @@ type
     property startupInfoSurpassedLimit: Boolean read FstartupInfoSurpassedLimit write FstartupInfoSurpassedLimit;
     property startupInfoValidLimits: Boolean read FstartupInfoValidLimits write FstartupInfoValidLimits;
     property startupUncheckedExtractions: Boolean read FstartupUncheckedExtractions write FstartupUncheckedExtractions;
+    property startupInfoOldDays: Integer read FstartupInfoOldDays write FstartupInfoOldDays;
     property workDays: String read FworkDays write FworkDays;
     property backupOnStart: Boolean read FbackupOnStart write FbackupOnStart;
     property backupAction: Integer read FbackupAction write FbackupAction;
@@ -291,6 +293,7 @@ begin
   FstartupUncheckedExtractions := TBasePref(APrefItem).startupUncheckedExtractions;
   FevenListColor := TBasePref(APrefItem).evenListColor;
   FoddListColor := TBasePref(APrefItem).oddListColor;
+  FstartupInfoOldDays := TBasePref(APrefItem).startupInfoOldDays;
 end;
 
 function TBasePref.ExpandTemplate(ATemplate: String): String;
@@ -371,6 +374,7 @@ begin
   FstartupCheckUpdates := GetXmlAttribute('startupCheckUpdates', ANode, False);
   FstartupInfoSurpassedLimit := GetXmlAttribute('startupInfoSurpassedLimit', ANode, False);
   FstartupInfoValidLimits := GetXmlAttribute('startupInfoValidLimits', ANode, False);
+  FstartupInfoOldDays := GetXmlAttribute('startupInfoOldDays', ANode, 90);
   FworkDays := GetXmlAttribute('workDays', ANode, '+++++--');
   if Length(FworkDays) <> 7 then begin
     FworkDays := '+++++--';
@@ -430,6 +434,7 @@ begin
   SetXmlAttribute('startupUncheckedExtractions', ANode, FstartupUncheckedExtractions);
   SetXmlAttribute('evenListColor', ANode, ColorToString(FevenListColor));
   SetXmlAttribute('oddListColor', ANode, ColorToString(FoddListColor));
+  SetXmlAttribute('startupInfoOldDays', ANode, FstartupInfoOldDays);
 end;
 
 constructor TDescPatterns.Create(ASaveToDatabase: Boolean);

@@ -259,7 +259,7 @@ begin
   xBs.Add(xTm);
   xTm.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Wykres przychodów' , TOperationsByCategoryChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CChartReportImage), True));
   xTm.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Lista przychodów' , TOperationsByCategoryList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kategorie', CHtmlReportImage), True));
-  xTm.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Drzewo rozchodów' , TOperationsTreeCategoryList, TCSelectedMovementTypeParams.Create(COutMovement), 'Pokazuje sumy operacji rozchodowych w drzewie kategorii', CHtmlReportImage), True));
+  xTm.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Drzewo przychodów' , TOperationsTreeCategoryList, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje sumy operacji przychodowych w drzewie kategorii', CHtmlReportImage), True));
   xTm := TCListDataElement.Create(False, List, TReportListElement.CreateGroup('w/g kontrahentów', '', CNoImage), True);
   xBs.Add(xTm);
   xTm.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Wykres przychodów' , TOperationsByCashpointChart, TCSelectedMovementTypeParams.Create(CInMovement), 'Pokazuje operacje przychodowe w rozbiciu na kontrahentów', CChartReportImage), True));

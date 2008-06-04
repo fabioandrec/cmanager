@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 478
           Height = 422
-          ActivePage = TabSheetAutostart
+          ActivePage = TabSheetOperations
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -96,11 +96,14 @@ inherited CPreferencesForm: TCPreferencesForm
                 Top = 54
                 Width = 241
                 Height = 21
+                Hint = '<kliknij tutaj aby wybra'#263' plik danych>'
                 AutoSize = False
                 BevelKind = bkTile
                 Caption = '<kliknij tutaj aby wybra'#263' plik danych>'
                 Color = clWindow
                 ParentColor = False
+                ParentShowHint = False
+                ShowHint = True
                 TabOrder = 3
                 TabStop = True
                 Transparent = False
@@ -256,11 +259,14 @@ inherited CPreferencesForm: TCPreferencesForm
                 Top = 64
                 Width = 353
                 Height = 21
+                Hint = '<kliknij tutaj aby wybra'#263' katalog kopii>'
                 AutoSize = False
                 BevelKind = bkTile
                 Caption = '<kliknij tutaj aby wybra'#263' katalog kopii>'
                 Color = clWindow
                 ParentColor = False
+                ParentShowHint = False
+                ShowHint = True
                 TabOrder = 1
                 TabStop = True
                 Transparent = False
@@ -558,7 +564,7 @@ inherited CPreferencesForm: TCPreferencesForm
             end
             object GroupBox9: TGroupBox
               Left = 8
-              Top = 280
+              Top = 312
               Width = 449
               Height = 89
               Caption = ' Przy starcie systemu '
@@ -585,9 +591,24 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 120
               Width = 449
-              Height = 65
+              Height = 97
               Caption = ' Zaleg'#322'e operacje '
               TabOrder = 1
+              object Label3: TLabel
+                Left = 17
+                Top = 60
+                Width = 135
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Sprawdzaj w ci'#261'gu ostatnich'
+              end
+              object Label14: TLabel
+                Left = 204
+                Top = 60
+                Width = 14
+                Height = 13
+                Caption = 'dni'
+              end
               object CheckBoxAutoOldIn: TCheckBox
                 Left = 18
                 Top = 26
@@ -612,10 +633,20 @@ inherited CPreferencesForm: TCPreferencesForm
                 Caption = 'Transfery'
                 TabOrder = 2
               end
+              object CIntEditOldDays: TCIntEdit
+                Left = 160
+                Top = 56
+                Width = 33
+                Height = 21
+                BevelKind = bkTile
+                BorderStyle = bsNone
+                TabOrder = 3
+                Text = '0'
+              end
             end
             object GroupBox11: TGroupBox
               Left = 8
-              Top = 200
+              Top = 232
               Width = 449
               Height = 65
               Caption = ' Inne '
@@ -748,12 +779,12 @@ inherited CPreferencesForm: TCPreferencesForm
               Left = 8
               Top = 8
               Width = 449
-              Height = 241
+              Height = 273
               Caption = ' Domy'#347'lnie przyjmowane warto'#347'ci '
               TabOrder = 0
               object Label8: TLabel
                 Left = 36
-                Top = 41
+                Top = 73
                 Width = 76
                 Height = 13
                 Alignment = taRightJustify
@@ -761,7 +792,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object Label9: TLabel
                 Left = 19
-                Top = 77
+                Top = 109
                 Width = 93
                 Height = 13
                 Alignment = taRightJustify
@@ -769,7 +800,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object Label10: TLabel
                 Left = 13
-                Top = 113
+                Top = 145
                 Width = 99
                 Height = 13
                 Alignment = taRightJustify
@@ -777,7 +808,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object Label11: TLabel
                 Left = 42
-                Top = 149
+                Top = 181
                 Width = 70
                 Height = 13
                 Alignment = taRightJustify
@@ -785,7 +816,7 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object Label12: TLabel
                 Left = 16
-                Top = 192
+                Top = 224
                 Width = 425
                 Height = 41
                 AutoSize = False
@@ -795,18 +826,29 @@ inherited CPreferencesForm: TCPreferencesForm
                   #347'ci domy'#347'lne dla poszczeg'#243'lnych p'#243'l'
                 WordWrap = True
               end
+              object Label15: TLabel
+                Left = 32
+                Top = 37
+                Width = 80
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Domy'#347'lna waluta'
+              end
               object CStaticAccount: TCStatic
                 Left = 120
-                Top = 37
+                Top = 69
                 Width = 305
                 Height = 21
                 Cursor = crHandPoint
+                Hint = '<wybierz konto z listy>'
                 AutoSize = False
                 BevelKind = bkTile
                 Caption = '<wybierz konto z listy>'
                 Color = clWindow
                 ParentColor = False
-                TabOrder = 0
+                ParentShowHint = False
+                ShowHint = True
+                TabOrder = 1
                 TabStop = True
                 Transparent = False
                 TextOnEmpty = '<wybierz konto z listy>'
@@ -815,16 +857,19 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CStaticCategory: TCStatic
                 Left = 120
-                Top = 73
+                Top = 105
                 Width = 305
                 Height = 21
                 Cursor = crHandPoint
+                Hint = '<wybierz kategori'#281' z listy>'
                 AutoSize = False
                 BevelKind = bkTile
                 Caption = '<wybierz kategori'#281' z listy>'
                 Color = clWindow
                 ParentColor = False
-                TabOrder = 1
+                ParentShowHint = False
+                ShowHint = True
+                TabOrder = 2
                 TabStop = True
                 Transparent = False
                 TextOnEmpty = '<wybierz kategori'#281' z listy>'
@@ -833,16 +878,19 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CStaticCashpoint: TCStatic
                 Left = 120
-                Top = 109
+                Top = 141
                 Width = 305
                 Height = 21
                 Cursor = crHandPoint
+                Hint = '<wybierz kontrahenta z listy>'
                 AutoSize = False
                 BevelKind = bkTile
                 Caption = '<wybierz kontrahenta z listy>'
                 Color = clWindow
                 ParentColor = False
-                TabOrder = 2
+                ParentShowHint = False
+                ShowHint = True
+                TabOrder = 3
                 TabStop = True
                 Transparent = False
                 TextOnEmpty = '<wybierz kontrahenta z listy>'
@@ -851,20 +899,44 @@ inherited CPreferencesForm: TCPreferencesForm
               end
               object CStaticProfile: TCStatic
                 Left = 120
-                Top = 145
+                Top = 177
                 Width = 305
                 Height = 21
                 Cursor = crHandPoint
+                Hint = '<wybierz profil z listy>'
                 AutoSize = False
                 BevelKind = bkTile
                 Caption = '<wybierz profil z listy>'
                 Color = clWindow
                 ParentColor = False
-                TabOrder = 3
+                ParentShowHint = False
+                ShowHint = True
+                TabOrder = 4
                 TabStop = True
                 Transparent = False
                 TextOnEmpty = '<wybierz profil z listy>'
                 OnGetDataId = CStaticProfileGetDataId
+                HotTrack = True
+              end
+              object CStaticDefaultCurrency: TCStatic
+                Left = 120
+                Top = 33
+                Width = 305
+                Height = 21
+                Cursor = crHandPoint
+                Hint = '<wybierz walut'#281' z listy>'
+                AutoSize = False
+                BevelKind = bkTile
+                Caption = '<wybierz walut'#281' z listy>'
+                Color = clWindow
+                ParentColor = False
+                ParentShowHint = False
+                ShowHint = True
+                TabOrder = 0
+                TabStop = True
+                Transparent = False
+                TextOnEmpty = '<wybierz walut'#281' z listy>'
+                OnGetDataId = CStaticDefaultCurrencyGetDataId
                 HotTrack = True
               end
             end

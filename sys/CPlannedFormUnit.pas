@@ -114,9 +114,9 @@ procedure TCPlannedForm.InitializeForm;
 begin
   FSchedule := TSchedule.Create;
   if Operation = coAdd then begin
-    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
-    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
-    CCurrEdit.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+    CStaticCurrency.DataId := GDefaultCurrencyId;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
+    CCurrEdit.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
     CStaticCategoryChanged(Nil);
   end;
   ComboBoxTypeChange(ComboBoxType);

@@ -49,6 +49,7 @@ inherited CXmlFrame: TCXmlFrame
         TreeOptions.MiscOptions = [toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect]
+        OnFocusChanged = ListFocusChanged
         AutoExpand = False
         OnGetRowPreferencesName = ListGetRowPreferencesName
         OnCDataListReloadTree = ListCDataListReloadTree

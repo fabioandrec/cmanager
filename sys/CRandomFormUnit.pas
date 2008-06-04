@@ -95,7 +95,6 @@ begin
       description := name;
       symbol := 'W' + IntToStr(xStartIndex + xCount);
       iso := symbol;
-      isBase := False;
       StepWaitForm(1);
     end;
   end;

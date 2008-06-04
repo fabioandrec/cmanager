@@ -80,11 +80,14 @@ inherited CExtractionForm: TCExtractionForm
         Width = 225
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz konto z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz konto z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
         TabStop = True
         Transparent = False

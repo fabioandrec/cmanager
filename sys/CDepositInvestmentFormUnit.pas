@@ -148,9 +148,9 @@ begin
   FDeposit := TDeposit.Create;
   FRateHelper := nil;
   CDateTime.Value := Now;
-  CStaticCurrency.DataId := CCurrencyDefGid_PLN;
-  CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
-  CCurrEditActualCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+  CStaticCurrency.DataId := GDefaultCurrencyId;
+  CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
+  CCurrEditActualCash.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
   LabelState.Visible := False;
   Label16.Visible := Operation = coEdit;
   CCurrEditNoncapitalized.Visible := Operation = coEdit;

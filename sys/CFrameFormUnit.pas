@@ -17,6 +17,8 @@ type
     PanelFrame: TPanel;
     BevelBottom: TBevel;
     Bevel1: TBevel;
+    LabelTopPanelInfo: TLabel;
+    LabelBottomPanelInfo: TLabel;
   private
     FFrame: TCBaseFrame;
     FAdditionalData: TObject;

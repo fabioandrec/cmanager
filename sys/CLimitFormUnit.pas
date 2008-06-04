@@ -62,9 +62,9 @@ procedure TCLimitForm.InitializeForm;
 begin
   inherited InitializeForm;
   if Operation = coAdd then begin
-    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
-    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
-    CCurrEditBound.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+    CStaticCurrency.DataId := GDefaultCurrencyId;
+    CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
+    CCurrEditBound.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
   end;
   ComboBoxDaysChange(ComboBoxDays);
 end;

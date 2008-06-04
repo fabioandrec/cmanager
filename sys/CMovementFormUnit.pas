@@ -279,14 +279,14 @@ begin
   FbaseList := CEmptyDataGid;
   FsourceAccount := CEmptyDataGid;
   if Operation = coAdd then begin
-    CStaticInOutOnceMovementCurrency.DataId := CCurrencyDefGid_PLN;
-    CStaticInOutOnceMovementCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
-    CCurrEditInoutOnceMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+    CStaticInOutOnceMovementCurrency.DataId := GDefaultCurrencyId;
+    CStaticInOutOnceMovementCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
+    CCurrEditInoutOnceMovement.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
     CCurrEditInOutOnceAccount.SetCurrencyDef(CEmptyDataGid, '');
-    CStaticInOutCyclicMovementCurrency.DataId := CCurrencyDefGid_PLN;
-    CStaticInOutCyclicMovementCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
+    CStaticInOutCyclicMovementCurrency.DataId := GDefaultCurrencyId;
+    CStaticInOutCyclicMovementCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
     CCurrEditInOutCyclicAccount.SetCurrencyDef(CEmptyDataGid, '');
-    CCurrEditInoutCyclicMovement.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+    CCurrEditInoutCyclicMovement.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
     CCurrEditOnceTransMovement.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditOnceTransAccount.SetCurrencyDef(CEmptyDataGid, '');
     CCurrEditCyclicTransMovement.SetCurrencyDef(CEmptyDataGid, '');

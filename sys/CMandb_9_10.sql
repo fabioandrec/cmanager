@@ -92,3 +92,6 @@ insert into cmanagerParams (paramName, paramValue) values ('BaseMovementPlannedT
 
 alter table plannedDone add dueDate datetime not null;
 update plannedDone set dueDate = triggerDate;
+
+insert into cmanagerParams (paramName, paramValue) values ('GDefaultCurrencyId', '{00000000-0000-0000-0000-000000000001}');
+alter table currencyDef drop column isBase;

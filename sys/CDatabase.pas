@@ -1235,6 +1235,7 @@ begin
     GDefaultProductId := GetCmanagerParam('GDefaultProductId', CEmptyDataGid);
     GDefaultAccountId := GetCmanagerParam('GDefaultAccountId', CEmptyDataGid);
     GDefaultCashpointId := GetCmanagerParam('GDefaultCashpointId', CEmptyDataGid);
+    GDefaultCurrencyId := GetCmanagerParam('GDefaultCurrencyId', CEmptyDataGid);
   end;
 end;
 

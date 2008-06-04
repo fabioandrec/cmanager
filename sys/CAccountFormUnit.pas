@@ -187,9 +187,9 @@ begin
   inherited InitializeForm;
   Frules := TStringList.Create;
   if Operation = coAdd then begin
-    CStaticCurrency.DataId := CCurrencyDefGid_PLN;
+    CStaticCurrency.DataId := GDefaultCurrencyId;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CStaticCurrency.DataId, False)).GetElementText;
-    CCurrEditCash.SetCurrencyDef(CCurrencyDefGid_PLN, GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN));
+    CCurrEditCash.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
   end;
 end;
 

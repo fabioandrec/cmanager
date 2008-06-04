@@ -117,6 +117,7 @@ function ChangeColorsToRgb(AString: String): String;
 function ColorToHtmlColor(AColor: TColor): String;
 procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
 function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
+function CalculateSubstrings(AText: String; ASubstring: String): Integer;
 
 implementation
 
@@ -1184,6 +1185,13 @@ begin
     Result := IncDay(Result, Sign(Result) * DaysInMonth(Result));
     Inc(xCount);
   end;
+end;
+
+function CalculateSubstrings(AText: String; ASubstring: String): Integer;
+var xText: String;
+begin
+  xText := StringReplace(AText, ASubstring, '', [rfReplaceAll, rfIgnoreCase]);
+  Result := (Length(AText) - Length(xText)) div Length(ASubstring);
 end;
 
 end.

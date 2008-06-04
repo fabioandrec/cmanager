@@ -11,9 +11,11 @@ type
   TXmlAdditionalData = class(TObject)
   private
     FXml: ICXMLDOMDocument;
+    FCaption: String;
   public
-    constructor Create(AXml: ICXMLDOMDocument);
+    constructor Create(AXml: ICXMLDOMDocument; ACaption: String);
     property Xml: ICXMLDOMDocument read FXml write FXml;
+    property Caption: String read FCaption write FCaption;
   end;
 
   TXmlListElement = class(TCDataListElementObject)
@@ -28,6 +30,7 @@ type
     function GetElementId: String; override;
     function GetElementHint(AColumnIndex: Integer): String; override;
     property isElement: Boolean read FisElement;
+    function GetElementText: String; override;
   end;
 
   TCXmlFrame = class(TCBaseFrame)
@@ -36,7 +39,11 @@ type
     List: TCDataList;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
+    procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
+  protected
+    function GetSelectedId: ShortString; override;
+    function GetSelectedText: String; override;
   public
     procedure InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean); override;
     class function GetTitle: String; override;
@@ -45,9 +52,10 @@ type
     function GetCheckType(ANode: PVirtualNode): TCheckType; override;
     class function GetPrefname: String; override;
     procedure UpdateFrameForm(AFormInstance: TCBaseForm); override;
+    function CanAcceptSelectedObject: Boolean; override;
   end;
 
-function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList): Boolean;
+function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList; ACaption: String; var ADataId: String; var AText: String): Boolean;
 
 implementation
 
@@ -55,14 +63,13 @@ uses CFrameFormUnit, CConsts, CXmlTlb, StrUtils;
 
 {$R *.dfm}
 
-function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList): Boolean;
-var xDataId, xText: String;
-    xAdditional: TXmlAdditionalData;
+function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList; ACaption: String; var ADataId: String; var AText: String): Boolean;
+var xAdditional: TXmlAdditionalData;
     xRect: TRect;
 begin
-  xAdditional := TXmlAdditionalData.Create(AXml);
+  xAdditional := TXmlAdditionalData.Create(AXml, ACaption);
   xRect := Rect(0, 0, 500, 400);
-  Result := TCFrameForm.ShowFrame(TCXmlFrame, xDataId, xText, xAdditional, @xRect, Nil, AChecks, True, Nil, True, True);
+  Result := TCFrameForm.ShowFrame(TCXmlFrame, ADataId, AText, xAdditional, @xRect, Nil, AChecks, True, Nil, True, True);
 end;
 
 constructor TXmlListElement.Create(ANode: ICXMLDOMNode);
@@ -105,7 +112,7 @@ end;
 
 class function TCXmlFrame.GetTitle: String;
 begin
-  Result := 'Domyœlne dane pliku'
+  Result := 'Konfiguracja pliku danych'
 end;
 
 procedure TCXmlFrame.InitializeFrame(AOwner: TComponent; AAdditionalData: TObject; AOutputData: Pointer; AMultipleCheck: TStringList; AWithButtons: Boolean);
@@ -145,10 +152,11 @@ begin
   Result := Fid;
 end;
 
-constructor TXmlAdditionalData.Create(AXml: ICXMLDOMDocument);
+constructor TXmlAdditionalData.Create(AXml: ICXMLDOMDocument; ACaption: String);
 begin
   inherited Create;
   FXml := AXml;
+  FCaption := ACaption;
 end;
 
 procedure TCXmlFrame.ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
@@ -160,9 +168,35 @@ procedure TCXmlFrame.UpdateFrameForm(AFormInstance: TCBaseForm);
 begin
   inherited UpdateFrameForm(AFormInstance);
   with TCFrameForm(AFormInstance) do begin
-    PanelTopInfo.Caption := '  Zaznacz tylko te dane domyœlne, które powinny byæ zapamiêtane w nowym pliku danych';
+    PanelTopInfo.Height := PanelTopInfo.Height + LabelTopPanelInfo.Height * CalculateSubstrings(TXmlAdditionalData(AdditionalData).Caption, sLineBreak);
+    LabelTopPanelInfo.Caption := TXmlAdditionalData(AdditionalData).Caption;
     PanelTopInfo.Visible := True;
   end;
+end;
+
+procedure TCXmlFrame.ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+begin
+  UpdateButtons(Node <> Nil);
+end;
+
+function TXmlListElement.GetElementText: String;
+begin
+  Result := Fdescription; 
+end;
+
+function TCXmlFrame.CanAcceptSelectedObject: Boolean;
+begin
+  Result := True;
+end;
+
+function TCXmlFrame.GetSelectedId: ShortString;
+begin
+  Result := List.SelectedId;
+end;
+
+function TCXmlFrame.GetSelectedText: String;
+begin
+  Result := List.SelectedText;
 end;
 
 end.

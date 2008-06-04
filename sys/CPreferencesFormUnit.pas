@@ -122,6 +122,11 @@ type
     CheckBoxSurpassed: TCheckBox;
     CheckBoxValid: TCheckBox;
     CheckBoxExtractions: TCheckBox;
+    Label3: TLabel;
+    CIntEditOldDays: TCIntEdit;
+    Label14: TLabel;
+    Label15: TLabel;
+    CStaticDefaultCurrency: TCStatic;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -153,6 +158,7 @@ type
     procedure ShortcutListGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: Integer);
     procedure ShortcutListClick(Sender: TObject);
     procedure Ustawienialisty1Click(Sender: TObject);
+    procedure CStaticDefaultCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
     FPrevWorkDays: String;
     FActiveAction: TAction;
@@ -182,7 +188,7 @@ uses CListPreferencesFormUnit, StrUtils, FileCtrl, CConsts,
   CTemplates, CDescpatternFormUnit, CPlugins, CExtractionItemFormUnit,
   CExtractionsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
   CProductsFrameUnit, CCashpointsFrameUnit, CProfileFrameUnit, CDatabase,
-  CDataObjects, CTools, Math, CImageListsUnit;
+  CDataObjects, CTools, Math, CImageListsUnit, CCurrencydefFrameUnit;
 
 {$R *.dfm}
 
@@ -308,6 +314,7 @@ begin
     CheckBoxFri.Checked := workDays[5] = '+';
     CheckBoxSat.Checked := workDays[6] = '+';
     CheckBoxSun.Checked := workDays[7] = '+';
+    CIntEditOldDays.Value := startupInfoOldDays;
     FPrevWorkDays := workDays;
     ComboBoxBackupAction.ItemIndex := backupAction;
     ComboBoxWhen.ItemIndex := IfThen(backupOnStart, 0, 1);
@@ -336,6 +343,10 @@ begin
   if GDefaultProfileId <> CEmptyDataGid then begin
     CStaticProfile.DataId := GDefaultProfileId;
     CStaticProfile.Caption := TProfile(TProfile.LoadObject(ProfileProxy, GDefaultProfileId, False)).name;
+  end;
+  if GDefaultCurrencyId <> CEmptyDataGid then begin
+    CStaticDefaultCurrency.DataId := GDefaultCurrencyId;
+    CStaticDefaultCurrency.Caption := GCurrencyCache.GetIso(GDefaultCurrencyId);
   end;
   GDataProvider.RollbackTransaction;
   CheckBoxAutostartOperationsClick(Nil);
@@ -392,6 +403,7 @@ begin
     startupCheckUpdates := CheckBoxCheckForupdates.Checked;
     startupInfoSurpassedLimit := CheckBoxSurpassed.Checked;
     startupInfoValidLimits := CheckBoxValid.Checked;
+    startupInfoOldDays := CIntEditOldDays.Value;
     workDays := ifThen(CheckBoxMon.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxTue.Checked, '+', '-');
     workDays := workDays + ifThen(CheckBoxWed.Checked, '+', '-');
@@ -437,11 +449,13 @@ begin
     GDefaultProductId := CStaticCategory.DataId;
     GDefaultAccountId := CStaticAccount.DataId;
     GDefaultCashpointId := CStaticCashpoint.DataId;
+    GDefaultCurrencyId := CStaticDefaultCurrency.DataId;
     GDataProvider.BeginTransaction;
     GDataProvider.SetCmanagerParam('GActiveProfileId', GDefaultProfileId);
     GDataProvider.SetCmanagerParam('GDefaultProductId', GDefaultProductId);
     GDataProvider.SetCmanagerParam('GDefaultAccountId', GDefaultAccountId);
     GDataProvider.SetCmanagerParam('GDefaultCashpointId', GDefaultCashpointId);
+    GDataProvider.SetCmanagerParam('GDefaultCurrencyId', GDefaultCurrencyId);
     GDataProvider.CommitTransaction;
   end;
 end;
@@ -702,6 +716,11 @@ begin
     ShortcutList.Repaint;
   end;
   xPrefs.Free;
+end;
+
+procedure TCPreferencesForm.CStaticDefaultCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := TCFrameForm.ShowFrame(TCCurrencydefFrame, ADataGid, AText);
 end;
 
 end.

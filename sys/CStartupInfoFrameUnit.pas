@@ -143,7 +143,7 @@ begin
       xTypes := xTypes + 'T';
     end;
     if startupInfoOldIn or startupInfoOldOut or startupInfoOldTran then begin
-      xDf := IncYear(xDf, -1);
+      xDf := IncDay(xDf, (-1) * startupInfoOldDays);
     end;
     xSqlPlanned := 'select plannedMovement.*, (select count(*) from plannedDone where plannedDone.idplannedMovement = plannedMovement.idplannedMovement) as doneCount from plannedMovement where isActive = true ';
     if Length(xTypes) = 1 then begin

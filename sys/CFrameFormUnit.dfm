@@ -29,6 +29,13 @@ inherited CFrameForm: TCFrameForm
         Alignment = taLeftJustify
         BevelOuter = bvNone
         TabOrder = 0
+        object LabelTopPanelInfo: TLabel
+          Left = 16
+          Top = 12
+          Width = 9
+          Height = 13
+          Caption = '...'
+        end
       end
       object PanelBottomInfo: TPanel
         Left = 0
@@ -39,6 +46,14 @@ inherited CFrameForm: TCFrameForm
         Alignment = taLeftJustify
         BevelOuter = bvNone
         TabOrder = 1
+        object LabelBottomPanelInfo: TLabel
+          Left = 856
+          Top = 12
+          Width = 9
+          Height = 13
+          Alignment = taRightJustify
+          Caption = '...'
+        end
       end
       object PanelFrame: TPanel
         Left = 0

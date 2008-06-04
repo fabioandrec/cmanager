@@ -69,7 +69,7 @@ begin
     end else if Components[xCount].InheritsFrom(TRichEdit) then begin
       TRichEdit(Components[xCount]).Font.Name := 'Microsoft Sans Serif';
     end else if Components[xCount].InheritsFrom(TCCurrEdit) then begin
-      TCCurrEdit(Components[xCount]).CurrencyId := CCurrencyDefGid_PLN;
+      TCCurrEdit(Components[xCount]).CurrencyId := GDefaultCurrencyId;
     end;
   end;
 end;

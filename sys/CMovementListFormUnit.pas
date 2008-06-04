@@ -191,7 +191,7 @@ begin
     xElement.isNew := True;
     xElement.movementType := IfThen(ComboBox1.ItemIndex = 0, COutMovement, CInMovement);
     xElement.idAccountCurrencyDef := CStaticCurrency.DataId;
-    xElement.idMovementCurrencyDef := CCurrencyDefGid_PLN;
+    xElement.idMovementCurrencyDef := GDefaultCurrencyId;
     xElement.dateTime := CDateTime1.Value;
     xElement.idCashpoint := CStaticInoutOnceCashpoint.DataId;
     xElement.idAccount := CStaticInoutOnceAccount.DataId;

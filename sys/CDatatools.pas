@@ -433,7 +433,7 @@ var xCurSymbol: String;
 begin
   if AWithSymbol then begin
     if ACurrencyId = '' then begin
-      xCurSymbol := GCurrencyCache.GetSymbol(CCurrencyDefGid_PLN);
+      xCurSymbol := GCurrencyCache.GetSymbol(GDefaultCurrencyId);
     end else begin
       xCurSymbol := GCurrencyCache.GetSymbol(ACurrencyId);
     end;

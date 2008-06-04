@@ -41,12 +41,10 @@ type
     Fsymbol: TBaseName;
     Fiso: TBaseName;
     Fdescription: TBaseDescription;
-    FisBase: Boolean;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure Setiso(const Value: TBaseName);
     procedure Setsymbol(const Value: TBaseName);
-    procedure SetisBase(const Value: Boolean);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -62,7 +60,6 @@ type
     property symbol: TBaseName read Fsymbol write Setsymbol;
     property iso: TBaseName read Fiso write Setiso;
     property description: TBaseDescription read Fdescription write Setdescription;
-    property isBase: Boolean read FisBase write SetisBase;
   end;
 
   TUnitDef = class(TDataObject)
@@ -1191,7 +1188,7 @@ const CDatafileTablesExportConditions: array[0..27] of string =
              '', '', '',
              '', '', '', '',
              '', '', '', '',
-             '', '', 'isBase <> True', '',
+             '', '', '', '',
              '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
              '', '', '', '', '', '');
 
@@ -1212,7 +1209,7 @@ const CDatafileTablesExportOrders: array[0..27] of string =
              '', '', '',
              '', '', '', '', '', '');
 
-const CCurrencyDefGid_PLN = '{00000000-0000-0000-0000-000000000001}';
+var GDefaultCurrencyId: TDataGid = '';
 
 procedure InitializeProxies(ADataProvider: TDataProvider);
 function IsMultiCurrencyDataset(ADataset: TADOQuery; ACurDefFieldname: String; var AOneCurrDef: TDataGid): Boolean;
@@ -3071,8 +3068,8 @@ var xText: String;
 begin
   Result := True;
   xText := '';
-  if GDataProvider.GetSqlBoolean('select isBase from currencyDef where idCurrencyDef = ' + DataGidToDatabase(AId), False) then begin
-    xText := 'jest ona walut¹ podstawow¹';
+  if GDefaultCurrencyId = AId then begin
+    xText := 'jest ona walut¹ domyœln¹';
   end else if GDataProvider.GetSqlInteger('select count(*) from currencyRate where ' +
       '(idSourceCurrencyDef = ' + DataGidToDatabase(AId) + ') or ' +
       '(idTargetCurrencyDef = ' + DataGidToDatabase(AId) + ')', 0) <> 0 then begin
@@ -3108,7 +3105,6 @@ begin
     Fsymbol := FieldByName('symbol').AsString;
     FpreviousSymbol := Fsymbol;
     Fiso := FieldByName('iso').AsString;
-    FisBase := FieldByName('isBase').AsBoolean;
   end;
 end;
 
@@ -3137,14 +3133,6 @@ procedure TCurrencyDef.Setdescription(const Value: TBaseDescription);
 begin
   if Fdescription <> Value then begin
     Fdescription := Value;
-    SetState(msModified);
-  end;
-end;
-
-procedure TCurrencyDef.SetisBase(const Value: Boolean);
-begin
-  if FisBase <> Value then begin
-    FisBase := Value;
     SetState(msModified);
   end;
 end;
@@ -3181,7 +3169,6 @@ begin
     AddField('symbol', Fsymbol, True, 'currencyDef');
     AddField('iso', Fiso, True, 'currencyDef');
     AddField('description', Fdescription, True, 'currencyDef');
-    AddField('isBase', IntToStr(Integer(FIsBase)), False, 'currencyDef');
   end;
 end;
 

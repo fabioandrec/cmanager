@@ -49,8 +49,8 @@ begin
     xForm.CStaticTarget.DataId := ATargetId;
     xForm.CStaticTarget.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, ATargetId, False)).GetElementText;
   end else begin
-    xForm.CStaticTarget.DataId := CCurrencyDefGid_PLN;
-    xForm.CStaticTarget.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CCurrencyDefGid_PLN, False)).GetElementText;
+    xForm.CStaticTarget.DataId := GDefaultCurrencyId;
+    xForm.CStaticTarget.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
   end;
   if ACashpointId <> CEmptyDataGid then begin
     xForm.CStaticTarget.DataId := ACashpointId;

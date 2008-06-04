@@ -41,6 +41,10 @@ type
     LabelFinish: TLabel;
     CStaticDesc: TCStatic;
     ProgressBar: TProgressBar;
+    TabSheetCurrency: TTabSheet;
+    Label7: TLabel;
+    Label8: TLabel;
+    CStaticCurrency: TCStatic;
     procedure FormCreate(Sender: TObject);
     procedure BitBtnFinishClick(Sender: TObject);
     procedure BitBtnPrevClick(Sender: TObject);
@@ -49,14 +53,17 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure CButtonShowDefaultClick(Sender: TObject);
     procedure CStaticDescGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
   private
-    FDefaultXml: ICXMLDOMDocument;
+    FDefaultData: ICXMLDOMDocument;
+    FDefaultCurrencies: ICXMLDOMDocument;
     FCheckedData: TStringList;
     FReportList: TStringList;
     FIsDisabled: Boolean;
     procedure UpdateButtons;
     procedure UpdateTabs;
-    procedure LoadDefaultXmlData;
+    procedure LoadDefaultDatafileData;
+    procedure LoadDefaultCurrencyData;
     function DoCreateDatafile: Boolean;
     function CanSelectNextPage: Boolean;
     function GetDisabled: Boolean;
@@ -98,7 +105,8 @@ begin
   FCheckedData := TStringList.Create;
   FReportList := TStringList.Create;
   FIsDisabled := False;
-  LoadDefaultXmlData;
+  LoadDefaultDatafileData;
+  LoadDefaultCurrencyData;
   UpdateButtons;
   UpdateTabs;
 end;
@@ -158,7 +166,7 @@ begin
   end;
 end;
 
-procedure TCCreateDatafileForm.LoadDefaultXmlData;
+procedure TCCreateDatafileForm.LoadDefaultDatafileData;
 var xResStream: TResourceStream;
     xXmlString: String;
 begin
@@ -168,8 +176,8 @@ begin
   if xResStream.Size > 0 then begin
     CopyMemory(@xXmlString[1], xResStream.Memory, xResStream.Size);
   end;
-  FDefaultXml := GetDocumentFromString(xXmlString, Nil);
-  SetXmlIdForEach(FDefaultXml.documentElement.childNodes, True);
+  FDefaultData := GetDocumentFromString(xXmlString, Nil);
+  SetXmlIdForEach(FDefaultData.documentElement.childNodes, True);
   xResStream.Free;
 end;
 
@@ -177,13 +185,15 @@ procedure TCCreateDatafileForm.FormDestroy(Sender: TObject);
 begin
   FCheckedData.Free;
   FReportList.Free;
-  FDefaultXml := Nil;
+  FDefaultData := Nil;
+  FDefaultCurrencies := Nil;
   inherited;
 end;
 
 procedure TCCreateDatafileForm.CButtonShowDefaultClick(Sender: TObject);
+var xId, xText: String;
 begin
-  ShowXmlFile(FDefaultXml, FCheckedData);
+  ShowXmlFile(FDefaultData, FCheckedData, 'Zaznacz tylko te dane domyœlne, które powinny byæ zapamiêtane w nowym pliku danych', xId, xText);
 end;
 
 function TCCreateDatafileForm.CanSelectNextPage: Boolean;
@@ -374,9 +384,30 @@ function TCCreateDatafileForm.GetDefaultDataAsString: String;
 var xCommands: TStringList;
 begin
   xCommands := TStringList.Create;
-  AppendCommands(FDefaultXml.documentElement.childNodes, xCommands);
+  AppendCommands(FDefaultData.documentElement.childNodes, xCommands);
   Result := xCommands.Text;
   xCommands.Free;
+end;
+
+procedure TCCreateDatafileForm.LoadDefaultCurrencyData;
+var xResStream: TResourceStream;
+    xXmlString: String;
+begin
+  xXmlString := '';
+  xResStream := TResourceStream.Create(HInstance, 'CURDEFS', RT_RCDATA);
+  SetLength(xXmlString, xResStream.Size);
+  if xResStream.Size > 0 then begin
+    CopyMemory(@xXmlString[1], xResStream.Memory, xResStream.Size);
+  end;
+  FDefaultCurrencies := GetDocumentFromString(xXmlString, Nil);
+  xResStream.Free;
+end;
+
+procedure TCCreateDatafileForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := ShowXmlFile(FDefaultCurrencies, Nil, 'Wybierz walutê domyœl¹. Je¿eli nie ma jej wsród poni¿szych walut wybierz dowoln¹ ' + sLineBreak +
+                                                    'z nich, a po utworzeniu pliku danych bêdziesz móg³ dodaæ w³asne waluty i wybraæ' + sLineBreak +
+                                                    'spoœród nich domyœn¹.', ADataGid, AText);
 end;
 
 end.

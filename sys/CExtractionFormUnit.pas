@@ -356,7 +356,7 @@ begin
     xElement.isNew := True;
     xElement.movementType := CInMovement;
     xElement.idAccount := CStaticAccount.DataId;
-    xElement.idCurrencyDef := CCurrencyDefGid_PLN;
+    xElement.idCurrencyDef := GDefaultCurrencyId;
     xElement.regTime := GWorkDate;
     xElement.accountingDate := GWorkDate;
     xForm := TCExtractionItemForm.CreateFormElement(Application, xElement);
