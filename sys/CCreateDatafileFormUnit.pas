@@ -70,6 +70,8 @@ type
     procedure SetDisabled(const Value: Boolean);
     procedure AddToReport(AText: String);
     function GetDefaultDataAsString: String;
+    function GetDefaultCurrencyAsString: String;
+    procedure AppendCommands(ANodes: ICXMLDOMNodeList; AChecks: TStringList; ACommands: TStringList);
   public
     property Disabled: Boolean read GetDisabled write SetDisabled;
   end;
@@ -205,6 +207,13 @@ begin
       CStaticName.SetFocus;
       Result := False;
     end;
+  end else if PageControl.ActivePage = TabSheetCurrency then begin
+    if CStaticCurrency.DataId = CEmptyDataGid then begin
+      if ShowInfo(itQuestion, 'Nie wybrano domyœlnej waluty pliku danych. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticCurrency.DoGetDataId;
+      end;
+      Result := False;
+    end;
   end;
 end;
 
@@ -254,16 +263,22 @@ begin
             if DbExecuteSql(xConnection, Format(CInsertCmanagerInfo , [FileVersion(ParamStr(0)), DatetimeToDatabase(Now, True)]), False, xError) then begin
                ProgressBar.StepBy(1);
                //Krok 6
-               if (ComboBoxDefault.ItemIndex = 0) then begin
-                 if DbExecuteSql(xConnection, GetDefaultDataAsString, False, xError) then begin
+               if DbExecuteSql(xConnection, GetDefaultCurrencyAsString, False, xError) then begin
+                 ProgressBar.StepBy(1);
+                 // Krok 7
+                 if (ComboBoxDefault.ItemIndex = 0) then begin
+                   if DbExecuteSql(xConnection, GetDefaultDataAsString, False, xError) then begin
+                     ProgressBar.StepBy(1);
+                     Result := True;
+                   end else begin
+                     AddToReport('B³¹d tworzenia domyœlnych danych w pliku, opis b³êdu ' + xError);
+                   end;
+                 end else begin
                    ProgressBar.StepBy(1);
                    Result := True;
-                 end else begin
-                   AddToReport('B³¹d tworzenia domyœlnych danych w pliku, opis b³êdu ' + xError);
                  end;
                end else begin
-                 ProgressBar.StepBy(1);
-                 Result := True;
+                 AddToReport('B³¹d tworzenia walut w pliku, opis b³êdu ' + xError);
                end;
             end else begin
               AddToReport('B³¹d zapisu CManagerInfo, opis b³êdu ' + xError);
@@ -362,29 +377,34 @@ begin
   ShowReport('Raport z wykonanych czynnoœci', FReportList.Text, 400, 300);
 end;
 
-function TCCreateDatafileForm.GetDefaultDataAsString: String;
-
-  procedure AppendCommands(ANodes: ICXMLDOMNodeList; ACommands: TStringList);
-  var xCount: Integer;
-      xNode: ICXMLDOMNode;
-      xId: String;
-      xSql: String;
-  begin
-    for xCount := 0 to ANodes.length - 1 do begin
-      xNode := ANodes.item[xCount];
-      xId := GetXmlAttribute('id', xNode, CEmptyDataGid);
-      xSql := GetXmlAttribute('sql', xNode, '');
-      if (xSql <> '') and (xId <> CEmptyDataGid) and ((FCheckedData.Count = 0) or (FCheckedData.IndexOf(xId) >= 0)) then begin
-        ACommands.Add(xSql);
-      end;
-      AppendCommands(xNode.childNodes, ACommands);
+procedure TCCreateDatafileForm.AppendCommands(ANodes: ICXMLDOMNodeList; AChecks: TStringList; ACommands: TStringList);
+var xCount: Integer;
+    xNode: ICXMLDOMNode;
+    xId: String;
+    xSql: String;
+    xIsChecked: Boolean;
+begin
+  for xCount := 0 to ANodes.length - 1 do begin
+    xNode := ANodes.item[xCount];
+    xId := GetXmlAttribute('id', xNode, CEmptyDataGid);
+    xSql := GetXmlAttribute('sql', xNode, '');
+    if AChecks = Nil then begin
+      xIsChecked := True;
+    end else begin
+      xIsChecked := ((FCheckedData.Count = 0) or (FCheckedData.IndexOf(xId) >= 0));
     end;
+    if (xSql <> '') and (xId <> CEmptyDataGid) and xIsChecked then begin
+      ACommands.Add(xSql);
+    end;
+    AppendCommands(xNode.childNodes, AChecks, ACommands);
   end;
+end;
 
+function TCCreateDatafileForm.GetDefaultDataAsString: String;
 var xCommands: TStringList;
 begin
   xCommands := TStringList.Create;
-  AppendCommands(FDefaultData.documentElement.childNodes, xCommands);
+  AppendCommands(FDefaultData.documentElement.childNodes, FCheckedData, xCommands);
   Result := xCommands.Text;
   xCommands.Free;
 end;
@@ -408,6 +428,16 @@ begin
   AAccepted := ShowXmlFile(FDefaultCurrencies, Nil, 'Wybierz walutê domyœl¹. Je¿eli nie ma jej wsród poni¿szych walut wybierz dowoln¹ ' + sLineBreak +
                                                     'z nich, a po utworzeniu pliku danych bêdziesz móg³ dodaæ w³asne waluty i wybraæ' + sLineBreak +
                                                     'spoœród nich domyœn¹.', ADataGid, AText);
+end;
+
+function TCCreateDatafileForm.GetDefaultCurrencyAsString: String;
+var xCommands: TStringList;
+begin
+  xCommands := TStringList.Create;
+  AppendCommands(FDefaultCurrencies.documentElement.childNodes, Nil, xCommands);
+  xCommands.Append('insert into cmanagerParams (paramName, paramValue) values (''GDefaultCurrencyId'', ''' + CStaticCurrency.DataId + ''');');
+  Result := xCommands.Text;
+  xCommands.Free;
 end;
 
 end.

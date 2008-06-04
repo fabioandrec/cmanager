@@ -74,7 +74,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
     Top = 0
     Width = 339
     Height = 131
-    ActivePage = TabSheetCurrency
+    ActivePage = TabSheetFinish
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 2
@@ -362,7 +362,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
         Top = 90
         Width = 320
         Height = 21
-        Max = 7
+        Max = 8
         Smooth = True
         TabOrder = 1
         Visible = False
