@@ -82,6 +82,7 @@ type
     function CanAccept: Boolean; override;
     procedure AfterCommitData; override;
     procedure ReadValues; override;
+    procedure FillForm; override;
   public
     destructor Destroy; override;
     function ExpandTemplate(ATemplate: String): String; override;
@@ -109,6 +110,13 @@ begin
       CStaticDeposit.Caption := deposit.GetElementText;
       CStaticDepositChanged(Nil);
     end;
+  end;
+  if Operation = coEdit then begin
+    ComboBoxType.Items.Add('Za³o¿enie lokaty');
+    ComboBoxType.Items.Add('Rejestracja lokaty');
+    ComboBoxType.Items.Add('Zakoñczenie lokaty');
+    ComboBoxType.Items.Add('Odnowienie lokaty');
+    ComboBoxType.Items.Add('Naliczenie odsetek');
   end;
   ComboBoxTypeChange(Nil);
 end;
@@ -558,6 +566,22 @@ begin
     Result := '<symbol waluty lokaty>';
     if CStaticDepositCurrency.DataId <> CEmptyDataGid then begin
       Result := GCurrencyCache.GetSymbol(CStaticDepositCurrency.DataId);
+    end;
+  end;
+end;
+
+procedure TCDepositInvestmentPayForm.FillForm;
+begin
+  with TDepositMovement(Dataobject) do begin
+    ComboBoxType.Enabled := False;
+    if movementType = CDepositMovementCreate then begin
+    end else if movementType = CDepositMovementRegister then begin
+    end else if movementType = CDepositMovementInactivate then begin
+    end else if movementType = CDepositMovementRenew then begin
+    end else if movementType = CDepositMovementDue then begin
+    end else if movementType = CDepositMovementAddCash then begin
+    end else if movementType = CDepositMovementClose then begin
+    end else if movementType = CDepositMovementGetInterest then begin
     end;
   end;
 end;
