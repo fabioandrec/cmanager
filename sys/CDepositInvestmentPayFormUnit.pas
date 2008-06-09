@@ -101,7 +101,7 @@ uses CConsts, CDescpatternFormUnit, CPreferences, CTemplates, CRichtext,
 procedure TCDepositInvestmentPayForm.InitializeForm;
 begin
   inherited InitializeForm;
-  Caption := 'Lokata - Wyp³ata';
+  Caption := 'Lokata - Operacja';
   CDateTime.Value := Now;
   FRateHelper := nil;
   if AdditionalData <> Nil then begin
@@ -323,48 +323,50 @@ function TCDepositInvestmentPayForm.CanAccept: Boolean;
 var xNoncapInt, xPrevCash: Currency;
 begin
   Result := True;
-  if CStaticDeposit.DataId = CEmptyDataGid then begin
-    Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano lokaty. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticDeposit.DoGetDataId;
-    end;
-  end else if (CStaticCurrencyRate.DataId = CEmptyDataGid) and (CStaticCurrencyRate.Enabled) then begin
-    Result := False;
-    if ShowInfo(itQuestion, 'Nie wybrano przelicznika waluty. Czy wyœwietliæ listê teraz ?', '') then begin
-      CStaticCurrencyRate.DoGetDataId;
-    end;
-  end;
-  if Result and (ComboBoxType.ItemIndex = 2) then begin
-    GDataProvider.BeginTransaction;
-    xNoncapInt := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False)).noncapitalizedInterest;
-    GDataProvider.RollbackTransaction;
-    if xNoncapInt < CCurrEditCash.Value then begin
+  if Operation = coAdd then begin
+    if CStaticDeposit.DataId = CEmptyDataGid then begin
       Result := False;
-      ShowInfo(itError, 'Kwota odsetek do wyp³aty nie mo¿e byæ wiêksza od kwoty wolnych odsetek', '');
-      CCurrEditCash.SetFocus;
-    end;
-  end;
-  if Result then begin
-    if CStaticCategory.DataId = CEmptyDataGid then begin
-      Result := False;
-      if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
-        CStaticCategory.DoGetDataId;
+      if ShowInfo(itQuestion, 'Nie wybrano lokaty. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticDeposit.DoGetDataId;
       end;
-    end else if CStaticAccount.DataId = CEmptyDataGid then begin
+    end else if (CStaticCurrencyRate.DataId = CEmptyDataGid) and (CStaticCurrencyRate.Enabled) then begin
       Result := False;
-      if ShowInfo(itQuestion, 'Nie wybrano konta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
-        CStaticAccount.DoGetDataId;
+      if ShowInfo(itQuestion, 'Nie wybrano przelicznika waluty. Czy wyœwietliæ listê teraz ?', '') then begin
+        CStaticCurrencyRate.DoGetDataId;
       end;
-    end else begin
-      if Operation = coEdit then begin
-        xPrevCash := TDepositMovement(Dataobject).cash;
+    end;
+    if Result and (ComboBoxType.ItemIndex = 2) then begin
+      GDataProvider.BeginTransaction;
+      xNoncapInt := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False)).noncapitalizedInterest;
+      GDataProvider.RollbackTransaction;
+      if xNoncapInt < CCurrEditCash.Value then begin
+        Result := False;
+        ShowInfo(itError, 'Kwota odsetek do wyp³aty nie mo¿e byæ wiêksza od kwoty wolnych odsetek', '');
+        CCurrEditCash.SetFocus;
+      end;
+    end;
+    if Result then begin
+      if CStaticCategory.DataId = CEmptyDataGid then begin
+        Result := False;
+        if ShowInfo(itQuestion, 'Nie wybrano kategorii operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+          CStaticCategory.DoGetDataId;
+        end;
+      end else if CStaticAccount.DataId = CEmptyDataGid then begin
+        Result := False;
+        if ShowInfo(itQuestion, 'Nie wybrano konta operacji. Czy wyœwietliæ listê teraz ?', '') then begin
+          CStaticAccount.DoGetDataId;
+        end;
       end else begin
-        xPrevCash := 0;
+        if Operation = coEdit then begin
+          xPrevCash := TDepositMovement(Dataobject).cash;
+        end else begin
+          xPrevCash := 0;
+        end;
+        Result := CheckSurpassedLimits(IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CDateTime.Value,
+                                       TDataGids.CreateFromGid(CStaticAccount.DataId),
+                                       TDataGids.CreateFromGid(CEmptyDataGid),
+                                       TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditCash.Value - xPrevCash, CStaticDepositCurrency.DataId));
       end;
-      Result := CheckSurpassedLimits(IfThen(ComboBoxType.ItemIndex = 0, COutMovement, CInMovement), CDateTime.Value,
-                                     TDataGids.CreateFromGid(CStaticAccount.DataId),
-                                     TDataGids.CreateFromGid(CEmptyDataGid),
-                                     TSumList.CreateWithSum(CStaticCategory.DataId, CCurrEditCash.Value - xPrevCash, CStaticDepositCurrency.DataId));
     end;
   end;
 end;
@@ -450,42 +452,46 @@ end;
 procedure TCDepositInvestmentPayForm.ReadValues;
 begin
   with TDepositMovement(Dataobject) do begin
-    regDateTime := CDateTime.Value;
-    regOrder := 0;
-    description := RichEditDesc.Text;
-    if ComboBoxType.ItemIndex = 0 then begin
-      cash := CCurrEditCash.Value;
-      interest := 0;
-    end else if ComboBoxType.ItemIndex = 1 then begin
-      cash := CCurrEditBeforeCap.Value;
-      interest := CCurrEditBeforeInt.Value;
-    end else if ComboBoxType.ItemIndex = 2 then begin
-      cash := 0;
-      interest := CCurrEditCash.Value;
-    end;
-    depositState := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False)).depositState;
-    idDepositInvestment := CStaticDeposit.DataId;
-    idAccount := CStaticAccount.DataId;
-    idAccountCurrencyDef := CStaticAccountCurrency.DataId;
-    accountCash := CCurrEditAccount.Value;
-    if CStaticCurrencyRate.Enabled then begin
-      idCurrencyRate := CStaticCurrencyRate.DataId;
-      rateDescription := FRateHelper.desc;
-      currencyQuantity := FRateHelper.quantity;
-      currencyRate := FRateHelper.rate;
+    if Operation = coAdd then begin
+      regDateTime := CDateTime.Value;
+      regOrder := 0;
+      description := RichEditDesc.Text;
+      if ComboBoxType.ItemIndex = 0 then begin
+        cash := CCurrEditCash.Value;
+        interest := 0;
+      end else if ComboBoxType.ItemIndex = 1 then begin
+        cash := CCurrEditBeforeCap.Value;
+        interest := CCurrEditBeforeInt.Value;
+      end else if ComboBoxType.ItemIndex = 2 then begin
+        cash := 0;
+        interest := CCurrEditCash.Value;
+      end;
+      depositState := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, CStaticDeposit.DataId, False)).depositState;
+      idDepositInvestment := CStaticDeposit.DataId;
+      idAccount := CStaticAccount.DataId;
+      idAccountCurrencyDef := CStaticAccountCurrency.DataId;
+      accountCash := CCurrEditAccount.Value;
+      if CStaticCurrencyRate.Enabled then begin
+        idCurrencyRate := CStaticCurrencyRate.DataId;
+        rateDescription := FRateHelper.desc;
+        currencyQuantity := FRateHelper.quantity;
+        currencyRate := FRateHelper.rate;
+      end else begin
+        idCurrencyRate := CEmptyDataGid;
+        rateDescription := '';
+        currencyQuantity := 1;
+        currencyRate := 1;
+      end;
+      idProduct := CStaticCategory.DataId;
+      if ComboBoxType.ItemIndex = 0 then begin
+        movementType := CDepositMovementAddCash;
+      end else if ComboBoxType.ItemIndex = 1 then begin
+        movementType := CDepositMovementClose;
+      end else if ComboBoxType.ItemIndex = 2 then begin
+        movementType := CDepositMovementGetInterest;
+      end;
     end else begin
-      idCurrencyRate := CEmptyDataGid;
-      rateDescription := '';
-      currencyQuantity := 1;
-      currencyRate := 1;
-    end;
-    idProduct := CStaticCategory.DataId;
-    if ComboBoxType.ItemIndex = 0 then begin
-      movementType := CDepositMovementAddCash;
-    end else if ComboBoxType.ItemIndex = 1 then begin
-      movementType := CDepositMovementClose;
-    end else if ComboBoxType.ItemIndex = 2 then begin
-      movementType := CDepositMovementGetInterest;
+      description := RichEditDesc.Text;
     end;
   end;
 end;
@@ -575,14 +581,84 @@ begin
   with TDepositMovement(Dataobject) do begin
     ComboBoxType.Enabled := False;
     if movementType = CDepositMovementCreate then begin
+      ComboBoxType.ItemIndex := 3;
     end else if movementType = CDepositMovementRegister then begin
+      ComboBoxType.ItemIndex := 4;
     end else if movementType = CDepositMovementInactivate then begin
+      ComboBoxType.ItemIndex := 5;
     end else if movementType = CDepositMovementRenew then begin
+      ComboBoxType.ItemIndex := 6;
     end else if movementType = CDepositMovementDue then begin
+      ComboBoxType.ItemIndex := 7;
     end else if movementType = CDepositMovementAddCash then begin
+      ComboBoxType.ItemIndex := 0;
     end else if movementType = CDepositMovementClose then begin
+      ComboBoxType.ItemIndex := 1;
     end else if movementType = CDepositMovementGetInterest then begin
+      ComboBoxType.ItemIndex := 2;
     end;
+    Label14.Visible := (movementType = CDepositMovementCreate) or (movementType = CDepositMovementClose) or
+                       (movementType = CDepositMovementAddCash) or (movementType = CDepositMovementGetInterest);
+    CStaticAccount.Visible := Label14.Visible;
+    Label17.Visible := Label14.Visible;
+    CStaticAccountCurrency.Visible := Label14.Visible;
+    Label22.Visible := Label14.Visible;
+    CStaticCurrencyRate.Visible := Label14.Visible;
+    Label21.Visible := Label14.Visible;
+    CCurrEditAccount.Visible := Label14.Visible;
+    Label13.Visible := Label14.Visible;
+    CStaticCategory.Visible := Label14.Visible;
+    Label15.Visible := False;
+    CCurrEditBeforeCap.Visible := False;
+    Label1.Visible := False;
+    CCurrEditBeforeInt.Visible := False;
+    Label5.Visible := False;
+    CCurrEditAfterCap.Visible := False;
+    Label6.Visible := False;
+    CCurrEditAfterInt.Visible := False;
+    CDateTime.Value := regDateTime;
+    CCurrEditCash.Value := cash + interest;
+    CCurrEditCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
+    CCurrEditAccount.Value := accountCash;
+    CCurrEditAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
+    GDataProvider.BeginTransaction;
+    CStaticDeposit.DataId := idDepositInvestment;
+    CStaticDeposit.Caption := TDepositInvestment(TDepositInvestment.LoadObject(DepositInvestmentProxy, idDepositInvestment, False)).GetElementText;
+    CStaticDepositCurrency.DataId := idCurrencyDef;
+    CStaticDepositCurrency.Caption := GCurrencyCache.GetIso(idCurrencyDef);
+    if idAccount <> CEmptyDataGid then begin
+      CStaticAccount.DataId := idAccount;
+      CStaticAccount.Caption := TAccount(TAccount.LoadObject(AccountProxy, idAccount, False)).GetElementText;
+      CStaticAccountCurrency.DataId := idAccountCurrencyDef;
+      CStaticAccountCurrency.Caption := GCurrencyCache.GetIso(idAccountCurrencyDef);
+    end;
+    if idProduct <> CEmptyDataGid then begin
+      CStaticCategory.DataId := idAccount;
+      CStaticCategory.Caption := TProduct(TProduct.LoadObject(ProductProxy, idProduct, False)).GetElementText;
+    end;
+    if idCurrencyRate <> CEmptyDataGid then begin
+      CStaticCurrencyRate.DataId := idCurrencyRate;
+      CStaticCurrencyRate.Caption := rateDescription;
+    end;
+    FRateHelper := TCurrencyRateHelper.Create(currencyQuantity, currencyRate, rateDescription, idAccountCurrencyDef, idCurrencyDef);
+    GDataProvider.RollbackTransaction;
+    ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
+    SimpleRichText(description, RichEditDesc);
+    UpdateCurrencyRates(False);
+    CCurrEditBeforeCap.Enabled := False;
+    CCurrEditBeforeInt.Enabled := False;
+    CCurrEditCash.Enabled := False;
+    CCurrEditAfterInt.Enabled := False;
+    CCurrEditAfterCap.Enabled := False;
+    CStaticAccount.Enabled := False;
+    CStaticCurrencyRate.Enabled := False;
+    CStaticCategory.Enabled := False;
+    CCurrEditAccount.Enabled := False;
+    CStaticAccountCurrency.Enabled := False;
+    CStaticDeposit.Enabled := False;
+    CDateTime.Enabled := False;
+    ComboBoxType.Enabled := False;
+    CStaticDepositCurrency.Enabled := False;
   end;
 end;
 

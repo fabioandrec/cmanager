@@ -153,7 +153,7 @@ begin
         xMove.rateDescription := '';
         xMove.currencyQuantity := 1;
         xMove.currencyRate := 1;
-        xMove.accountCash := xProgItem.cash;
+        xMove.accountCash := 0;
         xMove.regOrder := xProgItem.regOrder;
         xMove.depositState := xProgItem.depositState;
         if xProgItem.movementType = CDepositMovementInactivate then begin

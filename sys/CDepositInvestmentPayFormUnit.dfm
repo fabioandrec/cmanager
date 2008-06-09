@@ -190,7 +190,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       Top = 172
       Width = 593
       Height = 253
-      Caption = ' Szczeg'#243#322'y lokaty '
+      Caption = ' Szczeg'#243#322'y operacji '
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2

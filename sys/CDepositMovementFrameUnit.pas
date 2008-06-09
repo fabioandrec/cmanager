@@ -315,19 +315,9 @@ begin
     xMt := TDepositMovement(List.SelectedElement.Data).movementType;
     if (xMt = CDepositMovementAddCash) or (xMt = CDepositMovementGetInterest) then begin
       ActionDelete.Enabled := True;
-      ActionEdit.Caption := 'Edytuj operacjê';
     end else begin
       ActionDelete.Enabled := (xMt = CDepositMovementClose);
-      ActionEdit.Caption := 'Poka¿ operacjê';
     end;
-    CButtonEdit.Repaint;
-  end else begin
-    if FCanAdd then begin
-      ActionEdit.Caption := 'Edytuj operacjê';
-    end else begin
-      ActionEdit.Caption := 'Poka¿ operacjê';
-    end;
-    CButtonEdit.Repaint;
   end;
 end;
 
