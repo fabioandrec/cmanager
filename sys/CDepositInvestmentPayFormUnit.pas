@@ -118,6 +118,7 @@ begin
     ComboBoxType.Items.Add('Odnowienie lokaty');
     ComboBoxType.Items.Add('Naliczenie odsetek');
   end;
+  CCurrEditAccount.SetCurrencyDef(CEmptyDataGid, '');
   ComboBoxTypeChange(Nil);
 end;
 
@@ -659,6 +660,31 @@ begin
     CDateTime.Enabled := False;
     ComboBoxType.Enabled := False;
     CStaticDepositCurrency.Enabled := False;
+    Label4.Top := Label15.Top;
+    Label4.Left := Label15.Left - (Label4.Width - Label15.Width);
+    CCurrEditCash.Top := CCurrEditBeforeCap.Top;
+    CCurrEditCash.Left := CCurrEditBeforeCap.Left;
+    CCurrEditCash.Width := CCurrEditBeforeCap.Width;
+    if Label14.Visible then begin
+      Label14.Top := Label14.Top - 72;
+      CStaticAccount.Top := CStaticAccount.Top - 72;
+      Label22.Top := Label22.Top - 72;
+      CStaticCurrencyRate.Top := CStaticCurrencyRate.Top - 72;
+      Label13.Top := Label13.Top - 72;
+      CStaticCategory.Top := CStaticCategory.Top - 72;
+      Label21.Top := Label21.Top - 72;
+      CCurrEditAccount.Top := CCurrEditAccount.Top - 72;
+      Label17.Top := Label17.Top - 72;
+      CStaticAccountCurrency.Top := CStaticAccountCurrency.Top - 72;
+      GroupBox3.Height := GroupBox3.Height - 72;
+      GroupBox2.Top := GroupBox2.Top - 72;
+      Height := Height - 72;
+    end else begin
+      CCurrEditCash.Width := 441;
+      GroupBox3.Height := GroupBox3.Height - 182;
+      GroupBox2.Top := GroupBox2.Top - 182;
+      Height := Height - 182;
+    end;
   end;
 end;
 

@@ -151,6 +151,7 @@ begin
   CStaticCurrency.DataId := GDefaultCurrencyId;
   CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, GDefaultCurrencyId, False)).GetElementText;
   CCurrEditActualCash.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
+  CCurrEditAccount.SetCurrencyDef(CEmptyDataGid, '');
   LabelState.Visible := False;
   Label16.Visible := Operation = coEdit;
   CCurrEditNoncapitalized.Visible := Operation = coEdit;
@@ -558,7 +559,7 @@ begin
       xMove.currencyQuantity := 1;
       xMove.currencyRate := 1;
     end;
-    xMove.accountCash := CCurrEditActualCash.Value;
+    xMove.accountCash := CCurrEditAccount.Value;
     GDataProvider.CommitTransaction;
     if CStaticCategory.DataId <> CEmptyDataGid then begin
       GDataProvider.BeginTransaction;

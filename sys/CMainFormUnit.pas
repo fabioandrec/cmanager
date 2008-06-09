@@ -84,6 +84,7 @@ type
     ActionShortcutQuickpatterns: TAction;
     ActionShortcutDepositInvestment: TAction;
     ActionDepositCalc: TAction;
+    ActionGreenGrass: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -131,6 +132,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ActionShortcutQuickpatternsExecute(Sender: TObject);
     procedure ActionDepositCalcExecute(Sender: TObject);
+    procedure ActionGreenGrassExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -1026,6 +1028,11 @@ end;
 procedure TCMainForm.ActionDepositCalcExecute(Sender: TObject);
 begin
   ShowDepositCalculator(False, Nil);
+end;
+
+procedure TCMainForm.ActionGreenGrassExecute(Sender: TObject);
+begin
+  ShellExecute(0, nil, 'http://nazielonejtrawie.blogspot.com', nil, nil, SW_SHOWNORMAL);
 end;
 
 end.

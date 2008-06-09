@@ -402,6 +402,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionDepositCalc
+                Caption = 'Ka&lkulator lokat'
               end
               item
                 Action = ActionCss
@@ -445,6 +446,10 @@ object CMainForm: TCMainForm
               item
                 Action = ActionDiscForum
                 Caption = '&Forum dyskusyjne'
+              end
+              item
+                Action = ActionGreenGrass
+                ImageIndex = 22
               end
               item
                 Action = ActionCmd
@@ -712,6 +717,12 @@ object CMainForm: TCMainForm
       Category = 'Narz'#281'dzia'
       Caption = 'Kalkulator lokat'
       OnExecute = ActionDepositCalcExecute
+    end
+    object ActionGreenGrass: TAction
+      Category = 'Pomoc'
+      Caption = 'Na zielonej trawie'
+      ImageIndex = 22
+      OnExecute = ActionGreenGrassExecute
     end
   end
   object OpenDialog: TOpenDialog
