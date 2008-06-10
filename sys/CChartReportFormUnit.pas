@@ -221,6 +221,7 @@ function TCChartReportForm.CreateNewChart(ASymbol: String): TCChart;
 begin
   Result := TCChart.CreateNew(Nil, ASymbol);
   with Result do begin
+    DoubleBuffered := True;
     AnimatedZoom := True;
     BackWall.Brush.Color := clWhite;
     BackWall.Brush.Style := bsClear;
@@ -617,10 +618,18 @@ begin
     GetCursorPos(xPos);
     if IsWindow(xChart.Handle) and (WindowFromPoint(xPos) = xChart.Handle) then begin
       try
-        if WheelDelta > 0 then begin
-          xChart.ZoomPercent(96);
-        end else if WheelDelta < 0 then begin
-          xChart.ZoomPercent(104);
+        if xChart.isPie then begin
+          if WheelDelta > 0 then begin
+            xChart.View3DOptions.Zoom := xChart.View3DOptions.Zoom - 4;
+          end else if WheelDelta < 0 then begin
+            xChart.View3DOptions.Zoom := xChart.View3DOptions.Zoom + 4;
+          end;
+        end else begin
+          if WheelDelta > 0 then begin
+            xChart.ZoomPercent(96);
+          end else if WheelDelta < 0 then begin
+            xChart.ZoomPercent(104);
+          end;
         end;
       except
       end;

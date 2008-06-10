@@ -108,23 +108,25 @@ begin
   xMustbackup := False;
   if ((ACManagerState = CMANAGERSTATE_STARTING) and (GBasePreferences.backupOnStart)) or
      ((ACManagerState = CMANAGERSTATE_CLOSING) and (not GBasePreferences.backupOnStart)) then begin
-    xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDataProvider.Filename]);
-    if GBasePreferences.backupAction = CBackupActionOnce then begin
-      if xPref <> Nil then begin
-        xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
-      end else begin
+    if GDataProvider.Filename <> '' then begin
+      xPref := TBackupPref(GBackupsPreferences.ByPrefname[GDataProvider.Filename]);
+      if GBasePreferences.backupAction = CBackupActionOnce then begin
+        if xPref <> Nil then begin
+          xMustbackup := DateOf(xPref.lastBackup) <> DateOf(Now);
+        end else begin
+          xMustbackup := True;
+        end;
+      end else if GBasePreferences.backupAction = CBackupActionAlways then begin
         xMustbackup := True;
-      end;
-    end else if GBasePreferences.backupAction = CBackupActionAlways then begin
-      xMustbackup := True;
-    end else if GBasePreferences.backupAction = CBackupActionAsk then begin
-      if xPref = Nil then begin
-        xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.\n' +
-                                            'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
-      end else begin
-        if DaysBetween(Today, xPref.lastBackup) + 1 >= GBasePreferences.backupDaysOld then begin
-          xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.\n' +
+      end else if GBasePreferences.backupAction = CBackupActionAsk then begin
+        if xPref = Nil then begin
+          xMustbackup := ShowInfo(itQuestion, 'Nie uda³o siê uzyskaæ informacji kiedy wykonywano ostatni raz kopiê pliku danych.\n' +
                                               'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
+        end else begin
+          if DaysBetween(Today, xPref.lastBackup) + 1 >= GBasePreferences.backupDaysOld then begin
+            xMustbackup := ShowInfo(itQuestion, 'Ostatnio wykonywa³eœ kopiê pliku danych ' + IntToStr(DaysBetween(Today, xPref.lastBackup) + 1) + ' dni temu.\n' +
+                                                'Czy chcesz wykonaæ kopiê pliku danych teraz?', '');
+          end;
         end;
       end;
     end;

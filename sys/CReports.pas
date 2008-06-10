@@ -1673,7 +1673,6 @@ begin
   UpdateChartsThumbnails;
   if TCChartReportForm(FForm).charts.Count > 0 then begin
     TCChartReportForm(FForm).ActiveChartIndex := 0;
-    //RecalculateBarWidth(TCChartReportForm(FForm).charts.Items[0]);
     SetChartProps;
   end;
 end;

@@ -183,8 +183,8 @@ begin
   if xFilename <> '' then begin
     GDebugLog := GetSystemPathname(xFilename);
   end;
+  xFilename := '';
   InitializeFrameGlobals;
-//  ShowXmlFile(Nil, Nil);
   if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
     InitializeProxies(GDataProvider);
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin

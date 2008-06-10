@@ -424,7 +424,7 @@ begin
     try
       xReg.RootKey := HKEY_CURRENT_USER;
       if xReg.OpenKey('Software\Microsoft\Windows\CurrentVersion\Run', False) then begin
-        if startupInfo or startupInfoSurpassedLimit then begin
+        if startupInfo then begin
           xReg.WriteString('CManagerCheckOnly', '"' + ExpandFileName(ParamStr(0)) + '" /checkonly');
         end else begin
           xReg.DeleteValue('CManagerCheckOnly');
@@ -540,7 +540,7 @@ end;
 
 procedure TCPreferencesForm.ComboBoxBackupActionChange(Sender: TObject);
 begin
-  CStaticBackupCat.Enabled := (ComboBoxBackupAction.ItemIndex = 0) or (ComboBoxBackupAction.ItemIndex = 1);
+  CStaticBackupCat.Enabled := (ComboBoxBackupAction.ItemIndex <> 3);
   EditBackupName.Enabled := CStaticBackupCat.Enabled;
   CheckBoxCanOverwrite.Enabled := CStaticBackupCat.Enabled;
   ActionAdd.Enabled := EditBackupName.Enabled;
