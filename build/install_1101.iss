@@ -58,7 +58,7 @@ Source: ..\..\bin\Wtyczki\NBPBSCurrencyRates.dll; DestDir: {app}\Wtyczki\; Compo
 Source: ..\..\bin\Wtyczki\MbankExtFF.dll; DestDir: {app}\Wtyczki\; Components: plugins\mbank; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\Metastock.dll; DestDir: {app}\Wtyczki\; Components: plugins\exchange; Flags: ignoreversion
 Source: ..\..\bin\Wtyczki\SqlConsole.dll; DestDir: {app}\Wtyczki\; Components: advanced\psql; Flags: ignoreversion
-Source: ..\..\sources\res\home.url; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\..\b_head\res\home.url; DestDir: {app}; Components: program; Flags: ignoreversion
 
 [Icons]
 Name: {group}\CManager; Filename: {app}\CManager.exe; WorkingDir: {app}
