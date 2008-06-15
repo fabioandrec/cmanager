@@ -1119,6 +1119,7 @@ initialization
     backupOverwrite := False;
     evenListColor := clWindow;
     oddListColor := GetDarkerColor(evenListColor);
+    startupInfoOldDays := 90;
   end;
   GDescPatterns := TDescPatterns.Create(True);
   GViewsPreferences := TPrefList.Create(TViewPref);
