@@ -1160,7 +1160,13 @@ begin
             xOverallOutSum.AddSum(xIdCurrency, xElement.planned.cash, CEmptyDataGid);
             xNotrealOutSum.AddSum(xIdCurrency, xElement.planned.cash, CEmptyDataGid);
           end;
-          xStat := '';
+          if xElement.triggerDate < GWorkDate then begin
+            xStat := CPlannedScheduledOvertime;
+          end else if xElement.triggerDate = GWorkDate then begin
+            xStat := CPlannedScheduledTodayDescription;
+          end else begin
+            xStat := CPlannedScheduledReady;
+          end;
           xDate := xElement.triggerDate;
         end;
         Add('<td class="text" width="5%">' + IntToStr(xRec) + '</td>');
@@ -3184,6 +3190,9 @@ var xBody: TStringList;
     xNode: PVirtualNode;
     xAl: String;
     xExpand: String;
+    xPrefname: String;
+    xPref: TFontPref;
+    xFontStyle: String;
 begin
   xList := TCVirtualStringTreeParams(FParams).list;
   xBody := TStringList.Create;
@@ -3216,10 +3225,42 @@ begin
           end else begin
             xExpand := '&nbsp+&nbsp';
           end;
-        end else begin
-          xExpand := '&nbsp';
         end;
-        Add(Format('<td class="%s" width="%s">' + xExpand + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
+        xFontStyle := '';
+        if (xList.ViewPref <> Nil) then begin
+          if Assigned(xList.OnGetRowPreferencesName) then begin
+            if xList.NodeDataSize > 0 then begin
+              xList.OnGetRowPreferencesName(TObject(xList.GetNodeData(xNode)^), xPrefname);
+            end else begin
+              xList.OnGetRowPreferencesName(Nil, xPrefname);
+            end;
+          end else begin
+            xPrefname := '*';
+          end;
+          xPref := TFontPref(xList.ViewPref.Fontprefs.ByPrefname[xPrefname]);
+          if xPref <> Nil then begin
+            if fsStrikeOut in xPref.Font.Style then begin
+              xFontStyle := xFontStyle + 'text-decoration: line-through;';
+            end;
+            if fsUnderline in xPref.Font.Style then begin
+              xFontStyle := xFontStyle + 'text-decoration: underline;';
+            end;
+            if fsBold in xPref.Font.Style then begin
+              xFontStyle := xFontStyle + 'font-weight: bold;';
+            end;
+            if fsItalic in xPref.Font.Style then begin
+              xFontStyle := xFontStyle + 'font-style: italic;';
+            end;
+            if Odd(xList.GetVisibleIndex(xNode)) then begin
+              xFontStyle := xFontStyle + 'background-color: ' + ColorToHtmlColor(xPref.Background) + ';';
+            end else begin
+              xFontStyle := xFontStyle + 'background-color: ' + ColorToHtmlColor(xPref.BackgroundEven) + ';';
+            end;
+            xFontStyle := xFontStyle + 'color: ' + ColorToHtmlColor(xPref.Font.Color) + ';';
+            xFontStyle := 'style="' + xFontStyle + '"';
+          end;
+        end;
+        Add(Format('<td %s class="%s" width="%s">' + xExpand + xList.Text[xNode, xColumns[xCount].Index] + '</td>', [xFontStyle, xAl, IntToStr(GetColumnPercentage(xColumns[xCount])) + '%']));
       end;
       Add('</tr>');
       xNode := xList.GetNextVisible(xNode);
