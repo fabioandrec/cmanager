@@ -80,7 +80,10 @@ procedure GetScheduledObjects(AList: TObjectList; APlannedObjects, ADoneObjects:
   begin
     xCurDate := IncDay(AFromDate, -3);
     xToDate :=  IncDay(AToDate, 3);
-    xTimes := AMovement.doneCount;
+    if AMovement.endCondition = CEndConditionTimes then begin
+      xCurDate := IncDay(AMovement.scheduleDate, -3);
+    end;
+    xTimes := 0;
     while (xCurDate <= xToDate) do begin
       DecodeDate(xCurDate, xY, xM, xD);
       xDueDate := 0;

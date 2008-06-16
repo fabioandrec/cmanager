@@ -1,6 +1,6 @@
 object CImageLists: TCImageLists
   OldCreateOrder = False
-  Left = 266
+  Left = 254
   Top = 100
   Height = 747
   Width = 1026
