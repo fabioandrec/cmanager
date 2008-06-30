@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 306
-  Top = 166
+  Left = 180
+  Top = 64
   Caption = 'Preferencje'
   ClientHeight = 486
   ClientWidth = 609
@@ -48,7 +48,7 @@ inherited CPreferencesForm: TCPreferencesForm
           Top = 22
           Width = 478
           Height = 422
-          ActivePage = TabSheetBase
+          ActivePage = TabSheetView
           Align = alClient
           Style = tsFlatButtons
           TabOrder = 1
@@ -359,9 +359,9 @@ inherited CPreferencesForm: TCPreferencesForm
             end
             object GroupBox4: TGroupBox
               Left = 192
-              Top = 8
+              Top = 7
               Width = 265
-              Height = 257
+              Height = 262
               Caption = ' Czcionki i kolory element'#243'w list  '
               TabOrder = 1
               object CButton4: TCButton
@@ -441,16 +441,16 @@ inherited CPreferencesForm: TCPreferencesForm
               end
             end
             object GroupBox7: TGroupBox
-              Left = 192
-              Top = 280
-              Width = 265
+              Left = 8
+              Top = 148
+              Width = 169
               Height = 121
               Caption = ' Domy'#347'lne kolory element'#243'w list '
               TabOrder = 2
               object Panel4: TPanel
                 Left = 24
                 Top = 32
-                Width = 217
+                Width = 121
                 Height = 25
                 Cursor = crHandPoint
                 BevelOuter = bvLowered
@@ -461,7 +461,7 @@ inherited CPreferencesForm: TCPreferencesForm
               object Panel5: TPanel
                 Left = 24
                 Top = 72
-                Width = 217
+                Width = 121
                 Height = 25
                 Cursor = crHandPoint
                 BevelOuter = bvLowered
@@ -469,6 +469,14 @@ inherited CPreferencesForm: TCPreferencesForm
                 TabOrder = 1
                 OnClick = Panel5Click
               end
+            end
+            object GroupBox12: TGroupBox
+              Left = 8
+              Top = 288
+              Width = 449
+              Height = 105
+              Caption = ' Wygl'#261'd raport'#243'w '
+              TabOrder = 3
             end
           end
           object TabSheetAutostart: TTabSheet

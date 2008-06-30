@@ -127,6 +127,7 @@ type
     Label14: TLabel;
     Label15: TLabel;
     CStaticDefaultCurrency: TCStatic;
+    GroupBox12: TGroupBox;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
