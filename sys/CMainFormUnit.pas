@@ -189,7 +189,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
      CImportExportDatafileFormUnit, CChangePasswordFormUnit,
   CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
-  CDepositCalculatorFormUnit, CDebug;
+  CDepositCalculatorFormUnit, CDebug, CReports;
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
@@ -780,13 +780,13 @@ end;
 
 procedure TCMainForm.ActionCssExecute(Sender: TObject);
 begin
-  if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
-    GetFileFromResource('REPCSS', RT_RCDATA, GetSystemPathname(CCSSReportFile));
+  if not FileExists(GetCSSReportFile) then begin
+    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile);
   end;
-  if FileExists(GetSystemPathname(CCSSReportFile)) then begin
-    ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CCSSReportFile)), Nil, SW_SHOWNORMAL);
+  if FileExists(GetCSSReportFile) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetCSSReportFile), Nil, SW_SHOWNORMAL);
   end else begin
-    ShowInfo(itError, 'Nie odnaleziono pliku "report.css". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+    ShowInfo(itError, 'Nie odnaleziono pliku "' + GetCSSReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
   end;
 end;
 
@@ -846,13 +846,13 @@ end;
 
 procedure TCMainForm.ActionXslExecute(Sender: TObject);
 begin
-  if not FileExists(GetSystemPathname(CXSLReportFile)) then begin
-    GetFileFromResource('REPXSL', RT_RCDATA, GetSystemPathname(CXSLReportFile));
+  if not FileExists(GetXSLReportFile) then begin
+    GetFileFromResource('REPXSL', RT_RCDATA, GetXSLReportFile);
   end;
-  if FileExists(GetSystemPathname(CXSLReportFile)) then begin
-    ShellExecute(0, Nil, 'notepad.exe', PChar(GetSystemPathname(CXSLReportFile)), Nil, SW_SHOWNORMAL);
+  if FileExists(GetXSLReportFile) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetXSLReportFile), Nil, SW_SHOWNORMAL);
   end else begin
-    ShowInfo(itError, 'Nie odnaleziono pliku "' + CXSLReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+    ShowInfo(itError, 'Nie odnaleziono pliku "' + GetXSLReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
   end;
 end;
 

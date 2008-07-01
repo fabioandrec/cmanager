@@ -185,7 +185,7 @@ begin
   end;
   xFilename := '';
   InitializeFrameGlobals;
-  if InitializeSettings(GetSystemPathname(CSettingsFilename)) then begin
+  if InitializeSettings(GetSettingsFilename) then begin
     InitializeProxies(GDataProvider);
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
@@ -222,7 +222,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

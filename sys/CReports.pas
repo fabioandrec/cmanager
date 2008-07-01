@@ -703,6 +703,9 @@ type
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
 procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
+function GetCSSReportFile: String;
+function GetXSLReportFile: String;
+function GetHTMReportFile: String;
 
 implementation
 
@@ -720,19 +723,22 @@ uses Forms, Adodb, CConfigFormUnit, Math,
 var LDefaultXsl: ICXMLDOMDocument = Nil;
     LPropertyXml: ICXMLDOMDocument = Nil;
 
+const CPrivateCSSReportFile = 'report.css';
+      CPrivateXSLReportFile = 'transform.xml';
+      CPrivateHTMReportFile = 'report.htm';
 
 function TCHtmlReport.GetDefaultXsl(var AError: String): ICXMLDOMDocument;
 var xStr: TStringList;
 begin
   Result := Nil;
   PrepareReportPath;
-  if not FileExists(GetSystemPathname(CXSLReportFile)) then begin
-    GetFileFromResource('REPXSL', RT_RCDATA, GetSystemPathname(CXSLReportFile));
+  if not FileExists(GetXSLReportFile) then begin
+    GetFileFromResource('REPXSL', RT_RCDATA, GetXSLReportFile);
   end;
   xStr := TStringList.Create;
   try
     try
-      xStr.LoadFromFile(GetSystemPathname(CXSLReportFile));
+      xStr.LoadFromFile(GetXSLReportFile);
       xStr.Text := StringReplace(xStr.Text, '[repstyle]', FreportStyle.Text, [rfReplaceAll, rfIgnoreCase]);
       xStr.Text := StringReplace(xStr.Text, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
       xStr.Text := StringReplace(xStr.Text, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
@@ -1593,14 +1599,14 @@ end;
 
 procedure TCHtmlReport.PrepareReportPath;
 begin
-  if not FileExists(GetSystemPathname(CCSSReportFile)) then begin
-    GetFileFromResource('REPCSS', RT_RCDATA, GetSystemPathname(CCSSReportFile));
+  if not FileExists(GetCSSReportFile) then begin
+    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile);
   end;
-  if not FileExists(GetSystemPathname(CHTMReportFile)) then begin
-    GetFileFromResource('REPBASE', RT_RCDATA, GetSystemPathname(CHTMReportFile));
+  if not FileExists(GetHTMReportFile) then begin
+    GetFileFromResource('REPBASE', RT_RCDATA, GetHTMReportFile);
   end;
-  FreportText.LoadFromFile(GetSystemPathname(CHTMReportFile));
-  FreportStyle.LoadFromFile(GetSystemPathname(CCSSReportFile));
+  FreportText.LoadFromFile(GetHTMReportFile);
+  FreportStyle.LoadFromFile(GetCSSReportFile);
 end;
 
 function TCChartReport.CanShowReport: Boolean;
@@ -3206,7 +3212,12 @@ begin
       end else begin
         xAl := 'headtext';
       end;
-      Add('<td class="' + xAl + '" width="' + IntToStr(GetColumnPercentage(xColumns[xCount])) + '%">' + xColumns[xCount].Text + '</td>');
+      if GBasePreferences.listAsReportUseColors then begin
+        xFontStyle := 'style="background-color: ' + ColorToHtmlColor(xList.Header.Background) + ';"';
+      end else begin
+        xFontStyle := '';
+      end;
+      Add('<td ' + xFontStyle + ' class="' + xAl + '" width="' + IntToStr(GetColumnPercentage(xColumns[xCount])) + '%">' + xColumns[xCount].Text + '</td>');
     end;
     Add('</tr>');
     Add('</table><hr><table class="base" colspan=' + IntToStr(Length(xColumns)) + '>');
@@ -3239,24 +3250,28 @@ begin
           end;
           xPref := TFontPref(xList.ViewPref.Fontprefs.ByPrefname[xPrefname]);
           if xPref <> Nil then begin
-            if fsStrikeOut in xPref.Font.Style then begin
-              xFontStyle := xFontStyle + 'text-decoration: line-through;';
+            if GBasePreferences.listAsReportUseFonts then begin
+              if fsStrikeOut in xPref.Font.Style then begin
+                xFontStyle := xFontStyle + 'text-decoration: line-through;';
+              end;
+              if fsUnderline in xPref.Font.Style then begin
+                xFontStyle := xFontStyle + 'text-decoration: underline;';
+              end;
+              if fsBold in xPref.Font.Style then begin
+                xFontStyle := xFontStyle + 'font-weight: bold;';
+              end;
+              if fsItalic in xPref.Font.Style then begin
+                xFontStyle := xFontStyle + 'font-style: italic;';
+              end;
             end;
-            if fsUnderline in xPref.Font.Style then begin
-              xFontStyle := xFontStyle + 'text-decoration: underline;';
+            if GBasePreferences.listAsReportUseColors then begin
+              if Odd(xList.GetVisibleIndex(xNode)) then begin
+                xFontStyle := xFontStyle + 'background-color: ' + ColorToHtmlColor(xPref.Background) + ';';
+              end else begin
+                xFontStyle := xFontStyle + 'background-color: ' + ColorToHtmlColor(xPref.BackgroundEven) + ';';
+              end;
+              xFontStyle := xFontStyle + 'color: ' + ColorToHtmlColor(xPref.Font.Color) + ';';
             end;
-            if fsBold in xPref.Font.Style then begin
-              xFontStyle := xFontStyle + 'font-weight: bold;';
-            end;
-            if fsItalic in xPref.Font.Style then begin
-              xFontStyle := xFontStyle + 'font-style: italic;';
-            end;
-            if Odd(xList.GetVisibleIndex(xNode)) then begin
-              xFontStyle := xFontStyle + 'background-color: ' + ColorToHtmlColor(xPref.Background) + ';';
-            end else begin
-              xFontStyle := xFontStyle + 'background-color: ' + ColorToHtmlColor(xPref.BackgroundEven) + ';';
-            end;
-            xFontStyle := xFontStyle + 'color: ' + ColorToHtmlColor(xPref.Font.Color) + ';';
             xFontStyle := 'style="' + xFontStyle + '"';
           end;
         end;
@@ -5501,6 +5516,21 @@ end;
 function TDepositReport.GetReportTitle: String;
 begin
   Result := 'Informacje o lokacie';
+end;
+
+function GetCSSReportFile: String;
+begin
+  Result := GetUserProfilePathname(CPrivateCSSReportFile);
+end;
+
+function GetXSLReportFile: String;
+begin
+  Result := GetUserProfilePathname(CPrivateXSLReportFile);
+end;
+
+function GetHTMReportFile: String;
+begin
+  Result := GetUserProfilePathname(CPrivateHTMReportFile);
 end;
 
 initialization

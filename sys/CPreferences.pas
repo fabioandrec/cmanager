@@ -158,6 +158,8 @@ type
     FevenListColor: TColor;
     FoddListColor: TColor;
     FconfigFileVersion: String;
+    FlistAsReportUseColors: Boolean;
+    FlistAsReportUseFonts: Boolean;
   public
     function GetBackupfilename: String;
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
@@ -205,6 +207,8 @@ type
     property evenListColor: TColor read FevenListColor write FevenListColor;
     property oddListColor: TColor read FoddListColor write FoddListColor;
     property configFileVersion: String read FconfigFileVersion write FconfigFileVersion;
+    property listAsReportUseColors: Boolean read FlistAsReportUseColors write FlistAsReportUseColors;
+    property listAsReportUseFonts: Boolean read FlistAsReportUseFonts write FlistAsReportUseFonts;
   end;
 
   TDescPatterns = class(TStringList)
@@ -294,6 +298,8 @@ begin
   FevenListColor := TBasePref(APrefItem).evenListColor;
   FoddListColor := TBasePref(APrefItem).oddListColor;
   FstartupInfoOldDays := TBasePref(APrefItem).startupInfoOldDays;
+  FlistAsReportUseColors := TBasePref(APrefItem).listAsReportUseColors;
+  FlistAsReportUseFonts := TBasePref(APrefItem).listAsReportUseFonts;
 end;
 
 function TBasePref.ExpandTemplate(ATemplate: String): String;
@@ -388,6 +394,8 @@ begin
   FstartupUncheckedExtractions := GetXmlAttribute('startupUncheckedExtractions', ANode, False);
   FevenListColor := StringToColor(GetXmlAttribute('evenListColor', ANode, ColorToString(clWindow)));
   FoddListColor := StringToColor(GetXmlAttribute('oddListColor', ANode, ColorToString(GetDarkerColor(FevenListColor))));
+  FlistAsReportUseColors := GetXmlAttribute('listAsReportUseColors', ANode, False);
+  FlistAsReportUseFonts := GetXmlAttribute('listAsReportUseFonts', ANode, False);
 end;
 
 function TBasePref.QueryInterface(const IID: TGUID; out Obj): HRESULT;
@@ -435,6 +443,8 @@ begin
   SetXmlAttribute('evenListColor', ANode, ColorToString(FevenListColor));
   SetXmlAttribute('oddListColor', ANode, ColorToString(FoddListColor));
   SetXmlAttribute('startupInfoOldDays', ANode, FstartupInfoOldDays);
+  SetXmlAttribute('listAsReportUseColors', ANode, FlistAsReportUseColors);
+  SetXmlAttribute('listAsReportUseFonts', ANode, FlistAsReportUseFonts);
 end;
 
 constructor TDescPatterns.Create(ASaveToDatabase: Boolean);
@@ -1108,6 +1118,8 @@ initialization
     startupInfoAlways := True;
     startupInfoSurpassedLimit := True;
     startupUncheckedExtractions := False;
+    listAsReportUseColors := False;
+    listAsReportUseFonts := False;
     startupInfoValidLimits := False;
     startupCheckUpdates := False;
     workDays := '+++++--';

@@ -6,7 +6,7 @@ interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics, Math;
+uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics, Math, ShlObj;
 
 const
   CEmptyDataGid = '';
@@ -113,6 +113,7 @@ function GetHalfOfTheYear(ADateTime: TDateTime): Integer;
 function GetFormattedDate(ADate: TDateTime; AFormat: String): String;
 function GetFormattedTime(ADate: TDateTime; AFormat: String): String;
 function GetSystemPathname(AFilename: String): String;
+function GetUserProfilePathname(AFilename: String): String;
 function ChangeColorsToRgb(AString: String): String;
 function ColorToHtmlColor(AColor: TColor): String;
 procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
@@ -1192,6 +1193,31 @@ var xText: String;
 begin
   xText := StringReplace(AText, ASubstring, '', [rfReplaceAll, rfIgnoreCase]);
   Result := (Length(AText) - Length(xText)) div Length(ASubstring);
+end;
+
+function GetSpecialFolder(const ACSIDL: Integer): String;
+var xRecPath: PAnsiChar;
+begin
+  xRecPath := StrAlloc(MAX_PATH);
+  try
+    FillChar(xRecPath^, MAX_PATH, 0);
+    if SHGetSpecialFolderPath(0, xRecPath, ACSIDL, False) then begin
+      Result := xRecPath;
+    end else begin
+      Result := '';
+    end;
+  finally
+    StrDispose(xRecPath);
+  end;
+end;
+
+function GetUserProfilePathname(AFilename: String): String;
+var xCat: String;
+begin
+  xCat := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'CManager';
+  if ForceDirectories(xCat) then begin
+    Result := IncludeTrailingPathDelimiter(xCat) + AFilename;
+  end;
 end;
 
 end.

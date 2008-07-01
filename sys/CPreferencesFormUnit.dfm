@@ -1,6 +1,6 @@
 inherited CPreferencesForm: TCPreferencesForm
-  Left = 180
-  Top = 64
+  Left = 295
+  Top = 30
   Caption = 'Preferencje'
   ClientHeight = 486
   ClientWidth = 609
@@ -475,8 +475,58 @@ inherited CPreferencesForm: TCPreferencesForm
               Top = 288
               Width = 449
               Height = 105
-              Caption = ' Wygl'#261'd raport'#243'w '
+              Caption = ' Wy'#347'wietl jako raport dla list '
               TabOrder = 3
+              object Label16: TLabel
+                Left = 18
+                Top = 32
+                Width = 66
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Kolory wierszy'
+              end
+              object Label17: TLabel
+                Left = 36
+                Top = 68
+                Width = 48
+                Height = 13
+                Alignment = taRightJustify
+                Caption = 'Kr'#243'j pisma'
+              end
+              object ComboBoxListAsColors: TComboBox
+                Left = 92
+                Top = 28
+                Width = 325
+                Height = 21
+                BevelInner = bvNone
+                BevelKind = bkTile
+                Style = csDropDownList
+                ItemHeight = 13
+                ItemIndex = 0
+                TabOrder = 0
+                Text = 'U'#380'ywaj standardowych ustawie'#324' raport'#243'w'
+                OnChange = ComboBoxDaysChange
+                Items.Strings = (
+                  'U'#380'ywaj standardowych ustawie'#324' raport'#243'w'
+                  'U'#380'ywaj kolor'#243'w listy')
+              end
+              object ComboBoxListAsFonts: TComboBox
+                Left = 92
+                Top = 64
+                Width = 325
+                Height = 21
+                BevelInner = bvNone
+                BevelKind = bkTile
+                Style = csDropDownList
+                ItemHeight = 13
+                ItemIndex = 0
+                TabOrder = 1
+                Text = 'U'#380'ywaj standardowych ustawie'#324' raport'#243'w'
+                OnChange = ComboBoxDaysChange
+                Items.Strings = (
+                  'U'#380'ywaj standardowych ustawie'#324' raport'#243'w'
+                  'U'#380'ywaj czcionek listy')
+              end
             end
           end
           object TabSheetAutostart: TTabSheet

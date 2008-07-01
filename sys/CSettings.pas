@@ -4,9 +4,6 @@ interface
 
 uses Forms, Windows, CXml;
 
-const
-  CSettingsFilename = 'CManager.cfg';
-
 function InitializeSettings(AFileName: String): Boolean;
 procedure FinalizeSettings(AFilename: String);
 procedure SaveSettings;
@@ -22,6 +19,7 @@ function GetSettingsBackups: ICXMLDOMNode;
 function GetSettingsPlugins: ICXMLDOMNode;
 function GetSettingsCharts: ICXMLDOMNode;
 function GetSettingsFrames: ICXMLDOMNode;
+function GetSettingsFilename: String;
 
 implementation
 
@@ -29,6 +27,8 @@ uses CInfoFormUnit, SysUtils, Types, CDatabase, CBaseFrameUnit, CConsts,
   CPreferences, CTools, CComponents;
 
 var GSettings: ICXMLDOMDocument = Nil;
+
+const CSettingsFilename = 'CManager.cfg';
 
 function GetSettingsRoot: ICXMLDOMNode;
 begin
@@ -261,7 +261,7 @@ begin
   end;
   GBasePreferences.SaveToXml(GetSettingsPreferences);
   SetXmlAttribute('configFileVersion', GetSettingsRoot, GBasePreferences.configFileVersion);
-  FinalizeSettings(GetSystemPathname(CSettingsFilename));
+  FinalizeSettings(GetSettingsFilename);
 end;
 
 procedure FinalizeSettings(AFilename: String);
@@ -290,6 +290,11 @@ begin
     SetXmlAttribute('state', xNode, AState);
     Result := xNode;
   end;
+end;
+
+function GetSettingsFilename: String;
+begin
+  Result := GetUserProfilePathname(CSettingsFilename);
 end;
 
 end.

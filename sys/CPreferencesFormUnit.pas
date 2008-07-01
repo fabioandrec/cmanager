@@ -128,6 +128,10 @@ type
     Label15: TLabel;
     CStaticDefaultCurrency: TCStatic;
     GroupBox12: TGroupBox;
+    Label16: TLabel;
+    ComboBoxListAsColors: TComboBox;
+    ComboBoxListAsFonts: TComboBox;
+    Label17: TLabel;
     procedure CStaticFileNameGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure RadioButtonLastClick(Sender: TObject);
     procedure RadioButtonThisClick(Sender: TObject);
@@ -327,6 +331,8 @@ begin
     CheckBoxExtractions.Checked := startupUncheckedExtractions;
     Panel5.Color := oddListColor;
     Panel4.Color := evenListColor;
+    ComboBoxListAsColors.ItemIndex := IfThen(listAsReportUseColors, 1, 0);
+    ComboBoxListAsFonts.ItemIndex := IfThen(listAsReportUseFonts, 1, 0);
   end;
   GDataProvider.BeginTransaction;
   if GDefaultAccountId <> CEmptyDataGid then begin
@@ -419,6 +425,8 @@ begin
     backupFileName := EditBackupName.Text;
     backupOverwrite := CheckBoxCanOverwrite.Checked;
     startupUncheckedExtractions := CheckBoxExtractions.Checked;
+    listAsReportUseColors := ComboBoxListAsColors.ItemIndex = 1;
+    listAsReportUseFonts := ComboBoxListAsFonts.ItemIndex = 1;
     oddListColor := Panel5.Color;
     evenListColor := Panel4.Color;
     xReg := TRegistry.Create;

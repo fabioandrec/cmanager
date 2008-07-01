@@ -30,9 +30,6 @@ const
   WMOPT_REFRESHQUICKPATTERNS = 3;
 
 const
-  CCSSReportFile = 'report.css';
-  CXSLReportFile = 'transform.xml';
-  CHTMReportFile = 'report.htm';
   CXSLDefaultTransformResname = 'DEFAULTXSL';
 
 const
