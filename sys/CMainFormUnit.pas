@@ -2,12 +2,14 @@ unit CMainFormUnit;
 
 interface
 
+{$WARN UNIT_PLATFORM OFF}
+
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList, CXml, PngSpeedButton, ShellApi,
-  CBaseFrameUnit, Menus, CInitializeProviderFormUnit;
+  CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl;
 
 type
   TCMainForm = class(TForm)
@@ -407,7 +409,9 @@ begin
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
     Caption := 'CManager - obs³uga finansów (na dzieñ ' + Date2StrDate(GWorkDate) + ')';
-    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' + AnsiLowerCase(ExpandFileName(GDataProvider.Filename));
+    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' +
+                                      MinimizeName(AnsiLowerCase(ExpandFileName(GDataProvider.Filename)),
+                                                   StatusBar.Canvas, 300);
   end else begin
     Caption := 'CManager - obs³uga finansów';
     StatusBar.Panels.Items[0].Text := ' (brak otwartego pliku danych)';

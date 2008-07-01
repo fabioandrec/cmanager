@@ -119,10 +119,13 @@ function ColorToHtmlColor(AColor: TColor): String;
 procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
 function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
 function CalculateSubstrings(AText: String; ASubstring: String): Integer;
+function GetDatafileDefaultFilename: String;
 
 implementation
 
 uses SysUtils, StrUtils, DateUtils;
+
+const CPrivateDefaultFilename = 'CManager.dat';
 
 const CSupportedColors: array[0..51] of TColor = (
           clBlack, clMaroon, clGreen, clOlive, clNavy, clPurple, clTeal, clGray, clSilver,
@@ -1217,6 +1220,15 @@ begin
   xCat := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'CManager';
   if ForceDirectories(xCat) then begin
     Result := IncludeTrailingPathDelimiter(xCat) + AFilename;
+  end;
+end;
+
+function GetDatafileDefaultFilename: String;
+var xCat: String;
+begin
+  xCat := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'CManager';
+  if ForceDirectories(xCat) then begin
+    Result := IncludeTrailingPathDelimiter(xCat) + CPrivateDefaultFilename;
   end;
 end;
 

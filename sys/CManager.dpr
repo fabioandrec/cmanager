@@ -189,7 +189,7 @@ begin
     InitializeProxies(GDataProvider);
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
-        xFilename := GetSystemPathname(CDefaultFilename);
+        xFilename := GetDatafileDefaultFilename;
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened then begin
         xFilename := GBasePreferences.lastOpenedDatafilename;
       end else if GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile then begin

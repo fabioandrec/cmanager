@@ -151,7 +151,7 @@ type
     FbackupAction: Integer;
     FbackupOnStart: Boolean;
     FbackupDaysOld: Integer;
-    FbakupDirectory: String;
+    FbackupDirectory: String;
     FbackupFileName: String;
     FbackupOverwrite: Boolean;
     FstartupUncheckedExtractions: Boolean;
@@ -201,7 +201,7 @@ type
     property backupOnStart: Boolean read FbackupOnStart write FbackupOnStart;
     property backupAction: Integer read FbackupAction write FbackupAction;
     property backupDaysOld: Integer read FbackupDaysOld write FbackupDaysOld;
-    property backupDirectory: String read FbakupDirectory write FbakupDirectory;
+    property backupDirectory: String read FbackupDirectory write FbackupDirectory;
     property backupFileName: String read FbackupFileName write FbackupFileName;
     property backupOverwrite: Boolean read FbackupOverwrite write FbackupOverwrite;
     property evenListColor: TColor read FevenListColor write FevenListColor;
@@ -291,7 +291,7 @@ begin
   FbackupAction := TBasePref(APrefItem).backupAction;
   FbackupOnStart := TBasePref(APrefItem).backupOnStart;
   FbackupDaysOld := TBasePref(APrefItem).backupDaysOld;
-  FbakupDirectory := TBasePref(APrefItem).backupDirectory;
+  FbackupDirectory := TBasePref(APrefItem).backupDirectory;
   FbackupFileName := TBasePref(APrefItem).backupFileName;
   FbackupOverwrite := TBasePref(APrefItem).backupOverwrite;
   FstartupUncheckedExtractions := TBasePref(APrefItem).startupUncheckedExtractions;
@@ -359,7 +359,7 @@ procedure TBasePref.LoadFromXml(ANode: ICXMLDOMNode);
 begin
   inherited LoadFromXml(ANode);
   FstartupDatafileMode := GetXmlAttribute('startupfilemode', ANode, CStartupFilemodeThisfile);
-  FstartupDatafileName := GetXmlAttribute('startupfilename', ANode, GetSystemPathname(CDefaultFilename));
+  FstartupDatafileName := GetXmlAttribute('startupfilename', ANode, GetDatafileDefaultFilename);
   FlastOpenedDatafilename := GetXmlAttribute('lastopenedfilename', ANode, '');
   FshowShortcutBar := GetXmlAttribute('showShortcutBar', ANode, True);
   FshortcutBarSmall := GetXmlAttribute('shortcutBarSmall', ANode, False);
@@ -388,7 +388,7 @@ begin
   FbackupAction := GetXmlAttribute('backupAction', ANode, CBackupActionAsk);
   FbackupOnStart := GetXmlAttribute('backupOnStart', ANode, True);
   FbackupDaysOld := GetXmlAttribute('backupDaysOld', ANode, 7);
-  FbakupDirectory := GetXmlAttribute('backupDirectory', ANode, ExpandFileName(ExtractFilePath(ParamStr(0))));
+  FbackupDirectory := GetXmlAttribute('backupDirectory', ANode, ExpandFileName(ExtractFilePath(GetUserProfilePathname(''))));
   FbackupFileName := GetXmlAttribute('backupFilename', ANode, '@data@.cmb');
   FbackupOverwrite := GetXmlAttribute('backupOverwrite', ANode, False);
   FstartupUncheckedExtractions := GetXmlAttribute('startupUncheckedExtractions', ANode, False);
@@ -436,7 +436,7 @@ begin
   SetXmlAttribute('backupAction', ANode, FbackupAction);
   SetXmlAttribute('backupOnStart', ANode, FbackupOnStart);
   SetXmlAttribute('backupDaysOld', ANode, FbackupDaysOld);
-  SetXmlAttribute('backupDirectory', ANode, FbakupDirectory);
+  SetXmlAttribute('backupDirectory', ANode, FbackupDirectory);
   SetXmlAttribute('backupFilename', ANode, FbackupFileName);
   SetXmlAttribute('backupOverwrite', ANode, FbackupOverwrite);
   SetXmlAttribute('startupUncheckedExtractions', ANode, FstartupUncheckedExtractions);
@@ -1102,7 +1102,7 @@ initialization
   GBasePreferences := TBasePref.Create('basepreferences');
   with GBasePreferences do begin
     startupDatafileMode := CStartupFilemodeFirsttime;
-    startupDatafileName := GetSystemPathname(CDefaultFilename);
+    startupDatafileName := GetDatafileDefaultFilename;
     showShortcutBar := True;
     showStatusBar := True;
     lastOpenedDatafilename := '';
@@ -1126,7 +1126,7 @@ initialization
     backupAction := CBackupActionAsk;
     backupOnStart := False;
     backupDaysOld := 7;
-    backupDirectory := ExpandFileName(ExtractFilePath(ParamStr(0)));
+    backupDirectory := ExpandFileName(ExtractFilePath(GetUserProfilePathname('')));
     backupFileName := '@data@ @godz@ @min@.cmb';
     backupOverwrite := False;
     evenListColor := clWindow;
