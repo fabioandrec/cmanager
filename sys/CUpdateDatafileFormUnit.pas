@@ -184,10 +184,10 @@ begin
     ProgressBar.StepBy(1);
     //Kork 3
     if xProceed then begin
-      AddToReport('Uaktualnianie pliku danych');
+      AddToReport('Uaktualnianie pliku danych ' + FFilename);
       Result := True;
       xLogFile := DbGetSqllogfile;
-      DbSetSqllogfile(GetSystemPathname(ChangeFileExt(FFilename, '') + '_update.log'));
+      DbSetSqllogfile(ChangeFileExt(FFilename, '') + '_update.log');
       SaveToLog('Sesja uaktualnienia z ' + FFromVersion + ' do ' + FToVersion, DbGetSqllogfile);
       xCurDbversion := FFromDbversion;
       while Result and (xCurDbversion <> FToDbversion) do begin
