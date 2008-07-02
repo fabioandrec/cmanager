@@ -15,9 +15,10 @@ function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TA
 function DbConnectDatabase(AConnectionString: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean; overload;
 function DbExecuteSql(AConnection: TADOConnection; ASql: String; AOneStatement: Boolean; var AErrorText: String; ADbProgressEvent: TDbExecuteSqlProgress = Nil): Boolean;
 function DbOpenSql(AConnection: TADOConnection; ASql: String; var AErrorText: String): TADOQuery;
+function DbGetSqllogfile: String;
+procedure DbSetSqllogfile(AFilename: String);
 
-var DbSqllogfile: String = '';
-    DbLastStatement: String = '';
+var DbLastStatement: String = '';
     DbLastError: String = '';
 
 const CInsertCmanagerInfo = 'insert into cmanagerInfo (version, created) values (''%s'', %s)';
@@ -29,6 +30,8 @@ uses CTools;
 const CConnectionString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s';
       CConnectionStringWithPass = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Jet OLEDB:Database Password=%s';
       CCreateExcelFile = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;Extended Properties="Excel 8.0"';
+
+var GPrivateSqllogfile: String = '';
 
 function DbConnectDatabase(AFilename: String; APassword: String; AConnection: TADOConnection; var AError: String; var ANativeError: Integer; AExclusive: Boolean): Boolean;
 var xConnectionString: String;
@@ -246,7 +249,7 @@ begin
         end;
         if Trim(xSql) <> '' then begin
           try
-            SaveToLog('Wykonywanie "' + xSql + '"', DbSqllogfile);
+            SaveToLog('Wykonywanie "' + xSql + '"', DbGetSqllogfile);
             DbLastStatement := xSql;
             AConnection.Execute(xSql, cmdText, [eoExecuteNoRecords]);
           except
@@ -268,7 +271,7 @@ begin
       end;
       if Trim(ASql) <> '' then begin
         try
-          SaveToLog('Wykonywanie "' + ASql + '"', DbSqllogfile);
+          SaveToLog('Wykonywanie "' + ASql + '"', DbGetSqllogfile);
           DbLastStatement := ASql;
           AConnection.Execute(ASql, cmdText, [eoExecuteNoRecords]);
         except
@@ -284,14 +287,14 @@ begin
       end;
     end;
     if not Result then begin
-      SaveToLog('B³¹d "' + AErrorText + '"', DbSqllogfile);
+      SaveToLog('B³¹d "' + AErrorText + '"', DbGetSqllogfile);
     end;
   end;
 end;
 
 function DbOpenSql(AConnection: TADOConnection; ASql: String; var AErrorText: String): TADOQuery;
 begin
-  SaveToLog('Otwieranie "' + ASql + '"', DbSqllogfile);
+  SaveToLog('Otwieranie "' + ASql + '"', DbGetSqllogfile);
   Result := TADOQuery.Create(Nil);
   try
     Result.ParamCheck := False;
@@ -308,8 +311,18 @@ begin
     end;
   end;
   if Result = Nil then begin
-    SaveToLog('B³¹d "' + AErrorText + '"', DbSqllogfile);
+    SaveToLog('B³¹d "' + AErrorText + '"', DbGetSqllogfile);
   end;
+end;
+
+function DbGetSqllogfile: String;
+begin
+  Result := GPrivateSqllogfile;
+end;
+
+procedure DbSetSqllogfile(AFilename: String);
+begin
+  GPrivateSqllogfile := AFilename;
 end;
 
 end.

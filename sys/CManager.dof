@@ -154,9 +154,9 @@ Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\Trash
-Item1=..\..\..\..\Trash
+Item0=..\..\..\..\Trash
+Item1=..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\Bin
-Item1=..\..\..\..\Bin\Wtyczki
+Item0=..\..\..\..\Bin\Wtyczki
+Item1=..\..\Bin

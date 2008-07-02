@@ -173,7 +173,7 @@ begin
   DebugStartTickCount('CManager');
   xFilename := GetParamValue('/savequery');
   if xFilename <> '' then begin
-    DbSqllogfile := GetSystemPathname(xFilename);
+    DbSetSqllogfile(GetSystemPathname(xFilename));
   end;
   xFilename := GetParamValue('/saveplugin');
   if xFilename <> '' then begin

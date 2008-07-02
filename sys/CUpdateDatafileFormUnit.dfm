@@ -89,11 +89,14 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
     Top = 98
     Width = 318
     Height = 21
+    Hint = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     AutoSize = False
     BevelKind = bkTile
     Caption = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     Color = clWindow
     ParentColor = False
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 2
     TabStop = True
     Transparent = False

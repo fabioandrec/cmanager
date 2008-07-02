@@ -186,12 +186,12 @@ begin
     if xProceed then begin
       AddToReport('Uaktualnianie pliku danych');
       Result := True;
-      xLogFile := DbSqllogfile;
-      DbSqllogfile := GetSystemPathname(ChangeFileExt(FFilename, '') + '_update.log');
-      SaveToLog('Sesja uaktualnienia z ' + FFromVersion + ' do ' + FToVersion, DbSqllogfile);
+      xLogFile := DbGetSqllogfile;
+      DbSetSqllogfile(GetSystemPathname(ChangeFileExt(FFilename, '') + '_update.log'));
+      SaveToLog('Sesja uaktualnienia z ' + FFromVersion + ' do ' + FToVersion, DbGetSqllogfile);
       xCurDbversion := FFromDbversion;
       while Result and (xCurDbversion <> FToDbversion) do begin
-        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), DbSqllogfile);
+        SaveToLog(IntToStr(xCurDbversion) + ' -> ' + IntToStr(xCurDbversion + 1), DbGetSqllogfile);
         try
           xCommand := GetStringFromResources(Format('SQLUPD_%d_%d', [xCurDbversion, xCurDbversion + 1]), RT_RCDATA);
           Result := DbExecuteSql(FConnection, xCommand, False, xError);
@@ -207,7 +207,7 @@ begin
       if not Result then begin
         AddToReport('B³¹d uaktualniania struktur pliku danych, opis b³êdu ' + xError);
       end;
-      DbSqllogfile := xLogFile;
+      DbSetSqllogfile(xLogFile);
     end;
     ProgressBar.StepBy(1);
     //Krok 4

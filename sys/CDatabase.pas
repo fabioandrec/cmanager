@@ -495,7 +495,7 @@ begin
   if not FConnection.InTransaction then begin
     FConnection.BeginTrans;
   end;
-  SaveToLog('begin transaction', DbSqllogfile);
+  SaveToLog('begin transaction', DbGetSqllogfile);
 end;
 
 procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
@@ -521,7 +521,7 @@ begin
   if FConnection.InTransaction then begin
     if Result then begin
       FConnection.CommitTrans;
-      SaveToLog('commit transaction', DbSqllogfile);
+      SaveToLog('commit transaction', DbGetSqllogfile);
     end else begin
       FConnection.RollbackTrans;
     end;
@@ -627,7 +627,7 @@ procedure TDataProvider.RollbackTransaction;
 begin
   if FConnection.InTransaction then begin
     FConnection.RollbackTrans;
-    SaveToLog('rollback transaction', DbSqllogfile);
+    SaveToLog('rollback transaction', DbGetSqllogfile);
   end;
   ClearProxies(False);
 end;
