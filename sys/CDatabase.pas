@@ -270,12 +270,7 @@ begin
   xPassword := APassword;
   Result := ConnectToDatabase(xDatabaseName, xPassword, ADataProvider.Connection);
   if Result = iprSuccess then begin
-    if UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xFromVersion, xToVersion) then begin
-      if not UpdateConfiguration(GBasePreferences.configFileVersion, xFromVersion, xToVersion) then begin
-        Result := iprError;
-        ShowInfo(itError, 'Plik "' + xDatabaseName + '" nie jest poprawnym plikiem danych', '');
-      end;
-    end else begin
+    if not UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xFromVersion, xToVersion) then begin
       Result := iprError;
     end;
   end;

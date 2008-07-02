@@ -4,8 +4,8 @@ interface
 
 uses Forms, Windows, CXml;
 
-function InitializeSettings(AFileName: String): Boolean;
-procedure FinalizeSettings(AFilename: String);
+function InitializeSettings: Boolean;
+procedure FinalizeSettings;
 procedure SaveSettings;
 function SaveFormPosition(AName: String; ALeft, ATop, AWidth, AHeight, AState: Integer): ICXMLDOMNode; overload;
 function SaveFormPosition(AForm: TForm): ICXMLDOMNode; overload;
@@ -19,7 +19,7 @@ function GetSettingsBackups: ICXMLDOMNode;
 function GetSettingsPlugins: ICXMLDOMNode;
 function GetSettingsCharts: ICXMLDOMNode;
 function GetSettingsFrames: ICXMLDOMNode;
-function GetSettingsFilename: String;
+function GetSettingsFilename(AFromUserProfile: Boolean): String;
 
 implementation
 
@@ -211,12 +211,17 @@ begin
   end;
 end;
 
-function InitializeSettings(AFileName: String): Boolean;
+function InitializeSettings: Boolean;
+var xFilename: String;
 begin
   Result := IsValidXmlparserInstalled(True, True);
   if Result then begin
-    if (AFileName <> '') and FileExists(AFileName) then begin
-      GSettings := GetDocumentFromFile(AFileName, Nil);
+    xFilename := GetSettingsFilename(True);
+    if not FileExists(xFilename) then begin
+      xFilename := GetSettingsFilename(False);
+    end;
+    if FileExists(xFileName) then begin
+      GSettings := GetDocumentFromFile(xFileName, Nil);
       if GSettings <> Nil then begin
         if GSettings.parseError.errorCode <> 0 then begin
           ShowInfo(itError, 'B³¹d wczytywania pliku konfiguracyjnego. Nie mo¿na uruchomiæ aplikacji.', GetParseErrorDescription(GSettings.parseError, True));
@@ -236,6 +241,9 @@ begin
           GChartPreferences.LoadAllFromParentNode(GetSettingsCharts);
           GBasePreferences.LoadFromXml(GetSettingsPreferences);
           SetEvenListColors(GBasePreferences.evenListColor, GBasePreferences.oddListColor);
+          if not UpdateConfiguration(GBasePreferences.configFileVersion) then begin
+            Result := False;
+          end;
         end;
       end else begin
         Result := False;
@@ -261,13 +269,13 @@ begin
   end;
   GBasePreferences.SaveToXml(GetSettingsPreferences);
   SetXmlAttribute('configFileVersion', GetSettingsRoot, GBasePreferences.configFileVersion);
-  FinalizeSettings(GetSettingsFilename);
+  FinalizeSettings;
 end;
 
-procedure FinalizeSettings(AFilename: String);
+procedure FinalizeSettings;
 begin
   if GSettings <> Nil then begin
-    GSettings.save(AFilename);
+    GSettings.save(GetSettingsFilename(True));
     GSettings := Nil;
   end;
 end;
@@ -292,9 +300,13 @@ begin
   end;
 end;
 
-function GetSettingsFilename: String;
+function GetSettingsFilename(AFromUserProfile: Boolean): String;
 begin
-  Result := GetUserProfilePathname(CSettingsFilename);
+  if AFromUserProfile then begin
+    Result := GetUserProfilePathname(CSettingsFilename);
+  end else begin
+    Result := GetSystemPathname(CSettingsFilename);
+  end;
 end;
 
 end.

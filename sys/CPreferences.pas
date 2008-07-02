@@ -234,7 +234,7 @@ var GViewsPreferences: TPrefList;
 
 function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 function GetDefaultViewPreferences: TPrefList;
-function UpdateConfiguration(AFromConfigVersion, AFromDatafileVersion, AToDatafileVersion: String): Boolean;
+function UpdateConfiguration(AFromConfigVersion: String): Boolean;
 procedure SetInterfaceIcons(ASmall: Boolean);
 
 implementation
@@ -986,19 +986,19 @@ begin
   end;
 end;
 
-function UpdateConfiguration(AFromConfigVersion, AFromDatafileVersion, AToDatafileVersion: String): Boolean;
+function UpdateConfiguration(AFromConfigVersion: String): Boolean;
 var xFromDynArray, xToDynArray: TStringDynArray;
     xFromVersion, xToVersion, xTitle: String;
     x001008002000Answer: T001008002000Answer;
 begin
   Result := True;
-  xTitle := 'CManager - wersja ' + AToDatafileVersion;
+  xTitle := 'CManager - wersja ' + FileVersion(ParamStr(0));
   if AFromConfigVersion = '' then begin
-    xFromDynArray := StringToStringArray(AFromDatafileVersion, '.');
+    xFromDynArray := StringToStringArray('1.8.1.40', '.');
   end else begin
     xFromDynArray := StringToStringArray(AFromConfigVersion, '.');
   end;
-  xToDynArray := StringToStringArray(AToDatafileVersion, '.');
+  xToDynArray := StringToStringArray(FileVersion(ParamStr(0)), '.');
   if (Length(xFromDynArray) <> 4) and (Length(xToDynArray) <> 4) then begin
     Result := False;
   end else begin
@@ -1023,9 +1023,11 @@ begin
       end;
       x001008002000Answer.Free;
     end;
+    if xFromVersion < '001010002000' then begin
+    end;
   end;
   if Result then begin
-    GBasePreferences.configFileVersion := AToDatafileVersion;
+    GBasePreferences.configFileVersion := FileVersion(ParamStr(0));
   end;
 end;
 

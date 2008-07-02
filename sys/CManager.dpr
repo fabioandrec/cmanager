@@ -185,7 +185,7 @@ begin
   end;
   xFilename := '';
   InitializeFrameGlobals;
-  if InitializeSettings(GetSettingsFilename) then begin
+  if InitializeSettings then begin
     InitializeProxies(GDataProvider);
     if GBasePreferences.startupDatafileMode <> CStartupFilemodeNeveropen then begin
       if GBasePreferences.startupDatafileMode = CStartupFilemodeFirsttime then begin
