@@ -276,7 +276,6 @@ procedure FinalizeSettings;
 begin
   if GSettings <> Nil then begin
     GSettings.save(GetSettingsFilename(True));
-    GSettings := Nil;
   end;
 end;
 

@@ -241,7 +241,7 @@ implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit,
      CDoneFrameUnit, CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit, CBaseFrameUnit, CReportsFrameUnit,
-     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit;
+     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit, CReports;
 
 procedure SetInterfaceIcons(ASmall: Boolean);
 var xCount: Integer;
@@ -252,6 +252,22 @@ begin
   GBasePreferences.chartListSmall := ASmall;
   for xCount := 0 to GViewsPreferences.Count - 1 do begin
     TViewPref(GViewsPreferences.Items[xCount]).ButtonSmall := ASmall;
+  end;
+end;
+
+procedure MoveFilesToProfile(ADelete: Boolean);
+begin
+  if CopyFile(PChar(GetSettingsFilename(False)), PChar(GetSettingsFilename(True)), False) and ADelete then begin
+    DeleteFile(PChar(GetSettingsFilename(False)));
+  end;
+  if CopyFile(PChar(GetCSSReportFile(False)), PChar(GetCSSReportFile(True)), False) and ADelete then begin
+    DeleteFile(PChar(GetCSSReportFile(False)));
+  end;
+  if CopyFile(PChar(GetXSLReportFile(False)), PChar(GetXSLReportFile(True)), False) and ADelete then begin
+    DeleteFile(PChar(GetXSLReportFile(False)));
+  end;
+  if CopyFile(PChar(GetHTMReportFile(False)), PChar(GetHTMReportFile(True)), False) and ADelete then begin
+    DeleteFile(PChar(GetHTMReportFile(False)));
   end;
 end;
 
@@ -331,6 +347,10 @@ begin
     Result := GetFormattedDate(Now, 'yyyy-MM-dd') + ' ' + GetFormattedTime(Now, 'HH:mm');
   end else if ATemplate = '@wersja@' then begin
     Result := FileVersion(ParamStr(0));
+  end else if ATemplate = '@kataloginstalacji@' then begin
+    Result := GetSystemPathname('');
+  end else if ATemplate = '@kataloguzytkownika@' then begin
+    Result := GetUserProfilePathname('');
   end;
 end;
 
@@ -972,6 +992,15 @@ type
     property smallIcons: Boolean read FsmallIcons;
   end;
 
+  T001010002000Answer = class(THtmlAnswer)
+  private
+    FdeleteUnused: Boolean;
+  public
+    procedure UpdateAnswer(AWebBrowser: IWebBrowser2); override;
+  published
+    property deleteUnused: Boolean read FdeleteUnused;
+  end;
+
 procedure T001008002000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
 var xRadioList: IDispatch;
     xRadio: IHTMLOptionButtonElement;
@@ -990,6 +1019,7 @@ function UpdateConfiguration(AFromConfigVersion: String): Boolean;
 var xFromDynArray, xToDynArray: TStringDynArray;
     xFromVersion, xToVersion, xTitle: String;
     x001008002000Answer: T001008002000Answer;
+    x001010002000Answer: T001010002000Answer;
 begin
   Result := True;
   xTitle := 'CManager - wersja ' + FileVersion(ParamStr(0));
@@ -1011,7 +1041,7 @@ begin
                   LPad(xToDynArray[2], '0', 3) +
                   LPad(xToDynArray[3], '0', 3);
     if xFromVersion < '001004000000' then begin
-      ShowHtmlReport(xTitle, GetStringFromResources('PL_001004000000', RT_RCDATA), 500, 170);
+      ShowHtmlReport(xTitle, GetStringFromResources('PL_001004000000', RT_RCDATA), 500, 170, '', Nil);
       GColumnsPreferences.Clear;
       GChartPreferences.Clear;
     end;
@@ -1024,10 +1054,15 @@ begin
       x001008002000Answer.Free;
     end;
     if xFromVersion < '001010002000' then begin
+      x001010002000Answer := T001010002000Answer.Create;
+      ShowHtmlReport(xTitle, GetStringFromResources('PL_001010002000', RT_RCDATA), 600, 380, '', x001010002000Answer);
+      MoveFilesToProfile(x001010002000Answer.deleteUnused);
+      x001010002000Answer.Free;
     end;
   end;
   if Result then begin
     GBasePreferences.configFileVersion := FileVersion(ParamStr(0));
+    SaveSettings;
   end;
 end;
 
@@ -1098,6 +1133,20 @@ begin
   SetXmlAttribute('patternListWidth', ANode, FpatternListWidth);
   SetXmlAttribute('userPatternsVisible', ANode, FuserPatternsVisible);
   SetXmlAttribute('statisticPatternsVisible', ANode, FstatisticPatternsVisible);
+end;
+
+procedure T001010002000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
+var xRadioList: IDispatch;
+    xRadio: IHTMLOptionButtonElement;
+begin
+  FdeleteUnused := False;
+  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('kill', EmptyParam);
+  if xRadioList <> Nil then begin
+    if IHTMLElementCollection(xRadioList).length > 0 then begin
+      xRadio := IHTMLElementCollection(xRadioList).item(0, EmptyParam) as IHTMLOptionButtonElement;
+      FdeleteUnused := xRadio.checked;
+    end;
+  end;
 end;
 
 initialization

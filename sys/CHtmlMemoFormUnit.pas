@@ -24,21 +24,25 @@ type
     function ShowConfig(AOperation: TConfigOperation; ACanResize: Boolean = False; ANoneButtonCaption: String = ''): Boolean; override;
   end;
 
-procedure ShowHtmlReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AButtonCaption: String = ''; AHtmlAnswer: THtmlAnswer = Nil);
+procedure ShowHtmlReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AButtonCaption: String; AHtmlAnswer: THtmlAnswer);
 
 implementation
 
+uses CPreferences, CTemplates;
+
 {$R *.dfm}
 
-procedure ShowHtmlReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AButtonCaption: String = ''; AHtmlAnswer: THtmlAnswer = Nil);
+procedure ShowHtmlReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AButtonCaption: String; AHtmlAnswer: THtmlAnswer);
 var xForm: TCHtmlMemoForm;
+    xReport: String;
 begin
   xForm := TCHtmlMemoForm.Create(Application);
   xForm.Caption := AFormTitle;
   xForm.Width := AWidth;
   xForm.Height := AHeight;
   xForm.FHtmlAnswer := AHtmlAnswer;
-  xForm.CBrowser.LoadFromString(AReport);
+  xReport := GBaseTemlatesList.ExpandTemplates(AReport, GBasePreferences);
+  xForm.CBrowser.LoadFromString(xReport);
   xForm.ShowConfig(coNone, False, '&OK');
   xForm.Free;
 end;

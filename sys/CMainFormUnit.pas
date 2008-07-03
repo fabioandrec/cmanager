@@ -784,13 +784,13 @@ end;
 
 procedure TCMainForm.ActionCssExecute(Sender: TObject);
 begin
-  if not FileExists(GetCSSReportFile) then begin
-    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile);
+  if not FileExists(GetCSSReportFile(True)) then begin
+    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile(True));
   end;
-  if FileExists(GetCSSReportFile) then begin
-    ShellExecute(0, Nil, 'notepad.exe', PChar(GetCSSReportFile), Nil, SW_SHOWNORMAL);
+  if FileExists(GetCSSReportFile(True)) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetCSSReportFile(True)), Nil, SW_SHOWNORMAL);
   end else begin
-    ShowInfo(itError, 'Nie odnaleziono pliku "' + GetCSSReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+    ShowInfo(itError, 'Nie odnaleziono pliku "' + GetCSSReportFile(True) + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
   end;
 end;
 
@@ -850,13 +850,13 @@ end;
 
 procedure TCMainForm.ActionXslExecute(Sender: TObject);
 begin
-  if not FileExists(GetXSLReportFile) then begin
-    GetFileFromResource('REPXSL', RT_RCDATA, GetXSLReportFile);
+  if not FileExists(GetXSLReportFile(True)) then begin
+    GetFileFromResource('REPXSL', RT_RCDATA, GetXSLReportFile(True));
   end;
-  if FileExists(GetXSLReportFile) then begin
-    ShellExecute(0, Nil, 'notepad.exe', PChar(GetXSLReportFile), Nil, SW_SHOWNORMAL);
+  if FileExists(GetXSLReportFile(True)) then begin
+    ShellExecute(0, Nil, 'notepad.exe', PChar(GetXSLReportFile(True)), Nil, SW_SHOWNORMAL);
   end else begin
-    ShowInfo(itError, 'Nie odnaleziono pliku "' + GetXSLReportFile + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
+    ShowInfo(itError, 'Nie odnaleziono pliku "' + GetXSLReportFile(True) + '". Sprawdz poprawnoœæ instalacji CManager-a.', '');
   end;
 end;
 

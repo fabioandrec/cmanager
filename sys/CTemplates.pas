@@ -125,6 +125,8 @@ initialization
     AddTemplate('@data@', 'aktualna data w formacie RRRR-MM-DD');
     AddTemplate('@dataczas@', 'aktualna data i czas w formacie RRRR-MM-DD HH:MM');
     AddTemplate('@wersja@', 'wersja programu CManager');
+    AddTemplate('@kataloginstalacji@', 'katalog instalacji CManager-a');
+    AddTemplate('@kataloguzytkownika@', 'katalog plików u¿ytkownika');
   end;
   with GBaseMovementTemplatesList do begin
     AddTemplate('@dataoperacji@', 'data operacji w formacie RRRR-MM-DD');

@@ -421,11 +421,11 @@ end;
 function TCManagerInterfaceObject.GetReportCss: OleVariant;
 var xStr: TStringList;
 begin
-  if not FileExists(GetCSSReportFile) then begin
-    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile);
+  if not FileExists(GetCSSReportFile(True)) then begin
+    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile(True));
   end;
   xStr := TStringList.Create;
-  xStr.LoadFromFile(GetCSSReportFile);
+  xStr.LoadFromFile(GetCSSReportFile(True));
   Result := xStr.Text;
   xStr.Free;
 end;
@@ -433,11 +433,11 @@ end;
 function TCManagerInterfaceObject.GetReportText: OleVariant;
 var xStr: TStringList;
 begin
-  if not FileExists(GetHTMReportFile) then begin
-    GetFileFromResource('REPBASE', RT_RCDATA, GetHTMReportFile);
+  if not FileExists(GetHTMReportFile(True)) then begin
+    GetFileFromResource('REPBASE', RT_RCDATA, GetHTMReportFile(True));
   end;
   xStr := TStringList.Create;
-  xStr.LoadFromFile(GetHTMReportFile);
+  xStr.LoadFromFile(GetHTMReportFile(True));
   Result := xStr.Text;
   xStr.Free;
 end;

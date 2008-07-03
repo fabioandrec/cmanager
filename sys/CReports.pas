@@ -703,9 +703,9 @@ type
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
 procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
-function GetCSSReportFile: String;
-function GetXSLReportFile: String;
-function GetHTMReportFile: String;
+function GetCSSReportFile(AFromUserProfile: Boolean): String;
+function GetXSLReportFile(AFromUserProfile: Boolean): String;
+function GetHTMReportFile(AFromUserProfile: Boolean): String;
 
 implementation
 
@@ -732,13 +732,13 @@ var xStr: TStringList;
 begin
   Result := Nil;
   PrepareReportPath;
-  if not FileExists(GetXSLReportFile) then begin
-    GetFileFromResource('REPXSL', RT_RCDATA, GetXSLReportFile);
+  if not FileExists(GetXSLReportFile(True)) then begin
+    GetFileFromResource('REPXSL', RT_RCDATA, GetXSLReportFile(True));
   end;
   xStr := TStringList.Create;
   try
     try
-      xStr.LoadFromFile(GetXSLReportFile);
+      xStr.LoadFromFile(GetXSLReportFile(True));
       xStr.Text := StringReplace(xStr.Text, '[repstyle]', FreportStyle.Text, [rfReplaceAll, rfIgnoreCase]);
       xStr.Text := StringReplace(xStr.Text, '[reptitle]', GetReportTitle, [rfReplaceAll, rfIgnoreCase]);
       xStr.Text := StringReplace(xStr.Text, '[repfooter]', GetReportFooter, [rfReplaceAll, rfIgnoreCase]);
@@ -1599,14 +1599,14 @@ end;
 
 procedure TCHtmlReport.PrepareReportPath;
 begin
-  if not FileExists(GetCSSReportFile) then begin
-    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile);
+  if not FileExists(GetCSSReportFile(True)) then begin
+    GetFileFromResource('REPCSS', RT_RCDATA, GetCSSReportFile(True));
   end;
-  if not FileExists(GetHTMReportFile) then begin
-    GetFileFromResource('REPBASE', RT_RCDATA, GetHTMReportFile);
+  if not FileExists(GetHTMReportFile(True)) then begin
+    GetFileFromResource('REPBASE', RT_RCDATA, GetHTMReportFile(True));
   end;
-  FreportText.LoadFromFile(GetHTMReportFile);
-  FreportStyle.LoadFromFile(GetCSSReportFile);
+  FreportText.LoadFromFile(GetHTMReportFile(True));
+  FreportStyle.LoadFromFile(GetCSSReportFile(True));
 end;
 
 function TCChartReport.CanShowReport: Boolean;
@@ -5518,19 +5518,31 @@ begin
   Result := 'Informacje o lokacie';
 end;
 
-function GetCSSReportFile: String;
+function GetCSSReportFile(AFromUserProfile: Boolean): String;
 begin
-  Result := GetUserProfilePathname(CPrivateCSSReportFile);
+  if AFromUserProfile then begin
+    Result := GetUserProfilePathname(CPrivateCSSReportFile);
+  end else begin
+    Result := GetSystemPathname(CPrivateCSSReportFile);
+  end;
 end;
 
-function GetXSLReportFile: String;
+function GetXSLReportFile(AFromUserProfile: Boolean): String;
 begin
-  Result := GetUserProfilePathname(CPrivateXSLReportFile);
+  if AFromUserProfile then begin
+    Result := GetUserProfilePathname(CPrivateXSLReportFile);
+  end else begin
+    Result := GetSystemPathname(CPrivateXSLReportFile);
+  end;
 end;
 
-function GetHTMReportFile: String;
+function GetHTMReportFile(AFromUserProfile: Boolean): String;
 begin
-  Result := GetUserProfilePathname(CPrivateHTMReportFile);
+  if AFromUserProfile then begin
+    Result := GetUserProfilePathname(CPrivateHTMReportFile);
+  end else begin
+    Result := GetSystemPathname(CPrivateHTMReportFile);
+  end;
 end;
 
 initialization
