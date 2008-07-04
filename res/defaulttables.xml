@@ -21,7 +21,7 @@
   <treeElement id="{00000000-0000-0000-0000-000000000013}" description="currencyDef" name="currencyDef"/>
   <treeElement id="{00000000-0000-0000-0000-000000000014}" description="currencyRate" name="currencyRate"/>
   <treeElement id="{00000000-0000-0000-0000-000000000015}" description="accountCurrencyRule" name="accountCurrencyRule"/>
-  <treeElement id="{00000000-0000-0000-0000-000000000016}" description="reportDef" name="reportDef" exportCondition="idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000016}" description="reportDef" name="reportDef" exportCondition="idReportDef not in ('{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}')"/>
   <treeElement id="{00000000-0000-0000-0000-000000000017}" description="instrument" name="instrument"/>
   <treeElement id="{00000000-0000-0000-0000-000000000018}" description="instrumentValue" name="instrumentValue"/>
   <treeElement id="{00000000-0000-0000-0000-000000000018}" description="investmentItem" name="investmentItem"/>

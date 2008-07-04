@@ -624,6 +624,9 @@ begin
   if Assigned(FOnCheckChanged) then begin
     FOnCheckChanged(Self);
   end;
+  if (FMultipleChecks <> Nil) then begin
+    UpdateButtons(List.SelectedCount > 0);
+  end;
 end;
 
 procedure TCBaseFrame.ListChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
