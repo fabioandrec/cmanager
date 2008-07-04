@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<defaultdatafile>
+  <treeElement id="{00000000-0000-0000-0000-000000000001}" description="cashPoint" name="cashPoint"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000002}" description="account" name="account"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000003}" description="unitDef" name="unitDef"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000004}" description="accountExtraction" name="accountExtraction"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000005}" description="extractionItem" name="extractionItem"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000006}" description="product" name="product" exportOrder="created"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000007}" description="plannedMovement" name="plannedMovement"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000008}" description="plannedDone" name="plannedDone"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000009}" description="movementList" name="movementList"/>
+  <treeElement id="{00000000-0000-0000-0000-00000000000A}" description="baseMovement" name="baseMovement"/>
+  <treeElement id="{00000000-0000-0000-0000-00000000000B}" description="movementFilter" name="movementFilter"/>
+  <treeElement id="{00000000-0000-0000-0000-00000000000C}" description="accountFilter" name="accountFilter"/>
+  <treeElement id="{00000000-0000-0000-0000-00000000000D}" description="cashpointFilter" name="cashpointFilter"/>
+  <treeElement id="{00000000-0000-0000-0000-00000000000E}" description="productFilter" name="productFilter"/>
+  <treeElement id="{00000000-0000-0000-0000-00000000000F}" description="profile" name="profile"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000010}" description="cmanagerInfo" name="cmanagerInfo" exportDeletes="1"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000011}" description="cmanagerParams" name="cmanagerParams" exportDeletes="1"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000012}" description="movementLimit" name="movementLimit"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000013}" description="currencyDef" name="currencyDef"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000014}" description="currencyRate" name="currencyRate"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000015}" description="accountCurrencyRule" name="accountCurrencyRule"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000016}" description="reportDef" name="reportDef" exportCondition="idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000017}" description="instrument" name="instrument"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000018}" description="instrumentValue" name="instrumentValue"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000018}" description="investmentItem" name="investmentItem"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000018}" description="investmentMovement" name="investmentMovement"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000018}" description="quickPattern" name="quickPattern"/>
+  <treeElement id="{00000000-0000-0000-0000-000000000018}" description="depositInvestment" name="depositInvestment"/>
+</defaultdatafile>

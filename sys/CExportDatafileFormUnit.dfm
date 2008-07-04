@@ -1,44 +1,60 @@
-inherited CImportExportDatafileForm: TCImportExportDatafileForm
-  Left = 522
-  Top = 381
-  Caption = 'CImportExportDatafileForm'
-  ClientHeight = 137
+inherited CExportDatafileForm: TCExportDatafileForm
+  Left = 260
+  Top = 351
+  Caption = 'CExportDatafileForm'
+  ClientHeight = 174
   PixelsPerInch = 96
   TextHeight = 13
   inherited LabelDescription: TLabel
     Height = 17
   end
-  inherited CStaticDesc: TCStatic
-    Top = 66
-  end
   inherited PanelButtons: TPanel
-    Top = 96
+    Top = 133
   end
   inherited PanelImage: TPanel
-    Height = 96
-  end
-  inherited ProgressText: TStaticText
-    Top = 66
+    Height = 133
   end
   inherited ProgressBar: TProgressBar
-    Top = 66
     Max = 0
   end
   object CStaticFilename: TCStatic [7]
     Left = 68
-    Top = 66
+    Top = 98
     Width = 320
     Height = 21
+    Hint = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     AutoSize = False
     BevelKind = bkTile
     Caption = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     Color = clWindow
     ParentColor = False
-    TabOrder = 5
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 6
     TabStop = True
     Transparent = False
     TextOnEmpty = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     OnGetDataId = CStaticFilenameGetDataId
+    HotTrack = True
+  end
+  object CStaticTables: TCStatic [8]
+    Left = 68
+    Top = 66
+    Width = 320
+    Height = 21
+    Hint = '<kliknij tutaj aby zobaczy'#263' list'#281' tabel do eksportu>'
+    AutoSize = False
+    BevelKind = bkTile
+    Caption = '<kliknij tutaj aby zobaczy'#263' list'#281' tabel do eksportu>'
+    Color = clWindow
+    ParentColor = False
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 5
+    TabStop = True
+    Transparent = False
+    TextOnEmpty = '<kliknij tutaj aby zobaczy'#263' list'#281' tabel do eksportu>'
+    OnGetDataId = CStaticTablesGetDataId
     HotTrack = True
   end
   inherited PngImageList: TPngImageList
@@ -352,19 +368,11 @@ inherited CImportExportDatafileForm: TCImportExportDatafileForm
       end>
     Bitmap = {}
   end
-  object OpenDialog: TOpenDialog
-    DefaultExt = '.sql'
-    Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
-    FilterIndex = 0
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 80
-    Top = 96
-  end
   object SaveDialog: TSaveDialog
     DefaultExt = '.sql'
     Filter = 'Pliki sql|*.sql|Wszystkie pliki|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 48
+    Left = 16
     Top = 99
   end
 end

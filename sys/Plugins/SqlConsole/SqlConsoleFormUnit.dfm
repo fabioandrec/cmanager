@@ -1,6 +1,6 @@
 object SqlConsoleForm: TSqlConsoleForm
-  Left = 242
-  Top = 407
+  Left = 241
+  Top = 208
   Width = 715
   Height = 358
   Caption = 'Kosola Sql'
@@ -61,33 +61,33 @@ object SqlConsoleForm: TSqlConsoleForm
       BevelOuter = bvNone
       TabOrder = 1
       object PngSpeedButton1: TPngSpeedButton
-        Left = 8
+        Left = 0
         Top = 4
-        Width = 129
+        Width = 89
         Height = 25
         Action = ActionExecute
         Flat = True
       end
       object PngSpeedButton2: TPngSpeedButton
-        Left = 144
+        Left = 89
         Top = 4
-        Width = 129
+        Width = 88
         Height = 25
         Action = ActionOpen
         Flat = True
       end
       object PngSpeedButton3: TPngSpeedButton
-        Left = 280
+        Left = 177
         Top = 4
-        Width = 129
+        Width = 89
         Height = 25
         Action = ActionSave
         Flat = True
       end
       object PngSpeedButton4: TPngSpeedButton
-        Left = 416
+        Left = 266
         Top = 4
-        Width = 129
+        Width = 89
         Height = 25
         Action = ActionPrint
         Flat = True
@@ -149,17 +149,17 @@ object SqlConsoleForm: TSqlConsoleForm
       OnExecute = ActionExecuteExecute
     end
     object ActionOpen: TAction
-      Caption = 'Wczytaj skrypt'
+      Caption = 'Otw'#243'rz'
       ImageIndex = 1
       OnExecute = ActionOpenExecute
     end
     object ActionSave: TAction
-      Caption = 'Zapisz wynik'
+      Caption = 'Zapisz'
       ImageIndex = 3
       OnExecute = ActionSaveExecute
     end
     object ActionPrint: TAction
-      Caption = 'Drukuj wynik'
+      Caption = 'Drukuj'
       ImageIndex = 2
       OnExecute = ActionPrintExecute
     end

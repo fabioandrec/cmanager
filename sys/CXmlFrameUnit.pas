@@ -55,7 +55,7 @@ type
     function CanAcceptSelectedObject: Boolean; override;
   end;
 
-function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList; ACaption: String; var ADataId: String; var AText: String): Boolean;
+function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList; ACaption: String; ADialogTitle: String; var ADataId: String; var AText: String): Boolean;
 
 implementation
 
@@ -63,13 +63,13 @@ uses CFrameFormUnit, CConsts, CXmlTlb, StrUtils;
 
 {$R *.dfm}
 
-function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList; ACaption: String; var ADataId: String; var AText: String): Boolean;
+function ShowXmlFile(AXml: ICXMLDOMDocument; AChecks: TStringList; ACaption: String; ADialogTitle: String; var ADataId: String; var AText: String): Boolean;
 var xAdditional: TXmlAdditionalData;
     xRect: TRect;
 begin
   xAdditional := TXmlAdditionalData.Create(AXml, ACaption);
   xRect := Rect(0, 0, 500, 400);
-  Result := TCFrameForm.ShowFrame(TCXmlFrame, ADataId, AText, xAdditional, @xRect, Nil, AChecks, True, Nil, True, True);
+  Result := TCFrameForm.ShowFrame(TCXmlFrame, ADataId, AText, xAdditional, @xRect, Nil, AChecks, True, Nil, True, True, ADialogTitle);
 end;
 
 constructor TXmlListElement.Create(ANode: ICXMLDOMNode);
@@ -82,7 +82,7 @@ begin
     SetXmlAttribute('id', ANode, Fid);
   end;
   Fdescription := GetXmlAttribute('description', Fnode, '');
-  FisElement := ANode.attributes.getNamedItem('sql') <> Nil;
+  FisElement := GetXmlAttribute('isGroup', Fnode, 0) = 0;
 end;
 
 function TXmlListElement.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;

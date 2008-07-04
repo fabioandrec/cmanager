@@ -55,6 +55,7 @@ type
     class function FindByIso(AIso: TBaseName): TCurrencyDef;
     constructor Create(AStatic: Boolean); override;
     procedure AfterPost; override;
+    procedure DeleteObject; override;
   published
     property name: TBaseName read Fname write Setname;
     property symbol: TBaseName read Fsymbol write Setsymbol;
@@ -1174,41 +1175,6 @@ var GCurrencyCache: TCurrCache;
 const CHASH_INSTRUMENT_SYMBOL = 0;
       CHASH_INSTRUMENT_NAME = 1;
 
-const CDatafileTables: array[0..27] of string =
-            ('cashPoint', 'account', 'unitDef', 'accountExtraction', 'extractionItem',
-             'product', 'plannedMovement', 'plannedDone',
-             'movementList', 'baseMovement', 'movementFilter', 'accountFilter',
-             'cashpointFilter', 'productFilter', 'profile', 'cmanagerInfo',
-             'cmanagerParams', 'movementLimit', 'currencyDef', 'currencyRate',
-             'accountCurrencyRule', 'reportDef',
-             'instrument', 'instrumentValue', 'investmentItem', 'investmentMovement', 'quickPattern', 'depositInvestment');
-
-const CDatafileTablesExportConditions: array[0..27] of string =
-            ('', '', '', '', '',
-             '', '', '',
-             '', '', '', '',
-             '', '', '', '',
-             '', '', '', '',
-             '', 'idReportDef not in (''{00000000-0000-0000-0000-000000000001}'', ''{00000000-0000-0000-0000-000000000002}'')',
-             '', '', '', '', '', '');
-
-const CDatafileDeletes: array[0..27] of string =
-            ('', '', '', '', '',
-             '', '', '',
-             '', '', '', '',
-             '', '', '', 'cmanagerInfo',
-             'cmanagerParams', '', '', '',
-             '', '', '', '', '', '', '', '');
-
-const CDatafileTablesExportOrders: array[0..27] of string =
-            ('', '', '', '', '',
-             'created', '', '',
-             '', '', '', '',
-             '', '', '', '',
-             '', '', '',
-             '', '', '',
-             '', '', '', '', '', '');
-
 var GDefaultCurrencyId: TDataGid = '';
 
 procedure InitializeProxies(ADataProvider: TDataProvider);
@@ -1367,6 +1333,7 @@ end;
 
 procedure TCashPoint.DeleteObject;
 begin
+  GDataProvider.ExecuteSql('delete from movementStatistics where idCashpoint = ' + DataGidToDatabase(id));
   inherited DeleteObject;
   if GDefaultCashpointId = id then begin
     GDefaultCashpointId := CEmptyDataGid;
@@ -1524,6 +1491,7 @@ end;
 
 procedure TProduct.DeleteObject;
 begin
+  GDataProvider.ExecuteSql('delete from movementStatistics where idProduct = ' + DataGidToDatabase(id));
   inherited DeleteObject;
   if GDefaultProductId = id then begin
     GDefaultProductId := CEmptyDataGid;
@@ -3089,6 +3057,12 @@ constructor TCurrencyDef.Create(AStatic: Boolean);
 begin
   inherited Create(AStatic);
   FpreviousSymbol := '';
+end;
+
+procedure TCurrencyDef.DeleteObject;
+begin
+  GDataProvider.ExecuteSql('delete from movementStatistics where idAccountCurrencyDef = ' + DataGidToDatabase(id) + ' or idMovementCurrencyDef = ' + DataGidToDatabase(id));
+  inherited DeleteObject;
 end;
 
 class function TCurrencyDef.FindByIso(AIso: TBaseName): TCurrencyDef;
@@ -4874,7 +4848,8 @@ end;
 
 procedure TAccount.DeleteObject;
 begin
-  inherited DeleteObject;
+ GDataProvider.ExecuteSql('delete from movementStatistics where idAccount = ' + DataGidToDatabase(id) + ' or idSourceAccount = ' + DataGidToDatabase(id));
+ inherited DeleteObject;
   if GDefaultAccountId = id then begin
     GDefaultAccountId := CEmptyDataGid;
   end;

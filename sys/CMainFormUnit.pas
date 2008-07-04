@@ -189,7 +189,7 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CInstrumentValueFrameUnit, CTools, CInvestmentMovementFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
-     CImportExportDatafileFormUnit, CChangePasswordFormUnit,
+     CExportDatafileFormUnit, CImportDatafileFormUnit, CChangePasswordFormUnit,
   CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
   CDepositCalculatorFormUnit, CDebug, CReports;
 {$R *.dfm}
@@ -643,7 +643,7 @@ end;
 
 procedure TCMainForm.ActionExportDatafileExecute(Sender: TObject);
 begin
-  CProgressFormUnit.ShowProgressForm(TCImportExportDatafileForm, TCImportExportAdditionalData.Create(GDataProvider, ieoExport));
+  CProgressFormUnit.ShowProgressForm(TCExportDatafileForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
 end;
 
 procedure TCMainForm.ActionRandomExecute(Sender: TObject);
@@ -845,7 +845,7 @@ end;
 
 procedure TCMainForm.ActionImportDatafileExecute(Sender: TObject);
 begin
-  CProgressFormUnit.ShowProgressForm(TCImportExportDatafileForm, TCImportExportAdditionalData.Create(GDataProvider, ieoImport));
+  CProgressFormUnit.ShowProgressForm(TCImportDatafileForm, TCProgressSimpleAdditionalData.Create(GDataProvider));
 end;
 
 procedure TCMainForm.ActionXslExecute(Sender: TObject);

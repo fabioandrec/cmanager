@@ -203,10 +203,6 @@ const
   CDepositMovementClose = 'K';
   CDepositMovementGetInterest = 'G';
 
-  CDepositInvestmentStateActive = 'A';
-  CDepositInvestmentStateInactive = 'I';
-  CDepositInvestmentStateClosed = 'C';
-
 const
   CInMovementDescription = 'Przychód';
   COutMovementDescription = 'Rozchód';
@@ -282,7 +278,7 @@ const
     CPropertyItems: String =
      '<?xml version="1.0" encoding="Windows-1250"?>' + 
      '<list>' +
-     '  <property name="rodzaj operacji">' +
+     '  <property name="rodzaj operacji finansowej">' +
      '    <item name="przychód" value="' + CInMovement + '"/>' +
      '    <item name="rozchód" value="' + COutMovement + '"/>' +
      '    <item name="transfer" value="' + CTransferMovement + '"/>' +
@@ -321,7 +317,7 @@ const
      '    <item name="kurs kupna" value="' + CCurrencyRateTypeBuy + '"/>' +
      '  </property>' +
      '  <property name="status wyciągu">' +
-     '    <item name="otwrty" value="' + CExtractionStateOpen + '"/>' +
+     '    <item name="otwarty" value="' + CExtractionStateOpen + '"/>' +
      '    <item name="zamknięty" value="' + CExtractionStateClose + '"/>' +
      '    <item name="uzgodniony" value="' + CExtractionStateStated + '"/>' +
      '  </property>' +
@@ -332,6 +328,21 @@ const
      '    <item name="Fundusz inwestycyjny" value="' + CInstrumentTypeFundinv + '"/>' +
      '    <item name="Fundusz emerytalny" value="' + CInstrumentTypeFundret + '"/>' +
      '    <item name="Nieokreślony" value="' + CInstrumentTypeUndefined + '"/>' +
+     '  </property>' +
+     '  <property name="status lokaty">' +
+     '    <item name="aktywna" value="' + CDepositInvestmentActive + '"/>' +
+     '    <item name="zamknięty" value="' + CDepositInvestmentClosed + '"/>' +
+     '    <item name="nieaktywna" value="' + CDepositInvestmentInactive + '"/>' +
+     '  </property>' +
+     '  <property name="rodzaj operacji lokaty">' +
+     '    <item name="Założenie lokaty" value="' + CDepositMovementCreate + '"/>' +
+     '    <item name="Rejestracja lokaty" value="' + CDepositMovementRegister + '"/>' +
+     '    <item name="Zakończenie lokaty" value="' + CDepositMovementInactivate + '"/>' +
+     '    <item name="Odnowienie lokaty" value="' + CDepositMovementRenew + '"/>' +
+     '    <item name="Naliczenie odsetek" value="' + CDepositMovementDue + '"/>' +
+     '    <item name="Dopłata do lokaty" value="' + CDepositMovementAddCash + '"/>' +
+     '    <item name="Likwidacja lokaty" value="' + CDepositMovementClose + '"/>' +
+     '    <item name="Wypłata odsetek" value="' + CDepositMovementGetInterest + '"/>' +
      '  </property>' +
      '</list>';
 

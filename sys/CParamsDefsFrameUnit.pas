@@ -39,6 +39,9 @@ type
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
     procedure UpdateIcons;
+  protected
+    function GetSelectedId: ShortString; override;
+    function GetSelectedText: String; override;
   public
     procedure UpdateButtons(AIsSelectedSomething: Boolean); override;
     function GetList: TCList; override;
@@ -248,5 +251,15 @@ begin
                    xDummy);
 end;
 
+
+function TCParamsDefsFrame.GetSelectedId: ShortString;
+begin
+  Result := TReportDialgoParamDef(List.SelectedElement.Data).name;
+end;
+
+function TCParamsDefsFrame.GetSelectedText: String;
+begin
+  Result := TReportDialgoParamDef(List.SelectedElement.Data).desc;
+end;
 
 end.

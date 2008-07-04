@@ -169,18 +169,11 @@ begin
 end;
 
 procedure TCCreateDatafileForm.LoadDefaultDatafileData;
-var xResStream: TResourceStream;
-    xXmlString: String;
+var xXmlString: String;
 begin
-  xXmlString := '';
-  xResStream := TResourceStream.Create(HInstance, 'SQLDEFS', RT_RCDATA);
-  SetLength(xXmlString, xResStream.Size);
-  if xResStream.Size > 0 then begin
-    CopyMemory(@xXmlString[1], xResStream.Memory, xResStream.Size);
-  end;
+  xXmlString := GetStringFromResources('SQLDEFS', RT_RCDATA, HInstance);
   FDefaultData := GetDocumentFromString(xXmlString, Nil);
   SetXmlIdForEach(FDefaultData.documentElement.childNodes, True);
-  xResStream.Free;
 end;
 
 procedure TCCreateDatafileForm.FormDestroy(Sender: TObject);
@@ -195,7 +188,11 @@ end;
 procedure TCCreateDatafileForm.CButtonShowDefaultClick(Sender: TObject);
 var xId, xText: String;
 begin
-  ShowXmlFile(FDefaultData, FCheckedData, 'Zaznacz tylko te dane domyœlne, które powinny byæ zapamiêtane w nowym pliku danych', xId, xText);
+  ShowXmlFile(FDefaultData,
+              FCheckedData,
+              'Zaznacz tylko te dane domyœlne, które powinny byæ zapamiêtane w nowym pliku danych',
+              'Domyœlne dane',
+              xId, xText);
 end;
 
 function TCCreateDatafileForm.CanSelectNextPage: Boolean;
@@ -410,24 +407,19 @@ begin
 end;
 
 procedure TCCreateDatafileForm.LoadDefaultCurrencyData;
-var xResStream: TResourceStream;
-    xXmlString: String;
+var xXmlString: String;
 begin
-  xXmlString := '';
-  xResStream := TResourceStream.Create(HInstance, 'CURDEFS', RT_RCDATA);
-  SetLength(xXmlString, xResStream.Size);
-  if xResStream.Size > 0 then begin
-    CopyMemory(@xXmlString[1], xResStream.Memory, xResStream.Size);
-  end;
+  xXmlString := GetStringFromResources('CURDEFS', RT_RCDATA, HInstance);
   FDefaultCurrencies := GetDocumentFromString(xXmlString, Nil);
-  xResStream.Free;
 end;
 
 procedure TCCreateDatafileForm.CStaticCurrencyGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
 begin
   AAccepted := ShowXmlFile(FDefaultCurrencies, Nil, 'Wybierz walutê domyœl¹. Je¿eli nie ma jej wsród poni¿szych walut wybierz dowoln¹ ' + sLineBreak +
                                                     'z nich, a po utworzeniu pliku danych bêdziesz móg³ dodaæ w³asne waluty i wybraæ' + sLineBreak +
-                                                    'spoœród nich domyœn¹.', ADataGid, AText);
+                                                    'spoœród nich domyœn¹.',
+                                                    'Wybór domyœlnej waluty pliku danych',
+                                                    ADataGid, AText);
 end;
 
 function TCCreateDatafileForm.GetDefaultCurrencyAsString: String;

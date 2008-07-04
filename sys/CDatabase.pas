@@ -495,7 +495,7 @@ begin
   if not FConnection.InTransaction then begin
     FConnection.BeginTrans;
   end;
-  SaveToLog('begin transaction', DbGetSqllogfile);
+  SaveToLog('begin transaction', GDbSqllogfile);
 end;
 
 procedure TDataProvider.ClearProxies(AForceClearStatic: Boolean);
@@ -521,7 +521,7 @@ begin
   if FConnection.InTransaction then begin
     if Result then begin
       FConnection.CommitTrans;
-      SaveToLog('commit transaction', DbGetSqllogfile);
+      SaveToLog('commit transaction', GDbSqllogfile);
     end else begin
       FConnection.RollbackTrans;
     end;
@@ -627,7 +627,7 @@ procedure TDataProvider.RollbackTransaction;
 begin
   if FConnection.InTransaction then begin
     FConnection.RollbackTrans;
-    SaveToLog('rollback transaction', DbGetSqllogfile);
+    SaveToLog('rollback transaction', GDbSqllogfile);
   end;
   ClearProxies(False);
 end;
@@ -672,7 +672,7 @@ begin
             xVal := IntToStr(Integer(xField.AsBoolean));
           end else begin
             Result := False;
-            DbLastError := 'Podczas eksportu tabeli ' + ATableName + ' nie uda³o siê przetworzyæ pola ' + xField.FieldName;
+            GDbLastError := 'Podczas eksportu tabeli ' + ATableName + ' nie uda³o siê przetworzyæ pola ' + xField.FieldName;
           end;
         end else begin
           xVal := 'null';

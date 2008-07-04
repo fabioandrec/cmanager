@@ -143,7 +143,6 @@ uses
   CCreateDatafileFormUnit in 'CCreateDatafileFormUnit.pas' {CCreateDatafileForm},
   CXmlFrameUnit in 'CXmlFrameUnit.pas' {CXmlFrame: TFrame},
   CUpdateDatafileFormUnit in 'CUpdateDatafileFormUnit.pas' {CUpdateDatafileForm},
-  CImportExportDatafileFormUnit in 'CImportExportDatafileFormUnit.pas' {CImportExportDatafileForm},
   CChangePasswordFormUnit in 'CChangePasswordFormUnit.pas' {CChangePasswordForm},
   CHtmlMemoFormUnit in 'CHtmlMemoFormUnit.pas' {CHtmlMemoForm},
   CQuickpatternFrameUnit in 'CQuickpatternFrameUnit.pas' {CQuickpatternFrame: TFrame},
@@ -154,7 +153,9 @@ uses
   CDeposits in 'CDeposits.pas',
   CDepositCalculatorFormUnit in 'CDepositCalculatorFormUnit.pas' {CDepositCalculatorForm},
   CDepositMovementFrameUnit in 'CDepositMovementFrameUnit.pas' {CDepositMovementFrame: TFrame},
-  CDepositInvestmentPayFormUnit in 'CDepositInvestmentPayFormUnit.pas' {CDepositInvestmentPayForm};
+  CDepositInvestmentPayFormUnit in 'CDepositInvestmentPayFormUnit.pas' {CDepositInvestmentPayForm},
+  CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
+  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm};
 
 {$R *.res}
 
@@ -171,18 +172,9 @@ begin
   Application.Initialize;
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   DebugStartTickCount('CManager');
-  xFilename := GetParamValue('/savequery');
-  if xFilename <> '' then begin
-    DbSetSqllogfile(GetSystemPathname(xFilename));
-  end;
-  xFilename := GetParamValue('/saveplugin');
-  if xFilename <> '' then begin
-    GPluginlogfile := GetSystemPathname(xFilename);
-  end;
-  xFilename := GetParamValue('/savedebug');
-  if xFilename <> '' then begin
-    GDebugLog := GetSystemPathname(xFilename);
-  end;
+  GDbSqllogfile := GetParamValue('/savequery');
+  GPluginlogfile := GetParamValue('/saveplugin');
+  GDebugLog := GetParamValue('/savedebug');
   xFilename := '';
   InitializeFrameGlobals;
   if InitializeSettings then begin
@@ -222,7 +214,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

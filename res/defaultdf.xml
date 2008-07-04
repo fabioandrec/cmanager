@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="Windows-1250"?>
 <defaultdatafile>
-  <treeElement description="Kontrahenci">
+  <treeElement description="Kontrahenci" isGroup="1">
     <treeElement description="Twój bank" sql="insert into cashPoint (idCashPoint, created, modified, name, description, cashpointType) values ('{F9111277-744E-4E4C-9D97-C8A0E4F3CF82}', #2007-03-14 12:44:48#, #2007-03-14 12:44:48#, 'Twój bank', 'Bank, w którym prowadzisz rachunek oszczędnościowo-rozliczeniowy', 'X');"/>
     <treeElement description="Sklep osiedlowy" sql="insert into cashPoint (idCashPoint, created, modified, name, description, cashpointType) values ('{72976F14-B380-4F40-B9F2-E6A328453DC4}', #2007-03-14 12:45:07#, #2007-03-14 12:45:07#, 'Sklep osiedlowy', 'Sklep na twoim osiedlu', 'O');"/>
     <treeElement description="Twój pracodawca" sql="insert into cashPoint (idCashPoint, created, modified, name, description, cashpointType) values ('{4C293552-2331-4336-A73E-A9F36F5CBCED}', #2007-03-14 12:45:26#, #2007-03-14 12:45:26#, 'Twój pracodawca', 'Firma, w której pracujesz', 'I');"/>
     <treeElement description="Poczta Polska" sql="insert into cashPoint (idCashPoint, created, modified, name, description, cashpointType) values ('{2F7760FA-4F2C-4BAC-9943-A573CD720FE1}', #2007-03-14 12:45:41#, #2007-03-14 12:45:41#, 'Poczta Polska', 'Poczta Polska', 'O');"/>
   </treeElement>
-  <treeElement description="Konta">
+  <treeElement description="Konta" isGroup="1">
     <treeElement description="Twój portfel" sql="insert into account (idAccount, created, modified, name, description, accountType, cash, initialBalance, accountNumber, idCashPoint, idCurrencyDef) values ('{3FA611D2-F6D6-4DAA-9EE8-CE8193FEB1B5}', #2007-03-14 12:46:39#, #2007-03-14 12:46:39#, 'Twój portfel', 'Twój portfel', 'C', 0, 0, '', null, '{00000000-0000-0000-0000-000000000001}');"/>
     <treeElement description="Twoje konto bankowe" sql="insert into account (idAccount, created, modified, name, description, accountType, cash, initialBalance, accountNumber, idCashPoint, idCurrencyDef) values ('{360EE776-DCA7-436E-A084-72A7BCEF6440}', #2007-03-14 12:47:14#, #2007-03-14 12:59:17#, 'Twoje konto bankowe', 'Twoje konto bankowe', 'B', 0, 0, '', '{F9111277-744E-4E4C-9D97-C8A0E4F3CF82}', '{00000000-0000-0000-0000-000000000001}');"/>
   </treeElement>
-  <treeElement description="Kategorie przychodów i rozchodów">
+  <treeElement description="Kategorie przychodów i rozchodów" isGroup="1">
     <treeElement description="Twoje przychody" sql="insert into product (idProduct, created, modified, name, description, idParentProduct, productType) values ('{4CBABD0C-FAA9-4CE8-9F6D-B35B97012C3E}', #2007-03-14 13:17:50#, #2007-03-14 13:17:50#, 'Twoje przychody', 'Twoje przychody', null, 'I');">
       <treeElement description="Pensja" sql="insert into product (idProduct, created, modified, name, description, idParentProduct, productType) values ('{2A5D1B16-4C4A-478C-837B-792F26D436BF}', #2007-03-14 13:17:57#, #2007-03-14 13:17:57#, 'Pensja', 'Pensja', '{4CBABD0C-FAA9-4CE8-9F6D-B35B97012C3E}', 'I');"/>
       <treeElement description="Zwrot z Urzędu Skarbowego" sql="insert into product (idProduct, created, modified, name, description, idParentProduct, productType) values ('{D4C24555-61EB-4CCA-9067-E4F0430F76FC}', #2007-03-14 13:18:12#, #2007-03-14 13:18:12#, 'Zwrot z Urzędu Skarbowego', 'Zwrot z Urzędu Skarbowego', '{4CBABD0C-FAA9-4CE8-9F6D-B35B97012C3E}', 'I');"/>

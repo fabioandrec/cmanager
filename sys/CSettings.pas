@@ -252,6 +252,7 @@ begin
     end else begin
       GSettings := GetNewDocument;
       GetSettingsRoot;
+      GBasePreferences.configFileVersion := FileVersion(ParamStr(0));
     end;
   end;
 end;

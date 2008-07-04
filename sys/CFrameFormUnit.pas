@@ -31,7 +31,7 @@ type
     function CanAccept: Boolean; override;
   public
     constructor CreateFrame(AOwner: TComponent; AFrameClass: TCBaseFrameClass; AAdditionalData: TObject = Nil; AOutData: TObject = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AWithButtons: Boolean = True); virtual;
-    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True; ABevelBottom: Boolean = True): Boolean;
+    class function ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId: String; var AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True; ABevelBottom: Boolean = True; ADialogTitle: String = ''): Boolean;
     destructor Destroy; override;
   published
     property IsChoice: Boolean read FIsChoice;
@@ -109,7 +109,7 @@ begin
   end;
 end;
 
-class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True; ABevelBottom: Boolean = True): Boolean;
+class function TCFrameForm.ShowFrame(AFrameClass: TCBaseFrameClass; var ADataId, AText: String; AAdditionalData: Pointer = Nil; ARect: PRect = Nil; AOutData: Pointer = Nil; AMultipleCheck: TStringList = Nil; AIsChoice: Boolean = True; AFormClass: TCFrameFormClass = Nil; ABordered: Boolean = True; ABevelBottom: Boolean = True; ADialogTitle: String = ''): Boolean;
 var xForm: TCFrameForm;
     xFormClass: TCFrameFormClass;
     xOperation: TConfigOperation;
@@ -137,6 +137,9 @@ begin
     xOperation := AFrameClass.GetOperation;
   end else begin
     xOperation := coNone;
+  end;
+  if ADialogTitle <> '' then begin
+    xForm.Caption := ADialogTitle;
   end;
   if xForm.ShowConfig(xOperation, True) then begin
     ADataId := xForm.FFrame.SelectedId;

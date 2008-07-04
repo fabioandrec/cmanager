@@ -4564,7 +4564,7 @@ begin
     end else begin
       FErrorText := 'Podczas wykonywania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu\n' +
                     'pod k¹tem poprawnoœci sk³adniowej zapytania oraz definicjê parametrów i mnemoników.';
-      FAddText := DbLastError;
+      FAddText := GDbLastError;
     end;
   end else begin
     FErrorText := 'Podczas przygotowania zapytania tworz¹cego raport wyst¹pi³ b³¹d. Sprawdz definicjê raportu\n' +
