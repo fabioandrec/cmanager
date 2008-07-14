@@ -169,7 +169,7 @@ var xFilename, xPassword: String;
     xProceed: Boolean;
 begin
   GCmanagerState := CMANAGERSTATE_STARTING;
-  GDebugMode := {$IFDEF DEBUG}True{$ELSE}GetSwitch('/debug'){$ENDIF};
+  GDebugMode := GetSwitch('/debug');
   {$IFOPT W+}
   if GDebugMode then begin
     MemChk;
