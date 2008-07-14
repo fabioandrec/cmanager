@@ -96,7 +96,7 @@ PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
 Packages=vcl;rtl;vclx;indy;inet;xmlrtl;vclie;inetdbbde;inetdbxpress;dbrtl;dsnap;dsnapcon;vcldb;soaprtl;VclSmp;dbexpress;dbxcds;inetdb;bdertl;vcldbx;webdsnap;websnap;adortl;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;IntrawebDB_50_70;Intraweb_50_70;Rave50CLX;Rave50VCL;dclOfficeXP;NowaPoczta;KSIUP;Ksiup3
-Conditionals=DEBUG
+Conditionals=RELEASE
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
@@ -139,8 +139,9 @@ Count=2
 Item0=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOURCEFORGE\cmanager\sources\others\PngComponents\Source\
 Item1=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
 [HistoryLists\hlConditionals]
-Count=1
-Item0=DEBUG
+Count=2
+Item0=RELEASE
+Item1=DEBUG
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
