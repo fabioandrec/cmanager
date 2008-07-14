@@ -15,6 +15,12 @@ program CManager;
 {%File 'CMandb_8_9.sql'}
 {%File 'CMandb_9_10.sql'}
 
+{$IFNDEF DEBUG}
+{$IFNDEF RELEASE}
+!!! You must specify DEBUG or RELEASE
+{$ENDIF}
+{$ENDIF}
+
 uses
   MemCheck in 'MemCheck.pas',
   Forms,
@@ -163,7 +169,7 @@ var xFilename, xPassword: String;
     xProceed: Boolean;
 begin
   GCmanagerState := CMANAGERSTATE_STARTING;
-  GDebugMode := GetSwitch('/debug');
+  GDebugMode := {$IFDEF DEBUG}True{$ELSE}GetSwitch('/debug'){$ENDIF};
   {$IFOPT W+}
   if GDebugMode then begin
     MemChk;

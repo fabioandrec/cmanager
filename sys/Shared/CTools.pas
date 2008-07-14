@@ -1217,7 +1217,11 @@ end;
 function GetUserProfilePathname(AFilename: String): String;
 var xCat: String;
 begin
+  {$IFDEF DEBUG}
+  xCat := IncludeTrailingPathDelimiter(GetSystemPathname(''));
+  {$ELSE}
   xCat := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'CManager';
+  {$ENDIF}
   if ForceDirectories(xCat) then begin
     Result := IncludeTrailingPathDelimiter(xCat) + AFilename;
   end;
@@ -1226,7 +1230,11 @@ end;
 function GetDatafileDefaultFilename: String;
 var xCat: String;
 begin
+  {$IFDEF DEBUG}
+  xCat := IncludeTrailingPathDelimiter(GetSystemPathname(''));
+  {$ELSE}
   xCat := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'CManager';
+  {$ENDIF}
   if ForceDirectories(xCat) then begin
     Result := IncludeTrailingPathDelimiter(xCat) + CPrivateDefaultFilename;
   end;

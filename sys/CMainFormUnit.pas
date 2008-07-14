@@ -424,9 +424,7 @@ begin
   end;
   ActionImportCurrencyRates.Visible := GDataProvider.IsConnected;
   ActionCompactDatafile.Visible := GDataProvider.IsConnected;
-  {$IFDEF DEBUG}
-  ActionRandom.Visible := GDataProvider.IsConnected;
-  {$ENDIF}
+  ActionRandom.Visible := GDebugMode and GDataProvider.IsConnected;
   ActionCheckDatafile.Visible := GDataProvider.IsConnected;
   ActionImportDatafile.Visible := GDataProvider.IsConnected;
   ActionExportDatafile.Visible := GDataProvider.IsConnected;
