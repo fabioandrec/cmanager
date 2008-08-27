@@ -1,0 +1,382 @@
+CMANAGER - CHANGELOG
+====================
+
+[+] modyfikacja funkcjonalna
+[*] modyfikacja niefunkcjonalna
+[-] poprawka b³êdu
+[i] informacja
+
+Wersja 1.10.2 Beta
+[i] wyjœcie kolejnej wersji beta (2008-07-14)
+[-] okres powiadamiania za zaleg³e operacje domyœlnie by³ ustawiany na 0 je¿eli w katalogu CManager-a nie by³o ¿adnego
+    pliku konfiguracyjnego (np. przy pierwszym uruchomieniu CManager-a). Powinien wynosiæ 90 dni.
+[-] poprawiono obliczanie harmonogramu dla operacji zaplanowanych okreœlon¹ iloœæ razy
+[*] na zestawieniu zaplanowanych operacji dodano opisowe statusy równie¿ dla operacji zaleg³ych
+[+] w preferencjach dodano mo¿liwoœæ zdecydowania czy dla wydruków list jako raport maj¹ byæ u¿ywane standardowe ustawienia kolorów i czcionek dla
+    raportów czy takie jakie s¹ w aktualnie ustalone dla listy.
+[*] instalator nie usuwa plików report.htm i report.css
+[*] od tej wersji wszystkie pliki konfiguracyjne oraz szablony bêd¹ przechowywane w katalogu, w którym u¿ytkownik ma swój profil np.
+    c:\document and settings\[nazwa u¿ytkownika]\dane aplikacji\CManager, a nie jak do tej pory w katalogu, w którym zainstalowany by³ CManager.
+	Równie¿ podczas tworzenia nowego pliku danych proponowana lokalizacja bêdzie wskazywa³a na katalog w profilu u¿ytkwnika
+[-] poprawiono b³¹d usuwania konta, kontrahenta, kategorii, waluty. Je¿eli by³a choæ jedna zarejestrowana operacja, która póŸniej by³a usuniêta
+    pozostawa³y statystyki, które nie pozwala³y na usuniêcie wybranego elementu
+[-] dodano status lokaty oraz rodzaj operacji lokaty jako cechy mo¿liwe do wyboru przy definiowaniu w³asnych raportów
+[-] poprawiono funkcjonalnoœæ wstawiania parametru w wybranym miejscu podczas definiowania w³asnego raportu
+[+] w funkcji eksportu pliku danych dodano mo¿liwoœæ wyboru tabel, które maj¹ byæ wyeksportowane
+[-] drobne poprawki w dialogach zawieraj¹cych listê z mo¿liwoœci¹ zaznaczenia/odznaczenia wielu elementów
+	
+Wersja 1.10.1 Beta
+[i] wyjœcie kolejnej wersji beta (2008-06-12)
+[-] w wykresach, w których mo¿na by³o zgrupowaæ operacje w/g dni, tygodni lub miesiêcy wartoœci by³y zawsze przypisywane do okresu
+    o jeden wiêkszego ni¿ faktyczny, np. wydatki kwietniowe by³y wykazywane w maju
+[-] poprawiono wygl¹d wykresów maj¹cych mo¿liwoœæ grupowania w/g dni, tygodni lub miesiêcy. Szerokoœæ s³upków by³¹ zawsze zale¿na od iloœci dni w
+    w wybranym okresie, teraz jest zale¿na raczej od sposobu grupowania
+[-] drobny b³¹d w liœcie inwestycji w kolumnie konta by³ wyœwietlany instrument inwestycyjny i odwrotnie
+[-] usuniêto drobne wycieki pamiêci je¿eli zmieniane by³y widoki z du¿ych ikon na ma³e
+[-] usuniêto wycieki pamiêci je¿eli zmieniane by³y zakres wyœwietlanych operacji inwestycyjnych
+[*] zmieniono nazwê zak³adki inwestycji na portfel inwestycyjny, oraz usuniêto z g³ownej formatki mo¿liwoœæ obejrzenia operacji inwestycyjnych. Na zak³adce
+    portfel inwestycyjny dodano przycisk Wszystkie operacje, pozwalaj¹cy obejrzeæ wszystkie dawne operacje inwestycyjne. Te zmiany mia³y na celu przygotowanie
+    spójnego rozwi¹zania dla inwestycji oraz przygotowywanej obs³ugi lokat i kredytów
+[+] z poziomu zak³adki portfel inwestycyjny (dawna inwestycje) dodano mo¿liwoœæ tworzenia nowych operacji, oraz przejrzenia listy operacji stowarzyszonych z danym portfelem
+    inwestycyjnym, czyli wszystkich operacji, które dotycz¹ danego instrumentu i konta. Dodano równie¿ mo¿liwoœæ usuwania inwestycji, 
+    w³¹cznie z wszystkimi operacjami, które jej dotyczy³y
+[+] drobne reorganizacje przycisków na zak³adce portfel inwestycyjny, nowy przycisk szczegó³y inwestycji
+[-] poprawiono b³¹d uniemo¿liwiaj¹cy usuwanie operacji finansowych powsta³ych na bazie operacji inwestycyjnych, które zosta³y usuniête. Usuwanie
+    operacji inwestycyjnych zwi¹zanych z operacj¹ finansow¹ skutkuje usuniêciem równie¿ operacji finansowej
+[-] trochê kosmetyki m.in. listy, ukrywanie pozycji menu Wtyczki, je¿eli nie ma ¿adnych, i parê innych drobiazgów
+[+] w menu narzêdzi dodano kalkulator lokatowy
+[+] wprowadzono mo¿liwoœæ tworzenia zaplanowanych transferów (ID1960573)
+[-] przeprojektowana zosta³a zak³adka powiadamiania w preferencjach (w zwi¹zku z dodaniem planowanych transferów)
+[-] poprawki odœwie¿ania zak³adek konta, operacji podczas usuwania operacji inwestycyjnych
+[*] w miejscach gdzie mo¿na wybieraæ kolory w dialogu do wyboru dodano kilka domyœlnych kolorów systemowych
+[-] poprawka w wybieraniu kursów w/g których wykonywane s¹ czynnoœci inwestycyjne (wprowadzono ograniczanie listy tylko do kursów danych walut)
+[+] trzy dodatkowe filtry na liœcie zaplanowanych operacji (od pocz¹tku roku, do koñca roku, w tym roku)
+[-] poprawka w wyliczaniu harmonogramie w sytuacji gdy dzieñ zaplanowanej operacji wypada³ w dniu oznaczonym jako wolny, a nastêpny wypada³ w 
+    kolejnym miesi¹cu, np. harmonogram ustawiony na ostatni dzieñ ka¿dego miesi¹ca, 31 maja 2008 wypada³ w sobotê. Je¿eli sobota by³a oznaczona 
+	jako wolna, nastêpny dzieñ pracuj¹cy wypada³ dopiero 2 czerwca 2008. Ta p³atnoœæ by³a gubiona.
+[*] zmiana okresu za jaki s¹ sprawdzane zaleg³e operacje (do tej pory by³o to 90 dni, aktualnie mo¿na ten okres zdefiniowaæ w preferencjach)
+[-] poprawiono raport przychodów w formie drzewa kategorii
+[+] dodano mo¿liwoœæ definiowania domyœlnej waluty obowi¹zuj¹cej dla danego pliku danych (do tej pory zawsze by³ to polski z³oty), definiowanie odbywa siê
+    na etapie tworzenia pliku danych. Domyœlna waluta mo¿e byæ równie¿ zmieniona w preferencjach u¿ytkownika
+[*] dodano obs³ugê kó³ka myszki w raportach ko³owych
+[-] poprawiono obs³ugê kopii zapasowych podczas startu i zamykania CManager-a. Wystêpowa³ b³¹d gdy ¿aden plik danych nie by³ otwarty. Kopia oczywiœcie nie powinna byæ wtedy robiona
+[*] dwie nowe sta³e w PluginConsts.pas CFRAMETYPE_* dotycz¹ce lokat
+
+Wersja 1.9.1 Beta
+[i] wyjœcie kolejnej wersji beta (2008-03-31)
+[*] wprowadzono mo¿liwoœæ u¿ywania standardowych nazw kolorów w domyœlnym arkuszu styli raportów, oraz w podstawowym szablonie raportów (nazwy kolorów patrz plik colors)
+[+] dodano mo¿liwoœæ automatycznego wykonywania kopii zapasowych przy wyjœciu z programu (do tej pory by³a mo¿liwoœæ tylko przy uruchamianiu)
+[+] dwa nowe zestawienia: drzewo przychodów/rozchodów pozwalaj¹ce uzyskaæ w postaci drzewka sumy na dane kategorie
+[+] dodano mo¿liwoœæ ukrywania list zawieraj¹cych podsumowania operacji w wybranym okresie (lista operacji i lista zaplanowanych operacji)
+[-] usuniêto zbêdn¹ opcjê usuñ aktywny profil, z zarz¹dzania profilami
+[-] poprawiono rejestracjê operacji z wybranym aktywnym profilem - nie by³a wype³niana kategoria
+[-] poprawka krytycznego b³êdu zwi¹zanego z akceptacj¹ preferencji u¿ytkownika (ID1927089)
+[+] dodano mo¿liwoœæ definiowania tzw. szybkich operacji - pozwala na zdefiniowanie szablonów operacji, które za pomoc¹ jednego klikniêcia pozwalaj¹ na
+    póŸniejsze wywo³anie jako kompletnej operacji, w której nale¿y wype³niæ tylko pole kwota
+[-] poprawiono problemy podczas rejestracji z profilem lub domyœl¹ wartoœci¹ dla konta, czasami nie mo¿na by³o zaakceptowaæ operacji z komunikatem o zerowej
+    kwocie, mimo, ¿e kwota by³a wype³niona
+
+Wersja 1.8.2 Beta
+[i] wyjœcie kolejnej wersji beta (2008-03-19)
+[-] rozwi¹zano problem b³êdu je¿eli w polu tekstowym zosta³ wpisany znak ";" œrednik (ID1887243)
+[-] w niektórych raportach wymagane by³o wskazywanie filtru, niepotrzebnie
+[-] poprawiono eksport danych, literówka w nazwie tabeli skutkuj¹ca b³êdem
+[+] wprowadzono mo¿liwoœæ ochrony pliku danych has³em (ID1887238)
+[*] wszystkie narzêdzia zwi¹zane z plikami danych posiadaj¹ teraz dodatkowy parametr pozwalaj¹cy okreœliæ has³o dostêpu do pliku danych
+[+] kosmetyka pozwalaj¹ca zmieniæ wielkoœæ ikon na g³ównej formatce
+[-] poprawiono wyœwietlanie w³asnych kolorów t³a w liœcie powiadomieñ na dziœ
+[+] mo¿liwoœæ definiowania w³aœciwoœci listy wyci¹gów z poziomu formatki preferencji
+[-] poprawiono wyœwietlanie w³asnych kolorów t³a w liœcie wyci¹gów
+[+] dwie nowe sta³e w PluginConsts.pas CFRAMETYPE_* dotycz¹ce inwestycji, oraz jedna dotycz¹ca listy raportów
+[+] dodano mo¿liwoœæ definiowania wygl¹du i czcionek, koloru i wysokoœci wierszy w wiêkszoœci list
+[+] nowa pozycja menu Pomoc-Forum dyskusyjne, pozwala na otworzenie w domyœlnej przegl¹darce g³ownego forum CManager-a
+[-] poprawiono b³¹d "Metoda LoadObject zwróci³a..." gdy nast¹pi³o otwarcie innego pliku danych ni¿ aktualnie otwarty z aktywnym profilem domyœlnym
+[-] przez przypadek, znik³a mo¿liwoœæ wyczyszczenia aktywnego profilu, przywrócono
+[+] dodano mo¿liwoœæ definiowania domyœlnych wartoœci dla pól konto, kontrahent, kategoria w preferencjach. Je¿eli je zdefiniujesz
+    CManager dla ka¿dej nowo rejestrowanej operacji bêdzie te pola wype³nia³. Jest to rozwi¹zane podobne do profili, przy czym wybór domyœlnych wartoœci
+    odbywa siê przy otwarciu pliku danych
+[*] dodano zapamiêtywanie ostatnio wybranych sortowañ w listach
+[+] drobne zmiany w wygl¹dzie zestawieñ "Suma przychodów i Rozchodów" oraz "Wykres sum...", zmiany mam nadziejê na lepsze
+[+] wszystkie listy mo¿na konfigurowaæ w zakresie w³asnych kolorów i czcionek
+[+] dodano mo¿liwoœæ okreœlania wielkoœci ikon na g³ównej formatce programu
+[*] drobne zmiany przy eksporcie danych - kategorie s¹ eksportowane w kolejnoœci tworzenia
+[+] zasadnicze zmiany w Plik->Narzêdzia (nast¹pi³a zmiana nazwy na Narzêdzia pliku danych). Uzna³em równie¿, ¿e wszystkie znajduj¹ce siê
+    tam funkcje powinny dzia³aæ zawsze w kontekscie aktualnie otwartego pliku danych.
+[+] wydzieli³em pozycjê menu "Wtyczki" jako oddzieln¹ pozycjê w g³ównym menu CManager-a
+[+] dodano kreatora tworzenia nowego pliku danych
+[+] w menu Pomoc dodano mo¿liwoœæ uruchomienia linii poleceñ systemu Windows
+[+] do programu CArchive dodano opcjê -m, mo¿liwoœæ tworzenia nowego pliku danych z linii poleceñ
+[+] uaktualnienie niektórych sk³adników komponentów PngComponents (dok³adnie sk³adnik PNGObjects do wersji 1.56)
+[*] dodano mo¿liwoœæ definiowania wielkoœci ikon na belkach z przyciskami (do wyboru ma³e lub du¿e ikony, pod prawym przyciskiem myszy)
+[+] poprawka w wykresach s³upkowych, szerokoœæ s³upków jest teraz zale¿na od zakresu danych wyœwietlanych na dziedzinie wykresu
+[+] w raportach udostêpniono mo¿liwoœæ zoom/undo zoom za pomoc¹ kó³ka w myszce
+[*] w helpie powsta³a krótka sekcja poœwiêcona narzêdziom konsolowym
+
+Wersja 1.8.1 Beta
+[i] wyjœcie kolejnej wersji beta (2008-02-05)
+[+] dodano mo¿liwoœæ konfigurowania kolorów parzystych i nieparzystych elementów list
+[+] dodano listê definicji instrumentów inwestycyjnych, w zwi¹zku z tym dosz³y nowe typy elementów dla wtyczek typu "zaznaczony element"
+[-] poprawiono kontrolê tworzenia i edycji kont, zaakceptowaæ konto bez wybranej waluty co powodowa³o b³¹d na bazie danych
+[*] pe³ne przejœcie na MsXml 6.0, biblioteki te s¹ obecnie WYMAGANE do poprawnej pracy CManager-a
+[-] poprawka do elementów wyci¹gów. Bez wzglêdu na rodzaj operacji kwota zawsze powinna byæ dodatnia
+[*] znaczne zmiany w CUpdate i wtyczkach pobieraj¹cych kursy walut. Problem by³ z przerywaniem dzia³ania w¹tków.
+[+] dwie nowych metody w interfejsie ICManagerInterface, patrz plik plugins
+[+] na ka¿dym liniowym lub s³upkowym raporcie mo¿na dodaæ liniê œrednich i liniê trendu
+[+] nowa funkcjonalnoœæ aplikacji pozwalaj¹ca na definiowanie instrumentów finansowych, oraz okreœlanie ich wartoœci.
+    Pozwala na œledzenie notowañ akcji, obligacji i innych notowanych papierów wartoœciowych.
+[+] nowy rodzaj wtyczek - wczytywanie notowañ, jako przyk³adowa wtyczka do³¹czana jest wtyczka importuj¹ca notowania
+    z dowolnego miejsca bêd¹cego serwerem http notowañ w formacie MetaStock-a (Copyright © 2007 Equis International,  a Reuters company.  All rights reserved.)
+[+] przy imporcie kursów walut dodano mo¿liwoœæ zdecydowania czy importujemy wszystkie kursy, czy tylko kursy dla walut, które istniej¹ w bazie danych
+[-] poprawki b³êdów obs³ugi parametrów raportów w³asnych (access przy edycji parametru)
+[+] zestawienie lista kursów wybranej waluty
+[+] dodano mo¿liwoœæ definiowania sposobu wyboru kursów walut w regu³ach przeliczania zwi¹zanych z kontami
+[-] zmiany w wygl¹dzie okna g³ównego, czêœæ s³owników z listy skrótów zosta³a przeniesiona do listy s³owników
+[-] poprawiono b³¹d definiowania parametrów, który uniemo¿liwia³ definiowanie rodzaju cechy
+[-] poprawiono b³¹d przy wyœwietlaniu zaplanowanych zadañ. Zaplanowana operacja by³a wykazywana nawet przed faktycznym czasem jej rozpoczêcia
+[-] poprawiono b³¹d przy uzupe³nianiu opisu dla operacji bêd¹cej operacj¹ z listy. Dla mnemonika kategoria wykazywany by³ rodzaj operacji
+[+] dodano mo¿liwoœæ wyboru filtrów w zestawieniach Rozchody/Przychody-Wg kategorii/Wg Kontrahentów/Wykres i Lista
+[-] poprawiono sposób wyœwietlania kursu w liœcie kursów walut (usuniêto zbêdny symbol polskiej waluty)
+[-] poprawiono przeliczenia na walutê konta podczas edycji zarejestrowanych operacji walutowych
+[-] poprawiono wyœwietlanie daty realizacji zaplanowanej operacji na formatce zmiany stanu
+[+] dodano kolumnê data realizacji na liœcie zaplanowanych operacji
+[*] zmieniono nazwê "Plany" na "Operacje zaplanowane"
+[*] na liœcie zaplanowanych operacji dodano przycisk "Harmonogramy" pe³ni¹cy rolê tak¹ sam¹ jak poprzednio taki przycisk na liœcie skrótów
+[-] poprawki b³êdów wewn¹trz dostêpu do danych
+[+] narzêdzie CValidate s³u¿¹ce do weryfikacji dowolnego pliku xml wzglêdem dtd lub xsd
+
+Wersja 1.7.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-09-07)
+[+] szeœæ nowych metody w interfejsie ICManagerInterface, patrz plik plugins
+[+] nowy rodzaj pluginów - zaznaczony element (patrz plik plugins)
+[+] zmiany w sposobie wykonywania wtyczek "po prostu uruchom", patrz plik plugins
+[+] drobna zmiana w cquery.exe, nowy parametr pozwalaj¹cy okreœliæ separator pól. Domyœlnie jest pusty co oznacza, ¿e cquery
+    na wyjœciu zwróci sformatowane do maksymalnej szerokoœci kolumny. Nowy parametr pozwalaj¹cy przes³aæ wynik w postaci xml-a
+[-] poprawka w nazwie groupbox-a przy definiowaniu waluty
+[+] nowa wtyczka o nazwie "konsola Sql", pozwala grzebaæ bezpoœrednio w pliku danych za pomoc¹ komend Sql. Powinna byæ
+    u¿ywana z du¿¹ rozwag¹
+[+] wprowadzono nowy atrybut dla kategorii, który okreœla jednostkê miary danej kategorii. Je¿eli dla danej kategorii okreœlono
+    tak¹ jednostkê, wtedy podczas rejestracji operacji mo¿na okreœliæ iloœæ kategorii, np. je¿eli okreœlimy dla Paliwa jednostkê miary
+    litry to przy ka¿dym zakupie paliwa bêdziemy mogli wpisaæ w odpowiednie pole iloœæ litrów jaka zosta³a zakupiona
+[+] na zestawieniu historii waluty dodano mo¿liwoœæ wyœwietlenia procentowej ró¿nicy pomiêdzy kursami z dwóch s¹siaduj¹cych dni
+[-] poprawiono filtrowanie kursów walut przy dodawaniu i modyfikacji kursów (nie by³y brane pod uwagê wybrane daty)
+[+] dwa nowe zestawienia iloœciowe
+[-] poprawka w zestawieniu sum rozchodów/przychodów dla kont, zestawienie by³o robione dla wszystkich kont, a nie dla tych, które wybrano
+[+] do okna powiadomieñ na dziœ dodano informacjê o nieuzgodnionych wyci¹gach z mo¿liwoœci¹ konfiguracji po stronie preferencji
+    u¿ytkownika
+[+] na formatce preferencji dodano mo¿liwoœæ w³¹czania lub wy³¹czania wtyczek
+[+] wtyczka importuj¹ca wyci¹gi z mBanku pozwala na wczytywanie wyci¹gów z operacji na karcie kredytowej
+[+] drobne zmiany w implementacji wtyczek, dosz³a opcjonalna metoda Plugin_About (patrz plik plugins)
+[+] dodano funkcjonalnoœæ importu danych z pliku wykonanego za pomoc¹ eksportu pliku danych, w chwili obecnej import jest zawszy wykonywany przyrostowo
+    do aktualnych danych
+[+] w pluginach typu "wykres" i "zestawienie html" mo¿na wykorzystywaæ wszystkie "mnemoniki podstawowe" (dok³adnie tak samo
+    jak wykorzystuje siê te mnemoniki w polach opis, patrz plik plugins)
+[-] poprawiono ustawianie dostêpnoœci przycisku uruchom raport, inicjalnie by³ dostêpny nawet je¿eli nie by³ wybrany ¿aden raport
+    wciœniêcie go powodowa³o Access Violation
+[-] rozwi¹zano problem ze znikaniem checkbox-ów do zaznaczania elementów na liœcie, je¿eli zmieniono zakres widocznych na liœcie elementów
+[-] poprawiono b³¹d w polach pozwalaj¹cych na wybór kilku elementów przez zaznaczenie np. pole konta w definicji filtra, aplikacja niepoprawnie
+    rozpoznawa³a iloœæ zaznaczonych elementów
+[+] dodano mo¿liwoœæ definiowania w³asnych raportów za pomoc¹ podanych zapytañ sql, oraz w³asnego lub dostarczonego arkusza styli
+[+] nowe narzêdzie do transformowania xml-i za pomoc¹ arkusza styli ctransform.exe. Pomocne przy definiowaniu w³asnych raportów, pozwala na szybkie
+    przetestowanie poprawnoœci arkusza styli
+[+] wtyczka importuj¹ca wyci¹gi z mBanku pozwala na wczytywanie wyci¹gów w formacie csv
+[*] je¿eli lista zezwala³a na wybór wielu elementów przycisk OK bêdzie teraz wy³¹czany je¿eli nie zaznaczono przynajmniej jednego. Do tej pory
+    powodowa³o to uznanie, ¿e zaznaczono wszystkie elementy
+
+Wersja 1.6.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-07-30)
+[-] poprawiono b³¹d cannot focus na formatce listy operacji, je¿eli kwota by³a równa 0
+[-] poprawiono b³¹d cannot focus na formatce operacji, je¿eli kwota by³a równa 0
+[-] zmiana g³ownym module obs³ugi bazy danych pozwalaj¹ca na zapisywanie znaków z³amania linii w polach typu opis. Do tej pory nie by³o
+    mo¿liwe zapisanie poprawnie sformatowanego opisu
+[+] zmieniono sposób wyœwietlania opisów w listach. Wyœwietlana jest zawsze pierwsza linia, oraz trzy kropki je¿eli jest wiêcej linii
+[-] poprawiono wyœwietlanie d³ugich tekstów w komponentach s³u¿¹cych do wyboru z listy
+[+] obs³uga wyci¹gów bankowych, uzgadnianie operacji z wyci¹giem
+[+] nowy rodzaj pluginów - wczytywanie wyci¹gów bankowych (patrz plik plugins)
+[+] plugin do wczytywania wyci¹gów z ror-ów w mBanku
+
+Wersja 1.5.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-07-09)
+[*] zmiana formatki o programie
+[*] we wszystkich polach typu memo w programie nastêpuje rozpoznawanie wpisanych linków, klik na linka powoduje otwarcie strony
+    wskazanej w linku w domyœlnej przegl¹darce
+[+] w liœcie zrealizowanych operacji mozna wybraæ czy chcemy widzieæ kwoty w walucie operacji czy kwoty w walucie konta
+[+] przy dodawaniu i edycji listy operacji mo¿na wyœwietliæ wszystkie wchodz¹ce w jej sk³ad operacji w kwotach waluty lub konta
+[-] w powiadomieniach na dziœ sumy kwot powinny byæ wyliczane tylko gdy grupowane operacje s¹ w jednej walucie
+[*] piêæ nowych mnemoników do szablonów opisów operacji
+[-] poprawiono zestawienie listy operacji rozchodowych/listy operacji przychodowych, kwoty by³y zawsze brane po przeliczeniu na walutê konta
+    a wyœwietlane z walut¹ operacji
+[-] poprawiono zestawienie listy operacji rozchodowych/listy operacji przychodowych z grupowaniem po kategoriach/produktach,
+    kwoty by³y zawsze brane po przeliczeniu na walutê konta, a wyœwietlane z walut¹ operacji
+[*] drobne zmiany w zestawieniu historii konta
+[+] niektóre zestawienia dosta³y mo¿liwoœæ wykonywania w walucie operacji lub w walucie konta
+[+] dwa nowe zestawienia - historia kontrahenta i historia kategorii
+[+] w listach z mo¿liwoœci¹ wyboru wielu elementów za pomoc¹ zaznaczenia w menu kontekstowym dodano mo¿liwoœæ zaznaczenia,odznaczenia i odwrócenia
+    zaznaczenia wszystkich elementów
+[+] w zestawieniach rozchody-sumy oraz przychody sumy pole z wyborem kont zast¹pione zosta³o polem z wyborem filtru
+[*] zmiany w wygl¹dzie okna g³ównego
+[+] zmiany w sposobie wybierania filtrów, dosz³o okienko z bezpoœrednim okreœleniem filtru
+[*] zmiany w raportach, kilka nowych raportów
+
+Wersja 1.4.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-06-22)
+[+] dodano typ kursu waluty. Mo¿liwe wartoœci to kupno, sprzeda¿ i œredni. Domyœlnie jest œredni i taki jest przyjmowany
+    je¿eli plugin nie zwróci typu, zmiana raportu kursów waluty
+[-] usuniêto ogólny b³¹d przy wyszukiwaniu w FindByCondition (jako typ danych by³ TDataGid a powinien byæ string). Je¿eli
+    np. w walutach by³a d³uga nazwa kontrahenta móg³ byæ b³¹d wyknania zapytania
+[+] na wszystkich listach dodano funkcjonalnoœæ wyszukiwania po wpisywanym tekscie
+[+] plugin do pobierania kursów kupna/sprzeda¿y z NBP
+[i] zmieniono nazwê pluginu do pobierania kursów œrednich z NBP
+[+] kalkulator z podstawowymi funkcjami po wciœniêciu klawisza C na polach edycyjnych do wprowadzania kwot
+[*] zmiany kolorów dialogu do wyboru dat
+[+] nowy typ konta rachunek inwestycyjny
+[-] poprawiono wyœwietlanie listy wykonanych operacji przy pierwszym wyœwietleniu listy operacji
+[-] zmieniono sposób nazywania ustawieñ kolumn w pliku konfiguracyjnym. Niestety bêdzie to zwi¹zane z utrat¹ aktualnych ustawieñ dla
+    wszystkich list, podobnie dla ustawieñ wykresów
+[-] je¿eli nast¹pi³o awaryjne zamkniêcie CManager-a wartoœæ ostatnio otwieranego pliku danych by³a tracona. Je¿eli dodatkowo
+    konfiguracja przewidywa³a uruchamianie z ostatnio otwartym plikiem wystêpowa³ b³ad inicjowania pliku danych.
+[*] zmieniono css dla raportów dosz³y klasy evensum, evenbase, evenhead s³u¿¹ce do wyró¿nienia w raportach typu html zawartoœci parzystych
+    wierszy odpowiednio podsumowañ, linii raportu, nag³ówka
+[-] poprawiono wyró¿nianie kolorem wierszy w listach
+[*] raporty generowane na podstawie list zawieraj¹ dok³adnie te elementy, które s¹ widoczne
+[+] dwie nowe pozycje w menu Pomoc, Zg³oœ b³¹d otwiera tracker-a na Sourceforge do dodawania zg³oszeñ b³êdów. Analogicznie
+    Zaproponuj zmianê
+[+] nowy rodzaj eksportu ka¿dej z list, mo¿na wygenerowaæ plik excel-a
+[-] poprawiono b³¹d zapamiêtywania odpowiedzi je¿eli podczas komunikatu z mo¿liwoœci¹ zapamiêtania odpowiedzi wciœniêto przycisk Esc
+[+] pe³ne wsparcie dla wielowalutowoœci, zmiana SDK dla plugin-ów, dwie nowe metody interfejsu CManager-a dla pluginów (patrz plik plugins)
+[+] w limitach wprowadzono atrybut waluta. Do wyliczenia aktualnej wartoœci limitu wybierane s¹ tylko operacje wykonane w walucie limitu
+[+] mo¿liwoœæ zdefiniowania regu³ przeliczania walut dla ka¿dego z kont
+[-] poprawiono b³¹d podczas akceptacji listy operacji, je¿eli wczeœniej z tej listy usuniêto now¹ operacjê, czyli przypadek dodaj listê,
+    dodaj operacjê na liœcie, usuñ tê operacjê na liœcie, akceptuj listê operacji
+[+] wprowadzono obs³ugê limitów przy rejestracji list operacji
+[-] poprawiono dzia³anie filtrów je¿eli dla danego filtru nie wskazano jawnie elementów filtru (czyli wszystkie elementy wchodzi³y w zakres wyboru)
+[-] poprawiono rozpoznawanie przekroczenia limitu podczas edycji operacji
+[-] poprawiono filtrowanie listy kontrahentów
+
+Wersja 1.3.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-04-29)
+[+] dwie nowe funkcje programu carchive, komapktowanie i tworzenie nowego czystego pliku danych 
+    (nawet bez schematu danych)
+[+] nowe narzêdzie do podgl¹dania i modyfikacji bazy danych cquery.exe. Mo¿esz wykonaæ za jego pomoc¹ dowolne 
+    zapytanie zgodne z sql-em w rozumieniu MsAccess-a, w tym równie¿ mo¿esz modyfikowaæ schemat bazy danych
+[-] poprawiono literówkê na przycisku dodawania kontrahentów
+[+] dodano obs³ugê walut (narazie w zakresie definicji walut i kursów walut)
+[+] pierwsze podejœcie do plugin-ów, jako przyk³ad plugin pobieraj¹cy kursy œrednie NBP oraz plugin uruchamiaj¹cy 
+    kalkulator systemowy informacje o API do pluginów w pliku plugins
+[+] mo¿liwoœæ wczytania kursów walut na dany dzieñ z odpowiedniego pliku XML
+[+] wyrównanie ikon w listach
+[+] w menu kontekstowym w listach dodano nowe pozycje Dodaj, Edytuj, Usuñ
+[+] dodano skróty klawiaturowe w listach Dodaj - Ctrl + D, Edytuj - Ctrl + E, Usuñ - Ctrl + U
+[+] nowe zestawienie - historia waluty
+[-] poprawiono b³¹d wykonania zapytania je¿eli jakiœ ³añcuch znakowy zawiera³ apostrof
+[+] nowe zestawienie - wykres stanu kont z poziomu zak³adki kont
+[+] parametryzowanie i zapamiêtywanie wygl¹du wykresów
+[+] drugie podejœcie do plugin-ów, dodano mo¿liwoœæ tworzenia zestawieñ i wykresów za pomoc¹ pluginów, patrz plik plugins
+
+Wersja 1.2.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-04-01)
+[+] zapamiêtywanie kiedy by³a wykonywana ostatnio kopia zapasowa danego pliku danych
+[-] poprawiono b³êdne zapisywanie i wyœwietlanie rodzaju kontrahenta
+[*] pierwsze podejœcie do du¿ego refactoringu kodu Ÿród³owego
+[+] przycisk Delete czyœci pola pozwalaj¹ce na wybór z listy
+[+] limity na operacje
+[+] w kalkulatorze kredytowym dodano opcjê wprowadzania prowizji, s³u¿¹cej do wyliczenia rrso
+[+] nowe zestawienie Sumy przychodów i rozchodów
+[-] poprawiony szablon raportu, dodano meta z definicj¹ kodowania, powinny znikn¹æ problemy z pl-iterkami
+[-] je¿eli dodawano jakiœ obiekt na listach gdy dostêpne by³y zaznaczenia wielu obiektów (np. przy definiowaniu kategorii do filtru)
+    nowo dodane obiekty nie mia³y checkbox-ów
+[+] dodano mo¿liwoœæ definiowania dni pracuj¹cych, co mo¿e mieæ wp³yw na terminy wykonania zaplanowanych operacji
+[+] w zwi¹zku z dodaniem dni pracuj¹cych do harmonogramu dosz³a cecha mówi¹ca o tym jak przesuwaæ termin wykonania operacji
+    je¿eli wypada on w dniu wolnym od pracy
+[-] poprawiono wyœwietlanie harmonogramu (dla niedzieli by³ wyœwietlany poniedzia³ek)
+[+] wprowadzono mo¿liwoœæ automatycznego tworzenia kopii plików danych podczas uruchamiania CManager-a, 
+    konfigurowalne w preferencjach
+[+] dodano nowe narzêdzie CArchive, s³u¿¹ce do wykonywania kopii plików danych i odtwarzania ich z kopii. Mo¿e pos³u¿yæ np.
+    do zdefiniowania w systemie zadania harmonogramu i cyklicznego wykonywania kopii plików danych
+[+] dodano mo¿liwoœæ eksportu ka¿dej z list do pliku txt, rtf, html
+[*] zmieniono sposób generowania raportów html-owych, style s¹ teraz do³¹czane do pliku html, mo¿na je jednak 
+    edytowaæ tak jak do tej pory
+[+] dodano mo¿liwoœæ zapisywania do pliku zawartoœci ka¿dego raportu
+
+Wersja 1.1.1 Beta
+[i] wyjœcie kolejnej wersji beta (2007-03-16)
+[+] operacje mo¿na grupowaæ w listy operacji (funkcjonalnoœæ podobna do rejestracji operacji z profilem)
+[-] poprawiono odœwie¿anie listy kont przy zmianie operacji, w której wybrano inne konto ni¿ pierwotne
+[+] dodano mo¿liwoœæ eksportu pliku danych do pliku SQL
+[-] poprawiono budowanie drzewa kategorii, poniewa¿ przy iloœci podkategorii wiêkszej od jednej mog³y wystêpowaæ
+    b³êdne przypisania
+[*] spore zmiany w kodzie zwi¹zanym z odœwie¿aniem list
+[-] przy usuwaniu kont, produktów i kontrahentów nie sprawdzane by³y powi¹zania z filtrami
+[-] przy usuwaniu kont, produktów i kontrahentów nie sprawdzane by³y powi¹zania z profilami
+[-] poprawiono funkcjonalnoœæ sprawdzania pliku danych, mimo znalezienia niespójnoœci dla kont nie by³y one naprawiane
+    a jedynie raportowane w logu
+[*] spore zmiany w kodzie zwi¹zane z dodawaniem, modyfikowaniem i usuwaniem operacji
+[+] kontrhent ma now¹ cechê: rodzaj. S³u¿y do wyœwietlenia na listach przy wyborze kontrahenta tylko takich, które s¹
+    odpowiedni dla danego typu operacji
+[-] poprawiono b³¹d literki ñ w wyœwietlaniu opisów na formatkach
+[-] usuniêto mo¿liwoœæ wyst¹pienia b³êdów podczas odœwie¿ania list po usuniêciu obiektu z listy
+[-] usuniêto b³¹d w³¹czania klawisza usuñ na liœcie zrealizowanych operacji, je¿eli na liœcie nie by³o zaznaczonych
+    ¿adnych obiektów, ale na liœcie podsumowañ by³y
+[-] poprawiono b³¹d czcionek w polach opisu
+[+] dodano szablony opisów, pozwalaj¹ce na automatyczne wype³nianie pola opis dla operacji
+[-] usuniêto mo¿liwoœæ wyst¹pienia b³êdów podczas odœwie¿ania list po zmianie zakresu wyœwietlanych informacji
+[+] dodano mo¿liwoœæ zmiany inicjalnego stanu konta, je¿eli nie by³o zarejestrowanych, ¿adnych operacji
+[+] dodano mo¿liwoœæ zmiany typu kategorii, je¿eli nie mia³a ona ¿adnych podkategorii
+[*] zmodyfikowano styl css dla raportów
+[+] na formatce uaktualnieñ dodano przycisk pobierz, dostêpny je¿eli znaleziono aktualizacjê CManager-a
+
+Wersja 1.0.4 Beta
+[i] wyjœcie kolejnej wersji beta (2007-02-25)
+[-] okienko kalendarza zamyka³o siê po klikniêciu na przyciski zmiany miesi¹ca, co by³o troche uci¹¿liwe
+[-] je¿eli nie zdefiniowano ¿adnych kont, podczas sprawdzania pliku danych wystêpowa³ b³¹d dzielenia przez zero
+[+] powiadamianie o zaplanowanych i zaleg³ych operacjach przy starcie systemu (konfigurowane w preferencjach)
+[+] ustawienia czcionek dla niektórych list w zak³adce "widok" w preferencjach
+[+] powiadomienia na dziœ na g³ównej formatce aplikacji
+[-] po sprawdzeniu pliku danych nie by³a zwalniania kolekcja kont
+[+] sprawdzanie uaktualnieñ, program CUpdate, konfiguracja sprawdzania przy starcie aplikacji
+[+] kalkulator kredytowy
+[-] je¿eli dla skrótu nie by³ ustawiony katalog roboczy na katalog aplikacji raporty wygl¹da³y nie tak jak trzeba, lub
+    wcale nie by³y wykonywane gdy¿ by³ b³¹d otwarcia pliku report.html
+[-] usuniêto wyj¹tek krytyczny po dwukliku na pustej liœcie czynnoœci wykonanych lub zaplanowanych
+[-] usuniêto potencjalne mo¿liwoœci wyst¹pienia wyj¹tków krytycznych podczas usuwania obiektów bazy danych z list, problem
+    polega³ na przekazywaniu zwolnionych ju¿ wczeœniej obiektów do odœwie¿ania list
+[+] zapamiêtywanie widocznoœci, szerokoœci i pozycji kolumn w listach, które mog¹ maj¹ wiêcej ni¿ dwie kolumny
+[+] w liœcie czynnoœci zaplanowanych nowa kolumna status, która okreœla w jakim stanie jest dana czynnoœæ zaplanowana
+[*] w kolumnach rodzaj czynnoœci, rodzaj operacji, rodzaj definicji, status czynnoœci dodano wyœwietlanie ikon
+[+] wiêkszoœæ formatek z listami do wyboru ma teraz mo¿liwoœæ zmiany rozmiaru
+[*] formatki po raz pierwszy nie bêd¹ pojawiaæ siê w dziwnych miejscach tylko na œrodku ekranu
+[*] pozycje i wielkoœæ fromatek nie zale¿y od klasy formatki a od klasy i tytu³u
+
+wersja 1.0.3 Beta
+[i] wyjœcie serwisowe wersji beta (2007-01-18)
+[-] po nowej instalacji nie by³ tworzony plik danych, zg³aszany by³ b³¹d braku pliku danych
+
+wersja 1.0.2 Beta
+[i] drugie publiczne wyjœcie wersji beta (2007-01-17)
+[-] pliki szablonów raportów tworzone zawsze w katalogu aplikacji, a nie w bie¿¹cym
+[+] zestawienie statystyczne
+[+] wydruki wiêkszoœci list w postaci raportów
+[-] wy³¹czono zbêdny opis na formatce zmiany statusu zaplanowanej operacji, je¿eli jej status by³ "gotowa do realizacji"
+[+] dodano przycisk "Wykonaj operacje" na liœcie operacji zaplanowanych do wykonania na wybrany dzieñ
+[+] preferencje, dodano opcje startowe pliku danych
+[+] preferencje, dodano ustwienia widocznoœci paska skrótów i paska stanu
+
+Wersja 1.0.1 Beta
+[i] pierwsze publiczne wyjœcie wersji beta (2006-12-29)
+[+] dodano mo¿liwoœæ kompaktowania pliku danych
+[-] modyfikacja podkategorii powodowa³a odpiêcie od kategorii nadrzêdnej
+[-] modyfikacja operacji jednorazowych powodowa³a podwójne obci¹¿enie kont Ÿród³owych/docelowych
+[-] modyfikacja operacji planowanych powodowa³a podwójne obci¹¿enie kont Ÿród³owych/docelowych
+[-] modyfikacja operacji powodowa³a podwójne obci¹¿enie kont Ÿród³owych/docelowych
+[+] dodano mo¿liwoœæ wykonywania kopii zapasowej pliku danych, oraz odtwarzania plik danych z kopii
+[+] dodano mo¿liwoœæ sprawdzania pliku danych (np. korygowane s¹ niepoprawne stany kont. Poprawny wyliczany jest 
+    na podstawie operacji oraz stanu startowego)
+[+] komponenty typu static maj¹ teraz mo¿liwoœæ klikania spacj¹ oraz maj¹ tabstop
+[+] do list dodano mo¿liwoœæ konfigurowania czcionek
+[*] nowe ikony
+[+] dodano mo¿liwoœæ rejestracji operacji pojedyñczych za pomoc¹ profili. Aktywny profil pozwala na automatyczny wybór
+    kontrahenta, konta i kategorii dla nowej operacji
+
+Wersja 1.0.0 Beta
+[i] wyjœcie tylko na potrzeby wewnêtrznych testów (2006-11-25)
+[*] nowy atrybut account.initialBalance
+

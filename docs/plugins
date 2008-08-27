@@ -1,0 +1,199 @@
+CMANAGER - PLUGINY
+==================
+
+Zasady ogólne
+
+1. Wszystkie pluginy powinny mieæ rozsze¿enie dll i powinny byæ umieszczone w podkatalogu Wtyczki.
+2. Wszystkie metody pluginów powinny byæ implementowane w konwencji stdcall
+3. Plik Delphi z typami funkcji jakie powinny znaleŸæ siê w pluginie to PluginTypes.pas
+4. Plik Delphi ze sta³ymi okreœlaj¹cymi typy pluginów to PluginConsts.pas
+5. Dla ka¿dego pluginu zostaje utworzona pozycja menu o odpowiedniej nazwie na poziomie Narzêdzia->Wtyczki
+6. Ka¿dy plugin powinien implementowaæ nastêpuj¹ce metody
+
+   a) function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall;
+      wymagana, parametrem wejœciowym jest interfejs do CManager-a. Wywo³ywana przy uruchomieniu CManagera.
+      Funkcja powinna zwróciæ True je¿eli uda³o siê zainicjowaæ poprawnie plugin. Dodatkowo powinna wywo³aæ metodê
+      ACManagerInterface.SetType aby powiadomiæ CManager-a jakiego typu jest plugin. Je¿eli ta metoda nie zostanie wywo³ana
+      CManager uzna, ¿e plugin jest nieznanego typu i nie bêdzie go widaæ. W tej metodzie powinny zostaæ ustawione nazwa i opis
+      pluginu, odpowiednio za pomoc¹ metod ACManagerInterface.SetCaption i ACManagerInterface.SetDescription. Zazwyczaj interfejs do
+      CManager-a powienien zostaæ zapamiêtany w jakiejœ zmiennej globalnej plugin-u, aby móc wykrzystywaæ go póŸniej,
+      np. w metodzie Plugin_Execute
+
+   b) function procedure Plugin_Finalize; stdcall;
+      opcjonalna, powinna zwalniaæ wszystkie globalne obiekty zaalokowane w pluginie. Wywo³ywana przy
+      zamykaniu CManagera.
+
+   c) function Plugin_Configure: Boolean; stdcall
+      funkcja opcjonalna pozwalaj¹ca wyœwietliæ parametry konfiguracyjne pluginu. Aktualne parametry mo¿na pobraæ za pomoc¹
+      ACManagerInterface.GetConfiguration, która zwraca ³añcuch znaków. Je¿eli u¿ytkownik zdecyduje siê na akceptacjê parametrów
+      plugin powinien wywo³aæ metodê ACManagerInterface.SetConfiguration i jako jej parametr przekazaæ ³añcuch znaków bêd¹cy
+      nowymi parametrami. Je¿eli u¿ytkownik zaakceptuje konfiguracjê metoda powinna zwróciæ true
+
+   d) function Plugin_Execute: OleVariant; stdcall
+      funkcja wymagana, wykonuje g³ówne zadanie pluginu, wykonywana je¿eli u¿ytkownik wybierze odpowiadaj¹c¹ dla danego pluginu
+      pozycjê menu lub przycisk. W zale¿noœci od typu pluginu funkcja powinna zwracaæ odpowednie dane
+
+   e) function procedure Plugin_About; stdcall;
+      opcjonalna, powinna pokazaæ jakieœ informacje o pluginie
+
+Opis interfejsu ICManagerInterface
+
+1. Interfejs reprezentuje instancjê CManager-a w pluginie. Dziêki temu mo¿na uzyskaæ dostêp do pewnych obiektów CManager-a
+2. Wszystkie parametry przekazywane s¹ jako OleVariant, choæ w wiêkszoœci przypadków powinny byæ to ³añcuchy znaków
+3. Opis metod
+
+   * function GetAppHandle: HWND; metoda zwraca uchwyt do g³ownego okna CManager-a
+   
+   * function GetConfiguration: OleVariant; metoda zwraca aktualn¹ konfiguracjê pluginu zapamiêtan¹ w pliku konfiguracyjnym CManager-a
+     powinien byæ to ³añcuch znaków
+   
+   * procedure SetConfiguration(AConfigurationBuffer: OleVariant); metoda zapisuje w pliku konfiguracyjnym CManager-a wybran¹ konfiguracjê
+     pluginu. Powinien byæ to ³añcuch znaków
+   
+   * procedure SetType(AType: Integer); metoda ustawia typ pluginu, musi byæ wywo³ana w metodzie Plugin_Initialize
+   
+   * procedure SetDescription(ADescription: OleVariant); metoda ustawia opis pluginu, który bêdzie wyœwietlany na liœcie pluginów w
+     preferencjach CManager-a
+   
+   * procedure SetCaption(ACaption: OleVariant); metoda ustawia nazwê pluginu, czyli tekst jaki bêdzie wyœwietlany w pozycji menu zwi¹zanej
+     z pluginem
+   
+   * function GetConnection: IInterface; metoda zwraca interfejs _Connection (zgodny z Ado) reprezentuj¹cy po³¹czenie do pliku danych
+     CManager-a. Dziêki temu plugin ma mo¿liwoœæ wykonania dowolnej czynnoœci na bazie danych. Niestety wi¹¿e siê to z zagro¿eniem,
+     ¿e autor pluginu mo¿e ingerowaæ w twój plik danych. Dlatego przy próbie wywo³ania tej metody CManager wyœwietla okno z komunikatem
+     czy plugin mo¿e dostaæ _Connection
+
+   * function GetName: OleVariant; metoda zwraca nazwê programu, czyli zwyczajnie tekst CManager
+   
+   * function GetVersion: OleVariant; metoda zwraca wersjê programu w postci x.y.z.b
+
+   * function GetDatafilename: OleVariant; metoda zwraca pe³n¹ nazwê do aktualnie otwartego pliku danych
+
+   * function GetWorkdate: OleVariant; metoda zwraca aktualn¹ datê z jak¹ pracuje CManager
+
+   * function GetReportText: OleVariant; metoda zwraca szablon wydruków typu html, znajduj¹cy siê w katalogu CManager-a
+
+   * function GetReportCss: OleVariant; metoda zwraca aktualny szablon stylów jaki jest u¿ywany przez CManager-a,
+     znajduje siê on domyœlnie w katalogu CManager-a
+
+   * function GetCurrencySymbol(ACurrencyId: OleVariant): OleVariant; metoda zwraca symbol waluty o podanym identyfikatorze
+
+   * function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant; metoda zwraca iso waluty o podanym identyfikatorze
+
+   * function ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean; metoda wyœwietla zwyk³y messageBox, zwraca True
+     je¿eli wywo³ano z ADialogType = CDIALOGBOX_QUESTION i u¿ytkownik nacisn¹³ Tak
+
+   * procedure ShowReportBox(AFormTitle: OleVariant; AReportBody: OleVariant); metoda wyœwietla standardow¹ formatkê raportu
+     typu html, gdzie zawartoœci¹ raportu jest AReportBody
+
+   * function GetSelectedType: Integer; podaje rodzaj zaznaczonego elementu w liœcie która jest aktualnie aktywna
+
+   * function GetSelectedId: OleVariant; podaje identyfikator zaznaczonego elementu w liœcie która jest aktualnie aktywna
+
+   * function GetShutdownEvent: Cardinal; podaje handle-a do eventu, który zostaje ustwiony w stan Signaled je¿eli aplikacja
+     w³aœnie siê zamyka
+
+   * procedure SendFrameMessage(AMessage: OleVariant; AFrameType: OleVariant; ADataGid: OleVariant; AOptParam: OleVariant); metoda
+     pozwala na wys³anie informacji do frame-ów okreœlonego przez AFrameType typu informacji, ¿e dodano, zmienono, usuniêto jakiœ element
+     z listy, lub ¿e nale¿y dan¹ listê odœwie¿yæ w ca³oœci. W przypadku wywo³ywania CFRAMEMESSAGE_REFRESH parametry ADataGid, AOptParam s¹
+     ignorowane, natomiast w przypadku innych powinny byæ wype³nione ADataGid identyfikatorem obiektu, który uleg³ zmianie/zosta³ dodany lub
+     usuniêty. AOptParam ma znaczenie narazie tylko przy CFRAMETYPE_MOVEMENTLIST i tam w zale¿noœci od typu obiektu wysy³amy odp. 
+     CFRAMEOPTPARAM_BASEMOVEMENT lub CFRAMEOPTPARAM_MOVEMENTLIST. W ka¿dym innym przypadku powinien zostaæ przekazany CFRAMEOPTPARAM_NULL.
+
+   * function GetState: Integer; funkcja zwraca jedn¹ z trzech wartoœci: CMANAGERSTATE_STARTING w momencie gdy CManager jest uruchamiany
+     (a¿ do momentu wyœwietlenia g³ownej formatki), CMANAGERSTATE_RUNNING - przez ca³y czas dzia³ania (a¿ do momentu naciœniêcia przycisku 
+     zamykaj¹cego g³owne okno), CMANAGERSTATE_CLOSING gdy nastêpuje zamykanie CManager-a
+     
+   * procedure SaveToLog(AText, ALogFilename: OleVariant); metoda zapisuje do pliku o nazwie ALogFilename tekstu AText
+
+   * function DebugMode: Boolean; funkcja zwraca True je¿eli CManager zosta³ uruchomiony z opcj¹ /debug
+
+Rodzaje pluginów
+
+1. Plugin typu "pobierz kursy walut"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_CURRENCYRATE
+   Jako wyjœcie z metody Plugin_Execute powinien wróciæ ³añcuch znaków, tworz¹cy xml-a o budowie zgodnej z "rates.xsd",
+   (przyk³ad w rates_example.xml)   
+
+2. Plugin typu "po prostu wykonaj"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_JUSTEXECUTE
+   CManager po prostu wywo³uje metode Plugin_Execute, a co tam bêdzie to ju¿ tylko kwestia inwencji autora wtyczki. Cokolwiek znajdzie siê
+   na wyjœciu metody zostanie przez CManager-a zignorowane. Kiedy plugin powinien zostaæ wywo³any wskazuj¹ dodatkowe
+   flagi CJUSTEXECUTE_*, domyœlnie plugin jest umieszczany w odp. pozycji menu i wykonywany tylko na ¿¹danie u¿ytkownika.
+   Mo¿na wywo³aæ równie¿ plugin przy starcie CManager-a (flaga _ONSTART) lub przy zamkniêciu (flaga _ONEXIT). Je¿eli nie chcemy
+   aby plugin by³ dostêpny z poziomu menu CManager-a nale¿y dodaæ flagê _DISABLEONDEMAND.
+   
+3. Plugin typy "Zestawienie html"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_HTMLREPORT
+   Metoda Plugin_Execute powinna zróciæ ³añcuch znaków bêd¹cy poprawnym dokumentem html. Zostanie on wyœwietlony w standardowym
+   oknie raportów CManager-a. Je¿eli z jakichœ przyczyn raport ma nie byæ wyœwietlony powinien zostaæ zwrócony pusty Variant - Empty
+   Wykonanie pluginu tego typu odbywa siê z poziomu zak³adki raportów i ga³êzi "Ró¿ne"
+   Mo¿na wykorzystywaæ tzw. mnemoniki podstawowe. Zostan¹ one automatycznie zast¹pione odpowiednimi tekstami przed pokazaniem
+   zestawienia
+
+4. Plugin typu "Wykres"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_CHARTREPORT
+   Metoda Plugin_Execute powinna zróciæ ³añcuch znaków bêd¹cy poprawnym dokumentem xml zgodnym z "charts.xsd",
+   (przyk³ad w charts_example.xml). Iloœæ wykresów jest dowolna, Iloœæ serii jest dowolna, iloœæ wartoœci w serii
+   jest dowolna. typ serii powinien byæ brany z PluginConsts, podobnie typ wartoœci osi X czyli domain.
+   Wszystkie wartoœci "domain" dla typu CSERIESDOMAIN_DATETIME powinny byæ przekazywane jako data zgodna z definicj¹ xsd.
+   Je¿eli z jakichœ przyczyn raport ma nie byæ wyœwietlony powinien zostaæ zwrócony pusty Variant - Empty
+   Wykonanie pluginu tego typu odbywa siê z poziomu zak³adki raportów i ga³êzi "Ró¿ne"
+   Mo¿na wykorzystywaæ tzw. mnemoniki podstawowe. Zostan¹ one automatycznie zast¹pione odpowiednimi tekstami przed pokazaniem
+   wykresu.
+
+5. Plugin typu "pobierz wyci¹g bankowy"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_EXTRACTION
+   Jako wyjœcie z metody Plugin_Execute powinien wróciæ ³añcuch znaków, tworz¹cy xml-a o zgodnego z "extractions.xsd".
+   (przyk³ad w extractions_example.xml)
+
+6. Plugin typu "zaznaczony element"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_SELECTEDITEM. Plugin tworzy now¹ pozycjê
+   menu w menu kontekstowym, rozwijanym po klikniêciu prawym przyciskiem myszy na jakimœ zaznaczonym elementie aktywnej listy. Pozycja menu bêdzie
+   dostêpna tylko je¿eli typy elementów listy bêd¹ dozwolone dla danego pluginu. Dozwolone elementy plugin-u nale¿y przekazaæ jako lista z-OR-owanych
+   wartoœci do zwracanego typu plugin-u np. CPLUGINTYPE_SELECTEDITEM or C_SELECTEDITEM_ACCOUNT (co oznacza, ¿e pozycja menu bêdzie dostêpna tylko na
+   liœcie kont). Metoda Plugin_Execute mo¿e wykorzystaæ metody ICManagerInterface.GetSelectedId i ICManagerInterface.GetSelectedType
+   aby uzyskaæ informacje o zaznaczonym elemencie listy.
+
+7. Plugin typu "pobierz notowania"
+
+   W metodzie Plugin_Initialize nale¿y wywo³aæ metodê ACManagerInterface.SetType z parametrem CPLUGINTYPE_STOCKEXCHANGE
+   Jako wyjœcie z metody Plugin_Execute powinien wróciæ ³añcuch znaków, tworz¹cy xml-a o zgodnego z "exchanges.xsd" 
+   (przyk³ad w exchanges_example.xml)
+
+Przyk³adowe wtyczki
+
+1. accountchart.dll       - wtyczka pokazuje jak wykonaæ prosty raport typu chart
+2. accountlist.dll        - wtyczka pokazuje jak wykonaæ prosty raport typu html
+3. dbstats.dll            - wtyczka pokazuje jak pobraæ dane z pliku danych
+4. MbankExtFF.dll         - wtyczka pokazuje jak wykonaæ wczytywanie wyci¹gu bankowego
+5. NBPACurrencyRates.dll  - wtyczka pokazuje jak wykonaæ wczytywnie œrednich kursów walut
+6. NBPBSCurrencyRates.dll - wtyczka pokazuje jak wykonaæ wczytywnie kursów kupna/sprzeda¿y walut
+7. RunCalc.dll            - prosta wtyczka typu "po prostu wykonaj", uruchamia kalkulator
+8. ShOper.dll             - prezentuje podstawowe mo¿liwoœci GetSelectedType i GetSelectedId, oraz prosty sposób ich wykorzystania
+9. SndMess.dll            - prezentuje podstawowe mo¿liwoœci SendFrameMessage
+10. SqlConsole.dll        - prosta wtyczka typu "po prostu wykonaj" pozwalaj¹ca na wykonanie dowolnej komendy Sql na pliku danych
+11. OnStart.dll           - prosta wtyczka typu "po prostu uruchom" z zastosowaniem parametrów dodatkowych wskazuj¹cych kiedy nale¿y wykonaæ uruchomienie
+12. Metastock.dll         - wtyczka pokazuje jak wykonaæ wczytywnie notowañ
+
+Mnemoniki podstawowe
+
+1. @godz@           - aktualna godzina w formacie HH
+2. @min@            - aktualna minuta w formacie MM
+3. @czas@           - aktualny czas w formacie HH:MM
+4. @dzien@          - aktualny dzieñ w formacie DD
+5. @miesiac@        - aktualny miesiac w formacie MM
+6. @rok@            - aktualny rok w formacie RRRR
+7. @rokkrotki@      - aktualny rok w formacie RR
+8. @dzientygodnia@  - numer dnia w tygodni
+9. @nazwadnia@      - nazwa dnia
+10. @nazwamiesiaca@ - nazwa miesi¹ca
+11. @data@          - aktualna data w formacie RRRR-MM-DD
+12. @dataczas@      - aktualna data i czas w formacie RRRR-MM-DD HH:MM
+13. @wersja@        - wersja programu CManager

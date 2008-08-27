@@ -1,0 +1,31 @@
+CMANAGER - README
+=================
+
+CManager jest prostym programem do obs³ugi finansów osobistych.
+Pozwala (tak mi siê wydaje) zapisaæ wiêkszoœæ podstawowych operacji
+finansowych jakie zwykle wykonujemy tj. rozchody, przychody, transfery.
+Pozwala równie¿ na planowanie jednorazowych oraz cyklicznych operacji.
+
+Je¿eli uda Ci siê konsekwentnie zapisywaæ wszystkie swoje operacje, 
+CManager dziêki swoim raportom pozwoli na przeprowadzenie kilku podstawowych
+analiz finansowych. Byæ mo¿e dziêki temu zobaczysz ile tak naprawde wydajesz
+np. na ¿ywnoœæ, jakie s¹ twoje dzienne wydatki itp.
+
+Oczywiœcie, CManager wymaga konsekwencji. Nic samo siê nie zrobi. 
+Nie spodziewaj siê poprawnych analiz przy niewielu wprowadzonych 
+operacjach.
+
+CManager jest darmowy, nie zawiera ¯ADNYCH komponentów szpieguj¹cych,
+wyœwietlaj¹cych reklamy ani innych funkcjonalnoœci nie zwi¹zanych 
+z obs³ug¹ finansów osobistych. CManager NIE wysy³a ¿adnych danych przez
+sieæ.
+
+CManager wymaga do poprawnego dzia³ania nastêpuj¹cych rzeczy:
+MDAC, MSXML6, IE5, przechowuje swoje dane w bazie MSAccess.
+
+
+Wszystkie komentarze s¹ oczywiœcie mile widziane, proszê o ich przysy³anie
+na adres:
+                                  levin_a@users.sourceforge.net
+                                  http://cmanager.sourceforge.net
+                                  GG 4963605

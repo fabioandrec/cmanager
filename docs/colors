@@ -1,0 +1,58 @@
+Oprócz standardowych nazw kolorów dostêpnych w standardzie css (patrz http://www.w3schools.com/css/css_colornames.asp),
+nastêpuj¹ce kolory mog¹ zostaæ u¿yte jako mnemoniki w domyœlnym arkuszu styli raportów, oraz w szablonie raportu
+
+1. Kolory podstawowe
+    clBlack
+    clMaroon
+    clGreen
+    clOlive
+    clNavy
+    clPurple
+    clTeal
+    clGray
+    clSilver
+    clRed
+    clLime
+    clYellow
+    clBlue
+    clFuchsia
+    clAqua
+    clWhite
+    clMoneyGreen
+    clSkyBlue
+    clCream
+    clMedGray
+
+2. Kolory systemowe (zale¿ne od ustawionego schematu kolorów w systemie)
+    clActiveBorder
+    clActiveCaption
+    clAppWorkSpace
+    clBackground
+    clBtnFace
+    clBtnHighlight
+    clBtnShadow
+    clBtnText
+    clCaptionText
+    clDefault
+    clGradientActiveCaption
+    clGradientInactiveCaption
+    clGrayText
+    clHighlight
+    clHighlightText
+    clHotLight
+    clInactiveBorder
+    clInactiveCaption
+    clInactiveCaptionText
+    clInfoBk
+    clInfoText
+    clMenu
+    clMenuBar
+    clMenuHighlight
+    clMenuText
+    clNone
+    clScrollBar
+    cl3DDkShadow
+    cl3DLight
+    clWindow
+    clWindowFrame
+    clWindowText

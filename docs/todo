@@ -1,0 +1,31 @@
+CMANAGER - TODO
+===============
+
+1. 
+Podczas dodawania nowej operacji po zmianie rodzaju operacji powinno byæ czyszczenie pola kategoria,
+gdy¿ mo¿na wybraæ inny rodzaj czynnoœci ni¿ taki jaki wynika z kategorii. Podobnie przy profilach, pole kategorii
+powinno byæ wype³niane tylko wtedy gdy rodzaj kategorii z profilu jest zgodny z wybranym rodzajem operacji
+   
+3.
+Uda³o mi sie skompilowaæ
+
+Musia³em zmieniæ tutaj
+CReports.pas ( linia 3712 )
+
+         if xSerieObject.ValuesLists.Count > 0 then begin
+           xChart.AddSeries(xSerieObject);
+         end;
+
+W moim delphi (Turbo delphi PRO) TChartSeries nie posiada metody 
+ValuesLists za to posiada ValuesList
+
+4.
+Zauwazylem ¿e w Twoich plikach DFM
+dla obiektu TPngImageList jest w³aœciwoœæ Bitmap = {}
+Tylko ¿e TPngImageList  nie ma takiej w³aœciwoœci ?? (chyba)
+
+Przy otwieraniu form odwo³uj¹cych sie do formy z ikonami dostaje komunikat:
+Error reading MainImageList24x24.bitmap property Bitmap does not exist.
+
+Oczywiœcie mo¿na zignorowaæ i delphi wytnie Bitmap z DFM i z tego co 
+widze dzia³a OK.
