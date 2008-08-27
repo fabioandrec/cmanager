@@ -8,7 +8,7 @@ AppUpdatesURL=http://cmanager.sourceforge.net
 DefaultDirName={pf}\CManager
 DefaultGroupName=CManager
 AllowNoIcons=true
-LicenseFile=..\..\docs\license
+LicenseFile=..\docs\license
 OutputDir=..\..\releases\
 OutputBaseFilename=CManagerSetup_1_10_2_Beta
 SetupIconFile=..\res\cmanager32.ico
@@ -41,12 +41,12 @@ Name: "advanced\psql"; Description: "Konsola Sql"; Types: full
 
 [Files]
 Source: ..\..\bin\CManager.exe; DestDir: {app}; Components: program; Flags: ignoreversion
-Source: ..\..\docs\readme; DestDir: {app}; Components: program; Flags: ignoreversion
-Source: ..\..\docs\changelog; DestDir: {app}; Components: program; Flags: ignoreversion
-Source: ..\..\docs\contrib; DestDir: {app}; Components: program; Flags: ignoreversion
-Source: ..\..\docs\license; DestDir: {app}; Components: program; Flags: ignoreversion
-Source: ..\..\docs\plugins; DestDir: {app}; Components: program; Flags: ignoreversion
-Source: ..\..\docs\colors; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\docs\readme; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\docs\changelog; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\docs\contrib; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\docs\license; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\docs\plugins; DestDir: {app}; Components: program; Flags: ignoreversion
+Source: ..\docs\colors; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\docs\Help\CManager.chm; DestDir: {app}\Help\; Components: program; Flags: ignoreversion
 Source: ..\..\bin\CUpdate.exe; DestDir: {app}; Components: program; Flags: ignoreversion
 Source: ..\..\bin\CArchive.exe; DestDir: {app}; Components: program; Flags: ignoreversion
