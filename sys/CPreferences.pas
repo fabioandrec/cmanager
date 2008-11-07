@@ -236,12 +236,15 @@ function GetWorkDay(ADate: TDateTime; AForward: Boolean): TDateTime;
 function GetDefaultViewPreferences: TPrefList;
 function UpdateConfiguration(AFromConfigVersion: String): Boolean;
 procedure SetInterfaceIcons(ASmall: Boolean);
+function GetDatafileDefaultFilename: String;
 
 implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit,
      CDoneFrameUnit, CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit, CBaseFrameUnit, CReportsFrameUnit,
      CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit, CReports;
+
+const CPrivateDefaultFilename = 'CManager.dat';
 
 procedure SetInterfaceIcons(ASmall: Boolean);
 var xCount: Integer;
@@ -1146,6 +1149,19 @@ begin
       xRadio := IHTMLElementCollection(xRadioList).item(0, EmptyParam) as IHTMLOptionButtonElement;
       FdeleteUnused := xRadio.checked;
     end;
+  end;
+end;
+
+function GetDatafileDefaultFilename: String;
+var xCat: String;
+begin
+  {$IFDEF DEBUG}
+  xCat := IncludeTrailingPathDelimiter(GetSystemPathname(''));
+  {$ELSE}
+  xCat := IncludeTrailingPathDelimiter(GetSpecialFolder(CSIDL_APPDATA)) + 'CManager';
+  {$ENDIF}
+  if ForceDirectories(xCat) then begin
+    Result := IncludeTrailingPathDelimiter(xCat) + CPrivateDefaultFilename;
   end;
 end;
 
