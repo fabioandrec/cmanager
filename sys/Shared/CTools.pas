@@ -120,6 +120,7 @@ procedure AppendToList(var AList: TDoubleDynArray; AValue: Double);
 function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
 function CalculateSubstrings(AText: String; ASubstring: String): Integer;
 function GetMouseWheelLines: Integer;
+function GetSpecialFolder(const ACSIDL: Integer): String;
 
 implementation
 

@@ -242,7 +242,7 @@ implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit,
      CDoneFrameUnit, CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit, CBaseFrameUnit, CReportsFrameUnit,
-     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit, CReports;
+     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit, CReports, ShlObj;
 
 const CPrivateDefaultFilename = 'CManager.dat';
 
