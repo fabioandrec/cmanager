@@ -169,7 +169,7 @@ var xFilename, xPassword: String;
     xProceed: Boolean;
 begin
   GCmanagerState := CMANAGERSTATE_STARTING;
-  GDebugMode := GetSwitch('/debug');
+  GDebugMode := {$IFDEF DEBUG}True{$ELSE}GetSwitch('/debug'){$ENDIF};
   {$IFOPT W+}
   if GDebugMode then begin
     MemChk;
@@ -206,7 +206,7 @@ begin
         if GetSwitch('/datafile') then begin
           xFilename := GetParamValue('/datafile');
         end;
-        xProceed := InitializeDataProvider(xFilename, xPassword, GDataProvider) = iprSuccess;
+        InitializeDataProvider(xFilename, xPassword, GDataProvider);
       end;
     end else begin
       xProceed := True;
