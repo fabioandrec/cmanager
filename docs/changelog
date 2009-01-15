@@ -11,6 +11,7 @@ Kolejna wersja
 [*] przejœcie na wersjê Virtual Tree View 4.7.0 
 [-] je¿eli podczas otwierania pliku danych przy starcie CManager-a wystêpowa³ b³¹d, CManager po wyœwietleniu stosownego komunikatu nie uruchamia³ siê, co 
     prowadzi³o do koniecznoœci rêcznego edytowania pliku konfiguracyjnego. Teraz CManager wyœwietli komunikat, i uruchomi siê bez otwartego pliku danych
+[+] w menu poderêcznym kategorii dodano pozycê pozwalaj¹c¹ na dodanie podkategorii
     
 
 Wersja 1.10.2 Beta

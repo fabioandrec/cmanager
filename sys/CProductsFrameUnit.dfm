@@ -4,7 +4,7 @@ inherited CProductsFrame: TCProductsFrame
     Columns = <
       item
         Position = 0
-        Width = 443
+        Width = 435
         WideText = 'Nazwa'
       end>
     WideDefaultText = ''
@@ -31,6 +31,11 @@ inherited CProductsFrame: TCProductsFrame
       PicOffset = 10
       TxtOffset = 15
       Framed = False
+      Action = ActionAddSubcategory
+    end
+  end
+  inherited ListPopupMenu: TPopupMenu
+    object Dodajpodkategori1: TMenuItem [1]
       Action = ActionAddSubcategory
     end
   end

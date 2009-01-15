@@ -10,6 +10,7 @@ type
   TCProductsFrame = class(TCDataobjectFrame)
     CButtonAddSubcategory: TCButton;
     ActionAddSubcategory: TAction;
+    Dodajpodkategori1: TMenuItem;
     procedure ActionAddSubcategoryExecute(Sender: TObject);
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
@@ -27,6 +28,7 @@ type
     function GetDataobjectParent(ADataobject: TDataObject): TCListDataElement; override;
     function GetHistoryText: String; override;
     procedure ShowHistory(AGid: ShortString); override;
+    procedure ShowFrame; override;
   end;
 
 implementation
@@ -149,6 +151,12 @@ end;
 function TCProductsFrame.IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean;
 begin
   Result := (APluginSelectedItemTypes and CSELECTEDITEM_PRODUCT) = CSELECTEDITEM_PRODUCT;
+end;
+
+procedure TCProductsFrame.ShowFrame;
+begin
+  inherited ShowFrame;
+  ActionAddSubcategory.ShortCut := ShortCut(Word('S'), [ssCtrl]);
 end;
 
 end.
