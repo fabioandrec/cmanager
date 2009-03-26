@@ -15,6 +15,7 @@ type
     procedure CloseForm; virtual;
     procedure WndProc(var Message: TMessage); override;
     procedure Loaded; override;
+    procedure DoAfterLoadPosition; virtual;
   public
     function ExpandTemplate(ATemplate: String): String; virtual;
   end;
@@ -46,6 +47,7 @@ end;
 procedure TCBaseForm.FormShow(Sender: TObject);
 begin
   LoadFormPosition(Self);
+  DoAfterLoadPosition;
 end;
 
 procedure TCBaseForm.WndProc(var Message: TMessage);
@@ -77,6 +79,10 @@ end;
 function TCBaseForm.ExpandTemplate(ATemplate: String): String;
 begin
   Result := GBasePreferences.ExpandTemplate(ATemplate);
+end;
+
+procedure TCBaseForm.DoAfterLoadPosition;
+begin
 end;
 
 end.

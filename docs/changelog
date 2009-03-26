@@ -12,6 +12,7 @@ Kolejna wersja
 [-] je¿eli podczas otwierania pliku danych przy starcie CManager-a wystêpowa³ b³¹d, CManager po wyœwietleniu stosownego komunikatu nie uruchamia³ siê, co 
     prowadzi³o do koniecznoœci rêcznego edytowania pliku konfiguracyjnego. Teraz CManager wyœwietli komunikat, i uruchomi siê bez otwartego pliku danych
 [+] w menu poderêcznym kategorii dodano pozycê pozwalaj¹c¹ na dodanie podkategorii
+[*] drobne zmiany kosmetyczne wygl¹du okna raportów html, okienka raportów z wykonanych czynnoœci np. kompaktowania
     
 
 Wersja 1.10.2 Beta

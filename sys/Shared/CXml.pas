@@ -35,7 +35,7 @@ resourcestring
   CNoValidMsxmlFoundError = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.';
   CNoValidMsxmlFoundQuestion = 'Nie znaleziono bibliotek MSXML w wersji 6.0 lub wy¿szej. Aplikacja nie mo¿e byæ uruchomiona.' + sLineBreak +
                                'Zainstaluj najnowsze biblioteki MSXML. Czy chcesz otworzyæ w domyœlnej przegl¹darce stronê,' + sLineBreak +
-                               'z której bêdzisz móg³ pobraæ niezbêdne pakiety?';
+                               'z której bêdziesz móg³ pobraæ niezbêdne pakiety?';
   CXmlDownloadLink = 'http://www.microsoft.com/downloads/details.aspx?familyid=993C0BCF-3BCF-4009-BE21-27E85E1857B1&displaylang=en';
 
 implementation

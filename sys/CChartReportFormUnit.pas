@@ -75,8 +75,7 @@ type
     procedure MenuItemListClick(Sender: TObject);
     procedure MenuItemBigClick(Sender: TObject);
     procedure MenuItemSmallClick(Sender: TObject);
-    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
-      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     Fcharts: TChartList;
     FActiveChartIndex: Integer;
@@ -87,6 +86,7 @@ type
   protected
     procedure DoPrint; override;
     procedure DoSave; override;
+    procedure DoAfterLoadPosition; override;
   public
     constructor CreateForm(AReport: TObject); override;
     procedure UpdateThumbnails;
@@ -396,6 +396,7 @@ end;
 procedure TCChartReportForm.UpdateThumbnails;
 begin
   PanelThumbs.Visible := Fcharts.Count > 1;
+  Splitter.Visible := PanelThumbs.Visible;
   if PanelThumbs.Visible then begin
     ThumbsList.RootNodeCount := Fcharts.Count;
   end;
@@ -636,6 +637,12 @@ begin
     end;
   end;
   inherited;
+end;
+
+procedure TCChartReportForm.DoAfterLoadPosition;
+begin
+  inherited ;
+
 end;
 
 end.

@@ -17,6 +17,7 @@ type
     CButton2: TCButton;
     CButton3: TCButton;
     SaveDialog: TSaveDialog;
+    PanelReport: TPanel;
     procedure Action1Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
     procedure Action2Execute(Sender: TObject);
@@ -26,6 +27,7 @@ type
     procedure DoPrint; virtual;
     procedure DoPreview; virtual;
     procedure DoSave; virtual;
+    procedure DoAfterLoadPosition; override;
   public
     constructor CreateForm(AReport: TObject); virtual;
     property Report: TObject read FReport write FReport;
@@ -72,6 +74,13 @@ constructor TCReportForm.CreateForm(AReport: TObject);
 begin
   inherited Create(Nil);
   FReport := AReport;
+end;
+
+procedure TCReportForm.DoAfterLoadPosition;
+begin
+  inherited DoAfterLoadPosition;
+  PanelReport.Width := PanelConfig.Width - 2 * PanelReport.Left;
+  PanelReport.Height := PanelConfig.Height - 2 * PanelReport.Top;
 end;
 
 end.

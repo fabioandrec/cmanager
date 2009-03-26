@@ -1,29 +1,34 @@
 inherited CReportForm: TCReportForm
-  Left = 162
-  Top = 77
-  Width = 799
-  Height = 638
+  Left = 238
+  Top = 193
+  Width = 822
+  Height = 643
   BorderIcons = [biSystemMenu, biMaximize]
   BorderStyle = bsSizeable
   Caption = 'CReportForm'
-  DesignSize = (
-    791
-    611)
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TPanel
-    Left = 4
-    Top = 4
-    Width = 783
-    Height = 562
-    Align = alNone
-    BevelOuter = bvLowered
+    Width = 806
+    Height = 566
+    DesignSize = (
+      806
+      566)
+    object PanelReport: TPanel
+      Left = 4
+      Top = 4
+      Width = 798
+      Height = 558
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      BevelOuter = bvLowered
+      TabOrder = 0
+    end
   end
   inherited PanelButtons: TPanel
-    Top = 570
-    Width = 791
+    Top = 566
+    Width = 806
     DesignSize = (
-      791
+      806
       41)
     object CButton1: TCButton [0]
       Left = 8
@@ -65,10 +70,10 @@ inherited CReportForm: TCReportForm
       Color = clBtnFace
     end
     inherited BitBtnOk: TBitBtn
-      Left = 614
+      Left = 633
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 702
+      Left = 721
     end
   end
   object ActionList: TActionList

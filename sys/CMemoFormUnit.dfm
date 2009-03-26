@@ -12,7 +12,7 @@ inherited CMemoForm: TCMemoForm
     object RichEdit: TCRichedit
       Left = 4
       Top = 5
-      Width = 585
+      Width = 583
       Height = 376
       TabStop = False
       Anchors = [akLeft, akTop, akRight, akBottom]

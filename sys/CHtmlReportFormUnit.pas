@@ -19,7 +19,7 @@ type
 
 implementation
 
-uses CReports;
+uses CReports, CConfigFormUnit;
 
 {$R *.dfm}
 

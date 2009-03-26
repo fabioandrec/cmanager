@@ -15,6 +15,8 @@ type
     Action1: TAction;
     CButton1: TCButton;
     procedure Action1Execute(Sender: TObject);
+  protected
+    procedure DoAfterLoadPosition; override;
   end;
 
 procedure ShowReport(AFormTitle: String; AReport: String; AWidth, AHeight: Integer; AFontname: String = ''; AFontsize: Integer = -1);
@@ -52,6 +54,13 @@ begin
   end else begin
     MessageBox(Application.Handle, 'W systemie nie zainstalowano ¿adnej drukarki', 'Uwaga', MB_OK + MB_ICONEXCLAMATION);
   end;
+end;
+
+procedure TCMemoForm.DoAfterLoadPosition;
+begin
+  inherited DoAfterLoadPosition;
+  RichEdit.Width := PanelConfig.Width - 2 * RichEdit.Left;
+  RichEdit.Height := PanelConfig.Height - 2 * RichEdit.Top;
 end;
 
 end.
