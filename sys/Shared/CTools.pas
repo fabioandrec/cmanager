@@ -842,17 +842,25 @@ var xYear, xMonth, xDay, xHour, xMin, xSec, xMilli, xBHour, xBMinute : Word;
     xTime, xDate : TDateTime;
     xBias: Longint;
     xLen: Integer;
+    xDateTimeStr: String;
 begin
-  xLen := Length(ADateTimeStr);
+  xDateTimeStr := Trim(ADateTimeStr);
+  xLen := Length(xDateTimeStr);
   //Maybe its yyyy-mm-dd
-  xYear := StrToIntDef(Copy(ADateTimeStr, 1, 4), 0);
-  xMonth := StrToIntDef(Copy(ADateTimeStr, 6, 2), 0);
-  xDay := StrToIntDef(Copy(ADateTimeStr, 9, 2), 0);
+  if Copy(xDateTimeStr, 5, 1) = '-' then begin
+    xYear := StrToIntDef(Copy(xDateTimeStr, 1, 4), 0);
+    xMonth := StrToIntDef(Copy(xDateTimeStr, 6, 2), 0);
+    xDay := StrToIntDef(Copy(xDateTimeStr, 9, 2), 0);
+  end else begin
+    xYear := 0;
+    xMonth := 0;
+    xDay := 0;
+  end;
   if (xYear = 0) or (xMonth = 0) or (xDay = 0) then begin
     //No, check dd-mm-yyyy
-    xDay := StrToIntDef(Copy(ADateTimeStr, 1, 2), 0);
-    xMonth := StrToIntDef(Copy(ADateTimeStr, 4, 2), 0);
-    xYear := StrToIntDef(Copy(ADateTimeStr, 7, 4), 0);
+    xDay := StrToIntDef(Copy(xDateTimeStr, 1, 2), 0);
+    xMonth := StrToIntDef(Copy(xDateTimeStr, 4, 2), 0);
+    xYear := StrToIntDef(Copy(xDateTimeStr, 7, 4), 0);
   end;
   if (xYear <> 0) and (xMonth <> 0) and (xDay <> 0) then begin
     if xLen = 10 then begin
@@ -860,15 +868,15 @@ begin
       Result := EncodeDate(xYear, xMonth, xDay);
     end else if xLen = 19 then begin
       //"yyyy-mm-ddThh:nn:ss"
-      xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
-      xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
-      xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+      xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+      xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+      xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
       Result := EncodeDateTime(xYear, xMonth, xDay, xHour, xMin, xSec, 0);
     end else if xLen = 22 then begin
       //"yyyy-mm-ddThh:nn:ssZ"
-      xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
-      xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
-      xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+      xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+      xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+      xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
       xMilli := 0;
       if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
         if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
@@ -882,17 +890,17 @@ begin
       end;
     end else if xLen = 25 then begin
       //"yyyy-mm-ddThh:nn:ss+hh:nn"
-      xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
-      xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
-      xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
+      xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+      xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+      xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
       xMilli := 0;
       if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
         if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
           xDate := xDate + xTime;
-          xBHour := StrToIntDef(Copy(ADateTimeStr, 21, 2), 0);
-          xBMinute := StrToIntDef(Copy(ADateTimeStr, 24, 2), 0);
+          xBHour := StrToIntDef(Copy(xDateTimeStr, 21, 2), 0);
+          xBMinute := StrToIntDef(Copy(xDateTimeStr, 24, 2), 0);
           xBias := (xBHour * 60) + xBMinute;
-          if (ADateTimeStr[20] = '-') then xBias := 0 - xBias;
+          if (xDateTimeStr[20] = '-') then xBias := 0 - xBias;
           AddTimeBias(xDate, 0 - xBias);
           xBias := GetTimeZoneBias;
           AddTimeBias(xDate, 0 - xBias);
@@ -907,10 +915,10 @@ begin
       //"yyyy-mm-ddThh:nn:ss.zzzZ"
       //"yyyy-mm-ddThh:nn:ss.zzz+hh:nn"
       if (xLen = 29) or (xLen = 26) then begin
-        xHour := StrToIntDef(Copy(ADateTimeStr, 12, 2), 0);
-        xMin := StrToIntDef(Copy(ADateTimeStr, 15, 2), 0);
-        xSec := StrToIntDef(Copy(ADateTimeStr, 18, 2), 0);
-        xMilli := StrToIntDef(Copy(ADateTimeStr, 21, 3), 0);
+        xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+        xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+        xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
+        xMilli := StrToIntDef(Copy(xDateTimeStr, 21, 3), 0);
       end else begin
         xHour := 0;
         xMin := 0;
@@ -920,11 +928,11 @@ begin
       if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
         if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
           xDate := xDate + xTime;
-          if (Length(ADateTimeStr) = 29) then begin
-            xBHour := StrToIntDef(Copy(ADateTimeStr, 25, 2), 0);
-            xBMinute := StrToIntDef(Copy(ADateTimeStr, 28, 2), 0);
+          if (Length(xDateTimeStr) = 29) then begin
+            xBHour := StrToIntDef(Copy(xDateTimeStr, 25, 2), 0);
+            xBMinute := StrToIntDef(Copy(xDateTimeStr, 28, 2), 0);
             xBias := (xBHour * 60) + xBMinute;
-            if (ADateTimeStr[24] = '-') then xBias := 0 - xBias;
+            if (xDateTimeStr[24] = '-') then xBias := 0 - xBias;
           end else begin
             xBias := 0;
           end;

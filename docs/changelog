@@ -13,7 +13,7 @@ Kolejna wersja
     prowadzi³o do koniecznoœci rêcznego edytowania pliku konfiguracyjnego. Teraz CManager wyœwietli komunikat, i uruchomi siê bez otwartego pliku danych
 [+] w menu poderêcznym kategorii dodano pozycê pozwalaj¹c¹ na dodanie podkategorii
 [*] drobne zmiany kosmetyczne wygl¹du okna raportów html, okienka raportów z wykonanych czynnoœci np. kompaktowania
-    
+[+] poprawka w imporcie wyci¹gów html z mBanku (dziêki JS)
 
 Wersja 1.10.2 Beta
 [i] wyjœcie kolejnej wersji beta (2008-07-14)
@@ -26,14 +26,14 @@ Wersja 1.10.2 Beta
 [*] instalator nie usuwa plików report.htm i report.css
 [*] od tej wersji wszystkie pliki konfiguracyjne oraz szablony bêd¹ przechowywane w katalogu, w którym u¿ytkownik ma swój profil np.
     c:\document and settings\[nazwa u¿ytkownika]\dane aplikacji\CManager, a nie jak do tej pory w katalogu, w którym zainstalowany by³ CManager.
-	Równie¿ podczas tworzenia nowego pliku danych proponowana lokalizacja bêdzie wskazywa³a na katalog w profilu u¿ytkwnika
+    Równie¿ podczas tworzenia nowego pliku danych proponowana lokalizacja bêdzie wskazywa³a na katalog w profilu u¿ytkwnika
 [-] poprawiono b³¹d usuwania konta, kontrahenta, kategorii, waluty. Je¿eli by³a choæ jedna zarejestrowana operacja, która póŸniej by³a usuniêta
     pozostawa³y statystyki, które nie pozwala³y na usuniêcie wybranego elementu
 [-] dodano status lokaty oraz rodzaj operacji lokaty jako cechy mo¿liwe do wyboru przy definiowaniu w³asnych raportów
 [-] poprawiono funkcjonalnoœæ wstawiania parametru w wybranym miejscu podczas definiowania w³asnego raportu
 [+] w funkcji eksportu pliku danych dodano mo¿liwoœæ wyboru tabel, które maj¹ byæ wyeksportowane
 [-] drobne poprawki w dialogach zawieraj¹cych listê z mo¿liwoœci¹ zaznaczenia/odznaczenia wielu elementów
-	
+
 Wersja 1.10.1 Beta
 [i] wyjœcie kolejnej wersji beta (2008-06-12)
 [-] w wykresach, w których mo¿na by³o zgrupowaæ operacje w/g dni, tygodni lub miesiêcy wartoœci by³y zawsze przypisywane do okresu
@@ -62,7 +62,7 @@ Wersja 1.10.1 Beta
 [+] trzy dodatkowe filtry na liœcie zaplanowanych operacji (od pocz¹tku roku, do koñca roku, w tym roku)
 [-] poprawka w wyliczaniu harmonogramie w sytuacji gdy dzieñ zaplanowanej operacji wypada³ w dniu oznaczonym jako wolny, a nastêpny wypada³ w 
     kolejnym miesi¹cu, np. harmonogram ustawiony na ostatni dzieñ ka¿dego miesi¹ca, 31 maja 2008 wypada³ w sobotê. Je¿eli sobota by³a oznaczona 
-	jako wolna, nastêpny dzieñ pracuj¹cy wypada³ dopiero 2 czerwca 2008. Ta p³atnoœæ by³a gubiona.
+    jako wolna, nastêpny dzieñ pracuj¹cy wypada³ dopiero 2 czerwca 2008. Ta p³atnoœæ by³a gubiona.
 [*] zmiana okresu za jaki s¹ sprawdzane zaleg³e operacje (do tej pory by³o to 90 dni, aktualnie mo¿na ten okres zdefiniowaæ w preferencjach)
 [-] poprawiono raport przychodów w formie drzewa kategorii
 [+] dodano mo¿liwoœæ definiowania domyœlnej waluty obowi¹zuj¹cej dla danego pliku danych (do tej pory zawsze by³ to polski z³oty), definiowanie odbywa siê

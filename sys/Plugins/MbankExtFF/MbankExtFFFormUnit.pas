@@ -190,20 +190,12 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
     if xAppenRow then begin
       if (xDatesStr.Text <> '') and (xTitlesStr.Text <> '') and (xCashStr <> '') then begin
         if xDatesStr.Count > 0 then begin
-          if AIsCreditCard then begin
-            xRegDate := XsdToDateTime(xDatesStr.Strings[0]);
-          end else begin
-            xRegDate := XsdToDateTime(xDatesStr.Strings[0]);
-          end;
+          xRegDate := XsdToDateTime(xDatesStr.Strings[0]);
         end else begin
           xRegDate := 0;
         end;
         if xDatesStr.Count > 1 then begin
-          if AIsCreditCard then begin
-            xAccountingDate := XsdToDateTime(xDatesStr.Strings[1]);
-          end else begin
-            xAccountingDate := XsdToDateTime(xDatesStr.Strings[1]);
-          end;
+          xAccountingDate := XsdToDateTime(xDatesStr.Strings[1]);
         end else begin
           xAccountingDate := 0;
         end;
