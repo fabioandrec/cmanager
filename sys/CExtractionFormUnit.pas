@@ -584,8 +584,16 @@ begin
       Result := 0;
     end;
   end else if Column = 1 then begin
-    Result := AnsiCompareText(xData1.description, xData2.description);
+    if xData1.regTime > xData2.regTime then begin
+      Result := 1;
+    end else if xData1.regTime < xData2.regTime then begin
+      Result := -1;
+    end else begin
+      Result := 0;
+    end;
   end else if Column = 2 then begin
+    Result := AnsiCompareText(xData1.description, xData2.description);
+  end else if Column = 3 then begin
     if xData1.cash > xData2.cash then begin
       Result := 1;
     end else if xData1.cash < xData2.cash then begin

@@ -14,6 +14,7 @@ Kolejna wersja
 [+] w menu poderêcznym kategorii dodano pozycê pozwalaj¹c¹ na dodanie podkategorii
 [*] drobne zmiany kosmetyczne wygl¹du okna raportów html, okienka raportów z wykonanych czynnoœci np. kompaktowania
 [+] poprawka w imporcie wyci¹gów html z mBanku (dziêki JS)
+[+] poprawki sortowania kolumn na formatce pozycji wyci¹gu (dziêki JS)
 
 Wersja 1.10.2 Beta
 [i] wyjœcie kolejnej wersji beta (2008-07-14)
