@@ -1,8 +1,8 @@
 object CMainForm: TCMainForm
-  Left = 178
-  Top = 222
-  Width = 975
-  Height = 606
+  Left = 3
+  Top = 1
+  Width = 798
+  Height = 568
   ActiveControl = ShortcutList
   Caption = 'CManager'
   Color = clBtnFace
@@ -22,15 +22,15 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 967
+    Width = 790
     Height = 24
     UseSystemFont = False
     ActionManager = ActionManager
     AllowHiding = True
     Caption = 'MenuBar'
-    ColorMap.HighlightColor = 10725814
+    ColorMap.HighlightColor = 15660791
     ColorMap.BtnSelectedColor = clBtnFace
-    ColorMap.UnusedColor = 10725814
+    ColorMap.UnusedColor = 15660791
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -42,8 +42,8 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TCStatusBar
     Left = 0
-    Top = 560
-    Width = 967
+    Top = 515
+    Width = 790
     Height = 19
     Panels = <
       item
@@ -64,7 +64,7 @@ object CMainForm: TCMainForm
   object PanelNotconnected: TPanel
     Left = 0
     Top = 24
-    Width = 967
+    Width = 790
     Height = 41
     Align = alTop
     BevelOuter = bvLowered
@@ -79,8 +79,8 @@ object CMainForm: TCMainForm
   object PanelMain: TPanel
     Left = 0
     Top = 65
-    Width = 967
-    Height = 495
+    Width = 790
+    Height = 450
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelMain'
@@ -88,7 +88,7 @@ object CMainForm: TCMainForm
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 967
+      Width = 790
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -97,12 +97,12 @@ object CMainForm: TCMainForm
       Left = 195
       Top = 24
       Width = 2
-      Height = 471
+      Height = 426
     end
     object PanelTitle: TPanel
       Left = 0
       Top = 0
-      Width = 967
+      Width = 790
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -116,12 +116,12 @@ object CMainForm: TCMainForm
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        967
+        790
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 967
+        Width = 790
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -149,7 +149,7 @@ object CMainForm: TCMainForm
         PngOptions = []
       end
       object CDateTime: TCDateTime
-        Left = 882
+        Left = 705
         Top = 3
         Width = 81
         Height = 15
@@ -181,8 +181,8 @@ object CMainForm: TCMainForm
     object PanelFrames: TPanel
       Left = 197
       Top = 24
-      Width = 770
-      Height = 471
+      Width = 593
+      Height = 426
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -192,7 +192,7 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 195
-      Height = 471
+      Height = 426
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
@@ -236,7 +236,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 22
         Width = 193
-        Height = 448
+        Height = 403
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -440,6 +440,9 @@ object CMainForm: TCMainForm
                 ImageIndex = 19
               end
               item
+                Action = ActionSystemInfo
+              end
+              item
                 Action = ActionFutureRequest
                 Caption = 'Z&aproponuj zmian'#281
               end
@@ -449,6 +452,7 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionGreenGrass
+                Caption = '&Na zielonej trawie'
                 ImageIndex = 22
               end
               item
@@ -723,6 +727,11 @@ object CMainForm: TCMainForm
       Caption = 'Na zielonej trawie'
       ImageIndex = 22
       OnExecute = ActionGreenGrassExecute
+    end
+    object ActionSystemInfo: TAction
+      Category = 'Pomoc'
+      Caption = 'Informacje o systemie'
+      OnExecute = ActionSystemInfoExecute
     end
   end
   object OpenDialog: TOpenDialog

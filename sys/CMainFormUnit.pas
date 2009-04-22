@@ -87,6 +87,7 @@ type
     ActionShortcutDepositInvestment: TAction;
     ActionDepositCalc: TAction;
     ActionGreenGrass: TAction;
+    ActionSystemInfo: TAction;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -135,6 +136,7 @@ type
     procedure ActionShortcutQuickpatternsExecute(Sender: TObject);
     procedure ActionDepositCalcExecute(Sender: TObject);
     procedure ActionGreenGrassExecute(Sender: TObject);
+    procedure ActionSystemInfoExecute(Sender: TObject);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -1035,6 +1037,43 @@ end;
 procedure TCMainForm.ActionGreenGrassExecute(Sender: TObject);
 begin
   ShellExecute(0, nil, 'http://nazielonejtrawie.blogspot.com', nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure GetCmanagerSystemInfo(AInfo: TStringList);
+begin
+  with AInfo do begin
+  end;
+{
+   Dao360.dll
+   Expsrv.dll
+   Msexch40.dll
+   Msexcl40.dll
+   Msjet40.dll
+   Msjetoledb40.dll
+   Msjint40.dll
+   Msjter40.dll
+   Msjtes40.dll
+   Msltus40.dll
+   Mspbde40.dll       4.0.8015.0      348 432
+   Msrd2x40.dll        4.0.7328.0     422 160
+   Msrd3x40.dll        4.0.6508.0     315 664
+   Msrepl40.dll       4.0.8015.0      553 232
+   Mstext40.dll       4.0.8015.0      258 320
+   Mswdat10.dll        4.0.6508.0     831 760
+   Mswstr10.dll        4.0.6508.0     614 672
+   Msxbde40.dll       4.0.8025.0      348 432
+   Vbajet32.dll        6.0.1.9431     30 749
+   }
+end;
+
+
+procedure TCMainForm.ActionSystemInfoExecute(Sender: TObject);
+var xInfo: TStringList;
+begin
+  xInfo := TStringList.Create;
+  GetCmanagerSystemInfo(xInfo);
+  ShowReport('Informacje o systemie', xInfo.Text, 600, 400);
+  xInfo.Free;
 end;
 
 end.
