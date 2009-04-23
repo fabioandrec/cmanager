@@ -847,20 +847,20 @@ type
   private
     FidAccount: TDataGid;
     FidInstrument: TDataGid;
-    Fquantity: Integer;
+    Fquantity: Double;
     procedure SetidInstrument(const Value: TDataGid);
     procedure SetidAccount(const Value: TDataGid);
-    procedure Setquantity(const Value: Integer);
+    procedure Setquantity(const Value: Double);
   public
     constructor Create(AStatic: Boolean); override;
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
-    class function FindInvestmentItem(AIdInstrument, AIdAccount: TDataGid; AMinimumQuantity: Integer = -1): TInvestmentItem;
+    class function FindInvestmentItem(AIdInstrument, AIdAccount: TDataGid; AMinimumQuantity: Double = -1): TInvestmentItem;
     function GetInvestmentItems: TDataObjectList;
   published
     property idAccount: TDataGid read FidAccount write SetidAccount;
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
-    property quantity: Integer read Fquantity write Setquantity;
+    property quantity: Double read Fquantity write Setquantity;
   end;
 
   TInvestmentMovement = class(TDataObject)
@@ -874,8 +874,8 @@ type
     FidInstrument: TDataGid;
     FprevIdInstrument: TDataGid;
     FidInstrumentCurrencyDef: TDataGid;
-    Fquantity: Integer;
-    FprevQuantity: Integer;
+    Fquantity: Double;
+    FprevQuantity: Double;
     FidInstrumentValue: TDataGid;
     FvalueOf: Currency;
     FsummaryOf: Currency;
@@ -900,7 +900,7 @@ type
     procedure SetidInstrumentValue(const Value: TDataGid);
     procedure SetidProduct(const Value: TDataGid);
     procedure SetmovementType(const Value: TBaseEnumeration);
-    procedure Setquantity(const Value: Integer);
+    procedure Setquantity(const Value: Double);
     procedure SetregDateTime(const Value: TDateTime);
     procedure SetsummaryOf(const Value: Currency);
     procedure SetsummaryOfAccount(const Value: Currency);
@@ -930,7 +930,7 @@ type
     property yearDate: TDateTime read FyearDate;
     property idInstrument: TDataGid read FidInstrument write SetidInstrument;
     property idInstrumentCurrencyDef: TDataGid read FidInstrumentCurrencyDef write SetidInstrumentCurrencyDef;
-    property quantity: Integer read Fquantity write Setquantity;
+    property quantity: Double read Fquantity write Setquantity;
     property idInstrumentValue: TDataGid read FidInstrumentValue write SetidInstrumentValue;
     property valueOf: Currency read FvalueOf write SetvalueOf;
     property summaryOf: Currency read FsummaryOf write SetsummaryOf;
@@ -954,7 +954,7 @@ type
     FinstrumentName: TBaseName;
     FaccountName: TBaseName;
     FinstrumentType: TBaseEnumeration;
-    Fquantity: Integer;
+    Fquantity: Double;
     FvalueOf: Currency;
     function GetoverallValue: Currency;
   public
@@ -968,7 +968,7 @@ type
     property instrumentName: TBaseName read FinstrumentName;
     property accountName: TBaseName read FaccountName;
     property instrumentType: TBaseEnumeration read FinstrumentType;
-    property quantity: Integer read Fquantity;
+    property quantity: Double read Fquantity;
     property valueOf: Currency read FvalueOf;
     property overallValue: Currency read GetoverallValue;
   end;
@@ -4388,7 +4388,7 @@ begin
   with ADataset do begin
     FidAccount := FieldByName('idAccount').AsString;
     FidInstrument := FieldByName('idInstrument').AsString;
-    Fquantity := FieldByName('quantity').AsInteger;
+    Fquantity := FieldByName('quantity').AsFloat;
   end;
 end;
 
@@ -4408,7 +4408,7 @@ begin
   end;
 end;
 
-procedure TInvestmentItem.Setquantity(const Value: Integer);
+procedure TInvestmentItem.Setquantity(const Value: Double);
 begin
   if Fquantity <> Value then begin
     Fquantity := Value;
@@ -4422,7 +4422,7 @@ begin
   with DataFieldList do begin
     AddField('idAccount', DataGidToDatabase(FidAccount), False, 'investmentItem');
     AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'investmentItem');
-    AddField('quantity', IntToStr(Fquantity), False, 'investmentItem');
+    AddField('quantity', FloatToDatabase(Fquantity), False, 'investmentItem');
   end;
 end;
 
@@ -4459,7 +4459,7 @@ begin
     FyearDate := FieldByName('yearDate').AsDateTime;
     FidInstrument := FieldByName('idInstrument').AsString;
     FidInstrumentCurrencyDef := FieldByName('idInstrumentCurrencyDef').AsString;
-    Fquantity := FieldByName('quantity').AsInteger;
+    Fquantity := FieldByName('quantity').AsFloat;
     FidInstrumentValue := FieldByName('idInstrumentValue').AsString;
     FvalueOf := FieldByName('valueOf').AsCurrency;
     FsummaryOf := FieldByName('summaryOf').AsCurrency;
@@ -4499,7 +4499,7 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := Date2StrDate(FregDateTime, True);
   end else if AColumnIndex = 3 then begin
-    Result := IntToStr(Fquantity);
+    Result := FloatToString(Fquantity, 6);
   end else if AColumnIndex = 4 then begin
     if AViewTextSelector = CCurrencyViewInvestmentAccounts then begin
       Result := CurrencyToString(FsummaryOfAccount, FidAccountCurrencyDef, False);
@@ -4539,7 +4539,7 @@ var xSql: String;
 begin
   Result := inherited OnDeleteObject(AProxy);
   xSql := Format('update investmentItem set quantity = quantity %s where idInstrument = %s and idAccount = %s',
-                 [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * Fquantity),
+                 [FloatToDatabaseWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * Fquantity),
                   DataGidToDatabase(FidInstrument), DataGidToDatabase(FidAccount)]);
   AProxy.DataProvider.ExecuteSql(xSql);
 end;
@@ -4558,7 +4558,7 @@ begin
     xItem.ForceUpdate;
   end else begin
     xSql := Format('update investmentItem set quantity = quantity %s where idInstrument = %s and idAccount = %s',
-                   [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, -1, 1) * Fquantity),
+                   [FloatToDatabaseWithSign(IfThen(FmovementType = CInvestmentSellMovement, -1, 1) * Fquantity),
                     DataGidToDatabase(FidInstrument), DataGidToDatabase(FidAccount)]);
     AProxy.DataProvider.ExecuteSql(xSql);
   end;
@@ -4570,12 +4570,12 @@ begin
   Result := inherited OnUpdateObject(AProxy);
   if (FprevIdInstrument = FidInstrument) and (FprevIdAccount = FidAccount) then begin
     xSql := Format('update investmentItem set quantity = quantity %s where idInstrument = %s and idAccount = %s',
-                   [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, -1, 1) * (Fquantity - FprevQuantity)),
+                   [FloatToDatabaseWithSign(IfThen(FmovementType = CInvestmentSellMovement, -1, 1) * (Fquantity - FprevQuantity)),
                     DataGidToDatabase(FidInstrument), DataGidToDatabase(FidAccount)]);
     AProxy.DataProvider.ExecuteSql(xSql);
   end else begin
     xSql := Format('update investmentItem set quantity = quantity %s where idInstrument = %s and idAccount = %s',
-                   [IntToStrWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * FprevQuantity),
+                   [FloatToDatabaseWithSign(IfThen(FmovementType = CInvestmentSellMovement, 1, -1) * FprevQuantity),
                     DataGidToDatabase(FprevIdInstrument), DataGidToDatabase(FprevIdAccount)]);
     AProxy.DataProvider.ExecuteSql(xSql);
     OnInsertObject(AProxy);
@@ -4678,7 +4678,7 @@ begin
   end;
 end;
 
-procedure TInvestmentMovement.Setquantity(const Value: Integer);
+procedure TInvestmentMovement.Setquantity(const Value: Double);
 begin
   if Fquantity <> Value then begin
     Fquantity := Value;
@@ -4749,7 +4749,7 @@ begin
     AddField('yearDate', DatetimeToDatabase(FyearDate, False), False, 'investmentMovement');
     AddField('idInstrument', DataGidToDatabase(FidInstrument), False, 'investmentMovement');
     AddField('idInstrumentCurrencyDef', DataGidToDatabase(FidInstrumentCurrencyDef), False, 'investmentMovement');
-    AddField('quantity', IntToStr(Fquantity), False, 'investmentMovement');
+    AddField('quantity', FloatToDatabase(Fquantity), False, 'investmentMovement');
     AddField('idInstrumentValue', DataGidToDatabase(FidInstrumentValue), False, 'investmentMovement');
     AddField('valueOf', CurrencyToDatabase(FvalueOf), False, 'investmentMovement');
     AddField('summaryOf', CurrencyToDatabase(FsummaryOf), False, 'investmentMovement');
@@ -4779,13 +4779,13 @@ begin
   end;
 end;
 
-class function TInvestmentItem.FindInvestmentItem(AIdInstrument, AIdAccount: TDataGid; AMinimumQuantity: Integer = -1): TInvestmentItem;
+class function TInvestmentItem.FindInvestmentItem(AIdInstrument, AIdAccount: TDataGid; AMinimumQuantity: Double = -1): TInvestmentItem;
 var xSql: String;
 begin
   xSql := Format('select * from investmentItem where idInstrument = %s and idAccount = %s',
              [DataGidToDatabase(AIdInstrument), DataGidToDatabase(AIdAccount)]);
   if AMinimumQuantity <> -1 then begin
-    xSql := xSql + ' and quantity >= ' + IntToStr(AMinimumQuantity);
+    xSql := xSql + ' and quantity >= ' + FloatToDatabase(AMinimumQuantity);
   end;
   Result := TInvestmentItem(TInvestmentItem.FindByCondition(InvestmentItemProxy, xSql, False));
 end;
@@ -4800,7 +4800,7 @@ begin
     FinstrumentName := FieldByName('instrumentName').AsString;
     FaccountName := FieldByName('accountName').AsString;
     FinstrumentType := FieldByName('instrumentType').AsString;
-    Fquantity := FieldByName('quantity').AsInteger;
+    Fquantity := FieldByName('quantity').AsFloat;
     FvalueOf := FieldByName('valueOf').AsCurrency;
   end;
 end;
@@ -4812,7 +4812,7 @@ begin
   end else if AColumnIndex = 1 then begin
     Result := FinstrumentName;
   end else if AColumnIndex = 2 then begin
-    Result := IntToStr(Fquantity);
+    Result := FloatToString(Fquantity, 6);
   end else if AColumnIndex = 3 then begin
     Result := CurrencyToString(SimpleRoundTo(FvalueOf * Fquantity, -2), FidCurrencyDef, False);
   end else if AColumnIndex = 4 then begin

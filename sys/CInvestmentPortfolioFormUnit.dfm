@@ -46,12 +46,15 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Top = 68
         Width = 337
         Height = 21
+        Hint = '<wybierz konto z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz konto z listy>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 0
         TabStop = True
         Transparent = False
@@ -63,12 +66,15 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Top = 29
         Width = 153
         Height = 21
+        Hint = '<wybierz z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz z listy>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
         TabStop = True
         Transparent = False
@@ -111,17 +117,6 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Alignment = taRightJustify
         Caption = 'Warto'#347#263
       end
-      object CIntQuantity: TCIntEdit
-        Left = 112
-        Top = 29
-        Width = 153
-        Height = 21
-        BevelKind = bkTile
-        BorderStyle = bsNone
-        Enabled = False
-        TabOrder = 0
-        Text = '1'
-      end
       object CCurrEditValue: TCCurrEdit
         Tag = 1
         Left = 328
@@ -132,6 +127,21 @@ inherited CInvestmentPortfolioForm: TCInvestmentPortfolioForm
         Enabled = False
         TabOrder = 1
         Decimals = 4
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
+      end
+      object CCurrEditQuantity: TCCurrEdit
+        Tag = 1
+        Left = 112
+        Top = 30
+        Width = 153
+        Height = 21
+        BorderStyle = bsNone
+        Enabled = False
+        TabOrder = 0
+        Decimals = 6
         ThousandSep = True
         CurrencyStr = 'z'#322
         BevelKind = bkTile

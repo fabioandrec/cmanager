@@ -17,16 +17,16 @@ type
     EditType: TEdit;
     GroupBox2: TGroupBox;
     Label15: TLabel;
-    CIntQuantity: TCIntEdit;
     Label6: TLabel;
     CCurrEditValue: TCCurrEdit;
+    CCurrEditQuantity: TCCurrEdit;
   protected
     procedure FillForm; override;
   end;
 
 implementation
 
-uses CDataObjects, CDatabase;
+uses CDataObjects, CDatabase, CTools;
 
 {$R *.dfm}
 
@@ -42,7 +42,8 @@ begin
     GDataProvider.RollbackTransaction;
     CCurrEditValue.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
     CCurrEditValue.Value := overallValue;
-    CIntQuantity.Value := quantity;
+    CCurrEditQuantity.Value := quantity;
+    CCurrEditQuantity.SetCurrencyDef(CEmptyDataGid, '');
   end;
 end;
 

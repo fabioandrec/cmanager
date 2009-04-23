@@ -13,8 +13,12 @@ Kolejna wersja
     prowadzi³o do koniecznoœci rêcznego edytowania pliku konfiguracyjnego. Teraz CManager wyœwietli komunikat, i uruchomi siê bez otwartego pliku danych
 [+] w menu poderêcznym kategorii dodano pozycê pozwalaj¹c¹ na dodanie podkategorii
 [*] drobne zmiany kosmetyczne wygl¹du okna raportów html, okienka raportów z wykonanych czynnoœci np. kompaktowania
-[+] poprawka w imporcie wyci¹gów html z mBanku (dziêki JS)
-[+] poprawki sortowania kolumn na formatce pozycji wyci¹gu (dziêki JS)
+[-] poprawka w imporcie wyci¹gów html z mBanku (dziêki JS)
+[-] poprawki sortowania kolumn na formatce pozycji wyci¹gu (dziêki JS)
+[+] drobna zmiana kolejnoœci w listach wyboru zakresu dat (m.in. na liœcie operacji). Nast¹pi³a zmiana interpretacji "dowolny". W tej chwili 
+    "dowolny" oznacza, poprawn¹ dat¹ rejestracji jest dowolna data, a nie jak do tej pory data mieszcz¹ca siê w wybranym zakresie dat. Dodana
+    zosta³a równie¿ nowa pozycja "wybrany zakres", która dzia³a dok³adnie tak jak do tej pory "dowolnie" czyli pozwala na wybranie odpowiedniego
+    zakresu dat (ID2778434).
 
 Wersja 1.10.2 Beta
 [i] wyjœcie kolejnej wersji beta (2008-07-14)

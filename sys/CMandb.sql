@@ -399,7 +399,7 @@ create table investmentItem (
   modified datetime,
   idAccount uniqueidentifier not null,
   idInstrument uniqueidentifier not null,
-  quantity int not null,
+  quantity float not null,
   primary key (idInvestmentItem),
   constraint fk_investmentItem_Instrument foreign key (idInstrument) references instrument (idInstrument),
   constraint fk_investmentItem_Account foreign key (idAccount) references account (idAccount)
@@ -417,7 +417,7 @@ create table investmentMovement (
   yearDate datetime not null,
   idInstrument uniqueidentifier not null,
   idInstrumentCurrencyDef uniqueidentifier not null,
-  quantity integer not null,
+  quantity float not null,
   idInstrumentValue uniqueidentifier,
   valueOf money not null,
   summaryOf money not null,

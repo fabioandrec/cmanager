@@ -23,6 +23,7 @@ function GetExchangesXsd: ICXMLDOMDocument;
 function GetExtractionsXsd: ICXMLDOMDocument;
 function GetChartsXsd: ICXMLDOMDocument;
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;
+function FloatToString(AFloat: Double; ADecimal: Integer = 2): String;
 function DatabaseToDatetime(ADatetime: String): TDateTime;
 function GetFieldValueDef(ADataset: TADOQuery; AFieldname: String; ADefValue: Variant): Variant;
 
@@ -428,6 +429,11 @@ end;
 function GetChartsXsd: ICXMLDOMDocument;
 begin
   Result := GetDocumentFromString(GetStringFromResources('CHARTSXSD', RT_RCDATA), Nil);
+end;
+
+function FloatToString(AFloat: Double; ADecimal: Integer = 2): String;
+begin
+  Result := FloatToStrF(AFloat, ffNumber, 10, ADecimal);
 end;
 
 function CurrencyToString(ACurrency: Currency; ACurrencyId: String = ''; AWithSymbol: Boolean = True; ADecimal: Integer = 2): String;

@@ -238,11 +238,14 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 153
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz konto z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz konto z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 3
         TabStop = True
         Transparent = False
@@ -257,11 +260,14 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 153
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
         TabStop = True
         Transparent = False
@@ -276,12 +282,15 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 153
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz z listy>'
         Color = clWindow
         ParentColor = False
-        TabOrder = 6
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 5
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz z listy>'
@@ -324,11 +333,14 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 409
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz kategori'#281' z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz kategori'#281' z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 11
         TabStop = True
         Transparent = False
@@ -343,12 +355,15 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 145
         Height = 21
         Cursor = crHandPoint
+        Hint = '<brak instrumentu>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<brak instrumentu>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 2
         TabStop = True
         Transparent = False
@@ -362,11 +377,14 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 169
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz przelicznik kursu z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz przelicznik kursu z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 9
         TabStop = True
         Transparent = False
@@ -380,12 +398,15 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Top = 101
         Width = 145
         Height = 21
+        Hint = '<brak konta>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<brak konta>'
         Color = clWindow
         Enabled = False
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 4
         TabStop = True
         Transparent = False
@@ -413,11 +434,14 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         Width = 409
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz z portfela inwestycyjnego>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz z portfela inwestycyjnego>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 0
         TabStop = True
         Transparent = False
@@ -426,16 +450,20 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
         OnChanged = CStaticPortfolioChanged
         HotTrack = True
       end
-      object CIntQuantity: TCIntEdit
+      object CCurrEditQuantity: TCCurrEdit
+        Tag = 1
         Left = 360
-        Top = 136
+        Top = 137
         Width = 145
         Height = 21
-        BevelKind = bkTile
         BorderStyle = bsNone
-        TabOrder = 5
-        Text = '1'
+        TabOrder = 6
         OnChange = CCurrEditQuantityChange
+        Decimals = 6
+        ThousandSep = True
+        CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
       end
     end
   end

@@ -56,12 +56,12 @@ type
     MenuItemSmallIcons: TMenuItem;
     MenuItemsumsVisible: TMenuItem;
     Panel: TPanel;
-    Label2: TLabel;
-    Label1: TLabel;
+    LabelFilterMovement: TLabel;
+    LabelFilterPeriod: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    Label6: TLabel;
+    LabelFilterCurrency: TLabel;
     CStaticPeriod: TCStatic;
     CStaticFilter: TCStatic;
     CDateTimePerStart: TCDateTime;
@@ -312,8 +312,8 @@ begin
   Label4.Left := CDateTimePerEnd.Left - 15;
   CDateTimePerStart.Left := Label4.Left - CDateTimePerStart.Width;
   Label3.Left := CDateTimePerStart.Left - 18;
-  Label6.Left := CStaticPeriod.Left + CStaticPeriod.Width;
-  CStaticViewCurrency.Left := Label6.Left + Label6.Width + 4;
+  LabelFilterPeriod.Left := CStaticViewCurrency.Left + CStaticViewCurrency.Width;
+  CStaticPeriod.Left := LabelFilterPeriod.Left + LabelFilterPeriod.Width + 4;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
   Label3.Anchors := [akRight, akTop];
@@ -855,7 +855,8 @@ begin
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
   xList.Add('6=<ostatnie 30 dni>');
-  xList.Add('7=<dowolny>');
+  xList.Add('7=<wybrany zakres>');
+  xList.Add('8=<dowolny>');
   xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 200, 300);
@@ -893,6 +894,9 @@ begin
   end else if xId = '7' then begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
+  end else if xId = '8' then begin
+    ADateFrom := 0;
+    ADateTo := MaxDateTime;
   end;
 end;
 
@@ -901,10 +905,25 @@ var xF, xE: TDateTime;
 begin
   CDateTimePerStart.HotTrack := CStaticPeriod.DataId = '7';
   CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = '7';
+  Label4.Visible := CStaticPeriod.DataId <> '8';;
+  Label4.Update;
+  Label5.Visible := CStaticPeriod.DataId <> '8';;
+  Label5.Update;
+  Label3.Visible := CStaticPeriod.DataId <> '8';;
+  Label3.Update;
+  CDateTimePerStart.Visible := CStaticPeriod.DataId <> '8';
+  CDateTimePerEnd.Visible := CStaticPeriod.DataId <> '8';;
   if CStaticPeriod.DataId <> '7' then begin
     GetFilterDates(xF, xE);
     CDateTimePerStart.Value := xF;
     CDateTimePerEnd.Value := xE;
+  end else begin
+    if CDateTimePerStart.Value = 0 then begin
+      CDateTimePerStart.Value := Today;
+    end;
+    if CDateTimePerEnd.Value = Trunc(MaxDateTime) then begin
+      CDateTimePerEnd.Value := Today;
+    end;
   end;
 end;
 

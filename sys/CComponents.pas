@@ -244,7 +244,7 @@ type
   TCCurrEdit = class(TCustomEdit)
   private
     FAlign: TAlignment;
-    FValue: Currency;
+    FValue: Double;
     FMaxDigits: smallint;
     FDecimals: smallint;
     FCurrencyStr: string;
@@ -262,8 +262,8 @@ type
     function ReplaceChars2(OrgStr: string; ReplChar: Char; CharPos, CharCount: smallint): string;
     function GetDecimals: smallint;
     procedure SetDecimals(Value: smallint);
-    function GetValue: Currency;
-    procedure SetValue(Value: Currency);
+    function GetValue: Double;
+    procedure SetValue(Value: Double);
     procedure SetCurrencyStr(const Value: String);
   protected
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
@@ -276,7 +276,7 @@ type
     procedure CreateParams(var Params: TCreateParams); override;
     procedure Update; override;
     function AsCurrency: Currency;
-    function AsFloat: double;
+    function AsFloat: Double;
     function AsString: string;
     destructor Destroy; override;
     procedure SetCurrencyDef(AId, ASymbol: String);
@@ -317,7 +317,7 @@ type
     property OnMouseMove;
     property OnMouseUp;
     property Decimals: smallint read GetDecimals write SetDecimals;
-    property Value: Currency read GetValue write SetValue;
+    property Value: Double read GetValue write SetValue;
     property ThousandSep: Boolean read FShowKSeps write FShowKSeps;
     property CurrencyStr: String read FCurrencyStr write SetCurrencyStr;
     property BevelEdges;
@@ -1004,7 +1004,7 @@ begin
   InputParsed := False;
   if Key = VK_DELETE then begin
     cPos := SelStart;
-    txt := FormatIt(StrToCurr(Text), False);
+    txt := FormatIt(StrToFloat(Text), False);
     tlen := Length(txt);
     if ((cPos = tlen) or (cPos = tlen - FDecimals - 1)) then begin
       InputParsed := True;
@@ -1041,7 +1041,7 @@ begin
     end;
     if Text <> txt then begin
       cPos := SelStart;
-      Text := FormatIt(StrToCurr(txt), False);
+      Text := FormatIt(StrToFloat(txt), False);
       SelStart := cPos;
       Modified := True;
     end;
@@ -1073,7 +1073,7 @@ begin
   else Negative := False;
 
   cPos := SelStart;
-  txt := FormatIt(StrToCurr(Text), False);
+  txt := FormatIt(StrToFloat(Text), False);
   tlen := Length(txt);
 
   if not (Key in ['0'..'9', DecimalSeparator, '-', Char(#8)]) then {//Filter Keys} begin
@@ -1207,7 +1207,7 @@ begin
 
   if ((not ExitFlag) and (InputParsed)) then begin
     if Text <> txt then begin
-      Text := FormatIt(StrToCurr(txt), False); //Reformat
+      Text := FormatIt(StrToFloat(txt), False); //Reformat
       if ((Negative) and (LeftStr(Text, 1) <> '-')) then Text := InsertChars(Text, '-', 0);
       Modified := True;
     end;
@@ -1226,26 +1226,26 @@ end;
 
 procedure TCCurrEdit.SetDecimals(Value: smallint);
 begin
-  if ((Value >= 0) and (Value <= 4)) then begin
+  if ((Value >= 0) and (Value <= 6)) then begin
     FDecimals := Value;
   end
   else begin
     FDecimals := 2;
-    raise TCEditError.Create('"' + IntToStr(Value) + '" is not valid for Decimals (0 to 4)');
+    raise TCEditError.Create('"' + IntToStr(Value) + '" is not valid for Decimals (0 to 6)');
   end;
   Update;
 end;
 
-function TCCurrEdit.GetValue: Currency;
+function TCCurrEdit.GetValue: Double;
 begin
   result := FValue;
 end;
 
-procedure TCCurrEdit.SetValue(Value: Currency);
+procedure TCCurrEdit.SetValue(Value: Double);
 var xTest: string;
 begin
   try
-    xTest := FormatCurr('0.00', Value);
+    xTest := FormatFloat('0.00', Value);
     FValue := Value;
   except
     FValue := 0;
@@ -1290,8 +1290,8 @@ begin
     decimals := decimals + '0';
   mask := mask + decimals;
   try
-    result := FormatCurr(mask, AValue);
-    if not ShowMode then FValue := StrToCurr(result);
+    result := FormatFloat(mask, AValue);
+    if not ShowMode then FValue := StrToFloat(result);
   except
     result := '0' + DecimalSeparator + decimals;
     if not ShowMode then begin

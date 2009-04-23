@@ -1,16 +1,18 @@
 inherited CMovementFrame: TCMovementFrame
+  Width = 833
+  Height = 556
   object Splitter1: TSplitter [0]
     Left = 0
-    Top = 87
-    Width = 443
+    Top = 366
+    Width = 833
     Height = 1
     Cursor = crVSplit
     Align = alBottom
   end
   object PanelFrameButtons: TPanel [1]
     Left = 0
-    Top = 88
-    Width = 443
+    Top = 367
+    Width = 833
     Height = 189
     Align = alBottom
     BevelOuter = bvNone
@@ -19,13 +21,13 @@ inherited CMovementFrame: TCMovementFrame
     object Bevel: TBevel
       Left = 0
       Top = 146
-      Width = 443
+      Width = 833
       Height = 3
       Align = alBottom
       Shape = bsBottomLine
     end
     object Splitter2: TSplitter
-      Left = 335
+      Left = 725
       Top = 0
       Width = 1
       Height = 146
@@ -35,7 +37,7 @@ inherited CMovementFrame: TCMovementFrame
     object Panel1: TPanel
       Left = 0
       Top = 149
-      Width = 443
+      Width = 833
       Height = 40
       Align = alBottom
       BevelOuter = bvNone
@@ -94,7 +96,7 @@ inherited CMovementFrame: TCMovementFrame
     object PanelSum: TPanel
       Left = 0
       Top = 0
-      Width = 335
+      Width = 725
       Height = 146
       Align = alClient
       AutoSize = True
@@ -103,7 +105,7 @@ inherited CMovementFrame: TCMovementFrame
       object SumList: TCList
         Left = 0
         Top = 21
-        Width = 335
+        Width = 725
         Height = 125
         Align = alClient
         BevelEdges = [beRight]
@@ -165,7 +167,7 @@ inherited CMovementFrame: TCMovementFrame
           end
           item
             Position = 4
-            Width = 10
+            Width = 309
             WideText = 'Waluta'
           end>
         WideDefaultText = ''
@@ -173,17 +175,17 @@ inherited CMovementFrame: TCMovementFrame
       object Panel2: TPanel
         Left = 0
         Top = 0
-        Width = 335
+        Width = 725
         Height = 21
         Align = alTop
         Alignment = taLeftJustify
         Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
         TabOrder = 1
         DesignSize = (
-          335
+          725
           21)
         object SpeedButtonCloseShortcuts: TSpeedButton
-          Left = 824
+          Left = 1222
           Top = 5
           Width = 13
           Height = 13
@@ -201,7 +203,7 @@ inherited CMovementFrame: TCMovementFrame
       end
     end
     object PanelPatterns: TPanel
-      Left = 336
+      Left = 726
       Top = 0
       Width = 107
       Height = 146
@@ -292,20 +294,20 @@ inherited CMovementFrame: TCMovementFrame
   object Panel: TPanel [2]
     Left = 0
     Top = 0
-    Width = 443
+    Width = 833
     Height = 21
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 1
-    object Label2: TLabel
+    object LabelFilterMovement: TLabel
       Left = 8
       Top = 4
       Width = 61
       Height = 13
       Caption = 'Typ operacji:'
     end
-    object Label1: TLabel
-      Left = 146
+    object LabelFilterPeriod: TLabel
+      Left = 274
       Top = 4
       Width = 85
       Height = 13
@@ -332,19 +334,20 @@ inherited CMovementFrame: TCMovementFrame
       Height = 13
       Caption = ')'
     end
-    object Label6: TLabel
-      Left = 312
+    object LabelFilterCurrency: TLabel
+      Left = 152
       Top = 4
       Width = 32
       Height = 13
       Caption = 'Kwoty:'
     end
     object CStaticPeriod: TCStatic
-      Left = 235
+      Left = 363
       Top = 4
       Width = 90
       Height = 15
       Cursor = crHandPoint
+      Hint = '<tylko dzi'#347'>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -358,6 +361,8 @@ inherited CMovementFrame: TCMovementFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       TabStop = True
       Transparent = False
@@ -373,6 +378,7 @@ inherited CMovementFrame: TCMovementFrame
       Width = 74
       Height = 15
       Cursor = crHandPoint
+      Hint = '<dowolny typ>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -386,6 +392,8 @@ inherited CMovementFrame: TCMovementFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       TabStop = True
       Transparent = False
@@ -404,7 +412,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '<wybierz dat'#281'  i czas>'
+      Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 2
@@ -412,7 +420,7 @@ inherited CMovementFrame: TCMovementFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
-      Withtime = True
+      Withtime = False
     end
     object CDateTimePerEnd: TCDateTime
       Left = 504
@@ -423,7 +431,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelInner = bvNone
       BevelKind = bkTile
       BevelOuter = bvNone
-      Caption = '<wybierz dat'#281'  i czas>'
+      Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
       TabOrder = 3
@@ -431,14 +439,15 @@ inherited CMovementFrame: TCMovementFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
-      Withtime = True
+      Withtime = False
     end
     object CStaticViewCurrency: TCStatic
-      Left = 345
+      Left = 185
       Top = 4
       Width = 88
       Height = 15
       Cursor = crHandPoint
+      Hint = '<waluta operacji>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -452,6 +461,8 @@ inherited CMovementFrame: TCMovementFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 4
       TabStop = True
       Transparent = False
@@ -465,8 +476,8 @@ inherited CMovementFrame: TCMovementFrame
   object TodayList: TCList [3]
     Left = 0
     Top = 21
-    Width = 443
-    Height = 66
+    Width = 833
+    Height = 345
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -514,7 +525,7 @@ inherited CMovementFrame: TCMovementFrame
       end
       item
         Position = 1
-        Width = 143
+        Width = 533
         WideText = 'Opis'
         WideHint = 'Opis'
       end

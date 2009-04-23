@@ -92,7 +92,9 @@ function DataGidToDatabase(ADataGid: String; ANullText: Boolean = True): String;
 function IsNullCondition(AValue: String): String;
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
 function CurrencyToDatabase(ACurrency: Currency): String;
+function FloatToDatabase(AFloat: Double): String;
 function CurrencyToDatabaseWithSign(ACurrency: Currency): String;
+function FloatToDatabaseWithSign(AFloat: Double): String;
 function TrimStr(AStr: String; AUnwanted: String): String;
 function WrapTextToLength(AText: String; ALength: Integer): String;
 function GetMonthNumber(AMonthName: String): Integer;
@@ -104,6 +106,7 @@ procedure GetFileFromResource(AResName: String; AResType: PChar; AFilename: Stri
 function XsdToDateTime(ADateTimeStr: String): TDateTime;
 function DateTimeToXsd(ADateTime: TDateTime; AYearFirst: Boolean = True; AWithTime: Boolean = True): String;
 function IntToStrWithSign(AInteger: Integer): String;
+function FloatToStrWithSign(AFloat: Double; ADecimals: Integer): String;
 function GetStartQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetEndQuarterOfTheYear(ADateTime: TDateTime): TDateTime;
 function GetQuarterOfTheYear(ADateTime: TDateTime): Integer;
@@ -665,6 +668,14 @@ begin
   Result := CurrToStr(ACurrency, xFormat);
 end;
 
+function FloatToDatabase(AFloat: Double): String;
+var xFormat: TFormatSettings;
+begin
+  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
+  xFormat.DecimalSeparator := '.';
+  Result := FloatToStr(AFloat, xFormat);
+end;
+
 function CurrencyToDatabaseWithSign(ACurrency: Currency): String;
 var xFormat: TFormatSettings;
 begin
@@ -672,6 +683,17 @@ begin
   xFormat.DecimalSeparator := '.';
   Result := CurrToStr(ACurrency, xFormat);
   if ACurrency >= 0 then begin
+    Result := '+' + Result;
+  end;
+end;
+
+function FloatToDatabaseWithSign(AFloat: Double): String;
+var xFormat: TFormatSettings;
+begin
+  GetLocaleFormatSettings(LOCALE_USER_DEFAULT, xFormat);
+  xFormat.DecimalSeparator := '.';
+  Result := FloatToStr(AFloat, xFormat);
+  if AFloat >= 0 then begin
     Result := '+' + Result;
   end;
 end;
@@ -1072,6 +1094,14 @@ function IntToStrWithSign(AInteger: Integer): String;
 begin
   Result := IntToStr(AInteger);
   if AInteger >= 0 then begin
+    Result := '+' + Result;
+  end;
+end;
+
+function FloatToStrWithSign(AFloat: Double; ADecimals: Integer): String;
+begin
+  Result :=  FloatToStrF(AFloat, ffNumber, ADecimals, 10);
+  if AFloat >= 0 then begin
     Result := '+' + Result;
   end;
 end;
