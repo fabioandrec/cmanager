@@ -2,7 +2,7 @@ unit CAdox;
 
 interface
 
-uses ShellApi, SysUtils, Classes, ComObj, Variants, AdoDb;
+uses ShellApi, SysUtils, Classes, ComObj, Variants, AdoDb, Db;
 
 type
   TDbExecuteSqlProgress = procedure (AMin, AMax, AStep: Integer) of Object;
@@ -208,6 +208,7 @@ begin
       xAdo.Mode := 12;
       xAdo.Open;
       xAdo.Execute('alter database password ' + xNewPass + ' ' + xOldPass);
+      xAdo.Close;
       Result := True;
     except
       on E: Exception do begin
