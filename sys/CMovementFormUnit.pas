@@ -736,8 +736,8 @@ begin
         CCurrEditInoutOnceMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
         CCurrEditInOutOnceAccount.Value := cash;
         CCurrEditInOutOnceAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
-        CCurrEditOnceQuantity.Value := quantity;
         CStaticInoutOnceCategoryChanged(Nil);
+        CCurrEditOnceQuantity.Value := quantity;
         FonceState.AccountId := idAccount;
         FonceState.ExtrId := idExtractionItem;
         FonceState.Stated := isStated;
@@ -770,8 +770,8 @@ begin
         CCurrEditInoutCyclicMovement.SetCurrencyDef(idMovementCurrencyDef, GCurrencyCache.GetSymbol(idMovementCurrencyDef));
         CCurrEditInOutCyclicAccount.Value := cash;
         CCurrEditInOutCyclicAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
-        CCurrEditCyclicQuantity.Value := quantity;
         CStaticInoutCyclicCategoryChanged(Nil);
+        CCurrEditCyclicQuantity.Value := quantity;
         FcyclicState.AccountId := idAccount;
         FcyclicState.ExtrId := idExtractionItem;
         FcyclicState.Stated := isStated;
