@@ -43,6 +43,7 @@ type
     function OpenSql(ASql: String; AShowError: Boolean = True): TADOQuery;
     function GetSqlInteger(ASql: String; ADefault: Integer): Integer;
     function GetSqlBoolean(ASql: String; ADefault: Boolean): Boolean;
+    function GetSqlFloat(ASql: String; ADefault: Double): Double;
     function GetSqlCurrency(ASql: String; ADefault: Currency): Currency;
     function GetSqlString(ASql: String; ADefault: String): String;
     function GetSqlStringList(ASql: String): TStringList;
@@ -1309,6 +1310,19 @@ begin
     if (xElement.childsInSum = 0) and (xElement.cashIn = 0) and (xElement.cashOut = 0) then begin
       AList.Remove(xElement);
     end;
+  end;
+end;
+
+function TDataProvider.GetSqlFloat(ASql: String; ADefault: Double): Double;
+var xQ: TADOQuery;
+begin
+  Result := ADefault;
+  xQ := OpenSql(ASql);
+  if xQ <> Nil then begin
+    if not xQ.IsEmpty then begin
+      Result := xQ.Fields[0].AsFloat;
+    end;
+    xQ.Free;
   end;
 end;
 

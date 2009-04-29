@@ -26,7 +26,7 @@ implementation
 
 uses FileCtrl, CMainFormUnit, CDatatools, CDataObjects, CTools,
   CBaseFrameUnit, CAccountsFrameUnit, CConsts,
-  CInvestmentPortfolioFrameUnit, CMovementFrameUnit;
+  CInvestmentPortfolioFrameUnit, CMovementFrameUnit, Math;
 
 function TCCheckDatafileForm.DoWork: TDoWorkResult;
 var xText: String;
@@ -37,6 +37,7 @@ var xText: String;
     xInvestment: TInvestmentItem;
     xInstrument: TInstrument;
     xSum: Currency;
+    xQuantitySum: Double;
 begin
   AddToReport('Rozpoczêcie wykonywania sprawdzania pliku danych...');
   try
@@ -65,10 +66,10 @@ begin
         xAccount := TAccount(TAccount.LoadObject(AccountProxy, xInvestment.idAccount, False));
         xInstrument := TInstrument(TInstrument.LoadObject(InstrumentProxy, xInvestment.idInstrument, False));
         AddToReport('Sprawdzanie inwestycji ' + xAccount.name + ' - ' + xInstrument.name);
-        xSum := FDataProvider.GetSqlCurrency('select sum(quantity) as quantity from investments where idAccount = ' + DataGidToDatabase(xInvestment.idAccount) + ' and idInstrument = ' + DataGidToDatabase(xInvestment.idInstrument), 0);
-        if xSum <> xInvestment.quantity then begin
-          AddToReport('Stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name + Format(' wynosi %d, powinien wynosiæ %.0f', [xInvestment.quantity, xSum]));
-          xInvestment.quantity := Trunc(xSum);
+        xQuantitySum := FDataProvider.GetSqlFloat('select sum(quantity) as quantity from investments where idAccount = ' + DataGidToDatabase(xInvestment.idAccount) + ' and idInstrument = ' + DataGidToDatabase(xInvestment.idInstrument), 0);
+        if not SameValue(xQuantitySum, xInvestment.quantity) then begin
+          AddToReport('Stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name + Format(' wynosi %.6f, powinien wynosiæ %.6f', [xInvestment.quantity, xQuantitySum]));
+          xInvestment.quantity := xQuantitySum;
           AddToReport('Zmodyfikowano stan inwestycji ' + xAccount.name + ' - ' + xInstrument.name);
           inc(xSuspectedCount);
         end else begin
