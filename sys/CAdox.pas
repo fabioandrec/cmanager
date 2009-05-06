@@ -196,10 +196,10 @@ begin
         xOldPass := 'null';
       end else begin
         xConnectionString := Format(CConnectionStringWithPass, [AFilename, APassword]);
-        xOldPass := APassword;
+        xOldPass := '[' + APassword + ']';
       end;
       if ANewPassword <> '' then begin
-        xNewPass := ANewPassword;
+        xNewPass := '[' + ANewPassword + ']';
       end else begin
         xNewPass := 'null';
       end;
