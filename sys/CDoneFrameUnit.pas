@@ -519,7 +519,8 @@ begin
   xList.Add('10=<nastêpne 14 dni>');
   xList.Add('11=<nastêpne 30 dni>');
   xList.Add('14=<do koñca roku>');
-  xList.Add('12=<dowolny>');
+  xList.Add('12=<wybrany zakres>');
+  xList.Add('16=<dowolny>');
   xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 200, 400);
@@ -573,14 +574,17 @@ begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
   end else if xId = '13' then begin
-    ADateFrom := StartOfTheYear(CDateTimePerStart.Value);
-    ADateTo := CDateTimePerEnd.Value;
+    ADateFrom := StartOfTheYear(GWorkDate);
+    ADateTo := GWorkDate;
   end else if xId = '14' then begin
-    ADateFrom := CDateTimePerStart.Value;
-    ADateTo := EndOfTheYear(CDateTimePerEnd.Value);
+    ADateFrom := GWorkDate;
+    ADateTo := EndOfTheYear(GWorkDate);
   end else if xId = '15' then begin
-    ADateFrom := StartOfTheYear(CDateTimePerStart.Value);
-    ADateTo := EndOfTheYear(CDateTimePerEnd.Value);
+    ADateFrom := StartOfTheYear(GWorkDate);
+    ADateTo := EndOfTheYear(GWorkDate);
+  end else if xId = '16' then begin
+    ADateFrom := LowestDatetime;
+    ADateTo := HighestDatetime;
   end;
 end;
 
@@ -589,10 +593,25 @@ var xF, xE: TDateTime;
 begin
   CDateTimePerStart.HotTrack := CStaticPeriod.DataId = '12';
   CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = '12';
+  CDateTimePerStart.Visible := CStaticPeriod.DataId <> '16';
+  CDateTimePerEnd.Visible := CStaticPeriod.DataId <> '16';
+  Label3.Visible := CDateTimePerEnd.Visible;
+  Label3.Update;
+  Label4.Visible := CDateTimePerEnd.Visible;
+  Label4.Update;
+  Label5.Visible := CDateTimePerEnd.Visible;
+  Label5.Update;
   if CStaticPeriod.DataId <> '12' then begin
     GetFilterDates(xF, xE);
     CDateTimePerStart.Value := xF;
     CDateTimePerEnd.Value := xE;
+  end else begin
+    if IsLowestDatetime(CDateTimePerStart.Value) then begin
+      CDateTimePerStart.Value := GWorkDate;
+    end;
+    if IsHighestDatetime(CDateTimePerEnd.Value) then begin
+      CDateTimePerEnd.Value := GWorkDate;
+    end;
   end;
 end;
 

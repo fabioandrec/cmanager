@@ -124,6 +124,10 @@ function CustomIncMonth(ADate: TDateTime; ADelta: Integer): TDateTime;
 function CalculateSubstrings(AText: String; ASubstring: String): Integer;
 function GetMouseWheelLines: Integer;
 function GetSpecialFolder(const ACSIDL: Integer): String;
+function IsLowestDatetime(ADateTime: TDateTime): Boolean;
+function IsHighestDatetime(ADateTime: TDateTime): Boolean;
+function LowestDatetime: TDatetime;
+function HighestDatetime: TDatetime;
 
 implementation
 
@@ -699,14 +703,20 @@ begin
 end;
 
 function DatetimeToDatabase(ADatetime: TDateTime; AWithTime: Boolean): String;
+var xDatetime: TDateTime;
 begin
-  if ADatetime = 0 then begin
+  if ADatetime > MaxDateTime then begin
+    xDatetime := MaxDateTime;
+  end else begin
+    xDatetime := ADatetime;
+  end;
+  if xDatetime = 0 then begin
     Result := 'Null';
   end else begin
     if not AWithTime then begin
-      Result := '#' + FormatDateTime('yyyy-mm-dd', ADatetime) + '#';
+      Result := '#' + FormatDateTime('yyyy-mm-dd', xDatetime) + '#';
     end else begin
-      Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ADatetime) + '#';
+      Result := '#' + FormatDateTime('yyyy-mm-dd hh:nn:ss', xDatetime) + '#';
     end;
   end;
 end;
@@ -1267,6 +1277,26 @@ end;
 function GetMouseWheelLines: Integer;
 begin
   SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, @Result, 0);
+end;
+
+function IsLowestDatetime(ADateTime: TDateTime): Boolean;
+begin
+  Result := Trunc(ADateTime) = LowestDatetime;
+end;
+
+function IsHighestDatetime(ADateTime: TDateTime): Boolean;
+begin
+  Result := Trunc(ADateTime) = HighestDatetime;
+end;
+
+function LowestDatetime: TDatetime;
+begin
+  Result := -1;
+end;
+
+function HighestDatetime: TDatetime;
+begin
+  Result := Trunc(MaxDateTime);
 end;
 
 end.

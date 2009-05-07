@@ -895,8 +895,8 @@ begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
   end else if xId = '8' then begin
-    ADateFrom := 0;
-    ADateTo := MaxDateTime;
+    ADateFrom := LowestDatetime;
+    ADateTo := HighestDatetime;
   end;
 end;
 
@@ -918,11 +918,11 @@ begin
     CDateTimePerStart.Value := xF;
     CDateTimePerEnd.Value := xE;
   end else begin
-    if CDateTimePerStart.Value = 0 then begin
-      CDateTimePerStart.Value := Today;
+    if IsLowestDatetime(CDateTimePerStart.Value) then begin
+      CDateTimePerStart.Value := GWorkDate;
     end;
-    if CDateTimePerEnd.Value = Trunc(MaxDateTime) then begin
-      CDateTimePerEnd.Value := Today;
+    if IsHighestDatetime(CDateTimePerEnd.Value) then begin
+      CDateTimePerEnd.Value := GWorkDate;
     end;
   end;
 end;
