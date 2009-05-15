@@ -105,6 +105,9 @@ begin
   end else if xId = '7' then begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
+  end else if xId = '8' then begin
+    ADateFrom := LowestDatetime;
+    ADateTo := HighestDatetime;
   end;
 end;
 
@@ -219,10 +222,25 @@ var xF, xE: TDateTime;
 begin
   CDateTimePerStart.HotTrack := CStaticPeriod.DataId = '7';
   CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = '7';
+  CDateTimePerStart.Visible := CStaticPeriod.DataId <> '8';
+  CDateTimePerEnd.Visible := CStaticPeriod.DataId <> '8';
+  Label3.Visible := CDateTimePerEnd.Visible;
+  Label3.Update;
+  Label4.Visible := CDateTimePerEnd.Visible;
+  Label4.Update;
+  Label5.Visible := CDateTimePerEnd.Visible;
+  Label5.Update;
   if CStaticPeriod.DataId <> '7' then begin
     GetFilterDates(xF, xE);
     CDateTimePerStart.Value := xF;
     CDateTimePerEnd.Value := xE;
+  end else begin
+    if IsLowestDatetime(CDateTimePerStart.Value) then begin
+      CDateTimePerStart.Value := GWorkDate;
+    end;
+    if IsHighestDatetime(CDateTimePerEnd.Value) then begin
+      CDateTimePerEnd.Value := GWorkDate;
+    end;
   end;
 end;
 
@@ -244,7 +262,8 @@ begin
   xList.Add('4=<ostatnie 7 dni>');
   xList.Add('5=<ostatnie 14 dni>');
   xList.Add('6=<ostatnie 30 dni>');
-  xList.Add('7=<dowolny>');
+  xList.Add('7=<wybrany zakres>');
+  xList.Add('8=<dowolny>');
   xGid := CEmptyDataGid;
   xText := '';
   xRect := Rect(10, 10, 200, 300);

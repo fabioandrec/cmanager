@@ -105,6 +105,9 @@ begin
   end else if xId = CFilterOther then begin
     ADateFrom := CDateTimePerStart.Value;
     ADateTo := CDateTimePerEnd.Value;
+  end else if xId = CFilterAllElements then begin
+    ADateFrom := LowestDatetime;
+    ADateTo := HighestDatetime;
   end;
 end;
 
@@ -177,10 +180,25 @@ var xF, xE: TDateTime;
 begin
   CDateTimePerStart.HotTrack := CStaticPeriod.DataId = CFilterOther;
   CDateTimePerEnd.HotTrack := CStaticPeriod.DataId = CFilterOther;
+  CDateTimePerStart.Visible := CStaticPeriod.DataId <> CFilterAllElements;
+  CDateTimePerEnd.Visible := CStaticPeriod.DataId <> CFilterAllElements;
+  Label3.Visible := CDateTimePerEnd.Visible;
+  Label3.Update;
+  Label4.Visible := CDateTimePerEnd.Visible;
+  Label4.Update;
+  Label5.Visible := CDateTimePerEnd.Visible;
+  Label5.Update;
   if CStaticPeriod.DataId <> CFilterOther then begin
     GetFilterDates(xF, xE);
     CDateTimePerStart.Value := xF;
     CDateTimePerEnd.Value := xE;
+  end else begin
+    if IsLowestDatetime(CDateTimePerStart.Value) then begin
+      CDateTimePerStart.Value := GWorkDate;
+    end;
+    if IsHighestDatetime(CDateTimePerEnd.Value) then begin
+      CDateTimePerEnd.Value := GWorkDate;
+    end;
   end;
 end;
 
@@ -215,7 +233,8 @@ begin
   xList.Add(CFilterYesterday + '=<wa¿ne wczoraj>');
   xList.Add(CFilterWeek + '=<wa¿ne w tym tygodniu>');
   xList.Add(CFilterMonth + '=<wa¿ne w tym miesi¹cu>');
-  xList.Add(CFilterOther + '=<dowolny okres>');
+  xList.Add(CFilterOther + '=<wybrany okres>');
+  xList.Add(CFilterAllElements + '=<wszystkie>');
   xGid := CFilterAllElements;
   xText := '';
   xRect := Rect(10, 10, 200, 300);
