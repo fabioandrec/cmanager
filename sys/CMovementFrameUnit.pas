@@ -291,8 +291,8 @@ begin
   if FTodayLists <> Nil then begin
     FreeAndNil(FTodayLists);
   end;
-  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where ' + xCondition + ' order by created');
-  FTodayLists := TDataObject.GetList(TMovementList, MovementListProxy, 'select * from movementList where ' + xCondition + ' order by created');
+  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from StnBaseMovement where ' + xCondition + ' order by created');
+  FTodayLists := TDataObject.GetList(TMovementList, MovementListProxy, 'select * from StnMovementList where ' + xCondition + ' order by created');
   RecreateTreeHelper;
   TodayList.RootNodeCount := FTreeHelper.Count;
   TodayListFocusChanged(TodayList, TodayList.FocusedNode, 0);

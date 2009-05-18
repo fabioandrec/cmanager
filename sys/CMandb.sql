@@ -600,7 +600,16 @@ create view StnInvestmentPortfolio as
 create view StnDepositMovement as
   select v.*, d.idCurrencyDef from depositMovement v
   left join depositInvestment d on d.idDepositInvestment = v.idDepositInvestment;
+  
+create view StnBaseMovement as
+  select v.*, i.name as accountName, q.name as sourceAccountName from ((baseMovement v
+  left outer join account i on i.idAccount = v.idAccount)
+  left outer join account q on q.idAccount = v.idSourceAccount);
 
+create view StnMovementList as
+  select v.*, i.name as accountName from movementList v
+  left outer join account i on i.idAccount = v.idAccount;
+  
 create index ix_baseMovement_regDate on baseMovement (regDate);
 create index ix_movementList_regDate on movementList (regDate);
 create index ix_baseMovement_movementType on baseMovement (movementType);

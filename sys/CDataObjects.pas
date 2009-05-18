@@ -404,6 +404,8 @@ type
     FidUnitDef: TDataGid;
     FisInvestmentMovement: Boolean;
     FisDepositMovement: Boolean;
+    FaccountName: TBaseName;
+    FsourceAccountName: TBaseName;
     procedure Setcash(const Value: Currency);
     procedure Setdescription(const Value: TBaseDescription);
     procedure SetidAccount(const Value: TDataGid);
@@ -467,6 +469,8 @@ type
     property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
     property isInvestmentMovement: Boolean read FisInvestmentMovement write SetisInvestmentMovement;
     property isDepositMovement: Boolean read FisDepositMovement write SetidDepositMovement;
+    property accountName: TBaseName read FaccountName;
+    property sourceAccountName: TBaseName read FsourceAccountName;
   end;
 
   TPlannedMovement = class(TDataObject)
@@ -1302,8 +1306,8 @@ begin
   DepositInvestmentProxy := TDataProxy.Create(ADataProvider, 'depositInvestment');
   InvestmentMovementProxy := TDataProxy.Create(ADataProvider, 'investmentMovement');
   DepositMovementProxy := TDataProxy.Create(ADataProvider, 'depositMovement', 'StnDepositMovement');
-  BaseMovementProxy := TDataProxy.Create(ADataProvider, 'baseMovement');
-  MovementListProxy :=  TDataProxy.Create(ADataProvider, 'movementList');
+  BaseMovementProxy := TDataProxy.Create(ADataProvider, 'baseMovement', 'StnBaseMovement');
+  MovementListProxy :=  TDataProxy.Create(ADataProvider, 'movementList', 'StnMovementList');
   PlannedMovementProxy :=  TDataProxy.Create(ADataProvider, 'plannedMovement');
 end;
 
@@ -1652,6 +1656,8 @@ begin
     FprevIdMovementCurrencyDef := FidMovementCurrencyDef;
     FprevIdCashPoint := FidCashPoint;
     FprevIdProduct := FidProduct;
+    FaccountName := FieldByName('accountName').AsString;
+    FsourceAccountName := FieldByName('sourceAccountName').AsString;
   end;
 end;
 
@@ -2544,7 +2550,7 @@ end;
 
 function TMovementList.GetMovements: TDataObjectList;
 begin
-  Result := TMovementList.GetList(TBaseMovement, BaseMovementProxy, 'select * from baseMovement where idmovementList = ' + DataGidToDatabase(id));
+  Result := TMovementList.GetList(TBaseMovement, BaseMovementProxy, 'select * from StnBaseMovement where idmovementList = ' + DataGidToDatabase(id));
 end;
 
 function TMovementList.OnDeleteObject(AProxy: TDataProxy): Boolean;
