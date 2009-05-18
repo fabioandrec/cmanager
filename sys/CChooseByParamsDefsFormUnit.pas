@@ -467,7 +467,7 @@ begin
       Add('nastêpne 7 dni');
       Add('nastêpne 14 dni');
       Add('nastêpne 30 dni');
-      Add('dowolny');
+      Add('wybrany zakres');
     end;
     Caption := '';
     FstartLabel.Caption := 'Zakres od';

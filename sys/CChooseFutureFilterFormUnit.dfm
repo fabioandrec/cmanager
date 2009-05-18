@@ -62,7 +62,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
         Text = 'przysz'#322'y tydzie'#324
         OnChange = ComboBoxFutureChange
         Items.Strings = (
-          'dowolny'
+          'wybrany zakres'
           'przysz'#322'y tydzie'#324
           'przysz'#322'y miesi'#261'c'
           'przysz'#322'y kwarta'#322

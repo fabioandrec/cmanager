@@ -69,12 +69,26 @@ var xDf, xDe: TDateTime;
 begin
   CDateTime1.Enabled := ComboBoxPredefined.ItemIndex = 0;
   CDateTime2.Enabled := ComboBoxPredefined.ItemIndex = 0;
+  CDateTime1.Visible := ComboBoxPredefined.ItemIndex <> 10;
+  CDateTime2.Visible := ComboBoxPredefined.ItemIndex <> 10;
+  Label1.Visible := ComboBoxPredefined.ItemIndex <> 10;
+  Label1.Update;
+  Label2.Visible := ComboBoxPredefined.ItemIndex <> 10;
+  Label2.Update;
   GetFilterDates(xDf, xDe);
   CDateTime1.Value := xDf;
+  CDateTime2.Value := xDe;
+  if ComboBoxPredefined.ItemIndex = 0 then begin
+    if IsLowestDatetime(CDateTime1.Value) then begin
+      CDateTime1.Value := GWorkDate;
+    end;
+    if IsHighestDatetime(CDateTime2.Value) then begin
+      CDateTime2.Value := GWorkDate;
+    end;
+  end;
   if CDateTime1.Withtime then begin
     CDateTime1.Value := StartOfTheDay(CDateTime1.Value);
   end;
-  CDateTime2.Value := xDe;
   if CDateTime2.Withtime then begin
     CDateTime2.Value := EndOfTheDay(CDateTime2.Value);
   end;

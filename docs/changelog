@@ -17,7 +17,7 @@ Kolejna wersja
 [-] poprawki sortowania kolumn na formatce pozycji wyci¹gu (dziêki JS)
 [+] poprawiono obs³ugê definiowania has³a dla pliku danych (ID2768993)
 [+] poprawiono wyœwietlanie na formatce iloœci towaru dla kategorii maj¹cej zdefiniowan¹ jednostkê miary (ID2782783).
-[+] !!DOKOÑCZYÆ W INNYCH MIEJSCACH, drobna zmiana kolejnoœci w listach wyboru zakresu dat (m.in. na liœcie operacji). Nast¹pi³a zmiana interpretacji "dowolny". W tej chwili 
+[+] drobna zmiana kolejnoœci w listach wyboru zakresu dat (m.in. na liœcie operacji). Nast¹pi³a zmiana interpretacji "dowolny". W tej chwili 
     "dowolny" oznacza, poprawn¹ dat¹ rejestracji jest dowolna data, a nie jak do tej pory data mieszcz¹ca siê w wybranym zakresie dat. Dodana
     zosta³a równie¿ nowa pozycja "wybrany zakres", która dzia³a dok³adnie tak jak do tej pory "dowolnie" czyli pozwala na wybranie odpowiedniego
     zakresu dat (ID2778434).
