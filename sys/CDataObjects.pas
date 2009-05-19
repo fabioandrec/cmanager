@@ -400,7 +400,7 @@ type
     FisStated: Boolean;
     FidSourceExtractionItem: TDataGid;
     FisSourceStated: Boolean;
-    Fquantity: Currency;
+    Fquantity: Double;
     FidUnitDef: TDataGid;
     FisInvestmentMovement: Boolean;
     FisDepositMovement: Boolean;
@@ -427,7 +427,7 @@ type
     procedure SetisStated(const Value: Boolean);
     procedure SetidSourceExtractionItem(const Value: TDataGid);
     procedure SetisSourceStated(const Value: Boolean);
-    procedure Setquantity(const Value: Currency);
+    procedure Setquantity(const Value: Double);
     procedure SetidUnitDef(const Value: TDataGid);
     procedure SetisInvestmentMovement(const Value: Boolean);
     procedure SetidDepositMovement(const Value: Boolean);
@@ -465,7 +465,7 @@ type
     property isStated: Boolean read FisStated write SetisStated;
     property idSourceExtractionItem: TDataGid read FidSourceExtractionItem write SetidSourceExtractionItem;
     property isSourceStated: Boolean read FisSourceStated write SetisSourceStated;
-    property quantity: Currency read Fquantity write Setquantity;
+    property quantity: Double read Fquantity write Setquantity;
     property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
     property isInvestmentMovement: Boolean read FisInvestmentMovement write SetisInvestmentMovement;
     property isDepositMovement: Boolean read FisDepositMovement write SetidDepositMovement;
@@ -492,7 +492,7 @@ type
     FdoneCount: Integer;
     FfreeDays: TBaseEnumeration;
     FidMovementCurrencyDef: TDataGid;
-    Fquantity: Currency;
+    Fquantity: Double;
     FidUnitDef: TDataGid;
     FidDestAccount: TDataGid;
     procedure Setcash(const Value: Currency);
@@ -511,7 +511,7 @@ type
     procedure SetisActive(const Value: Boolean);
     procedure SetfreeDays(const Value: TBaseEnumeration);
     procedure SetidMovementCurrencyDef(const Value: TDataGid);
-    procedure Setquantity(const Value: Currency);
+    procedure Setquantity(const Value: Double);
     procedure SetidUnitDef(const Value: TDataGid);
     procedure SetidDestAccount(const Value: TDataGid);
   public
@@ -538,7 +538,7 @@ type
     property doneCount: Integer read FdoneCount;
     property freeDays: TBaseEnumeration read FfreeDays write SetfreeDays;
     property idMovementCurrencyDef: TDataGid read FidMovementCurrencyDef write SetidMovementCurrencyDef;
-    property quantity: Currency read Fquantity write Setquantity;
+    property quantity: Double read Fquantity write Setquantity;
     property idUnitDef: TDataGid read FidUnitDef write SetidUnitDef;
     property idDestAccount: TDataGid read FidDestAccount write SetidDestAccount;
   end;
@@ -1648,7 +1648,7 @@ begin
     FidSourceExtractionItem := FieldByName('idSourceExtractionItem').AsString;
     FisSourceStated := FieldByName('isSourceStated').AsBoolean;
     FidUnitDef := FieldByName('idUnitDef').AsString;
-    Fquantity := FieldByName('quantity').AsCurrency;
+    Fquantity := FieldByName('quantity').AsFloat;
     FisInvestmentMovement := FieldByName('isInvestmentMovement').AsBoolean;
     FisDepositMovement := FieldByName('isDepositMovement').AsBoolean;
     FprevmovementCash := FmovementCash;
@@ -1740,7 +1740,7 @@ begin
     AddField('isStated', IntToStr(Integer(FisStated)), False, 'baseMovement');
     AddField('idSourceExtractionItem', DataGidToDatabase(FidSourceExtractionItem), False, 'baseMovement');
     AddField('isSourceStated', IntToStr(Integer(FisSourceStated)), False, 'baseMovement');
-    AddField('quantity', CurrencyToDatabase(Fquantity), False, 'baseMovement');
+    AddField('quantity', FloatToDatabase(Fquantity), False, 'baseMovement');
     AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'baseMovement');
     AddField('isInvestmentMovement', IntToStr(Integer(FisInvestmentMovement)), False, 'baseMovement');
     AddField('isDepositMovement', IntToStr(Integer(FisDepositMovement)), False, 'baseMovement');
@@ -1833,7 +1833,7 @@ begin
     FtriggerType := FieldByName('triggerType').AsString;
     FtriggerDay := FieldByName('triggerDay').AsInteger;
     FfreeDays := FieldByName('freeDays').AsString;
-    Fquantity := FieldByName('quantity').AsCurrency;
+    Fquantity := FieldByName('quantity').AsFloat;
     FidUnitDef := FieldByName('idUnitDef').AsString;
     xField := FindField('doneCount');
     if xField <> Nil then begin
@@ -1967,7 +1967,7 @@ begin
   end;
 end;
 
-procedure TPlannedMovement.Setquantity(const Value: Currency);
+procedure TPlannedMovement.Setquantity(const Value: Double);
 begin
   if Fquantity <> Value then begin
     Fquantity := Value;
@@ -2027,7 +2027,7 @@ begin
     AddField('triggerDay', IntToStr(FtriggerDay), False, 'plannedMovement');
     AddField('freeDays', FfreeDays, True, 'plannedMovement');
     AddField('idMovementCurrencyDef', DataGidToDatabase(FidMovementCurrencyDef), False, 'plannedMovement');
-    AddField('quantity', CurrencyToDatabase(Fquantity), False, 'plannedMovement');
+    AddField('quantity', FloatToDatabase(Fquantity), False, 'plannedMovement');
     AddField('idUnitDef', DataGidToDatabase(FidUnitDef), False, 'plannedMovement');
     AddField('idDestAccount', DataGidToDatabase(FidDestAccount), False, 'plannedMovement');
   end;
@@ -4040,7 +4040,7 @@ begin
   end;
 end;
 
-procedure TBaseMovement.Setquantity(const Value: Currency);
+procedure TBaseMovement.Setquantity(const Value: Double);
 begin
   if Fquantity <> Value then begin
     Fquantity := Value;
