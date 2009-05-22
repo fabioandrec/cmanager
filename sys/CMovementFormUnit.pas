@@ -737,6 +737,9 @@ begin
         CCurrEditInOutOnceAccount.Value := cash;
         CCurrEditInOutOnceAccount.SetCurrencyDef(idAccountCurrencyDef, GCurrencyCache.GetSymbol(idAccountCurrencyDef));
         CStaticInoutOnceCategoryChanged(Nil);
+        if isInvestmentMovement then begin
+          CCurrEditOnceQuantity.Decimals := 6;
+        end;
         CCurrEditOnceQuantity.Value := quantity;
         FonceState.AccountId := idAccount;
         FonceState.ExtrId := idExtractionItem;
