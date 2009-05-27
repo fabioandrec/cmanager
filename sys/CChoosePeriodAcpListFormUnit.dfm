@@ -4,7 +4,7 @@ inherited CChoosePeriodAcpListForm: TCChoosePeriodAcpListForm
   ClientHeight = 376
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Height = 335
     inherited GroupBoxView: TGroupBox
       Top = 248
@@ -45,7 +45,7 @@ inherited CChoosePeriodAcpListForm: TCChoosePeriodAcpListForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 335
   end
 end

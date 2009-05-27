@@ -7,7 +7,7 @@ inherited CDoneFrame: TCDoneFrame
     Cursor = crVSplit
     Align = alBottom
   end
-  object PanelFrameButtons: TPanel [1]
+  object PanelFrameButtons: TCPanel [1]
     Left = 0
     Top = 88
     Width = 443
@@ -24,7 +24,7 @@ inherited CDoneFrame: TCDoneFrame
       Align = alBottom
       Shape = bsBottomLine
     end
-    object Panel1: TPanel
+    object Panel1: TCPanel
       Left = 0
       Top = 149
       Width = 443
@@ -75,7 +75,7 @@ inherited CDoneFrame: TCDoneFrame
         Anchors = [akTop, akRight]
       end
     end
-    object Panel2: TPanel
+    object Panel2: TCPanel
       Left = 0
       Top = 0
       Width = 443
@@ -262,7 +262,7 @@ inherited CDoneFrame: TCDoneFrame
       end>
     WideDefaultText = ''
   end
-  object Panel: TPanel [3]
+  object Panel: TCPanel [3]
     Left = 0
     Top = 0
     Width = 443

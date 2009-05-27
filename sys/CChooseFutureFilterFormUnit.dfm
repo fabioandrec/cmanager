@@ -4,7 +4,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
   ClientHeight = 515
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Height = 474
     inherited GroupBox1: TGroupBox
       Caption = ' Zakres dat dla podstawy prognozy  '
@@ -106,7 +106,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 474
   end
 end

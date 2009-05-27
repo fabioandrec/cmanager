@@ -4,7 +4,7 @@ inherited CProfileForm: TCProfileForm
   ClientWidth = 375
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 375
     Height = 362
     object GroupBox2: TGroupBox
@@ -137,7 +137,7 @@ inherited CProfileForm: TCProfileForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 362
     Width = 375
     inherited BitBtnOk: TBitBtn

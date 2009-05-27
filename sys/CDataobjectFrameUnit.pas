@@ -22,7 +22,7 @@ type
     FilterPanel: TCPanel;
     List: TCDataList;
     Bevel: TBevel;
-    ButtonPanel: TPanel;
+    ButtonPanel: TCPanel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     ActionListButtons: TActionList;
     ActionAdd: TAction;

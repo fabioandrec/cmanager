@@ -7,7 +7,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 805
     Height = 532
     object GroupBox1: TGroupBox
@@ -353,7 +353,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
         Alignment = taRightJustify
         Caption = 'Razem do wyp'#322'aty'
       end
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 24
         Top = 27
         Width = 721
@@ -455,7 +455,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
             end>
           WideDefaultText = ''
         end
-        object PanelError: TPanel
+        object PanelError: TCPanel
           Left = 200
           Top = 40
           Width = 321
@@ -502,7 +502,7 @@ inherited CDepositCalculatorForm: TCDepositCalculatorForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 532
     Width = 805
     inherited BitBtnOk: TBitBtn

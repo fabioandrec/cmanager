@@ -1,6 +1,6 @@
 object CMainForm: TCMainForm
-  Left = 3
-  Top = 1
+  Left = 177
+  Top = 171
   Width = 798
   Height = 568
   ActiveControl = ShortcutList
@@ -61,7 +61,7 @@ object CMainForm: TCMainForm
     OnClick = StatusBarClick
     ImageList = CImageLists.StatusbarImagesList16x16
   end
-  object PanelNotconnected: TPanel
+  object PanelNotconnected: TCPanel
     Left = 0
     Top = 24
     Width = 790
@@ -76,7 +76,7 @@ object CMainForm: TCMainForm
     ParentFont = False
     TabOrder = 2
   end
-  object PanelMain: TPanel
+  object PanelMain: TCPanel
     Left = 0
     Top = 65
     Width = 790
@@ -99,7 +99,7 @@ object CMainForm: TCMainForm
       Width = 2
       Height = 426
     end
-    object PanelTitle: TPanel
+    object PanelTitle: TCPanel
       Left = 0
       Top = 0
       Width = 790
@@ -139,14 +139,13 @@ object CMainForm: TCMainForm
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object PngImage: TPngSpeedButton
+      object CImageTitle: TCImage
         Left = 6
         Top = 3
         Width = 16
         Height = 16
-        Enabled = False
-        Flat = True
-        PngOptions = []
+        ImageList = CImageLists.MainImageList16x16
+        ImageIndex = -1
       end
       object CDateTime: TCDateTime
         Left = 705
@@ -178,7 +177,7 @@ object CMainForm: TCMainForm
         Withtime = False
       end
     end
-    object PanelFrames: TPanel
+    object PanelFrames: TCPanel
       Left = 197
       Top = 24
       Width = 593
@@ -188,7 +187,7 @@ object CMainForm: TCMainForm
       Color = clWindow
       TabOrder = 1
     end
-    object PanelShortcuts: TPanel
+    object PanelShortcuts: TCPanel
       Left = 0
       Top = 24
       Width = 195
@@ -197,7 +196,7 @@ object CMainForm: TCMainForm
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 2
-      object PanelShortcutsTitle: TPanel
+      object PanelShortcutsTitle: TCPanel
         Left = 1
         Top = 1
         Width = 193
@@ -782,5 +781,9 @@ object CMainForm: TCMainForm
       RadioItem = True
       OnClick = MenuItemBigShortcutClick
     end
+  end
+  object XPManifest: TXPManifest
+    Left = 349
+    Top = 265
   end
 end

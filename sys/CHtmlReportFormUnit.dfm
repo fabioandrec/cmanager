@@ -4,9 +4,9 @@ inherited CHtmlReportForm: TCHtmlReportForm
   Caption = 'CHtmlReportForm'
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
-    inherited PanelReport: TPanel
-      object Panel1: TPanel
+  inherited PanelConfig: TCPanel
+    inherited PanelReport: TCPanel
+      object Panel1: TCPanel
         Left = 1
         Top = 1
         Width = 796

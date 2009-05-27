@@ -10,7 +10,7 @@ uses
 
 type
   TCPlannedFrame = class(TCBaseFrame)
-    PanelFrameButtons: TPanel;
+    PanelFrameButtons: TCPanel;
     PlannedList: TCList;
     ActionList: TActionList;
     ActionMovement: TAction;

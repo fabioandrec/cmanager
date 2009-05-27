@@ -23,9 +23,9 @@ type
     Label6: TLabel;
     CCurrEditCash: TCCurrEdit;
     GroupBox2: TGroupBox;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     RepaymentList: TCList;
-    PanelError: TPanel;
+    PanelError: TCPanel;
     Label7: TLabel;
     CCurrEditOthers: TCCurrEdit;
     Label8: TLabel;

@@ -9,7 +9,7 @@ inherited CMovementFrame: TCMovementFrame
     Cursor = crVSplit
     Align = alBottom
   end
-  object PanelFrameButtons: TPanel [1]
+  object PanelFrameButtons: TCPanel [1]
     Left = 0
     Top = 367
     Width = 833
@@ -34,7 +34,7 @@ inherited CMovementFrame: TCMovementFrame
       Align = alRight
       AutoSnap = False
     end
-    object Panel1: TPanel
+    object Panel1: TCPanel
       Left = 0
       Top = 149
       Width = 833
@@ -93,7 +93,7 @@ inherited CMovementFrame: TCMovementFrame
         Action = ActionAddList
       end
     end
-    object PanelSum: TPanel
+    object PanelSum: TCPanel
       Left = 0
       Top = 0
       Width = 725
@@ -172,7 +172,7 @@ inherited CMovementFrame: TCMovementFrame
           end>
         WideDefaultText = ''
       end
-      object Panel2: TPanel
+      object Panel2: TCPanel
         Left = 0
         Top = 0
         Width = 725
@@ -202,7 +202,7 @@ inherited CMovementFrame: TCMovementFrame
         end
       end
     end
-    object PanelPatterns: TPanel
+    object PanelPatterns: TCPanel
       Left = 726
       Top = 0
       Width = 107
@@ -211,7 +211,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelOuter = bvNone
       Color = clWindow
       TabOrder = 2
-      object Panel3: TPanel
+      object Panel3: TCPanel
         Left = 0
         Top = 0
         Width = 107
@@ -291,7 +291,7 @@ inherited CMovementFrame: TCMovementFrame
       end
     end
   end
-  object Panel: TPanel [2]
+  object Panel: TCPanel [2]
     Left = 0
     Top = 0
     Width = 833

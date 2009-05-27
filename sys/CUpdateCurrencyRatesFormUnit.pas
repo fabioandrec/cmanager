@@ -10,19 +10,19 @@ uses
 
 type
   TCUpdateCurrencyRatesForm = class(TCBaseForm)
-    PanelButtons: TPanel;
+    PanelButtons: TCPanel;
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
-    PanelConfig: TPanel;
+    PanelConfig: TCPanel;
     GroupBox4: TGroupBox;
     Label15: TLabel;
     Label2: TLabel;
     CDateTime: TCDateTime;
     CStaticCashpoint: TCStatic;
     GroupBox1: TGroupBox;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     Bevel1: TBevel;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     RatesList: TCList;
     ActionManager1: TActionManager;
     Action1: TAction;
@@ -407,4 +407,3 @@ end;
 
 
 end.
-

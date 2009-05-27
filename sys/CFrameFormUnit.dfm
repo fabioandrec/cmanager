@@ -6,13 +6,13 @@ inherited CFrameForm: TCFrameForm
   ClientWidth = 877
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 877
     Height = 580
     DesignSize = (
       877
       580)
-    object PanelBase: TPanel
+    object PanelBase: TCPanel
       Left = 2
       Top = 2
       Width = 873
@@ -20,7 +20,7 @@ inherited CFrameForm: TCFrameForm
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvNone
       TabOrder = 0
-      object PanelTopInfo: TPanel
+      object PanelTopInfo: TCPanel
         Left = 0
         Top = 0
         Width = 873
@@ -37,7 +37,7 @@ inherited CFrameForm: TCFrameForm
           Caption = '...'
         end
       end
-      object PanelBottomInfo: TPanel
+      object PanelBottomInfo: TCPanel
         Left = 0
         Top = 535
         Width = 873
@@ -55,7 +55,7 @@ inherited CFrameForm: TCFrameForm
           Caption = '...'
         end
       end
-      object PanelFrame: TPanel
+      object PanelFrame: TCPanel
         Left = 0
         Top = 41
         Width = 873
@@ -83,7 +83,7 @@ inherited CFrameForm: TCFrameForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 580
     Width = 877
     DesignSize = (

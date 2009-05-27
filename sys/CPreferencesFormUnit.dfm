@@ -6,10 +6,10 @@ inherited CPreferencesForm: TCPreferencesForm
   ClientWidth = 609
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 609
     Height = 445
-    object PanelMain: TPanel
+    object PanelMain: TCPanel
       Left = 0
       Top = 0
       Width = 609
@@ -18,7 +18,7 @@ inherited CPreferencesForm: TCPreferencesForm
       BevelOuter = bvNone
       Caption = 'PanelMain'
       TabOrder = 0
-      object PanelShortcuts: TPanel
+      object PanelShortcuts: TCPanel
         Left = 129
         Top = 0
         Width = 480
@@ -26,7 +26,7 @@ inherited CPreferencesForm: TCPreferencesForm
         Align = alClient
         BevelOuter = bvLowered
         TabOrder = 0
-        object PanelShortcutsTitle: TPanel
+        object PanelShortcutsTitle: TCPanel
           Left = 1
           Top = 1
           Width = 478
@@ -447,7 +447,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Height = 121
               Caption = ' Domy'#347'lne kolory element'#243'w list '
               TabOrder = 2
-              object Panel4: TPanel
+              object Panel4: TCPanel
                 Left = 24
                 Top = 32
                 Width = 121
@@ -458,7 +458,7 @@ inherited CPreferencesForm: TCPreferencesForm
                 TabOrder = 0
                 OnClick = Panel4Click
               end
-              object Panel5: TPanel
+              object Panel5: TCPanel
                 Left = 24
                 Top = 72
                 Width = 121
@@ -765,7 +765,7 @@ inherited CPreferencesForm: TCPreferencesForm
               Action = Action10
               Color = clBtnFace
             end
-            object Panel3: TPanel
+            object Panel3: TCPanel
               Left = 8
               Top = 8
               Width = 449
@@ -1001,7 +1001,7 @@ inherited CPreferencesForm: TCPreferencesForm
           end
         end
       end
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 0
         Top = 0
         Width = 129
@@ -1010,7 +1010,7 @@ inherited CPreferencesForm: TCPreferencesForm
         BevelOuter = bvLowered
         Color = clWindow
         TabOrder = 1
-        object Panel2: TPanel
+        object Panel2: TCPanel
           Left = 1
           Top = 1
           Width = 127
@@ -1079,7 +1079,7 @@ inherited CPreferencesForm: TCPreferencesForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 445
     Width = 609
     DesignSize = (

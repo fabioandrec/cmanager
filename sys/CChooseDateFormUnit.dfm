@@ -6,7 +6,7 @@ inherited CChooseDateForm: TCChooseDateForm
   ClientWidth = 234
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 234
     Height = 114
     object GroupBox1: TGroupBox
@@ -31,7 +31,7 @@ inherited CChooseDateForm: TCChooseDateForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 114
     Width = 234
     inherited BitBtnOk: TBitBtn

@@ -6,7 +6,7 @@ inherited CExtractionForm: TCExtractionForm
   ClientWidth = 595
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 595
     Height = 618
     object GroupBox1: TGroupBox
@@ -217,7 +217,7 @@ inherited CExtractionForm: TCExtractionForm
       Height = 289
       Caption = ' Lista operacji '
       TabOrder = 2
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 24
         Top = 32
         Width = 513
@@ -233,7 +233,7 @@ inherited CExtractionForm: TCExtractionForm
           Align = alBottom
           Shape = bsBottomLine
         end
-        object Panel2: TPanel
+        object Panel2: TCPanel
           Left = 1
           Top = 191
           Width = 511
@@ -360,7 +360,7 @@ inherited CExtractionForm: TCExtractionForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 618
     Width = 595
     inherited BitBtnOk: TBitBtn

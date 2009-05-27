@@ -35,7 +35,7 @@ inherited CDepositInvestmentFrame: TCDepositInvestmentFrame
       end>
     WideDefaultText = ''
   end
-  inherited ButtonPanel: TPanel
+  inherited ButtonPanel: TCPanel
     inherited CButtonEdit: TCButton
       Left = 245
     end

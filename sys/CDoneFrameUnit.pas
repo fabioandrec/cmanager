@@ -20,13 +20,13 @@ type
   end;
 
   TCDoneFrame = class(TCBaseFrame)
-    PanelFrameButtons: TPanel;
+    PanelFrameButtons: TCPanel;
     DoneList: TCList;
     ActionList: TActionList;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
-    Panel: TPanel;
+    Panel: TCPanel;
     CStaticFilter: TCStatic;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     Splitter1: TSplitter;
     SumList: TCList;
     Label2: TLabel;
@@ -38,7 +38,7 @@ type
     CDateTimePerEnd: TCDateTime;
     Label5: TLabel;
     ActionOperation: TAction;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     CButtonsStatus: TCButton;
     Bevel: TBevel;
     ActionDooperation: TAction;

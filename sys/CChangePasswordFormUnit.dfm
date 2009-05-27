@@ -48,10 +48,10 @@ inherited CChangePasswordForm: TCChangePasswordForm
     Top = 122
     Width = 244
   end
-  inherited PanelButtons: TPanel [8]
+  inherited PanelButtons: TCPanel [8]
     Top = 157
   end
-  inherited PanelImage: TPanel [9]
+  inherited PanelImage: TCPanel [9]
     Height = 157
   end
   object EditPassword: TEdit [10]

@@ -7,7 +7,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
     Color = clBtnFace
     ParentColor = False
   end
-  object PanelThumbs: TPanel [1]
+  object PanelThumbs: TCPanel [1]
     Left = 0
     Top = 28
     Width = 131
@@ -66,7 +66,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
         end>
       WideDefaultText = ''
     end
-    object PanelShortcutsTitle: TPanel
+    object PanelShortcutsTitle: TCPanel
       Left = 1
       Top = 1
       Width = 129
@@ -101,7 +101,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       end
     end
   end
-  object PanelFrames: TPanel [2]
+  object PanelFrames: TCPanel [2]
     Left = 133
     Top = 28
     Width = 310
@@ -111,7 +111,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
     Color = clWindow
     TabOrder = 1
   end
-  object Panel1: TPanel [3]
+  object Panel1: TCPanel [3]
     Left = 0
     Top = 0
     Width = 443

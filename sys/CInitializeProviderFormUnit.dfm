@@ -6,7 +6,7 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
   ClientWidth = 350
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 350
     Height = 97
     object Image1: TImage
@@ -122,7 +122,7 @@ inherited CInitializeProviderForm: TCInitializeProviderForm
       TabOrder = 0
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 97
     Width = 350
     inherited BitBtnOk: TBitBtn

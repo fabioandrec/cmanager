@@ -6,7 +6,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
   ClientWidth = 560
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 560
     Height = 612
     object GroupBox1: TGroupBox
@@ -467,7 +467,7 @@ inherited CInvestmentMovementForm: TCInvestmentMovementForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 612
     Width = 560
     inherited BitBtnOk: TBitBtn

@@ -15,7 +15,7 @@ type
     ActionDelete: TAction;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     List: TCDataList;
-    ButtonPanel: TPanel;
+    ButtonPanel: TCPanel;
     CButtonAdd: TCButton;
     CButtonEdit: TCButton;
     CButtonDelete: TCButton;

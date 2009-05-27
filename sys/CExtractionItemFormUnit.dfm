@@ -5,7 +5,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
   ClientWidth = 460
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 460
     Height = 344
     object GroupBox2: TGroupBox
@@ -201,7 +201,7 @@ inherited CExtractionItemForm: TCExtractionItemForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 344
     Width = 460
     inherited BitBtnOk: TBitBtn

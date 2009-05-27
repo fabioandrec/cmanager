@@ -5,7 +5,7 @@ inherited CSurpassedForm: TCSurpassedForm
   ClientWidth = 594
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 594
     object Label1: TLabel
       Left = 16
@@ -26,7 +26,7 @@ inherited CSurpassedForm: TCSurpassedForm
         'Wci'#347'nij OK aby zaakceptowa'#263' przekroczenie limit'#243'w, lub Anuluj ab' +
         'y powr'#243'ci'#263' do operacji'
     end
-    object PanelFrame: TPanel
+    object PanelFrame: TCPanel
       Left = 2
       Top = 40
       Width = 588
@@ -115,7 +115,7 @@ inherited CSurpassedForm: TCSurpassedForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Width = 594
     inherited BitBtnOk: TBitBtn
       Left = 417

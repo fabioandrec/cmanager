@@ -32,7 +32,7 @@ type
     List: TCDataList;
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
-    PanelShortcutsTitle: TPanel;
+    PanelShortcutsTitle: TCPanel;
     ImageList16: TPngImageList;
     N4: TMenuItem;
     procedure ActionNewOperationExecute(Sender: TObject);

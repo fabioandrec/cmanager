@@ -7,7 +7,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 368
     Height = 241
     object GroupBox1: TGroupBox
@@ -138,7 +138,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 241
     Width = 368
     DesignSize = (

@@ -8,7 +8,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
-  object PanelButtons: TPanel
+  object PanelButtons: TCPanel
     Left = 0
     Top = 456
     Width = 536
@@ -41,7 +41,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
       OnClick = BitBtnCancelClick
     end
   end
-  object PanelConfig: TPanel
+  object PanelConfig: TCPanel
     Left = 0
     Top = 0
     Width = 536
@@ -123,7 +123,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
         Alignment = taRightJustify
         Caption = 'Tryb importu walut'
       end
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 24
         Top = 64
         Width = 457
@@ -139,7 +139,7 @@ inherited CUpdateCurrencyRatesForm: TCUpdateCurrencyRatesForm
           Align = alBottom
           Shape = bsBottomLine
         end
-        object Panel2: TPanel
+        object Panel2: TCPanel
           Left = 1
           Top = 222
           Width = 455

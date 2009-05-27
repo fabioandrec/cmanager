@@ -4,11 +4,11 @@ inherited CHtmlMemoForm: TCHtmlMemoForm
   Caption = 'CHtmlMemoForm'
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     DesignSize = (
       591
       384)
-    object Panel1: TPanel
+    object Panel1: TCPanel
       Left = 4
       Top = 4
       Width = 583
@@ -16,7 +16,7 @@ inherited CHtmlMemoForm: TCHtmlMemoForm
       Anchors = [akLeft, akTop, akRight, akBottom]
       BevelOuter = bvLowered
       TabOrder = 0
-      object Panel2: TPanel
+      object Panel2: TCPanel
         Left = 1
         Top = 1
         Width = 581

@@ -8,13 +8,13 @@ inherited CReportForm: TCReportForm
   Caption = 'CReportForm'
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 806
     Height = 566
     DesignSize = (
       806
       566)
-    object PanelReport: TPanel
+    object PanelReport: TCPanel
       Left = 4
       Top = 4
       Width = 798
@@ -24,7 +24,7 @@ inherited CReportForm: TCReportForm
       TabOrder = 0
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 566
     Width = 806
     DesignSize = (

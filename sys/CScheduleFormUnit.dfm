@@ -6,7 +6,7 @@ inherited CScheduleForm: TCScheduleForm
   ClientWidth = 491
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 491
     Height = 359
     object GroupBox1: TGroupBox
@@ -279,7 +279,7 @@ inherited CScheduleForm: TCScheduleForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 359
     Width = 491
     inherited BitBtnOk: TBitBtn

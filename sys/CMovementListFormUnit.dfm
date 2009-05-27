@@ -6,7 +6,7 @@ inherited CMovementListForm: TCMovementListForm
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 536
     Height = 626
     object GroupBox4: TGroupBox
@@ -224,7 +224,7 @@ inherited CMovementListForm: TCMovementListForm
         Alignment = taRightJustify
         Caption = 'Razem w walucie konta'
       end
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 24
         Top = 64
         Width = 457
@@ -240,7 +240,7 @@ inherited CMovementListForm: TCMovementListForm
           Align = alBottom
           Shape = bsBottomLine
         end
-        object Panel2: TPanel
+        object Panel2: TCPanel
           Left = 1
           Top = 167
           Width = 455
@@ -351,7 +351,7 @@ inherited CMovementListForm: TCMovementListForm
             end>
           WideDefaultText = ''
         end
-        object Panel: TPanel
+        object Panel: TCPanel
           Left = 1
           Top = 1
           Width = 455
@@ -436,7 +436,7 @@ inherited CMovementListForm: TCMovementListForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 626
     Width = 536
     inherited BitBtnOk: TBitBtn

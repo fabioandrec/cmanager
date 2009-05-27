@@ -1,5 +1,16 @@
 inherited CAccountsFrame: TCAccountsFrame
+  Width = 607
+  Height = 360
+  inherited Bevel: TBevel
+    Top = 317
+    Width = 607
+  end
+  inherited FilterPanel: TCPanel
+    Width = 607
+  end
   inherited List: TCDataList
+    Width = 607
+    Height = 296
     Header.MainColumn = 0
     Columns = <
       item
@@ -20,10 +31,14 @@ inherited CAccountsFrame: TCAccountsFrame
       end
       item
         Position = 3
-        Width = 10
+        Width = 164
         WideText = 'Waluta'
       end>
     WideDefaultText = ''
+  end
+  inherited ButtonPanel: TCPanel
+    Top = 320
+    Width = 607
   end
   inherited ActionListButtons: TActionList
     Images = CImageLists.AccountFrameImageList24x24

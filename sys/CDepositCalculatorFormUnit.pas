@@ -11,9 +11,9 @@ type
   TCDepositCalculatorForm = class(TCConfigForm)
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     RepaymentList: TCList;
-    PanelError: TPanel;
+    PanelError: TCPanel;
     Label8: TLabel;
     PopupMenu1: TPopupMenu;
     Zaznaczwszystkie1: TMenuItem;

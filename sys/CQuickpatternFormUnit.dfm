@@ -6,7 +6,7 @@ inherited CQuickpatternForm: TCQuickpatternForm
   ClientWidth = 375
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 375
     Height = 387
     object GroupBox2: TGroupBox
@@ -191,7 +191,7 @@ inherited CQuickpatternForm: TCQuickpatternForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 387
     Width = 375
     inherited BitBtnOk: TBitBtn

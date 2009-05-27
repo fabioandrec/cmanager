@@ -17,7 +17,7 @@ type
     GroupBox2: TGroupBox;
     CButton5: TCButton;
     CButton6: TCButton;
-    PanelExample: TPanel;
+    PanelExample: TCPanel;
     ComboBoxType: TComboBox;
     FontDialog: TFontDialog;
     ColorDialog: TColorDialog;

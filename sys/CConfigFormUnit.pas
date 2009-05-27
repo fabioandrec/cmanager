@@ -12,8 +12,8 @@ type
 
   TConfigOperation = (coNone, coAdd, coEdit);
   TCConfigForm = class(TCBaseForm)
-    PanelConfig: TPanel;
-    PanelButtons: TPanel;
+    PanelConfig: TCPanel;
+    PanelButtons: TCPanel;
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
     procedure BitBtnOkClick(Sender: TObject);

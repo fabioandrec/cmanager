@@ -8,7 +8,7 @@ inherited CConfigForm: TCConfigForm
   ClientWidth = 591
   PixelsPerInch = 96
   TextHeight = 13
-  object PanelConfig: TPanel
+  object PanelConfig: TCPanel
     Left = 0
     Top = 0
     Width = 591
@@ -17,7 +17,7 @@ inherited CConfigForm: TCConfigForm
     BevelOuter = bvNone
     TabOrder = 0
   end
-  object PanelButtons: TPanel
+  object PanelButtons: TCPanel
     Left = 0
     Top = 384
     Width = 591

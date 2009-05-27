@@ -23,13 +23,13 @@ type
   end;
 
   TCFilterDetailFrame = class(TCBaseFrame)
-    PanelThumbs: TPanel;
+    PanelThumbs: TCPanel;
     ThumbsList: TCList;
     Splitter: TSplitter;
-    PanelFrames: TPanel;
-    PanelShortcutsTitle: TPanel;
+    PanelFrames: TCPanel;
+    PanelShortcutsTitle: TCPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     CStaticFilter: TCStatic;
     PopupMenu1: TPopupMenu;
     MenuItemList: TMenuItem;

@@ -9,7 +9,7 @@ inherited CQuickpatternFrame: TCQuickpatternFrame
       end>
     WideDefaultText = ''
   end
-  inherited ButtonPanel: TPanel
+  inherited ButtonPanel: TCPanel
     inherited CButtonAdd: TCButton
       Width = 116
     end

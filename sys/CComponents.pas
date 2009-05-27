@@ -509,7 +509,7 @@ type
   public
     procedure SetPngImageList(const Value: TPngImageList);
     procedure UpdateCursor;
-    function GetPanelWithMouse: TCStatusPanel;
+    function GeTCPanelWithMouse: TCStatusPanel;
     constructor Create(AOwner: TComponent); override;
   published
     property ImageList: TPngImageList read FImageList write SetPngImageList;
@@ -526,6 +526,9 @@ type
     procedure CNNotify(var Message: TMessage); message CN_NOTIFY;
   published
     property OnURLClick: TURLClickEvent read FOnURLClick write FOnURLClick;
+  end;
+
+  TCSpeedButton = class(TSpeedButton)
   end;
 
 function GetCurrencySymbol: string;
@@ -552,7 +555,7 @@ var LOddColor: TColor;
 
 procedure Register;
 begin
-  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit, TCPanel]);
+  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit, TCPanel, TCSpeedButton]);
 end;
 
 function GetBrighterColor(ABaseColor: TColor): TColor;
@@ -2148,7 +2151,7 @@ begin
   Result := TCStatusPanel;
 end;
 
-function TCStatusBar.GetPanelWithMouse: TCStatusPanel;
+function TCStatusBar.GeTCPanelWithMouse: TCStatusPanel;
 var xP: TPoint;
     xCount: Integer;
     xRect: TRect;
@@ -2199,7 +2202,7 @@ procedure TCStatusBar.UpdateCursor;
 var xPanel: TCStatusPanel;
 begin
   if (not (csDesigning in ComponentState)) and Enabled then begin
-    xPanel := GetPanelWithMouse;
+    xPanel := GeTCPanelWithMouse;
     if (xPanel <> Nil) then begin
       if xPanel.Clickable then begin
         Cursor := crHandPoint;
@@ -2850,10 +2853,8 @@ begin
     Frame3D(Canvas, Rect, TopColor, BottomColor, BevelWidth);
   end;
   with Canvas do begin
-    if not ThemeServices.ThemesEnabled or not ParentBackground then begin
-      Brush.Color := Color;
-      FillRect(Rect);
-    end;
+    Brush.Color := Color;
+    FillRect(Rect);
     Brush.Style := bsClear;
     Font := Self.Font;
     FontHeight := TextHeight('W');
@@ -2890,6 +2891,8 @@ begin
   end;
 end;
 
+{ TCSpeedButton }
+
 initialization
   CurrencyComponents := TObjectList.Create(False);
   ListComponents := TObjectList.Create(False);
@@ -2899,4 +2902,3 @@ finalization
   FreeAndNil(CurrencyComponents);
   FreeAndNil(ListComponents);
 end.
-

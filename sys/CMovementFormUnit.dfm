@@ -6,7 +6,7 @@ inherited CMovementForm: TCMovementForm
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 536
     Height = 566
     object GroupBox1: TGroupBox
@@ -1191,7 +1191,7 @@ inherited CMovementForm: TCMovementForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 566
     Width = 536
     DesignSize = (

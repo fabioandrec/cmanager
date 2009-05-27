@@ -1,5 +1,5 @@
 inherited CPlannedFrame: TCPlannedFrame
-  object PanelFrameButtons: TPanel [0]
+  object PanelFrameButtons: TCPanel [0]
     Left = 0
     Top = 236
     Width = 443

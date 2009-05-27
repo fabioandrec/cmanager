@@ -6,7 +6,7 @@ inherited CLimitForm: TCLimitForm
   ClientWidth = 533
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 533
     Height = 395
     object GroupBox2: TGroupBox
@@ -274,7 +274,7 @@ inherited CLimitForm: TCLimitForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 395
     Width = 533
     inherited BitBtnOk: TBitBtn

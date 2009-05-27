@@ -7,7 +7,7 @@ inherited CStartupInfoForm: TCStartupInfoForm
   Position = poDesktopCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel1: TCPanel
     Left = 0
     Top = 0
     Width = 631
@@ -19,7 +19,7 @@ inherited CStartupInfoForm: TCStartupInfoForm
     DesignSize = (
       631
       441)
-    object Panel2: TPanel
+    object Panel2: TCPanel
       Left = 2
       Top = 2
       Width = 627
@@ -45,7 +45,7 @@ inherited CStartupInfoForm: TCStartupInfoForm
         Shape = bsTopLine
       end
     end
-    object Panel3: TPanel
+    object Panel3: TCPanel
       Left = 0
       Top = 404
       Width = 631

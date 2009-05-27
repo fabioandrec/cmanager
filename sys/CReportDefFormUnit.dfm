@@ -5,7 +5,7 @@ inherited CReportDefForm: TCReportDefForm
   ClientHeight = 643
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Height = 602
     object GroupBox1: TGroupBox
       Left = 16
@@ -182,7 +182,7 @@ inherited CReportDefForm: TCReportDefForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 602
   end
   object ActionManager: TActionManager

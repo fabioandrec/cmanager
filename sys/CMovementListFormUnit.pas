@@ -27,9 +27,9 @@ type
     Action2: TAction;
     Action3: TAction;
     GroupBox1: TGroupBox;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     Bevel1: TBevel;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
@@ -44,7 +44,7 @@ type
     CStaticCurrency: TCStatic;
     Label21: TLabel;
     CCurrEditCash: TCCurrEdit;
-    Panel: TPanel;
+    Panel: TCPanel;
     Label8: TLabel;
     CStaticViewCurrency: TCStatic;
     ActionManagerStates: TActionManager;

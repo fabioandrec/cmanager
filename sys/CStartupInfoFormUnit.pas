@@ -14,9 +14,9 @@ type
     Action1: TAction;
     Action2: TAction;
     PngImageList1: TPngImageList;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
+    Panel1: TCPanel;
+    Panel2: TCPanel;
+    Panel3: TCPanel;
     CButton1: TCButton;
     CButton2: TCButton;
     Bevel1: TBevel;
@@ -55,4 +55,3 @@ begin
 end;
 
 end.
-

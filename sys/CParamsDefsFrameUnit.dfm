@@ -61,7 +61,7 @@ inherited CParamsDefsFrame: TCParamsDefsFrame
       end>
     WideDefaultText = ''
   end
-  object ButtonPanel: TPanel [2]
+  object ButtonPanel: TCPanel [2]
     Left = 0
     Top = 237
     Width = 443

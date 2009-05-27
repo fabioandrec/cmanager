@@ -34,8 +34,8 @@ type
   end;
 
   TCXmlFrame = class(TCBaseFrame)
-    Panel1: TPanel;
-    Panel3: TPanel;
+    Panel1: TCPanel;
+    Panel3: TCPanel;
     List: TCDataList;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListGetRowPreferencesName(AHelper: TObject; var APrefname: String);

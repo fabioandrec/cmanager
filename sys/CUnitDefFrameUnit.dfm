@@ -9,7 +9,7 @@ inherited CUnitDefFrame: TCUnitDefFrame
       end>
     WideDefaultText = ''
   end
-  inherited ButtonPanel: TPanel
+  inherited ButtonPanel: TCPanel
     inherited CButtonAdd: TCButton
       Width = 124
     end

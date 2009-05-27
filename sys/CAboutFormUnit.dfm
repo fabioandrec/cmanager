@@ -7,7 +7,7 @@ inherited CAboutForm: TCAboutForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 514
     Height = 389
     object Image: TImage
@@ -4930,7 +4930,7 @@ inherited CAboutForm: TCAboutForm
       OnURLClick = RichEditContribURLClick
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 389
     Width = 514
     inherited BitBtnOk: TBitBtn

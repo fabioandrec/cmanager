@@ -5,7 +5,7 @@ inherited CParamDefForm: TCParamDefForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 566
     Height = 276
     object GroupBox1: TGroupBox
@@ -214,7 +214,7 @@ inherited CParamDefForm: TCParamDefForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 276
     Width = 566
     inherited BitBtnOk: TBitBtn

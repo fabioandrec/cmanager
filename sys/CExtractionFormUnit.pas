@@ -47,9 +47,9 @@ type
     Action2: TAction;
     Action3: TAction;
     GroupBox3: TGroupBox;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     Bevel1: TBevel;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;

@@ -6,7 +6,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
   ClientWidth = 428
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 428
     Height = 368
     object GroupBox2: TGroupBox
@@ -101,7 +101,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
         Action = ActionDefault
         Color = clBtnFace
       end
-      object PanelExample: TPanel
+      object PanelExample: TCPanel
         Left = 24
         Top = 68
         Width = 201
@@ -170,7 +170,7 @@ inherited CListPreferencesForm: TCListPreferencesForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 368
     Width = 428
     DesignSize = (

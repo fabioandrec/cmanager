@@ -16,7 +16,7 @@ type
 
   TCStartupInfoFrame = class(TCBaseFrame)
     RepaymentList: TCList;
-    PanelError: TPanel;
+    PanelError: TCPanel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     procedure RepaymentListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure RepaymentListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
@@ -592,4 +592,3 @@ begin
 end;
 
 end.
-

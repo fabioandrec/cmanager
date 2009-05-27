@@ -11,10 +11,10 @@ type
   TCFrameFormClass = class of TCFrameForm;
 
   TCFrameForm = class(TCConfigForm)
-    PanelBase: TPanel;
-    PanelTopInfo: TPanel;
-    PanelBottomInfo: TPanel;
-    PanelFrame: TPanel;
+    PanelBase: TCPanel;
+    PanelTopInfo: TCPanel;
+    PanelBottomInfo: TCPanel;
+    PanelFrame: TCPanel;
     BevelBottom: TBevel;
     Bevel1: TBevel;
     LabelTopPanelInfo: TLabel;

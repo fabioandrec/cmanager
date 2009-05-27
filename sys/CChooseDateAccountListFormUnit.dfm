@@ -5,7 +5,7 @@ inherited CChooseDateAccountListForm: TCChooseDateAccountListForm
   ClientWidth = 372
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 372
     Height = 207
     inherited GroupBox1: TGroupBox
@@ -47,7 +47,7 @@ inherited CChooseDateAccountListForm: TCChooseDateAccountListForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 207
     Width = 372
     inherited BitBtnOk: TBitBtn

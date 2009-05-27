@@ -1,7 +1,7 @@
 inherited CDataobjectFrame: TCDataobjectFrame
   object Bevel: TBevel [0]
     Left = 0
-    Top = 234
+    Top = 227
     Width = 443
     Height = 3
     Align = alBottom
@@ -30,6 +30,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Width = 136
       Height = 13
       Cursor = crHandPoint
+      Hint = '<wszystkie elementy>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -43,6 +44,8 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       TabStop = True
       Transparent = False
@@ -57,7 +60,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Left = 0
     Top = 21
     Width = 443
-    Height = 213
+    Height = 206
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -93,9 +96,9 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Columns = <>
     WideDefaultText = ''
   end
-  object ButtonPanel: TPanel [3]
+  object ButtonPanel: TCPanel [3]
     Left = 0
-    Top = 237
+    Top = 230
     Width = 443
     Height = 40
     Align = alBottom

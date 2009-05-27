@@ -9,7 +9,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList, CXml, PngSpeedButton, ShellApi,
-  CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl;
+  CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl, XPMan;
 
 type
   TCMainForm = class(TForm)
@@ -35,17 +35,16 @@ type
     ActionShortcutStart: TAction;
     ActionCompactDatafile: TAction;
     ActionHelp: TAction;
-    PanelNotconnected: TPanel;
-    PanelMain: TPanel;
+    PanelNotconnected: TCPanel;
+    PanelMain: TCPanel;
     BevelU2: TBevel;
-    PanelTitle: TPanel;
+    PanelTitle: TCPanel;
     BevelU1: TBevel;
     LabelShortcut: TLabel;
-    PngImage: TPngSpeedButton;
     CDateTime: TCDateTime;
-    PanelFrames: TPanel;
-    PanelShortcuts: TPanel;
-    PanelShortcutsTitle: TPanel;
+    PanelFrames: TCPanel;
+    PanelShortcuts: TCPanel;
+    PanelShortcutsTitle: TCPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     ShortcutList: TCList;
     ActionBackupDatafile: TAction;
@@ -88,6 +87,8 @@ type
     ActionDepositCalc: TAction;
     ActionGreenGrass: TAction;
     ActionSystemInfo: TAction;
+    XPManifest: TXPManifest;
+    CImageTitle: TCImage;
     procedure FormCreate(Sender: TObject);
     procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -303,7 +304,7 @@ begin
     LabelShortcut.Caption := AAction.Caption;
     if AAction.ImageIndex <> -1 then begin
       if AAction.ImageIndex <= CImageLists.MainImageList16x16.PngImages.Count - 1 then begin
-        PngImage.PngImage := CImageLists.MainImageList16x16.PngImages.Items[AAction.ImageIndex].PngImage;
+        CImageTitle.ImageIndex := AAction.ImageIndex;
       end;
     end;
   end;
@@ -654,7 +655,7 @@ end;
 procedure TCMainForm.StatusBarClick(Sender: TObject);
 var xPanel: TCStatusPanel;
 begin
-  xPanel := TCStatusPanel(StatusBar.GetPanelWithMouse);
+  xPanel := TCStatusPanel(StatusBar.GeTCPanelWithMouse);
   if xPanel = StatusBar.Panels.Items[1] then begin
     if GBackupThread <> Nil then begin
       xPanel.Clickable := False;
@@ -1077,4 +1078,3 @@ begin
 end;
 
 end.
-

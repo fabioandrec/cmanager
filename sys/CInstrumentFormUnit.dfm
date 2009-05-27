@@ -4,7 +4,7 @@ inherited CInstrumentForm: TCInstrumentForm
   ClientWidth = 380
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 380
     Height = 417
     object GroupBoxAccountType: TGroupBox
@@ -176,7 +176,7 @@ inherited CInstrumentForm: TCInstrumentForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 417
     Width = 380
     inherited BitBtnOk: TBitBtn

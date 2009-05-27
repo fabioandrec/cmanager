@@ -4,7 +4,7 @@ inherited CUnitdefForm: TCUnitdefForm
   ClientWidth = 370
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 370
     Height = 241
     object GroupBox2: TGroupBox
@@ -69,7 +69,7 @@ inherited CUnitdefForm: TCUnitdefForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 241
     Width = 370
     inherited BitBtnOk: TBitBtn

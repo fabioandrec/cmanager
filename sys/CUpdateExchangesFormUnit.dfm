@@ -8,7 +8,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
   ClientWidth = 656
   PixelsPerInch = 96
   TextHeight = 13
-  object PanelButtons: TPanel
+  object PanelButtons: TCPanel
     Left = 0
     Top = 425
     Width = 656
@@ -41,7 +41,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
       OnClick = BitBtnCancelClick
     end
   end
-  object PanelConfig: TPanel
+  object PanelConfig: TCPanel
     Left = 0
     Top = 0
     Width = 656
@@ -64,7 +64,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
         Alignment = taRightJustify
         Caption = 'Tryb importu notowa'#324
       end
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 24
         Top = 64
         Width = 577
@@ -80,7 +80,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           Align = alBottom
           Shape = bsBottomLine
         end
-        object Panel2: TPanel
+        object Panel2: TCPanel
           Left = 1
           Top = 270
           Width = 575

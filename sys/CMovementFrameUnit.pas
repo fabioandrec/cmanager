@@ -35,12 +35,12 @@ type
   end;
 
   TCMovementFrame = class(TCBaseFrame)
-    PanelFrameButtons: TPanel;
+    PanelFrameButtons: TCPanel;
     ActionList: TActionList;
     ActionMovement: TAction;
     ActionEditMovement: TAction;
     ActionDelMovement: TAction;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
@@ -55,7 +55,7 @@ type
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
     MenuItemsumsVisible: TMenuItem;
-    Panel: TPanel;
+    Panel: TCPanel;
     LabelFilterMovement: TLabel;
     LabelFilterPeriod: TLabel;
     Label3: TLabel;
@@ -68,14 +68,14 @@ type
     CDateTimePerEnd: TCDateTime;
     CStaticViewCurrency: TCStatic;
     TodayList: TCList;
-    PanelSum: TPanel;
+    PanelSum: TCPanel;
     SumList: TCList;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     SpeedButtonCloseShortcuts: TSpeedButton;
     MenuItemPatternsVisible: TMenuItem;
-    PanelPatterns: TPanel;
+    PanelPatterns: TCPanel;
     Splitter2: TSplitter;
-    Panel3: TPanel;
+    Panel3: TCPanel;
     SpeedButtonPatternVisible: TSpeedButton;
     QuickpatternList: TCDataList;
     PopupMenuQuickPatterns: TPopupMenu;

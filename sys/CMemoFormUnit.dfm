@@ -5,7 +5,7 @@ inherited CMemoForm: TCMemoForm
   Caption = 'ReportForm'
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     DesignSize = (
       591
       384)
@@ -24,7 +24,7 @@ inherited CMemoForm: TCMemoForm
       WordWrap = False
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     object CButton1: TCButton [0]
       Left = 8
       Top = 8

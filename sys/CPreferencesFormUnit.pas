@@ -14,11 +14,11 @@ const
 
 type
   TCPreferencesForm = class(TCConfigForm)
-    PanelMain: TPanel;
-    PanelShortcuts: TPanel;
-    PanelShortcutsTitle: TPanel;
-    Panel1: TPanel;
-    Panel2: TPanel;
+    PanelMain: TCPanel;
+    PanelShortcuts: TCPanel;
+    PanelShortcutsTitle: TCPanel;
+    Panel1: TCPanel;
+    Panel2: TCPanel;
     PageControl: TPageControl;
     ActionManager1: TActionManager;
     Action1: TAction;
@@ -79,15 +79,15 @@ type
     CheckBoxCanOverwrite: TCheckBox;
     TabSheetPlugins: TTabSheet;
     Action8: TAction;
-    Panel3: TPanel;
+    Panel3: TCPanel;
     List: TCDataList;
     CButton10: TCButton;
     Action9: TAction;
     CButton11: TCButton;
     Action10: TAction;
     GroupBox7: TGroupBox;
-    Panel4: TPanel;
-    Panel5: TPanel;
+    Panel4: TCPanel;
+    Panel5: TCPanel;
     ColorDialog: TColorDialog;
     CheckBoxSmallIcons: TCheckBox;
     CButton12: TCButton;

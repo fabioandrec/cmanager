@@ -1,5 +1,5 @@
 inherited CInstrumentValueFrame: TCInstrumentValueFrame
-  inherited FilterPanel: TPanel
+  inherited FilterPanel: TCPanel
     object Label4: TLabel [1]
       Left = 362
       Top = 4
@@ -125,7 +125,7 @@ inherited CInstrumentValueFrame: TCInstrumentValueFrame
       end>
     WideDefaultText = ''
   end
-  inherited ButtonPanel: TPanel
+  inherited ButtonPanel: TCPanel
     inherited CButtonAdd: TCButton
       Width = 124
     end

@@ -50,7 +50,7 @@ inherited CHomeFrame: TCHomeFrame
       end>
     WideDefaultText = ''
   end
-  object PanelShortcutsTitle: TPanel [1]
+  object PanelShortcutsTitle: TCPanel [1]
     Left = 0
     Top = 0
     Width = 443

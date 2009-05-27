@@ -10,7 +10,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object PanelButtons: TPanel
+  object PanelButtons: TCPanel
     Left = 0
     Top = 131
     Width = 401
@@ -52,7 +52,7 @@ inherited CCreateDatafileForm: TCCreateDatafileForm
       OnClick = BitBtnPrevClick
     end
   end
-  object PanelImage: TPanel
+  object PanelImage: TCPanel
     Left = 0
     Top = 0
     Width = 62

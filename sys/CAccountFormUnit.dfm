@@ -7,7 +7,7 @@ inherited CAccountForm: TCAccountForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 379
     Height = 477
     object GroupBox2: TGroupBox
@@ -211,7 +211,7 @@ inherited CAccountForm: TCAccountForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 477
     Width = 379
     inherited BitBtnOk: TBitBtn

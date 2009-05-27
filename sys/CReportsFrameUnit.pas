@@ -44,7 +44,7 @@ type
     ActionList: TActionList;
     ActionExecute: TAction;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
-    PanelFrameButtons: TPanel;
+    PanelFrameButtons: TCPanel;
     CButtonExecute: TCButton;
     List: TCDataList;
     Bevel: TBevel;

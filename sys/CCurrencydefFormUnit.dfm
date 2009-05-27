@@ -4,7 +4,7 @@ inherited CCurrencydefForm: TCCurrencydefForm
   ClientWidth = 370
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 370
     Height = 275
     object GroupBox2: TGroupBox
@@ -87,7 +87,7 @@ inherited CCurrencydefForm: TCCurrencydefForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 275
     Width = 370
     inherited BitBtnOk: TBitBtn

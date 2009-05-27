@@ -17,7 +17,7 @@ type
     CButton2: TCButton;
     CButton3: TCButton;
     SaveDialog: TSaveDialog;
-    PanelReport: TPanel;
+    PanelReport: TCPanel;
     procedure Action1Execute(Sender: TObject);
     procedure Action3Execute(Sender: TObject);
     procedure Action2Execute(Sender: TObject);

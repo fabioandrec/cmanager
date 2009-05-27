@@ -10,14 +10,14 @@ uses
 
 type
   TCUpdateExchangesForm = class(TCBaseForm)
-    PanelButtons: TPanel;
+    PanelButtons: TCPanel;
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
-    PanelConfig: TPanel;
+    PanelConfig: TCPanel;
     GroupBox1: TGroupBox;
-    Panel1: TPanel;
+    Panel1: TCPanel;
     Bevel1: TBevel;
-    Panel2: TPanel;
+    Panel2: TCPanel;
     ExchangesList: TCList;
     ActionManager1: TActionManager;
     Action1: TAction;
@@ -451,4 +451,3 @@ begin
 end;
 
 end.
-

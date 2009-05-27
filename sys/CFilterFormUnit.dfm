@@ -6,7 +6,7 @@ inherited CFilterForm: TCFilterForm
   ClientWidth = 371
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 371
     Height = 361
     object GroupBox2: TGroupBox
@@ -133,7 +133,7 @@ inherited CFilterForm: TCFilterForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 361
     Width = 371
     inherited BitBtnOk: TBitBtn

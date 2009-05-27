@@ -6,7 +6,7 @@ inherited CDoneForm: TCDoneForm
   ClientWidth = 405
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 405
     Height = 461
     object GroupBox1: TGroupBox
@@ -141,7 +141,7 @@ inherited CDoneForm: TCDoneForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 461
     Width = 405
     inherited BitBtnOk: TBitBtn

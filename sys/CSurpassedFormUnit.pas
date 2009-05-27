@@ -22,7 +22,7 @@ type
   end;
 
   TCSurpassedForm = class(TCConfigForm)
-    PanelFrame: TPanel;
+    PanelFrame: TCPanel;
     Label1: TLabel;
     Label2: TLabel;
     SurpassedList: TCDataList;

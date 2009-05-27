@@ -132,11 +132,11 @@ function FindTreeobjectNode(AGid: TDataGid; AList: TCList): PVirtualNode;
 procedure InitializeFrameGlobals;
 procedure FinalizeFrameGlobals;
 
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+procedure UpdatePanelIcons(APanel: TCPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
                            ABigIcons_1, ABigIcons_2: TPngImageList;
                            AActionList_1, AActionList_2: TActionList;
                            var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+procedure UpdatePanelIcons(APanel: TCPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
                            ABigIcons_1, ABigIcons_2: TPngImageList;
                            AActionList_1, AActionList_2: TActionManager;
                            var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;
@@ -830,7 +830,7 @@ procedure TCBaseFrame.SaveFramePreferences;
 begin
 end;
 
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+procedure UpdatePanelIcons(APanel: TCPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
                            ABigIcons_1, ABigIcons_2: TPngImageList;
                            AActionList_1, AActionList_2: TActionList;
                            var ASmallIcons_1, ASmallIcons_2: TPngImageList);
@@ -866,7 +866,7 @@ begin
   end;
 end;
 
-procedure UpdatePanelIcons(APanel: TPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
+procedure UpdatePanelIcons(APanel: TCPanel; AMenuItemBig, AMenuItemSmall: TMenuItem;
                            ABigIcons_1, ABigIcons_2: TPngImageList;
                            AActionList_1, AActionList_2: TActionManager;
                            var ASmallIcons_1, ASmallIcons_2: TPngImageList); overload;

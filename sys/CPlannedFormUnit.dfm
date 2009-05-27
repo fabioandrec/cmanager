@@ -6,7 +6,7 @@ inherited CPlannedForm: TCPlannedForm
   ClientWidth = 536
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 536
     Height = 500
     object GroupBox2: TGroupBox
@@ -458,7 +458,7 @@ inherited CPlannedForm: TCPlannedForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 500
     Width = 536
     DesignSize = (

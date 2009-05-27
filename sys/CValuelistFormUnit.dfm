@@ -4,10 +4,10 @@ inherited CValuelistForm: TCValuelistForm
   ClientWidth = 595
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 595
     Height = 492
-    object TPanel
+    object TCPanel
       Left = 8
       Top = 8
       Width = 580
@@ -33,7 +33,7 @@ inherited CValuelistForm: TCValuelistForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 492
     Width = 595
     inherited BitBtnOk: TBitBtn

@@ -7,7 +7,7 @@ inherited CReportsFrame: TCReportsFrame
     Align = alBottom
     Shape = bsBottomLine
   end
-  object PanelFrameButtons: TPanel [1]
+  object PanelFrameButtons: TCPanel [1]
     Left = 0
     Top = 237
     Width = 443

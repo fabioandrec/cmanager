@@ -6,7 +6,7 @@ inherited CCashpointForm: TCCashpointForm
   ClientWidth = 370
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 370
     Height = 232
     object GroupBox2: TGroupBox
@@ -79,7 +79,7 @@ inherited CCashpointForm: TCCashpointForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 232
     Width = 370
     inherited BitBtnOk: TBitBtn

@@ -35,7 +35,7 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
       #347'nij przycisk "Uaktualnij".'
     WordWrap = True
   end
-  object PanelButtons: TPanel
+  object PanelButtons: TCPanel
     Left = 0
     Top = 131
     Width = 406
@@ -67,7 +67,7 @@ inherited CUpdateDatafileForm: TCUpdateDatafileForm
       OnClick = BitBtnFinishClick
     end
   end
-  object PanelImage: TPanel
+  object PanelImage: TCPanel
     Left = 0
     Top = 0
     Width = 62

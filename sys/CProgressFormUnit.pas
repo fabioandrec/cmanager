@@ -50,11 +50,11 @@ type
   end;
 
   TCProgressForm = class(TForm)
-    PanelButtons: TPanel;
+    PanelButtons: TCPanel;
     BitBtnOk: TBitBtn;
     BitBtnCancel: TBitBtn;
     PngImageList: TPngImageList;
-    PanelImage: TPanel;
+    PanelImage: TCPanel;
     CImage: TCImage;
     ProgressText: TStaticText;
     ProgressBar: TProgressBar;

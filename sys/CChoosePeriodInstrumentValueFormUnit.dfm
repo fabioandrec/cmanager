@@ -4,7 +4,7 @@ inherited CChoosePeriodInstrumentValueForm: TCChoosePeriodInstrumentValueForm
   ClientWidth = 433
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 433
     inherited GroupBox1: TGroupBox
       Width = 401
@@ -59,7 +59,7 @@ inherited CChoosePeriodInstrumentValueForm: TCChoosePeriodInstrumentValueForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Width = 433
     inherited BitBtnOk: TBitBtn
       Left = 256

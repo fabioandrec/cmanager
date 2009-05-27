@@ -5,7 +5,7 @@ inherited CChoosePeriodAcpListGroupForm: TCChoosePeriodAcpListGroupForm
   ClientWidth = 363
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 363
     Height = 528
     inherited GroupBox1: TGroupBox
@@ -88,7 +88,7 @@ inherited CChoosePeriodAcpListGroupForm: TCChoosePeriodAcpListGroupForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 528
     Width = 363
     inherited BitBtnOk: TBitBtn

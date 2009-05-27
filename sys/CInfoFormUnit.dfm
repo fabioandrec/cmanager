@@ -7,7 +7,7 @@ inherited CInfoForm: TCInfoForm
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 774
     Height = 430
     object Image: TImage
@@ -24,7 +24,7 @@ inherited CInfoForm: TCInfoForm
       Caption = 'LabelInfo'
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 430
     Width = 774
     inherited BitBtnOk: TBitBtn

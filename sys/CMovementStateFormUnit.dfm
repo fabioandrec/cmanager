@@ -6,7 +6,7 @@ inherited CMovementStateForm: TCMovementStateForm
   ClientWidth = 372
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 372
     Height = 203
     object GroupBox1: TGroupBox
@@ -94,7 +94,7 @@ inherited CMovementStateForm: TCMovementStateForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 203
     Width = 372
     inherited BitBtnOk: TBitBtn

@@ -6,7 +6,7 @@ inherited CDescpatternForm: TCDescpatternForm
   ClientWidth = 540
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 540
     Height = 271
     object GroupBox1: TGroupBox
@@ -105,7 +105,7 @@ inherited CDescpatternForm: TCDescpatternForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 271
     Width = 540
     inherited BitBtnOk: TBitBtn

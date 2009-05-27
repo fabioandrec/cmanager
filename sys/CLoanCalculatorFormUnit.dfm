@@ -7,7 +7,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 576
     Height = 482
     object GroupBox1: TGroupBox
@@ -208,7 +208,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
         Action = Action1
         Color = clBtnFace
       end
-      object Panel1: TPanel
+      object Panel1: TCPanel
         Left = 24
         Top = 27
         Width = 497
@@ -307,7 +307,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
             end>
           WideDefaultText = ''
         end
-        object PanelError: TPanel
+        object PanelError: TCPanel
           Left = 96
           Top = 40
           Width = 321
@@ -341,7 +341,7 @@ inherited CLoanCalculatorForm: TCLoanCalculatorForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 482
     Width = 576
     inherited BitBtnOk: TBitBtn

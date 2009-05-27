@@ -7,13 +7,13 @@ inherited CChartReportForm: TCChartReportForm
   OnMouseWheel = FormMouseWheel
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 819
     Height = 617
     DesignSize = (
       819
       617)
-    inherited PanelReport: TPanel
+    inherited PanelReport: TCPanel
       Anchors = [akLeft, akTop, akRight, akBottom]
       object Splitter: TSplitter
         Left = 132
@@ -21,7 +21,7 @@ inherited CChartReportForm: TCChartReportForm
         Width = 2
         Height = 556
       end
-      object PanelThumbs: TPanel
+      object PanelThumbs: TCPanel
         Left = 1
         Top = 1
         Width = 131
@@ -30,7 +30,7 @@ inherited CChartReportForm: TCChartReportForm
         BevelOuter = bvNone
         Caption = 'PanelThumbs'
         TabOrder = 0
-        object PanelShortcutsTitle: TPanel
+        object PanelShortcutsTitle: TCPanel
           Left = 0
           Top = 0
           Width = 131
@@ -64,7 +64,7 @@ inherited CChartReportForm: TCChartReportForm
             ParentFont = False
           end
         end
-        object Panel1: TPanel
+        object Panel1: TCPanel
           Left = 0
           Top = 21
           Width = 131
@@ -126,14 +126,14 @@ inherited CChartReportForm: TCChartReportForm
           end
         end
       end
-      object PanelParent: TPanel
+      object PanelParent: TCPanel
         Left = 134
         Top = 1
         Width = 663
         Height = 556
         Align = alClient
         TabOrder = 1
-        object PanelChart: TPanel
+        object PanelChart: TCPanel
           Left = 1
           Top = 1
           Width = 661
@@ -142,7 +142,7 @@ inherited CChartReportForm: TCChartReportForm
           BevelOuter = bvNone
           Caption = 'PanelChart'
           TabOrder = 0
-          object PanelNoData: TPanel
+          object PanelNoData: TCPanel
             Left = 0
             Top = 0
             Width = 661
@@ -163,7 +163,7 @@ inherited CChartReportForm: TCChartReportForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 617
     Width = 819
     inherited CButton3: TCButton

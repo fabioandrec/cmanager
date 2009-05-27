@@ -17,10 +17,10 @@ inherited CCheckDatafileForm: TCCheckDatafileForm
   inherited CStaticDesc: TCStatic
     Top = 66
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 96
   end
-  inherited PanelImage: TPanel
+  inherited PanelImage: TCPanel
     Height = 96
   end
   inherited ProgressText: TStaticText

@@ -11,11 +11,11 @@ uses
 
 type
   TCCreateDatafileForm = class(TCBaseForm)
-    PanelButtons: TPanel;
+    PanelButtons: TCPanel;
     BitBtnNext: TBitBtn;
     BitBtnFinish: TBitBtn;
     BitBtnPrev: TBitBtn;
-    PanelImage: TPanel;
+    PanelImage: TCPanel;
     PageControl: TPageControl;
     TabSheetStart: TTabSheet;
     CImage: TCImage;

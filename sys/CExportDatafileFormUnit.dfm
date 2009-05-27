@@ -8,10 +8,10 @@ inherited CExportDatafileForm: TCExportDatafileForm
   inherited LabelDescription: TLabel
     Height = 17
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 133
   end
-  inherited PanelImage: TPanel
+  inherited PanelImage: TCPanel
     Height = 133
   end
   inherited ProgressBar: TProgressBar

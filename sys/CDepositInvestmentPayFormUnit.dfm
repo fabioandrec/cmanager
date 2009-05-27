@@ -6,7 +6,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
   ClientWidth = 626
   PixelsPerInch = 96
   TextHeight = 13
-  inherited PanelConfig: TPanel
+  inherited PanelConfig: TCPanel
     Width = 626
     Height = 595
     object GroupBox1: TGroupBox
@@ -446,7 +446,7 @@ inherited CDepositInvestmentPayForm: TCDepositInvestmentPayForm
       end
     end
   end
-  inherited PanelButtons: TPanel
+  inherited PanelButtons: TCPanel
     Top = 595
     Width = 626
     inherited BitBtnOk: TBitBtn

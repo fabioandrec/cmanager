@@ -1,5 +1,5 @@
 inherited CCurrencyRateFrame: TCCurrencyRateFrame
-  inherited FilterPanel: TPanel
+  inherited FilterPanel: TCPanel
     object Label4: TLabel [1]
       Left = 362
       Top = 4

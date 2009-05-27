@@ -14,8 +14,8 @@ type
   end;
 
   TCHtmlMemoForm = class(TCConfigForm)
-    Panel1: TPanel;
-    Panel2: TPanel;
+    Panel1: TCPanel;
+    Panel2: TCPanel;
     CBrowser: TCBrowser;
     procedure CBrowserDocumentComplete(Sender: TObject; const pDisp: IDispatch; var URL: OleVariant);
   private

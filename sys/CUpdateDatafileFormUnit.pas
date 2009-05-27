@@ -11,10 +11,10 @@ uses
 
 type
   TCUpdateDatafileForm = class(TCBaseForm)
-    PanelButtons: TPanel;
+    PanelButtons: TCPanel;
     BitBtnNext: TBitBtn;
     BitBtnFinish: TBitBtn;
-    PanelImage: TPanel;
+    PanelImage: TCPanel;
     CImage: TCImage;
     PngImageList: TPngImageList;
     LabelInfo: TLabel;

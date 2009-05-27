@@ -1,6 +1,6 @@
 inherited CXmlFrame: TCXmlFrame
   Color = clBtnFace
-  object Panel1: TPanel [0]
+  object Panel1: TCPanel [0]
     Left = 0
     Top = 0
     Width = 443
@@ -9,7 +9,7 @@ inherited CXmlFrame: TCXmlFrame
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
-    object Panel3: TPanel
+    object Panel3: TCPanel
       Left = 0
       Top = 0
       Width = 443
