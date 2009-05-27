@@ -910,13 +910,15 @@ var xDataset: TADOQuery;
 begin
   Result := TDataObjectList.Create(True);
   xDataset := ADataProxy.DataProvider.OpenSql(ASql);
-  while not xDataset.Eof do begin
-    xObj := AClass.CreateObject(ADataProxy, True);
-    xObj.FromDataset(xDataset);
-    Result.Add(xObj);
-    xDataset.Next;
+  if xDataset <> Nil then begin
+    while not xDataset.Eof do begin
+      xObj := AClass.CreateObject(ADataProxy, True);
+      xObj.FromDataset(xDataset);
+      Result.Add(xObj);
+      xDataset.Next;
+    end;
+    xDataset.Free;
   end;
-  xDataset.Free;
 end;
 
 function TDataObject.IsReadonly: Boolean;
