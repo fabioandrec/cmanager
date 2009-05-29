@@ -21,7 +21,6 @@ type
   TCDataobjectFrame = class(TCBaseFrame)
     FilterPanel: TCPanel;
     List: TCDataList;
-    Bevel: TBevel;
     ButtonPanel: TCPanel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     ActionListButtons: TActionList;
@@ -43,6 +42,7 @@ type
     PopupMenuIcons: TPopupMenu;
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
+    BevelPanel: TCPanel;
     procedure ListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ActionAddExecute(Sender: TObject);
@@ -176,7 +176,7 @@ begin
   end;
   xFilters.Free;
   if (not AWithButtons) then begin
-    Bevel.Visible := False;
+    BevelPanel.Visible := False;
     ButtonPanel.Visible := False;
     ActionAdd.Visible := False;
     ActionEdit.Visible := False;

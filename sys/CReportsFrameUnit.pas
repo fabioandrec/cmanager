@@ -47,7 +47,6 @@ type
     PanelFrameButtons: TCPanel;
     CButtonExecute: TCButton;
     List: TCDataList;
-    Bevel: TBevel;
     ActionAdd: TAction;
     ActionEdit: TAction;
     ActionDel: TAction;
@@ -57,6 +56,7 @@ type
     PopupMenuIcons: TPopupMenu;
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
+    BevelPanel: TCPanel;
     procedure ListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
     procedure ListDblClick(Sender: TObject);
     procedure ActionExecuteExecute(Sender: TObject);

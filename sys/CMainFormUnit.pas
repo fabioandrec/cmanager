@@ -9,7 +9,7 @@ uses
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
   CComponents, VirtualTrees, PngImageList, CXml, PngSpeedButton, ShellApi,
-  CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl, XPMan;
+  CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl, XPMan, Themes;
 
 type
   TCMainForm = class(TForm)
@@ -238,6 +238,7 @@ begin
   end;
   TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := False;
   PerformShortcutAction(ActionShortcutStart);
+  SpeedButtonCloseShortcuts.Flat := not ThemeServices.ThemesEnabled;
   DebugEndTickCounting('TCMainForm.FormCreate');
 end;
 

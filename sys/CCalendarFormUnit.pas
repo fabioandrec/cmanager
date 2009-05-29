@@ -18,8 +18,7 @@ type
     procedure CButtonClick(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
     procedure CButtonChooseClick(Sender: TObject);
-    procedure CButtonMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure CButtonMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     FWithtime: Boolean;
     FChoosenDatetime: TDateTime;

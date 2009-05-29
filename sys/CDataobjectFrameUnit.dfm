@@ -1,20 +1,12 @@
 inherited CDataobjectFrame: TCDataobjectFrame
-  object Bevel: TBevel [0]
-    Left = 0
-    Top = 227
-    Width = 443
-    Height = 3
-    Align = alBottom
-    Shape = bsBottomLine
-  end
-  object FilterPanel: TCPanel [1]
+  object FilterPanel: TCPanel [0]
     Left = 0
     Top = 0
-    Width = 443
+    Width = 435
     Height = 21
     Align = alTop
     Alignment = taLeftJustify
-    TabOrder = 2
+    TabOrder = 3
     BevelEdges = [beLeft, beTop, beBottom]
     object Label2: TLabel
       Left = 11
@@ -56,11 +48,11 @@ inherited CDataobjectFrame: TCDataobjectFrame
       HotTrack = True
     end
   end
-  object List: TCDataList [2]
+  object List: TCDataList [1]
     Left = 0
     Top = 21
-    Width = 443
-    Height = 206
+    Width = 435
+    Height = 205
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -96,16 +88,16 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Columns = <>
     WideDefaultText = ''
   end
-  object ButtonPanel: TCPanel [3]
+  object ButtonPanel: TCPanel [2]
     Left = 0
-    Top = 230
-    Width = 443
+    Top = 228
+    Width = 435
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
     PopupMenu = PopupMenuIcons
-    TabOrder = 1
+    TabOrder = 2
     object CButtonAdd: TCButton
       Left = 13
       Top = 4
@@ -154,6 +146,15 @@ inherited CDataobjectFrame: TCDataobjectFrame
       Framed = False
       Action = ActionHistory
     end
+  end
+  object BevelPanel: TCPanel [3]
+    Left = 0
+    Top = 226
+    Width = 435
+    Height = 2
+    Align = alBottom
+    BevelOuter = bvLowered
+    TabOrder = 1
   end
   inherited ListPopupMenu: TPopupMenu
     object Dodaj1: TMenuItem [0]

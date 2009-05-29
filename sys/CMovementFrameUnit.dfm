@@ -1,43 +1,42 @@
 inherited CMovementFrame: TCMovementFrame
-  Width = 833
-  Height = 556
   object Splitter1: TSplitter [0]
     Left = 0
-    Top = 366
-    Width = 833
+    Top = 78
+    Width = 435
     Height = 1
     Cursor = crVSplit
     Align = alBottom
   end
   object PanelFrameButtons: TCPanel [1]
     Left = 0
-    Top = 367
-    Width = 833
+    Top = 79
+    Width = 435
     Height = 189
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
-    object Bevel: TBevel
-      Left = 0
-      Top = 146
-      Width = 833
-      Height = 3
-      Align = alBottom
-      Shape = bsBottomLine
-    end
     object Splitter2: TSplitter
-      Left = 725
+      Left = 327
       Top = 0
       Width = 1
-      Height = 146
+      Height = 147
       Align = alRight
       AutoSnap = False
+    end
+    object BevelPanel: TCPanel
+      Left = 0
+      Top = 147
+      Width = 435
+      Height = 2
+      Align = alBottom
+      BevelOuter = bvLowered
+      TabOrder = 3
     end
     object Panel1: TCPanel
       Left = 0
       Top = 149
-      Width = 833
+      Width = 435
       Height = 40
       Align = alBottom
       BevelOuter = bvNone
@@ -96,8 +95,8 @@ inherited CMovementFrame: TCMovementFrame
     object PanelSum: TCPanel
       Left = 0
       Top = 0
-      Width = 725
-      Height = 146
+      Width = 327
+      Height = 147
       Align = alClient
       AutoSize = True
       BevelOuter = bvNone
@@ -105,8 +104,8 @@ inherited CMovementFrame: TCMovementFrame
       object SumList: TCList
         Left = 0
         Top = 21
-        Width = 725
-        Height = 125
+        Width = 327
+        Height = 126
         Align = alClient
         BevelEdges = [beRight]
         BevelInner = bvNone
@@ -167,7 +166,7 @@ inherited CMovementFrame: TCMovementFrame
           end
           item
             Position = 4
-            Width = 309
+            Width = 10
             WideText = 'Waluta'
           end>
         WideDefaultText = ''
@@ -175,14 +174,14 @@ inherited CMovementFrame: TCMovementFrame
       object Panel2: TCPanel
         Left = 0
         Top = 0
-        Width = 725
+        Width = 327
         Height = 21
         Align = alTop
         Alignment = taLeftJustify
         Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
         TabOrder = 1
         DesignSize = (
-          725
+          327
           21)
         object SpeedButtonCloseShortcuts: TSpeedButton
           Left = 1222
@@ -203,10 +202,10 @@ inherited CMovementFrame: TCMovementFrame
       end
     end
     object PanelPatterns: TCPanel
-      Left = 726
+      Left = 328
       Top = 0
       Width = 107
-      Height = 146
+      Height = 147
       Align = alRight
       BevelOuter = bvNone
       Color = clWindow
@@ -244,7 +243,7 @@ inherited CMovementFrame: TCMovementFrame
         Left = 0
         Top = 21
         Width = 107
-        Height = 125
+        Height = 126
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -294,7 +293,7 @@ inherited CMovementFrame: TCMovementFrame
   object Panel: TCPanel [2]
     Left = 0
     Top = 0
-    Width = 833
+    Width = 435
     Height = 21
     Align = alTop
     Alignment = taLeftJustify
@@ -476,8 +475,8 @@ inherited CMovementFrame: TCMovementFrame
   object TodayList: TCList [3]
     Left = 0
     Top = 21
-    Width = 833
-    Height = 345
+    Width = 435
+    Height = 57
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -525,7 +524,7 @@ inherited CMovementFrame: TCMovementFrame
       end
       item
         Position = 1
-        Width = 533
+        Width = 135
         WideText = 'Opis'
         WideHint = 'Opis'
       end

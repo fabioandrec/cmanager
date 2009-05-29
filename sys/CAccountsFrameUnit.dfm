@@ -1,10 +1,6 @@
 inherited CAccountsFrame: TCAccountsFrame
   Width = 607
   Height = 360
-  inherited Bevel: TBevel
-    Top = 317
-    Width = 607
-  end
   inherited FilterPanel: TCPanel
     Width = 607
   end

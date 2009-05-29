@@ -23,6 +23,7 @@ type
     PanelFrameButtons: TCPanel;
     DoneList: TCList;
     ActionList: TActionList;
+    BevelPanel: TCPanel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     Panel: TCPanel;
     CStaticFilter: TCStatic;
@@ -40,7 +41,6 @@ type
     ActionOperation: TAction;
     Panel1: TCPanel;
     CButtonsStatus: TCButton;
-    Bevel: TBevel;
     ActionDooperation: TAction;
     CButtonOperation: TCButton;
     CButtonPlanned: TCButton;
@@ -209,7 +209,7 @@ begin
   end;
   ReloadDone;
   if not AWithButtons then begin
-    Bevel.Visible := False;
+    BevelPanel.Visible := False;
     Panel1.Visible := False;
   end;
   DoneListFocusChanged(DoneList, DoneList.FocusedNode, 0)

@@ -4,8 +4,8 @@ object CCalendarForm: TCCalendarForm
   Anchors = [akLeft, akTop, akRight, akBottom]
   BorderStyle = bsNone
   Caption = 'CCalendarForm'
-  ClientHeight = 191
-  ClientWidth = 170
+  ClientHeight = 194
+  ClientWidth = 169
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object CCalendarForm: TCCalendarForm
   TextHeight = 13
   object CButton: TCButton
     Left = 103
-    Top = 163
+    Top = 173
     Width = 58
     Height = 18
     Cursor = crHandPoint
@@ -40,7 +40,7 @@ object CCalendarForm: TCCalendarForm
   object Bevel: TBevel
     Left = 0
     Top = 0
-    Width = 170
+    Width = 169
     Height = 7
     Align = alTop
     Shape = bsSpacer
@@ -48,7 +48,7 @@ object CCalendarForm: TCCalendarForm
   end
   object CButtonChoose: TCButton
     Left = 1
-    Top = 163
+    Top = 173
     Width = 56
     Height = 18
     Cursor = crHandPoint
@@ -63,13 +63,13 @@ object CCalendarForm: TCCalendarForm
   object MonthCalendar: TMonthCalendar
     Left = 0
     Top = 7
-    Width = 170
-    Height = 136
+    Width = 169
+    Height = 146
     Align = alTop
     CalColors.BackColor = clBtnFace
     CalColors.MonthBackColor = clBtnFace
     CalColors.TrailingTextColor = clBtnFace
-    Date = 38974.536889942130000000
+    Date = 38974.628708078700000000
     ShowToday = False
     ShowTodayCircle = False
     TabOrder = 0
@@ -79,7 +79,7 @@ object CCalendarForm: TCCalendarForm
   end
   object TrackBar1: TTrackBar
     Left = 12
-    Top = 147
+    Top = 157
     Width = 147
     Height = 10
     Max = 1439

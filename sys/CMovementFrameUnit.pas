@@ -41,10 +41,10 @@ type
     ActionEditMovement: TAction;
     ActionDelMovement: TAction;
     Panel1: TCPanel;
+    BevelPanel: TCPanel;
     CButtonOut: TCButton;
     CButtonEdit: TCButton;
     CButtonDel: TCButton;
-    Bevel: TBevel;
     VTHeaderPopupMenu: TVTHeaderPopupMenu;
     Splitter1: TSplitter;
     ActionAddList: TAction;
@@ -322,7 +322,7 @@ begin
   CDateTimePerEnd.Anchors := [akRight, akTop];
   Label5.Anchors := [akRight, akTop];
   if not AWithButtons then begin
-    Bevel.Visible := False;
+    BevelPanel.Visible := False;
     Panel1.Visible := False;
   end;
   SumList.ViewPref := TViewPref(GViewsPreferences.ByPrefname[CFontPreferencesMovementListSum]);

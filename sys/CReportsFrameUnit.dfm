@@ -1,16 +1,8 @@
 inherited CReportsFrame: TCReportsFrame
-  object Bevel: TBevel [0]
+  object PanelFrameButtons: TCPanel [0]
     Left = 0
-    Top = 234
-    Width = 443
-    Height = 3
-    Align = alBottom
-    Shape = bsBottomLine
-  end
-  object PanelFrameButtons: TCPanel [1]
-    Left = 0
-    Top = 237
-    Width = 443
+    Top = 228
+    Width = 435
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
@@ -18,7 +10,7 @@ inherited CReportsFrame: TCReportsFrame
     PopupMenu = PopupMenuIcons
     TabOrder = 0
     DesignSize = (
-      443
+      435
       40)
     object CButtonExecute: TCButton
       Left = 13
@@ -72,11 +64,11 @@ inherited CReportsFrame: TCReportsFrame
       Anchors = [akTop, akRight]
     end
   end
-  object List: TCDataList [2]
+  object List: TCDataList [1]
     Left = 0
     Top = 0
-    Width = 443
-    Height = 234
+    Width = 435
+    Height = 226
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone
@@ -112,10 +104,19 @@ inherited CReportsFrame: TCReportsFrame
     Columns = <
       item
         Position = 0
-        Width = 443
+        Width = 435
         WideText = 'Nazwa'
       end>
     WideDefaultText = ''
+  end
+  object BevelPanel: TCPanel [2]
+    Left = 0
+    Top = 226
+    Width = 435
+    Height = 2
+    Align = alBottom
+    BevelOuter = bvLowered
+    TabOrder = 2
   end
   inherited ImageList: TPngImageList
     PngImages = <

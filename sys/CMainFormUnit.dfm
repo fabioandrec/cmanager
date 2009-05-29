@@ -22,15 +22,15 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 790
+    Width = 782
     Height = 24
     UseSystemFont = False
     ActionManager = ActionManager
     AllowHiding = True
     Caption = 'MenuBar'
-    ColorMap.HighlightColor = 15660791
+    ColorMap.HighlightColor = clWhite
     ColorMap.BtnSelectedColor = clBtnFace
-    ColorMap.UnusedColor = 15660791
+    ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -42,8 +42,8 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TCStatusBar
     Left = 0
-    Top = 515
-    Width = 790
+    Top = 513
+    Width = 782
     Height = 19
     Panels = <
       item
@@ -64,7 +64,7 @@ object CMainForm: TCMainForm
   object PanelNotconnected: TCPanel
     Left = 0
     Top = 24
-    Width = 790
+    Width = 782
     Height = 41
     Align = alTop
     BevelOuter = bvLowered
@@ -79,16 +79,15 @@ object CMainForm: TCMainForm
   object PanelMain: TCPanel
     Left = 0
     Top = 65
-    Width = 790
-    Height = 450
+    Width = 782
+    Height = 448
     Align = alClient
     BevelOuter = bvNone
-    Caption = 'PanelMain'
     TabOrder = 3
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 790
+      Width = 782
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -97,12 +96,12 @@ object CMainForm: TCMainForm
       Left = 195
       Top = 24
       Width = 2
-      Height = 426
+      Height = 424
     end
     object PanelTitle: TCPanel
       Left = 0
       Top = 0
-      Width = 790
+      Width = 782
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -116,12 +115,12 @@ object CMainForm: TCMainForm
       ParentFont = False
       TabOrder = 0
       DesignSize = (
-        790
+        782
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 790
+        Width = 782
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -180,8 +179,8 @@ object CMainForm: TCMainForm
     object PanelFrames: TCPanel
       Left = 197
       Top = 24
-      Width = 593
-      Height = 426
+      Width = 585
+      Height = 424
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -191,7 +190,7 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 195
-      Height = 426
+      Height = 424
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
@@ -215,18 +214,18 @@ object CMainForm: TCMainForm
           193
           21)
         object SpeedButtonCloseShortcuts: TSpeedButton
-          Left = 176
-          Top = 5
-          Width = 13
-          Height = 13
+          Left = 175
+          Top = 3
+          Width = 15
+          Height = 16
           Anchors = [akTop, akRight]
-          Caption = 'r'
-          Flat = True
+          Caption = 'x'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -8
-          Font.Name = 'Marlett'
+          Font.Name = 'MS Sans Serif'
           Font.Style = []
+          Layout = blGlyphBottom
           ParentFont = False
           OnClick = SpeedButtonCloseShortcutsClick
         end
@@ -235,7 +234,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 22
         Width = 193
-        Height = 403
+        Height = 401
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
