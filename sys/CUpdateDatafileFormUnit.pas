@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, StdCtrls, Buttons, ExtCtrls, ComCtrls,
-  CComponents, ImgList, PngImageList, CXml, AdoDb, Types;
+  CComponents, ImgList, PngImageList, CXml, AdoDb, Types, CDatabase;
 
 type
   TCUpdateDatafileForm = class(TCBaseForm)
@@ -50,7 +50,7 @@ type
     property ToVersion: String read FToVersion write FToVersion;
   end;
 
-function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection; var AFromVersion, AToVersion: String): Boolean;
+function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection; var AFromVersion, AToVersion: String): TInitializeProviderResult;
 
 implementation
 
@@ -59,13 +59,13 @@ uses CRichtext, FileCtrl, CXmlFrameUnit, CInfoFormUnit, CReportFormUnit,
 
 {$R *.dfm}
 
-function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection; var AFromVersion, AToVersion: String): Boolean;
+function UpdateDatafileWithWizard(AFilename: String; AConnection: TADOConnection; var AFromVersion, AToVersion: String): TInitializeProviderResult;
 var xDataset: TADOQuery;
     xError: String;
     xFromDynArray, xToDynArray: TStringDynArray;
     xFromDb, xToDb: Integer;
 begin
-  Result := False;
+  Result := iprCancelled;
   AFromVersion := '';
   AToVersion := '';
   xDataset := DbOpenSql(AConnection, 'select * from cmanagerInfo', xError);
@@ -81,8 +81,7 @@ begin
     end else begin
       xFromDb := StrToIntDef(xFromDynArray[1], -1);
       xToDb := StrToIntDef(xToDynArray[1], -1);
-      Result := xFromDb = xToDb;
-      if not Result then begin
+      if (xFromDb <> xToDb) then begin
         with TCUpdateDatafileForm.Create(Application) do begin
           Filename := AFilename;
           Connection := AConnection;
@@ -92,11 +91,15 @@ begin
           FToDbversion := xToDb;
           LabelFinish.Caption := Format(LabelFinish.Caption, [FFromVersion, FToVersion]);
           CImage.ImageIndex := 0;
-          Result := ShowModal = mrOk;
+          if ShowModal = mrOk then begin
+            Result := iprSuccess;
+          end;
           Free;
         end;
+      end else begin
+        Result := iprSuccess;
       end;
-      if Result and (AFromVersion <> AToVersion) then begin
+      if (Result = iprSuccess) and (AFromVersion <> AToVersion) then begin
         DbExecuteSql(AConnection, 'update cmanagerInfo set version = ''' + AToVersion + '''', False, xError);
       end;
     end;

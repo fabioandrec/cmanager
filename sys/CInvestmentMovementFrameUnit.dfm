@@ -41,6 +41,7 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       Width = 90
       Height = 15
       Cursor = crHandPoint
+      Hint = '<tylko dzi'#347'>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -54,6 +55,8 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       TabStop = True
       Transparent = False
@@ -69,6 +72,7 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       Width = 105
       Height = 15
       Cursor = crHandPoint
+      Hint = '<waluta instrumentu>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -82,6 +86,8 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 2
       TabStop = True
       Transparent = False
@@ -143,7 +149,7 @@ inherited CInvestmentMovementFrame: TCInvestmentMovementFrame
       end
       item
         Position = 1
-        Width = 93
+        Width = 85
         WideText = 'Opis'
         WideHint = 'Opis'
       end

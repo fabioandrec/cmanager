@@ -56,7 +56,6 @@ type
     Splitter: TSplitter;
     PanelParent: TCPanel;
     PanelShortcutsTitle: TCPanel;
-    SpeedButtonCloseShortcuts: TSpeedButton;
     PopupMenu1: TPopupMenu;
     MenuItemList: TMenuItem;
     N4: TMenuItem;
@@ -86,7 +85,6 @@ type
   protected
     procedure DoPrint; override;
     procedure DoSave; override;
-    procedure DoAfterLoadPosition; override;
   public
     constructor CreateForm(AReport: TObject); override;
     procedure UpdateThumbnails;
@@ -637,12 +635,6 @@ begin
     end;
   end;
   inherited;
-end;
-
-procedure TCChartReportForm.DoAfterLoadPosition;
-begin
-  inherited ;
-
 end;
 
 end.

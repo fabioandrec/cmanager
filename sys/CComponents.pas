@@ -438,6 +438,7 @@ type
     function SumColumn(AColumnIndex: TColumnIndex; var ASum: Extended): Boolean;
     destructor Destroy; override;
     procedure Repaint; override;
+    function GetNodeByIndex(AIndex: Integer): PVirtualNode;
   published
     property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
     property ViewPref: TViewPref read FViewPref write SetViewPref;
@@ -445,11 +446,20 @@ type
   end;
 
   TCPanel = class(TPanel)
+  private
+    FIsFlatButton: Boolean;
+    procedure SetIsFlatButton(const Value: Boolean);
   protected
     procedure Paint; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer); override;
+    procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
   public
     function GetTextLeft: Integer;
+    constructor Create(AOwner: TComponent); override;
   published
+    property IsFlatButton: Boolean read FIsFlatButton write SetIsFlatButton;
     property BevelEdges;
   end;
 
@@ -1812,6 +1822,20 @@ begin
   end;
 end;
 
+function TCList.GetNodeByIndex(AIndex: Integer): PVirtualNode;
+var xNode: PVirtualNode;
+begin
+  Result := Nil;
+  xNode := GetFirst;
+  while (Result = Nil) and (xNode <> Nil) do begin
+    if xNode.Index = AIndex then begin
+      Result := xNode;
+    end else begin
+      xNode := GetNext(xNode);
+    end;
+  end;
+end;
+
 function TCList.GetVisibleIndex(ANode: PVirtualNode): Integer;
 begin
   Result := -1;
@@ -2799,6 +2823,26 @@ begin
   Text := IntToStr(Value);
 end;
 
+procedure TCPanel.CMMouseenter(var Message: TMessage);
+begin
+  if FIsFlatButton then begin
+    BevelOuter := bvRaised;
+  end;
+end;
+
+procedure TCPanel.CMMouseleave(var Message: TMessage);
+begin
+  if FIsFlatButton then begin
+    BevelOuter := bvNone;
+  end;
+end;
+
+constructor TCPanel.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FIsFlatButton := False;
+end;
+
 function TCPanel.GetTextLeft: Integer;
 var xWidth: Integer;
 begin
@@ -2809,6 +2853,22 @@ begin
     Result := Width - xWidth;
   end else begin
     Result := (Width - xWidth) div 2;
+  end;
+end;
+
+procedure TCPanel.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited MouseDown(Button, Shift, X, Y);
+  if FIsFlatButton then begin
+    BevelOuter := bvLowered;
+  end;
+end;
+
+procedure TCPanel.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited MouseUp(Button, Shift, X, Y);
+  if FIsFlatButton then begin
+    BevelOuter := bvRaised;
   end;
 end;
 
@@ -2891,7 +2951,14 @@ begin
   end;
 end;
 
-{ TCSpeedButton }
+procedure TCPanel.SetIsFlatButton(const Value: Boolean);
+begin
+  FIsFlatButton := Value;
+  if FIsFlatButton then begin
+    BevelOuter := bvNone;
+  end;
+  Invalidate;
+end;
 
 initialization
   CurrencyComponents := TObjectList.Create(False);

@@ -3,7 +3,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
     Left = 131
     Top = 28
     Width = 2
-    Height = 249
+    Height = 240
     Color = clBtnFace
     ParentColor = False
   end
@@ -11,7 +11,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
     Left = 0
     Top = 28
     Width = 131
-    Height = 249
+    Height = 240
     Align = alLeft
     BevelOuter = bvLowered
     Caption = 'PanelThumbs'
@@ -20,7 +20,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       Left = 1
       Top = 22
       Width = 129
-      Height = 226
+      Height = 217
       Align = alClient
       BevelEdges = []
       BevelInner = bvNone
@@ -81,31 +81,13 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      DesignSize = (
-        129
-        21)
-      object SpeedButtonCloseShortcuts: TSpeedButton
-        Left = 133
-        Top = 5
-        Width = 13
-        Height = 13
-        Anchors = [akTop, akRight]
-        Caption = 'r'
-        Flat = True
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -8
-        Font.Name = 'Marlett'
-        Font.Style = []
-        ParentFont = False
-      end
     end
   end
   object PanelFrames: TCPanel [2]
     Left = 133
     Top = 28
-    Width = 310
-    Height = 249
+    Width = 302
+    Height = 240
     Align = alClient
     BevelOuter = bvLowered
     Color = clWindow
@@ -114,13 +96,13 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
   object Panel1: TCPanel [3]
     Left = 0
     Top = 0
-    Width = 443
+    Width = 435
     Height = 28
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
     DesignSize = (
-      443
+      435
       28)
     object CStaticFilter: TCStatic
       Left = 0
@@ -128,6 +110,7 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       Width = 443
       Height = 21
       Cursor = crHandPoint
+      Hint = '<wybierz predefiniowany filtr z listy>'
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
@@ -135,6 +118,8 @@ inherited CFilterDetailFrame: TCFilterDetailFrame
       Caption = '<wybierz predefiniowany filtr z listy>'
       Color = clWindow
       ParentColor = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       TabStop = True
       Transparent = False

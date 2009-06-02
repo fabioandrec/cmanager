@@ -16,6 +16,7 @@ inherited CMovementFrame: TCMovementFrame
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
+    IsFlatButton = False
     object Splitter2: TSplitter
       Left = 327
       Top = 0
@@ -32,6 +33,7 @@ inherited CMovementFrame: TCMovementFrame
       Align = alBottom
       BevelOuter = bvLowered
       TabOrder = 3
+      IsFlatButton = False
     end
     object Panel1: TCPanel
       Left = 0
@@ -43,6 +45,7 @@ inherited CMovementFrame: TCMovementFrame
       Color = clWindow
       PopupMenu = PopupMenuIcons
       TabOrder = 0
+      IsFlatButton = False
       object CButtonOut: TCButton
         Left = 13
         Top = 4
@@ -101,6 +104,7 @@ inherited CMovementFrame: TCMovementFrame
       AutoSize = True
       BevelOuter = bvNone
       TabOrder = 1
+      IsFlatButton = False
       object SumList: TCList
         Left = 0
         Top = 21
@@ -180,24 +184,26 @@ inherited CMovementFrame: TCMovementFrame
         Alignment = taLeftJustify
         Caption = '  Sumy przychod'#243'w/rozchod'#243'w w wybranym okresie'
         TabOrder = 1
+        IsFlatButton = False
         DesignSize = (
           327
           21)
-        object SpeedButtonCloseShortcuts: TSpeedButton
-          Left = 1222
-          Top = 5
-          Width = 13
-          Height = 13
+        object ButtonCloseShortcuts: TCPanel
+          Left = 285
+          Top = 4
+          Width = 14
+          Height = 14
           Anchors = [akTop, akRight]
-          Caption = 'r'
-          Flat = True
+          Caption = '6'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -8
           Font.Name = 'Marlett'
           Font.Style = []
           ParentFont = False
-          OnClick = SpeedButtonCloseShortcutsClick
+          TabOrder = 0
+          OnClick = ButtonCloseShortcutsClick
+          IsFlatButton = True
         end
       end
     end
@@ -210,6 +216,7 @@ inherited CMovementFrame: TCMovementFrame
       BevelOuter = bvNone
       Color = clWindow
       TabOrder = 2
+      IsFlatButton = False
       object Panel3: TCPanel
         Left = 0
         Top = 0
@@ -219,24 +226,26 @@ inherited CMovementFrame: TCMovementFrame
         Alignment = taLeftJustify
         Caption = '  Szybka operacja'
         TabOrder = 0
+        IsFlatButton = False
         DesignSize = (
           107
           21)
-        object SpeedButtonPatternVisible: TSpeedButton
+        object ButtonPatternVisible: TCPanel
           Left = 85
-          Top = 5
-          Width = 13
-          Height = 13
+          Top = 4
+          Width = 14
+          Height = 14
           Anchors = [akTop, akRight]
-          Caption = 'r'
-          Flat = True
+          Caption = '6'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -8
           Font.Name = 'Marlett'
           Font.Style = []
           ParentFont = False
-          OnClick = SpeedButtonPatternVisibleClick
+          TabOrder = 0
+          OnClick = ButtonPatternVisibleClick
+          IsFlatButton = True
         end
       end
       object QuickpatternList: TCDataList
@@ -267,7 +276,6 @@ inherited CMovementFrame: TCMovementFrame
         Indent = 8
         ParentShowHint = False
         PopupMenu = PopupMenuQuickPatterns
-        ScrollBarOptions.ScrollBars = ssHorizontal
         ShowHint = True
         TabOrder = 1
         TabStop = False
@@ -298,6 +306,7 @@ inherited CMovementFrame: TCMovementFrame
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 1
+    IsFlatButton = False
     object LabelFilterMovement: TLabel
       Left = 8
       Top = 4

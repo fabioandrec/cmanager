@@ -14,7 +14,6 @@ inherited CChartReportForm: TCChartReportForm
       819
       617)
     inherited PanelReport: TCPanel
-      Anchors = [akLeft, akTop, akRight, akBottom]
       object Splitter: TSplitter
         Left = 132
         Top = 1
@@ -45,24 +44,6 @@ inherited CChartReportForm: TCChartReportForm
           Font.Style = []
           ParentFont = False
           TabOrder = 0
-          DesignSize = (
-            131
-            21)
-          object SpeedButtonCloseShortcuts: TSpeedButton
-            Left = 135
-            Top = 5
-            Width = 13
-            Height = 13
-            Anchors = [akTop, akRight]
-            Caption = 'r'
-            Flat = True
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -8
-            Font.Name = 'Marlett'
-            Font.Style = []
-            ParentFont = False
-          end
         end
         object Panel1: TCPanel
           Left = 0

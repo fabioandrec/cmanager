@@ -71,18 +71,18 @@ type
     PanelSum: TCPanel;
     SumList: TCList;
     Panel2: TCPanel;
-    SpeedButtonCloseShortcuts: TSpeedButton;
     MenuItemPatternsVisible: TMenuItem;
     PanelPatterns: TCPanel;
     Splitter2: TSplitter;
     Panel3: TCPanel;
-    SpeedButtonPatternVisible: TSpeedButton;
     QuickpatternList: TCDataList;
     PopupMenuQuickPatterns: TPopupMenu;
     MenuItemQuickpatterns: TMenuItem;
     N4: TMenuItem;
     MenuItemshowUserQuickpatterns: TMenuItem;
     MenuItemStatisticQuickPatterns: TMenuItem;
+    ButtonPatternVisible: TCPanel;
+    ButtonCloseShortcuts: TCPanel;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -111,11 +111,11 @@ type
     procedure TodayListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure MenuItemBigIconsClick(Sender: TObject);
     procedure MenuItemSmallIconsClick(Sender: TObject);
-    procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
+    procedure ButtonCloseShortcutsClick(Sender: TObject);
     procedure MenuItemsumsVisibleClick(Sender: TObject);
-    procedure SpeedButtonClosePatternsClick(Sender: TObject);
+    procedure ButtonClosePatternsClick(Sender: TObject);
     procedure MenuItemPatternsVisibleClick(Sender: TObject);
-    procedure SpeedButtonPatternVisibleClick(Sender: TObject);
+    procedure ButtonPatternVisibleClick(Sender: TObject);
     procedure QuickpatternListCDataListReloadTree(Sender: TCDataList; ARootElement: TCListDataElement);
     procedure QuickpatternListGetRowPreferencesName(AHelper: TObject; var APrefname: String);
     procedure MenuItemQuickpatternsClick(Sender: TObject);
@@ -1251,7 +1251,7 @@ begin
                    xDummy);
 end;
 
-procedure TCMovementFrame.SpeedButtonCloseShortcutsClick(Sender: TObject);
+procedure TCMovementFrame.ButtonCloseShortcutsClick(Sender: TObject);
 begin
   TBaseMovementFramePref(FramePreferences).sumListVisible := False;
   UpdateSumAndPatterns;
@@ -1303,8 +1303,8 @@ begin
     PanelFrameButtons.AutoSize := True;
   end;
   Splitter1.Enabled := TBaseMovementFramePref(FramePreferences).sumListVisible or TBaseMovementFramePref(FramePreferences).patternsListVisible;
-  SpeedButtonCloseShortcuts.Left := Panel2.Width - 16;
-  SpeedButtonPatternVisible.Left := Panel3.Width - 16;
+  ButtonCloseShortcuts.Left := Panel2.Width - 16;
+  ButtonPatternVisible.Left := Panel3.Width - 16;
 end;
 
 procedure TCMovementFrame.MenuItemsumsVisibleClick(Sender: TObject);
@@ -1330,7 +1330,7 @@ begin
   UpdateSumAndPatterns;
 end;
 
-procedure TCMovementFrame.SpeedButtonClosePatternsClick(Sender: TObject);
+procedure TCMovementFrame.ButtonClosePatternsClick(Sender: TObject);
 begin
   TBaseMovementFramePref(FramePreferences).patternsListVisible := False;
   UpdateSumAndPatterns;
@@ -1342,7 +1342,7 @@ begin
   UpdateSumAndPatterns;
 end;
 
-procedure TCMovementFrame.SpeedButtonPatternVisibleClick(Sender: TObject);
+procedure TCMovementFrame.ButtonPatternVisibleClick(Sender: TObject);
 begin
   TBaseMovementFramePref(FramePreferences).patternsListVisible := False;
   UpdateSumAndPatterns;

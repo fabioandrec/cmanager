@@ -3,7 +3,7 @@ unit CDatabase;
 interface
 
 uses Forms, Controls, Windows, Contnrs, SysUtils, AdoDb, ActiveX, Classes, ComObj, Variants, CConsts,
-     Types, CComponents, AdoInt, CInitializeProviderFormUnit, CAdox;
+     Types, CComponents, AdoInt, CAdox;
 
 type
   TDataGid = ShortString;
@@ -13,6 +13,7 @@ type
   TDataObject = class;
   TDataObjectClass = class of TDataObject;
   TDataObjectList = class;
+  TInitializeProviderResult = (iprSuccess, iprCancelled, iprError);
 
   TDataGids = class(TStringList)
   public
@@ -252,7 +253,7 @@ procedure FinalizeDataProvider(ADataProvider: TDataProvider);
 implementation
 
 uses CInfoFormUnit, DB, StrUtils, DateUtils, CBaseFrameUnit, CDatatools,
-     CPreferences, CTools, CDataObjects,
+     CPreferences, CTools, CDataObjects, CInitializeProviderFormUnit,
      CAdotools, CUpdateDatafileFormUnit, CDeposits, CDebug;
 
 function InitializeDataProvider(ADatabaseName: String; APassword: String; ADataProvider: TDataProvider): TInitializeProviderResult;
@@ -271,9 +272,7 @@ begin
   xPassword := APassword;
   Result := ConnectToDatabase(xDatabaseName, xPassword, ADataProvider.Connection);
   if Result = iprSuccess then begin
-    if not UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xFromVersion, xToVersion) then begin
-      Result := iprError;
-    end;
+    Result := UpdateDatafileWithWizard(xDatabaseName, ADataProvider.Connection, xFromVersion, xToVersion);
   end;
   if Result = iprSuccess then begin
     ADataProvider.Filename := xDatabaseName;

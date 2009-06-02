@@ -7,7 +7,7 @@ uses
   Dialogs, CBaseFrameUnit, ImgList, StdCtrls, ExtCtrls, VirtualTrees,
   ActnList, CComponents, CDatabase, Menus, VTHeaderPopup, GraphUtil, AdoDb,
   Contnrs, CDataObjects, PngImageList, CImageListsUnit, CSchedules, CPreferences,
-  Buttons;
+  Buttons, Themes;
 
 type
   TDoneFrameAdditionalData = class
@@ -51,7 +51,7 @@ type
     MenuItemBigIcons: TMenuItem;
     MenuItemSmallIcons: TMenuItem;
     MenuItemsumsVisible: TMenuItem;
-    SpeedButtonCloseShortcuts: TSpeedButton;
+    ButtonCloseShortcuts: TCPanel;
     procedure DoneListInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure DoneListGetNodeDataSize(Sender: TBaseVirtualTree; var NodeDataSize: Integer);
     procedure DoneListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -77,7 +77,7 @@ type
     procedure MenuItemBigIconsClick(Sender: TObject);
     procedure MenuItemSmallIconsClick(Sender: TObject);
     procedure MenuItemsumsVisibleClick(Sender: TObject);
-    procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
+    procedure ButtonCloseShortcutsClick(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -181,6 +181,11 @@ begin
   GetFilterDates(xDf, xDe);
   CDateTimePerStart.Value := xDf;
   CDateTimePerEnd.Value := xDe;
+  Label5.Left := Panel.Width - 8;
+  CDateTimePerEnd.Left := Label5.Left - CDateTimePerEnd.Width;
+  Label4.Left := CDateTimePerEnd.Left - 15;
+  CDateTimePerStart.Left := Label4.Left - CDateTimePerStart.Width;
+  Label3.Left := CDateTimePerStart.Left - 18;
   Label3.Anchors := [akRight, akTop];
   CDateTimePerStart.Anchors := [akRight, akTop];
   Label4.Anchors := [akRight, akTop];
@@ -983,7 +988,7 @@ begin
   UpdateSumList;
 end;
 
-procedure TCDoneFrame.SpeedButtonCloseShortcutsClick(Sender: TObject);
+procedure TCDoneFrame.ButtonCloseShortcutsClick(Sender: TObject);
 begin
   TFrameWithSumlistPref(FramePreferences).sumListVisible := False;
   UpdateSumList;
@@ -1008,7 +1013,7 @@ begin
     Splitter1.Enabled := False;
     MenuItemsumsVisible.Checked := False;
   end;
-  SpeedButtonCloseShortcuts.Left := PanelFrameButtons.Width - 16;
+  ButtonCloseShortcuts.Left := PanelFrameButtons.Width - 16;
 end;
 
 procedure TCDoneFrame.SaveFramePreferences;

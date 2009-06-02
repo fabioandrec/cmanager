@@ -6,11 +6,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, pngimage, AdoDb;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CComponents, pngimage,
+  AdoDb, CDatabase;
 
 type
-  TInitializeProviderResult = (iprSuccess, iprCancelled, iprError);
-
   TCInitializeProviderForm = class(TCConfigForm)
     Image1: TImage;
     Label2: TLabel;
@@ -37,7 +36,7 @@ implementation
 
 {$R *.dfm}
 
-uses FileCtrl, CConsts, CInfoFormUnit, CAdox, CDatabase;
+uses FileCtrl, CConsts, CInfoFormUnit, CAdox;
 
 function ConnectToDatabase(AFilename: String; var APassword: String; AConnection: TADOConnection): TInitializeProviderResult;
 var xDialog: TCInitializeProviderForm;

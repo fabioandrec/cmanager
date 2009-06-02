@@ -1,8 +1,8 @@
 object CMainForm: TCMainForm
-  Left = 177
-  Top = 171
-  Width = 798
-  Height = 568
+  Left = 161
+  Top = 187
+  Width = 996
+  Height = 641
   ActiveControl = ShortcutList
   Caption = 'CManager'
   Color = clBtnFace
@@ -22,7 +22,7 @@ object CMainForm: TCMainForm
   object MenuBar: TActionMainMenuBar
     Left = 0
     Top = 0
-    Width = 782
+    Width = 980
     Height = 24
     UseSystemFont = False
     ActionManager = ActionManager
@@ -42,8 +42,8 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TCStatusBar
     Left = 0
-    Top = 513
-    Width = 782
+    Top = 586
+    Width = 980
     Height = 19
     Panels = <
       item
@@ -64,7 +64,7 @@ object CMainForm: TCMainForm
   object PanelNotconnected: TCPanel
     Left = 0
     Top = 24
-    Width = 782
+    Width = 980
     Height = 41
     Align = alTop
     BevelOuter = bvLowered
@@ -75,19 +75,21 @@ object CMainForm: TCMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 2
+    IsFlatButton = False
   end
   object PanelMain: TCPanel
     Left = 0
     Top = 65
-    Width = 782
-    Height = 448
+    Width = 980
+    Height = 521
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 3
+    IsFlatButton = False
     object BevelU2: TBevel
       Left = 0
       Top = 21
-      Width = 782
+      Width = 980
       Height = 3
       Align = alTop
       Shape = bsSpacer
@@ -96,12 +98,12 @@ object CMainForm: TCMainForm
       Left = 195
       Top = 24
       Width = 2
-      Height = 424
+      Height = 497
     end
     object PanelTitle: TCPanel
       Left = 0
       Top = 0
-      Width = 782
+      Width = 980
       Height = 21
       Align = alTop
       Alignment = taRightJustify
@@ -114,13 +116,14 @@ object CMainForm: TCMainForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
+      IsFlatButton = False
       DesignSize = (
-        782
+        980
         21)
       object BevelU1: TBevel
         Left = 0
         Top = 0
-        Width = 782
+        Width = 980
         Height = 3
         Align = alTop
         Shape = bsSpacer
@@ -147,7 +150,7 @@ object CMainForm: TCMainForm
         ImageIndex = -1
       end
       object CDateTime: TCDateTime
-        Left = 705
+        Left = 903
         Top = 3
         Width = 81
         Height = 15
@@ -179,62 +182,29 @@ object CMainForm: TCMainForm
     object PanelFrames: TCPanel
       Left = 197
       Top = 24
-      Width = 585
-      Height = 424
+      Width = 783
+      Height = 497
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 1
+      IsFlatButton = False
     end
     object PanelShortcuts: TCPanel
       Left = 0
       Top = 24
       Width = 195
-      Height = 424
+      Height = 497
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
       TabOrder = 2
-      object PanelShortcutsTitle: TCPanel
-        Left = 1
-        Top = 1
-        Width = 193
-        Height = 21
-        Align = alTop
-        Alignment = taLeftJustify
-        Caption = '  Skr'#243'ty'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 0
-        DesignSize = (
-          193
-          21)
-        object SpeedButtonCloseShortcuts: TSpeedButton
-          Left = 175
-          Top = 3
-          Width = 15
-          Height = 16
-          Anchors = [akTop, akRight]
-          Caption = 'x'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -8
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          Layout = blGlyphBottom
-          ParentFont = False
-          OnClick = SpeedButtonCloseShortcutsClick
-        end
-      end
+      IsFlatButton = False
       object ShortcutList: TCList
         Left = 1
         Top = 22
         Width = 193
-        Height = 401
+        Height = 474
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone
@@ -267,7 +237,7 @@ object CMainForm: TCMainForm
         TreeOptions.MiscOptions = [toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toHideFocusRect, toHotTrack, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect]
-        OnClick = ShortcutListClick
+        OnFocusChanged = ShortcutListFocusChanged
         OnGetText = ShortcutListGetText
         OnGetImageIndex = ShortcutListGetImageIndex
         OnGetNodeDataSize = ShortcutListGetNodeDataSize
@@ -281,6 +251,39 @@ object CMainForm: TCMainForm
             Width = 193
           end>
         WideDefaultText = ''
+      end
+      object PanelShortcutsTitle: TCPanel
+        Left = 1
+        Top = 1
+        Width = 193
+        Height = 21
+        Align = alTop
+        Alignment = taLeftJustify
+        Caption = '  Skr'#243'ty'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        IsFlatButton = False
+        object ButtonCloseShortcuts: TCPanel
+          Left = 172
+          Top = 4
+          Width = 14
+          Height = 14
+          Caption = '3'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -8
+          Font.Name = 'Marlett'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = ButtonCloseShortcutsClick
+          IsFlatButton = True
+        end
       end
     end
   end

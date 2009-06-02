@@ -28,7 +28,6 @@ type
     Splitter: TSplitter;
     PanelFrames: TCPanel;
     PanelShortcutsTitle: TCPanel;
-    SpeedButtonCloseShortcuts: TSpeedButton;
     Panel1: TCPanel;
     CStaticFilter: TCStatic;
     PopupMenu1: TPopupMenu;

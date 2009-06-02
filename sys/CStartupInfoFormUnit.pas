@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CBaseFormUnit, ExtCtrls, VirtualTrees, StdCtrls, CComponents,
   ActnList, XPStyleActnCtrls, ActnMan, ImgList, PngImageList, CDatabase,
-  Contnrs, CSchedules, Buttons, PngSpeedButton, CStartupInfoFrameUnit;
+  Contnrs, CSchedules, Buttons, CStartupInfoFrameUnit;
 
 type
   TCStartupInfoForm = class(TCBaseForm)

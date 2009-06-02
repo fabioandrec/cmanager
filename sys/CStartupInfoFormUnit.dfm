@@ -10,15 +10,15 @@ inherited CStartupInfoForm: TCStartupInfoForm
   object Panel1: TCPanel
     Left = 0
     Top = 0
-    Width = 631
-    Height = 441
+    Width = 623
+    Height = 432
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
     DesignSize = (
-      631
-      441)
+      623
+      432)
     object Panel2: TCPanel
       Left = 2
       Top = 2
@@ -47,14 +47,14 @@ inherited CStartupInfoForm: TCStartupInfoForm
     end
     object Panel3: TCPanel
       Left = 0
-      Top = 404
-      Width = 631
+      Top = 395
+      Width = 623
       Height = 37
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       DesignSize = (
-        631
+        623
         37)
       object CButton1: TCButton
         Left = 500

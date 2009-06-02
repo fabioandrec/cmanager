@@ -8,7 +8,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
-  CComponents, VirtualTrees, PngImageList, CXml, PngSpeedButton, ShellApi,
+  CComponents, VirtualTrees, PngImageList, CXml, ShellApi,
   CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl, XPMan, Themes;
 
 type
@@ -45,7 +45,6 @@ type
     PanelFrames: TCPanel;
     PanelShortcuts: TCPanel;
     PanelShortcutsTitle: TCPanel;
-    SpeedButtonCloseShortcuts: TSpeedButton;
     ShortcutList: TCList;
     ActionBackupDatafile: TAction;
     ActionRestoreDatafile: TAction;
@@ -89,8 +88,9 @@ type
     ActionSystemInfo: TAction;
     XPManifest: TXPManifest;
     CImageTitle: TCImage;
+    ButtonCloseShortcuts: TCPanel;
     procedure FormCreate(Sender: TObject);
-    procedure SpeedButtonCloseShortcutsClick(Sender: TObject);
+    procedure ButtonCloseShortcutsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ActionShortcutsExecute(Sender: TObject);
     procedure CDateTimeChanged(Sender: TObject);
@@ -138,6 +138,7 @@ type
     procedure ActionDepositCalcExecute(Sender: TObject);
     procedure ActionGreenGrassExecute(Sender: TObject);
     procedure ActionSystemInfoExecute(Sender: TObject);
+    procedure ShortcutListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
   private
     FShortcutList: TStringList;
     FShortcutsFrames: TStringList;
@@ -237,9 +238,10 @@ begin
     MenuItemSmallShortcut.Click;
   end;
   TCStatusPanel(StatusBar.Panels.Items[1]).Clickable := False;
-  PerformShortcutAction(ActionShortcutStart);
-  SpeedButtonCloseShortcuts.Flat := not ThemeServices.ThemesEnabled;
+  ShortcutList.FocusedNode := ShortcutList.GetFirst;
+  ShortcutList.Selected[ShortcutList.GetFirst] := True;
   DebugEndTickCounting('TCMainForm.FormCreate');
+  ButtonCloseShortcuts.Left := PanelShortcutsTitle.Width - 16;
 end;
 
 function TCMainForm.GetShortcutsVisible: Boolean;
@@ -262,7 +264,7 @@ begin
   EnableAlign;
 end;
 
-procedure TCMainForm.SpeedButtonCloseShortcutsClick(Sender: TObject);
+procedure TCMainForm.ButtonCloseShortcutsClick(Sender: TObject);
 begin
   ShortcutsVisible := False;
 end;
@@ -277,6 +279,7 @@ procedure TCMainForm.PerformShortcutAction(AAction: TAction);
 var xFrame: TCBaseFrame;
     xIndex: Integer;
     xClass: TCBaseFrameClass;
+    xNode: PVirtualNode;
 begin
   xIndex := FShortcutsFrames.IndexOf(AAction.Caption);
   if xIndex = -1 then begin
@@ -308,6 +311,10 @@ begin
         CImageTitle.ImageIndex := AAction.ImageIndex;
       end;
     end;
+    xIndex := FShortcutList.IndexOfObject(AAction);
+    xNode := ShortcutList.GetNodeByIndex(xIndex);
+    ShortcutList.Selected[xNode] := True;
+    ShortcutList.FocusedNode := xNode;
   end;
 end;
 
@@ -1076,6 +1083,11 @@ begin
   GetCmanagerSystemInfo(xInfo);
   ShowReport('Informacje o systemie', xInfo.Text, 600, 400);
   xInfo.Free;
+end;
+
+procedure TCMainForm.ShortcutListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
+begin
+  ShortcutListClick(Nil);
 end;
 
 end.
