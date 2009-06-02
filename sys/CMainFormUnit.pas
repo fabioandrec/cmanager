@@ -8,7 +8,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ComCtrls, ExtCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, ActnMenus, StdCtrls, Buttons, Dialogs, CDatabase,
-  CComponents, VirtualTrees, PngImageList, CXml, ShellApi,
+  CComponents, VirtualTrees, PngImageList, CXml, ShellApi, AdoInt,
   CBaseFrameUnit, Menus, CInitializeProviderFormUnit, FileCtrl, XPMan, Themes;
 
 type
@@ -1049,30 +1049,22 @@ begin
 end;
 
 procedure GetCmanagerSystemInfo(AInfo: TStringList);
+var xCount: Integer;
+    xProp: Property_;
 begin
   with AInfo do begin
+    AInfo.Add('Procesor: ' + GetEnvironmentVariable('PROCESSOR_ARCHITECTURE'));
+    AInfo.Add('Model: ' + GetEnvironmentVariable('PROCESSOR_IDENTIFIER'));
+    if GDataProvider.Connection <> Nil then begin
+      AInfo.Add('Informacje o po³¹czeniu:');
+      for xCount := 0 to GDataProvider.Connection.Properties.Count - 1 do begin
+        xProp := GDataProvider.Connection.Properties.Item[xCount];
+        AInfo.Add('  ' + xProp.Name + ': ' + VarToStr(xProp.Value));
+      end;
+    end else begin
+      AInfo.Add('Informacje o po³¹czeniu: obiekt nie jest dostêpny');
+    end;
   end;
-{
-   Dao360.dll
-   Expsrv.dll
-   Msexch40.dll
-   Msexcl40.dll
-   Msjet40.dll
-   Msjetoledb40.dll
-   Msjint40.dll
-   Msjter40.dll
-   Msjtes40.dll
-   Msltus40.dll
-   Mspbde40.dll       4.0.8015.0      348 432
-   Msrd2x40.dll        4.0.7328.0     422 160
-   Msrd3x40.dll        4.0.6508.0     315 664
-   Msrepl40.dll       4.0.8015.0      553 232
-   Mstext40.dll       4.0.8015.0      258 320
-   Mswdat10.dll        4.0.6508.0     831 760
-   Mswstr10.dll        4.0.6508.0     614 672
-   Msxbde40.dll       4.0.8025.0      348 432
-   Vbajet32.dll        6.0.1.9431     30 749
-   }
 end;
 
 
