@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CDatabase, CBaseFrameUnit;
+  Dialogs, CConfigFormUnit, StdCtrls, Buttons, ExtCtrls, CDatabase, CBaseFrameUnit,
+  CComponents;
 
 type
   TCDataobjectFormClass = class of TCDataobjectForm;

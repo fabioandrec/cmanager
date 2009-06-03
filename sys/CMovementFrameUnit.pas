@@ -83,6 +83,11 @@ type
     MenuItemStatisticQuickPatterns: TMenuItem;
     ButtonPatternVisible: TCPanel;
     ButtonCloseShortcuts: TCPanel;
+    CButtonShowHideFilters: TCPanel;
+    Label1: TLabel;
+    CStatic1: TCStatic;
+    Label2: TLabel;
+    FilterEditDescription: TEdit;
     procedure ActionMovementExecute(Sender: TObject);
     procedure ActionEditMovementExecute(Sender: TObject);
     procedure ActionDelMovementExecute(Sender: TObject);
@@ -122,6 +127,8 @@ type
     procedure QuickpatternListClick(Sender: TObject);
     procedure MenuItemshowUserQuickpatternsClick(Sender: TObject);
     procedure MenuItemStatisticQuickPatternsClick(Sender: TObject);
+    procedure CButtonShowHideFiltersClick(Sender: TObject);
+    procedure FilterEditDescriptionChange(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -130,6 +137,7 @@ type
     FTreeHelper: TTreeObjectList;
     FSumRoot: TSumElement;
     FQuickPatternElements: TCListDataElement;
+    FAdvancedFilterVisible: Boolean;
     procedure MessageMovementAdded(AId: TDataGid; AOption: Integer);
     procedure MessageMovementEdited(AId: TDataGid; AOption: Integer);
     procedure MessageMovementDeleted(AId: TDataGid; AOption: Integer);
@@ -138,6 +146,7 @@ type
     function FindParentMovementList(AListGid: TDataGid): TTreeObjectList;
     function FindObjectNode(ADataGid: TDataGid; AType: Integer): PVirtualNode;
     procedure DeleteObjectsWithMovementList(AListId: TDataGid);
+    procedure SetAdvancedFilterVisible(const Value: Boolean);
   protected
     procedure UpdateSumAndPatterns;
     procedure WndProc(var Message: TMessage); override;
@@ -162,6 +171,7 @@ type
     class function GetPrefname: String; override;
     procedure SaveFramePreferences; override;
     procedure LoadFramePreferences; override;
+    property AdvancedFilterVisible: Boolean read FAdvancedFilterVisible write SetAdvancedFilterVisible;
   end;
 
 implementation
@@ -261,6 +271,7 @@ begin
   inherited Create(AOwner);
   FTodayObjects := Nil;
   FTodayLists := Nil;
+  FAdvancedFilterVisible := False;
   FSumRoot := TSumElement.Create;
   FQuickPatternElements := TCListDataElement.Create(False, QuickpatternList, Nil, True, False);
 end;
@@ -284,6 +295,9 @@ begin
     xCondition := xCondition + Format(' and movementType = ''%s''', [CInMovement]);
   end else if CStaticFilter.DataId = '4' then begin
     xCondition := xCondition + ' and movementType = ''' + CTransferMovement + '''';
+  end;
+  if FilterEditDescription.Text <> '' then begin
+    xCondition := xCondition + ' and description like ''%' + FilterEditDescription.Text + '%''';
   end;
   if FTodayObjects <> Nil then begin
     FreeAndNil(FTodayObjects);
@@ -321,6 +335,7 @@ begin
   Label4.Anchors := [akRight, akTop];
   CDateTimePerEnd.Anchors := [akRight, akTop];
   Label5.Anchors := [akRight, akTop];
+  AdvancedFilterVisible := False;
   if not AWithButtons then begin
     BevelPanel.Visible := False;
     Panel1.Visible := False;
@@ -1443,6 +1458,29 @@ begin
   MenuItemStatisticQuickPatterns.Checked := not MenuItemStatisticQuickPatterns.Checked;
   TBaseMovementFramePref(FramePreferences).statisticPatternsVisible := MenuItemStatisticQuickPatterns.Checked;
   ReloadQuickPatterns;
+end;
+
+procedure TCMovementFrame.CButtonShowHideFiltersClick(Sender: TObject);
+begin
+  AdvancedFilterVisible := not AdvancedFilterVisible;
+end;
+
+procedure TCMovementFrame.SetAdvancedFilterVisible(const Value: Boolean);
+begin
+  FAdvancedFilterVisible := Value;
+  if FAdvancedFilterVisible then begin
+    CButtonShowHideFilters.Caption := '6';
+    Panel.Height := 95;
+  end else begin
+    CButtonShowHideFilters.Caption := '4';
+    Panel.Height := 21;
+  end;
+end;
+
+procedure TCMovementFrame.FilterEditDescriptionChange(Sender: TObject);
+begin
+  ReloadToday;
+  ReloadSums;
 end;
 
 end.
