@@ -336,6 +336,8 @@ begin
   CDateTimePerEnd.Anchors := [akRight, akTop];
   Label5.Anchors := [akRight, akTop];
   AdvancedFilterVisible := False;
+  FilterEditDescription.Anchors := [akLeft, akTop, akRight];
+  FilterEditDescription.Width := Panel.Width - FilterEditDescription.Left - 16;
   if not AWithButtons then begin
     BevelPanel.Visible := False;
     Panel1.Visible := False;
@@ -632,13 +634,16 @@ function TCMovementFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 var xOt, xFt: String;
     xDf, xDt: TDateTime;
     xRd:  TDateTime;
+    xDesc: String;
 begin
   if AObject.InheritsFrom(TBaseMovement) then begin
     xOt := TBaseMovement(AObject).movementType;
     xRd := TBaseMovement(AObject).regDate;
+    xDesc := TBaseMovement(AObject).description;
   end else begin
     xOt := TMovementList(AObject).movementType;
     xRd := TMovementList(AObject).regDate;
+    xDesc := TMovementList(AObject).description;
   end;
   if CStaticFilter.DataId = '2' then begin
     xFt := COutMovement;
@@ -653,6 +658,9 @@ begin
   if Result then begin
     GetFilterDates(xDf, xDt);
     Result := (xDf <= xRd) and (xRd <= xDt);
+  end;
+  if Result and (FilterEditDescription.Text <> '') then begin
+    Result := Pos(AnsiUpperCase(FilterEditDescription.Text), AnsiUpperCase(xDesc)) > 0;
   end;
 end;
 
@@ -692,7 +700,7 @@ var xDs: TADOQuery;
     xMultiCurrency: Boolean;
     xOneCurrency: TDataGid;
     xSumObj: TSumElement;
-    xIs, xEs, xCs: String;
+    xIs, xEs, xCs, xLikeDesc: String;
 begin
   GetFilterDates(xDf, xDt);
   if CStaticViewCurrency.DataId = CCurrencyViewBaseMovements then begin
@@ -704,12 +712,17 @@ begin
     xEs := 'expense';
     xCs := 'idAccountCurrencyDef';
   end;
+  if FilterEditDescription.Text <> '' then begin
+    xLikeDesc := ' and description like ''%' + FilterEditDescription.Text + '%''';
+  end else begin
+    xLikeDesc := '';
+  end;
   xSql := Format('select v.*, a.name from ' +
                  ' (select idAccount, %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses from balances where ' +
                  '   movementType <> ''%s'' and ' +
-                 '   regDate between %s and %s group by idAccount, %s) as v ' +
+                 '   regDate between %s and %s %s group by idAccount, %s) as v ' +
                  '   left outer join account a on a.idAccount = v.idAccount',
-       [xCs, xIs, xEs, CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), xCs]);
+       [xCs, xIs, xEs, CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), xLikeDesc, xCs]);
   xDs := GDataProvider.OpenSql(xSql);
   xMultiCurrency := IsMultiCurrencyDataset(xDs, 'idCurrencyDef', xOneCurrency);
   SumList.BeginUpdate;
@@ -989,7 +1002,7 @@ end;
 
 procedure TCMovementFrame.RecreateTreeHelper;
 var xCount: Integer;
-    xItem: TMovementTreeElement;
+    xItem, xListItem: TMovementTreeElement;
     xParentList: TTreeObjectList;
 begin
   FTreeHelper.Clear;
@@ -1010,7 +1023,23 @@ begin
     end else begin
       xParentList := FTreeHelper;
     end;
-    xParentList.Add(xItem);
+    if xParentList <> Nil then begin
+      xParentList.Add(xItem);
+    end else begin
+      xListItem := TMovementTreeElement.Create;
+      xListItem.elementType := mtList;
+      xListItem.Dataobject := TMovementList(TMovementList.LoadObject(MovementListProxy, TBaseMovement(xItem.Dataobject).idMovementList, False));
+      xListItem.currencyView := CStaticViewCurrency.DataId;
+      FTreeHelper.Add(xListItem);
+      FTodayLists.Add(xListItem.Dataobject);
+      xListItem.Childobjects.Add(xItem);
+    end;
+  end;
+  for xCount := FTreeHelper.Count - 1 downto 0 do begin
+    xItem := TMovementTreeElement(FTreeHelper.Items[xCount]);
+    if (xItem.elementType = mtList) and (xItem.Childobjects.Count = 0) then begin
+      FTreeHelper.Remove(xItem);
+    end;
   end;
   FTreeHelper.Sort(SortByDate);
 end;

@@ -1,9 +1,8 @@
 inherited CMovementFrame: TCMovementFrame
-  Width = 891
   object Splitter1: TSplitter [0]
     Left = 0
     Top = 78
-    Width = 891
+    Width = 435
     Height = 1
     Cursor = crVSplit
     Align = alBottom
@@ -11,7 +10,7 @@ inherited CMovementFrame: TCMovementFrame
   object PanelFrameButtons: TCPanel [1]
     Left = 0
     Top = 79
-    Width = 891
+    Width = 435
     Height = 189
     Align = alBottom
     BevelOuter = bvNone
@@ -19,7 +18,7 @@ inherited CMovementFrame: TCMovementFrame
     TabOrder = 0
     IsFlatButton = False
     object Splitter2: TSplitter
-      Left = 783
+      Left = 327
       Top = 0
       Width = 1
       Height = 147
@@ -29,7 +28,7 @@ inherited CMovementFrame: TCMovementFrame
     object BevelPanel: TCPanel
       Left = 0
       Top = 147
-      Width = 891
+      Width = 435
       Height = 2
       Align = alBottom
       BevelOuter = bvLowered
@@ -39,7 +38,7 @@ inherited CMovementFrame: TCMovementFrame
     object Panel1: TCPanel
       Left = 0
       Top = 149
-      Width = 891
+      Width = 435
       Height = 40
       Align = alBottom
       BevelOuter = bvNone
@@ -99,7 +98,7 @@ inherited CMovementFrame: TCMovementFrame
     object PanelSum: TCPanel
       Left = 0
       Top = 0
-      Width = 783
+      Width = 327
       Height = 147
       Align = alClient
       AutoSize = True
@@ -109,7 +108,7 @@ inherited CMovementFrame: TCMovementFrame
       object SumList: TCList
         Left = 0
         Top = 21
-        Width = 783
+        Width = 327
         Height = 126
         Align = alClient
         BevelEdges = [beRight]
@@ -171,7 +170,7 @@ inherited CMovementFrame: TCMovementFrame
           end
           item
             Position = 4
-            Width = 367
+            Width = 10
             WideText = 'Waluta'
           end>
         WideDefaultText = ''
@@ -179,7 +178,7 @@ inherited CMovementFrame: TCMovementFrame
       object Panel2: TCPanel
         Left = 0
         Top = 0
-        Width = 783
+        Width = 327
         Height = 21
         Align = alTop
         Alignment = taLeftJustify
@@ -187,7 +186,7 @@ inherited CMovementFrame: TCMovementFrame
         TabOrder = 1
         IsFlatButton = False
         DesignSize = (
-          783
+          327
           21)
         object ButtonCloseShortcuts: TCPanel
           Left = 1018
@@ -210,7 +209,7 @@ inherited CMovementFrame: TCMovementFrame
       end
     end
     object PanelPatterns: TCPanel
-      Left = 784
+      Left = 328
       Top = 0
       Width = 107
       Height = 147
@@ -304,15 +303,12 @@ inherited CMovementFrame: TCMovementFrame
   object Panel: TCPanel [2]
     Left = 0
     Top = 0
-    Width = 891
+    Width = 435
     Height = 97
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 1
     IsFlatButton = False
-    DesignSize = (
-      891
-      97)
     object LabelFilterMovement: TLabel
       Left = 24
       Top = 4
@@ -543,7 +539,6 @@ inherited CMovementFrame: TCMovementFrame
       Top = 28
       Width = 761
       Height = 21
-      Anchors = [akLeft, akTop, akRight]
       AutoSelect = False
       BevelKind = bkTile
       BorderStyle = bsNone
@@ -554,7 +549,7 @@ inherited CMovementFrame: TCMovementFrame
   object TodayList: TCList [3]
     Left = 0
     Top = 97
-    Width = 891
+    Width = 435
     Height = 107
     Align = alClient
     BevelEdges = []
@@ -603,7 +598,7 @@ inherited CMovementFrame: TCMovementFrame
       end
       item
         Position = 1
-        Width = 591
+        Width = 135
         WideText = 'Opis'
         WideHint = 'Opis'
       end
