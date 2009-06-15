@@ -2276,17 +2276,17 @@ begin
     end;
     xFilter := TMovementFilter(TMovementFilter.LoadObject(MovementFilterProxy, AIdFilter, False));
     xFilter.LoadSubfilters;
-    if xFilter.Faccounts.Count <> 0 then begin
+    if (xFilter.Faccounts.Count <> 0) and (AAcountField <> '') then begin
       xAccountsPart := AAcountField + ' in (select idAccount from accountFilter where idMovementFilter = ' + DataGidToDatabase(AIdFilter) + ')';
     end else begin
       xAccountsPart := '';
     end;
-    if xFilter.Fcashpoints.Count <> 0 then begin
+    if (xFilter.Fcashpoints.Count <> 0) and (ACashpointField <> '') then begin
       xCashpointsPart := ACashpointField + ' in (select idCashpoint from cashpointFilter where idMovementFilter = ' + DataGidToDatabase(AIdFilter) + ')';
     end else begin
       xCashpointsPart := '';
     end;
-    if xFilter.Fproducts.Count <> 0 then begin
+    if (xFilter.Fproducts.Count <> 0) and (ACategoryField <> '') then begin
       xProductsPart := ACategoryField + ' in (select idProduct from productFilter where idMovementFilter = ' + DataGidToDatabase(AIdFilter) + ')';
     end else begin
       xProductsPart := '';

@@ -304,7 +304,7 @@ inherited CMovementFrame: TCMovementFrame
     Left = 0
     Top = 0
     Width = 435
-    Height = 97
+    Height = 65
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 1
@@ -388,7 +388,7 @@ inherited CMovementFrame: TCMovementFrame
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 1
+      TabOrder = 3
       TabStop = True
       Transparent = False
       DataId = '1'
@@ -419,7 +419,7 @@ inherited CMovementFrame: TCMovementFrame
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 0
+      TabOrder = 1
       TabStop = True
       Transparent = False
       DataId = '@'
@@ -440,7 +440,7 @@ inherited CMovementFrame: TCMovementFrame
       Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
-      TabOrder = 2
+      TabOrder = 4
       TabStop = True
       Transparent = False
       OnChanged = CDateTimePerStartChanged
@@ -459,7 +459,7 @@ inherited CMovementFrame: TCMovementFrame
       Caption = '<wybierz dat'#281' >'
       Color = clBtnFace
       ParentColor = False
-      TabOrder = 3
+      TabOrder = 5
       TabStop = True
       Transparent = False
       OnChanged = CDateTimePerStartChanged
@@ -488,7 +488,7 @@ inherited CMovementFrame: TCMovementFrame
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 4
+      TabOrder = 2
       TabStop = True
       Transparent = False
       DataId = 'M'
@@ -502,7 +502,6 @@ inherited CMovementFrame: TCMovementFrame
       Top = 4
       Width = 14
       Height = 14
-      BevelOuter = bvNone
       Caption = '4'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -510,11 +509,11 @@ inherited CMovementFrame: TCMovementFrame
       Font.Name = 'Marlett'
       Font.Style = []
       ParentFont = False
-      TabOrder = 5
+      TabOrder = 0
       OnClick = CButtonShowHideFiltersClick
       IsFlatButton = True
     end
-    object CStatic1: TCStatic
+    object CStaticFastFilter: TCStatic
       Left = 88
       Top = 28
       Width = 193
@@ -532,6 +531,8 @@ inherited CMovementFrame: TCMovementFrame
       TabStop = True
       Transparent = False
       TextOnEmpty = '<okre'#347'l warunki wyboru>'
+      OnGetDataId = CStaticFastFilterGetDataId
+      OnChanged = CStaticFastFilterChanged
       HotTrack = True
     end
     object FilterEditDescription: TEdit
@@ -548,9 +549,9 @@ inherited CMovementFrame: TCMovementFrame
   end
   object TodayList: TCList [3]
     Left = 0
-    Top = 97
+    Top = 65
     Width = 435
-    Height = 107
+    Height = 13
     Align = alClient
     BevelEdges = []
     BevelInner = bvNone

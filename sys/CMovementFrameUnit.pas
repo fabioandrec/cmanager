@@ -85,7 +85,7 @@ type
     ButtonCloseShortcuts: TCPanel;
     CButtonShowHideFilters: TCPanel;
     Label1: TLabel;
-    CStatic1: TCStatic;
+    CStaticFastFilter: TCStatic;
     Label2: TLabel;
     FilterEditDescription: TEdit;
     procedure ActionMovementExecute(Sender: TObject);
@@ -129,6 +129,8 @@ type
     procedure MenuItemStatisticQuickPatternsClick(Sender: TObject);
     procedure CButtonShowHideFiltersClick(Sender: TObject);
     procedure FilterEditDescriptionChange(Sender: TObject);
+    procedure CStaticFastFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticFastFilterChanged(Sender: TObject);
   private
     FSmallIconsButtonsImageList: TPngImageList;
     FBigIconsButtonsImageList: TPngImageList;
@@ -180,7 +182,8 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   CAccountsFrameUnit, DateUtils, CListFrameUnit, DB, CMovementFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
   CListPreferencesFormUnit, CReports, CMovmentListElementFormUnit,
-  CMovementListFormUnit, CTools, CPluginConsts, CDatatools;
+  CMovementListFormUnit, CTools, CPluginConsts, CDatatools,
+  CFilterDetailFrameUnit;
 
 {$R *.dfm}
 
@@ -282,22 +285,27 @@ begin
 end;
 
 procedure TCMovementFrame.ReloadToday;
-var xCondition: String;
+var xConditionOperations, xConditionLists: String;
     xDf, xDt: TDateTime;
 begin
   TodayList.BeginUpdate;
   TodayList.Clear;
   GetFilterDates(xDf, xDt);
-  xCondition := Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
+  xConditionOperations := Format('regDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   if CStaticFilter.DataId = '2' then begin
-    xCondition := xCondition + Format(' and movementType = ''%s''', [COutMovement]);
+    xConditionOperations := xConditionOperations + Format(' and movementType = ''%s''', [COutMovement]);
   end else if CStaticFilter.DataId = '3' then begin
-    xCondition := xCondition + Format(' and movementType = ''%s''', [CInMovement]);
+    xConditionOperations := xConditionOperations + Format(' and movementType = ''%s''', [CInMovement]);
   end else if CStaticFilter.DataId = '4' then begin
-    xCondition := xCondition + ' and movementType = ''' + CTransferMovement + '''';
+    xConditionOperations := xConditionOperations + ' and movementType = ''' + CTransferMovement + '''';
   end;
   if FilterEditDescription.Text <> '' then begin
-    xCondition := xCondition + ' and description like ''%' + FilterEditDescription.Text + '%''';
+    xConditionOperations := xConditionOperations + ' and description like ''%' + FilterEditDescription.Text + '%''';
+  end;
+  xConditionLists := xConditionOperations;
+  if CStaticFastFilter.DataId <> CEmptyDataGid then begin
+    xConditionOperations := xConditionOperations + ' and (' + TMovementFilter.GetFilterCondition(CStaticFastFilter.DataId, False, 'idAccount', 'idCashpoint', 'idProduct') + ')';
+    xConditionLists := xConditionLists + ' and (' + TMovementFilter.GetFilterCondition(CStaticFastFilter.DataId, False, 'idAccount', 'idCashpoint', '') + ')';
   end;
   if FTodayObjects <> Nil then begin
     FreeAndNil(FTodayObjects);
@@ -305,8 +313,8 @@ begin
   if FTodayLists <> Nil then begin
     FreeAndNil(FTodayLists);
   end;
-  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from StnBaseMovement where ' + xCondition + ' order by created');
-  FTodayLists := TDataObject.GetList(TMovementList, MovementListProxy, 'select * from StnMovementList where ' + xCondition + ' order by created');
+  FTodayObjects := TDataObject.GetList(TBaseMovement, BaseMovementProxy, 'select * from StnBaseMovement where ' + xConditionOperations + ' order by created');
+  FTodayLists := TDataObject.GetList(TMovementList, MovementListProxy, 'select * from StnMovementList where ' + xConditionLists + ' order by created');
   RecreateTreeHelper;
   TodayList.RootNodeCount := FTreeHelper.Count;
   TodayListFocusChanged(TodayList, TodayList.FocusedNode, 0);
@@ -700,7 +708,7 @@ var xDs: TADOQuery;
     xMultiCurrency: Boolean;
     xOneCurrency: TDataGid;
     xSumObj: TSumElement;
-    xIs, xEs, xCs, xLikeDesc: String;
+    xIs, xEs, xCs, xLikeDesc, xFastCondition: String;
 begin
   GetFilterDates(xDf, xDt);
   if CStaticViewCurrency.DataId = CCurrencyViewBaseMovements then begin
@@ -712,6 +720,11 @@ begin
     xEs := 'expense';
     xCs := 'idAccountCurrencyDef';
   end;
+  if CStaticFastFilter.DataId <> CEmptyDataGid then begin
+    xFastCondition := xFastCondition + ' and (' + TMovementFilter.GetFilterCondition(CStaticFastFilter.DataId, False, 'idAccount', 'idCashpoint', 'idProduct') + ')';
+  end else begin
+    xFastCondition := '';
+  end;
   if FilterEditDescription.Text <> '' then begin
     xLikeDesc := ' and description like ''%' + FilterEditDescription.Text + '%''';
   end else begin
@@ -720,9 +733,9 @@ begin
   xSql := Format('select v.*, a.name from ' +
                  ' (select idAccount, %s as idCurrencyDef, sum(%s) as incomes, sum(%s) as expenses from balances where ' +
                  '   movementType <> ''%s'' and ' +
-                 '   regDate between %s and %s %s group by idAccount, %s) as v ' +
+                 '   regDate between %s and %s %s %s group by idAccount, %s) as v ' +
                  '   left outer join account a on a.idAccount = v.idAccount',
-       [xCs, xIs, xEs, CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), xLikeDesc, xCs]);
+       [xCs, xIs, xEs, CTransferMovement, DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False), xLikeDesc, xFastCondition, xCs]);
   xDs := GDataProvider.OpenSql(xSql);
   xMultiCurrency := IsMultiCurrencyDataset(xDs, 'idCurrencyDef', xOneCurrency);
   SumList.BeginUpdate;
@@ -1499,7 +1512,7 @@ begin
   FAdvancedFilterVisible := Value;
   if FAdvancedFilterVisible then begin
     CButtonShowHideFilters.Caption := '6';
-    Panel.Height := 95;
+    Panel.Height := 65;
   end else begin
     CButtonShowHideFilters.Caption := '4';
     Panel.Height := 21;
@@ -1507,6 +1520,17 @@ begin
 end;
 
 procedure TCMovementFrame.FilterEditDescriptionChange(Sender: TObject);
+begin
+  ReloadToday;
+  ReloadSums;
+end;
+
+procedure TCMovementFrame.CStaticFastFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+begin
+  AAccepted := DoTemporaryMovementFilter(ADataGid, AText);
+end;
+
+procedure TCMovementFrame.CStaticFastFilterChanged(Sender: TObject);
 begin
   ReloadToday;
   ReloadSums;

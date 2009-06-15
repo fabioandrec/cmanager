@@ -79,7 +79,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
         Height = 21
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 1
@@ -95,7 +95,7 @@ inherited CChooseFutureFilterForm: TCChooseFutureFilterForm
         Height = 21
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz dat'#281'>'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 2
