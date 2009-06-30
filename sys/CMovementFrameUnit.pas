@@ -174,6 +174,8 @@ type
     procedure SaveFramePreferences; override;
     procedure LoadFramePreferences; override;
     property AdvancedFilterVisible: Boolean read FAdvancedFilterVisible write SetAdvancedFilterVisible;
+    procedure ShowFrame; override;
+    procedure HideFrame; override;
   end;
 
 implementation
@@ -228,43 +230,45 @@ procedure TCMovementFrame.ActionDelMovementExecute(Sender: TObject);
 var xBase: TMovementTreeElement;
     xIdTemp1, xIdTemp2, xIdTemp3, xIdTemp4, xIdTemp5: TDataGid;
 begin
-  xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
-  if xBase.elementType = mtObject then begin
-    if TBaseMovement(xBase.Dataobject).isInvestmentMovement then begin
-      ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji inwestycyjnej', '')
-    end else if TBaseMovement(xBase.Dataobject).isDepositMovement then begin
-      ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji lokat', '')
-    end else begin
-      if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
-        xIdTemp1 := xBase.Dataobject.id;
-        xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
-        xIdTemp3 := TBaseMovement(xBase.Dataobject).idSourceAccount;
-        xIdTemp4 :=  TBaseMovement(xBase.Dataobject).idMovementList;
-        xIdTemp5 :=  TBaseMovement(xBase.Dataobject).idPlannedDone;
-        xBase.Dataobject.DeleteObject;
-        GDataProvider.CommitTransaction;
-        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_BASEMOVEMENT);
-        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
-        if (xIdTemp3 <> CEmptyDataGid) then begin
-          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
-        end;
-        if (xIdTemp4 <> CEmptyDataGid) then begin
-          SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp4), WMOPT_MOVEMENTLIST);
-        end;
-        if xIdTemp5 <> CEmptyDataGid then begin
-          SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+  if TodayList.FocusedNode <> Nil then begin
+    xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+    if xBase.elementType = mtObject then begin
+      if TBaseMovement(xBase.Dataobject).isInvestmentMovement then begin
+        ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji inwestycyjnej', '')
+      end else if TBaseMovement(xBase.Dataobject).isDepositMovement then begin
+        ShowInfo(itWarning, 'Nie mo¿na usun¹æ operacji, gdy¿ powsta³a ona na bazie operacji lokat', '')
+      end else begin
+        if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ operacjê ?', '') then begin
+          xIdTemp1 := xBase.Dataobject.id;
+          xIdTemp2 := TBaseMovement(xBase.Dataobject).idAccount;
+          xIdTemp3 := TBaseMovement(xBase.Dataobject).idSourceAccount;
+          xIdTemp4 :=  TBaseMovement(xBase.Dataobject).idMovementList;
+          xIdTemp5 :=  TBaseMovement(xBase.Dataobject).idPlannedDone;
+          xBase.Dataobject.DeleteObject;
+          GDataProvider.CommitTransaction;
+          SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_BASEMOVEMENT);
+          SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
+          if (xIdTemp3 <> CEmptyDataGid) then begin
+            SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp3), WMOPT_BASEMOVEMENT);
+          end;
+          if (xIdTemp4 <> CEmptyDataGid) then begin
+            SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp4), WMOPT_MOVEMENTLIST);
+          end;
+          if xIdTemp5 <> CEmptyDataGid then begin
+            SendMessageToFrames(TCDoneFrame, WM_DATAREFRESH, 0, 0);
+          end;
         end;
       end;
-    end;
-  end else if xBase.elementType = mtList then begin
-    if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ listê operacji ?', '') then begin
-      xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
-      xIdTemp1 := xBase.Dataobject.id;
-      xIdTemp2 := TMovementList(xBase.Dataobject).idAccount;
-      xBase.Dataobject.DeleteObject;
-      GDataProvider.CommitTransaction;
-      SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_MOVEMENTLIST);
-      SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
+    end else if xBase.elementType = mtList then begin
+      if ShowInfo(itQuestion, 'Czy chcesz usun¹æ wybran¹ listê operacji ?', '') then begin
+        xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+        xIdTemp1 := xBase.Dataobject.id;
+        xIdTemp2 := TMovementList(xBase.Dataobject).idAccount;
+        xBase.Dataobject.DeleteObject;
+        GDataProvider.CommitTransaction;
+        SendMessageToFrames(TCMovementFrame, WM_DATAOBJECTDELETED, Integer(@xIdTemp1), WMOPT_MOVEMENTLIST);
+        SendMessageToFrames(TCAccountsFrame, WM_DATAOBJECTEDITED, Integer(@xIdTemp2), WMOPT_BASEMOVEMENT);
+      end;
     end;
   end;
 end;
@@ -1231,7 +1235,9 @@ procedure TCMovementFrame.UpdateButtons(AIsSelectedSomething: Boolean);
 begin
   inherited UpdateButtons(AIsSelectedSomething);
   CButtonEdit.Enabled := AIsSelectedSomething;
+  ActionEditMovement.Enabled := AIsSelectedSomething;
   CButtonDel.Enabled := AIsSelectedSomething;
+  ActionDelMovement.Enabled := AIsSelectedSomething;
 end;
 
 function TCMovementFrame.GetSelectedText: String;
@@ -1534,6 +1540,24 @@ procedure TCMovementFrame.CStaticFastFilterChanged(Sender: TObject);
 begin
   ReloadToday;
   ReloadSums;
+end;
+
+procedure TCMovementFrame.HideFrame;
+begin
+  inherited HideFrame;
+  ActionMovement.ShortCut := 0;
+  ActionEditMovement.ShortCut := 0;
+  ActionDelMovement.ShortCut := 0;
+  ActionAddList.ShortCut := 0;
+end;
+
+procedure TCMovementFrame.ShowFrame;
+begin
+  inherited ShowFrame;
+  ActionMovement.ShortCut := ShortCut(Word('D'), [ssCtrl]);;
+  ActionEditMovement.ShortCut := ShortCut(Word('E'), [ssCtrl]);;
+  ActionDelMovement.ShortCut := ShortCut(Word('U'), [ssCtrl]);;
+  ActionAddList.ShortCut := ShortCut(Word('L'), [ssCtrl]);;
 end;
 
 end.

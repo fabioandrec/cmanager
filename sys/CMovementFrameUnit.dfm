@@ -502,6 +502,7 @@ inherited CMovementFrame: TCMovementFrame
       Top = 4
       Width = 14
       Height = 14
+      BevelOuter = bvNone
       Caption = '4'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
