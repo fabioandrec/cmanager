@@ -191,9 +191,18 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
 
 procedure TCMovementFrame.ActionMovementExecute(Sender: TObject);
 var xForm: TCMovementForm;
+    xBase: TMovementTreeElement;
+    xObject: TBaseMovement;
 begin
   xForm := TCMovementForm.Create(Nil);
-  xForm.ShowDataobject(coAdd, BaseMovementProxy, Nil, True);
+  xObject := Nil;
+  if (GetKeyState(VK_CONTROL) < 0) and (TodayList.FocusedNode <> Nil) then begin
+    xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
+    if xBase.elementType = mtObject then begin
+      xObject := TBaseMovement(xBase.Dataobject);
+    end;
+  end;
+  xForm.ShowDataobject(coAdd, BaseMovementProxy, xObject, True);
   xForm.Free;
 end;
 
@@ -211,16 +220,26 @@ end;
 procedure TCMovementFrame.ActionEditMovementExecute(Sender: TObject);
 var xForm: TCDataobjectForm;
     xBase: TMovementTreeElement;
+    xIsCtrl: Boolean;
 begin
   if TodayList.FocusedNode <> Nil then begin
+    xIsCtrl := GetAsyncKeyState(VK_CONTROL) < 0;
     xBase := TMovementTreeElement(TodayList.GetNodeData(TodayList.FocusedNode)^);
     if xBase.elementType = mtObject then begin
       xForm := TCMovementForm.Create(Nil);
-      xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase.Dataobject, True);
+      if xIsCtrl then begin
+        xForm.ShowDataobject(coAdd, BaseMovementProxy, xBase.Dataobject, True);
+      end else begin
+        xForm.ShowDataobject(coEdit, BaseMovementProxy, xBase.Dataobject, True);
+      end;
       xForm.Free;
     end else if xBase.elementType = mtList then begin
       xForm := TCMovementListForm.Create(Nil);
-      xForm.ShowDataobject(coEdit, MovementListProxy, xBase.Dataobject, True);
+      if xIsCtrl then begin
+        xForm.ShowDataobject(coAdd, MovementListProxy, xBase.Dataobject, True);
+      end else begin
+        xForm.ShowDataobject(coEdit, MovementListProxy, xBase.Dataobject, True);
+      end;
       xForm.Free;
     end;
   end;

@@ -16,6 +16,7 @@ inherited CConfigForm: TCConfigForm
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    IsFlatButton = False
   end
   object PanelButtons: TCPanel
     Left = 0
@@ -25,6 +26,7 @@ inherited CConfigForm: TCConfigForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    IsFlatButton = False
     DesignSize = (
       591
       41)

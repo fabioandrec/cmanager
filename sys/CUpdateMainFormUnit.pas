@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CComponents, StdCtrls, ExtCtrls, WinInet, ShellApi, ComCtrls, ActiveX,
-  CHttpRequest, CBasics;
+  CHttpRequest, CBasics, XPMan;
 
 type
   TCUpdateMainForm = class(TForm)
@@ -15,6 +15,7 @@ type
     RichEdit: TRichEdit;
     Button1: TButton;
     Button2: TButton;
+    XPManifest1: TXPManifest;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);

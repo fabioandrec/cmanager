@@ -35,6 +35,7 @@ type
     procedure AfterCommitData; virtual;
     procedure InitializeForm; virtual;
     procedure UpdateFrames(ADataGid: TDataGid; AMessage, AOption: Integer); virtual;
+    function ShouldFillForm: Boolean; override;
   public
     function ShowDataobject(AOperation: TConfigOperation; AProxy: TDataProxy; ADataobject: TDataObject; ACreateStatic: Boolean; AAdditionalData: TAdditionalData = Nil): TDataGid;
     property Dataobject: TDataObject read FDataobject write FDataobject;
@@ -70,7 +71,7 @@ begin
     BitBtnCancel.Default := True;
     BitBtnCancel.Caption := '&Wyjœcie';
   end;
-  if (Operation = coEdit) or ((Dataobject <> Nil) and (Operation = coNone)) then begin
+  if ShouldFillForm then begin
     BeginFilling;
     FillForm;
     EndFilling;
@@ -83,16 +84,14 @@ begin
 end;
 
 function TCDataobjectForm.ShowDataobject(AOperation: TConfigOperation; AProxy: TDataProxy; ADataobject: TDataObject; ACreateStatic: Boolean; AAdditionalData: TAdditionalData = Nil): TDataGid;
+var xExternalDataobject: Boolean;
 begin
   Operation := AOperation;
   Result := CEmptyDataGid;
   FAdditionalData := AAdditionalData;
   InitializeForm;
-  if AOperation <> coAdd then begin
-    FDataobject := ADataobject;
-  end else begin
-    FDataobject := Nil;
-  end;
+  xExternalDataobject := (ADataobject <> Nil);
+  FDataobject := ADataobject;
   if ShowConfig(AOperation) then begin
     if Operation = coAdd then begin
       FDataobject := GetDataobjectClass.CreateObject(AProxy, ACreateStatic);
@@ -105,7 +104,7 @@ begin
   end else begin
     GDataProvider.RollbackTransaction;
   end;
-  if (AOperation = coAdd) and Accepted then begin
+  if (AOperation = coAdd) and Accepted and (not xExternalDataobject) then begin
     FreeAndNil(FDataobject);
   end;
 end;
@@ -137,6 +136,11 @@ constructor TAdditionalDataWithId.CreateId(AId: TDataGid);
 begin
   inherited Create;
   Fid := AId;
+end;
+
+function TCDataobjectForm.ShouldFillForm: Boolean;
+begin
+  Result := (Operation = coEdit) or ((Dataobject <> Nil) and (Operation = coNone));
 end;
 
 end.

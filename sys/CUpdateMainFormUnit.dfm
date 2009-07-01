@@ -75,4 +75,8 @@ object CUpdateMainForm: TCUpdateMainForm
     Visible = False
     OnClick = Button2Click
   end
+  object XPManifest1: TXPManifest
+    Left = 168
+    Top = 240
+  end
 end

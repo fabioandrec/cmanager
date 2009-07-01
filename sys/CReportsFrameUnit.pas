@@ -317,6 +317,12 @@ begin
     MenuItemSmallIcons.Checked := List.ViewPref.ButtonSmall;
     UpdateIcons;
   end;
+  CButton3.Left := PanelFrameButtons.Width - 1 * CButton1.Width - 15;
+  CButton2.Left := PanelFrameButtons.Width - 2 * CButton1.Width - 15;
+  CButton1.Left := PanelFrameButtons.Width - 3 * CButton1.Width - 15;
+  CButton1.Anchors := [akTop, akRight];
+  CButton2.Anchors := [akTop, akRight];
+  CButton3.Anchors := [akTop, akRight];
   List.RootElement.FreeDataOnClear := True;
   List.ReloadTree;
   ListFocusChanged(List, List.FocusedNode, 0);  

@@ -1,9 +1,8 @@
 inherited CDoneFrame: TCDoneFrame
-  Width = 779
   object Splitter1: TSplitter [0]
     Left = 0
     Top = 76
-    Width = 779
+    Width = 435
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -11,7 +10,7 @@ inherited CDoneFrame: TCDoneFrame
   object PanelFrameButtons: TCPanel [1]
     Left = 0
     Top = 79
-    Width = 779
+    Width = 435
     Height = 189
     Align = alBottom
     BevelOuter = bvNone
@@ -21,7 +20,7 @@ inherited CDoneFrame: TCDoneFrame
     object BevelPanel: TCPanel
       Left = 0
       Top = 147
-      Width = 779
+      Width = 435
       Height = 2
       Align = alBottom
       BevelOuter = bvLowered
@@ -31,7 +30,7 @@ inherited CDoneFrame: TCDoneFrame
     object Panel1: TCPanel
       Left = 0
       Top = 149
-      Width = 779
+      Width = 435
       Height = 40
       Align = alBottom
       BevelOuter = bvNone
@@ -39,9 +38,6 @@ inherited CDoneFrame: TCDoneFrame
       PopupMenu = PopupMenuIcons
       TabOrder = 2
       IsFlatButton = False
-      DesignSize = (
-        779
-        40)
       object CButtonsStatus: TCButton
         Left = 149
         Top = 4
@@ -67,7 +63,7 @@ inherited CDoneFrame: TCDoneFrame
         Action = ActionDooperation
       end
       object CButtonPlanned: TCButton
-        Left = 940
+        Left = 304
         Top = 3
         Width = 116
         Height = 33
@@ -77,13 +73,12 @@ inherited CDoneFrame: TCDoneFrame
         TxtOffset = 15
         Framed = False
         Action = ActionPlanned
-        Anchors = [akTop, akRight]
       end
     end
     object Panel2: TCPanel
       Left = 0
       Top = 0
-      Width = 779
+      Width = 435
       Height = 21
       Align = alTop
       Alignment = taLeftJustify
@@ -91,7 +86,7 @@ inherited CDoneFrame: TCDoneFrame
       TabOrder = 0
       IsFlatButton = False
       DesignSize = (
-        779
+        435
         21)
       object ButtonCloseShortcuts: TCPanel
         Left = 300
@@ -99,6 +94,7 @@ inherited CDoneFrame: TCDoneFrame
         Width = 14
         Height = 14
         Anchors = [akTop, akRight]
+        BevelOuter = bvNone
         Caption = '6'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -114,7 +110,7 @@ inherited CDoneFrame: TCDoneFrame
     object SumList: TCList
       Left = 0
       Top = 21
-      Width = 779
+      Width = 435
       Height = 126
       Align = alClient
       BevelEdges = []
@@ -152,7 +148,7 @@ inherited CDoneFrame: TCDoneFrame
       Columns = <
         item
           Position = 0
-          Width = 279
+          Width = 10
           WideText = 'Konto'
           WideHint = 'Konto'
         end
@@ -184,7 +180,7 @@ inherited CDoneFrame: TCDoneFrame
   object DoneList: TCList [2]
     Left = 0
     Top = 21
-    Width = 779
+    Width = 435
     Height = 55
     Align = alClient
     BevelEdges = []
@@ -264,7 +260,7 @@ inherited CDoneFrame: TCDoneFrame
       end
       item
         Position = 7
-        Width = 279
+        Width = 10
         WideText = 'Data wykonania'
       end>
     WideDefaultText = ''
@@ -272,14 +268,14 @@ inherited CDoneFrame: TCDoneFrame
   object Panel: TCPanel [3]
     Left = 0
     Top = 0
-    Width = 779
+    Width = 435
     Height = 21
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 2
     IsFlatButton = False
     DesignSize = (
-      779
+      435
       21)
     object Label2: TLabel
       Left = 8

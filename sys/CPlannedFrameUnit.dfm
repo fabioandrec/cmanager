@@ -1,14 +1,15 @@
 inherited CPlannedFrame: TCPlannedFrame
   object PanelFrameButtons: TCPanel [0]
     Left = 0
-    Top = 236
-    Width = 443
+    Top = 227
+    Width = 435
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     Color = clWindow
     PopupMenu = PopupMenuIcons
     TabOrder = 0
+    IsFlatButton = False
     object CButtonDel: TCButton
       Left = 220
       Top = 4
@@ -49,8 +50,8 @@ inherited CPlannedFrame: TCPlannedFrame
   object PlannedList: TCList [1]
     Left = 0
     Top = 0
-    Width = 443
-    Height = 236
+    Width = 435
+    Height = 227
     Align = alClient
     BevelEdges = [beBottom]
     BevelInner = bvNone
@@ -96,7 +97,7 @@ inherited CPlannedFrame: TCPlannedFrame
       end
       item
         Position = 1
-        Width = 193
+        Width = 185
         WideText = 'Opis'
         WideHint = 'Opis'
       end

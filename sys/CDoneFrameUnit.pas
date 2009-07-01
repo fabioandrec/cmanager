@@ -191,6 +191,8 @@ begin
   Label4.Anchors := [akRight, akTop];
   CDateTimePerEnd.Anchors := [akRight, akTop];
   Label5.Anchors := [akRight, akTop];
+  CButtonPlanned.Left := Panel1.Width - CButtonPlanned.Width - 15;
+  CButtonPlanned.Anchors := [akTop, akRight];
   if AAdditionalData <> Nil then begin
     PanelFrameButtons.Visible := False;
     MenuItemsumsVisible.Visible := False;

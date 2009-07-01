@@ -9,9 +9,7 @@ inherited CReportsFrame: TCReportsFrame
     Color = clWindow
     PopupMenu = PopupMenuIcons
     TabOrder = 0
-    DesignSize = (
-      435
-      40)
+    IsFlatButton = False
     object CButtonExecute: TCButton
       Left = 13
       Top = 2
@@ -35,7 +33,6 @@ inherited CReportsFrame: TCReportsFrame
       TxtOffset = 15
       Framed = False
       Action = ActionAdd
-      Anchors = [akTop, akRight]
     end
     object CButton2: TCButton
       Left = 293
@@ -48,7 +45,6 @@ inherited CReportsFrame: TCReportsFrame
       TxtOffset = 15
       Framed = False
       Action = ActionEdit
-      Anchors = [akTop, akRight]
     end
     object CButton3: TCButton
       Left = 365
@@ -61,7 +57,6 @@ inherited CReportsFrame: TCReportsFrame
       TxtOffset = 15
       Framed = False
       Action = ActionDel
-      Anchors = [akTop, akRight]
     end
   end
   object List: TCDataList [1]
@@ -117,6 +112,7 @@ inherited CReportsFrame: TCReportsFrame
     Align = alBottom
     BevelOuter = bvLowered
     TabOrder = 2
+    IsFlatButton = False
   end
   inherited ImageList: TPngImageList
     PngImages = <

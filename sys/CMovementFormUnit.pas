@@ -215,6 +215,8 @@ type
     function GetUpdateFrameOption: Integer; override;
     function GetUpdateFrameClass: TCBaseFrameClass; override;
     function CanModifyValues: Boolean; override;
+    function ShouldFillForm: Boolean; override;
+    procedure EndFilling; override;
   public
     function ExpandTemplate(ATemplate: String): String; override;
     destructor Destroy; override;
@@ -239,7 +241,6 @@ end;
 
 procedure TCMovementForm.ComboBoxTypeChange(Sender: TObject);
 begin
-  Caption := 'Operacja';
   if (ComboBoxType.ItemIndex = 0) or (ComboBoxType.ItemIndex = 1) then begin
     PageControl.ActivePage := TabSheetInOutOnce;
   end else if (ComboBoxType.ItemIndex = 3) or (ComboBoxType.ItemIndex = 4) then begin
@@ -262,6 +263,11 @@ var xAdd: TMovementAdditionalData;
     xQuickPatternMovementType: TBaseEnumeration;
     xCyclicMovementType: TBaseEnumeration;
 begin
+  if Operation = coAdd then begin
+    Caption := Caption + ' - dodawanie';
+  end else if Operation = coEdit then begin
+    Caption := Caption + ' - edycja';
+  end;
   FillCombo(ComboBoxType, CBaseMovementTypes);
   FOnceRateHelper := Nil;
   FCyclicRateHelper := Nil;
@@ -1819,6 +1825,20 @@ end;
 procedure TCMovementForm.CStaticCyclicTransRateChanged(Sender: TObject);
 begin
   UpdateCurrencyRates;
+end;
+
+function TCMovementForm.ShouldFillForm: Boolean;
+begin
+  Result := inherited ShouldFillForm;
+  Result := Result or ((Operation = coAdd) and (Dataobject <> Nil))
+end;
+
+procedure TCMovementForm.EndFilling;
+begin
+  inherited EndFilling;
+  if (Operation = coAdd) then begin
+    ComboBoxType.Enabled := True;
+  end;
 end;
 
 end.

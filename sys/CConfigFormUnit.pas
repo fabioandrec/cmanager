@@ -30,6 +30,7 @@ type
     function CanAccept: Boolean; virtual;
     function CanModifyValues: Boolean; virtual;
     procedure DoAccept; virtual;
+    function ShouldFillForm: Boolean; virtual;
     procedure FillForm; virtual;
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
@@ -79,9 +80,11 @@ begin
       BitBtnCancel.Caption := ANoneButtonCaption;
     end;
   end;
-  BeginFilling;
-  FillForm;
-  EndFilling;
+  if ShouldFillForm then begin
+    BeginFilling;
+    FillForm;
+    EndFilling;
+  end;
   if not CanModifyValues then begin
     DisableComponents;
   end;
@@ -210,6 +213,11 @@ end;
 function TCConfigForm.GetIsFilling: Boolean;
 begin
   Result := FFilling > 0;
+end;
+
+function TCConfigForm.ShouldFillForm: Boolean;
+begin
+  Result := True;
 end;
 
 end.
