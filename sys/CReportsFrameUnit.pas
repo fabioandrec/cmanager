@@ -275,6 +275,7 @@ begin
   xStats.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Œrednie' , TAveragesReport, Nil, 'Pokazuje œrednie rozchody/przychody w wybranym okresie', CHtmlReportImage), True));
   xStats.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Prognozy' , TFuturesReport, Nil,  'Pokazuje prognozy rozchodów i przychodów dla wybranego okresu', CHtmlReportImage), True));
   xStats.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Podsumowanie' , TPeriodSumsReport, Nil, 'Pokazuje podsumowanie statystyczne wybranego okresu', CHtmlReportImage), True));
+  xStats.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Porównanie lat' , TYearComparisionReport, Nil, 'Pokazuje porównanie miesiêcznych wydatków w kolejnych latach', CHtmlReportImage), True));
   xOthers := TCListDataElement.Create(False, List, TReportListElement.CreateGroup('Ró¿ne', '', CNoImage), True);
   ARootElement.Add(xOthers);
   xOthers.Add(TCListDataElement.Create(False, List, TReportListElement.CreateReport('Historia wybranej waluty' , TCurrencyRatesHistoryReport, Nil, 'Pokazuje historiê waluty w/g wybranego kontrahenta w zadanym okresis', CLineReportImage), True));

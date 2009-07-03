@@ -226,11 +226,17 @@ end;
 procedure TNBPBSCurrencyRatesBaseThread.ThreadFinished;
 begin
   if ExitCode = ERROR_SUCCESS then begin
-    PostMessage(NBPBSCurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
+    if FIsValidResponse then begin
+      PostMessage(NBPBSCurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
+    end else begin
+      NBPBSCurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
+      NBPBSCurrencyRatesProgressForm.Label2.Caption := 'B³¹d pobierania kursów walut';
+    end;
   end else if ExitCode = ERROR_CANCELLED then begin
     PostMessage(NBPBSCurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
   end else begin
     NBPBSCurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
+    NBPBSCurrencyRatesProgressForm.Label2.Caption := 'Przerwano pobierania kursów walut';
   end;
 end;
 

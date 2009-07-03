@@ -216,11 +216,13 @@ begin
       PostMessage(NBPACurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
     end else begin
       NBPACurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
+      NBPACurrencyRatesProgressForm.Label2.Caption := 'B³¹d pobierania kursów walut';
     end;
   end else if ExitCode = ERROR_CANCELLED then begin
     PostMessage(NBPACurrencyRatesProgressForm.Handle, WM_CLOSE, 0, 0);
   end else begin
     NBPACurrencyRatesProgressForm.Button1.Caption := '&Zamknij';
+    NBPACurrencyRatesProgressForm.Label2.Caption := 'Przerwano pobierania kursów walut';
   end;
 end;
 

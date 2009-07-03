@@ -615,6 +615,17 @@ type
     function GetReportTitle: String; override;
   end;
 
+  TYearComparisionReport = class(TCHtmlReport)
+  private
+    FStartYear: TDateTime;
+    FEndYear: TDateTime;
+  protected
+    function GetReportBody: String; override;
+    function PrepareReportConditions: Boolean; override;
+  public
+    function GetReportTitle: String; override;
+  end;
+
   TInstrumentValueChartReport = class(TCChartReport)
   private
     FStartDate: TDateTime;
@@ -5543,6 +5554,91 @@ begin
   end else begin
     Result := GetSystemPathname(CPrivateHTMReportFile);
   end;
+end;
+
+function TYearComparisionReport.GetReportBody: String;
+var xFieldI, xFieldO, xFieldC: String;
+    xOperations: TADOQuery;
+    xFilter: String;
+    xCurrs: TDataGids;
+    xInsums, xOutsums: TSumList;
+    xGid: TDataGid;
+    xLabel: String;
+    xBody: TStringList;
+begin
+  if CurrencyView = CCurrencyViewBaseMovements then begin
+    xFieldI := 'movementIncome';
+    xFieldO := 'movementExpense';
+    xFieldC := 'idMovementCurrencyDef';
+  end else begin
+    xFieldI := 'income';
+    xFieldO := 'expense';
+    xFieldC := 'idAccountCurrencyDef';
+  end;
+  xFilter := TMovementFilter.GetFilterCondition(FIdFilter, True, 'idAccount', 'idCashpoint', 'idProduct');
+  xOperations := GDataProvider.OpenSql(
+            Format('select sum(%s) as incomes, sum(%s) as expenses, %s as idCurrencyDef, monthDate from balances' +
+                   ' where movementType <> ''%s'' and monthDate between %s and %s %s group by monthDate, %s order by monthDate',
+                   [xFieldI, xFieldO, xFieldC, CTransferMovement,
+                    DatetimeToDatabase(FStartYear, False), DatetimeToDatabase(FEndYear, False),
+                    xFilter, xFieldC]));
+  xInsums := TSumList.Create(True);
+  xOutsums := TSumList.Create(True);
+  xCurrs := TDataGids.Create;
+  while not xOperations.Eof do begin
+    xGid := xOperations.FieldByName('idCurrencyDef').AsString;
+    if xCurrs.IndexOf(xGid) = -1 then begin
+      xCurrs.Add(xGid);
+    end;
+    xLabel := Date2StrDate(xOperations.FieldByName('monthDate').AsDateTime);
+    xInsums.AddSum(xLabel, xOperations.FieldByName('incomes').AsCurrency, xGid);
+    xOutsums.AddSum(xLabel, xOperations.FieldByName('expenses').AsCurrency, xGid);
+    xOperations.Next;
+  end;
+  xBody := TStringList.Create;
+  with xBody do begin
+    Add('<table class="base" colspan=13>');
+    Add('<tr class="head">');
+    Add('<td class="headtext" width="8%">Styczeñ</td>');
+    Add('<td class="headtext" width="8%">Luty</td>');
+    Add('<td class="headtext" width="8%">Marzec</td>');
+    Add('<td class="headtext" width="8%">Kwiecieñ</td>');
+    Add('<td class="headtext" width="8%">Maj</td>');
+    Add('<td class="headtext" width="8%">Czerwiec</td>');
+    Add('<td class="headtext" width="8%">Lipiec</td>');
+    Add('<td class="headtext" width="8%">Sierpieñ</td>');
+    Add('<td class="headtext" width="8%">Wrzesieñ</td>');
+    Add('<td class="headtext" width="8%">PaŸdziernik</td>');
+    Add('<td class="headtext" width="8%">Listopad</td>');
+    Add('<td class="headtext" width="8%">Grudzieñ</td>');
+    Add('<td class="headtext" width="8%">Razem</td>');
+    Add('</tr>');
+    Add('</table><hr><table class="base" colspan=3>');
+    //Pêtla po rekordach
+    Add('</table><hr>');
+  end;
+  xOperations.Free;
+  Result := xBody.Text;
+  xBody.Free;
+  xInsums.Free;
+  xOutsums.Free;
+  xCurrs.Free;
+  xOperations.Free;
+end;
+
+function TYearComparisionReport.GetReportTitle: String;
+begin
+  Result := 'Porównanie lat (od ' + IntToStr(YearOf(FStartYear)) + ' do ' + IntToStr(YearOf(FEndYear)) + ')';
+end;
+
+function TYearComparisionReport.PrepareReportConditions: Boolean;
+var xYears: TADOQuery;
+begin
+  xYears := GDataProvider.OpenSql('select min(yearDate) as minDate, max(yearDate) as maxDate from baseMovement');
+  FStartYear := xYears.FieldByName('minDate').AsDateTime;
+  FEndYear := xYears.FieldByName('maxDate').AsDateTime;
+  xYears.Free;
+  Result := True;
 end;
 
 initialization
