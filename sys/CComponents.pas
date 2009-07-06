@@ -438,7 +438,7 @@ type
     function SumColumn(AColumnIndex: TColumnIndex; var ASum: Extended): Boolean;
     destructor Destroy; override;
     procedure Repaint; override;
-    function GetNodeByIndex(AIndex: Integer): PVirtualNode;
+    function GetNodeByIndex(AIndex: Cardinal): PVirtualNode;
   published
     property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
     property ViewPref: TViewPref read FViewPref write SetViewPref;
@@ -1822,7 +1822,7 @@ begin
   end;
 end;
 
-function TCList.GetNodeByIndex(AIndex: Integer): PVirtualNode;
+function TCList.GetNodeByIndex(AIndex: Cardinal): PVirtualNode;
 var xNode: PVirtualNode;
 begin
   Result := Nil;

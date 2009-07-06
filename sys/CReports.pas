@@ -798,7 +798,7 @@ begin
   end else if AGroupType = CGroupByWeek then begin
     Result := GetFormattedDate(ADate, CBaseDateFormat) + ' - ' + GetFormattedDate(EndOfTheWeek(ADate), CBaseDateFormat);
   end else if AGroupType = CGroupByMonth then begin
-    Result := GetFormattedDate(ADate, CMonthnameDateFormat);
+    Result := GetFormattedDate(ADate, CMonthnameYearDateFormat);
   end;
 end;
 
@@ -5564,6 +5564,7 @@ var xFieldI, xFieldO, xFieldC: String;
     xInsums, xOutsums: TSumList;
     xGid: TDataGid;
     xLabel: String;
+    xRowCount, xCurCount, xYearCount, xYears: Integer;
     xBody: TStringList;
 begin
   if CurrencyView = CCurrencyViewBaseMovements then begin
@@ -5595,27 +5596,35 @@ begin
     xOutsums.AddSum(xLabel, xOperations.FieldByName('expenses').AsCurrency, xGid);
     xOperations.Next;
   end;
+  xYears := YearOf(FEndYear) - YearOf(FStartYear) + 1;
   xBody := TStringList.Create;
   with xBody do begin
-    Add('<table class="base" colspan=13>');
+    Add('<table class="base">');
     Add('<tr class="head">');
-    Add('<td class="headtext" width="8%">Styczeñ</td>');
-    Add('<td class="headtext" width="8%">Luty</td>');
-    Add('<td class="headtext" width="8%">Marzec</td>');
-    Add('<td class="headtext" width="8%">Kwiecieñ</td>');
-    Add('<td class="headtext" width="8%">Maj</td>');
-    Add('<td class="headtext" width="8%">Czerwiec</td>');
-    Add('<td class="headtext" width="8%">Lipiec</td>');
-    Add('<td class="headtext" width="8%">Sierpieñ</td>');
-    Add('<td class="headtext" width="8%">Wrzesieñ</td>');
-    Add('<td class="headtext" width="8%">PaŸdziernik</td>');
-    Add('<td class="headtext" width="8%">Listopad</td>');
-    Add('<td class="headtext" width="8%">Grudzieñ</td>');
-    Add('<td class="headtext" width="8%">Razem</td>');
-    Add('</tr>');
-    Add('</table><hr><table class="base" colspan=3>');
-    //Pêtla po rekordach
-    Add('</table><hr>');
+    Add('<td class="headtext">Miesi¹c/Rok</td>');
+    for xYearCount := 1 to xYears do begin
+      Add('<td class="headcenter" colspan="2" align="center">' + IntToStr(YearOf(FStartYear) + xYearCount - 1) + '</td>');
+    end;
+    Add('</tr></table><hr>');
+    for xCurCount := 0 to xCurrs.Count - 1 do begin
+      Add('<table class="base">');
+      Add('<tr class="subhead">');
+      Add('<td class="subheadtext">Przychody/Rozchody/Saldo [' + GCurrencyCache.GetSymbol(xCurrs.Strings[xCurCount]) + ']</td>');
+      Add('</tr>');
+      Add('</table><hr>');
+      Add('<table class="base">');
+      for xRowCount := 1 to 12 do begin
+        Add('<tr class="' + IsEvenToStr(xRowCount) + 'base">');
+        Add('<td>' + GetFormattedDate(EncodeDate(2000, xRowCount, 1), CMonthnameDateFormat) + '</td>');
+        Add('</tr>');
+      end;
+      Add('</table><hr>');
+      Add('<table class="base">');
+      Add('<tr class="sum">');
+      Add('<td class="sumtext">Razem</td>');
+      Add('</tr>');
+      Add('</table><hr>');
+    end;
   end;
   xOperations.Free;
   Result := xBody.Text;
@@ -5623,7 +5632,6 @@ begin
   xInsums.Free;
   xOutsums.Free;
   xCurrs.Free;
-  xOperations.Free;
 end;
 
 function TYearComparisionReport.GetReportTitle: String;
