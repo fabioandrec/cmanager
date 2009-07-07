@@ -88,6 +88,8 @@ type
     procedure UpdateIcons;
   end;
 
+procedure TestOneReport;
+
 implementation
 
 uses CDataObjects, CFrameFormUnit, CProductFormUnit, CConfigFormUnit, CInfoFormUnit, CConsts,
@@ -468,6 +470,14 @@ begin
                    ActionList, Nil,
                    FSmallIconsButtonsImageList,
                    xDummy);
+end;
+
+procedure TestOneReport;
+var xReport: TCBaseReport;
+begin
+  xReport := TYearComparisionReport.CreateReport(Nil);
+  xReport.ShowReport;
+  xReport.Free;
 end;
 
 end.

@@ -49,6 +49,7 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       Transparent = False
       OnChanged = CDateTimePerStartChanged
       HotTrack = True
+      Withtime = False
     end
     object CDateTimePerEnd: TCDateTime
       Left = 376
@@ -67,6 +68,7 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       Transparent = False
       OnChanged = CDateTimePerEndChanged
       HotTrack = True
+      Withtime = False
     end
     object CStaticPeriod: TCStatic
       Left = 243
@@ -74,6 +76,7 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       Width = 134
       Height = 15
       Cursor = crHandPoint
+      Hint = '<tylko dzi'#347'>'
       AutoSize = False
       BevelInner = bvNone
       BevelKind = bkTile
@@ -87,6 +90,8 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       Font.Style = []
       ParentColor = False
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 3
       TabStop = True
       Transparent = False
@@ -118,7 +123,7 @@ inherited CCurrencyRateFrame: TCCurrencyRateFrame
       end
       item
         Position = 3
-        Width = 100
+        Width = 92
         WideText = 'Rodzaj'
       end>
     WideDefaultText = ''

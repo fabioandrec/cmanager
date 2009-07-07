@@ -219,8 +219,10 @@ begin
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;
+        TestOneReport;
+        Application.Terminate;
         Application.CreateForm(TCMainForm, CMainForm);
-  GPlugins.ScanForPlugins;
+        GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

@@ -80,6 +80,27 @@ padding-left: 8px;
 padding-right: 8px;
 text-align: right;
 }
+td.infocolumnleft
+{
+padding-left: 8px;
+padding-right: 8px;
+text-align: left;
+background-color: white;
+}
+td.infocolumnright
+{
+padding-left: 8px;
+padding-right: 8px;
+text-align: right;
+background-color: white;
+}
+td.infocolumncenter
+{
+padding-left: 8px;
+padding-right: 8px;
+text-align: center;
+background-color: white;
+}
 td.infotext
 {
 padding-left: 8px;

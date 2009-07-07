@@ -5564,7 +5564,7 @@ var xFieldI, xFieldO, xFieldC: String;
     xInsums, xOutsums: TSumList;
     xGid: TDataGid;
     xLabel: String;
-    xRowCount, xCurCount, xYearCount, xYears: Integer;
+    xRec, xRowCount, xTypeCount, xCurCount, xYearCount, xYears: Integer;
     xBody: TStringList;
 begin
   if CurrencyView = CCurrencyViewBaseMovements then begin
@@ -5599,31 +5599,83 @@ begin
   xYears := YearOf(FEndYear) - YearOf(FStartYear) + 1;
   xBody := TStringList.Create;
   with xBody do begin
-    Add('<table class="base">');
-    Add('<tr class="head">');
-    Add('<td class="headtext">Miesi¹c/Rok</td>');
-    for xYearCount := 1 to xYears do begin
-      Add('<td class="headcenter" colspan="2" align="center">' + IntToStr(YearOf(FStartYear) + xYearCount - 1) + '</td>');
-    end;
-    Add('</tr></table><hr>');
+    xRec := 1;
     for xCurCount := 0 to xCurrs.Count - 1 do begin
       Add('<table class="base">');
-      Add('<tr class="subhead">');
-      Add('<td class="subheadtext">Przychody/Rozchody/Saldo [' + GCurrencyCache.GetSymbol(xCurrs.Strings[xCurCount]) + ']</td>');
-      Add('</tr>');
-      Add('</table><hr>');
+      Add('<tr class="head">');
+      Add('<td width="20%" class="headtext">Miesi¹c\Rok [' + GCurrencyCache.GetSymbol(xCurrs.Strings[xCurCount]) + ']</td>');
+      for xYearCount := 1 to xYears do begin
+        Add('<td class="headcash" colspan="2" width="10%">' + IntToStr(YearOf(FStartYear) + xYearCount - 1) + '</td>');
+      end;
+      Add('</tr></table><hr>');
       Add('<table class="base">');
       for xRowCount := 1 to 12 do begin
-        Add('<tr class="' + IsEvenToStr(xRowCount) + 'base">');
-        Add('<td>' + GetFormattedDate(EncodeDate(2000, xRowCount, 1), CMonthnameDateFormat) + '</td>');
-        Add('</tr>');
+        for xTypeCount := 1 to 3 do begin
+          Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
+          for xYearCount := 1 to xYears do begin
+            if xTypeCount = 1 then begin
+              if (xYearCount = 1) then begin
+                Add('<td width="10%" rowspan="3" class="infocolumnleft">' + GetFormattedDate(EncodeDate(2000, xRowCount, 1), CMonthnameDateFormat) + '</td>');
+                if xRowCount = 1 then begin
+                   Add('<td width="10%" class="text">Przychód</td>');
+                end else begin
+                  Add('<td width="10%" class="text"></td>');
+                end;
+              end;
+              Add('<td width="10%" class="cash">1.10</td>');
+            end else if xTypeCount = 2 then begin
+              if (xYearCount = 1) then begin
+                if xRowCount = 1 then begin
+                  Add('<td width="10%" class="text">Rozchód</td>');
+                end else begin
+                  Add('<td width="10%" class="text"></td>');
+                end;
+              end;
+              Add('<td width="10%" class="cash">2.10</td>');
+            end else if xTypeCount = 3 then begin
+              if (xYearCount = 1) then begin
+                if xRowCount = 1 then begin
+                  Add('<td width="10%" class="text">Saldo</td>');
+                end else begin
+                  Add('<td width="10%" class="text"></td>');
+                end;
+              end;
+              Add('<td width="10%" class="cash">10.2</td>');
+            end;
+          end;
+          Inc(xRec);
+          Add('</tr>');
+        end;
       end;
       Add('</table><hr>');
       Add('<table class="base">');
-      Add('<tr class="sum">');
-      Add('<td class="sumtext">Razem</td>');
-      Add('</tr>');
-      Add('</table><hr>');
+      for xTypeCount := 1 to 3 do begin
+        Add('<tr class="' + IsEvenToStr(xTypeCount) + 'sum">');
+        for xYearCount := 1 to xYears do begin
+          if xTypeCount = 1 then begin
+            if (xYearCount = 1) then begin
+              Add('<td class="sumtext" width="10%" rowspan="3">Razem</td>');
+              Add('<td class="sumtext" width="10%" class="text">Przychód</td>');
+            end;
+            Add('<td width="10%" class="sumcash">1.10</td>');
+          end else if xTypeCount = 2 then begin
+            if (xYearCount = 1) then begin
+              Add('<td width="10%" class="sumtext">Rozchód</td>');
+            end;
+            Add('<td width="10%" class="sumcash">2.10</td>');
+          end else if xTypeCount = 3 then begin
+            if (xYearCount = 1) then begin
+              Add('<td width="10%" class="sumtext">Saldo</td>');
+            end;
+            Add('<td width="10%" class="sumcash">10.2</td>');
+          end;
+        end;
+        Add('</tr>');
+      end;
+      Add('</table>');
+      if xCurCount <> xCurrs.Count - 1 then begin
+        Add('<hr>');
+      end;
     end;
   end;
   xOperations.Free;

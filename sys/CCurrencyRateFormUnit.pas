@@ -74,6 +74,7 @@ function TCCurrencyRateForm.CanAccept: Boolean;
 var xRate: TCurrencyRate;
     xText: String;
     xCheck: Boolean;
+    xEditedId: TDataGid;
 begin
   Result := True;
   if CStaticCashpoint.DataId = CEmptyDataGid then begin
@@ -114,18 +115,25 @@ begin
     end;
     if xCheck then begin
       GDataProvider.BeginTransaction;
+      if Operation = coEdit then begin
+        xEditedId := Dataobject.id;
+      end else begin
+        xEditedId := CEmptyDataGid;
+      end;
       xRate := TCurrencyRate.FindRate(formRateType, CStaticBaseCurrencydef.DataId, CStaticTargetCurrencydef.DataId, CStaticCashpoint.DataId, CDateTime.Value);
       if xRate <> Nil then begin
-        if CStaticCashpoint.DataId <> CEmptyDataGid then begin
-          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + Date2StrDate(CDateTime.Value) + '\n' +
-                   'Czy chcesz go zast¹piæ ?';
-        end else begin
-          xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + Date2StrDate(CDateTime.Value) + '\n' +
-                   'Czy chcesz go zast¹piæ ?';
-        end;
-        Result := ShowInfo(itQuestion, xText, '');
-        if Result then begin
-          FRateToReplaceId := xRate.id;
+        if xEditedId <> xRate.id then begin
+          if CStaticCashpoint.DataId <> CEmptyDataGid then begin
+            xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" w/g "' + CStaticCashpoint.Caption + '" z dat¹ obowi¹zywania ' + Date2StrDate(CDateTime.Value) + '\n' +
+                     'Czy chcesz go zast¹piæ ?';
+          end else begin
+            xText := 'Istnieje ju¿ ' + TCurrencyRate.GetTypeDesc(formRateType) + ' waluty "' + CStaticBaseCurrencydef.Caption + '" do "' + CStaticTargetCurrencydef.Caption + '" z dat¹ obowi¹zywania ' + Date2StrDate(CDateTime.Value) + '\n' +
+                     'Czy chcesz go zast¹piæ ?';
+          end;
+          Result := ShowInfo(itQuestion, xText, '');
+          if Result then begin
+            FRateToReplaceId := xRate.id;
+          end;
         end;
       end;
       GDataProvider.RollbackTransaction;
