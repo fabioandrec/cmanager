@@ -52,15 +52,15 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         ItemHeight = 13
         ItemIndex = 3
         TabOrder = 0
-        Text = 'w tym miesi¹cu'
+        Text = 'w tym miesi'#261'cu'
         OnChange = ComboBoxPredefinedChange
         Items.Strings = (
           'wybrany zakres'
-          'tylko dziœ'
+          'tylko dzi'#347
           'w tym tygodniu'
-          'w tym miesi¹cu'
+          'w tym miesi'#261'cu'
           'w tym kwartale'
-          'w tym pó³roczu'
+          'w tym p'#243#322'roczu'
           'w tym roku'
           'ostatnie 7 dni'
           'ostatnie 14 dni'
@@ -73,7 +73,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         Height = 21
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz datê >'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 1
@@ -89,7 +89,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
         Height = 21
         AutoSize = False
         BevelKind = bkTile
-        Caption = '<wybierz datê >'
+        Caption = '<wybierz dat'#281' >'
         Color = clWindow
         ParentColor = False
         TabOrder = 2
@@ -104,7 +104,7 @@ inherited CChoosePeriodForm: TCChoosePeriodForm
       Top = 152
       Width = 337
       Height = 81
-      Caption = ' Wyœwietlanie  '
+      Caption = ' Wy'#347'wietlanie  '
       TabOrder = 1
       object LabelView: TLabel
         Left = 24

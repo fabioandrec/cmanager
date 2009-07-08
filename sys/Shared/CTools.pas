@@ -128,6 +128,7 @@ function IsLowestDatetime(ADateTime: TDateTime): Boolean;
 function IsHighestDatetime(ADateTime: TDateTime): Boolean;
 function LowestDatetime: TDatetime;
 function HighestDatetime: TDatetime;
+function GetResourceUri(AResname: String): String;
 
 implementation
 
@@ -1297,6 +1298,12 @@ end;
 function HighestDatetime: TDatetime;
 begin
   Result := Trunc(MaxDateTime);
+end;
+
+function GetResourceUri(AResname: String): String;
+begin
+  Result := 'res://' + IncludeTrailingPathDelimiter(ExtractFilePath(
+    ExpandFileName(ParamStr(0)))) + AResname;
 end;
 
 end.

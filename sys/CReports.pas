@@ -729,7 +729,8 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      StrUtils, Variants, CPreferences, CInfoFormUnit, CPluginConsts,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
      CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
-     CBaseFrameUnit, CChoosePeriodInstrumentValueFormUnit, CAdox;
+     CBaseFrameUnit, CChoosePeriodInstrumentValueFormUnit, CAdox,
+     CChoosePeriodYearFormUnit;
 
 var LDefaultXsl: ICXMLDOMDocument = Nil;
     LPropertyXml: ICXMLDOMDocument = Nil;
@@ -5561,11 +5562,14 @@ var xFieldI, xFieldO, xFieldC: String;
     xOperations: TADOQuery;
     xFilter: String;
     xCurrs: TDataGids;
-    xInsums, xOutsums: TSumList;
+    xInsums, xOutsums, xInyearsums, xOutyearsums: TSumList;
     xGid: TDataGid;
     xLabel: String;
     xRec, xRowCount, xTypeCount, xCurCount, xYearCount, xYears: Integer;
     xBody: TStringList;
+    xInsum, xOutsum: TSum;
+    xInStr, xOutStr, xOvrStr: String;
+    xInValue, xOutValue: Currency;
 begin
   if CurrencyView = CCurrencyViewBaseMovements then begin
     xFieldI := 'movementIncome';
@@ -5585,6 +5589,8 @@ begin
                     xFilter, xFieldC]));
   xInsums := TSumList.Create(True);
   xOutsums := TSumList.Create(True);
+  xInyearsums := TSumList.Create(True);
+  xOutyearsums := TSumList.Create(True);
   xCurrs := TDataGids.Create;
   while not xOperations.Eof do begin
     xGid := xOperations.FieldByName('idCurrencyDef').AsString;
@@ -5608,66 +5614,100 @@ begin
         Add('<td class="headcash" colspan="2" width="10%">' + IntToStr(YearOf(FStartYear) + xYearCount - 1) + '</td>');
       end;
       Add('</tr></table><hr>');
-      Add('<table class="base">');
       for xRowCount := 1 to 12 do begin
+        Add('<table class="base">');
         for xTypeCount := 1 to 3 do begin
           Add('<tr class="' + IsEvenToStr(xRec) + 'base">');
           for xYearCount := 1 to xYears do begin
+            xLabel := Date2StrDate(EncodeDate(YearOf(FStartYear) + xYearCount - 1, xRowCount, 1));
+            xInsum := xInsums.ByNameCurrency[xLabel, xCurrs.Strings[xCurCount]];
+            if xInsum <> Nil then begin
+              xInValue := xInsum.value;
+            end else begin
+              xInValue := 0;
+            end;
+            xOutsum := xOutsums.ByNameCurrency[xLabel, xCurrs.Strings[xCurCount]];
+            if xInsum <> Nil then begin
+              xOutValue := xOutsum.value;
+            end else begin
+              xOutValue := 0;
+            end;
+            if (xOutsum <> Nil) or (xInsum <> Nil) then begin
+              xInStr := CurrencyToString(xInValue);
+              xOutStr := CurrencyToString(xOutValue);
+              xOvrStr := CurrencyToString(xInValue - xOutValue);
+              xInyearsums.AddSum(IntToStr(xYearCount), xInValue, xCurrs.Strings[xCurCount]);
+              xOutyearsums.AddSum(IntToStr(xYearCount), xOutValue, xCurrs.Strings[xCurCount]);
+            end else begin
+              xInStr := '';
+              xOutStr := '';
+              xOvrStr := '';
+            end;
             if xTypeCount = 1 then begin
               if (xYearCount = 1) then begin
                 Add('<td width="10%" rowspan="3" class="infocolumnleft">' + GetFormattedDate(EncodeDate(2000, xRowCount, 1), CMonthnameDateFormat) + '</td>');
-                if xRowCount = 1 then begin
-                   Add('<td width="10%" class="text">Przychód</td>');
-                end else begin
-                  Add('<td width="10%" class="text"></td>');
-                end;
+                Add('<td width="10%" class="text">Przychód</td>');
               end;
-              Add('<td width="10%" class="cash">1.10</td>');
+              Add('<td width="10%" class="cash">' + xInStr +'</td>');
             end else if xTypeCount = 2 then begin
               if (xYearCount = 1) then begin
-                if xRowCount = 1 then begin
-                  Add('<td width="10%" class="text">Rozchód</td>');
-                end else begin
-                  Add('<td width="10%" class="text"></td>');
-                end;
+                Add('<td width="10%" class="text">Rozchód</td>');
               end;
-              Add('<td width="10%" class="cash">2.10</td>');
+              Add('<td width="10%" class="cash">' + xOutStr +'</td>');
             end else if xTypeCount = 3 then begin
               if (xYearCount = 1) then begin
-                if xRowCount = 1 then begin
-                  Add('<td width="10%" class="text">Saldo</td>');
-                end else begin
-                  Add('<td width="10%" class="text"></td>');
-                end;
+                Add('<td width="10%" class="text">Saldo</td>');
               end;
-              Add('<td width="10%" class="cash">10.2</td>');
+              Add('<td width="10%" class="cash">' + xOvrStr +'</td>');
             end;
           end;
           Inc(xRec);
           Add('</tr>');
         end;
+        Add('</table><hr>');
       end;
-      Add('</table><hr>');
       Add('<table class="base">');
       for xTypeCount := 1 to 3 do begin
         Add('<tr class="' + IsEvenToStr(xTypeCount) + 'sum">');
         for xYearCount := 1 to xYears do begin
+          xLabel := IntToStr(xYearCount);
+          xInsum := xInyearsums.ByNameCurrency[xLabel, xCurrs.Strings[xCurCount]];
+          if xInsum <> Nil then begin
+            xInValue := xInsum.value;
+          end else begin
+            xInValue := 0;
+          end;
+          xOutsum := xOutyearsums.ByNameCurrency[xLabel, xCurrs.Strings[xCurCount]];
+          if xInsum <> Nil then begin
+            xOutValue := xOutsum.value;
+          end else begin
+            xOutValue := 0;
+          end;
+          if (xOutsum <> Nil) or (xInsum <> Nil) then begin
+            xInStr := CurrencyToString(xInValue);
+            xOutStr := CurrencyToString(xOutValue);
+            xOvrStr := CurrencyToString(xInValue - xOutValue);
+          end else begin
+            xInStr := '';
+            xOutStr := '';
+            xOvrStr := '';
+          end;
           if xTypeCount = 1 then begin
             if (xYearCount = 1) then begin
               Add('<td class="sumtext" width="10%" rowspan="3">Razem</td>');
               Add('<td class="sumtext" width="10%" class="text">Przychód</td>');
             end;
-            Add('<td width="10%" class="sumcash">1.10</td>');
+            Add('<td width="10%" class="sumcash">' + xInStr + '</td>');
           end else if xTypeCount = 2 then begin
             if (xYearCount = 1) then begin
               Add('<td width="10%" class="sumtext">Rozchód</td>');
             end;
-            Add('<td width="10%" class="sumcash">2.10</td>');
+            Add('<td width="10%" class="sumcash">' + xOutStr + '</td>');
           end else if xTypeCount = 3 then begin
             if (xYearCount = 1) then begin
               Add('<td width="10%" class="sumtext">Saldo</td>');
             end;
-            Add('<td width="10%" class="sumcash">10.2</td>');
+            Add('<td width="10%" class="sumcash">' + xOvrStr + '</td>');
           end;
         end;
         Add('</tr>');
@@ -5684,6 +5724,8 @@ begin
   xInsums.Free;
   xOutsums.Free;
   xCurrs.Free;
+  xInyearsums.Free;
+  xOutyearsums.Free;
 end;
 
 function TYearComparisionReport.GetReportTitle: String;
@@ -5692,14 +5734,16 @@ begin
 end;
 
 function TYearComparisionReport.PrepareReportConditions: Boolean;
-var xYears: TADOQuery;
 begin
-  xYears := GDataProvider.OpenSql('select min(yearDate) as minDate, max(yearDate) as maxDate from baseMovement');
-  FStartYear := xYears.FieldByName('minDate').AsDateTime;
-  FEndYear := xYears.FieldByName('maxDate').AsDateTime;
-  xYears.Free;
-  Result := True;
+  Result := ChoosePeriodYearFilterByForm(FStartYear, FEndYear, FIdFilter, @CurrencyView, True);
 end;
+
+{  xYears := GDataProvider.OpenSql('select min(yearDate) as minDate, max(yearDate) as maxDate from baseMovement');
+  FStartYear := StartOfTheYear(xYears.FieldByName('minDate').AsDateTime);
+  FEndYear := EndOfTheYear(xYears.FieldByName('maxDate').AsDateTime);
+  xYears.Free;
+  Result := True;}
+
 
 initialization
 finalization

@@ -161,7 +161,8 @@ uses
   CDepositMovementFrameUnit in 'CDepositMovementFrameUnit.pas' {CDepositMovementFrame: TFrame},
   CDepositInvestmentPayFormUnit in 'CDepositInvestmentPayFormUnit.pas' {CDepositInvestmentPayForm},
   CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
-  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm};
+  CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm},
+  CChoosePeriodYearFormUnit in 'CChoosePeriodYearFormUnit.pas' {CChoosePeriodYearFilterForm};
 
 {$R *.res}
 
@@ -219,8 +220,6 @@ begin
         if GBasePreferences.startupCheckUpdates then begin
           CheckForUpdates(True);
         end;
-        TestOneReport;
-        Application.Terminate;
         Application.CreateForm(TCMainForm, CMainForm);
         GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;

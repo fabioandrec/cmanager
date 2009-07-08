@@ -246,8 +246,8 @@ begin
   xOutproducts := TProduct.GetList(TProduct, ProductProxy, 'select * from product where productType = ''' + COutProduct + '''');
   xCurdefs := TCurrencyDef.GetList(TCurrencyDef, CurrencyDefProxy, 'select * from currencyDef');
   while (xDate <= ADateTo) do begin
+    GDataProvider.BeginTransaction;
     for xCount := 1 to AOutCount do begin
-      GDataProvider.BeginTransaction;
       with TBaseMovement.CreateObject(BaseMovementProxy, False) do begin
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
         xMovementCurrency := TCurrencyDef(xCurdefs.Items[Random(xCurdefs.Count)]);
@@ -286,10 +286,8 @@ begin
         idCashPoint := xCashpoint.id;
         idProduct := xProduct.id;
       end;
-      GDataProvider.CommitTransaction;
     end;
     for xCount := 1 to AInCount do begin
-      GDataProvider.BeginTransaction;
       with TBaseMovement.CreateObject(BaseMovementProxy, False) do begin
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
         xMovementCurrency := TCurrencyDef(xCurdefs.Items[Random(xCurdefs.Count)]);
@@ -328,10 +326,8 @@ begin
         idCashPoint := xCashpoint.id;
         idProduct := xProduct.id;
       end;
-      GDataProvider.CommitTransaction;
     end;
     for xCount := 1 to ATransferCount do begin
-      GDataProvider.BeginTransaction;
       xTries := 0;
       repeat
         xAccount := TAccount(xAccounts.Items[Random(xAccounts.Count)]);
@@ -370,8 +366,8 @@ begin
           regDate := xDate;
         end;
       end;
-      GDataProvider.CommitTransaction;
     end;
+    GDataProvider.CommitTransaction;
     StepWaitForm(1);
     xDate := IncDay(xDate);
   end;
