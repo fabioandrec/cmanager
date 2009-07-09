@@ -1053,7 +1053,8 @@ var xCount: Integer;
     xProp: Property_;
 begin
   with AInfo do begin
-    AInfo.Add('System: ' + GetWindowsVersion);  
+    AInfo.Add('System: ' + GetWindowsVersionStr);
+    AInfo.Add('Wersja: ' + GetWindowsVersionNumbers);
     AInfo.Add('Procesor: ' + GetEnvironmentVariable('PROCESSOR_ARCHITECTURE'));
     AInfo.Add('Model: ' + GetEnvironmentVariable('PROCESSOR_IDENTIFIER'));
     AInfo.Add('Procesory: ' + GetEnvironmentVariable('NUMBER_OF_PROCESSORS'));

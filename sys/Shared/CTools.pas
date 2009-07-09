@@ -129,7 +129,8 @@ function IsHighestDatetime(ADateTime: TDateTime): Boolean;
 function LowestDatetime: TDatetime;
 function HighestDatetime: TDatetime;
 function GetResourceUri(AResname: String): String;
-function GetWindowsVersion: string;
+function GetWindowsVersionStr: string;
+function GetWindowsVersionNumbers: string;
 
 implementation
 
@@ -1307,7 +1308,17 @@ begin
     ExpandFileName(ParamStr(0)))) + AResname;
 end;
 
-function GetWindowsVersion: string;
+function GetWindowsVersionNumbers: string;
+var xVerInfo: TOsversionInfo;
+begin
+  xVerInfo.dwOSVersionInfoSize := SizeOf(xVerInfo);
+  GetVersionEx(xVerInfo);
+  with xVerInfo do begin
+    Result := Format('%d.%d.%d.%d', [dwPlatformId, dwMajorVersion, dwMinorVersion, dwBuildNumber]);
+  end;
+end;
+
+function GetWindowsVersionStr: string;
 var xVerInfo: TOsversionInfo;
     xPlatformId, xVersionNumber: string;
     xReg: TRegistry;
