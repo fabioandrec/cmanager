@@ -217,9 +217,13 @@ type
     FInternalIsFocused: Boolean;
     FCanvas: TCanvas;
     FWithtime: Boolean;
+    FDateTimeFormat: String;
+    FTextOnEmpty: String;
     procedure SetValue(const Value: TDateTime);
     procedure UpdateCaption;
     procedure SetWithtime(const Value: Boolean);
+    procedure SetDateTimeFormat(const Value: String);
+    procedure SetTextOnEmpty(const Value: String);
   protected
     procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
     procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
@@ -237,6 +241,8 @@ type
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property HotTrack: Boolean read FHotTrack write FHotTrack;
     property Withtime: Boolean read FWithtime write SetWithtime;
+    property DateTimeFormat: String read FDateTimeFormat write SetDateTimeFormat;
+    property TextOnEmpty: String read FTextOnEmpty write SetTextOnEmpty;
   end;
 
   TCEditError = class(Exception);
@@ -1446,6 +1452,18 @@ begin
   end;
 end;
 
+procedure TCDateTime.SetDateTimeFormat(const Value: String);
+begin
+  FDateTimeFormat := Value;
+  UpdateCaption;
+end;
+
+procedure TCDateTime.SetTextOnEmpty(const Value: String);
+begin
+  FTextOnEmpty := Value;
+  UpdateCaption;
+end;
+
 procedure TCDateTime.SetValue(const Value: TDateTime);
 begin
   if FValue <> Value then begin
@@ -1467,9 +1485,17 @@ end;
 procedure TCDateTime.UpdateCaption;
 begin
   if FValue <> 0 then begin
-    Caption := FormatDateTime('yyyy-mm-dd' + IfThen(FWithtime, ' hh:nn', ''), FValue);
+    if FDateTimeFormat = '' then begin
+      Caption := FormatDateTime('yyyy-mm-dd' + IfThen(FWithtime, ' hh:nn', ''), FValue);
+    end else begin
+      Caption := FormatDateTime(FDateTimeFormat, FValue);
+    end;
   end else begin
-    Caption := '<wybierz datê ' + IfThen(FWithtime, ' i czas', '') + '>';
+    if FTextOnEmpty = '' then begin
+      Caption := '<wybierz datê ' + IfThen(FWithtime, ' i czas', '') + '>';
+    end else begin
+      Caption := FTextOnEmpty;
+    end;
   end;
 end;
 

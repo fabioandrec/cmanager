@@ -28,6 +28,7 @@ Wersja 1.11.1
     zostanie wyœwietlona formatka dodawania operacji z danymi operacji, na której by³ wykonany dwuklik
 [-] poprawki przy filtrowaniu kursów walut, je¿eli lista kursów wywo³ywana by³a z poziomu formatki operacji
 [-] poprawka b³êdu modyfikacji kursu waluty w przypadku zmiany np. kursu USD/PLN na PLN/USD
+[+] nowy raport "Porównanie lat", pozwalaj¹cy porównaæ miesiêczne wydatki w kilku latach
 
 Wersja 1.10.2 Beta
 [i] wyjœcie kolejnej wersji beta (2008-07-14)

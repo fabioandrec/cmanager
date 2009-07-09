@@ -5738,13 +5738,6 @@ begin
   Result := ChoosePeriodYearFilterByForm(FStartYear, FEndYear, FIdFilter, @CurrencyView, True);
 end;
 
-{  xYears := GDataProvider.OpenSql('select min(yearDate) as minDate, max(yearDate) as maxDate from baseMovement');
-  FStartYear := StartOfTheYear(xYears.FieldByName('minDate').AsDateTime);
-  FEndYear := EndOfTheYear(xYears.FieldByName('maxDate').AsDateTime);
-  xYears.Free;
-  Result := True;}
-
-
 initialization
 finalization
   LDefaultXsl := Nil;

@@ -6,7 +6,7 @@ interface
 
 {$WARN SYMBOL_PLATFORM OFF}
 
-uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics, Math, ShlObj;
+uses Windows, Types, Contnrs, Classes, StdCtrls, Graphics, Math, ShlObj, Registry;
 
 const
   CEmptyDataGid = '';
@@ -129,6 +129,7 @@ function IsHighestDatetime(ADateTime: TDateTime): Boolean;
 function LowestDatetime: TDatetime;
 function HighestDatetime: TDatetime;
 function GetResourceUri(AResname: String): String;
+function GetWindowsVersion: string;
 
 implementation
 
@@ -1304,6 +1305,41 @@ function GetResourceUri(AResname: String): String;
 begin
   Result := 'res://' + IncludeTrailingPathDelimiter(ExtractFilePath(
     ExpandFileName(ParamStr(0)))) + AResname;
+end;
+
+function GetWindowsVersion: string;
+var xVerInfo: TOsversionInfo;
+    xPlatformId, xVersionNumber: string;
+    xReg: TRegistry;
+begin
+  xVerInfo.dwOSVersionInfoSize := SizeOf(xVerInfo);
+  GetVersionEx(xVerInfo);
+  xReg := TRegistry.Create(KEY_READ);
+  try
+    try
+      xReg.RootKey := HKEY_LOCAL_MACHINE;
+      case xVerInfo.dwPlatformId of
+        VER_PLATFORM_WIN32s: begin
+          xPlatformId := 'Windows 3.1';
+        end;
+        VER_PLATFORM_WIN32_WINDOWS: begin
+          xReg.OpenKey('\SOFTWARE\Microsoft\Windows\CurrentVersion', False);
+          xPlatformId := xReg.ReadString('ProductName');
+          xVersionNumber := xReg.ReadString('VersionNumber');
+        end;
+        VER_PLATFORM_WIN32_NT: begin
+          xReg.OpenKey('\SOFTWARE\Microsoft\Windows NT\CurrentVersion', False);
+          xPlatformId := xReg.ReadString('ProductName');
+          xVersionNumber := xReg.ReadString('CurrentVersion');
+        end;
+      end;
+      Result := xPlatformId + ' (wersja ' + xVersionNumber + ')';
+    except
+      Result := '(b³¹d odczytu rejestru)';
+    end
+  finally
+    xReg.Free;
+  end
 end;
 
 end.

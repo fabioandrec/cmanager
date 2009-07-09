@@ -1053,8 +1053,10 @@ var xCount: Integer;
     xProp: Property_;
 begin
   with AInfo do begin
+    AInfo.Add('System: ' + GetWindowsVersion);  
     AInfo.Add('Procesor: ' + GetEnvironmentVariable('PROCESSOR_ARCHITECTURE'));
     AInfo.Add('Model: ' + GetEnvironmentVariable('PROCESSOR_IDENTIFIER'));
+    AInfo.Add('Procesory: ' + GetEnvironmentVariable('NUMBER_OF_PROCESSORS'));
     if GDataProvider.Connection <> Nil then begin
       AInfo.Add('Informacje o po³¹czeniu:');
       for xCount := 0 to GDataProvider.Connection.Properties.Count - 1 do begin

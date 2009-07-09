@@ -135,12 +135,6 @@ var xDf, xDe: TDateTime;
 begin
   CDateTime1.Enabled := ComboBoxPredefined.ItemIndex = 0;
   CDateTime2.Enabled := ComboBoxPredefined.ItemIndex = 0;
-  CDateTime1.Visible := ComboBoxPredefined.ItemIndex <> 10;
-  CDateTime2.Visible := ComboBoxPredefined.ItemIndex <> 10;
-  Label1.Visible := ComboBoxPredefined.ItemIndex <> 10;
-  Label1.Update;
-  Label2.Visible := ComboBoxPredefined.ItemIndex <> 10;
-  Label2.Update;
   GetFilterDates(xDf, xDe);
   CDateTime1.Value := xDf;
   CDateTime2.Value := xDe;
