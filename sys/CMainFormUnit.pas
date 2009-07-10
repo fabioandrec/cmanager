@@ -194,21 +194,26 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CInvestmentPortfolioFrameUnit, CConfigFormUnit, Math,
      CCreateDatafileFormUnit, CListPreferencesFormUnit, StrUtils,
      CExportDatafileFormUnit, CImportDatafileFormUnit, CChangePasswordFormUnit,
-  CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
-  CDepositCalculatorFormUnit, CDebug, CReports;
+     CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
+     CDepositCalculatorFormUnit, CDebug, CReports;
+     
 {$R *.dfm}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
 var xCount: Integer;
     xItem: TActionClientItem;
     xCaption: String;
+    xItemStr: String;
 begin
   Result := Nil;
   xCount := 0;
   xCaption := AnsiUpperCase(StringReplace(ACaption, '&', '', [rfReplaceAll, rfIgnoreCase]));
+  xCaption := PolishConversion(splWindows, splASCII, xCaption);
   while (Result = Nil) and (xCount <= AActionClients.Count - 1) do begin
     xItem := TActionClientItem(AActionClients.Items[xCount]);
-    if AnsiUpperCase(StringReplace(xItem.Caption, '&', '', [rfReplaceAll, rfIgnoreCase])) = xCaption then begin
+    xItemStr := PolishConversion(splWindows, splASCII,
+      AnsiUpperCase(StringReplace(xItem.Caption, '&', '', [rfReplaceAll, rfIgnoreCase])));
+    if xItemStr = xCaption then begin
       Result := xItem;
     end else begin
       Result := FindActionClientByCaption(xItem.Items, ACaption);

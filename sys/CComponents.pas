@@ -547,6 +547,18 @@ type
   TCSpeedButton = class(TSpeedButton)
   end;
 
+  TCLabel = class(TLabel)
+  private
+    FHottrack: Boolean;
+  protected
+    procedure CMMouseenter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseleave(var Message: TMessage); message CM_MOUSELEAVE;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Hottrack: Boolean read FHottrack write FHottrack;
+  end;
+
 function GetCurrencySymbol: string;
 procedure SetCurrencySymbol(ACurrencyId: String; ACurrencySymbol: String; AComponentTag: Integer);
 function FindNodeWithIndex(AIndex: Cardinal; AList: TVirtualStringTree): PVirtualNode;
@@ -571,7 +583,9 @@ var LOddColor: TColor;
 
 procedure Register;
 begin
-  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit, TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar, TCRichedit, TCPanel, TCSpeedButton]);
+  RegisterComponents('CManager', [TCButton, TCImage, TCStatic, TCCurrEdit,
+    TCDateTime, TCBrowser, TCIntEdit, TCList, TCDataList, TCStatusBar,
+    TCRichedit, TCPanel, TCSpeedButton, TCLabel]);
 end;
 
 function GetBrighterColor(ABaseColor: TColor): TColor;
@@ -2984,6 +2998,32 @@ begin
     BevelOuter := bvNone;
   end;
   Invalidate;
+end;
+
+procedure TCLabel.CMMouseenter(var Message: TMessage);
+begin
+  if (not (csDesigning in ComponentState)) and Enabled and FHottrack then begin
+    Font.Style := Font.Style + [fsUnderline];
+    Font.Color := clNavy;
+    Cursor := crHandPoint;
+    Invalidate;
+  end;
+end;
+
+procedure TCLabel.CMMouseleave(var Message: TMessage);
+begin
+  if (not (csDesigning in ComponentState)) and Enabled and FHottrack then begin
+    Font.Style := Font.Style - [fsUnderline];
+    Font.Color := clWindowText;
+    Cursor := crDefault;
+    Invalidate;
+  end;
+end;
+
+constructor TCLabel.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FHottrack := False;
 end;
 
 initialization

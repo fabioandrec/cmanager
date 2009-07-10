@@ -17,26 +17,6 @@ object CCalendarForm: TCCalendarForm
   OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
-  object CButton: TCButton
-    Left = 103
-    Top = 173
-    Width = 58
-    Height = 18
-    Cursor = crHandPoint
-    PicPosition = ppLeft
-    PicOffset = 10
-    TxtOffset = 15
-    Framed = False
-    Caption = 'Dzisiaj'
-    OnClick = CButtonClick
-    Color = clBtnFace
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = [fsBold]
-    OnMouseDown = CButtonMouseDown
-  end
   object Bevel: TBevel
     Left = 0
     Top = 0
@@ -46,30 +26,43 @@ object CCalendarForm: TCCalendarForm
     Shape = bsSpacer
     Style = bsRaised
   end
-  object CButtonChoose: TCButton
-    Left = 1
-    Top = 173
-    Width = 56
-    Height = 18
-    Cursor = crHandPoint
-    PicPosition = ppLeft
-    PicOffset = 10
-    TxtOffset = 15
-    Framed = False
-    Caption = '20:20'
-    OnClick = CButtonChooseClick
-    Color = clBtnFace
+  object CLabelToday: TCLabel
+    Left = 120
+    Top = 172
+    Width = 38
+    Height = 13
+    Alignment = taRightJustify
+    Caption = 'Dzisiaj'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    OnClick = CLabelTodayClick
+    OnMouseDown = CLabelTodayMouseDown
+    Hottrack = True
+  end
+  object CLabelNow: TCLabel
+    Left = 8
+    Top = 172
+    Width = 27
+    Height = 13
+    Caption = '22:22'
+    OnClick = CLabelNowClick
+    Hottrack = True
   end
   object MonthCalendar: TMonthCalendar
     Left = 0
     Top = 7
     Width = 169
-    Height = 146
+    Height = 136
     Align = alTop
+    AutoSize = True
     CalColors.BackColor = clBtnFace
     CalColors.MonthBackColor = clBtnFace
     CalColors.TrailingTextColor = clBtnFace
-    Date = 38974.628708078700000000
+    Date = 38974.310786145830000000
     ShowToday = False
     ShowTodayCircle = False
     TabOrder = 0
@@ -77,7 +70,7 @@ object CCalendarForm: TCCalendarForm
     OnClick = MonthCalendarDblClick
     OnDblClick = MonthCalendarDblClick
   end
-  object TrackBar1: TTrackBar
+  object TrackBarTime: TTrackBar
     Left = 12
     Top = 157
     Width = 147
@@ -88,6 +81,6 @@ object CCalendarForm: TCCalendarForm
     ThumbLength = 7
     TickMarks = tmTopLeft
     TickStyle = tsNone
-    OnChange = TrackBar1Change
+    OnChange = TrackBarTimeChange
   end
 end

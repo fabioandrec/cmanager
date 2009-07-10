@@ -4,21 +4,21 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, Buttons, ExtCtrls, CComponents, ActnList, StdCtrls;
+  Dialogs, ComCtrls, Buttons, ExtCtrls, CComponents, ActnList, StdCtrls, CommCtrl;
 
 type
   TCCalendarForm = class(TForm)
-    CButton: TCButton;
     MonthCalendar: TMonthCalendar;
     Bevel: TBevel;
-    TrackBar1: TTrackBar;
-    CButtonChoose: TCButton;
+    TrackBarTime: TTrackBar;
+    CLabelToday: TCLabel;
+    CLabelNow: TCLabel;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MonthCalendarDblClick(Sender: TObject);
-    procedure CButtonClick(Sender: TObject);
-    procedure TrackBar1Change(Sender: TObject);
-    procedure CButtonChooseClick(Sender: TObject);
-    procedure CButtonMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure TrackBarTimeChange(Sender: TObject);
+    procedure CLabelTodayMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure CLabelTodayClick(Sender: TObject);
+    procedure CLabelNowClick(Sender: TObject);
   private
     FWithtime: Boolean;
     FChoosenDatetime: TDateTime;
@@ -100,57 +100,67 @@ begin
   end;
 end;
 
-procedure TCCalendarForm.CButtonClick(Sender: TObject);
-begin
-  ModalResult := mrOk;
-end;
-
 procedure TCCalendarForm.InitializeCalendar(ADateTime: TDateTime; AWithtime: Boolean; AParent: TWinControl);
+var xR: TRect;
 begin
+  if HandleAllocated then begin
+    SendMessage(MonthCalendar.Handle, MCM_GETMINREQRECT, 0, Longint(@xR));
+  end;
   FWithtime := AWithtime;
   FChoosenDatetime := ADateTime;
   MonthCalendar.Date := FChoosenDatetime;
-  TrackBar1.Position := Trunc(1440 * TimeOf(FChoosenDatetime));
+  Width := xR.Right - xR.Left + 24;
+  Height := xR.Bottom - xR.Top + IfThen(AWithtime, 66, 46);
+  TrackBarTime.Position := Trunc(1440 * TimeOf(FChoosenDatetime));
   RefreshDatetimeControls;
   Top := AParent.ClientOrigin.Y + AParent.Height + 2;
   Left := AParent.ClientOrigin.X + 4;
   if Left + Width > Screen.Width then begin
     Left := Screen.Width - Width - 5;
   end;
-  TrackBar1.Visible := FWithtime;
-  CButtonChoose.Visible := FWithtime;
+  TrackBarTime.Top := MonthCalendar.Top + (xR.Bottom - xR.Top) + 8;
+  TrackBarTime.Left := MonthCalendar.Left + 4;
+  TrackBarTime.Width := MonthCalendar.Width - 8;
+  TrackBarTime.Visible := FWithtime;
+  CLabelNow.Visible := FWithtime;
   if FWithtime then begin
-    CButton.Caption := 'Teraz';
-    CButton.Left := CButton.Left + 5;
+    CLabelToday.Caption := 'Teraz';
+    CLabelToday.Left := CLabelToday.Left + 5;
   end else begin
-    Height := Height - 20;
-    CButton.Top := CButton.Top - 20;
+    CLabelToday.Top := MonthCalendar.Top + MonthCalendar.Height + 12;
   end;
+  CLabelToday.Left := MonthCalendar.BoundsRect.Right - CLabelToday.Width - 12;
+  CLabelNow.Left := 12;
 end;
 
 procedure TCCalendarForm.RefreshDatetimeControls;
 begin
-  CButtonChoose.Caption := FormatDateTime('hh:nn', FChoosenDatetime);
-  CButtonChoose.Repaint;
+  CLabelNow.Caption := FormatDateTime('hh:nn', FChoosenDatetime);
+  CLabelNow.Repaint;
 end;
 
-procedure TCCalendarForm.TrackBar1Change(Sender: TObject);
+procedure TCCalendarForm.TrackBarTimeChange(Sender: TObject);
 begin
-  FChoosenDatetime := DateOf(FChoosenDatetime) + TrackBar1.Position / 1440;
+  FChoosenDatetime := DateOf(FChoosenDatetime) + TrackBarTime.Position / 1440;
   RefreshDatetimeControls;
 end;
 
-procedure TCCalendarForm.CButtonChooseClick(Sender: TObject);
+procedure TCCalendarForm.CLabelTodayMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  FChoosenDatetime := Now;
+  MonthCalendar.Date := FChoosenDatetime;
+  TrackBarTime.Position := Trunc(1440 * TimeOf(FChoosenDatetime));
+  RefreshDatetimeControls;
+end;
+
+procedure TCCalendarForm.CLabelTodayClick(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-procedure TCCalendarForm.CButtonMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TCCalendarForm.CLabelNowClick(Sender: TObject);
 begin
-  FChoosenDatetime := Now;
-  MonthCalendar.Date := FChoosenDatetime;
-  TrackBar1.Position := Trunc(1440 * TimeOf(FChoosenDatetime));
-  RefreshDatetimeControls;
+  ModalResult := mrOk;
 end;
 
 end.
