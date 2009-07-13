@@ -7,6 +7,7 @@ var GDebugLog: String = '';
 
 procedure DebugStartTickCount(AId: String);
 procedure DebugEndTickCounting(AId: String; AText: String = '');
+procedure DebugSaveToLog(AText: String);
 
 implementation
 
@@ -29,6 +30,13 @@ begin
     end else begin
       SaveToLog(AId + ' ' + AText, GDebugLog);
     end;
+  end;
+end;
+
+procedure DebugSaveToLog(AText: String);
+begin
+  if GDebugMode and (GDebugLog <> '') then begin
+    SaveToLog(AText, GDebugLog);
   end;
 end;
 

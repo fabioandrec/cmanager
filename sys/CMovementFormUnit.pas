@@ -230,7 +230,7 @@ uses CAccountsFrameUnit, CFrameFormUnit, CCashpointsFrameUnit,
   CDoneFrameUnit, CConsts, CMovementFrameUnit, CDescpatternFormUnit,
   CTemplates, CPreferences, CRichtext, CDataobjectFrameUnit,
   CSurpassedFormUnit, CTools, CCurrencydefFrameUnit,
-  CCurrencyRateFrameUnit, CDatatools;
+  CCurrencyRateFrameUnit, CDatatools, CDebug;
 
 {$R *.dfm}
 
@@ -263,6 +263,7 @@ var xAdd: TMovementAdditionalData;
     xQuickPatternMovementType: TBaseEnumeration;
     xCyclicMovementType: TBaseEnumeration;
 begin
+  DebugStartTickCount('TCMovementForm.InitializeForm');
   if Operation = coAdd then begin
     Caption := Caption + ' - dodawanie';
   end else if Operation = coEdit then begin
@@ -450,6 +451,7 @@ begin
       ActiveControl := CCurrEditOnceTransMovement;
     end;
   end;
+  DebugEndTickCounting('TCMovementForm.InitializeForm');
 end;
 
 procedure TCMovementForm.CStaticInoutOnceAccountGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);

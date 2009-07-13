@@ -185,7 +185,7 @@ uses CFrameFormUnit, CInfoFormUnit, CConfigFormUnit, CDataobjectFormUnit,
   Types, CDoneFormUnit, CDoneFrameUnit, CConsts, CPreferences,
   CListPreferencesFormUnit, CReports, CMovmentListElementFormUnit,
   CMovementListFormUnit, CTools, CPluginConsts, CDatatools,
-  CFilterDetailFrameUnit;
+  CFilterDetailFrameUnit, CDebug;
 
 {$R *.dfm}
 

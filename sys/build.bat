@@ -1,9 +1,9 @@
-rc /R ..\res\cmanagericons.rc
-rc /R ..\res\cupdateicons.rc
-rc /R ..\res\carchiveicons.rc
-rc /R ..\res\cqueryicons.rc
-rc /R ..\res\ctransformicons.rc
-rc /R ..\res\cvalidateicons.rc
+brcc32 ..\res\cmanagericons.rc
+brcc32 ..\res\cupdateicons.rc
+brcc32 ..\res\carchiveicons.rc
+brcc32 ..\res\cqueryicons.rc
+brcc32 ..\res\ctransformicons.rc
+brcc32 ..\res\cvalidateicons.rc
 copy /Y ..\res\*.res .\
 brcc32 CMandbpat.rc
 brcc32 strings.rc
