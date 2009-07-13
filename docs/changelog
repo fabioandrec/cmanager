@@ -29,6 +29,7 @@ Wersja 1.11.1
 [-] poprawki przy filtrowaniu kursów walut, je¿eli lista kursów wywo³ywana by³a z poziomu formatki operacji
 [-] poprawka b³êdu modyfikacji kursu waluty w przypadku zmiany np. kursu USD/PLN na PLN/USD
 [+] nowy raport "Porównanie lat", pozwalaj¹cy porównaæ miesiêczne wydatki w kilku latach
+[-] podczas tworzenia nowego harmonogramu, po wyborze wartoœci innej ni¿ rozchód harmonogram definiowany by³ jako transfer (dziêki Tomek)
 
 Wersja 1.10.2 Beta
 [i] wyjœcie kolejnej wersji beta (2008-07-14)

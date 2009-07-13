@@ -311,7 +311,7 @@ begin
     description := RichEditDesc.Text;
     if ComboBoxType.ItemIndex = 0 then begin
       movementType := COutMovement;
-    end else if ComboBoxType.ItemIndex = 0 then begin
+    end else if ComboBoxType.ItemIndex = 1 then begin
       movementType := CInMovement;
     end else begin
       movementType := CTransferMovement;
