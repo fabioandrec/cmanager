@@ -1559,18 +1559,20 @@ end;
 
 procedure TCMovementForm.UpdateAccountCurEdit(ARate: TCStatic; ASourceEdit, ATargetEdit: TCCurrEdit; AHelper: TCurrencyRateHelper);
 begin
-  if ASourceEdit.CurrencyId <> ATargetEdit.CurrencyId then begin
-    if ARate.DataId <> CEmptyDataGid then begin
-      if AHelper <> Nil then begin
-        ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value, ASourceEdit.CurrencyId, ATargetEdit.CurrencyId);
+  if (ASourceEdit <> Nil) and (ATargetEdit <> Nil) then begin
+    if ASourceEdit.CurrencyId <> ATargetEdit.CurrencyId then begin
+      if ARate.DataId <> CEmptyDataGid then begin
+        if AHelper <> Nil then begin
+          ATargetEdit.Value := AHelper.ExchangeCurrency(ASourceEdit.Value, ASourceEdit.CurrencyId, ATargetEdit.CurrencyId);
+        end else begin
+          ATargetEdit.Value := 0;
+        end;
       end else begin
         ATargetEdit.Value := 0;
       end;
     end else begin
-      ATargetEdit.Value := 0;
+      ATargetEdit.Value := ASourceEdit.Value;
     end;
-  end else begin
-    ATargetEdit.Value := ASourceEdit.Value;
   end;
 end;
 

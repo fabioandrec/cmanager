@@ -33,6 +33,7 @@ type
     function GetCurrencyIso(ACurrencyId: OleVariant): OleVariant;
     function ShowDialogBox(AMessage: OleVariant; ADialogType: Integer): Boolean;
     procedure ShowReportBox(AFormTitle: OleVariant; AReportBody: OleVariant);
+    function ShowDataobjectFrame(AFrameType: OleVariant): OleVariant;
     function GetSelectedType: Integer;
     function GetSelectedId: OleVariant;
     function GetShutdownEvent: Cardinal;
@@ -104,7 +105,7 @@ uses SysUtils, CTools, CXml, CDatabase, CInfoFormUnit, ADODB, CPreferences,
   CDoneFrameUnit, CFilterFrameUnit, CProfileFormUnit, CProfileFrameUnit,
   CLimitsFrameUnit, CCurrencydefFrameUnit, CCurrencyRateFrameUnit,
   CExtractionsFrameUnit, CExtractionItemFrameUnit, CUnitDefFrameUnit, Math,
-  CDebug;
+  CDebug, CFrameFormUnit;
 
 function GetObjectDelegate(AObjectName: PChar): Pointer; stdcall; export;
 var xName: String;
@@ -565,6 +566,20 @@ end;
 function TCManagerInterfaceObject.DebugMode: Boolean;
 begin
   Result := GDebugMode;
+end;
+
+function TCManagerInterfaceObject.ShowDataobjectFrame(AFrameType: OleVariant): OleVariant;
+var xClass: TCBaseFrameClass;
+    xId: String;
+    xText: String;
+begin
+  VarClear(Result);
+  xClass := GRegisteredClasses.FindClass(AFrameType);
+  if xClass <> Nil then begin
+    if TCFrameForm.ShowFrame(TCAccountsFrame, xId, xText) then begin
+      Result := xId;
+    end;
+  end;
 end;
 
 initialization

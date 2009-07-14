@@ -100,6 +100,11 @@ Opis interfejsu ICManagerInterface
      usuniêty. AOptParam ma znaczenie narazie tylko przy CFRAMETYPE_MOVEMENTLIST i tam w zale¿noœci od typu obiektu wysy³amy odp. 
      CFRAMEOPTPARAM_BASEMOVEMENT lub CFRAMEOPTPARAM_MOVEMENTLIST. W ka¿dym innym przypadku powinien zostaæ przekazany CFRAMEOPTPARAM_NULL.
 
+   * function ShowDataobjectFrame(AFrameType: OleVariant): OleVariant; metoda pozwala wyœwietliæ formatkê z wyborem obiektu zwi¹zanego z 
+     wybranym frame-em, np. wywo³anie z parametrem CFRAMETYPE_MOVEMENTLIST pozwala pokazaæ formatkê z list¹ operacji. Je¿eli jakaœ operacja
+     zosta³a wybrana, jako wynik dzia³ania funkcji zostanie zwrócony jej identyfikator, je¿eli podano b³êdny typ frame-u lub nie wybrano
+     ¿adnego obiektu wynikiem jest pusty variant 
+
    * function GetState: Integer; funkcja zwraca jedn¹ z trzech wartoœci: CMANAGERSTATE_STARTING w momencie gdy CManager jest uruchamiany
      (a¿ do momentu wyœwietlenia g³ownej formatki), CMANAGERSTATE_RUNNING - przez ca³y czas dzia³ania (a¿ do momentu naciœniêcia przycisku 
      zamykaj¹cego g³owne okno), CMANAGERSTATE_CLOSING gdy nastêpuje zamykanie CManager-a
@@ -181,6 +186,7 @@ Przyk³adowe wtyczki
 10. SqlConsole.dll        - prosta wtyczka typu "po prostu wykonaj" pozwalaj¹ca na wykonanie dowolnej komendy Sql na pliku danych
 11. OnStart.dll           - prosta wtyczka typu "po prostu uruchom" z zastosowaniem parametrów dodatkowych wskazuj¹cych kiedy nale¿y wykonaæ uruchomienie
 12. Metastock.dll         - wtyczka pokazuje jak wykonaæ wczytywnie notowañ
+13. ShowAccountList.dll   - wtyczka pokazuje zastosowanie ShowDataobjectFrame 
 
 Mnemoniki podstawowe
 

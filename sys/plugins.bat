@@ -17,4 +17,6 @@ dcc32 /b /q SqlConsole.dpr
 cd ..\Metastock
 brcc32 Default.rc
 dcc32 /b /q Metastock.dpr
+cd ..\ShowAccountList
+dcc32 /b /q ShowAccountList.dpr
 cd ..\..

@@ -61,7 +61,7 @@ constructor TCDescpatternForm.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FDescPatterns := TDescPatterns.Create(False);
-  FDescPatterns.Text := GDescPatterns.Text;
+  FDescPatterns.Assign(GDescPatterns);
   FKeyName := '';
 end;
 

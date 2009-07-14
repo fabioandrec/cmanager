@@ -12,7 +12,7 @@ BRCC = $(ROOT)\bin\brcc32.exe $**
 PROJECTS = CManager.exe CUpdate.exe CArchive.exe CQuery.exe CTransform.exe \
   CValidate.exe NBPCurrencyRates.dll NBPBSCurrencyRates.dll RunCalc.dll \
   DbStats.dll AccountList.dll AccountChart.dll MbankExtFF.dll ShOper.dll \
-  SqlConsole.dll SndMess.dll OnStart.dll Metastock.dll
+  SqlConsole.dll SndMess.dll OnStart.dll Metastock.dll ShowAccountList.dll
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -69,6 +69,9 @@ CValidate.exe: ..\sys\CValidate.dpr
   $(DCC)
 
 Metastock.dll: ..\sys\Plugins\Metastock\Metastock.dpr
+  $(DCC)
+
+ShowAccountList.dll: ..\sys\Plugins\ShowAccountList\ShowAccountList.dpr
   $(DCC)
 
 
