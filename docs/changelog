@@ -30,6 +30,7 @@ Wersja 1.11.1
 [-] poprawka b³êdu modyfikacji kursu waluty w przypadku zmiany np. kursu USD/PLN na PLN/USD
 [+] nowy raport "Porównanie lat", pozwalaj¹cy porównaæ miesiêczne wydatki w kilku latach
 [-] podczas tworzenia nowego harmonogramu, po wyborze wartoœci innej ni¿ rozchód harmonogram definiowany by³ jako transfer (dziêki Tomek)
+[+] nowa metoda w interfejsie ICManagerInterface, patrz plik plugins
 
 Wersja 1.10.2 Beta
 [i] wyjœcie kolejnej wersji beta (2008-07-14)
