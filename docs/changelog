@@ -7,8 +7,8 @@ CMANAGER - CHANGELOG
 [i] informacja
 
 Wersja 1.11.1
-[i] wyjœcie kolejnej wersji beta (2009-06-16)
-[*] przejœcie na wersjê Virtual Tree View 4.7.0 
+[i] wyjœcie kolejnej wersji beta (2009-07-17)
+[*] przejœcie na wersjê Virtual Tree View 4.8.5
 [-] je¿eli podczas otwierania pliku danych przy starcie CManager-a wystêpowa³ b³¹d, CManager po wyœwietleniu stosownego komunikatu nie uruchamia³ siê, co 
     prowadzi³o do koniecznoœci rêcznego edytowania pliku konfiguracyjnego. Teraz CManager wyœwietli komunikat, i uruchomi siê bez otwartego pliku danych
 [+] w menu poderêcznym kategorii dodano pozycê pozwalaj¹c¹ na dodanie podkategorii
