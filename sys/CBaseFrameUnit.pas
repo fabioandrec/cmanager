@@ -265,7 +265,7 @@ begin
     Ustawienialisty1.Visible := GetPrefname <> '';
     if (AMultipleCheck <> Nil) then begin
       xList.TreeOptions.MiscOptions := xList.TreeOptions.MiscOptions + [toCheckSupport];
-      xList.CheckImageKind := ckDarkTick;
+      xList.CheckImageKind := ckSystem;
       xList.OnChecked := ListChecked;
     end;
     Odwrzaznaczenie1.Visible := AMultipleCheck <> Nil;

@@ -1,5 +1,6 @@
 inherited CProductsFrame: TCProductsFrame
   inherited List: TCDataList
+    CheckImageKind = ckSystemDefault
     Header.MainColumn = 0
     Columns = <
       item
