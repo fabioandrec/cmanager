@@ -216,6 +216,7 @@ object CMainForm: TCMainForm
         Colors.UnfocusedSelectionColor = clHighlight
         DefaultNodeHeight = 60
         Header.AutoSizeIndex = -1
+        Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText
         Header.Font.Height = -11
@@ -273,6 +274,7 @@ object CMainForm: TCMainForm
           Top = 4
           Width = 14
           Height = 14
+          BevelOuter = bvNone
           Caption = '3'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText

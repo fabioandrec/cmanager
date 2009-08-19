@@ -47,11 +47,14 @@ object CProgressForm: TCProgressForm
     Top = 98
     Width = 320
     Height = 21
+    Hint = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     AutoSize = False
     BevelKind = bkTile
     Caption = '<kliknij tutaj aby zobaczy'#263' raport z wykonanych czynno'#347'ci>'
     Color = clWindow
     ParentColor = False
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 4
     TabStop = True
     Transparent = False
@@ -68,6 +71,7 @@ object CProgressForm: TCProgressForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    IsFlatButton = False
     DesignSize = (
       406
       41)
@@ -101,6 +105,7 @@ object CProgressForm: TCProgressForm
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 1
+    IsFlatButton = False
     object CImage: TCImage
       Left = 16
       Top = 16

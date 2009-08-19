@@ -6,7 +6,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml, WinInet;
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, jpeg, CHttpRequest, CXml, WinInet,
+  MsHtml, ActiveX;
 
 type
   TNBPBSCurrencyRatesBaseThread = class(TBaseHttpRequest)
@@ -154,10 +155,10 @@ end;
 
 function TNBPBSCurrencyRatesBaseThread.AfterGetResponse(ARequestIdentifier: String): Cardinal;
 var xLocalization: String;
+    xDoc: IHTMLDocument2;
     xResponse: String;
-    xHtml: String;
-    xStag, xEtag: Integer;
-    xPath: String;
+    xLink: IHTMLElement;
+    xVar: Variant;
 begin
   Result := inherited AfterGetResponse(ARequestIdentifier);
   if ARequestIdentifier = '' then begin
@@ -176,21 +177,25 @@ begin
         AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
       end;
     end else begin
-      xHtml := ResponseBuffer;
-      xLocalization := '';
-      xStag := LastDelimiter('/', Url);
-      xPath := Copy(Url, 1, xStag);
-      xStag := Pos(CSTARTTAG, xHtml);
-      if xStag > 0 then begin
-        xStag := xStag + Length(CSTARTTAG);
-        xEtag := PosEx(CENDTAG, xHtml, xStag);
-        if xEtag > xStag then begin
-          xLocalization := xPath + Copy(xHtml, xStag, xEtag - xStag);
-        end;
+      xDoc := CoHTMLDocument.Create as IHTMLDocument2;
+      xDoc.designMode := 'on';
+      while xDoc.readyState <> 'complete' do begin
+        Sleep(1);
+      end;
+      xVar := VarArrayCreate([0, 0], VarVariant);
+      xVar[0] := ResponseBuffer;
+      xDoc.Write(PSafeArray(System.TVarData(xVar).VArray));
+      xDoc.designMode := 'off';
+      while xDoc.readyState <> 'complete' do begin
+        Sleep(1);
+      end;
+      if xDoc.links.length >= 4 then begin
+        xLink := xDoc.links.item(3, '') as IHTMLElement;
+        xLocalization := (xLink as IHTMLAnchorElement).pathname;
       end;
       if xLocalization <> '' then begin
         AddToReport('Rozpoczêcie pobierania tabeli kursów walut...');
-        Url := xLocalization;
+        Url := Hostname + '/' + xLocalization;
         InternetCloseHandle(FRequestHandle);
         InternetCloseHandle(FConnectHandle);
         InternetCloseHandle(FInternetHandle);

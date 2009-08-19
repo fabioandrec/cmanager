@@ -196,8 +196,11 @@ uses CDataObjects, CCashpointsFrameUnit, CFrameFormUnit, CAccountsFrameUnit,
      CExportDatafileFormUnit, CImportDatafileFormUnit, CChangePasswordFormUnit,
      CQuickpatternFrameUnit, CDepositInvestmentFrameUnit,
      CDepositCalculatorFormUnit, CDebug, CReports;
-     
+
 {$R *.dfm}
+
+const
+  CBlogUrl = 'http://sourceforge.net/apps/wordpress/cmanager/'; {'http://nazielonejtrawie.blogspot.com';}
 
 function FindActionClientByCaption(AActionClients: TActionClients; ACaption: String): TActionClientItem;
 var xCount: Integer;
@@ -1048,9 +1051,11 @@ begin
   ShowDepositCalculator(False, Nil);
 end;
 
+
+
 procedure TCMainForm.ActionGreenGrassExecute(Sender: TObject);
 begin
-  ShellExecute(0, nil, 'http://nazielonejtrawie.blogspot.com', nil, nil, SW_SHOWNORMAL);
+  ShellExecute(0, nil, CBlogUrl, nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure GetCmanagerSystemInfo(AInfo: TStringList);

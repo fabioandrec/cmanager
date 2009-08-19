@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ExtCtrls, Math, ComCtrls, ImgList,
-  PngImageList, CComponents;
+  PngImageList, CComponents, Themes;
 
 const
   CIMAGE_OK = 0;
@@ -28,7 +28,6 @@ type
     FBtnFaceBrush: HBRUSH;
     FHighliteBrush: HBRUSH;
     FImage: TBitmap;
-    FImageRect: TRect;
   protected
     procedure DoAnimate;
     procedure Execute; override;
@@ -134,7 +133,12 @@ begin
       end;
     end;
     Brush.Color := clHighlight;
-    FillRect(Rect(FCurLeft, 1, Min(FCurLeft + FCurWidth, FProgress.Width - 3), FProgress.Height - 3));
+    if ThemeServices.ThemesEnabled then begin
+      ThemeServices.DrawElement(Handle, ThemeServices.GetElementDetails(tpBar), Rect(0, 0, FProgress.Width, FProgress.Height));
+      ThemeServices.DrawElement(Handle, ThemeServices.GetElementDetails(tpChunk), Rect(FCurLeft, 1, Min(FCurLeft + FCurWidth, FProgress.Width - 1), FProgress.Height - 1));
+    end else begin
+      FillRect(Rect(FCurLeft, 1, Min(FCurLeft + FCurWidth, FProgress.Width - 3), FProgress.Height - 3));
+    end;
   end;
   xDC := GetDC(FProgress.Handle);
   try
@@ -153,7 +157,6 @@ begin
   FImage := TBitmap.Create;
   FImage.Width := FProgress.Width;
   FImage.Height := FProgress.Height;
-  FImageRect := Rect(0, 0, FProgress.Width, FProgress.Height);
   while not Terminated do begin
     xRes := WaitForSingleObject(FWaitHandle, 5);
     if xRes = WAIT_TIMEOUT then begin
@@ -237,6 +240,9 @@ begin
   end else if AWaitType = wtAnimate then begin
     ProgressBar.Visible := False;
     ProgressText.Visible := True;
+    if ThemeServices.ThemesEnabled then begin
+      ProgressText.BorderStyle := sbsNone;
+    end;
     FWaitHandle := CreateEvent(Nil, True, False, Nil);
     FWaitThread := TWaitThread.Create(FWaitHandle, ProgressText);
     FWaitThread.Resume;
