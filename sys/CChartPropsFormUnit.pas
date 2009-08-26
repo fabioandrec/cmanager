@@ -11,7 +11,7 @@ type
   TMarksStyle = (msHidden, msValues, msLabels);
 
   TCChartPropsForm = class(TCBaseForm)
-    GroupBox1: TGroupBox;
+    GroupBoxView: TGroupBox;
     ComboBox: TComboBox;
     TrackBarRotate: TTrackBar;
     Label1: TLabel;
@@ -28,16 +28,21 @@ type
     Label9: TLabel;
     TrackBarDepth: TTrackBar;
     Label10: TLabel;
-    GroupBox2: TGroupBox;
+    GroupBoxLegend: TGroupBox;
     ComboBoxLegendPos: TComboBox;
     Label11: TLabel;
     TrackBarZoom: TTrackBar;
     Label12: TLabel;
     GroupBoxMarks: TGroupBox;
     ComboBoxMarks: TComboBox;
-    GroupBox3: TGroupBox;
+    GroupBoxAvgs: TGroupBox;
     CheckBoxReg: TCheckBox;
     CheckBoxAvg: TCheckBox;
+    CheckBoxMed: TCheckBox;
+    CheckBoxAvgWei: TCheckBox;
+    CheckBoxOp: TCheckBox;
+    CheckBoxWs: TCheckBox;
+    CheckBoxAvgGeo: TCheckBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxLegendPosChange(Sender: TObject);
@@ -51,6 +56,11 @@ type
     procedure ComboBoxMarksChange(Sender: TObject);
     procedure CheckBoxRegClick(Sender: TObject);
     procedure CheckBoxAvgClick(Sender: TObject);
+    procedure CheckBoxOpClick(Sender: TObject);
+    procedure CheckBoxWsClick(Sender: TObject);
+    procedure CheckBoxAvgWeiClick(Sender: TObject);
+    procedure CheckBoxAvgGeoClick(Sender: TObject);
+    procedure CheckBoxMedClick(Sender: TObject);
   private
     Fchart: TCChart;
     Fprefs: TChartPref;
@@ -261,6 +271,11 @@ begin
     tilt := TrackBarTilt.Position;
     isAvg := CheckBoxAvg.Checked;
     isReg := CheckBoxReg.Checked;
+    isGeo := CheckBoxAvgGeo.Checked;
+    isWeight := CheckBoxAvgWei.Checked;
+    isMed := CheckBoxMed.Checked;
+    isRes := CheckBoxOp.Checked;
+    isSup := CheckBoxWs.Checked;
   end;
 end;
 
@@ -317,6 +332,36 @@ end;
 procedure TCChartPropsForm.CheckBoxAvgClick(Sender: TObject);
 begin
   Fchart.isAvgVisible := CheckBoxAvg.Checked;
+  UpdatePrefs;
+end;
+
+procedure TCChartPropsForm.CheckBoxOpClick(Sender: TObject);
+begin
+  Fchart.isResVisible := CheckBoxOp.Checked;
+  UpdatePrefs;
+end;
+
+procedure TCChartPropsForm.CheckBoxWsClick(Sender: TObject);
+begin
+  Fchart.isSupVisible := CheckBoxWs.Checked;
+  UpdatePrefs;
+end;
+
+procedure TCChartPropsForm.CheckBoxAvgWeiClick(Sender: TObject);
+begin
+  Fchart.isWeightVisible := CheckBoxAvgWei.Checked;
+  UpdatePrefs;
+end;
+
+procedure TCChartPropsForm.CheckBoxAvgGeoClick(Sender: TObject);
+begin
+  Fchart.isGeoVisible := CheckBoxAvgGeo.Checked;
+  UpdatePrefs;
+end;
+
+procedure TCChartPropsForm.CheckBoxMedClick(Sender: TObject);
+begin
+  Fchart.isMedVisible := CheckBoxMed.Checked;
   UpdatePrefs;
 end;
 

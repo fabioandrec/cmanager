@@ -162,7 +162,8 @@ uses
   CDepositInvestmentPayFormUnit in 'CDepositInvestmentPayFormUnit.pas' {CDepositInvestmentPayForm},
   CImportDatafileFormUnit in 'CImportDatafileFormUnit.pas' {CImportDatafileForm},
   CExportDatafileFormUnit in 'CExportDatafileFormUnit.pas' {CExportDatafileForm},
-  CChoosePeriodYearFormUnit in 'CChoosePeriodYearFormUnit.pas' {CChoosePeriodYearFilterForm};
+  CChoosePeriodYearFormUnit in 'CChoosePeriodYearFormUnit.pas' {CChoosePeriodYearFilterForm},
+  CMath in 'Shared\CMath.pas';
 
 {$R *.res}
 
@@ -221,7 +222,7 @@ begin
           CheckForUpdates(True);
         end;
         Application.CreateForm(TCMainForm, CMainForm);
-        GPlugins.ScanForPlugins;
+  GPlugins.ScanForPlugins;
         CMainForm.UpdatePluginsMenu;
         CMainForm.ExecuteOnstartupPlugins;
         if (GBasePreferences.startupDatafileMode = CStartupFilemodeLastOpened) or (GBasePreferences.startupDatafileMode = CStartupFilemodeThisfile) then begin

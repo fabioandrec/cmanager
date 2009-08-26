@@ -68,6 +68,11 @@ type
     Ftilt: Integer;
     FisAvg: Boolean;
     FisReg: Boolean;
+    FisGeo: Boolean;
+    FisWeight: Boolean;
+    FisMed: Boolean;
+    FisRes: Boolean;
+    FisSup: Boolean;
   public
     procedure LoadFromXml(ANode: ICXMLDOMNode); override;
     procedure SaveToXml(ANode: ICXMLDOMNode); override;
@@ -85,6 +90,11 @@ type
     property tilt: Integer read Ftilt write Ftilt;
     property isAvg: Boolean read FisAvg write FisAvg;
     property isReg: Boolean read FisReg write FisReg;
+    property isGeo: Boolean read FisGeo write FisGeo;
+    property isWeight: Boolean read FisWeight write FisWeight;
+    property isMed: Boolean read FisMed write FisMed;
+    property isRes: Boolean read FisRes write FisRes;
+    property isSup: Boolean read FisSup write FisSup;
   end;
 
   TFramePref = class(TPrefItem)
@@ -760,6 +770,11 @@ begin
   Ftilt := GetXmlAttribute('tilt', ANode, 0);
   FisAvg := GetXmlAttribute('isAvg', ANode, False);
   FisReg := GetXmlAttribute('isReg', ANode, False);
+  FisGeo := GetXmlAttribute('isGeo', ANode, False);
+  FisWeight := GetXmlAttribute('isWeight', ANode, False);
+  FisMed := GetXmlAttribute('isMed', ANode, False);
+  FisRes := GetXmlAttribute('isRes', ANode, False);
+  FisSup := GetXmlAttribute('isSup', ANode, False);
 end;
 
 procedure TChartPref.SaveToXml(ANode: ICXMLDOMNode);
@@ -776,6 +791,11 @@ begin
   SetXmlAttribute('tilt', ANode, Ftilt);
   SetXmlAttribute('isAvg', ANode, FisAvg);
   SetXmlAttribute('isReg', ANode, FisReg);
+  SetXmlAttribute('isGeo', ANode, FisGeo);
+  SetXmlAttribute('isWeight', ANode, FisWeight);
+  SetXmlAttribute('isMed', ANode, FisMed);
+  SetXmlAttribute('isRes', ANode, FisRes);
+  SetXmlAttribute('isSup', ANode, FisSup);
 end;
 
 function GetDefaultViewPreferences: TPrefList;

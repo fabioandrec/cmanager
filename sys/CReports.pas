@@ -713,7 +713,6 @@ type
 
 procedure ShowSimpleReport(AFormTitle, AReportText: string);
 procedure ShowXsltReport(AFormTitle: string; AXmlText: String; AXsltText: String);
-procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
 function GetCSSReportFile(AFromUserProfile: Boolean): String;
 function GetXSLReportFile(AFromUserProfile: Boolean): String;
 function GetHTMReportFile(AFromUserProfile: Boolean): String;
@@ -730,7 +729,7 @@ uses Forms, Adodb, CConfigFormUnit, Math,
      CChoosePeriodFilterGroupFormUnit, CAdotools, CBase64,
      CParamsDefsFrameUnit, CFrameFormUnit, CChooseByParamsDefsFormUnit,
      CBaseFrameUnit, CChoosePeriodInstrumentValueFormUnit, CAdox,
-     CChoosePeriodYearFormUnit;
+     CChoosePeriodYearFormUnit, CMath;
 
 var LDefaultXsl: ICXMLDOMDocument = Nil;
     LPropertyXml: ICXMLDOMDocument = Nil;
@@ -824,26 +823,6 @@ end;
 function MonthCount(AEndDay, AStartDay: TDateTime): Integer;
 begin
   Result := Trunc(DayCount(AEndDay, AStartDay) / ApproxDaysPerMonth);
-end;
-
-procedure RegLin(DBx, DBy: array of Double; var A, B: Double);
-var SigX, SigY : Double;
-    SigXY : Double;
-    SigSqrX : Double;
-    n, i : Word;
-begin
-  n := High(DBx) + 1;
-  SigX := 0; SigY := 0;
-  SigXY := 0;
-  SigSqrX := 0;
-  for i := 0 to n-1 do begin
-    SigX := SigX + DBx[i];
-    SigY := SigY + DBy[i];
-    SigXY := SigXY + (DBx[i] * DBy[i]);
-    SigSqrX := SigSqrX + Sqr(DBx[i]);
-  end;
-  A := (n * SigXY - SigX * SigY) / (n * SigSqrX - Sqr(Sigx));
-  B := 1/n * (SigY - A * SigX);
 end;
 
 function ColToRgb(AColor: TColor): String;
@@ -3111,8 +3090,8 @@ begin
 end;
 
 function TPeriodSums.GetregresionData: TRegresionData;
-var xArray: array of Double;
-    yArray: array of Double;
+var xArray: TDoubleDynArray;
+    yArray: TDoubleDynArray;
     xCount: Integer;
 begin
   SetLength(xArray, Count);
@@ -3613,6 +3592,11 @@ begin
         Legend.ShadowSize := 0;
         isAvgVisible := xPref.isAvg;
         isRegVisible := xPref.isReg;
+        isMedVisible := xPref.isMed;
+        isResVisible := xPref.isRes;
+        isSupVisible := xPref.isSup;
+        isWeightVisible := xPref.isWeight;
+        isGeoVisible := xPref.isGeo;
       end else begin
         Legend.LegendStyle := lsSeries;
         Legend.Visible := False;

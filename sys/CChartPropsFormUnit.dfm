@@ -1,16 +1,16 @@
 inherited CChartPropsForm: TCChartPropsForm
-  Left = 193
-  Top = 74
+  Left = 319
+  Top = 274
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Wygl'#261'd wykresu'
-  ClientHeight = 538
-  ClientWidth = 340
+  ClientHeight = 328
+  ClientWidth = 543
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object GroupBox1: TGroupBox
+  object GroupBoxView: TGroupBox
     Left = 16
     Top = 16
     Width = 305
@@ -200,17 +200,17 @@ inherited CChartPropsForm: TCChartPropsForm
       OnChange = TrackBarZoomChange
     end
   end
-  object GroupBox2: TGroupBox
-    Left = 16
+  object GroupBoxLegend: TGroupBox
+    Left = 336
     Top = 248
-    Width = 305
-    Height = 73
+    Width = 185
+    Height = 65
     Caption = ' Legenda '
     TabOrder = 1
     object ComboBoxLegendPos: TComboBox
       Left = 27
-      Top = 28
-      Width = 249
+      Top = 24
+      Width = 134
       Height = 21
       BevelInner = bvNone
       BevelKind = bkTile
@@ -227,15 +227,15 @@ inherited CChartPropsForm: TCChartPropsForm
   end
   object GroupBoxMarks: TGroupBox
     Left = 16
-    Top = 336
+    Top = 248
     Width = 305
-    Height = 73
+    Height = 65
     Caption = ' Warto'#347'ci '
     TabOrder = 2
     object ComboBoxMarks: TComboBox
       Left = 27
-      Top = 28
-      Width = 249
+      Top = 24
+      Width = 246
       Height = 21
       BevelInner = bvNone
       BevelKind = bkTile
@@ -249,30 +249,75 @@ inherited CChartPropsForm: TCChartPropsForm
         'nazwy')
     end
   end
-  object GroupBox3: TGroupBox
-    Left = 16
-    Top = 424
-    Width = 305
-    Height = 97
-    Caption = ' Informacje dodatkowe '
+  object GroupBoxAvgs: TGroupBox
+    Left = 336
+    Top = 16
+    Width = 185
+    Height = 217
+    Caption = ' Do ka'#380'dej serii dodaj '
     TabOrder = 3
     object CheckBoxReg: TCheckBox
       Left = 32
       Top = 28
-      Width = 241
+      Width = 73
       Height = 17
-      Caption = 'Do ka'#380'dej serii dodaj lini'#281' trendu'
+      Caption = 'lini'#281' trendu'
       TabOrder = 0
       OnClick = CheckBoxRegClick
     end
     object CheckBoxAvg: TCheckBox
       Left = 32
-      Top = 60
-      Width = 241
+      Top = 100
+      Width = 121
       Height = 17
-      Caption = 'Do ka'#380'dej serii dodaj '#347'redni'#261' arytmetyczn'#261
-      TabOrder = 1
+      Caption = #347'redni'#261' arytmetyczn'#261
+      TabOrder = 3
       OnClick = CheckBoxAvgClick
+    end
+    object CheckBoxMed: TCheckBox
+      Left = 32
+      Top = 172
+      Width = 73
+      Height = 17
+      Caption = 'median'#281
+      TabOrder = 6
+      OnClick = CheckBoxMedClick
+    end
+    object CheckBoxAvgWei: TCheckBox
+      Left = 32
+      Top = 124
+      Width = 121
+      Height = 17
+      Caption = #347'redni'#261' wa'#380'on'#261
+      TabOrder = 4
+      OnClick = CheckBoxAvgWeiClick
+    end
+    object CheckBoxOp: TCheckBox
+      Left = 32
+      Top = 52
+      Width = 73
+      Height = 17
+      Caption = 'lini'#281' oporu'
+      TabOrder = 1
+      OnClick = CheckBoxOpClick
+    end
+    object CheckBoxWs: TCheckBox
+      Left = 32
+      Top = 76
+      Width = 89
+      Height = 17
+      Caption = 'lini'#281' wsparcia'
+      TabOrder = 2
+      OnClick = CheckBoxWsClick
+    end
+    object CheckBoxAvgGeo: TCheckBox
+      Left = 32
+      Top = 148
+      Width = 121
+      Height = 17
+      Caption = #347'redni'#261' geometryczn'#261
+      TabOrder = 5
+      OnClick = CheckBoxAvgGeoClick
     end
   end
 end

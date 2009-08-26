@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, CReportFormUnit, StdCtrls, Buttons, ExtCtrls, TeeProcs,
   TeEngine, Chart, Series, ActnList, CComponents, Contnrs, VirtualTrees,
-  CImageListsUnit, Menus, StrUtils;
+  CImageListsUnit, Menus, StrUtils, Math, Types;
 
 type
   TCChart = class(TChart)
@@ -16,13 +16,28 @@ type
     Fimage: Integer;
     FregSeries: TObjectList;
     FavgSeries: TObjectList;
+    FmedSeries: TObjectList;
+    FresSeries: TObjectList;
+    FsupSeries: TObjectList;
+    FweightSeries: TObjectList;
+    FgeoSeries: TObjectList;
     function GetIsPie: Boolean;
     function GetIsBar: Boolean;
     function GetIsLin: Boolean;
     function GetIsavgVisible: Boolean;
     function GetIsregVisible: Boolean;
+    function GetIsgeoVisible: Boolean;
+    function GetIsmedVisible: Boolean;
+    function GetIsresVisible: Boolean;
+    function GetIssupVisible: Boolean;
+    function GetIsweightVisible: Boolean;
     procedure SetIsavgVisible(const Value: Boolean);
     procedure SetIsregVisible(const Value: Boolean);
+    procedure SetIsgeotVisible(const Value: Boolean);
+    procedure SetIsmedVisible(const Value: Boolean);
+    procedure SetIsresVisible(const Value: Boolean);
+    procedure SetIssupVisible(const Value: Boolean);
+    procedure SetIsweightVisible(const Value: Boolean);
   protected
     function GetSeriesOfClassCount(ASerie: TChartSeries): Integer;
   public
@@ -34,6 +49,11 @@ type
     property isLin: Boolean read GetIsLin;
     property isAvgVisible: Boolean read GetIsavgVisible write SetIsavgVisible;
     property isRegVisible: Boolean read GetIsregVisible write SetIsregVisible;
+    property isMedVisible: Boolean read GetIsmedVisible write SetIsmedVisible;
+    property isResVisible: Boolean read GetIsresVisible write SetIsresVisible;
+    property isSupVisible: Boolean read GetIssupVisible write SetIssupVisible;
+    property isWeightVisible: Boolean read GetIsweightVisible write SetIsweightVisible;
+    property isGeoVisible: Boolean read GetIsgeoVisible write SetIsgeotVisible;
     property image: Integer read Fimage write Fimage;
     destructor Destroy; override;
   end;
@@ -97,45 +117,147 @@ type
 
 implementation
 
-uses CChartPropsFormUnit, CReports, CConfigFormUnit, Math, CPreferences,
-  CConsts, CListPreferencesFormUnit;
+uses CChartPropsFormUnit, CReports, CConfigFormUnit, CPreferences,
+  CConsts, CListPreferencesFormUnit, CMath;
 
 {$R *.dfm}
+
+function SeriesToDoubleArray(ASerie: TChartSeries): TDoubleDynArray;
+var xLength, xCount: Integer;
+begin
+  xLength := ASerie.Count;
+  SetLength(Result, xLength);
+  for xCount := 0 to xLength - 1 do begin
+    Result[xCount] := ASerie.YValue[xCount];
+  end;
+end;
 
 procedure PrepareAvgSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
 var xCount: Integer;
     xSum: Double;
 begin
-  xSum := 0;
-  for xCount := 0 to ASourceSerie.Count - 1 do begin
-    xSum := xSum + ASourceSerie.YValue[xCount];
+  if ASourceSerie.Count > 0 then begin
+    xSum := AvgDoubleArray(SeriesToDoubleArray(ASourceSerie));
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(ASourceSerie.XValue[xCount], xSum);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Œrednie)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
   end;
-  xSum := xSum / ASourceSerie.Count;
-  for xCount := 0 to ASourceSerie.Count - 1 do begin
-    ADestserie.AddXY(ASourceSerie.XValue[xCount], xSum);
-  end;
-  ADestserie.Title := ASourceSerie.Title + ' (Œrednie)';
-  ADestserie.Marks.Assign(ASourceSerie.Marks);
 end;
 
 procedure PrepareRegSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
-var xXVals: array of Double;
-    xYVals: array of Double;
+var xXVals: TDoubleDynArray;
+    xYVals: TDoubleDynArray;
     xA, xB: Double;
     xCount: Integer;
 begin
-  SetLength(xXVals, ASourceSerie.Count);
-  SetLength(xYVals, ASourceSerie.Count);
-  for xCount := 0 to ASourceSerie.Count - 1 do begin
-    xXVals[xCount] := ASourceSerie.XValue[xCount];
-    xYVals[xCount] := ASourceSerie.YValue[xCount];
+  if ASourceSerie.Count > 0 then begin
+    SetLength(xXVals, ASourceSerie.Count);
+    SetLength(xYVals, ASourceSerie.Count);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      xXVals[xCount] := ASourceSerie.XValue[xCount];
+      xYVals[xCount] := ASourceSerie.YValue[xCount];
+    end;
+    RegLin(xXVals, xYVals, xA, xB);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Linia trendu)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
   end;
-  RegLin(xXVals, xYVals, xA, xB);
-  for xCount := 0 to ASourceSerie.Count - 1 do begin
-    ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
+end;
+
+procedure PrepareMedSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xSeriesArray: TDoubleDynArray;
+    xValue: Double;
+    xCount: Integer;
+begin
+  if ASourceSerie.Count > 0 then begin
+    xSeriesArray := SeriesToDoubleArray(ASourceSerie);
+    xValue := MedDoubleArray(xSeriesArray);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(ASourceSerie.XValue[xCount], xValue);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Mediana)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
   end;
-  ADestserie.Title := ASourceSerie.Title + ' (Linia trendu)';
-  ADestserie.Marks.Assign(ASourceSerie.Marks);
+end;
+
+procedure PrepareGeoSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xSeriesArray: TDoubleDynArray;
+    xValue: Double;
+    xCount: Integer;
+begin
+  if ASourceSerie.Count > 0 then begin
+    xSeriesArray := SeriesToDoubleArray(ASourceSerie);
+    xValue := GeoDoubleArray(xSeriesArray);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(ASourceSerie.XValue[xCount], xValue);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Œrednie geometryczne)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
+  end;
+end;
+
+procedure PrepareWeightSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xSeriesArray: TDoubleDynArray;
+    xValue: Double;
+    xCount: Integer;
+begin
+  if ASourceSerie.Count > 0 then begin
+    xSeriesArray := SeriesToDoubleArray(ASourceSerie);
+    xValue := WeightDoubleArray(xSeriesArray);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(ASourceSerie.XValue[xCount], xValue);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Œrednie wa¿one)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
+  end;
+end;
+
+procedure PrepareResSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xXVals: TDoubleDynArray;
+    xYVals: TDoubleDynArray;
+    xA, xB: Double;
+    xCount: Integer;
+begin
+  if ASourceSerie.Count > 0 then begin
+    SetLength(xXVals, ASourceSerie.Count);
+    SetLength(xYVals, ASourceSerie.Count);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      xXVals[xCount] := ASourceSerie.XValue[xCount];
+      xYVals[xCount] := ASourceSerie.YValue[xCount];
+    end;
+    ResLin(xXVals, xYVals, xA, xB);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Linia oporu)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
+  end;
+end;
+
+procedure PrepareSupSerie(ASourceSerie: TChartSeries; ADestserie: TLineSeries);
+var xXVals: TDoubleDynArray;
+    xYVals: TDoubleDynArray;
+    xA, xB: Double;
+    xCount: Integer;
+begin
+  if ASourceSerie.Count > 0 then begin
+    SetLength(xXVals, ASourceSerie.Count);
+    SetLength(xYVals, ASourceSerie.Count);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      xXVals[xCount] := ASourceSerie.XValue[xCount];
+      xYVals[xCount] := ASourceSerie.YValue[xCount];
+    end;
+    SupLin(xXVals, xYVals, xA, xB);
+    for xCount := 0 to ASourceSerie.Count - 1 do begin
+      ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
+    end;
+    ADestserie.Title := ASourceSerie.Title + ' (Linia wsparcia)';
+    ADestserie.Marks.Assign(ASourceSerie.Marks);
+  end;
 end;
 
 procedure TCChartReportForm.DoPrint;
@@ -185,6 +307,11 @@ begin
   inherited Create(AOwner);
   FregSeries := TObjectList.Create(True);
   FavgSeries := TObjectList.Create(True);
+  FmedSeries := TObjectList.Create(True);
+  FresSeries := TObjectList.Create(True);
+  FsupSeries := TObjectList.Create(True);
+  FweightSeries := TObjectList.Create(True);
+  FgeoSeries := TObjectList.Create(True);
   Fsymbol := ASymbol;
   Ftitle := '';
   Fimage := -1;
@@ -412,6 +539,11 @@ destructor TCChart.Destroy;
 begin
   FregSeries.Free;
   FavgSeries.Free;
+  FmedSeries.Free;
+  FresSeries.Free;
+  FsupSeries.Free;
+  FweightSeries.Free;
+  FgeoSeries.Free;
   inherited Destroy;
 end;
 
@@ -434,6 +566,11 @@ begin
   xTemp.Free;
 end;
 
+function TCChart.GetIsgeoVisible: Boolean;
+begin
+  Result := FgeoSeries.Count > 0;
+end;
+
 function TCChart.GetIsLin: Boolean;
 var xCount: Integer;
     xTemp: TLineSeries;
@@ -446,6 +583,11 @@ begin
     Inc(xCount);
   end;
   xTemp.Free;
+end;
+
+function TCChart.GetIsmedVisible: Boolean;
+begin
+  Result := FmedSeries.Count > 0;
 end;
 
 function TCChart.GetIsPie: Boolean;
@@ -505,6 +647,21 @@ begin
   Result := FregSeries.Count > 0;
 end;
 
+function TCChart.GetIsresVisible: Boolean;
+begin
+  Result := FresSeries.Count > 0;
+end;
+
+function TCChart.GetIssupVisible: Boolean;
+begin
+  Result := FsupSeries.Count > 0;
+end;
+
+function TCChart.GetIsweightVisible: Boolean;
+begin
+  Result := FweightSeries.Count > 0;
+end;
+
 function TCChart.GetSeriesOfClassCount(ASerie: TChartSeries): Integer;
 var xCount: Integer;
 begin
@@ -520,19 +677,22 @@ end;
 
 procedure TCChart.SetIsavgVisible(const Value: Boolean);
 var xCount: Integer;
-    xAvgSerie: TLineSeries;
+    xCalcSerie: TLineSeries;
     xCurSerie: TChartSeries;
 begin
   if Value <> isAvgVisible then begin
     if Value then begin
       for xCount := 0 to SeriesCount - 1 do begin
         xCurSerie := Series[xCount];
-        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) then begin
-          xAvgSerie := TLineSeries.Create(Self);
-          FavgSeries.Add(xAvgSerie);
-          PrepareAvgSerie(xCurSerie, xAvgSerie);
-          xAvgSerie.XValues.DateTime := BottomAxis.ExactDateTime;
-          AddSeries(xAvgSerie);
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FavgSeries.Add(xCalcSerie);
+          PrepareAvgSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
         end;
       end;
     end else begin
@@ -544,21 +704,82 @@ begin
   end;
 end;
 
+procedure TCChart.SetIsgeotVisible(const Value: Boolean);
+var xCount: Integer;
+    xCalcSerie: TLineSeries;
+    xCurSerie: TChartSeries;
+begin
+  if Value <> isGeoVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FgeoSeries.Add(xCalcSerie);
+          PrepareGeoSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
+        end;
+      end;
+    end else begin
+      while (FgeoSeries.Count <> 0) do begin
+        SeriesList.Remove(FgeoSeries.Items[0]);
+        FgeoSeries.Delete(0);
+      end;
+    end;
+  end;
+end;
+
+procedure TCChart.SetIsmedVisible(const Value: Boolean);
+var xCount: Integer;
+    xCalcSerie: TLineSeries;
+    xCurSerie: TChartSeries;
+begin
+  if Value <> ismedVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FmedSeries.Add(xCalcSerie);
+          PrepareMedSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
+        end;
+      end;
+    end else begin
+      while (FmedSeries.Count <> 0) do begin
+        SeriesList.Remove(FmedSeries.Items[0]);
+        FmedSeries.Delete(0);
+      end;
+    end;
+  end;
+end;
+
 procedure TCChart.SetIsregVisible(const Value: Boolean);
 var xCount: Integer;
-    xRegSerie: TLineSeries;
+    xCalcSerie: TLineSeries;
     xCurSerie: TChartSeries;
 begin
   if Value <> isRegVisible then begin
     if Value then begin
       for xCount := 0 to SeriesCount - 1 do begin
         xCurSerie := Series[xCount];
-        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) then begin
-          xRegSerie := TLineSeries.Create(Self);
-          FregSeries.Add(xRegSerie);
-          PrepareRegSerie(xCurSerie, xRegSerie);
-          xRegSerie.XValues.DateTime := BottomAxis.ExactDateTime;
-          AddSeries(xRegSerie);
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FregSeries.Add(xCalcSerie);
+          PrepareRegSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
         end;
       end;
     end else begin
@@ -635,6 +856,93 @@ begin
     end;
   end;
   inherited;
+end;
+
+procedure TCChart.SetIsresVisible(const Value: Boolean);
+var xCount: Integer;
+    xCalcSerie: TLineSeries;
+    xCurSerie: TChartSeries;
+begin
+  if Value <> isResVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FresSeries.Add(xCalcSerie);
+          PrepareResSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
+        end;
+      end;
+    end else begin
+      while (FresSeries.Count <> 0) do begin
+        SeriesList.Remove(FresSeries.Items[0]);
+        FresSeries.Delete(0);
+      end;
+    end;
+  end;
+end;
+
+procedure TCChart.SetIssupVisible(const Value: Boolean);
+var xCount: Integer;
+    xCalcSerie: TLineSeries;
+    xCurSerie: TChartSeries;
+begin
+  if Value <> isSupVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FsupSeries.Add(xCalcSerie);
+          PrepareSupSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
+        end;
+      end;
+    end else begin
+      while (FsupSeries.Count <> 0) do begin
+        SeriesList.Remove(FsupSeries.Items[0]);
+        FsupSeries.Delete(0);
+      end;
+    end;
+  end;
+end;
+
+procedure TCChart.SetIsweightVisible(const Value: Boolean);
+var xCount: Integer;
+    xCalcSerie: TLineSeries;
+    xCurSerie: TChartSeries;
+begin
+  if Value <> isWeightVisible then begin
+    if Value then begin
+      for xCount := 0 to SeriesCount - 1 do begin
+        xCurSerie := Series[xCount];
+        if (FregSeries.IndexOf(xCurSerie) = -1) and (FavgSeries.IndexOf(xCurSerie) = -1) and
+           (FmedSeries.IndexOf(xCurSerie) = -1) and (FresSeries.IndexOf(xCurSerie) = -1) and
+           (FsupSeries.IndexOf(xCurSerie) = -1) and (FweightSeries.IndexOf(xCurSerie) = -1) and
+           (FgeoSeries.IndexOf(xCurSerie) = -1) then begin
+          xCalcSerie := TLineSeries.Create(Self);
+          FweightSeries.Add(xCalcSerie);
+          PrepareWeightSerie(xCurSerie, xCalcSerie);
+          xCalcSerie.XValues.DateTime := BottomAxis.ExactDateTime;
+          AddSeries(xCalcSerie);
+        end;
+      end;
+    end else begin
+      while (FweightSeries.Count <> 0) do begin
+        SeriesList.Remove(FweightSeries.Items[0]);
+        FweightSeries.Delete(0);
+      end;
+    end;
+  end;
 end;
 
 end.
