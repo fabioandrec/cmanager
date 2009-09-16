@@ -7,6 +7,8 @@ uses
   Dialogs, jpeg, ExtCtrls, StdCtrls, Buttons, MsHtml, ActiveX, Types;
 
 type
+  TExtractionType = (etCreditCard, etMonthExtraction, etPeriodExtraction);
+
   TMbankExtFFForm = class(TForm)
     Image: TImage;
     Label1: TLabel;
@@ -120,7 +122,7 @@ end;
 
 function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String): Boolean;
 
-  function AppendExtractionItem(ARootNode: ICXMLDOMNode; ARow: IHTMLElement; AIsCreditCard: Boolean; var AError: String): Boolean;
+  function AppendExtractionItem(ARootNode: ICXMLDOMNode; ARow: IHTMLElement; AExtractionType: TExtractionType; var AError: String): Boolean;
   var xAll: IHTMLElementCollection;
       xCount: Integer;
       xElement: IHTMLElement;
@@ -143,7 +145,7 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
     xTitlesStr := TStringList.Create;
     xCashStr := '';
     xAppenRow := False;
-    if AIsCreditCard then begin
+    if AExtractionType = etCreditCard then begin
       if xAll.length > 1 then begin
         xElement := xAll.item(0, varEmpty) as IHTMLElement;
         if StrToIntDef(xElement.innerText, -1) >= 1 then begin
@@ -169,7 +171,7 @@ function TMbankExtFFForm.PrepareOutputHtml(AInpage: String; var AError: String):
           end;
         end;
       end;
-    end else begin
+    end else if AExtractionType = etMonthExtraction then begin
       xCurrStr := 'PLN';
       xAppenRow := True;
       while (xCount <= xAll.length - 1) and Result do begin
@@ -241,12 +243,18 @@ var xDoc: IHTMLDocument2;
     xStartDate, xEndDate: TDateTime;
     xOutXml: ICXMLDOMDocument;
     xDocElement: ICXMLDOMElement;
-    xIsCreditCard: Boolean;
+    xExtractionType: TExtractionType;
     xStr: String;
 begin
   Result := False;
   FExtOutput := '';
-  xIsCreditCard := Pos('RACHUNKU KARTY KREDYTOWEJ', AInpage) > 0;
+  if Pos('RACHUNKU KARTY KREDYTOWEJ', AInpage) > 0 then begin
+    xExtractionType := etCreditCard;
+  end else if Pos('Elektroniczne zestawienie operacji za okres od', AInpage) > 0 then begin
+    xExtractionType := etPeriodExtraction;
+  end else begin
+    xExtractionType := etMonthExtraction;
+  end;
   try
     xDoc := CoHTMLDocument.Create as IHTMLDocument2;
     try
@@ -267,7 +275,63 @@ begin
         if xBody <> Nil then begin
           xAll := xBody.all as IHTMLElementCollection;
           if xAll <> Nil then begin
-            if not xIsCreditCard then begin
+            if xExtractionType = etCreditCard then begin
+              xCount := 0;
+              xFinished := False;
+              xTabCount := 0;
+              xTabHeader := Nil;
+              xTabBase := Nil;
+              while (xCount <= xAll.length - 1) and (not xFinished) do begin
+                xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+                if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                  Inc(xTabCount);
+                end;
+                if (xTabCount = 3) and (xTabHeader = Nil) then begin
+                  xTabHeader := xElement as IHTMLTable;
+                end;
+                if (xTabCount = 9) and (xTabBase = Nil) then begin
+                  xTabBase := xElement as IHTMLTable;
+                end;
+                Inc(xCount);
+                xFinished := (xTabHeader <> Nil) and (xTabBase <> Nil);
+              end;
+              if (xTabHeader <> Nil) and (xTabBase <> Nil) then begin
+                xPeriodStr := AnsiUpperCase((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+                xPos := Pos('ZA OKRES OD', xPeriodStr);
+                if xPos > 0 then begin
+                  xPeriodStr := Copy(xPeriodStr, xPos + 12, MaxInt);
+                  if DecodeDate(xPeriodStr, True, xStartDate, xEndDate) then begin
+                    xOutXml := GetXmlDocument;
+                    xDocElement := xOutXml.createElement('accountExtraction');
+                    xOutXml.appendChild(xDocElement);
+                    SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
+                    SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyy-mm-dd', xStartDate));
+                    SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
+                    xStr := PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
+                    SetXmlAttribute('description', xDocElement, TrimStr(xStr, sLineBreak));
+                    if xTabBase.rows <> Nil then begin
+                      if xTabBase.rows.length >= 0 then begin
+                      xCount := 0;
+                        Result := True;
+                        while (xCount <= xTabBase.rows.length - 1) and Result do begin
+                          if (xCount >= 1) and (xCount < xTabBase.rows.length - 1) then begin
+                            xElement := xTabBase.rows.item(xCount, varEmpty) as IHTMLElement;
+                            if AnsiLowerCase(xElement.className) <> 'head' then begin
+                              Result := AppendExtractionItem(xDocElement, xElement, etCreditCard, AError);
+                            end;
+                          end;
+                          Inc(xCount);
+                        end;
+                      end;
+                    end;
+                    if Result then begin
+                      FExtOutput := GetStringFromDocument(xOutXml);
+                    end;
+                  end;
+                end;
+              end;
+            end else if xExtractionType = etPeriodExtraction then begin
+
               xCount := 0;
               xFinished := False;
               xTabCount := 0;
@@ -318,7 +382,7 @@ begin
                         while (xCount <= xTabOperations.rows.length - 1) and Result do begin
                           if (xCount > 1) and (xCount < xTabOperations.rows.length - 1) then begin
                             xElement := xTabOperations.rows.item(xCount, varEmpty) as IHTMLElement;
-                            Result := AppendExtractionItem(xDocElement, xElement, False, AError);
+                            Result := AppendExtractionItem(xDocElement, xElement, etMonthExtraction, AError);
                           end;
                           Inc(xCount);
                         end;
@@ -344,7 +408,7 @@ begin
                 if (xTabCount = 3) and (xTabHeader = Nil) then begin
                   xTabHeader := xElement as IHTMLTable;
                 end;
-                if (xTabCount = 9) and (xTabBase = Nil) then begin
+                if (xTabCount = 6) and (xTabBase = Nil) then begin
                   xTabBase := xElement as IHTMLTable;
                 end;
                 Inc(xCount);
@@ -352,28 +416,36 @@ begin
               end;
               if (xTabHeader <> Nil) and (xTabBase <> Nil) then begin
                 xPeriodStr := AnsiUpperCase((xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
-                xPos := Pos('ZA OKRES OD', xPeriodStr);
+                xPos := Pos('ZA', xPeriodStr);
                 if xPos > 0 then begin
-                  xPeriodStr := Copy(xPeriodStr, xPos + 12, MaxInt);
-                  if DecodeDate(xPeriodStr, True, xStartDate, xEndDate) then begin
+                  xPeriodStr := Copy(xPeriodStr, xPos + 3, MaxInt);
+                  if DecodeDate(xPeriodStr, False, xStartDate, xEndDate) then begin
                     xOutXml := GetXmlDocument;
                     xDocElement := xOutXml.createElement('accountExtraction');
                     xOutXml.appendChild(xDocElement);
                     SetXmlAttribute('creationDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
                     SetXmlAttribute('startDate', xDocElement, FormatDateTime('yyyy-mm-dd', xStartDate));
                     SetXmlAttribute('endDate', xDocElement, FormatDateTime('yyyy-mm-dd', xEndDate));
-                    xStr := PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText);
-                    SetXmlAttribute('description', xDocElement, TrimStr(xStr, sLineBreak));
-                    if xTabBase.rows <> Nil then begin
-                      if xTabBase.rows.length >= 0 then begin
+                    SetXmlAttribute('description', xDocElement, PolishConversion(splISO, splWindows, (xTabHeader.rows.item(0, varEmpty) as IHTMLElement).innerText));
+                    if xTabBase.rows.length >= 4 then begin
+                      xBaseRow := (xTabHeader.rows.item(3, varEmpty) as IHTMLElement);
+                      xAll := xBaseRow.all as IHTMLElementCollection;
+                      xTabOperations := Nil;
+                      xCount := 0;
+                      while (xCount <= xAll.length - 1) and (xTabOperations = Nil) do begin
+                        xElement := xAll.item(xCount, varEmpty) as IHTMLElement;
+                        if AnsiLowerCase(xElement.tagName) = 'table' then begin
+                          xTabOperations := xElement as IHTMLTable;
+                        end;;
+                        Inc(xCount);
+                      end;
+                      if xTabOperations <> Nil then begin
                         xCount := 0;
                         Result := True;
-                        while (xCount <= xTabBase.rows.length - 1) and Result do begin
-                          if (xCount >= 1) and (xCount < xTabBase.rows.length - 1) then begin
-                            xElement := xTabBase.rows.item(xCount, varEmpty) as IHTMLElement;
-                            if AnsiLowerCase(xElement.className) <> 'head' then begin
-                              Result := AppendExtractionItem(xDocElement, xElement, True, AError);
-                            end;
+                        while (xCount <= xTabOperations.rows.length - 1) and Result do begin
+                          if (xCount > 1) and (xCount < xTabOperations.rows.length - 1) then begin
+                            xElement := xTabOperations.rows.item(xCount, varEmpty) as IHTMLElement;
+                            Result := AppendExtractionItem(xDocElement, xElement, etMonthExtraction, AError);
                           end;
                           Inc(xCount);
                         end;
@@ -408,7 +480,7 @@ end;
 
 function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): Boolean;
 
-  function AppendExtractionItem(ARootNode: ICXMLDOMNode; ARow: TStringDynArray; AIsCreditCard: Boolean; var AError: String): Boolean;
+  function AppendExtractionItem(ARootNode: ICXMLDOMNode; ARow: TStringDynArray; AExtractionType: TExtractionType; ACurrencyStr: String; var AError: String): Boolean;
   var xTitle, xCurrStr, xCashStr: String;
       xRegDate, xAccountingDate: TDateTime;
       xCash: Currency;
@@ -419,7 +491,7 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
     xRegDate := 0;
     xAccountingDate := 0;
     xCash := 0;
-    if AIsCreditCard then begin
+    if AExtractionType = etCreditCard then begin
       try
         xRegDate := XsdToDateTime(ARow[Low(ARow) + 1]);
       except
@@ -446,7 +518,7 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
           Result := (xRegDate <> 0) and (xAccountingDate <> 0);
         end;
       end;
-    end else begin
+    end else if (AExtractionType = etMonthExtraction) then begin
       try
         xRegDate := XsdToDateTime(ARow[Low(ARow)]);
       except
@@ -471,7 +543,34 @@ function TMbankExtFFForm.PrepareOutputCsv(AInpage: String; var AError: String): 
           xTitle := Trim(ARow[Low(ARow) + 2]) + sLineBreak + Trim(ARow[Low(ARow) + 3]) + sLineBreak +
                     Trim(ARow[Low(ARow) + 4]) + sLineBreak + Trim(ARow[Low(ARow) + 5]) + sLineBreak +
                     Trim(ARow[Low(ARow) + 6]);
-          xCurrStr := 'PLN';
+          xCurrStr := ACurrencyStr;
+          Result := (xRegDate <> 0) and (xAccountingDate <> 0);
+        end;
+      end;
+    end else if (AExtractionType = etPeriodExtraction) then begin
+      try
+        xRegDate := XsdToDateTime(ARow[Low(ARow)]);
+      except
+        on E: Exception do begin
+          AError := 'Nierozpoznany format daty ' + ARow[Low(ARow)];
+          Result := False;
+        end;
+      end;
+      if Result then begin
+        try
+          xAccountingDate := XsdToDateTime(ARow[Low(ARow) + 1]);
+        except
+          on E: Exception do begin
+            AError := 'Nierozpoznany format daty ' + ARow[Low(ARow) + 1];
+            Result := False;
+          end;
+        end;
+        if Result then begin
+          xCashStr := StringReplace(Trim(ARow[Low(ARow) + 3]), '.', '', [rfReplaceAll, rfIgnoreCase]);
+          xCashStr := StringReplace(xCashStr, ' ', '', [rfReplaceAll, rfIgnoreCase]);
+          xCash := StrToCurrencyDecimalDot(xCashStr);
+          xTitle := Trim(TrimStr(ARow[Low(ARow) + 2], '"'));
+          xCurrStr := ACurrencyStr;
           Result := (xRegDate <> 0) and (xAccountingDate <> 0);
         end;
       end;
@@ -529,8 +628,8 @@ var xIsCreditCard: Boolean;
     xTitle: String;
     xOutXml: ICXMLDOMDocument;
     xDocElement: ICXMLDOMNode;
-    xPeriodStr: String;
-    xOperationsBlock: Boolean;
+    xPeriodStr, xCurrencyStr: String;
+    xOperationsBlock, xDateBlock, xCurrencyBlock: Boolean;
     xValid: Boolean;
 begin
   FExtOutput := '';
@@ -578,7 +677,7 @@ begin
           if xOperationsBlock then begin
             if Length(xSplit) = 8 then begin
               if StrToIntDef(Trim(xSplit[Low(xSplit)]), -1) > 0 then begin
-                xValid := AppendExtractionItem(xDocElement, xSplit, True, AError);
+                xValid := AppendExtractionItem(xDocElement, xSplit, etCreditCard, '', AError);
               end else begin
                 xOperationsBlock := False;
               end;
@@ -599,6 +698,8 @@ begin
       xCount := 0;
       xTitle := '';
       xOperationsBlock := False;
+      xCurrencyBlock := False;
+      xDateBlock := False;
       xValid := True;
       while (xCount <= xLines.Count - 1) and xValid do begin
         xSplit := SplitToArray(xLines.Strings[xCount]);
@@ -614,16 +715,37 @@ begin
           end;
           if xOperationsBlock then begin
             if Length(xSplit) = 9 then begin
-              xValid := AppendExtractionItem(xDocElement, xSplit, False, AError);
+              xValid := AppendExtractionItem(xDocElement, xSplit, etMonthExtraction, xCurrencyStr, AError);
+            end else if Length(xSplit) = 5 then begin
+              xValid := AppendExtractionItem(xDocElement, xSplit, etPeriodExtraction, xCurrencyStr, AError);
             end else begin
               xOperationsBlock := False;
             end;
           end;
+          if xDateBlock then begin
+            if Length(xSplit) = 2 then begin
+              xStartDate := XsdToDateTime(xSplit[Low(xSplit)]);
+              xEndDate := XsdToDateTime(xSplit[High(xSplit)]);
+            end else begin
+              xDateBlock := False;
+            end;
+          end;
+          if xCurrencyBlock then begin
+            xCurrencyStr := xSplit[Low(xSplit)];
+            xCurrencyBlock := False;
+          end;
           if AnsiUpperCase(xSplit[Low(xSplit)]) = '#DATA OPERACJI' then begin
             xOperationsBlock := True;
           end;
+          if AnsiUpperCase(xSplit[Low(xSplit)]) = '#ZA OKRES:' then begin
+            xDateBlock := True;
+          end;
+          if AnsiUpperCase(xSplit[Low(xSplit)]) = '#WALUTA' then begin
+            xCurrencyBlock := True;
+          end;
         end else begin
           xOperationsBlock := False;
+          xDateBlock := False;
         end;
         Inc(xCount);
       end;

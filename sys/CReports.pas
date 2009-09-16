@@ -9,6 +9,7 @@ uses Classes, CReportFormUnit, Graphics, Controls, Chart, Series, Contnrs, Windo
 
 type
   TReportDialogParamsDefs = class;
+  TSeriesClass = class of TCustomSeries;
 
   TReportDialgoParamDef = class(TCDataListElementObject)
   private

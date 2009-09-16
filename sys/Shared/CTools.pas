@@ -880,6 +880,7 @@ var xYear, xMonth, xDay, xHour, xMin, xSec, xMilli, xBHour, xBMinute : Word;
     xDateTimeStr: String;
 begin
   xDateTimeStr := Trim(ADateTimeStr);
+  xDateTimeStr := StringReplace(xDateTimeStr, '.', '-', [rfReplaceAll, rfIgnoreCase]);
   xLen := Length(xDateTimeStr);
   //Maybe its yyyy-mm-dd
   if Copy(xDateTimeStr, 5, 1) = '-' then begin

@@ -305,6 +305,11 @@ begin
     TrackBarZoom.Position := chart.View3DOptions.Zoom;
     CheckBoxReg.Checked := chart.isRegVisible;
     CheckBoxAvg.Checked := chart.isAvgVisible;
+    CheckBoxOp.Checked := chart.isResVisible;
+    CheckBoxWs.Checked := chart.isSupVisible;
+    CheckBoxAvgWei.Checked := chart.isWeightVisible;
+    CheckBoxAvgGeo.Checked := chart.isGeoVisible;
+    CheckBoxMed.Checked := chart.isMedVisible;
     UpdateLabelPos(Label2, TrackBarRotate);
     UpdateLabelPos(Label4, TrackBarElevation);
     UpdateLabelPos(Label6, TrackBarPerspective);

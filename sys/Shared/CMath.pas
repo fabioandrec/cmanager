@@ -27,36 +27,103 @@ var xSigX, xSigY : Double;
     xSigSqrX : Double;
     xN, xI : Word;
 begin
-  xN := High(ADBx) + 1;
-  xSigX := 0;
-  xSigY := 0;
-  xSigXY := 0;
-  xSigSqrX := 0;
-  for xI := 0 to xN - 1 do begin
-    xSigX := xSigX + ADBx[xI];
-    xSigY := xSigY + ADBy[xI];
-    xSigXY := xSigXY + (ADBx[xI] * ADBy[xI]);
-    xSigSqrX := xSigSqrX + Sqr(ADBx[xI]);
+  Aa := 0;
+  Ab := 0;
+  if Length(ADBy) > 0 then begin
+    xN := High(ADBx) + 1;
+    xSigX := 0;
+    xSigY := 0;
+    xSigXY := 0;
+    xSigSqrX := 0;
+    for xI := 0 to xN - 1 do begin
+      xSigX := xSigX + ADBx[xI];
+      xSigY := xSigY + ADBy[xI];
+      xSigXY := xSigXY + (ADBx[xI] * ADBy[xI]);
+      xSigSqrX := xSigSqrX + Sqr(ADBx[xI]);
+    end;
+    Aa := (xN * xSigXY - xSigX * xSigY) / (xN * xSigSqrX - Sqr(xSigX));
+    Ab := 1/xN * (xSigY - Aa * xSigX);
   end;
-  Aa := (xN * xSigXY - xSigX * xSigY) / (xN * xSigSqrX - Sqr(xSigX));
-  Ab := 1/xN * (xSigY - Aa * xSigX);
 end;
 
 procedure ResLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
 var xDBx, xDBy: TDoubleDynArray;
-    xCurx, xCury: Double;
+    xCount: Integer;
+    xMinCount, xMaxCount: Integer;
 begin
   Aa := 0;
   Ab := 0;
   if Length(ADBy) > 0 then begin
-    xCurx := ADbx[0];
-    xCury := ADbx[0];
+    SetLength(xDBx, 0);
+    SetLength(xDBy, 0);
+    xMinCount := Low(ADby);
+    xMaxCount := High(ADby);
+    for xCount := xMinCount to xMaxCount do begin
+      if xCount = xMinCount then begin
+        if ADBy[xMinCount] <= ADby[xMinCount + 1] then begin
+          SetLength(xDBx, Length(xDbx) + 1);
+          SetLength(xDBy, Length(xDby) + 1);
+          xDBx[High(xDbx)] := ADbx[xCount];
+          xDBy[High(xDby)] := ADby[xCount];
+        end;
+      end else if xCount = xMaxCount then begin
+        if ADBy[xMaxCount - 1] >= ADby[xMaxCount] then begin
+          SetLength(xDBx, Length(xDbx) + 1);
+          SetLength(xDBy, Length(xDby) + 1);
+          xDBx[High(xDbx)] := ADbx[xMaxCount];
+          xDBy[High(xDby)] := ADby[xMaxCount];
+        end;
+      end else begin
+        if (ADBy[xCount - 1] >= ADBy[xCount]) and (ADBy[xCount + 1] >= ADBy[xCount]) then begin
+          SetLength(xDBx, Length(xDbx) + 1);
+          SetLength(xDBy, Length(xDby) + 1);
+          xDBx[High(xDbx)] := ADbx[xCount];
+          xDBy[High(xDby)] := ADby[xCount];
+        end;
+      end;
+    end;
+    RegLin(xDBx, xDBy, Aa, Ab);
   end;
 end;
 
 procedure SupLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
+var xDBx, xDBy: TDoubleDynArray;
+    xCount: Integer;
+    xMinCount, xMaxCount: Integer;
 begin
-
+  Aa := 0;
+  Ab := 0;
+  if Length(ADBy) > 0 then begin
+    SetLength(xDBx, 0);
+    SetLength(xDBy, 0);
+    xMinCount := Low(ADby);
+    xMaxCount := High(ADby);
+    for xCount := xMinCount to xMaxCount do begin
+      if xCount = xMinCount then begin
+        if ADBy[xMinCount] >= ADby[xMinCount + 1] then begin
+          SetLength(xDBx, Length(xDbx) + 1);
+          SetLength(xDBy, Length(xDby) + 1);
+          xDBx[High(xDbx)] := ADbx[xCount];
+          xDBy[High(xDby)] := ADby[xCount];
+        end;
+      end else if xCount = xMaxCount then begin
+        if ADBy[xMaxCount - 1] <= ADby[xMaxCount] then begin
+          SetLength(xDBx, Length(xDbx) + 1);
+          SetLength(xDBy, Length(xDby) + 1);
+          xDBx[High(xDbx)] := ADbx[xMaxCount];
+          xDBy[High(xDby)] := ADby[xMaxCount];
+        end;
+      end else begin
+        if (ADBy[xCount - 1] <= ADBy[xCount]) and (ADBy[xCount + 1] <= ADBy[xCount]) then begin
+          SetLength(xDBx, Length(xDbx) + 1);
+          SetLength(xDBy, Length(xDby) + 1);
+          xDBx[High(xDbx)] := ADbx[xCount];
+          xDBy[High(xDby)] := ADby[xCount];
+        end;
+      end;
+    end;
+    RegLin(xDBx, xDBy, Aa, Ab);
+  end;
 end;
 
 function SumDoubleArray(const AList: TDoubleDynArray): Extended;
