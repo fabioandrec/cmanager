@@ -331,7 +331,6 @@ begin
                 end;
               end;
             end else if xExtractionType = etPeriodExtraction then begin
-
               xCount := 0;
               xFinished := False;
               xTabCount := 0;
