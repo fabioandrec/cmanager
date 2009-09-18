@@ -18,11 +18,11 @@
      http://www.helpware.net
 
   W aplikacji u¿yto ikon z nastêpuj¹cych pakietów
-	 
-  6) <b>Crystal</b>
+
+  5) <b>Crystal</b>
      Everaldo Coelho, contact@everaldo.com
      http://www.everaldo.com/crystal/
 
-  5) <b>Nuvola</b> - wersja 1.0
+  6) <b>Nuvola</b> - wersja 1.0
      David Vignoni, Icon King
      http://www.icon-king.com 

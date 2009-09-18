@@ -12,7 +12,7 @@ const
   CEmptyDataGid = '';
 
 type
-  TPolishEncodings = (splASCII, splISO, splLatinII, splMazovia, splWindows);
+  TPolishEncodings = (splASCII, splISO, splLatinII, splMazovia, splWindows, splUtf8);
 
   TSum = class(TObject)
   private
@@ -131,6 +131,7 @@ function HighestDatetime: TDatetime;
 function GetResourceUri(AResname: String): String;
 function GetWindowsVersionStr: string;
 function GetWindowsVersionNumbers: string;
+function SubstringFromTo(AString: String; AFrom, ATo: Integer): String;
 
 implementation
 
@@ -592,25 +593,34 @@ const xPolishCount = 18;
         (#161, #198, #202, #163, #209, #211, #166, #172, #175, #177, #230, #234, #179, #241, #243, #182, #188, #191),
         (#164, #143, #168, #157, #227, #224, #151, #141, #189, #165, #134, #169, #136, #228, #162, #152, #171, #190),
         (#143, #149, #144, #156, #165, #163, #152, #160, #161, #134, #141, #145, #146, #164, #162, #158, #166, #167),
-        (#165, #198, #202, #163, #209, #211, #140, #143, #175, #185, #230, #234, #179, #241, #243, #156, #159, #191));
+        (#165, #198, #202, #163, #209, #211, #140, #143, #175, #185, #230, #234, #179, #241, #243, #156, #159, #191),
+        (#0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0));
       xTabSets: array[TPolishEncodings] of set of Char =
       ([#97, #99, #101, #108, #110, #111, #115, #120, #122, #65, #67, #69, #76, #78, #79, #83, #88, #90],
         [#161, #198, #202, #163, #209, #211, #166, #172, #175, #177, #230, #234, #179, #241, #243, #182, #188, #191],
         [#164, #143, #168, #157, #227, #224, #151, #141, #189, #165, #134, #169, #136, #228, #162, #152, #171, #190],
         [#143, #149, #144, #156, #165, #163, #152, #160, #161, #134, #141, #145, #146, #164, #162, #158, #166, #167],
-        [#165, #198, #202, #163, #209, #211, #140, #143, #175, #185, #230, #234, #179, #241, #243, #156, #159, #191]);
+        [#165, #198, #202, #163, #209, #211, #140, #143, #175, #185, #230, #234, #179, #241, #243, #156, #159, #191],
+        [#0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0, #0]);
 var xCountI, xCountJ: integer;
     xChanged: boolean;
+    xStdIn, xStdOut: TPolishEncodings;
 begin
   Result := ALine;
-  if (AStdIn <> AStdOut) and (AStdIn <> splASCII) then begin
+  xStdIn := AStdIn;
+  xStdOut := AStdOut;
+  if xStdIn = splUtf8 then begin
+    Result := Utf8ToAnsi(Result);
+    xStdIn := splWindows;
+  end;
+  if (xStdIn <> xStdOut) and (xStdIn <> splASCII) then begin
     for xCountI := 1 to length(Result) do begin
-      if Result[xCountI] in xTabSets[AStdIn] then begin
+      if Result[xCountI] in xTabSets[xStdIn] then begin
         xChanged := false;
         xCountJ := 1;
         repeat
-          if Result[xCountI] = xTabCode[AStdIn, xCountJ] then begin
-            Result[xCountI] := xTabCode[AStdOut, xCountJ];
+          if Result[xCountI] = xTabCode[xStdIn, xCountJ] then begin
+            Result[xCountI] := xTabCode[xStdOut, xCountJ];
             xChanged := True;
           end;
           inc(xCountJ);
@@ -879,103 +889,108 @@ var xYear, xMonth, xDay, xHour, xMin, xSec, xMilli, xBHour, xBMinute : Word;
     xLen: Integer;
     xDateTimeStr: String;
 begin
-  xDateTimeStr := Trim(ADateTimeStr);
-  xDateTimeStr := StringReplace(xDateTimeStr, '.', '-', [rfReplaceAll, rfIgnoreCase]);
-  xLen := Length(xDateTimeStr);
-  //Maybe its yyyy-mm-dd
-  if Copy(xDateTimeStr, 5, 1) = '-' then begin
-    xYear := StrToIntDef(Copy(xDateTimeStr, 1, 4), 0);
-    xMonth := StrToIntDef(Copy(xDateTimeStr, 6, 2), 0);
-    xDay := StrToIntDef(Copy(xDateTimeStr, 9, 2), 0);
-  end else begin
-    xYear := 0;
-    xMonth := 0;
-    xDay := 0;
-  end;
-  if (xYear = 0) or (xMonth = 0) or (xDay = 0) then begin
-    //No, check dd-mm-yyyy
-    xDay := StrToIntDef(Copy(xDateTimeStr, 1, 2), 0);
-    xMonth := StrToIntDef(Copy(xDateTimeStr, 4, 2), 0);
-    xYear := StrToIntDef(Copy(xDateTimeStr, 7, 4), 0);
-  end;
-  if (xYear <> 0) and (xMonth <> 0) and (xDay <> 0) then begin
-    if xLen = 10 then begin
-      //"yyyy-mm-dd"
-      Result := EncodeDate(xYear, xMonth, xDay);
-    end else if xLen = 19 then begin
-      //"yyyy-mm-ddThh:nn:ss"
-      xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
-      xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
-      xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
-      Result := EncodeDateTime(xYear, xMonth, xDay, xHour, xMin, xSec, 0);
-    end else if xLen = 22 then begin
-      //"yyyy-mm-ddThh:nn:ssZ"
-      xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
-      xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
-      xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
-      xMilli := 0;
-      if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
-        if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
-          xDate := xDate + xTime;
-          Result := xDate;
-        end else begin
-          Result := 0;
-        end;
-      end else begin
-        Result := 0;
-      end;
-    end else if xLen = 25 then begin
-      //"yyyy-mm-ddThh:nn:ss+hh:nn"
-      xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
-      xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
-      xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
-      xMilli := 0;
-      if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
-        if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
-          xDate := xDate + xTime;
-          xBHour := StrToIntDef(Copy(xDateTimeStr, 21, 2), 0);
-          xBMinute := StrToIntDef(Copy(xDateTimeStr, 24, 2), 0);
-          xBias := (xBHour * 60) + xBMinute;
-          if (xDateTimeStr[20] = '-') then xBias := 0 - xBias;
-          AddTimeBias(xDate, 0 - xBias);
-          xBias := GetTimeZoneBias;
-          AddTimeBias(xDate, 0 - xBias);
-          Result := xDate;
-        end else begin
-          Result := 0;
-        end;
-      end else begin
-        Result := 0;
-      end;
-    end else if (xLen = 26) or (xLen = 29) then begin
-      //"yyyy-mm-ddThh:nn:ss.zzzZ"
-      //"yyyy-mm-ddThh:nn:ss.zzz+hh:nn"
-      if (xLen = 29) or (xLen = 26) then begin
+  Result := 0;
+  try
+    xDateTimeStr := Trim(ADateTimeStr);
+    xDateTimeStr := StringReplace(xDateTimeStr, '.', '-', [rfReplaceAll, rfIgnoreCase]);
+    xLen := Length(xDateTimeStr);
+    //Maybe its yyyy-mm-dd
+    if Copy(xDateTimeStr, 5, 1) = '-' then begin
+      xYear := StrToIntDef(Copy(xDateTimeStr, 1, 4), 0);
+      xMonth := StrToIntDef(Copy(xDateTimeStr, 6, 2), 0);
+      xDay := StrToIntDef(Copy(xDateTimeStr, 9, 2), 0);
+    end else begin
+      xYear := 0;
+      xMonth := 0;
+      xDay := 0;
+    end;
+    if (xYear = 0) or (xMonth = 0) or (xDay = 0) then begin
+      //No, check dd-mm-yyyy
+      xDay := StrToIntDef(Copy(xDateTimeStr, 1, 2), 0);
+      xMonth := StrToIntDef(Copy(xDateTimeStr, 4, 2), 0);
+      xYear := StrToIntDef(Copy(xDateTimeStr, 7, 4), 0);
+    end;
+    if (xYear <> 0) and (xMonth <> 0) and (xDay <> 0) then begin
+      if xLen = 10 then begin
+        //"yyyy-mm-dd"
+        Result := EncodeDate(xYear, xMonth, xDay);
+      end else if xLen = 19 then begin
+        //"yyyy-mm-ddThh:nn:ss"
         xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
         xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
         xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
-        xMilli := StrToIntDef(Copy(xDateTimeStr, 21, 3), 0);
-      end else begin
-        xHour := 0;
-        xMin := 0;
-        xSec := 0;
+        Result := EncodeDateTime(xYear, xMonth, xDay, xHour, xMin, xSec, 0);
+      end else if xLen = 22 then begin
+        //"yyyy-mm-ddThh:nn:ssZ"
+        xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+        xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+        xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
         xMilli := 0;
-      end;
-      if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
-        if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
-          xDate := xDate + xTime;
-          if (Length(xDateTimeStr) = 29) then begin
-            xBHour := StrToIntDef(Copy(xDateTimeStr, 25, 2), 0);
-            xBMinute := StrToIntDef(Copy(xDateTimeStr, 28, 2), 0);
-            xBias := (xBHour * 60) + xBMinute;
-            if (xDateTimeStr[24] = '-') then xBias := 0 - xBias;
+        if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
+          if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
+            xDate := xDate + xTime;
+            Result := xDate;
           end else begin
-            xBias := 0;
+            Result := 0;
           end;
-          AddTimeBias(xDate, 0 - xBias);
-          xBias := GetTimeZoneBias;
-          AddTimeBias(xDate, 0 - xBias);
-          Result := xDate;
+        end else begin
+          Result := 0;
+        end;
+      end else if xLen = 25 then begin
+        //"yyyy-mm-ddThh:nn:ss+hh:nn"
+        xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+        xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+        xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
+        xMilli := 0;
+        if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
+          if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
+            xDate := xDate + xTime;
+            xBHour := StrToIntDef(Copy(xDateTimeStr, 21, 2), 0);
+            xBMinute := StrToIntDef(Copy(xDateTimeStr, 24, 2), 0);
+            xBias := (xBHour * 60) + xBMinute;
+            if (xDateTimeStr[20] = '-') then xBias := 0 - xBias;
+            AddTimeBias(xDate, 0 - xBias);
+            xBias := GetTimeZoneBias;
+            AddTimeBias(xDate, 0 - xBias);
+            Result := xDate;
+          end else begin
+            Result := 0;
+          end;
+        end else begin
+          Result := 0;
+        end;
+      end else if (xLen = 26) or (xLen = 29) then begin
+        //"yyyy-mm-ddThh:nn:ss.zzzZ"
+        //"yyyy-mm-ddThh:nn:ss.zzz+hh:nn"
+        if (xLen = 29) or (xLen = 26) then begin
+          xHour := StrToIntDef(Copy(xDateTimeStr, 12, 2), 0);
+          xMin := StrToIntDef(Copy(xDateTimeStr, 15, 2), 0);
+          xSec := StrToIntDef(Copy(xDateTimeStr, 18, 2), 0);
+          xMilli := StrToIntDef(Copy(xDateTimeStr, 21, 3), 0);
+        end else begin
+          xHour := 0;
+          xMin := 0;
+          xSec := 0;
+          xMilli := 0;
+        end;
+        if TryEncodeTime(xHour, xMin, xSec, xMilli, xTime) then begin
+          if TryEncodeDate(xYear, xMonth, xDay, xDate) then begin
+            xDate := xDate + xTime;
+            if (Length(xDateTimeStr) = 29) then begin
+              xBHour := StrToIntDef(Copy(xDateTimeStr, 25, 2), 0);
+              xBMinute := StrToIntDef(Copy(xDateTimeStr, 28, 2), 0);
+              xBias := (xBHour * 60) + xBMinute;
+              if (xDateTimeStr[24] = '-') then xBias := 0 - xBias;
+            end else begin
+              xBias := 0;
+            end;
+            AddTimeBias(xDate, 0 - xBias);
+            xBias := GetTimeZoneBias;
+            AddTimeBias(xDate, 0 - xBias);
+            Result := xDate;
+          end else begin
+            Result := 0;
+          end;
         end else begin
           Result := 0;
         end;
@@ -985,8 +1000,7 @@ begin
     end else begin
       Result := 0;
     end;
-  end else begin
-    Result := 0;
+  except
   end;
 end;
 
@@ -1352,6 +1366,13 @@ begin
   finally
     xReg.Free;
   end
+end;
+
+function SubstringFromTo(AString: String; AFrom, ATo: Integer): String;
+var xLength: Integer;
+begin
+  xLength := ATo - AFrom;
+  Result := Copy(AString, AFrom, xLength);
 end;
 
 end.
