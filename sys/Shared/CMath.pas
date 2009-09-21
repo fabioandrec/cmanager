@@ -9,6 +9,8 @@ procedure ResLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
 procedure SupLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
 function MaxDoubleArray(const AList: TDoubleDynArray): Double;
 function MinDoubleArray(const AList: TDoubleDynArray): Double;
+function MaxPoint(const AX, AY: TDoubleDynArray): Integer;
+function MinPoint(const AX, AY: TDoubleDynArray): Integer;
 function SumDoubleArray(const AList: TDoubleDynArray): Extended;
 function MultiDoubleArray(const AList: TDoubleDynArray): Extended;
 procedure SortDoubleArray(var AList: TDoubleDynArray);
@@ -19,7 +21,7 @@ function WeightDoubleArray(const AList: TDoubleDynArray): Double;
 
 implementation
 
-uses Math;
+uses Math, CTools;
 
 procedure RegLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
 var xSigX, xSigY : Double;
@@ -30,19 +32,22 @@ begin
   Aa := 0;
   Ab := 0;
   if Length(ADBy) > 0 then begin
-    xN := High(ADBx) + 1;
-    xSigX := 0;
-    xSigY := 0;
-    xSigXY := 0;
-    xSigSqrX := 0;
-    for xI := 0 to xN - 1 do begin
-      xSigX := xSigX + ADBx[xI];
-      xSigY := xSigY + ADBy[xI];
-      xSigXY := xSigXY + (ADBx[xI] * ADBy[xI]);
-      xSigSqrX := xSigSqrX + Sqr(ADBx[xI]);
+    try
+      xN := High(ADBx) + 1;
+      xSigX := 0;
+      xSigY := 0;
+      xSigXY := 0;
+      xSigSqrX := 0;
+      for xI := 0 to xN - 1 do begin
+        xSigX := xSigX + ADBx[xI];
+        xSigY := xSigY + ADBy[xI];
+        xSigXY := xSigXY + (ADBx[xI] * ADBy[xI]);
+        xSigSqrX := xSigSqrX + Sqr(ADBx[xI]);
+      end;
+      Aa := (xN * xSigXY - xSigX * xSigY) / (xN * xSigSqrX - Sqr(xSigX));
+      Ab := 1/xN * (xSigY - Aa * xSigX);
+    except
     end;
-    Aa := (xN * xSigXY - xSigX * xSigY) / (xN * xSigSqrX - Sqr(xSigX));
-    Ab := 1/xN * (xSigY - Aa * xSigX);
   end;
 end;
 
@@ -278,39 +283,43 @@ begin
     xMin := MinDoubleArray(AList);
     xMax := MaxDoubleArray(AList);
     xDelta := (xMax - xMin) / 10;
-    xRangeList := TRangeList.Create(True);
-    xCur := xMin;
-    while (xCur <= xMax) do begin
-      xRangeList.Add(TRange.Create(xCur, xCur + xDelta));
-      xCur := xCur + xDelta;
-    end;
-    for xCount := Low(AList) to High(AList) do begin
-      xCur := AList[xCount];
-      xRange := TRange(xRangeList.GetRange(xCur));
-      if xRange <> Nil then begin
-        xRange.Counter := xRange.Counter + 1;
-      end else begin
-        {$IFDEF DEBUG}
-        raise EInvalidArgument.Create('Brak range');
-        {$ENDIF}
+    if xDelta <> 0 then begin
+      xRangeList := TRangeList.Create(True);
+      xCur := xMin;
+      while (xCur <= xMax) do begin
+        xRangeList.Add(TRange.Create(xCur, xCur + xDelta));
+        xCur := xCur + xDelta;
       end;
-    end;
-    xWeightSum := 0;
-    xSum := 0;
-    for xCount := Low(AList) to High(AList) do begin
-      xCur := AList[xCount];
-      xRange := TRange(xRangeList.GetRange(xCur));
-      if xRange <> Nil then begin
-        xWeightSum := xWeightSum + xRange.Counter;
-        xSum := xSum + xRange.Counter * xCur;
-      end else begin
-        {$IFDEF DEBUG}
-        raise EInvalidArgument.Create('Brak range');
-        {$ENDIF}
+      for xCount := Low(AList) to High(AList) do begin
+        xCur := AList[xCount];
+        xRange := TRange(xRangeList.GetRange(xCur));
+        if xRange <> Nil then begin
+          xRange.Counter := xRange.Counter + 1;
+        end else begin
+          {$IFDEF DEBUG}
+          raise EInvalidArgument.Create('Brak range');
+          {$ENDIF}
+        end;
       end;
+      xWeightSum := 0;
+      xSum := 0;
+      for xCount := Low(AList) to High(AList) do begin
+        xCur := AList[xCount];
+        xRange := TRange(xRangeList.GetRange(xCur));
+        if xRange <> Nil then begin
+          xWeightSum := xWeightSum + xRange.Counter;
+          xSum := xSum + xRange.Counter * xCur;
+        end else begin
+          {$IFDEF DEBUG}
+          raise EInvalidArgument.Create('Brak range');
+          {$ENDIF}
+        end;
+      end;
+      Result := xSum / xWeightSum;
+      xRangeList.Free;
+    end else begin
+      Result := xMin;
     end;
-    Result := xSum / xWeightSum;
-    xRangeList.Free;
   end;
 end;
 
@@ -334,6 +343,42 @@ begin
   inherited Create;
   Left := ALeft;
   Right := ARight;
+end;
+
+function MaxPoint(const AX, AY: TDoubleDynArray): Integer;
+var xLen, xCount: Integer;
+    xVal: Double;
+begin
+  Result := -1;
+  xLen := Length(AX);
+  if (xLen > 0) and (xLen = Length(AY)) then begin
+    Result := 0;
+    xVal := AY[Result];
+    for xCount := 1 to xLen - 1 do begin
+      if (xVal < AY[xCount]) then begin
+        Result := xCount;
+        xVal := AY[xCount];
+      end;
+    end;
+  end;
+end;
+
+function MinPoint(const AX, AY: TDoubleDynArray): Integer;
+var xLen, xCount: Integer;
+    xVal: Double;
+begin
+  Result := -1;
+  xLen := Length(AX);
+  if (xLen > 0) and (xLen = Length(AY)) then begin
+    Result := 0;
+    xVal := AY[Result];
+    for xCount := 1 to xLen - 1 do begin
+      if (xVal > AY[xCount]) then begin
+        Result := xCount;
+        xVal := AY[xCount];
+      end;
+    end;
+  end;
 end;
 
 end.

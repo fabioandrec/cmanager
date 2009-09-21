@@ -148,6 +148,9 @@ begin
         Result := GetLastError;
       end;
       CloseHandle(xFile);
+      if (not IsCancelled) and (Result = ERROR_SUCCESS) then begin
+        Result := AfterGetResponse(ARequestIdentifier);
+      end;
     end else begin
       Result := GetLastError;
       AddToReport('B³¹d, ' + GetErrorDesc(Result));

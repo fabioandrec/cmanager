@@ -171,6 +171,8 @@ begin
         if FRootElement = Nil then begin
           FResponseXml := Nil;
           AddToReport('Otrzymane dane nie s¹ poprawn¹ tabel¹ kursów walut');
+        end else begin
+          FIsValidResponse := True;
         end;
       end else begin
         FResponseXml := Nil;

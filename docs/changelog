@@ -6,10 +6,13 @@ CMANAGER - CHANGELOG
 [-] poprawka b³êdu
 [i] informacja
 
-Wersja 1.11.1
+Wersja 1.11.2
 [i] wyjœcie kolejnej wersji beta (2009-07-17)
-[-] poprawki do wtyczek pobieraj¹cych kursy walut
+[-] poprawki do wtyczek pobieraj¹cych kursy walut ze strony NBP
+[-] poprawki do wtyczek pobieraj¹cych kursy walut ze wskazanych plików
+[-] poprawki do wtyczki wczytuj¹cej wyci¹gi operacji z mBanku. Mo¿na wczytaæ równie¿ wyci¹gi wygenerowane ze strony mBanku
 [*] drobne zmiany kosmetyczne wygl¹du pasków postêpu przy w³¹czonych kompozycjach
+[+] w raportach liniowych i s³upkowych dodano mo¿liwoœæ umieœczenia œrednich wa¿onych, mediany itd.
 
 Wersja 1.11.1
 [i] wyjœcie kolejnej wersji beta (2009-07-17)
