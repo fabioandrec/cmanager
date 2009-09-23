@@ -126,9 +126,28 @@ function SeriesToDoubleArray(ASerie: TChartSeries): TDoubleDynArray;
 var xLength, xCount: Integer;
 begin
   xLength := ASerie.Count;
-  SetLength(Result, xLength);
+  SetLength(Result, 0);
   for xCount := 0 to xLength - 1 do begin
-    Result[xCount] := ASerie.YValue[xCount];
+    if not ASerie.IsNull(xCount) then begin
+      SetLength(Result, Length(Result) + 1);
+      Result[High(Result)] := ASerie.YValue[xCount];
+    end;
+  end;
+end;
+
+procedure SeriesToXYArrays(ASerie: TChartSeries; var AX, AY: TDoubleDynArray);
+var xLength, xCount: Integer;
+begin
+  xLength := ASerie.Count;
+  SetLength(AX, 0);
+  SetLength(AY, 0);
+  for xCount := 0 to xLength - 1 do begin
+    if not ASerie.IsNull(xCount) then begin
+      SetLength(AX, Length(AX) + 1);
+      SetLength(AY, Length(AY) + 1);
+      AX[High(AX)] := ASerie.XValue[xCount];
+      AY[High(AY)] := ASerie.YValue[xCount];
+    end;
   end;
 end;
 
@@ -153,14 +172,9 @@ var xXVals: TDoubleDynArray;
     xCount: Integer;
 begin
   if ASourceSerie.Count > 0 then begin
-    SetLength(xXVals, ASourceSerie.Count);
-    SetLength(xYVals, ASourceSerie.Count);
-    for xCount := 0 to ASourceSerie.Count - 1 do begin
-      xXVals[xCount] := ASourceSerie.XValue[xCount];
-      xYVals[xCount] := ASourceSerie.YValue[xCount];
-    end;
+    SeriesToXYArrays(ASourceSerie, xXVals, xYVals);
     RegLin(xXVals, xYVals, xA, xB);
-    for xCount := 0 to ASourceSerie.Count - 1 do begin
+    for xCount := Low(xXVals) to High(xXVals) do begin
       ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
     end;
     ADestserie.Title := ASourceSerie.Title + ' (Linia trendu)';
@@ -223,14 +237,9 @@ var xXVals: TDoubleDynArray;
     xCount: Integer;
 begin
   if ASourceSerie.Count > 0 then begin
-    SetLength(xXVals, ASourceSerie.Count);
-    SetLength(xYVals, ASourceSerie.Count);
-    for xCount := 0 to ASourceSerie.Count - 1 do begin
-      xXVals[xCount] := ASourceSerie.XValue[xCount];
-      xYVals[xCount] := ASourceSerie.YValue[xCount];
-    end;
+    SeriesToXYArrays(ASourceSerie, xXVals, xYVals);
     ResLin(xXVals, xYVals, xA, xB);
-    for xCount := 0 to ASourceSerie.Count - 1 do begin
+    for xCount := Low(xXVals) to High(xXVals) do begin
       ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
     end;
     ADestserie.Title := ASourceSerie.Title + ' (Linia oporu)';
@@ -245,14 +254,9 @@ var xXVals: TDoubleDynArray;
     xCount: Integer;
 begin
   if ASourceSerie.Count > 0 then begin
-    SetLength(xXVals, ASourceSerie.Count);
-    SetLength(xYVals, ASourceSerie.Count);
-    for xCount := 0 to ASourceSerie.Count - 1 do begin
-      xXVals[xCount] := ASourceSerie.XValue[xCount];
-      xYVals[xCount] := ASourceSerie.YValue[xCount];
-    end;
+    SeriesToXYArrays(ASourceSerie, xXVals, xYVals);
     SupLin(xXVals, xYVals, xA, xB);
-    for xCount := 0 to ASourceSerie.Count - 1 do begin
+    for xCount := Low(xXVals) to High(xXVals) do begin
       ADestserie.AddXY(xXVals[xCount], xA * xXVals[xCount] + xB);
     end;
     ADestserie.Title := ASourceSerie.Title + ' (Linia wsparcia)';
