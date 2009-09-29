@@ -18,6 +18,8 @@ function AvgDoubleArray(const AList: TDoubleDynArray): Double;
 function MedDoubleArray(const AList: TDoubleDynArray): Double;
 function GeoDoubleArray(const AList: TDoubleDynArray): Double;
 function WeightDoubleArray(const AList: TDoubleDynArray): Double;
+function InSour(AValue, ABase, AEpsilon: Cardinal): Boolean;
+function OutSour(AValue, ABase, AEpsilon: Cardinal): Boolean;
 
 implementation
 
@@ -379,6 +381,16 @@ begin
       end;
     end;
   end;
+end;
+
+function InSour(AValue, ABase, AEpsilon: Cardinal): Boolean;
+begin
+  Result := ((ABase - AEpsilon) >= AValue) and (AValue <= (ABase + AEpsilon));
+end;
+
+function OutSour(AValue, ABase, AEpsilon: Cardinal): Boolean;
+begin
+  Result := not InSour(AValue, ABase, AEpsilon);
 end;
 
 end.
