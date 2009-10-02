@@ -132,6 +132,7 @@ function GetResourceUri(AResname: String): String;
 function GetWindowsVersionStr: string;
 function GetWindowsVersionNumbers: string;
 function SubstringFromTo(AString: String; AFrom, ATo: Integer): String;
+function RemoveFromDynArray(const AArray: TDoubleDynArray; AIndex: Integer): TDoubleDynArray;
 
 implementation
 
@@ -1373,6 +1374,22 @@ var xLength: Integer;
 begin
   xLength := ATo - AFrom;
   Result := Copy(AString, AFrom, xLength);
+end;
+
+function RemoveFromDynArray(const AArray: TDoubleDynArray; AIndex: Integer): TDoubleDynArray;
+var xLow, xHigh, xCount: Integer;
+begin
+  xLow := Low(AArray);
+  xHigh := High(AArray);
+  SetLength(Result, 0);
+  if (xLow <= AIndex) and (AIndex <= xHigh) then begin
+    for xCount := xLow to xHigh do begin
+      if xCount <> AIndex then begin
+        SetLength(Result, Length(Result) + 1);
+        Result[High(Result)] := AArray[xCount];
+      end;
+    end;
+  end;
 end;
 
 end.

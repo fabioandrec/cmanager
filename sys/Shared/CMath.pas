@@ -56,38 +56,23 @@ end;
 procedure ResLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
 var xDBx, xDBy: TDoubleDynArray;
     xCount: Integer;
-    xMinCount, xMaxCount: Integer;
+    xMaxCount: Integer;
 begin
   Aa := 0;
   Ab := 0;
   if Length(ADBy) > 0 then begin
     SetLength(xDBx, 0);
     SetLength(xDBy, 0);
-    xMinCount := Low(ADby);
-    xMaxCount := High(ADby);
-    for xCount := xMinCount to xMaxCount do begin
-      if xCount = xMinCount then begin
-        if ADBy[xMinCount] <= ADby[xMinCount + 1] then begin
-          SetLength(xDBx, Length(xDbx) + 1);
-          SetLength(xDBy, Length(xDby) + 1);
-          xDBx[High(xDbx)] := ADbx[xCount];
-          xDBy[High(xDby)] := ADby[xCount];
-        end;
-      end else if xCount = xMaxCount then begin
-        if ADBy[xMaxCount - 1] >= ADby[xMaxCount] then begin
-          SetLength(xDBx, Length(xDbx) + 1);
-          SetLength(xDBy, Length(xDby) + 1);
-          xDBx[High(xDbx)] := ADbx[xMaxCount];
-          xDBy[High(xDby)] := ADby[xMaxCount];
-        end;
-      end else begin
-        if (ADBy[xCount - 1] >= ADBy[xCount]) and (ADBy[xCount + 1] >= ADBy[xCount]) then begin
-          SetLength(xDBx, Length(xDbx) + 1);
-          SetLength(xDBy, Length(xDby) + 1);
-          xDBx[High(xDbx)] := ADbx[xCount];
-          xDBy[High(xDby)] := ADby[xCount];
-        end;
+    xCount := Low(ADby) + 1;
+    xMaxCount := High(ADby) - 1;
+    while (xCount <= xMaxCount) do begin
+      if (ADBy[xCount - 1] >= ADBy[xCount]) and (ADBy[xCount + 1] >= ADBy[xCount]) then begin
+        SetLength(xDBx, Length(xDbx) + 1);
+        SetLength(xDBy, Length(xDby) + 1);
+        xDBx[High(xDbx)] := ADbx[xCount];
+        xDBy[High(xDby)] := ADby[xCount];
       end;
+      Inc(xCount);
     end;
     RegLin(xDBx, xDBy, Aa, Ab);
   end;
@@ -96,38 +81,23 @@ end;
 procedure SupLin(ADBx, ADBy: TDoubleDynArray; var Aa, Ab: Double);
 var xDBx, xDBy: TDoubleDynArray;
     xCount: Integer;
-    xMinCount, xMaxCount: Integer;
+    xMaxCount: Integer;
 begin
   Aa := 0;
   Ab := 0;
   if Length(ADBy) > 0 then begin
     SetLength(xDBx, 0);
     SetLength(xDBy, 0);
-    xMinCount := Low(ADby);
-    xMaxCount := High(ADby);
-    for xCount := xMinCount to xMaxCount do begin
-      if xCount = xMinCount then begin
-        if ADBy[xMinCount] >= ADby[xMinCount + 1] then begin
-          SetLength(xDBx, Length(xDbx) + 1);
-          SetLength(xDBy, Length(xDby) + 1);
-          xDBx[High(xDbx)] := ADbx[xCount];
-          xDBy[High(xDby)] := ADby[xCount];
-        end;
-      end else if xCount = xMaxCount then begin
-        if ADBy[xMaxCount - 1] <= ADby[xMaxCount] then begin
-          SetLength(xDBx, Length(xDbx) + 1);
-          SetLength(xDBy, Length(xDby) + 1);
-          xDBx[High(xDbx)] := ADbx[xMaxCount];
-          xDBy[High(xDby)] := ADby[xMaxCount];
-        end;
-      end else begin
-        if (ADBy[xCount - 1] <= ADBy[xCount]) and (ADBy[xCount + 1] <= ADBy[xCount]) then begin
-          SetLength(xDBx, Length(xDbx) + 1);
-          SetLength(xDBy, Length(xDby) + 1);
-          xDBx[High(xDbx)] := ADbx[xCount];
-          xDBy[High(xDby)] := ADby[xCount];
-        end;
+    xCount := Low(ADby) + 1;
+    xMaxCount := High(ADby) - 1;
+    while (xCount <= xMaxCount) do begin
+      if (ADBy[xCount - 1] <= ADBy[xCount]) and (ADBy[xCount + 1] <= ADBy[xCount]) then begin
+        SetLength(xDBx, Length(xDbx) + 1);
+        SetLength(xDBy, Length(xDby) + 1);
+        xDBx[High(xDbx)] := ADbx[xCount];
+        xDBy[High(xDby)] := ADby[xCount];
       end;
+      Inc(xCount);
     end;
     RegLin(xDBx, xDBy, Aa, Ab);
   end;
