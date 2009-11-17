@@ -697,7 +697,7 @@ type
   TCurrCacheItem = class(TObject)
   private
     FComponentTag: Integer;
-    FCurrI: String;
+    FCurrId: String;
     FCurrSymbol: String;
     FCurrIso: String;
     procedure SetCurrSymbol(const Value: String);
@@ -707,7 +707,7 @@ type
   published
     property CurrSymbol: String read FCurrSymbol write SetCurrSymbol;
     property CurrIso: String read FCurrIso write SetCurrIso;
-    property CurrId: String read FCurrI;
+    property CurrId: String read FCurrId;
   end;
 
   TCurrCache = class(TObjectList)
@@ -3316,7 +3316,7 @@ end;
 constructor TCurrCacheItem.Create(AComponentTag: Integer; AId, ASymbol, AIso: String);
 begin
   inherited Create;
-  FCurrI := AId;
+  FCurrId := AId;
   FCurrSymbol := ASymbol;
   FComponentTag := AComponentTag;
   FCurrIso := AIso;
@@ -3333,7 +3333,7 @@ procedure TCurrCacheItem.SetCurrSymbol(const Value: String);
 begin
   if FCurrSymbol <> Value then begin
     FCurrSymbol := Value;
-    SetCurrencySymbol(FCurrI, FCurrSymbol, FComponentTag);
+    SetCurrencySymbol(FCurrId, FCurrSymbol, FComponentTag);
     SendMessageToFrames(Nil, WM_MUSTREPAINT, 0, 0);
   end;
 end;
@@ -3363,7 +3363,7 @@ begin
   Result := Nil;
   xCount := 0;
   while (Result = Nil) and (xCount <= Count - 1) do begin
-    if AId = Items[xCount].FCurrI then begin
+    if AId = Items[xCount].FCurrId then begin
       Result := Items[xCount];
     end;
     Inc(xCount);

@@ -110,6 +110,8 @@ var xResponse: String;
     xOldDecimalSep: Char;
     xValueOf: Currency;
     xRegDatetime: TDateTime;
+    xCurrency: String;
+    xType: String;
 begin
   xOldDecimalSep := DecimalSeparator;
   DecimalSeparator := '.';
@@ -151,6 +153,8 @@ begin
       xRegDateColumn := GetXmlAttribute('regDateColumn', xNode, 2);
       xRegTimeColumn := GetXmlAttribute('regTimeColumn', xNode, 3);
       xValueColumn := GetXmlAttribute('valueColumn', xNode, 4);
+      xCurrency := GetXmlAttribute('currency', xNode, '');
+      xType := GetXmlAttribute('type', xNode, CINSTRUMENTTYPE_UNDEFINED);
       if GetXmlAttribute('isValid', xNode, False) then begin
         xResStr := TStringList.Create;
         xResStr.Text := GetXmlAttribute('response', xNode, '');
@@ -208,6 +212,8 @@ begin
         if xResValid then begin
           SetXmlAttribute('cashpointName', xStockNode, GetXmlAttribute('cashpointName', xNode, ''));
           SetXmlAttribute('searchType', xStockNode, GetXmlAttribute('searchType', xNode, ''));
+          SetXmlAttribute('currency', xStockNode, GetXmlAttribute('currency', xNode, ''));
+          SetXmlAttribute('instrumentType', xStockNode, GetXmlAttribute('type', xNode, CINSTRUMENTTYPE_UNDEFINED));
           xRoot.appendChild(xStockNode);
           Inc(FValidCount);
         end else begin

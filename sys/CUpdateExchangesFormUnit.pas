@@ -248,11 +248,14 @@ var xNode: PVirtualNode;
     xRegDateTime: TDateTime;
     xDesc: String;
     xCashpointName, xCashpointId: TDataGid;
+    xCurrencyIso: String;
+    xInstrumentType: String;
     xCashpoint: TCashPoint;
     xAnyCashpointAdded, xAnyInstrumentAdded, xAnyValueAdded: Boolean;
     xHelper: TExchangeDescriptionHelper;
     xSearchType: TBaseEnumeration;
     xCurMark, xCurNode, xTotalNodes: Integer;
+    xCurrency: TCurrCacheItem;
 begin
   ShowWaitForm(wtProgressbar, 'Trwa zapisywanie notowañ...', 0, 100);
   GDataProvider.BeginTransaction;
@@ -272,6 +275,8 @@ begin
       xCashpointName := GetXmlAttribute('cashpointName', xXml, '');
       xCashpointId := CEmptyDataGid;
       xSearchType := GetXmlAttribute('searchType', xXml, CINSTRUMENTSEARCHTYPE_BYNAME);
+      xInstrumentType := GetXmlAttribute('instrumentType', xXml, CINSTRUMENTTYPE_UNDEFINED);
+      xCurrencyIso := GetXmlAttribute('currency', xXml, '');
     end else begin
       if ExchangesList.CheckState[xNode] = csCheckedNormal then begin
         if xSearchType = CINSTRUMENTSEARCHTYPE_BYNAME then begin
@@ -295,8 +300,13 @@ begin
             xCashpointId := xCashpoint.id;
           end;
           xInstrument.idCashpoint := xCashpointId;
-          xInstrument.idCurrencyDef := CEmptyDataGid;
-          xInstrument.instrumentType := CInstrumentTypeUndefined;
+          xCurrency := GCurrencyCache.ByIso[xCurrencyIso];
+          if xCurrency <> Nil then begin
+            xInstrument.idCurrencyDef := xCurrency.CurrId;
+          end else begin
+            xInstrument.idCurrencyDef := CEmptyDataGid;
+          end;
+          xInstrument.instrumentType := xInstrumentType;
           xInstrumentList.Add(xInstrument);
         end;
         xRegDateTime := XsdToDateTime(GetXmlAttribute('regDateTime', xXml, ''));

@@ -16,6 +16,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    IsFlatButton = False
     DesignSize = (
       656
       41)
@@ -49,6 +50,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
+    IsFlatButton = False
     object GroupBox1: TGroupBox
       Left = 16
       Top = 16
@@ -72,6 +74,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
         BevelOuter = bvLowered
         Caption = 'Panel1'
         TabOrder = 0
+        IsFlatButton = False
         object Bevel1: TBevel
           Left = 1
           Top = 268
@@ -90,6 +93,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           Color = clWindow
           PopupMenu = PopupMenuIcons
           TabOrder = 0
+          IsFlatButton = False
           object CButtonOut: TCButton
             Left = 293
             Top = 4
@@ -129,6 +133,7 @@ inherited CUpdateExchangesForm: TCUpdateExchangesForm
           CheckImageKind = ckDarkTick
           DefaultNodeHeight = 24
           Header.AutoSizeIndex = -1
+          Header.DefaultHeight = 17
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11

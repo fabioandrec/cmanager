@@ -59,7 +59,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object Label4: TLabel
         Left = 120
-        Top = 148
+        Top = 188
         Width = 88
         Height = 13
         Alignment = taRightJustify
@@ -67,7 +67,7 @@ object MetastockEditForm: TMetastockEditForm
       end
       object Label6: TLabel
         Left = 110
-        Top = 188
+        Top = 148
         Width = 98
         Height = 13
         Alignment = taRightJustify
@@ -104,32 +104,33 @@ object MetastockEditForm: TMetastockEditForm
       end
       object EditIso: TEdit
         Left = 216
-        Top = 144
+        Top = 184
         Width = 145
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 40
-        TabOrder = 3
+        TabOrder = 4
       end
       object ComboBoxType: TComboBox
         Left = 216
-        Top = 184
+        Top = 144
         Width = 145
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
-        ItemIndex = 0
-        TabOrder = 4
-        Text = 'Indeksy'
+        ItemIndex = 5
+        TabOrder = 3
+        Text = 'Nieokre'#347'lony'
         Items.Strings = (
           'Indeksy'
           'Akcje'
           'Obligacje'
           'Fundusze inwestycyjne'
-          'Fundusze emerytalne')
+          'Fundusze emerytalne'
+          'Nieokre'#347'lony')
       end
     end
     object GroupBox2: TGroupBox
