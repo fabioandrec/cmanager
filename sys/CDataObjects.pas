@@ -4281,6 +4281,20 @@ begin
     Result := CurrencyToString(FvalueOf, '', False, 4);
   end else if AColumnIndex = 3 then begin
     Result := GCurrencyCache.GetSymbol(idCurrencyDef);
+  end else if AColumnIndex = 4 then begin
+    if FinstrumentType = CInstrumentTypeIndex then begin
+      Result := CInstrumentTypeIndexDesc;
+    end else if FinstrumentType = CInstrumentTypeStock then begin
+      Result := CInstrumentTypeStockDesc;
+    end else if FinstrumentType = CInstrumentTypeBond then begin
+      Result := CInstrumentTypeBondDesc;
+    end else if FinstrumentType = CInstrumentTypeFundinv then begin
+      Result := CInstrumentTypeFundinvDesc;
+    end else if FinstrumentType = CInstrumentTypeFundret then begin
+      Result := CInstrumentTypeFundretDesc;
+    end else if FinstrumentType = CInstrumentTypeUndefined then begin
+      Result := CInstrumentTypeUndefinedDesc;
+    end
   end;
 end;
 

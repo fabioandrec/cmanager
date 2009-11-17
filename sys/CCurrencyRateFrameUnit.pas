@@ -117,8 +117,8 @@ begin
   with Result do begin
     Add(CFilterAllElements + '=<wszystkie elementy>');
     Add(CCurrencyRateTypeAverage + '=<kursy œrednie>');
-    Add(CCurrencyRateTypeSell + '=<kursy kupna>');
-    Add(CCurrencyRateTypeBuy + '=<kursy sprzeda¿y>');
+    Add(CCurrencyRateTypeBuy + '=<kursy kupna>');
+    Add(CCurrencyRateTypeSell + '=<kursy sprzeda¿y>');
   end;
 end;
 
@@ -131,6 +131,11 @@ procedure TCCurrencyRateFrame.InitializeFrame(AOwner: TComponent; AAdditionalDat
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   UpdateCustomPeriod;
+  Label5.Left := FilterPanel.Width - 8;
+  CDateTimePerEnd.Left := Label5.Left - CDateTimePerEnd.Width;
+  Label4.Left := CDateTimePerEnd.Left - 15;
+  CDateTimePerStart.Left := Label4.Left - CDateTimePerStart.Width;
+  Label3.Left := CDateTimePerStart.Left - 18;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
   Label3.Anchors := [akRight, akTop];
@@ -165,7 +170,12 @@ begin
     xCondition := Format(' where bindingDate between %s and %s', [DatetimeToDatabase(xDf, False), DatetimeToDatabase(xDt, False)]);
   end;
   if CStaticFilter.DataId <> CFilterAllElements then begin
-    xCondition := xCondition + ' and rateType = ''' + CStaticFilter.DataId + '''';
+    if xCondition = '' then begin
+      xCondition := xCondition + ' where ';
+    end else begin
+      xCondition := xCondition + ' and ';
+    end;
+    xCondition := xCondition + ' rateType = ''' + CStaticFilter.DataId + '''';
   end;
   if AdditionalData <> Nil then begin
     with TRateFrameAdditionalData(AdditionalData) do begin

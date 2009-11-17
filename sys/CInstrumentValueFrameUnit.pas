@@ -113,6 +113,11 @@ procedure TCInstrumentValueFrame.InitializeFrame(AOwner: TComponent; AAdditional
 begin
   inherited InitializeFrame(AOwner, AAdditionalData, AOutputData, AMultipleCheck, AWithButtons);
   UpdateCustomPeriod;
+  Label5.Left := FilterPanel.Width - 8;
+  CDateTimePerEnd.Left := Label5.Left - CDateTimePerEnd.Width;
+  Label4.Left := CDateTimePerEnd.Left - 15;
+  CDateTimePerStart.Left := Label4.Left - CDateTimePerStart.Width;
+  Label3.Left := CDateTimePerStart.Left - 18;
   CDateTimePerStart.Value := GWorkDate;
   CDateTimePerEnd.Value := GWorkDate;
   Label3.Anchors := [akRight, akTop];
@@ -143,7 +148,12 @@ begin
     xCondition := Format(' where regDateTime between %s and %s', [DatetimeToDatabase(xDf, True), DatetimeToDatabase(xDt, True)]);
   end;
   if CStaticFilter.DataId <> CFilterAllElements then begin
-    xCondition := xCondition + ' and instrumentType = ''' + CStaticFilter.DataId + '''';
+    if xCondition = '' then begin
+      xCondition := xCondition + ' where ';
+    end else begin
+      xCondition := xCondition + ' and ';
+    end;
+    xCondition := xCondition + ' instrumentType = ''' + CStaticFilter.DataId + '''';
   end;
   Dataobjects := TInstrumentValue.GetList(TInstrumentValue, InstrumentValueProxy, 'select * from StnInstrumentValue ' + xCondition);
 end;
