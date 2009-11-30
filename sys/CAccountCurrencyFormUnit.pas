@@ -52,7 +52,7 @@ begin
   xForm.FRules.Assign(ARulesString);
   for xCount := Low(CSimpleMovementTypes) to High(CSimpleMovementTypes) do begin
     if xForm.FRules.IndexOfName(CSimpleMovementSymbols[xCount]) = -1 then begin
-      xForm.FRules.Values[CSimpleMovementSymbols[xCount]] := CCurrencyRateTypeAverage;
+      xForm.FRules.Values[CSimpleMovementSymbols[xCount]] := CCurrencyRateTypeAverage + 'N';
     end;
   end;
   xForm.ComboBoxTypeChange(Nil);

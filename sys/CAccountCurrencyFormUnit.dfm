@@ -98,11 +98,14 @@ inherited CAccountCurrencyForm: TCAccountCurrencyForm
         Width = 213
         Height = 21
         Cursor = crHandPoint
+        Hint = '<wybierz prowadz'#261'cego z listy>'
         AutoSize = False
         BevelKind = bkTile
         Caption = '<wybierz prowadz'#261'cego z listy>'
         Color = clWindow
         ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
         TabStop = True
         Transparent = False

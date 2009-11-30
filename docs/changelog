@@ -16,6 +16,10 @@ Wersja 1.11.2
 [-] poprawiono filtrowanie w liscie notowañ i walut. Wystêpowa³ b³¹d zapytania je¿eli w filtrze dat wybrano wszystkie, 
     a w filtrze poka¿ konkretny typ (ID2898659)
 [-] drobne poprawki zwi¹zane z wygl¹dem list kursów walut i notowañ
+[-] poprawki do wtyczki importuj¹cej notowania gie³dowe, ustawienia rodzaju instrumentu oraz waluty notowania by³y ignorowane podczas
+    tworzenia instrumentów, których nie by³o w pliku danych
+[+] drobna zmiana w formacie pliku notowañ gie³dowych, patrz plik exchanges.xsd w sdk wtyczek
+[-] poprawka do zapamiêtywania regu³ przeliczeñ walut (ID2905011)
 
 Wersja 1.11.1
 [i] wyjœcie kolejnej wersji beta (2009-07-17)
