@@ -2760,7 +2760,15 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := CurrencyToString(Fcash, FidCurrencyDef, False);
   end else if AColumnIndex = 1 then begin
-    Result := IfThen(FaccountType = CCashAccount, 'gotówkowe', 'bankowe');
+    if FaccountType = CCashAccount then begin
+      Result := CCashAccountDesc;
+    end else if FaccountType = CBankAccount then begin
+      Result := CBankAccountDesc;
+    end else if FaccountType = CInvestmentAccount then begin
+      Result := CInvestmentAccountDesc;
+    end else begin
+      Result := FaccountType;
+    end;
   end else begin
     Result := Fname;
   end;

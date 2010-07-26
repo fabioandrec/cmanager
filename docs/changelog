@@ -20,6 +20,7 @@ Wersja 1.11.2
     tworzenia instrumentów, których nie by³o w pliku danych
 [+] drobna zmiana w formacie pliku notowañ gie³dowych, patrz plik exchanges.xsd w sdk wtyczek
 [-] poprawka do zapamiêtywania regu³ przeliczeñ walut (ID2905011)
+[-] poprawka wyœwietlania rodzaju kont dla kont inwestycyjnych w liœcie kont (ID3030749)
 
 Wersja 1.11.1
 [i] wyjœcie kolejnej wersji beta (2009-07-17)

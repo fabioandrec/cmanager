@@ -55,6 +55,10 @@ const
   CCashAccount = 'C';
   CInvestmentAccount = 'I';
 
+  CBankAccountDesc = 'Rachunek bankowy';
+  CCashAccountDesc = 'Gotówkowe';
+  CInvestmentAccountDesc = 'Rachunek inwestycyjny';
+
   CScheduleTypeOnce = 'O';
   CScheduleTypeCyclic = 'C';
 
