@@ -725,6 +725,10 @@ begin
           if AnsiUpperCase(xSplit[Low(xSplit)]) = 'ELEKTRONICZNE ZESTAWIENIE OPERACJI ZA' then begin
             xY := StrToIntDef(Copy(xSplit[High(xSplit)], 1, 4), 0);
             xM := StrToIntDef(Copy(xSplit[High(xSplit)], 6, 2), 0);
+            if (xY = 0) or (xM = 0) then begin
+              xY := StrToIntDef(Copy(xSplit[High(xSplit)], 4, 4), 0);
+              xM := StrToIntDef(Copy(xSplit[High(xSplit)], 1, 2), 0);
+            end;
             if (xY <> 0) and (xM <> 0) then begin
               xStartDate := EncodeDateTime(xY, xM, 1, 0, 0, 0, 0);
               xEndDate := EncodeDateTime(xY, xM, DaysInAMonth(xY, xM), 0, 0, 0, 0);
