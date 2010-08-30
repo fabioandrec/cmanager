@@ -1,19 +1,19 @@
 inherited CAccountForm: TCAccountForm
-  Left = 413
-  Top = 169
+  Left = 387
+  Top = 294
   Caption = 'Konto'
   ClientHeight = 518
-  ClientWidth = 379
+  ClientWidth = 475
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelConfig: TCPanel
-    Width = 379
+    Width = 475
     Height = 477
     object GroupBox2: TGroupBox
       Left = 16
       Top = 144
-      Width = 345
+      Width = 441
       Height = 209
       Caption = ' Dane konta '
       TabOrder = 1
@@ -34,7 +34,7 @@ inherited CAccountForm: TCAccountForm
         Caption = 'Opis'
       end
       object LabelCash: TLabel
-        Left = 53
+        Left = 149
         Top = 172
         Width = 91
         Height = 13
@@ -44,7 +44,7 @@ inherited CAccountForm: TCAccountForm
       object EditName: TEdit
         Left = 56
         Top = 28
-        Width = 265
+        Width = 361
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -54,14 +54,14 @@ inherited CAccountForm: TCAccountForm
       object RichEditDesc: TCRichedit
         Left = 56
         Top = 64
-        Width = 265
+        Width = 361
         Height = 89
         BevelKind = bkTile
         BorderStyle = bsNone
         TabOrder = 1
       end
       object CCurrEditCash: TCCurrEdit
-        Left = 152
+        Left = 248
         Top = 168
         Width = 169
         Height = 21
@@ -77,7 +77,7 @@ inherited CAccountForm: TCAccountForm
     object GroupBoxAccountType: TGroupBox
       Left = 16
       Top = 16
-      Width = 345
+      Width = 441
       Height = 113
       Caption = ' Dane podstawowe  '
       TabOrder = 0
@@ -98,7 +98,7 @@ inherited CAccountForm: TCAccountForm
         Caption = 'Rodzaj'
       end
       object CButton1: TCButton
-        Left = 175
+        Left = 263
         Top = 70
         Width = 154
         Height = 25
@@ -110,10 +110,18 @@ inherited CAccountForm: TCAccountForm
         Action = Action1
         Color = clBtnFace
       end
+      object Label7: TLabel
+        Left = 234
+        Top = 36
+        Width = 30
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Status'
+      end
       object ComboBoxType: TComboBox
         Left = 56
         Top = 32
-        Width = 265
+        Width = 169
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -129,7 +137,7 @@ inherited CAccountForm: TCAccountForm
       object CStaticCurrency: TCStatic
         Left = 56
         Top = 72
-        Width = 114
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         Hint = '<wybierz walut'#281' z listy>'
@@ -140,7 +148,7 @@ inherited CAccountForm: TCAccountForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 1
+        TabOrder = 2
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz walut'#281' z listy>'
@@ -148,11 +156,23 @@ inherited CAccountForm: TCAccountForm
         OnChanged = CStaticCurrencyChanged
         HotTrack = True
       end
+      object ComboBoxStatus: TComboBox
+        Left = 272
+        Top = 32
+        Width = 145
+        Height = 21
+        BevelInner = bvNone
+        BevelKind = bkTile
+        Style = csDropDownList
+        ItemHeight = 13
+        TabOrder = 1
+        OnChange = ComboBoxTypeChange
+      end
     end
     object GroupBoxBank: TGroupBox
       Left = 16
       Top = 368
-      Width = 345
+      Width = 441
       Height = 105
       Caption = ' Dane dodatkowe '
       Font.Charset = DEFAULT_CHARSET
@@ -181,7 +201,7 @@ inherited CAccountForm: TCAccountForm
       object EditNumber: TEdit
         Left = 108
         Top = 28
-        Width = 213
+        Width = 309
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
@@ -191,7 +211,7 @@ inherited CAccountForm: TCAccountForm
       object CStaticBank: TCStatic
         Left = 108
         Top = 64
-        Width = 213
+        Width = 309
         Height = 21
         Cursor = crHandPoint
         Hint = '<wybierz prowadz'#261'cego z listy>'
@@ -213,12 +233,12 @@ inherited CAccountForm: TCAccountForm
   end
   inherited PanelButtons: TCPanel
     Top = 477
-    Width = 379
+    Width = 475
     inherited BitBtnOk: TBitBtn
-      Left = 202
+      Left = 298
     end
     inherited BitBtnCancel: TBitBtn
-      Left = 290
+      Left = 386
     end
   end
   object ActionManager: TActionManager

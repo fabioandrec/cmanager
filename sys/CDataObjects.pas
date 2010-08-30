@@ -154,6 +154,7 @@ type
     FaccountNumber: TAccountNumber;
     FidCashPoint: TDataGid;
     FidCurrencyDef: TDataGid;
+    FaccountState: TBaseEnumeration;
     procedure Setdescription(const Value: TBaseDescription);
     procedure Setname(const Value: TBaseName);
     procedure Setcash(const Value: Currency);
@@ -162,6 +163,7 @@ type
     procedure SetidCashPoint(const Value: TDataGid);
     procedure SetinitialBalance(const Value: Currency);
     procedure SetidCurrencyDef(const Value: TDataGid);
+    procedure SetAccountState(const Value: TBaseEnumeration);
   public
     procedure UpdateFieldList; override;
     procedure FromDataset(ADataset: TADOQuery); override;
@@ -183,6 +185,7 @@ type
     property accountNumber: TAccountNumber read FaccountNumber write SetaccountNumber;
     property idCashPoint: TDataGid read FidCashPoint write SetidCashPoint;
     property idCurrencyDef: TDataGid read FidCurrencyDef write SetidCurrencyDef;
+    property accountState: TBaseEnumeration read FaccountState write SetAccountState;
   end;
 
   TAccountExtraction = class(TDataObject)
@@ -1415,6 +1418,7 @@ begin
     FaccountNumber := FieldByName('accountNumber').AsString;
     FidCashPoint := FieldByName('idCashPoint').AsString;
     FidCurrencyDef := FieldByName('idCurrencyDef').AsString;
+    FaccountState := FieldByName('accountState').AsString;
   end;
 end;
 
@@ -1462,6 +1466,7 @@ begin
     AddField('accountNumber', FaccountNumber, True, 'account');
     AddField('idCashPoint', DataGidToDatabase(FidCashPoint), False, 'account');
     AddField('idCurrencyDef', DataGidToDatabase(FidCurrencyDef), False, 'account');
+    AddField('accountState', FaccountState, True, 'account');
   end;
 end;
 
@@ -2755,7 +2760,15 @@ end;
 
 function TAccount.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
-  if AColumnIndex = 3 then begin
+  if AColumnIndex = 4 then begin
+    if FaccountState = CAccountStateActive then begin
+      Result := CAccountStateActiveDesc;
+    end else if FaccountState = CAccountStateClosed then begin
+      Result := CAccountStateClosedDesc;
+    end else begin
+      Result := FaccountState;
+    end;
+  end else if AColumnIndex = 3 then begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
   end else if AColumnIndex = 2 then begin
     Result := CurrencyToString(Fcash, FidCurrencyDef, False);
@@ -5593,6 +5606,14 @@ end;
 function TDepositInvestment.GetDepositCashpointName: String;
 begin
   Result := GDataProvider.GetSqlString(Format('select name from cashpoint where idCashpoint = %s', [DataGidToDatabase(idCashPoint)]), '');
+end;
+
+procedure TAccount.SetAccountState(const Value: TBaseEnumeration);
+begin
+  if FaccountState <> Value then begin
+    FaccountState := Value;
+    SetState(msModified);
+  end;
 end;
 
 initialization

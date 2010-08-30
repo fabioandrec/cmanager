@@ -61,8 +61,10 @@ create table account (
   accountNumber varchar(50),
   idCashPoint uniqueidentifier,
   idCurrencyDef uniqueidentifier not null,
+  accountState varchar(1) not null,
   primary key (idAccount),
   constraint ck_accountType check (accountType in ('C', 'B', 'I')),
+  constraint ck_accountState check (accountState in ('A', 'C')),
   constraint fk_accountCashPoint foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_accountCurrencyDef foreign key (idCurrencyDef) references currencyDef (idCurrencyDef)
 );

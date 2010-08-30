@@ -22,6 +22,14 @@ type
     procedure MergeWithDataGids(AGids: TDataGids);
   end;
 
+  TConditionBuilder = class(TStringList)
+  private
+    function GetAsWhere: String;
+  public
+    procedure AddCondition(ACondition: String);
+    property AsWhere: String read GetAsWhere;
+  end;
+
   TDataProvider = class(TObject)
   private
     FConnection: TADOConnection;
@@ -1324,6 +1332,30 @@ begin
       Result := xQ.Fields[0].AsFloat;
     end;
     xQ.Free;
+  end;
+end;
+
+{ TConditionBuilder }
+
+procedure TConditionBuilder.AddCondition(ACondition: String);
+begin
+  if Trim(ACondition) <> '' then begin
+    Add(ACondition);
+  end;
+end;
+
+function TConditionBuilder.GetAsWhere: String;
+var xCount: Integer;
+begin
+  Result := '';
+  if Count > 0 then begin
+    Result := ' where ';
+    for xCount := 0 to Count - 1 do begin
+      if xCount > 0 then begin
+        Result := Result + ' and ';
+      end;
+      Result := Result + Strings[xCount];
+    end;
   end;
 end;
 

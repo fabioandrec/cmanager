@@ -30,6 +30,8 @@ type
     ActionManager: TActionManager;
     Action1: TAction;
     CButton1: TCButton;
+    Label7: TLabel;
+    ComboBoxStatus: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure CStaticBankGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
     procedure ComboBoxTypeChange(Sender: TObject);
@@ -96,6 +98,11 @@ begin
     end else begin
       ComboBoxType.ItemIndex := 0;
     end;
+    if accountState = CAccountStateClosed then begin
+      ComboBoxStatus.ItemIndex := 1;
+    end else begin
+      ComboBoxStatus.ItemIndex := 0;
+    end;
     CStaticCurrency.DataId := idCurrencyDef;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, idCurrencyDef, False)).GetElementText;
     CCurrEditCash.SetCurrencyDef(idCurrencyDef, GCurrencyCache.GetSymbol(idCurrencyDef));
@@ -161,6 +168,11 @@ begin
     idCashPoint := CStaticBank.DataId;
     idCurrencyDef := CStaticCurrency.DataId;
     accountNumber := EditNumber.Text;
+    if ComboBoxStatus.ItemIndex = 1 then begin
+      accountState := CAccountStateClosed;
+    end else begin
+      accountState := CAccountStateActive;
+    end;
   end;
 end;
 
@@ -190,6 +202,13 @@ begin
     CStaticCurrency.DataId := GDefaultCurrencyId;
     CStaticCurrency.Caption := TCurrencyDef(TCurrencyDef.LoadObject(CurrencyDefProxy, CStaticCurrency.DataId, False)).GetElementText;
     CCurrEditCash.SetCurrencyDef(GDefaultCurrencyId, GCurrencyCache.GetSymbol(GDefaultCurrencyId));
+  end;
+  with ComboBoxStatus do begin
+    Items.BeginUpdate;
+    Items.Add(CAccountStateActiveDesc);
+    Items.Add(CAccountStateClosedDesc);
+    Items.EndUpdate;
+    ItemIndex := 0;
   end;
 end;
 

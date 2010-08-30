@@ -8,6 +8,10 @@ uses CDataobjectFrameUnit, Classes, ActnList, VTHeaderPopup, Menus,
 
 type
   TCAccountsFrame = class(TCDataobjectFrame)
+    Label1: TLabel;
+    CStaticStatusFilter: TCStatic;
+    procedure CStaticStatusFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CStaticStatusFilterChanged(Sender: TObject);
   protected
     function IsSelectedTypeCompatible(APluginSelectedItemTypes: Integer): Boolean; override;
     function GetSelectedType: Integer; override;
@@ -26,7 +30,7 @@ type
 implementation
 
 uses CDataObjects, CAccountFormUnit, CConsts, CReports, CPluginConsts,
-  CBaseFrameUnit;
+  CBaseFrameUnit, CListFrameUnit, StrUtils;
 
 {$R *.dfm}
 
@@ -82,20 +86,30 @@ end;
 
 function TCAccountsFrame.IsValidFilteredObject(AObject: TDataObject): Boolean;
 begin
-  Result := (inherited IsValidFilteredObject(AObject)) or
-            (TAccount(AObject).accountType = CStaticFilter.DataId);
+  Result := ((CStaticFilter.DataId = CFilterAllElements) or (TAccount(AObject).accountType = CStaticFilter.DataId)) and
+            ((CStaticStatusFilter.DataId = CFilterAllElements) or (TAccount(AObject).accountState = CStaticStatusFilter.DataId));
 end;
 
 procedure TCAccountsFrame.ReloadDataobjects;
-var xCondition: String;
+var xConditionFilter, xConditionStatus: String;
+    xCondition: TConditionBuilder;
 begin
   inherited ReloadDataobjects;
+  xCondition := TConditionBuilder.Create;
   if CStaticFilter.DataId = CFilterAllElements then begin
-    xCondition := '';
+    xConditionFilter := '';
   end else begin
-    xCondition := ' where accountType = ''' + CStaticFilter.DataId + '''';
+    xConditionFilter := 'accountType = ''' + CStaticFilter.DataId + '''';
   end;
-  Dataobjects := TAccount.GetList(TAccount, AccountProxy, 'select * from account' + xCondition);
+  xCondition.AddCondition(xConditionFilter);
+  if CStaticStatusFilter.DataId = CFilterAllElements then begin
+    xConditionStatus := '';
+  end else begin
+    xConditionStatus := 'accountState = ''' + CStaticStatusFilter.DataId + '''';
+  end;
+  xCondition.AddCondition(xConditionStatus);
+  Dataobjects := TAccount.GetList(TAccount, AccountProxy, 'select * from account' + xCondition.AsWhere);
+  xCondition.Free;
 end;
 
 procedure TCAccountsFrame.ShowHistory(AGid: ShortString);
@@ -107,6 +121,23 @@ begin
   xReport.ShowReport;
   xReport.Free;
   xParams.Free;
+end;
+
+procedure TCAccountsFrame.CStaticStatusFilterGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+var xList: TStringList;
+begin
+  xList := TStringList.Create;
+  xList.Values[CFilterAllElements] := '<dowolny>';
+  xList.Values[CAccountStateActive] := '<' + CAccountStateActiveDesc + '>';
+  xList.Values[CAccountStateClosed] := '<' + CAccountStateClosedDesc + '>';
+  if xList <> Nil then begin
+    AAccepted := ShowList(xList, ADataGid, AText, False);
+  end;
+end;
+
+procedure TCAccountsFrame.CStaticStatusFilterChanged(Sender: TObject);
+begin
+  RefreshData;
 end;
 
 end.

@@ -59,6 +59,11 @@ const
   CCashAccountDesc = 'Gotówkowe';
   CInvestmentAccountDesc = 'Rachunek inwestycyjny';
 
+  CAccountStateActive = 'A';
+  CAccountStateActiveDesc = 'Aktywne';
+  CAccountStateClosed = 'C';
+  CAccountStateClosedDesc = 'Zamkniête';
+
   CScheduleTypeOnce = 'O';
   CScheduleTypeCyclic = 'C';
 
