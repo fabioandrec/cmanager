@@ -413,7 +413,6 @@ object CMainForm: TCMainForm
               end
               item
                 Action = ActionXsl
-                Caption = '&Domy'#347'lna transformcja raport'#243'w'
               end>
             Caption = '&Narz'#281'dzia'
           end
@@ -676,7 +675,7 @@ object CMainForm: TCMainForm
     end
     object ActionXsl: TAction
       Category = 'Narz'#281'dzia'
-      Caption = 'Domy'#347'lna transformcja raport'#243'w'
+      Caption = 'Domy'#347'lna transformacja raport'#243'w'
       OnExecute = ActionXslExecute
     end
     object ActionShortcutInstruments: TAction
