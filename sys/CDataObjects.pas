@@ -3465,13 +3465,12 @@ end;
 function TCurrencyRateHelper.ExchangeCurrency(ACash: Currency; ASourceId, ATargerId: TDataGid): Currency;
 begin
   if (ASourceId = FidSourceCurrencyDef) and (ATargerId = FidTargetCurrencyDef) then begin
-    Result := SimpleRoundTo(ACash * Frate / Fquantity, -4);
+    Result := RoundCurrency(ACash * Frate / Fquantity);
   end else if (ASourceId = FidTargetCurrencyDef) and (ATargerId = FidSourceCurrencyDef) then begin
-    Result := SimpleRoundTo(Fquantity * ACash / Frate, -4);
+    Result := RoundCurrency(Fquantity * ACash / Frate);
   end else begin
     Result := 0;
   end;
-  Result := SimpleRoundTo(Result, -2);
 end;
 
 procedure TBaseMovement.SetcurrencyQuantity(const Value: Integer);
@@ -4855,7 +4854,7 @@ begin
   end else if AColumnIndex = 2 then begin
     Result := FloatToString(Fquantity, 6);
   end else if AColumnIndex = 3 then begin
-    Result := CurrencyToString(SimpleRoundTo(FvalueOf * Fquantity, -2), FidCurrencyDef, False);
+    Result := CurrencyToString(RoundCurrency(FvalueOf * Fquantity), FidCurrencyDef, False);
   end else if AColumnIndex = 4 then begin
     Result := GCurrencyCache.GetSymbol(FidCurrencyDef);
   end;
@@ -4868,7 +4867,7 @@ end;
 
 function TInvestmentPortfolio.GetoverallValue: Currency;
 begin
-  Result := SimpleRoundTo(Fquantity * FvalueOf, -2);
+  Result := RoundCurrency(Fquantity * FvalueOf);
 end;
 
 procedure TMovementList.AfterPost;

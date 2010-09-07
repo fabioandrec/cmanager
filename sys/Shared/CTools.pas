@@ -133,6 +133,7 @@ function GetWindowsVersionStr: string;
 function GetWindowsVersionNumbers: string;
 function SubstringFromTo(AString: String; AFrom, ATo: Integer): String;
 function RemoveFromDynArray(const AArray: TDoubleDynArray; AIndex: Integer): TDoubleDynArray;
+function RoundCurrency(AFloat: Extended; ADecimals: Byte = 2): Currency;
 
 implementation
 
@@ -1390,6 +1391,20 @@ begin
       end;
     end;
   end;
+end;
+
+function RoundCurrency(AFloat: Extended; ADecimals: Byte = 2): Currency;
+var xErrCode: Integer;
+    xS: string;
+    xExtended: Extended;
+begin
+ Str(AFloat: 0: ADecimals, xS);
+ Val(xS, xExtended, xErrCode);
+ if xErrCode <> 0 then begin
+   Result := 0;
+ end else begin
+   Result := xExtended;
+ end;
 end;
 
 end.

@@ -236,7 +236,7 @@ begin
         end else begin
           xItem.operation := 'Naliczenie odsetek';
         end;
-        xCalcInterest := SimpleRoundTo((xRatePeriodCount * Fcash * FinterestRate) / (100 * xRateDivider), -2);
+        xCalcInterest := RoundCurrency((xRatePeriodCount * Fcash * FinterestRate) / (100 * xRateDivider));
         if FdueType <> CDepositDueTypeOnDepositEnd then begin
           FdueStartDate := IncDay(FdueEndDate, 1);
           FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, FdueType);
@@ -284,7 +284,7 @@ begin
             FdueStartDate := IncDay(periodEndDate, 1);
             FdueEndDate := TDepositInvestment.EndPeriodDatetime(FdueStartDate, FperiodCount, FperiodType);
           end;
-          xCalcInterest := SimpleRoundTo((xDaysBetween * Fcash * FinterestRate) / (100 * DaysInYear(FperiodStartDate)), -2);
+          xCalcInterest := RoundCurrency((xDaysBetween * Fcash * FinterestRate) / (100 * DaysInYear(FperiodStartDate)));
           xItem.cash := Fcash;
           xItem.interest := xCalcInterest;
           if FdueAction = CDepositDueActionAutoCapitalisation then begin
@@ -383,7 +383,7 @@ end;
 
 function TDeposit.GetrateOfReturn: Currency;
 begin
-  Result := SimpleRoundTo((100 * (Fcash + FnoncapitalizedInterest) / FinitialCash), -4) - 100;
+  Result := RoundCurrency((100 * (Fcash + FnoncapitalizedInterest) / FinitialCash), 4) - 100;
 end;
 
 function TDeposit.IsSumObject(ANumber: Integer): Boolean;

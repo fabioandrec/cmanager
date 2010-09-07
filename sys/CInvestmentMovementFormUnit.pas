@@ -262,7 +262,7 @@ procedure TCInvestmentMovementForm.UpdateOverallSum;
 begin
   if not (csLoading in ComponentState) then begin
     if (CCurrEditQuantity.Value <> 0) and (CCurrEditValue.Value <> 0) then begin
-      CCurrMovement.Value := SimpleRoundTo(CCurrEditQuantity.Value * CCurrEditValue.Value, -2);
+      CCurrMovement.Value := RoundCurrency(CCurrEditQuantity.Value * CCurrEditValue.Value);
     end else begin
       CCurrMovement.Value := 0;
     end;
@@ -319,7 +319,7 @@ begin
     idAccount := CStaticAccount.DataId;
     idAccountCurrencyDef := CStaticAccountCurrency.DataId;
     summaryOfAccount := CCurrEditAccount.Value;
-    valueOfAccount := SimpleRoundTo(summaryOfAccount / quantity, -4);
+    valueOfAccount := RoundCurrency(summaryOfAccount / quantity, 4);
     idProduct := CStaticCategory.DataId;
     if CStaticCurrencyRate.Enabled then begin
       idCurrencyRate := CStaticCurrencyRate.DataId;
