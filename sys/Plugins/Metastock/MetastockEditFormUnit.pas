@@ -43,6 +43,10 @@ type
     ComboBoxIgnore: TComboBox;
     Label15: TLabel;
     EditChars: TEdit;
+    Label16: TLabel;
+    EditRegexp: TEdit;
+    Label17: TLabel;
+    CheckBoxNotregex: TCheckBox;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -64,16 +68,19 @@ type
 function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
-                        ADateFormat, ATimeFormat, ASearchType, AIgnoreChars: String;
+                        ADateFormat, ATimeFormat, ASearchType, AIgnoreChars, ARegex: String;
+                    var ANotRegex: Boolean;
                     var AIgnoreLines, AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 
 implementation
 
-uses CXmlTlb, CPluginConsts;
+uses CXmlTlb, CPluginConsts, RegExpr;
 
 {$R *.dfm}
 
 procedure TMetastockEditForm.BitBtnOkClick(Sender: TObject);
+var xRegexp: TRegExpr;
+    xError: Boolean;
 begin
   if Trim(EditName.Text) = '' then begin
     MessageBox(0, 'Nazwa Ÿród³a nie mo¿e byæ pusta', 'B³¹d', MB_OK + MB_ICONERROR);
@@ -141,7 +148,27 @@ begin
     ComboBoxFieldChange(Nil);
     ComboBoxColumn.SetFocus;
   end else begin
-    ModalResult := mrOk;
+    if Trim(EditRegexp.Text) <> '' then begin
+      xError := False;
+      xRegexp := TRegExpr.Create;
+      try
+        try
+          xRegexp.Expression := EditRegexp.Text;
+          xRegexp.Compile;
+        except
+          xError := True;
+        end;
+      finally
+        xRegexp.Free;
+      end;
+      if xError then begin
+        MessageBox(0, 'Wprowadzone wyra¿enie nie jest poprawnym wyra¿eniem regularnym', 'B³¹d', MB_OK + MB_ICONERROR);
+      end else begin
+        ModalResult := mrOk;
+      end;
+    end else begin
+      ModalResult := mrOk;
+    end;
   end;
 end;
 
@@ -160,7 +187,8 @@ end;
 function EditSource(var AName, AUrl, ACashpoint,
                         AIso, AType, AFieldSeparator,
                         ADecimalSeparator, ADateSeparator, ATimeSeparator,
-                        ADateFormat, ATimeFormat, ASearchType, AIgnoreChars: String;
+                        ADateFormat, ATimeFormat, ASearchType, AIgnoreChars, ARegex: String;
+                    var ANotRegex: Boolean;
                     var AIgnoreLines, AIdentColumn, ARegDateColumn, ARegTimeColumn, AValueColumn: Integer): Boolean;
 var xForm: TMetastockEditForm;
 begin
@@ -171,6 +199,8 @@ begin
     EditUrl.Text := AUrl;
     EditCashpoint.Text := ACashpoint;
     EditIso.Text := AIso;
+    EditRegexp.Text := ARegex;
+    CheckBoxNotregex.Checked := ANotRegex;
     if AType = CINSTRUMENTTYPE_INDEX then begin
       ComboBoxType.ItemIndex := 0;
     end else if AType = CINSTRUMENTTYPE_STOCK then begin
@@ -231,10 +261,12 @@ begin
       ARegDateColumn := StrToIntDef(FRegDateColumn, 2);
       ARegTimeColumn := StrToIntDef(FRegTimeColumn, 0);
       AValueColumn := StrToIntDef(FValueColumn, 3);
+      ARegex := EditRegexp.Text;
       ADateFormat := ComboBoxDate.Text;
       ATimeFormat := ComboBoxTime.Text;
       AIgnoreLines := StrToIntDef(ComboBoxIgnore.Text, 0);
       AIgnoreChars := EditChars.Text;
+      ANotRegex := CheckBoxNotregex.Checked;
       if ComboBoxSearchType.ItemIndex = 1 then begin
         ASearchType := CINSTRUMENTSEARCHTYPE_BYNAME;
       end else begin

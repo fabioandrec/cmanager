@@ -20,7 +20,8 @@ uses
   CBase64 in '..\..\Shared\CBase64.pas',
   MetastockEditFormUnit in 'MetastockEditFormUnit.pas' {MetastockEditForm},
   CBasics in '..\..\Shared\CBasics.pas',
-  MetastockProgressFormUnit in 'MetastockProgressFormUnit.pas' {MetastockProgressForm};
+  MetastockProgressFormUnit in 'MetastockProgressFormUnit.pas' {MetastockProgressForm},
+  RegExpr in '..\..\..\others\Regexp\RegExpr.pas';
 
 function Plugin_Initialize(ACManagerInterface: ICManagerInterface): Boolean; stdcall; export;
 begin
