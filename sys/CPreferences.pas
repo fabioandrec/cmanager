@@ -252,7 +252,8 @@ implementation
 
 uses CSettings, CMovementFrameUnit, CConsts, CDatabase, DateUtils, CBackups, CTools, Forms, CPlannedFrameUnit,
      CDoneFrameUnit, CStartupInfoFrameUnit, CExtractionsFrameUnit, CBaseFormUnit, CBaseFrameUnit, CReportsFrameUnit,
-     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit, CReports, ShlObj;
+     CDescTemplatesFrameUnit, CInfoFormUnit, CHtmlMemoFormUnit, CReports, ShlObj,
+  CPlugins;
 
 const CPrivateDefaultFilename = 'CManager.dat';
 
@@ -1024,6 +1025,15 @@ type
     property deleteUnused: Boolean read FdeleteUnused;
   end;
 
+  T001012001000Answer = class(THtmlAnswer)
+  private
+    FsetDefault: Boolean;
+  public
+    procedure UpdateAnswer(AWebBrowser: IWebBrowser2); override;
+  published
+    property SetDefault: Boolean read FsetDefault;
+  end;
+
 procedure T001008002000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
 var xRadioList: IDispatch;
     xRadio: IHTMLOptionButtonElement;
@@ -1043,6 +1053,8 @@ var xFromDynArray, xToDynArray: TStringDynArray;
     xFromVersion, xToVersion, xTitle: String;
     x001008002000Answer: T001008002000Answer;
     x001010002000Answer: T001010002000Answer;
+    x001012001000Answer: T001012001000Answer;
+    xCount: Integer;
 begin
   Result := True;
   xTitle := 'CManager - wersja ' + FileVersion(ParamStr(0));
@@ -1068,7 +1080,7 @@ begin
       GColumnsPreferences.Clear;
       GChartPreferences.Clear;
     end;
-    if xFromVersion < '001008002000' then begin
+    if (xFromVersion < '001008002000') then begin
       x001008002000Answer := T001008002000Answer.Create;
       ShowHtmlReport(xTitle, GetStringFromResources('PL_001008002000', RT_RCDATA), 500, 300, '', x001008002000Answer);
       if x001008002000Answer.smallIcons then begin
@@ -1082,6 +1094,19 @@ begin
       MoveFilesToProfile(x001010002000Answer.deleteUnused);
       x001010002000Answer.Free;
     end;
+    if (xFromVersion < '001012001000') and
+       (FileExists(ExpandFileName(IncludeTrailingPathDelimiter(GPlugins.PluginPath) + 'metastock.dll'))) then begin
+      x001012001000Answer := T001012001000Answer.Create;
+      ShowHtmlReport(xTitle, GetStringFromResources('PL_001012001000', RT_RCDATA), 500, 300, '', x001012001000Answer);
+      if x001012001000Answer.SetDefault then begin
+        for xCount := GPluginsPreferences.Count - 1 downto 0 do begin
+          if AnsiCompareText(ExtractFileName(GPluginsPreferences.Items[xCount].Prefname), 'metastock.dll') = 0 then begin
+            GPluginsPreferences.Delete(xCount);
+          end;
+        end;
+      end;
+      x001012001000Answer.Free;
+    end
   end;
   if Result then begin
     GBasePreferences.configFileVersion := FileVersion(ParamStr(0));
@@ -1182,6 +1207,20 @@ begin
   {$ENDIF}
   if ForceDirectories(xCat) then begin
     Result := IncludeTrailingPathDelimiter(xCat) + CPrivateDefaultFilename;
+  end;
+end;
+
+procedure T001012001000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
+var xRadioList: IDispatch;
+    xRadio: IHTMLOptionButtonElement;
+begin
+  FsetDefault := True;
+  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('config', EmptyParam);
+  if xRadioList <> Nil then begin
+    if IHTMLElementCollection(xRadioList).length > 0 then begin
+      xRadio := IHTMLElementCollection(xRadioList).item(0, EmptyParam) as IHTMLOptionButtonElement;
+      FsetDefault := not xRadio.checked;
+    end;
   end;
 end;
 

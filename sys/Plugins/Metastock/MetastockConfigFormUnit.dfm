@@ -1,6 +1,6 @@
 object MetastockConfigForm: TMetastockConfigForm
-  Left = 384
-  Top = 188
+  Left = 334
+  Top = 273
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Konfiguracja'
@@ -110,6 +110,15 @@ object MetastockConfigForm: TMetastockConfigForm
       Caption = 'Usu'#324
       TabOrder = 4
       OnClick = BitBtnDelClick
+    end
+    object BitBtnDefault: TBitBtn
+      Left = 274
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Domy'#347'lne'
+      TabOrder = 5
+      OnClick = BitBtnDefaultClick
     end
   end
 end

@@ -52,7 +52,7 @@ const WM_SHOWIMPORTBUTTON = WM_USER + 1;
 implementation
 
 uses CRichtext, StrUtils, CPluginConsts, CBasics, MetastockConfigFormUnit,
-  CTools;
+  CTools, RegExpr;
 
 {$R *.dfm}
 
@@ -112,6 +112,10 @@ var xResponse: String;
     xRegDatetime: TDateTime;
     xCurrency: String;
     xType: String;
+    xRegex: String;
+    xRegexNot: Boolean;
+    xToProcess, xGotPattern: Boolean;
+    xRegexClass: TRegExpr;
 begin
   xOldDecimalSep := DecimalSeparator;
   DecimalSeparator := '.';
@@ -154,6 +158,8 @@ begin
       xRegTimeColumn := GetXmlAttribute('regTimeColumn', xNode, 3);
       xValueColumn := GetXmlAttribute('valueColumn', xNode, 4);
       xCurrency := GetXmlAttribute('currency', xNode, '');
+      xRegex := GetXmlAttribute('lineRegex', xNode, '');
+      xRegexNot := GetXmlAttribute('notLineRegex', xNode, False);
       xType := GetXmlAttribute('type', xNode, CINSTRUMENTTYPE_UNDEFINED);
       if GetXmlAttribute('isValid', xNode, False) then begin
         xResStr := TStringList.Create;
@@ -165,38 +171,53 @@ begin
           try
             try
               if Trim(xResStr.Strings[xLineNum]) <> '' then begin
-                xArray := StringToStringArray(xResStr.Strings[xLineNum], xFieldSeparator);
-                if Length(xArray) >= Max(Max(xIdentColumn, Max(xRegDateColumn, xRegTimeColumn)), xValueColumn) then begin
-                  xIdentifierStr := Trim(xArray[xIdentColumn - 1]);
-                  xValueStr := Trim(xArray[xValueColumn - 1]);
-                  if xRegDateColumn = xRegTimeColumn then begin
-                    xDateTimeStr := Trim(xArray[xRegTimeColumn - 1]);
+                if Trim(xRegex) <> '' then begin
+                  xRegexClass := TRegExpr.Create;
+                  xRegexClass.Expression := xRegex;
+                  xRegexClass.Compile;
+                  xGotPattern := xRegexClass.Exec(xResStr.Strings[xLineNum]);
+                  if xRegexNot then begin
+                    xToProcess := not xGotPattern;
                   end else begin
-                    xDateTimeStr := Trim(xArray[xRegDateColumn - 1] + ' ' + xArray[xRegTimeColumn - 1]);
+                    xToProcess := xGotPattern;
                   end;
-                  if xIdentifierStr <> '' then begin
-                    if StrToCurrencyDecimalDot(StringReplace(xValueStr, xDecimalSeparator, '.', [rfReplaceAll, rfIgnoreCase]), xValueOf) then begin
-                      if StrToDatetime(xDateTimeStr, xDateFormat, xTimeFormat, xDateSeparator, xTimeSeparator, xRegDatetime) then begin
-                        xExNode := FOutputXml.createElement('exchange');
-                        xStockNode.appendChild(xExNode);
-                        SetXmlAttribute('identifier', xExNode, xIdentifierStr);
-                        SetXmlAttribute('regDateTime', xExNode, DateTimeToXsd(xRegDatetime));
-                        SetXmlAttribute('value', xExNode, Trim(Format('%-10.4f', [xValueOf])));
+                end else begin
+                  xToProcess := True;
+                end;
+                if xToProcess then begin
+                  xArray := StringToStringArray(xResStr.Strings[xLineNum], xFieldSeparator);
+                  if Length(xArray) >= Max(Max(xIdentColumn, Max(xRegDateColumn, xRegTimeColumn)), xValueColumn) then begin
+                    xIdentifierStr := Trim(xArray[xIdentColumn - 1]);
+                    xValueStr := Trim(xArray[xValueColumn - 1]);
+                    if xRegDateColumn = xRegTimeColumn then begin
+                      xDateTimeStr := Trim(xArray[xRegTimeColumn - 1]);
+                    end else begin
+                      xDateTimeStr := Trim(xArray[xRegDateColumn - 1] + ' ' + xArray[xRegTimeColumn - 1]);
+                    end;
+                    if xIdentifierStr <> '' then begin
+                      if StrToCurrencyDecimalDot(StringReplace(xValueStr, xDecimalSeparator, '.', [rfReplaceAll, rfIgnoreCase]), xValueOf) then begin
+                        if StrToDatetime(xDateTimeStr, xDateFormat, xTimeFormat, xDateSeparator, xTimeSeparator, xRegDatetime) then begin
+                          xExNode := FOutputXml.createElement('exchange');
+                          xStockNode.appendChild(xExNode);
+                          SetXmlAttribute('identifier', xExNode, xIdentifierStr);
+                          SetXmlAttribute('regDateTime', xExNode, DateTimeToXsd(xRegDatetime));
+                          SetXmlAttribute('value', xExNode, Trim(Format('%-10.4f', [xValueOf])));
+                        end else begin
+                          xResValid := False;
+                          AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano niepoprawn¹ wartoœæ daty lub czasu notowania');
+                        end;
                       end else begin
                         xResValid := False;
-                        AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano niepoprawn¹ wartoœæ daty lub czasu notowania');
+                        AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano niepoprawn¹ wartoœæ instrumentu');
                       end;
                     end else begin
                       xResValid := False;
-                      AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano niepoprawn¹ wartoœæ intstrumentu');
+                      AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano pusty identyfikator');
                     end;
                   end else begin
                     xResValid := False;
-                    AddToReport('Z ' + GetXmlAttribute('name', xNode, '') + ' otrzymano pusty identyfikator');
+                    AddToReport('Dane odebrane z ' + GetXmlAttribute('name', xNode, '') + ' nie s¹ zgodne z definicj¹ pliku importu');
                   end;
-                end else begin
-                  xResValid := False;
-                  AddToReport('Dane odebrane z ' + GetXmlAttribute('name', xNode, '') + ' nie s¹ zgodne z definicj¹ pliku importu');
                 end;
               end;
             except

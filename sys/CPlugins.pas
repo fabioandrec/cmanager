@@ -90,6 +90,9 @@ type
     constructor Create(APath: String);
     procedure ScanForPlugins;
     function GetCountOfType(AType: Integer): Integer;
+    function IsPluginEnabled(AFilename: String): Boolean;
+  published
+    property PluginPath: String read FPluginPath;
   end;
 
 var GPlugins: TCPluginList;
@@ -286,6 +289,21 @@ begin
     if TCPlugin(Items[xCount]).isTypeof[AType] then begin
       Inc(Result);
     end;
+  end;
+end;
+
+function TCPluginList.IsPluginEnabled(AFilename: String): Boolean;
+var xCount: Integer;
+    xFilename: String;
+begin
+  xFilename := AnsiLowerCase(ExtractFileName(AFilename));
+  Result := False;
+  xCount :=0;
+  while (not Result) and (xCount <= Count - 1) do begin
+    if AnsiLowerCase(ExtractFileName(TCPlugin(Items[xCount]).fileName)) = xFilename then begin
+      Result := TCPlugin(Items[xCount]).pluginIsEnabled;
+    end;
+    Inc(xCount);
   end;
 end;
 

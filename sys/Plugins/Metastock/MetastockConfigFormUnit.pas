@@ -16,6 +16,7 @@ type
     BitBtnAdd: TBitBtn;
     BitBtnEdit: TBitBtn;
     BitBtnDel: TBitBtn;
+    BitBtnDefault: TBitBtn;
     procedure BitBtnOkClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -23,6 +24,7 @@ type
     procedure BitBtnDelClick(Sender: TObject);
     procedure BitBtnEditClick(Sender: TObject);
     procedure BitBtnAddClick(Sender: TObject);
+    procedure BitBtnDefaultClick(Sender: TObject);
   private
     FConfigXml: ICXMLDOMDocument;
     procedure UpdateButtons;
@@ -36,7 +38,7 @@ var GCManagerInterface: ICManagerInterface;
 
 implementation
 
-uses CXmlTlb, CBase64, MetastockEditFormUnit, CTools, CPluginConsts;
+uses CXmlTlb, CBase64, MetastockEditFormUnit, CTools, CPluginConsts, Math;
 
 {$R *.dfm}
 
@@ -96,10 +98,12 @@ procedure TMetastockConfigForm.BitBtnDelClick(Sender: TObject);
 var xIndex: Integer;
 begin
   if ListView.Selected <> Nil then begin
-    xIndex := ListView.Selected.Index;
-    ListView.DeleteSelected;
-    FConfigXml.documentElement.removeChild(FConfigXml.documentElement.childNodes.item[xIndex]);
-    UpdateButtons;
+    if MessageBox(0, 'Czy usun¹æ wybranego dostawcê?', 'Pytanie', MB_YESNO + MB_ICONQUESTION) = ID_YES then begin
+      xIndex := ListView.Selected.Index;
+      ListView.DeleteSelected;
+      FConfigXml.documentElement.removeChild(FConfigXml.documentElement.childNodes.item[xIndex]);
+      UpdateButtons;
+    end;
   end;
 end;
 
@@ -249,6 +253,15 @@ begin
       AErrorText := 'Konfiguracja wtyczki jest niepoprawna';
       Result := Nil;
     end;
+  end;
+end;
+
+procedure TMetastockConfigForm.BitBtnDefaultClick(Sender: TObject);
+var xConfigurationDecoded: String;
+begin
+  if MessageBox(0, 'Czy przywróciæ domyœlne ustawienia dostawców?', 'Pytanie', MB_YESNO + MB_ICONQUESTION) = ID_YES then begin
+    xConfigurationDecoded := GetStringFromResources('DEFAULTXML', RT_RCDATA);
+    SetConfigXml(GetDocumentFromString(xConfigurationDecoded, Nil));
   end;
 end;
 
