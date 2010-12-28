@@ -7,6 +7,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Align = alTop
     Alignment = taLeftJustify
     TabOrder = 3
+    IsFlatButton = False
     BevelEdges = [beLeft, beTop, beBottom]
     object Label2: TLabel
       Left = 11
@@ -62,6 +63,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     ButtonStyle = bsTriangle
     DefaultNodeHeight = 24
     Header.AutoSizeIndex = -1
+    Header.DefaultHeight = 17
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
@@ -98,6 +100,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Color = clWindow
     PopupMenu = PopupMenuIcons
     TabOrder = 2
+    IsFlatButton = False
     object CButtonAdd: TCButton
       Left = 13
       Top = 4
@@ -155,6 +158,7 @@ inherited CDataobjectFrame: TCDataobjectFrame
     Align = alBottom
     BevelOuter = bvLowered
     TabOrder = 1
+    IsFlatButton = False
   end
   inherited ListPopupMenu: TPopupMenu
     object Dodaj1: TMenuItem [0]

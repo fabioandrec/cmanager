@@ -42,7 +42,7 @@ object CMainForm: TCMainForm
   end
   object StatusBar: TCStatusBar
     Left = 0
-    Top = 586
+    Top = 584
     Width = 980
     Height = 19
     Panels = <
@@ -81,7 +81,7 @@ object CMainForm: TCMainForm
     Left = 0
     Top = 65
     Width = 980
-    Height = 521
+    Height = 519
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 3
@@ -98,7 +98,7 @@ object CMainForm: TCMainForm
       Left = 195
       Top = 24
       Width = 2
-      Height = 497
+      Height = 495
     end
     object PanelTitle: TCPanel
       Left = 0
@@ -183,7 +183,7 @@ object CMainForm: TCMainForm
       Left = 197
       Top = 24
       Width = 783
-      Height = 497
+      Height = 495
       Align = alClient
       BevelOuter = bvLowered
       Color = clWindow
@@ -194,7 +194,7 @@ object CMainForm: TCMainForm
       Left = 0
       Top = 24
       Width = 195
-      Height = 497
+      Height = 495
       Align = alLeft
       BevelOuter = bvLowered
       Color = clWindow
@@ -204,7 +204,7 @@ object CMainForm: TCMainForm
         Left = 1
         Top = 22
         Width = 193
-        Height = 474
+        Height = 472
         Align = alClient
         BevelEdges = []
         BevelInner = bvNone

@@ -96,7 +96,7 @@ PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
 Packages=vcl;rtl;vclx;indy;inet;xmlrtl;vclie;inetdbbde;inetdbxpress;dbrtl;dsnap;dsnapcon;vcldb;soaprtl;VclSmp;dbexpress;dbxcds;inetdb;bdertl;vcldbx;webdsnap;websnap;adortl;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;IntrawebDB_50_70;Intraweb_50_70;Rave50CLX;Rave50VCL;dclOfficeXP;NowaPoczta;KSIUP;Ksiup3
-Conditionals=RELEASE
+Conditionals=DEBUG
 DebugSourceDirs=C:\Sources\cmanager\head\sources\others\PngComponents\Source\
 UsePackages=0
 [Parameters]
@@ -115,7 +115,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=12
 Release=1
-Build=15
+Build=17
 Debug=0
 PreRelease=0
 Special=0
@@ -126,7 +126,7 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.12.1.15
+FileVersion=1.12.1.17
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
@@ -141,24 +141,24 @@ Item1=D:\Sources\SOURCEFORGE\cmanager\sources\others\vtv\Source\;D:\Sources\SOUR
 Item2=D:\CVS\SOURCEFORGE\cmanager\sources\others\vtv\Source\
 [HistoryLists\hlConditionals]
 Count=2
-Item0=RELEASE
-Item1=DEBUG
+Item0=DEBUG
+Item1=RELEASE
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=6
-Item0=..\others\PngComponents\Source;..\others\Vtv\Source
-Item1=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item0=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh;..\others\FastMM
+Item1=..\others\PngComponents\Source;..\others\Vtv\Source
 Item2=..\..\..\others\PngComponents\Source;..\..\..\others\PngComponents\Source\Obj
 Item3=..\..\..\others\PngComponents\Source
 Item4=..\others\PngComponents\Source;..\others\Vtv\Source;..\others\Hh
 Item5=..\..\others\PngComponents\Source
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
-Item0=..\..\..\..\Trash
-Item1=..\..\Trash
+Item0=..\..\Trash
+Item1=..\..\..\..\Trash
 [HistoryLists\hlOutputDirectorry]
 Count=2
-Item0=..\..\..\..\Bin\Wtyczki
-Item1=..\..\Bin
+Item0=..\..\Bin
+Item1=..\..\..\..\Bin\Wtyczki

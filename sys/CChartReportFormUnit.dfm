@@ -29,6 +29,7 @@ inherited CChartReportForm: TCChartReportForm
         BevelOuter = bvNone
         Caption = 'PanelThumbs'
         TabOrder = 0
+        IsFlatButton = False
         object PanelShortcutsTitle: TCPanel
           Left = 0
           Top = 0
@@ -44,6 +45,7 @@ inherited CChartReportForm: TCChartReportForm
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          IsFlatButton = False
         end
         object Panel1: TCPanel
           Left = 0
@@ -53,6 +55,7 @@ inherited CChartReportForm: TCChartReportForm
           Align = alClient
           Caption = 'Panel1'
           TabOrder = 1
+          IsFlatButton = False
           object ThumbsList: TCList
             Left = 1
             Top = 1
@@ -70,6 +73,7 @@ inherited CChartReportForm: TCChartReportForm
             Colors.UnfocusedSelectionBorderColor = clHighlight
             DefaultNodeHeight = 60
             Header.AutoSizeIndex = -1
+            Header.DefaultHeight = 17
             Header.Font.Charset = DEFAULT_CHARSET
             Header.Font.Color = clWindowText
             Header.Font.Height = -11
@@ -114,6 +118,7 @@ inherited CChartReportForm: TCChartReportForm
         Height = 556
         Align = alClient
         TabOrder = 1
+        IsFlatButton = False
         object PanelChart: TCPanel
           Left = 1
           Top = 1
@@ -123,6 +128,7 @@ inherited CChartReportForm: TCChartReportForm
           BevelOuter = bvNone
           Caption = 'PanelChart'
           TabOrder = 0
+          IsFlatButton = False
           object PanelNoData: TCPanel
             Left = 0
             Top = 0
@@ -139,6 +145,7 @@ inherited CChartReportForm: TCChartReportForm
             Font.Style = []
             ParentFont = False
             TabOrder = 0
+            IsFlatButton = False
           end
         end
       end

@@ -158,6 +158,8 @@ type
   protected
     procedure WndProc(var Message: TMessage); override;
     function GetFrameClassForAction(AAction: TAction): TCBaseFrameClass;
+    procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
+    procedure CreateParams(var Params: TCreateParams); override;
   public
     procedure ActionShortcutExecute(ASender: TObject);
     procedure ActionDictionaryExecute(ASender: TObject);
@@ -428,9 +430,9 @@ begin
   PanelMain.Visible := GDataProvider.IsConnected;
   if PanelMain.Visible then begin
     Caption := 'CManager - obs³uga finansów (na dzieñ ' + Date2StrDate(GWorkDate) + ')';
-    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych: ' +
+    StatusBar.Panels.Items[0].Text := ' Otwarty plik danych ' +
                                       MinimizeName(AnsiLowerCase(ExpandFileName(GDataProvider.Filename)),
-                                                   StatusBar.Canvas, 300);
+                                                   StatusBar.Canvas, 250);
   end else begin
     Caption := 'CManager - obs³uga finansów';
     StatusBar.Panels.Items[0].Text := ' (brak otwartego pliku danych)';
@@ -1093,6 +1095,30 @@ end;
 procedure TCMainForm.ShortcutListFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 begin
   ShortcutListClick(Nil);
+end;
+
+procedure TCMainForm.WMSysCommand(var Message: TWMSysCommand);
+begin
+case (Message.CmdType and $FFF0) of
+    SC_MINIMIZE:
+    begin
+      ShowWindow(Handle, SW_MINIMIZE);
+      Message.Result := 0;
+    end;
+    SC_RESTORE:
+    begin
+      ShowWindow(Handle, SW_RESTORE);
+      Message.Result := 0;
+    end;
+  else
+    inherited;  
+  end;
+end;
+
+procedure TCMainForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  Params.ExStyle := Params.ExStyle and not WS_EX_TOOLWINDOW or WS_EX_APPWINDOW;
 end;
 
 end.

@@ -1,8 +1,8 @@
 object CBaseFrame: TCBaseFrame
   Left = 0
   Top = 0
-  Width = 443
-  Height = 277
+  Width = 435
+  Height = 268
   Align = alClient
   AutoSize = True
   Color = clWindow

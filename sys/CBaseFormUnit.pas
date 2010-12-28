@@ -18,6 +18,7 @@ type
     procedure DoAfterLoadPosition; virtual;
   public
     function ExpandTemplate(ATemplate: String): String; virtual;
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
@@ -83,6 +84,12 @@ end;
 
 procedure TCBaseForm.DoAfterLoadPosition;
 begin
+end;
+
+constructor TCBaseForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  
 end;
 
 end.
