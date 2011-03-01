@@ -2,11 +2,17 @@ inherited CProductsFrame: TCProductsFrame
   inherited List: TCDataList
     CheckImageKind = ckSystemDefault
     Header.MainColumn = 0
+    Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
     Columns = <
       item
         Position = 0
         Width = 435
         WideText = 'Nazwa'
+      end
+      item
+        Position = 1
+        Width = 100
+        WideText = 'Jednostka miary'
       end>
     WideDefaultText = ''
   end

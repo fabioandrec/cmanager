@@ -516,6 +516,8 @@ create table depositInvestment (
   dueStartDate datetime not null,
   dueEndDate datetime not null,
   dueAction varchar(1) not null,
+  calcTax bit not null,
+  taxRate money not null,
   primary key (idDepositInvestment),
   constraint fk_cashPointdepositInvestment foreign key (idCashPoint) references cashPoint (idCashPoint),
   constraint fk_currencyDefdepositInvestment foreign key (idCurrencyDef) references currencyDef (idCurrencyDef),

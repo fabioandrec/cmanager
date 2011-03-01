@@ -192,8 +192,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = 'Prowadz'#261'cy lokat'#281
       end
       object Label10: TLabel
-        Left = 86
-        Top = 63
+        Left = 366
+        Top = 27
         Width = 34
         Height = 13
         Alignment = taRightJustify
@@ -208,16 +208,16 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = 'Oprocentowanie'
       end
       object Label6: TLabel
-        Left = 29
-        Top = 136
-        Width = 91
+        Left = 340
+        Top = 100
+        Width = 60
         Height = 13
         Alignment = taRightJustify
-        Caption = 'Czas trwania lokaty'
+        Caption = 'Czas trwania'
       end
       object Label7: TLabel
-        Left = 324
-        Top = 136
+        Left = 44
+        Top = 208
         Width = 76
         Height = 13
         Alignment = taRightJustify
@@ -232,8 +232,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = 'Naliczaj odsetki'
       end
       object Label9: TLabel
-        Left = 107
-        Top = 208
+        Left = 387
+        Top = 172
         Width = 13
         Height = 13
         Alignment = taRightJustify
@@ -248,7 +248,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Caption = 'Po naliczeniu'
       end
       object Label15: TLabel
-        Left = 335
+        Left = 55
         Top = 64
         Width = 65
         Height = 13
@@ -305,7 +305,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object Label16: TLabel
         Left = 332
-        Top = 100
+        Top = 64
         Width = 68
         Height = 13
         Alignment = taRightJustify
@@ -314,7 +314,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       object CStaticCashpoint: TCStatic
         Left = 128
         Top = 24
-        Width = 441
+        Width = 169
         Height = 21
         Cursor = crHandPoint
         Hint = '<wybierz kontrahenta z listy>'
@@ -334,8 +334,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         HotTrack = True
       end
       object CStaticCurrency: TCStatic
-        Left = 128
-        Top = 60
+        Left = 408
+        Top = 24
         Width = 161
         Height = 21
         Cursor = crHandPoint
@@ -358,10 +358,10 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       object CCurrEditRate: TCCurrEdit
         Left = 128
         Top = 96
-        Width = 161
+        Width = 169
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 3
+        TabOrder = 4
         OnChange = CCurrEditRateChange
         Decimals = 4
         ThousandSep = True
@@ -370,8 +370,8 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         WithCalculator = True
       end
       object CIntEditPeriodCount: TCIntEdit
-        Left = 128
-        Top = 132
+        Left = 408
+        Top = 96
         Width = 57
         Height = 21
         BevelKind = bkTile
@@ -382,9 +382,9 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         OnChange = CIntEditPeriodCountChange
       end
       object ComboBoxPeriodType: TComboBox
-        Left = 200
-        Top = 132
-        Width = 105
+        Left = 480
+        Top = 96
+        Width = 89
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
@@ -401,16 +401,16 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
           'lat')
       end
       object ComboBoxPeriodAction: TComboBox
-        Left = 408
-        Top = 132
-        Width = 161
+        Left = 128
+        Top = 204
+        Width = 169
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 7
+        TabOrder = 12
         Text = 'zmie'#324' status na nieaktywna'
         Items.Strings = (
           'zmie'#324' status na nieaktywna'
@@ -419,35 +419,35 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       object ComboBoxDueMode: TComboBox
         Left = 128
         Top = 168
-        Width = 441
+        Width = 169
         Height = 21
         BevelInner = bvNone
         BevelKind = bkTile
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 8
-        Text = 'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
+        TabOrder = 9
+        Text = 'jednorazowo, po zako'#324'czeniu'
         OnChange = ComboBoxDueModeChange
         Items.Strings = (
-          'jednorazowo, po zako'#324'czeniu czasu trwania lokaty'
-          'wielokrotnie, co wskazany okres czasu')
+          'jednorazowo, po zako'#324'czeniu'
+          'wielokrotnie, co wskazany okres')
       end
       object CIntEditDueCount: TCIntEdit
-        Left = 128
-        Top = 204
+        Left = 408
+        Top = 168
         Width = 57
         Height = 21
         BevelKind = bkTile
         BorderStyle = bsNone
         MaxLength = 4
-        TabOrder = 9
+        TabOrder = 10
         Text = '1'
         OnChange = CIntEditDueCountChange
       end
       object ComboBoxDueType: TComboBox
-        Left = 200
-        Top = 204
+        Left = 472
+        Top = 168
         Width = 97
         Height = 21
         BevelInner = bvNone
@@ -455,7 +455,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 2
-        TabOrder = 10
+        TabOrder = 11
         Text = 'miesi'#281'cy'
         OnChange = ComboBoxDueTypeChange
         Items.Strings = (
@@ -474,16 +474,16 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Style = csDropDownList
         ItemHeight = 13
         ItemIndex = 0
-        TabOrder = 11
+        TabOrder = 13
         Text = 'dopisz odsetki do kapita'#322'u'
         Items.Strings = (
           'dopisz odsetki do kapita'#322'u'
           'pozostaw do wyp'#322'aty')
       end
       object CCurrEditActualCash: TCCurrEdit
-        Left = 408
+        Left = 128
         Top = 60
-        Width = 161
+        Width = 169
         Height = 21
         BorderStyle = bsNone
         TabOrder = 2
@@ -508,7 +508,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 12
+        TabOrder = 14
         TabStop = True
         Transparent = False
         TextOnEmpty = '<kliknij tu aby obejrze'#263' informacje o lokacie>'
@@ -529,7 +529,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 13
+        TabOrder = 15
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz konto z listy>'
@@ -551,7 +551,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 14
+        TabOrder = 16
         TabStop = True
         Transparent = False
         TextOnEmpty = '<brak konta>'
@@ -571,7 +571,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 15
+        TabOrder = 17
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz przelicznik kursu z listy>'
@@ -586,7 +586,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         Height = 21
         BorderStyle = bsNone
         Enabled = False
-        TabOrder = 16
+        TabOrder = 18
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
@@ -607,7 +607,7 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 17
+        TabOrder = 19
         TabStop = True
         Transparent = False
         TextOnEmpty = '<wybierz kategori'#281' z listy>'
@@ -617,15 +617,41 @@ inherited CDepositInvestmentForm: TCDepositInvestmentForm
       end
       object CCurrEditNoncapitalized: TCCurrEdit
         Left = 408
-        Top = 96
+        Top = 60
         Width = 161
         Height = 21
         BorderStyle = bsNone
-        TabOrder = 4
+        TabOrder = 3
         OnChange = CCurrEditActualCashChange
         Decimals = 2
         ThousandSep = True
         CurrencyStr = 'z'#322
+        BevelKind = bkTile
+        WithCalculator = True
+      end
+      object CheckBoxBelka: TCheckBox
+        Left = 128
+        Top = 134
+        Width = 273
+        Height = 17
+        Caption = 'Naliczaj podatek od zysk'#243'w kapita'#322'owych wysoko'#347'ci'
+        Checked = True
+        State = cbChecked
+        TabOrder = 7
+        OnClick = CheckBoxBelkaClick
+      end
+      object CCurrEditTaxRate: TCCurrEdit
+        Left = 408
+        Top = 132
+        Width = 161
+        Height = 21
+        BorderStyle = bsNone
+        TabOrder = 8
+        OnChange = CCurrEditTaxRateChange
+        Decimals = 4
+        Value = 19.000000000000000000
+        ThousandSep = True
+        CurrencyStr = '%'
         BevelKind = bkTile
         WithCalculator = True
       end

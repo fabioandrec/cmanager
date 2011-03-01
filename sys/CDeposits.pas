@@ -12,6 +12,7 @@ type
     Foperation: String;
     Fcash: Currency;
     Finterest: Currency;
+    Ftax: Currency;
     FnoncapitalizedInterest: Currency;
     FdueStart: TDateTime;
     FdueEnd: TDateTime;
@@ -36,6 +37,7 @@ type
     property movementType: TBaseEnumeration read FmovementType write FmovementType;
     property regOrder: Integer read FregOrder write FregOrder;
     property depositState: TBaseEnumeration read FdepositState write FdepositState;
+    property tax: Currency read Ftax write Ftax;
   end;
 
   TDeposit = class(TObjectList)
@@ -58,6 +60,8 @@ type
     FdueEndDate: TDateTime;
     FprogEndDate: TDateTime;
     FdepositState: TBaseEnumeration;
+    FcalcTax: Boolean;
+    FtaxRate: Currency;
     function GetItems(AIndex: Integer): TDepositProgItem;
     procedure SetItems(AIndex: Integer; const Value: TDepositProgItem);
     function GetrateOfReturn: Currency;
@@ -89,6 +93,8 @@ type
     property initialPeriodEndDate: TDateTime read FinitialPeriodEndDate;
     property periodTypeAsString: String read GetPeriodTypeAsString;
     property dueTypeAsString: String read GetdueTypeAsString;
+    property calcTax: Boolean read FcalcTax write FcalcTax;
+    property taxRate: Currency read FtaxRate write FtaxRate;
   end;
 
 procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
@@ -195,7 +201,7 @@ var xRateDivider, xDaysBetween: Integer;
     xRatePeriodCount: Integer;
     xCurDate: TDateTime;
     xItem: TDepositProgItem;
-    xCalcInterest: Currency;
+    xCalcInterest, xTaxBase: Currency;
 begin
   Clear;
   FinitialCash := Fcash;
@@ -237,6 +243,21 @@ begin
           xItem.operation := 'Naliczenie odsetek';
         end;
         xCalcInterest := RoundCurrency((xRatePeriodCount * Fcash * FinterestRate) / (100 * xRateDivider));
+        if calcTax then begin
+          if Frac(xCalcInterest) >= 0.5 then begin
+            xTaxBase := Int(xCalcInterest) + 1;
+          end else begin
+            xTaxBase := Int(xCalcInterest);
+          end;
+          xTaxBase := RoundCurrency((xTaxBase * FtaxRate) / 100);
+          if Frac(xTaxBase) >= 0.5 then begin
+            xTaxBase := Int(xTaxBase) + 1;
+          end else begin
+            xTaxBase := Int(xTaxBase);
+          end;
+          xCalcInterest := xCalcInterest - xTaxBase;
+          xItem.tax := xTaxBase;
+        end;
         if FdueType <> CDepositDueTypeOnDepositEnd then begin
           FdueStartDate := IncDay(FdueEndDate, 1);
           FdueEndDate := TDepositInvestment.EndDueDatetime(FdueStartDate, FdueCount, FdueType);
@@ -345,6 +366,8 @@ begin
   FdueEndDate := FperiodEndDate;
   FprogEndDate := FperiodEndDate;
   FdepositState := CDepositInvestmentActive;
+  FcalcTax := False;
+  FtaxRate := 0;
 end;
 
 function TDeposit.GetdueTypeAsString: String;

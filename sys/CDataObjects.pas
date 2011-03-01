@@ -1025,6 +1025,8 @@ type
     FdueStartDate: TDateTime;
     FdueEndDate: TDateTime;
     FdueAction: TBaseEnumeration;
+    FcalcTax: Boolean;
+    FtaxRate: Currency;
     procedure Setcash(const Value: Currency);
     procedure SetdepositState(const Value: TBaseEnumeration);
     procedure Setdescription(const Value: TBaseDescription);
@@ -1043,6 +1045,8 @@ type
     procedure SetperiodStartDate(const Value: TDateTime);
     procedure SetperiodEndDate(const Value: TDateTime);
     procedure SetperiodType(const Value: TBaseEnumeration);
+    procedure SetcalcTax(const Value: Boolean);
+    procedure SettaxRate(const Value: Currency);
   protected
     function OnDeleteObject(AProxy: TDataProxy): Boolean; override;
   public
@@ -1077,6 +1081,8 @@ type
     property dueStartDate: TDateTime read FdueStartDate write SetdueStartDate;
     property dueEndDate: TDateTime read FdueEndDate write SetdueEndDate;
     property dueAction: TBaseEnumeration read FdueAction write SetdueAction;
+    property calcTax: Boolean read FcalcTax write SetcalcTax;
+    property taxRate: Currency read FtaxRate write SettaxRate;
   end;
 
   TDepositMovement = class(TDataObject)
@@ -1521,7 +1527,11 @@ end;
 
 function TProduct.GetColumnText(AColumnIndex: Integer; AStatic: Boolean; AViewTextSelector: String): String;
 begin
-  Result := Fname;
+  if AColumnIndex = 1 then begin
+    Result := GUnitdefCache.GetSymbol(idUnitDef);
+  end else begin
+    Result := Fname;
+  end;
 end;
 
 function TProduct.GetElementHint(AColumnIndex: Integer): String;
@@ -5067,6 +5077,8 @@ begin
     FdueStartDate := FieldByName('dueStartDate').AsDateTime;
     FdueEndDate := FieldByName('dueEndDate').AsDateTime;
     FdueAction := FieldByName('dueAction').AsString;
+    FcalcTax := FieldByName('calcTax').AsBoolean;
+    FtaxRate := FieldByName('taxRate').AsCurrency;
   end;
 end;
 
@@ -5315,6 +5327,8 @@ begin
     AddField('dueStartDate', DatetimeToDatabase(FdueStartDate, False), False, 'depositInvestment');
     AddField('dueEndDate', DatetimeToDatabase(FdueEndDate, False), False, 'depositInvestment');
     AddField('dueAction', FdueAction, True, 'depositInvestment');
+    AddField('calcTax', IntToStr(Integer(FcalcTax)), False, 'depositInvestment');
+    AddField('taxRate', CurrencyToDatabase(FtaxRate), False, 'depositInvestment');
   end;
 end;
 
@@ -5611,6 +5625,22 @@ procedure TAccount.SetAccountState(const Value: TBaseEnumeration);
 begin
   if FaccountState <> Value then begin
     FaccountState := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SetcalcTax(const Value: Boolean);
+begin
+  if FcalcTax <> Value then begin
+    FcalcTax := Value;
+    SetState(msModified);
+  end;
+end;
+
+procedure TDepositInvestment.SettaxRate(const Value: Currency);
+begin
+  if FtaxRate <> Value then begin
+    FtaxRate := Value;
     SetState(msModified);
   end;
 end;

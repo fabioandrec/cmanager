@@ -62,6 +62,8 @@ type
     ComboBoxDepositState: TComboBox;
     Label16: TLabel;
     CCurrEditNoncapitalized: TCCurrEdit;
+    CheckBoxBelka: TCheckBox;
+    CCurrEditTaxRate: TCCurrEdit;
     procedure CDateTimeChanged(Sender: TObject);
     procedure ComboBoxPeriodTypeChange(Sender: TObject);
     procedure CIntEditPeriodCountChange(Sender: TObject);
@@ -86,6 +88,8 @@ type
     procedure CStaticCurrencyRateChanged(Sender: TObject);
     procedure CCurrEditRateChange(Sender: TObject);
     procedure CStaticFutureGetDataId(var ADataGid, AText: String; var AAccepted: Boolean);
+    procedure CheckBoxBelkaClick(Sender: TObject);
+    procedure CCurrEditTaxRateChange(Sender: TObject);
   private
     FDeposit: TDeposit;
     FPeriodEndDate: TDateTime;
@@ -183,6 +187,8 @@ begin
       periodEndDate := FPeriodEndDate;
       dueType := formDueType;
       noncapitalizedInterest := CCurrEditNoncapitalized.Value;
+      taxRate := CCurrEditTaxRate.Value;
+      calcTax := CheckBoxBelka.Checked;
       if ComboBoxDueAction.ItemIndex = 0 then begin
         dueAction := CDepositDueActionAutoCapitalisation;
       end else begin
@@ -628,6 +634,8 @@ begin
       dueStartDate := CDateTime.Value;
       dueEndDate := FDueEndDate;
       progEndDate := FPeriodEndDate;
+      calcTax := CheckBoxBelka.Checked;
+      taxRate := CCurrEditTaxRate.Value;
       if ComboBoxPeriodAction.ItemIndex = 1 then begin
         periodAction := CDepositPeriodActionAutoRenew;
       end else begin
@@ -872,6 +880,9 @@ begin
     CDateTime.Value := periodStartDate;
     CIntEditPeriodCount.Value := periodCount;
     CIntEditDueCount.Value := dueCount;
+    CheckBoxBelka.Checked := calcTax;
+    CCurrEditTaxRate.Value := taxRate;
+    CCurrEditTaxRate.Enabled := CheckBoxBelka.Checked;
     formPeriodType := periodType;
     formDueType := dueType;
     if dueAction = CDepositDueActionAutoCapitalisation then begin
@@ -897,6 +908,17 @@ begin
       Result := False;
     end;
   end;
+end;
+
+procedure TCDepositInvestmentForm.CheckBoxBelkaClick(Sender: TObject);
+begin
+  CCurrEditTaxRate.Enabled := CheckBoxBelka.Checked;
+  UpdateFuture;
+end;
+
+procedure TCDepositInvestmentForm.CCurrEditTaxRateChange(Sender: TObject);
+begin
+  UpdateFuture;
 end;
 
 end.

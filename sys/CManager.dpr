@@ -179,7 +179,6 @@ begin
   end;
   {$ENDIF}
   Application.Initialize;
-  SetWindowLong(Application.Handle, GWL_EXSTYLE, GetWindowLong(Application.Handle, GWL_EXSTYLE) and not WS_EX_APPWINDOW or WS_EX_TOOLWINDOW);
   Application.Icon.Handle := LoadIcon(HInstance, 'SMALLICON');
   DebugStartTickCount('CManager');
   GDbSqllogfile := GetParamValue('/savequery');

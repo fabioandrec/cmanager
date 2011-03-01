@@ -35,6 +35,7 @@ type
     procedure ReadValues; virtual;
     procedure DisableComponents; virtual;
     procedure ShowInfoPanel(AHeight: Integer; AText: String; AFontColor: TColor; AFontStyle: TFontStyles; AInfoIconType: TInfoIconType);
+    procedure CreateParams(var Params: TCreateParams); override;
   protected
     procedure BeginFilling; virtual;
     procedure EndFilling; virtual;
@@ -218,6 +219,11 @@ end;
 function TCConfigForm.ShouldFillForm: Boolean;
 begin
   Result := True;
+end;
+
+procedure TCConfigForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
 end;
 
 end.

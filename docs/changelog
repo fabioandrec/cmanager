@@ -26,6 +26,8 @@ Wersja 1.12.1
 [+] do konfiguracji wtyczki metastock dodano mo¿liwoœæ importu linii z pliku, które spe³niaj¹ zadane wyra¿enie regularne
 [*] zmieniono domyslne konfiguracje wtyczki metastock
 [*] drobne poprawki do interfejsu u¿ytkownika na Viscie i 7
+[+] na liœcie kategorii dodano kolumnê z jednostk¹ miary
+[+] wprowadzono mo¿liwoœæ naliczania podatku od zysków kapita³owych w kalkulatorze lokat i lokatach
 
 Wersja 1.11.1
 [i] wyjœcie kolejnej wersji beta (2009-07-17)

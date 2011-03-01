@@ -159,7 +159,6 @@ type
     procedure WndProc(var Message: TMessage); override;
     function GetFrameClassForAction(AAction: TAction): TCBaseFrameClass;
     procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
-    procedure CreateParams(var Params: TCreateParams); override;
   public
     procedure ActionShortcutExecute(ASender: TObject);
     procedure ActionDictionaryExecute(ASender: TObject);
@@ -1053,8 +1052,6 @@ begin
   ShowDepositCalculator(False, Nil);
 end;
 
-
-
 procedure TCMainForm.ActionGreenGrassExecute(Sender: TObject);
 begin
   ShellExecute(0, nil, CBlogUrl, nil, nil, SW_SHOWNORMAL);
@@ -1113,12 +1110,6 @@ case (Message.CmdType and $FFF0) of
   else
     inherited;  
   end;
-end;
-
-procedure TCMainForm.CreateParams(var Params: TCreateParams);
-begin
-  inherited;
-  Params.ExStyle := Params.ExStyle and not WS_EX_TOOLWINDOW or WS_EX_APPWINDOW;
 end;
 
 end.

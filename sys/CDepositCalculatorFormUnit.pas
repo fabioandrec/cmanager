@@ -49,6 +49,8 @@ type
     CCurrEditRor: TCCurrEdit;
     Label12: TLabel;
     CCurrEditReadyCash: TCCurrEdit;
+    CheckBoxBelka: TCheckBox;
+    CCurrEditTaxRate: TCCurrEdit;
     procedure RepaymentListGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     procedure FormCreate(Sender: TObject);
     procedure Action1Execute(Sender: TObject);
@@ -65,6 +67,8 @@ type
     procedure CDateTimeStartChanged(Sender: TObject);
     procedure CDateTimeProgChanged(Sender: TObject);
     procedure RepaymentListGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+    procedure CCurrEditTaxRateChange(Sender: TObject);
+    procedure CheckBoxBelkaClick(Sender: TObject);
   private
     Fdeposit: TDeposit;
     procedure UpdateDepositData;
@@ -134,6 +138,8 @@ begin
         dueEndDate := CDateTimeDueEnd.Value;
         progEndDate := CDateTimeProg.Value;
         dueCount := CIntEditDueCount.Value;
+        calcTax := CheckBoxBelka.Checked;
+        taxRate := CCurrEditTaxRate.Value;
         if ComboBoxDueAction.ItemIndex = 0 then begin
           dueAction := CDepositDueActionAutoCapitalisation;
         end else begin
@@ -192,11 +198,17 @@ begin
     end;
   end else if Column = 5 then begin
     if xObj.movementType = CDepositMovementDue then begin
-      CellText := CurrencyToString(xObj.cash + xObj.interest, '', False);
+      CellText := CurrencyToString(xObj.tax, '', False);
     end else begin
       CellText := '';
     end;
   end else if Column = 6 then begin
+    if xObj.movementType = CDepositMovementDue then begin
+      CellText := CurrencyToString(xObj.cash + xObj.interest, '', False);
+    end else begin
+      CellText := '';
+    end;
+  end else if Column = 7 then begin
     CellText := CurrencyToString(xObj.noncapitalizedInterest, '', False);
   end;
 end;
@@ -422,6 +434,17 @@ end;
 procedure TCDepositCalculatorForm.EndFilling;
 begin
   inherited EndFilling;
+  UpdateDepositData;
+end;
+
+procedure TCDepositCalculatorForm.CCurrEditTaxRateChange(Sender: TObject);
+begin
+  UpdateDepositData;
+end;
+
+procedure TCDepositCalculatorForm.CheckBoxBelkaClick(Sender: TObject);
+begin
+  CCurrEditTaxRate.Enabled := CheckBoxBelka.Checked;
   UpdateDepositData;
 end;
 
