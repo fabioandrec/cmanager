@@ -648,7 +648,9 @@ begin
       end;
     end;
     if FDeposit.CalculateProg then begin
-      xFuture := 'Data koñca ' + Date2StrDate(FPeriodEndDate, False) + ', do wyp³aty ' + CurrencyToString(FDeposit.cash + FDeposit.noncapitalizedInterest, CStaticCurrency.DataId);
+      xFuture := 'Data koñca ' + Date2StrDate(FPeriodEndDate, False) +
+        ', do wyp³aty ' + CurrencyToString(FDeposit.cash + FDeposit.noncapitalizedInterest, CStaticCurrency.DataId) +
+        ', podatek ' + CurrencyToString(FDeposit.overallTax, CStaticCurrency.DataId);
     end else begin
       xFuture := '<brak danych do utworzenia prognozy>';
     end;

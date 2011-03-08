@@ -14,6 +14,8 @@ program CManager;
 {%File 'CMandb_7_8.sql'}
 {%File 'CMandb_8_9.sql'}
 {%File 'CMandb_9_10.sql'}
+{%File 'CMandb_10_11.sql'}
+{%File 'CMandb_11_12.sql'}
 
 {$IFNDEF DEBUG}
 {$IFNDEF RELEASE}

@@ -62,6 +62,7 @@ type
     FdepositState: TBaseEnumeration;
     FcalcTax: Boolean;
     FtaxRate: Currency;
+    FoverallTax: Currency;
     function GetItems(AIndex: Integer): TDepositProgItem;
     procedure SetItems(AIndex: Integer; const Value: TDepositProgItem);
     function GetrateOfReturn: Currency;
@@ -95,6 +96,7 @@ type
     property dueTypeAsString: String read GetdueTypeAsString;
     property calcTax: Boolean read FcalcTax write FcalcTax;
     property taxRate: Currency read FtaxRate write FtaxRate;
+    property overallTax: Currency read FoverallTax;
   end;
 
 procedure UpdateDepositInvestments(ADataProvider: TDataProvider);
@@ -205,6 +207,7 @@ var xRateDivider, xDaysBetween: Integer;
 begin
   Clear;
   FinitialCash := Fcash;
+  FoverallTax := 0;
   FinitialPeriodStartDate := FperiodStartDate;
   FinitialPeriodEndDate := FperiodEndDate;
   FdepositState := CDepositInvestmentActive;
@@ -277,6 +280,7 @@ begin
           xItem.noncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
           FnoncapitalizedInterest := FnoncapitalizedInterest + xCalcInterest;
         end;
+        FoverallTax := FoverallTax + xItem.tax;
         Add(xItem);
       end;
       if xCurDate = FperiodEndDate then begin
@@ -308,6 +312,23 @@ begin
           xCalcInterest := RoundCurrency((xDaysBetween * Fcash * FinterestRate) / (100 * DaysInYear(FperiodStartDate)));
           xItem.cash := Fcash;
           xItem.interest := xCalcInterest;
+          xCalcInterest := RoundCurrency((xRatePeriodCount * Fcash * FinterestRate) / (100 * xRateDivider));
+          if calcTax then begin
+            if Frac(xCalcInterest) >= 0.5 then begin
+              xTaxBase := Int(xCalcInterest) + 1;
+            end else begin
+              xTaxBase := Int(xCalcInterest);
+            end;
+            xTaxBase := RoundCurrency((xTaxBase * FtaxRate) / 100);
+            if Frac(xTaxBase) >= 0.5 then begin
+              xTaxBase := Int(xTaxBase) + 1;
+            end else begin
+              xTaxBase := Int(xTaxBase);
+            end;
+            xCalcInterest := xCalcInterest - xTaxBase;
+            xItem.tax := xTaxBase;
+          end;
+          FoverallTax := FoverallTax + xItem.tax;
           if FdueAction = CDepositDueActionAutoCapitalisation then begin
             xItem.noncapitalizedInterest := 0;
             FnoncapitalizedInterest := 0;
@@ -368,6 +389,7 @@ begin
   FdepositState := CDepositInvestmentActive;
   FcalcTax := False;
   FtaxRate := 0;
+  FoverallTax := 0;
 end;
 
 function TDeposit.GetdueTypeAsString: String;
