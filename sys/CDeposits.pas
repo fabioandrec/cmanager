@@ -133,6 +133,8 @@ begin
   xDepositCalculator.progEndDate := AToDate;
   xDepositCalculator.periodAction := ADi.periodAction;
   xDepositCalculator.dueAction := ADi.dueAction;
+  xDepositCalculator.taxRate := ADi.taxRate;
+  xDepositCalculator.calcTax := ADi.calcTax;
   if xDepositCalculator.CalculateProg and (xDepositCalculator.Count > 0) then begin
     xMovements := GDataProvider.OpenSql(Format(
       'select movementType, regDateTime from depositMovement where idDepositInvestment = %s and regDateTime between %s and %s',
