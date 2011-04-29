@@ -1184,11 +1184,11 @@ begin
 end;
 
 procedure T001010002000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
-var xRadioList: IDispatch;
+var xRadioList: IHTMLElementCollection;
     xRadio: IHTMLOptionButtonElement;
 begin
   FdeleteUnused := False;
-  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('kill', EmptyParam);
+  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('kill', EmptyParam) as IHTMLElementCollection;
   if xRadioList <> Nil then begin
     if IHTMLElementCollection(xRadioList).length > 0 then begin
       xRadio := IHTMLElementCollection(xRadioList).item(0, EmptyParam) as IHTMLOptionButtonElement;
@@ -1211,11 +1211,11 @@ begin
 end;
 
 procedure T001012001000Answer.UpdateAnswer(AWebBrowser: IWebBrowser2);
-var xRadioList: IDispatch;
+var xRadioList: IHTMLElementCollection;
     xRadio: IHTMLOptionButtonElement;
 begin
   FsetDefault := True;
-  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('config', EmptyParam);
+  xRadioList := IHTMLDocument2(AWebBrowser.Document).all.item('config', EmptyParam) as IHTMLElementCollection;
   if xRadioList <> Nil then begin
     if IHTMLElementCollection(xRadioList).length > 0 then begin
       xRadio := IHTMLElementCollection(xRadioList).item(0, EmptyParam) as IHTMLOptionButtonElement;

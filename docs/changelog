@@ -7,7 +7,7 @@ CMANAGER - CHANGELOG
 [i] informacja
 
 Wersja 1.12.1
-[i] wyjœcie kolejnej wersji beta (2010-12-28)
+[i] wyjœcie kolejnej wersji beta (2011-04-29)
 [-] poprawki do wtyczek pobieraj¹cych kursy walut ze strony NBP (zwi¹zane równie¿ z ID2897356)
 [-] poprawki do wtyczek pobieraj¹cych kursy walut ze wskazanych plików
 [-] poprawki do wtyczki wczytuj¹cej wyci¹gi operacji z mBanku. Mo¿na wczytaæ równie¿ wyci¹gi wygenerowane ze strony mBanku
