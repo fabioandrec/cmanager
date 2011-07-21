@@ -179,10 +179,10 @@ function TCDepositInvestmentFrame.CanAcceptSelectedObject: Boolean;
 begin
   Result := inherited CanAcceptSelectedObject;
   if Result and (AdditionalData <> Nil) then begin
-    if TCDepositFrameAdditionalData(AdditionalData).OnlyActive then begin
-      Result := TDepositInvestment(List.SelectedElement.Data).depositState = CDepositInvestmentActive;
+    if TCDepositFrameAdditionalData(AdditionalData).OnlyNonclosed then begin
+      Result := TDepositInvestment(List.SelectedElement.Data).depositState <> CDepositInvestmentClosed;
       if not Result then begin
-        ShowInfo(itWarning, 'Wybrana lokata nie jest aktywna. Operacje mo¿na dodawaæ tylko dla aktywnych lokat', '');
+        ShowInfo(itWarning, 'Wybrana lokata jest zamkniêta. Operacje mo¿na dodawaæ tylko dla niezamkniêtych lokat', '');
       end;
     end;
   end;

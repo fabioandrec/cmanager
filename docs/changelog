@@ -6,6 +6,9 @@ CMANAGER - CHANGELOG
 [-] poprawka b³êdu
 [i] informacja
 
+Wersja 1.12.2
+[-] rozwi¹zano problem braku mo¿liwoœci likwidacji nieaktywnej lokaty (ID3369849)
+
 Wersja 1.12.1
 [i] wyjœcie kolejnej wersji beta (2011-04-29)
 [-] poprawki do wtyczek pobieraj¹cych kursy walut ze strony NBP (zwi¹zane równie¿ z ID2897356)

@@ -114,8 +114,8 @@ IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=1
 MinorVer=12
-Release=1
-Build=22
+Release=2
+Build=2
 Debug=0
 PreRelease=0
 Special=0
@@ -126,13 +126,13 @@ CodePage=1250
 [Version Info Keys]
 CompanyName=
 FileDescription=CManager - system do obs³ugi finansów osobistych
-FileVersion=1.12.1.22
+FileVersion=1.12.2.2
 InternalName=CManager
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=CManager
 ProductName=CManager
-ProductVersion=1.12.1
+ProductVersion=1.12.2
 Comments=
 [HistoryLists\hlDebugSourcePath]
 Count=3

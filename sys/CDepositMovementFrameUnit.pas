@@ -12,12 +12,12 @@ type
   TCDepositFrameAdditionalData = class(TCDataobjectFrameData)
   private
     FDepositId: TDataGid;
-    FOnlyActive: Boolean;
+    FOnlyNonclosed: Boolean;
   public
-    constructor Create(ADepositId: TDataGid; AOnlyActive: Boolean);
+    constructor Create(ADepositId: TDataGid; AOnlyNonclosed: Boolean);
   published
     property DepositId: TDataGid read FDepositId;
-    property OnlyActive: Boolean read FOnlyActive;
+    property OnlyNonclosed: Boolean read FOnlyNonclosed;
   end;
 
   TCDepositMovementFrame = class(TCDataobjectFrame)
@@ -305,11 +305,11 @@ begin
   inherited AfterDeleteObject(ADataobject);
 end;
 
-constructor TCDepositFrameAdditionalData.Create(ADepositId: TDataGid; AOnlyActive: Boolean);
+constructor TCDepositFrameAdditionalData.Create(ADepositId: TDataGid; AOnlyNonclosed: Boolean);
 begin
   inherited CreateNew;
   FDepositId := ADepositId;
-  FOnlyActive := AOnlyActive;
+  FOnlyNonclosed := AOnlyNonclosed;
 end;
 
 procedure TCDepositMovementFrame.DoAddingNewDataobject(ADataobject: TDataObject);
