@@ -828,6 +828,9 @@ end;
 procedure TCDepositInvestmentForm.EndFilling;
 begin
   inherited EndFilling;
+  UpdateEndPeriodDatetime;
+  UpdateEndCapitalisationDatetime;
+  UpdateDescription;
   UpdateFuture;
 end;
 
@@ -899,6 +902,7 @@ begin
     end;
     ComboBoxTemplate.ItemIndex := IfThen(Operation = coEdit, 0, 1);
   end;
+  update
 end;
 
 function TCDepositInvestmentForm.CanModifyValues: Boolean;
